@@ -1,0 +1,194 @@
+import { Button } from "components/atoms";
+import { CaretDownOutlined } from "@ant-design/icons";
+import { FormattedIndexPool } from "features";
+import { InputNumber, List, Space } from "antd";
+import { SelectableToken } from "components/molecules";
+import { useDrawer } from "./providers";
+import React, { useCallback, useRef, useState } from "react";
+import styled from "styled-components";
+
+export type TokenSelectorValue = {
+  amount?: number;
+  token?: string;
+};
+
+export interface Props {
+  label?: string;
+  pool: FormattedIndexPool;
+  value?: TokenSelectorValue;
+  balance?: string;
+  onChange?: (value: TokenSelectorValue) => void;
+}
+
+export default function TokenSelector({
+  label = "",
+  pool,
+  balance,
+  value = {},
+  onChange,
+}: Props) {
+  const [amount, setAmount] = useState(0);
+  const [token, setToken] = useState("");
+  const input = useRef<null | HTMLInputElement>(null);
+  const { openDrawer, closeDrawer } = useDrawer({
+    name: "Select a token",
+    title: "Select a token",
+    mask: true,
+    width: 420,
+    actions: [
+      {
+        type: "default",
+        label: "Close",
+        onClick: () => closeDrawer(),
+      },
+    ],
+    closable: true,
+  });
+
+  const triggerChange = (changedValue: TokenSelectorValue) => {
+    if (onChange) {
+      onChange({
+        amount,
+        token,
+        ...value,
+        ...changedValue,
+      });
+    }
+  };
+
+  const onAmountChange = (newAmount?: number | string | null) => {
+    if (newAmount == null || Number.isNaN(amount) || amount < 0) {
+      return;
+    }
+
+    const amountToUse =
+      typeof newAmount === "string" ? parseFloat(newAmount) : newAmount;
+
+    if (!value.hasOwnProperty("amount")) {
+      setAmount(amountToUse);
+    }
+
+    triggerChange({ amount: amountToUse });
+  };
+
+  const onTokenChange = (newToken: string) => {
+    if (!value.hasOwnProperty("token")) {
+      setToken(newToken);
+    }
+
+    triggerChange({ token: newToken });
+    closeDrawer();
+  };
+
+  const handleWrapperClick = useCallback(() => {
+    if (input.current) {
+      input.current.focus();
+    }
+  }, []);
+
+  return (
+    <S.Wrapper onClick={handleWrapperClick}>
+      <S.Space direction="horizontal">
+        <S.Label>{label}</S.Label>
+        <S.Balance>
+          {value.token ? <>Balance: {balance ?? 0}</> : "-"}
+        </S.Balance>
+      </S.Space>
+      <S.Space direction="horizontal">
+        <S.InputNumber
+          ref={input}
+          min={0}
+          step="0.01"
+          value={value.amount ?? amount}
+          onChange={onAmountChange}
+        />
+        <S.InnerSpace>
+          {value.token && (
+            <Button type="dashed" disabled={!balance}>
+              Max
+            </Button>
+          )}
+          <S.Button
+            type={value.token ? "text" : "primary"}
+            onClick={() =>
+              openDrawer(
+                <S.List size="small" bordered={true}>
+                  {pool.assets.map((asset) => (
+                    <SelectableToken
+                      key={asset.name}
+                      asset={asset}
+                      onClick={(selectedAsset) => {
+                        onTokenChange(selectedAsset.symbol);
+                        closeDrawer();
+                      }}
+                    />
+                  ))}
+                </S.List>
+              )
+            }
+          >
+            {value.token ? (
+              <>
+                <S.Image
+                  alt={value.token}
+                  src={`/images/${value.token.toLowerCase()}.png`}
+                />
+                {value.token}
+              </>
+            ) : (
+              "Select a token"
+            )}
+            <CaretDownOutlined />
+          </S.Button>
+        </S.InnerSpace>
+      </S.Space>
+    </S.Wrapper>
+  );
+}
+
+const S = {
+  Wrapper: styled.div`
+    display: flex;
+    flex-direction: column;
+    border: 1px solid ${(props) => props.theme.colors.black100};
+    padding: ${(props) => props.theme.spacing.small};
+  `,
+  InputNumber: styled(InputNumber)`
+    border: none;
+    font-size: 24px;
+    font-weight: 500;
+  `,
+  Space: styled(Space)`
+    justify-content: space-between;
+
+    :first-of-type {
+      margin-bottom: ${(props) => props.theme.spacing.medium};
+    }
+  `,
+  Button: styled(Button)`
+    text-align: right;
+    ${(props) => props.theme.snippets.perfectlyCentered};
+  `,
+  Label: styled.div`
+    padding-left: 0.7rem;
+  `,
+  Balance: styled.div`
+    padding-right: 1rem;
+    text-align: right;
+  `,
+  InnerSpace: styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+  `,
+  List: styled(List)`
+    .ant-list-item-meta {
+      align-items: center;
+    }
+  `,
+  Image: styled.img`
+    ${(props) => props.theme.snippets.circular};
+    ${(props) => props.theme.snippets.size32};
+    margin-right: ${(props) => props.theme.spacing.small};
+  `,
+};
