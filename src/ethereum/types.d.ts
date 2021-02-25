@@ -64,8 +64,8 @@ export type NormalizedInitialData = {
 
 export type PoolTokenUpdate = {
   address: string;
-  weight?: string;
   balance: string;
+  weight?: string;
   usedBalance: string;
   usedWeight: string;
   usedDenorm: string;
