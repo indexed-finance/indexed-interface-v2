@@ -1,11 +1,13 @@
 import { AiOutlineClockCircle, AiOutlineSwap } from "react-icons/ai";
 import { Button } from "components";
-import { Card, Skeleton, Space, Tabs, Tag } from "antd";
+import { Card, Grid, Skeleton, Space, Tabs, Tag } from "antd";
 import { ImArrowRight2 } from "react-icons/im";
 import React, { ReactNode, useState } from "react";
 import Subscreen from "./Subscreen";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import type { FormattedIndexPool, Swap, Trade } from "features";
+
+const { useBreakpoint } = Grid;
 
 function BaseCard({
   when,
@@ -15,9 +17,12 @@ function BaseCard({
   title = null,
   extra = null,
 }: Swap & { title?: ReactNode; extra?: ReactNode }) {
+  const breakpoints = useBreakpoint();
+
   return (
     <S.Card
       size="small"
+      vertical={!breakpoints.sm}
       title={title}
       extra={
         <S.Time>
@@ -63,6 +68,7 @@ function SwapCard(props: Swap) {
 }
 
 export default function Recent({ pool }: { pool: FormattedIndexPool }) {
+  const breakpoints = useBreakpoint();
   const [mode, setMode] = useState("Trades");
   const tradesEmpty = pool.recent.trades.length === 0;
   const swapsEmpty = pool.recent.swaps.length === 0;
@@ -78,14 +84,14 @@ export default function Recent({ pool }: { pool: FormattedIndexPool }) {
         activeKey={mode}
         onChange={(next) => setMode(next)}
       >
-        <S.TabPane tab="Trades" key="Trades">
+        <S.TabPane tab="Trades" key="Trades" vertical={!breakpoints.sm}>
           {tradesEmpty
             ? placeholders
             : pool.recent.trades.map((trade, index) => (
                 <TradeCard key={index} {...trade} />
               ))}
         </S.TabPane>
-        <S.TabPane tab="Swaps" key="Swaps">
+        <S.TabPane tab="Swaps" key="Swaps" vertical={!breakpoints.sm}>
           {swapsEmpty
             ? placeholders
             : pool.recent.swaps.map((swap, index) => (
@@ -102,11 +108,24 @@ const S = {
     [role="tab"] {
       ${(props) => props.theme.snippets.fancy};
     }
+
+    [role="tablist"] {
+      margin-bottom: 0;
+    }
   `,
-  TabPane: styled(Tabs.TabPane)`
+  TabPane: styled(({ vertical, ...rest }) => <Tabs.TabPane {...rest} />)<{
+    vertical?: boolean;
+  }>`
     ${(props) => props.theme.snippets.perfectlyAligned};
-    margin: ${(props) => props.theme.spacing.medium};
+    padding: ${(props) => props.theme.spacing.medium};
     overflow: auto;
+
+    ${(props) =>
+      props.vertical &&
+      css`
+        flex-direction: column;
+        height: 400px;
+      `}
   `,
   Time: styled.div`
     ${(props) => props.theme.snippets.perfectlyAligned};
@@ -119,13 +138,19 @@ const S = {
     font-size: 24px;
     padding: 12px;
   `,
-  Card: styled(Card)`
-    width: 275px;
-    margin-right: ${(props) => props.theme.spacing.small};
+  Card: styled(({ vertical, ...rest }) => <Card {...rest} />)<{
+    vertical?: boolean;
+  }>`
+    width: 100%;
 
-    :last-of-type {
-      margin-right: ${(props) => props.theme.spacing.huge};
-    }
+    ${(props) =>
+      props.vertical
+        ? css`
+            margin-bottom: ${(props) => props.theme.spacing.small};
+          `
+        : css`
+            margin-right: ${(props) => props.theme.spacing.small};
+          `}
   `,
   Arrow: styled(ImArrowRight2)`
     font-size: 24px;

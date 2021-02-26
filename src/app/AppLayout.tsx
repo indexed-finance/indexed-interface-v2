@@ -22,7 +22,7 @@ import routes from "./routes";
 import styled from "styled-components";
 
 const { useBreakpoint } = Grid;
-const { Sider, Content, Header } = Layout;
+const { Sider, Header, Content } = Layout;
 const { Option } = Select;
 
 export default function AppLayout() {
@@ -54,7 +54,7 @@ export default function AppLayout() {
           <>
             <S.Header>
               <MobileMenuIcon onClick={toggleMobileMenu} />
-              <Logo tagline={false} />
+              <Logo />
             </S.Header>
             {mobileMenuActive && (
               <S.MobileMenu>
@@ -63,7 +63,7 @@ export default function AppLayout() {
             )}
           </>
         )}
-        <S.Content padded={breakpoint.sm}>
+        <Content>
           <S.Top>
             <S.Breadcrumb>
               <Breadcrumb.Item>Home</Breadcrumb.Item>
@@ -121,7 +121,7 @@ export default function AppLayout() {
               </Button.Group>
             }
           ></PageFooter>
-        </S.Content>
+        </Content>
       </S.Layout>
     </>
   );
@@ -142,26 +142,27 @@ const S = {
   Rights: styled.div`
     margin-top: ${(props) => props.theme.spacing.small};
   `,
-  Content: styled(({ padded: _, ...rest }) => <Content {...rest} />)<{
-    padded?: boolean;
-  }>`
-    padding: ${(props) => props.padded && props.theme.spacing.large};
-  `,
   Page: styled.div<{ extraPadded?: boolean }>`
     padding: ${(props) =>
       props.extraPadded
         ? props.theme.spacing.large
         : props.theme.spacing.small};
     ${(props) => props.theme.snippets.dropshadow};
-    scroll-behavior: smooth;
     position: relative;
+    padding-top: 112px;
   `,
   Breadcrumb: styled(Breadcrumb)`
     flex: 1;
   `,
-  Top: styled.div`
+  Top: styled(Header)`
     ${(props) => props.theme.snippets.spacedBetween};
     margin-bottom: ${(props) => props.theme.spacing.large};
+    position: fixed;
+    top: 0;
+    height: 64px;
+    width: calc(100% - 299px);
+    left: 299px;
+    z-index: 2;
   `,
   Controls: styled.div`
     flex: 1;
@@ -215,11 +216,15 @@ const S = {
     z-index: 2;
   `,
   Sider: styled(Sider)`
+    height: 100vh;
+
     .ant-layout-sider-children {
       position: fixed;
       top: 0;
+      bottom: 0;
       left: 0;
       width: 299px;
+      background: #111;
     }
   `,
 };

@@ -6,6 +6,7 @@
 @grey200: #222222;
 
 @primary-color: darken(#ccccff, 20%);
+@secondary-color: darken(#d664be, 20%);
 @text-color: @white100;
 @text-color-secondary: @white100;
 @body-background: @grey200;
@@ -23,10 +24,9 @@
 @breadcrumb-last-item-color: lighten(@primary-color, 10%);
 @breadcrumb-separator-color: @white100;
 
-.slick-slider {
-  background: @grey200;
+.ant-layout-header {
+  border-bottom: 1px solid darken(@secondary-color, 20%);
 }
-
 .ant-layout-sider {
-  border-right: 1px solid @grey100;
+  border-right: 1px solid darken(@secondary-color, 20%);
 }
