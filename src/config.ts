@@ -14,7 +14,6 @@ export const LOCALSTORAGE_KEY = "indexed.finance | Persisted";
 export const WETH_CONTRACT_ADDRESS =
   "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2";
 export const SOCKET_PORT = 13337;
-
 export const PROVIDER_OPTIONS = {
   walletconnect: {
     package: WalletConnectProvider,

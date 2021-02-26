@@ -1,3 +1,4 @@
+export * from "./thunks";
 export { default as actions } from "./thunks";
 export { default as selectors } from "./selectors";
 export * from "./store";

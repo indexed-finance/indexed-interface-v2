@@ -4,6 +4,7 @@ import { createEntityAdapter, createSlice } from "@reduxjs/toolkit";
 import {
   poolTradesAndSwapsLoaded,
   poolUpdated,
+  poolUserDataLoaded,
   subgraphDataLoaded,
 } from "features/actions";
 import { tokensSelectors } from "features/models/tokens";
@@ -50,6 +51,14 @@ const slice = createSlice({
           poolInState.dataForTradesAndSwaps.trades = trades;
           poolInState.dataForTradesAndSwaps.swaps = swaps;
         }
+      })
+      .addCase(poolUserDataLoaded, (state, action) => {
+        const { poolId, userData } = action.payload;
+        const poolInState = state.entities[poolId];
+
+        if (poolInState) {
+          poolInState.dataForUser = userData;
+        }
       }),
 });
 
@@ -74,6 +83,14 @@ export const selectors = {
   selectSwapFee: (state: AppState, poolId: string) => {
     const pool = selectors.selectPool(state, poolId);
     return pool ? convert.toBigNumber(pool.swapFee) : null;
+  },
+  selectPoolInitializerAddress: (state: AppState, poolId: string) => {
+    const pool = selectors.selectPool(state, poolId);
+    return pool?.poolInitializer?.id ?? null;
+  },
+  selectPoolUserData: (state: AppState, poolId: string) => {
+    const pool = selectors.selectPool(state, poolId);
+    return pool?.dataForUser ?? null;
   },
 };
 

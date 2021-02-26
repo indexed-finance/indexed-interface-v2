@@ -8,14 +8,21 @@ import { helpers } from "ethereum";
 import { settingsActions } from "./settings";
 import selectors from "./selectors";
 
-let provider: null | ethers.providers.Web3Provider = null;
+export let provider: null | ethers.providers.Web3Provider = null;
+export let signer: null | ethers.providers.JsonRpcSigner = null;
 
 const thunks = {
   /**
    *
    */
   initialize: (): AppThunk => async (dispatch) => {
+    await window.ethereum.enable();
+
     provider = new ethers.providers.Web3Provider(window.ethereum);
+    signer = provider.getSigner();
+
+    (window as any).provider = provider;
+    (window as any).signer = signer;
 
     const { chainId } = await provider.getNetwork();
     const url = helpers.getUrl(chainId);
@@ -109,11 +116,59 @@ const thunks = {
   },
   /**
    *
+   * @param poolId -
+   */
+  requestPoolUserData: (poolId: string): AppThunk => async (
+    dispatch,
+    getState
+  ) => {
+    if (provider) {
+      const state = getState();
+      const {
+        provider: { selectedAddress: sourceAddress },
+      } = provider as any;
+      const destinationAddress = poolId;
+      const tokens = selectors.selectPoolUnderlyingTokens(state, poolId);
+
+      if (sourceAddress && destinationAddress) {
+        const userData = await helpers.tokenUserDataMulticall(
+          provider,
+          sourceAddress,
+          destinationAddress,
+          tokens
+        );
+
+        dispatch(
+          actions.poolUserDataLoaded({
+            poolId,
+            userData,
+          })
+        );
+      }
+    }
+
+    // async updateUserData(): Promise<void> {
+    //   if (!this.userAddress) return;
+    //   const tokens = this.tokens;
+    //   const tokenDatas = await getTokenUserData(this.provider, this.userAddress, this.initializer.address, tokens);
+    //   const abi = require('./abi/IPoolInitializer.json');
+    //   let pool = new Contract(this.initializer.address, abi, this.provider);
+    //   this.userCredit = bnum(await pool.getCreditOf(this.userAddress));
+    //   tokenDatas.forEach(({ allowance, balance }, i) => {
+    //     const address = tokens[i].address;
+    //     this.userAllowances[address] = allowance;
+    //     this.userBalances[address] = balance;
+    //   });
+    // }
+  },
+  /**
+   *
    */
   requestPoolDetail: (poolId: string): AppThunk => async (dispatch) => {
     dispatch(actions.retrieveCoingeckoData(poolId));
     dispatch(actions.requestPoolUpdate(poolId));
     dispatch(actions.requestPoolTradesAndSwaps(poolId));
+    dispatch(actions.requestPoolUserData(poolId));
   },
 };
 

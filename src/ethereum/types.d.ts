@@ -47,6 +47,13 @@ export interface NormalizedPool
   tokens: string[];
   dataFromUpdates: null | Omit<PoolUpdate, "tokens">;
   dataForTradesAndSwaps: null | { trades: Trade[]; swaps: Swap[] };
+  dataForUser: null | Record<
+    string,
+    {
+      allowance: string;
+      balance: string;
+    }
+  >;
 }
 
 export interface NormalizedCategory

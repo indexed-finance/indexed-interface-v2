@@ -2,6 +2,7 @@ import {
   BigNumber,
   formatBalance,
   toBN,
+  toHex,
   toTokenAmount,
 } from "@indexed-finance/indexed.js";
 import { DEFAULT_DECIMAL_COUNT } from "config";
@@ -27,6 +28,7 @@ const convert = {
       useGrouping: true,
       ...options,
     }),
+  toHex: (amount: string | BigNumber) => toHex(convert.toBigNumber(amount)),
   toPercent: (number: number, options: Intl.NumberFormatOptions = {}) =>
     templateConvert(number, {
       style: "percent",

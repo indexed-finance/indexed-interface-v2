@@ -15,6 +15,7 @@ import {
 } from "./bytecode.json";
 import { convert } from "helpers";
 import { dedupe } from "helpers";
+import IERC20 from "./abi/IERC20.json";
 import IPool from "./abi/IPool.json";
 import chunk from "lodash.chunk";
 import type {
@@ -26,8 +27,9 @@ import type {
 import type { Swap as Trade } from "uniswap-types";
 
 export const MINIMUM_TOKEN_WEIGHT = convert.toBigNumber("10").pow(18).div(4);
-export const TOKEN_DATA_STARTING_INDEX = 4;
-export const TOKEN_CALL_COUNT = 3;
+export const POOL_UPDATE_TOKEN_DATA_STARTING_INDEX = 4;
+export const POOL_UPDATE_TOKEN_CALL_COUNT = 3;
+export const TOKEN_USER_DATA_CALL_COUNT = 2;
 
 // #region Querying
 export function getUrl(chainId: number) {
@@ -173,6 +175,7 @@ export async function poolUpdateMulticall(
   _tokens: PoolUnderlyingToken[]
 ) {
   const _interface = new Interface(IPool);
+  const _tokenAddresses = _tokens.map(({ token: { id } }) => id);
   const _tokenCalls = _tokens.reduce((prev, next) => {
     prev.push(
       {
@@ -193,8 +196,7 @@ export async function poolUpdateMulticall(
     );
     return prev;
   }, [] as Call[]);
-  const _tokenAddresses = _tokens.map(({ token: { id } }) => id);
-  const _calls = [
+  const _poolCalls = [
     {
       target: _poolId,
       function: "getTotalDenormalizedWeight",
@@ -216,11 +218,47 @@ export async function poolUpdateMulticall(
   const result = await multicallViaInterface(
     _provider,
     _interface,
-    _calls,
+    _poolCalls,
     false
   );
 
   return formatPoolUpdate(result, _tokenAddresses);
+}
+
+export async function tokenUserDataMulticall(
+  _provider: Provider,
+  _sourceAddress: string,
+  _destinationAddress: string,
+  _tokens: PoolUnderlyingToken[]
+) {
+  const _abi = IERC20;
+  const _interface = new Interface(_abi);
+  const _tokenAddresses = _tokens.map(({ token: { id } }) => id);
+  const _tokenCalls = _tokens.reduce((prev, next) => {
+    prev.push(
+      {
+        target: next.token.id,
+        function: "allowance",
+        args: [_sourceAddress, _destinationAddress],
+      },
+      {
+        target: next.token.id,
+        function: "balanceOf",
+        args: [_sourceAddress],
+      }
+    );
+    return prev;
+  }, [] as Call[]);
+  const result = await multicallViaInterface(
+    _provider,
+    _interface,
+    _tokenCalls,
+    true
+  );
+
+  console.log("raw result was", result);
+
+  return formatTokenUserData(result, _tokenAddresses);
 }
 // #endregion
 
@@ -282,6 +320,7 @@ export function normalizeInitialData(categories: Category[]) {
           tokens: tokenIds,
           dataFromUpdates: null,
           dataForTradesAndSwaps: null,
+          dataForUser: null,
         };
       }
 
@@ -339,10 +378,12 @@ export function formatPoolUpdate(
     maxTotalSupply,
     swapFee,
   ] = results.map(([raw]) => convert.toBigNumber(raw));
-  const tokenDataResponses = results.slice(TOKEN_DATA_STARTING_INDEX);
+  const tokenDataResponses = results.slice(
+    POOL_UPDATE_TOKEN_DATA_STARTING_INDEX
+  );
   const responseDataByTokenAddress = chunk(
     tokenDataResponses,
-    TOKEN_CALL_COUNT
+    POOL_UPDATE_TOKEN_CALL_COUNT
   ).reduce((prev, next, index) => {
     prev[tokenAddresses[index]] = next;
     return prev;
@@ -374,5 +415,28 @@ export function formatPoolUpdate(
     swapFee: swapFee.toString(),
     tokens,
   };
+}
+
+export function formatTokenUserData(
+  { results }: { blockNumber: string; results: Result[] },
+  tokenAddresses: string[]
+) {
+  const responseDataByTokenAddress = chunk(
+    results,
+    TOKEN_USER_DATA_CALL_COUNT
+  ).reduce((prev, next, index) => {
+    prev[tokenAddresses[index]] = next;
+    return prev;
+  }, {} as Record<string, Result[]>);
+  const tokens = tokenAddresses.reduce((prev, next) => {
+    const [allowance, balance] = responseDataByTokenAddress[next].map((entry) =>
+      convert.toBigNumber(entry.toString()).toString()
+    );
+
+    prev[next] = { allowance, balance };
+    return prev;
+  }, {} as Record<string, { allowance: string; balance: string }>);
+
+  return tokens;
 }
 // #endregion

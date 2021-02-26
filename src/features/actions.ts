@@ -54,3 +54,11 @@ export const poolTradesAndSwapsLoaded = createAction<{
   trades: Trade[];
   swaps: Swap[];
 }>("poolTradesAndSwapsLoaded");
+
+/**
+ *
+ */
+export const poolUserDataLoaded = createAction<{
+  poolId: string;
+  userData: Record<string, { allowance: string; balance: string }>;
+}>("poolUserDataLoaded");
