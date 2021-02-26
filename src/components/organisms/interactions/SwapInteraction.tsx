@@ -5,16 +5,12 @@ import {
   selectors,
   signer,
 } from "features";
-import { BigNumber } from "@indexed-finance/indexed.js";
 import { Button, Flipper } from "components/atoms";
 import { Form, Typography } from "antd";
 import { actions } from "features";
-import { balancerMath } from "ethereum";
 import { convert } from "helpers";
-import { ethers } from "ethers";
+import { helpers } from "ethereum";
 import { useDispatch, useSelector } from "react-redux";
-import BPool from "ethereum/abi/BPool.json";
-import IERC20 from "ethereum/abi/IERC20.json";
 import React, { useCallback, useRef, useState } from "react";
 import TokenSelector from "../TokenSelector";
 import styled from "styled-components";
@@ -43,14 +39,12 @@ const SLIPPAGE_RATE = 0.01;
 
 const { Item } = Form;
 const ZERO = convert.toBigNumber("0");
-const ONE = convert.toBigNumber("1");
-const TEN = convert.toBigNumber("10");
-const TOKEN_AMOUNT = TEN.exponentiatedBy(18);
 
 export default function SwapInteraction({ pool }: Props) {
   const [form] = Form.useForm<SwapValues>();
   const dispatch = useDispatch();
   const previousFormValues = useRef<SwapValues>(INITIAL_STATE);
+  const lastTouchedField = useRef<"input" | "output">("input");
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
   const balances = useSelector((state: AppState) =>
     selectors.selectRelevantBalances(state, pool?.id ?? "", form, provider)
@@ -136,84 +130,28 @@ export default function SwapInteraction({ pool }: Props) {
         const outputTokenData = tokenLookup[outputToken.toLowerCase()];
 
         if (inputTokenData && outputTokenData) {
-          const inputUpdates = inputTokenData.dataFromPoolUpdates[pool.id];
-          const outputPool = outputTokenData.dataByIndexPool[pool.id];
-          const outputUpdates = outputTokenData.dataFromPoolUpdates[pool.id];
+          const {
+            outputAmount,
+            price,
+            spotPriceAfter,
+            isGoodResult,
+          } = await helpers.calculateOutputFromInput(
+            pool.id,
+            inputAmount.toString(),
+            inputTokenData,
+            outputTokenData,
+            swapFee
+          );
 
-          if (inputUpdates && outputPool && outputUpdates) {
-            const {
-              usedBalance: inputUsedBalance,
-              usedDenorm: inputUsedDenorm,
-            } = inputUpdates;
-            const { denorm: outputDenorm } = outputPool;
-            const {
-              balance: outputBalance,
-              usedBalance: outputUsedBalance,
-              usedDenorm: outputUsedDenorm,
-            } = outputUpdates;
-            const [balanceIn, weightIn, balanceOut, weightOut, amountIn] = [
-              inputUsedBalance,
-              inputUsedDenorm,
-              outputBalance,
-              outputDenorm,
-              convert.toToken(inputAmount.toString()),
-            ]
-              .filter(Boolean)
-              .map((property) => convert.toBigNumber(property!));
+          if (isGoodResult) {
+            setPrice(price);
+            setMaxPrice(spotPriceAfter.times(SLIPPAGE_RATE));
 
-            if (
-              amountIn.isLessThanOrEqualTo(
-                convert.toBigNumber(outputUsedBalance)
-              )
-            ) {
-              const amountOut = balancerMath.calcOutGivenIn(
-                balanceIn,
-                weightIn,
-                balanceOut,
-                weightOut,
-                amountIn,
-                swapFee
-              );
-              const spotPriceAfter = balancerMath.calcSpotPrice(
-                balanceIn.plus(amountIn),
-                weightIn,
-                convert.toBigNumber(outputUsedBalance).minus(amountOut),
-                convert.toBigNumber(outputUsedDenorm),
-                swapFee
-              );
-
-              setMaxPrice(spotPriceAfter.times(1.02));
-
-              form.setFieldsValue({
-                to: {
-                  amount: parseFloat(convert.toBalance(amountOut)),
-                },
-              });
-
-              if (amountIn.isEqualTo(0) || amountOut.isEqualTo(0)) {
-                const oneToken = TOKEN_AMOUNT;
-                const preciseInput = balancerMath.calcOutGivenIn(
-                  balanceIn,
-                  weightIn,
-                  balanceOut,
-                  weightOut,
-                  oneToken,
-                  swapFee
-                );
-                const preciseOutput = preciseInput.dividedBy(TOKEN_AMOUNT);
-                const price = preciseOutput.dividedBy(ONE);
-
-                setPrice(price);
-              } else {
-                const preciseInput = amountIn.dividedBy(TOKEN_AMOUNT);
-                const preciseOutput = amountOut.dividedBy(TOKEN_AMOUNT);
-                const price = preciseOutput.dividedBy(preciseInput);
-
-                setPrice(price);
-              }
-            } else {
-              setMaxPrice(ZERO);
-            }
+            form.setFieldsValue({
+              to: {
+                amount: outputAmount,
+              },
+            });
           }
         }
       }
@@ -229,67 +167,30 @@ export default function SwapInteraction({ pool }: Props) {
         const { amount: outputAmount } = changedValues.to;
         const { token: outputToken } = previousFormValues.current.to;
         const { token: inputToken } = previousFormValues.current.from;
-        const inputPoolData = tokenLookup[inputToken.toLowerCase()];
-        const outputPoolData = tokenLookup[outputToken.toLowerCase()];
+        const inputTokenData = tokenLookup[inputToken.toLowerCase()];
+        const outputTokenData = tokenLookup[outputToken.toLowerCase()];
 
-        if (inputPoolData && outputPoolData) {
-          const inputUpdates = inputPoolData.dataFromPoolUpdates[pool.id];
-          const outputUpdates = outputPoolData.dataFromPoolUpdates[pool.id];
+        if (inputTokenData && outputTokenData) {
+          const {
+            inputAmount,
+            spotPriceAfter,
+            isGoodResult,
+          } = await helpers.calculateInputFromOutput(
+            pool.id,
+            outputAmount.toString(),
+            inputTokenData,
+            outputTokenData,
+            swapFee
+          );
 
-          if (inputUpdates && outputUpdates) {
-            const {
-              usedBalance: inputUsedBalance,
-              usedDenorm: inputUsedDenorm,
-            } = inputUpdates;
-            const {
-              balance: outputBalance,
-              usedBalance: outputUsedBalance,
-              usedDenorm: outputUsedDenorm,
-            } = outputUpdates;
-            const { denorm: outputDenorm } = outputPoolData.dataByIndexPool[
-              pool.id!
-            ]!;
-            const [balanceIn, weightIn, balanceOut, weightOut, amountOut] = [
-              inputUsedBalance,
-              inputUsedDenorm,
-              outputBalance,
-              outputDenorm,
-              convert.toToken(outputAmount.toString()),
-            ]
-              .filter(Boolean)
-              .map((property) => convert.toBigNumber(property!));
+          if (isGoodResult) {
+            setMaxPrice(spotPriceAfter.times(SLIPPAGE_RATE));
 
-            if (
-              amountOut.isLessThanOrEqualTo(
-                convert.toBigNumber(outputUsedBalance).div(3)
-              )
-            ) {
-              const amountIn = balancerMath.calcInGivenOut(
-                balanceIn,
-                weightIn,
-                balanceOut,
-                weightOut,
-                amountOut,
-                swapFee
-              );
-              const spotPriceAfter = balancerMath.calcSpotPrice(
-                balanceIn.plus(amountIn),
-                weightIn,
-                convert.toBigNumber(outputUsedBalance).minus(amountOut),
-                convert.toBigNumber(outputUsedDenorm),
-                swapFee
-              );
-
-              setMaxPrice(spotPriceAfter.times(1.02));
-
-              form.setFieldsValue({
-                from: {
-                  amount: parseFloat(convert.toBalance(amountIn)),
-                },
-              });
-            } else {
-              setMaxPrice(ZERO);
-            }
+            form.setFieldsValue({
+              to: {
+                amount: inputAmount,
+              },
+            });
           }
         }
       }
@@ -301,46 +202,24 @@ export default function SwapInteraction({ pool }: Props) {
    */
   const handleSubmit = useCallback(
     async (values: SwapValues) => {
-      if (pool && provider && signer) {
+      if (pool && signer) {
         const { amount: inputAmount, token: inputToken } = values.from;
         const { amount: outputAmount, token: outputToken } = values.to;
-        const minimumAmount = downwardSlippage(
-          convert.toToken(outputAmount.toString()),
-          SLIPPAGE_RATE
-        );
-        const [input] = [inputAmount, outputAmount].map((which) =>
-          convert.toHex(convert.toToken(which.toString()))
-        );
-        const { id: inputAddress } = tokenLookup[inputToken.toLowerCase()];
-        const { id: outputAddress } = tokenLookup[outputToken.toLowerCase()];
 
-        if (inputAddress && outputAddress) {
-          const abi = new ethers.utils.Interface(BPool.abi);
-          const contract = new ethers.Contract(pool.id, abi, signer);
-          const gasPrice = await contract.signer.getGasPrice();
-          const gasLimit = await contract.estimateGas.swapExactAmountIn(
-            inputAddress,
-            input,
-            outputAddress,
-            convert.toHex(minimumAmount),
-            convert.toHex(maxPrice)
-          );
-
-          await contract.swapExactAmountIn(
-            inputAddress,
-            input,
-            outputAddress,
-            convert.toHex(minimumAmount),
-            convert.toHex(maxPrice),
-            {
-              gasPrice,
-              gasLimit,
-            }
-          );
-        }
+        dispatch(
+          actions.swap(
+            pool.id,
+            lastTouchedField.current,
+            inputAmount.toString(),
+            inputToken.toLowerCase(),
+            outputAmount.toString(),
+            outputToken.toLowerCase(),
+            maxPrice
+          )
+        );
       }
     },
-    [pool, maxPrice, tokenLookup]
+    [dispatch, pool, maxPrice]
   );
   /**
    *
@@ -381,8 +260,10 @@ export default function SwapInteraction({ pool }: Props) {
         previousFormValues.current = form.getFieldsValue();
 
         if (changedValues.from) {
+          lastTouchedField.current = "input";
           calculateOutputFromInput(changedValues);
         } else if (changedValues.to) {
+          lastTouchedField.current = "output";
           calculateInputFromOutput(changedValues);
         }
 
@@ -449,11 +330,3 @@ const S = {
     ${(props) => props.theme.snippets.spacedBetween};
   `,
 };
-
-// function upwardSlippage(num: BigNumber, slippage: number): BigNumber {
-//   return num.times(1 + slippage).integerValue();
-// }
-
-function downwardSlippage(num: BigNumber, slippage: number): BigNumber {
-  return num.times(1 - slippage).integerValue();
-}

@@ -1,8 +1,10 @@
 import * as topLevelActions from "./actions";
 import { AppThunk } from "./store";
+import { BigNumber } from "bignumber.js";
 import { CoinGeckoService } from "services";
-import { SUBGRAPH_URL_UNISWAP } from "config";
+import { SLIPPAGE_RATE, SUBGRAPH_URL_UNISWAP } from "config";
 import { categoriesActions, indexPoolsActions, tokensActions } from "./models";
+import { convert } from "helpers";
 import { ethers } from "ethers";
 import { helpers } from "ethereum";
 import { settingsActions } from "./settings";
@@ -175,6 +177,62 @@ const thunks = {
         await helpers.approvePool(signer, poolAddress, tokenAddress, amount);
       } catch {
         // Handle failed approval.
+      }
+    }
+  },
+  /**
+   *
+   */
+  swap: (
+    poolAddress: string,
+    specifiedSide: "input" | "output",
+    inputAmount: string,
+    inputTokenSymbol: string,
+    outputAmount: string,
+    outputTokenSymbol: string,
+    maximumPrice: BigNumber
+  ): AppThunk => async (_, getState) => {
+    if (signer) {
+      const state = getState();
+      const tokensBySymbol = selectors.selectTokenLookupBySymbol(state);
+      const slippageFunction =
+        specifiedSide === "input"
+          ? helpers.downwardSlippage
+          : helpers.upwardSlippage;
+      const minimumAmount = slippageFunction(
+        convert.toToken(outputAmount),
+        SLIPPAGE_RATE
+      );
+      const [input, output] = [inputAmount, outputAmount].map((which) =>
+        convert.toHex(convert.toToken(which.toString()))
+      );
+      const { id: inputAddress } = tokensBySymbol[inputTokenSymbol];
+      const { id: outputAddress } = tokensBySymbol[outputTokenSymbol];
+
+      if (inputAddress && outputAddress) {
+        if (specifiedSide === "input") {
+          const result = await helpers.swapExactAmountIn(
+            signer,
+            poolAddress,
+            inputAddress,
+            outputAddress,
+            input,
+            minimumAmount,
+            maximumPrice
+          );
+        } else {
+          const result = await helpers.swapExactAmountOut(
+            signer,
+            poolAddress,
+            inputAddress,
+            outputAddress,
+            input,
+            output,
+            maximumPrice
+          );
+        }
+      } else {
+        // --
       }
     }
   },

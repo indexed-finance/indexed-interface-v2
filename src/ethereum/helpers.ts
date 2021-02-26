@@ -1,6 +1,7 @@
 import * as balancerMath from "./balancer-math";
 import * as config from "config";
 import * as queries from "./queries";
+import { BigNumber } from "bignumber.js";
 import { Contract } from "ethers";
 import { Interface, Result, defaultAbiCoder } from "ethers/lib/utils";
 import { JsonFragment } from "@ethersproject/abi";
@@ -32,6 +33,9 @@ export const MINIMUM_TOKEN_WEIGHT = convert.toBigNumber("10").pow(18).div(4);
 export const POOL_UPDATE_TOKEN_DATA_STARTING_INDEX = 4;
 export const POOL_UPDATE_TOKEN_CALL_COUNT = 3;
 export const TOKEN_USER_DATA_CALL_COUNT = 2;
+export const ZERO = convert.toBigNumber("0");
+export const ONE = convert.toBigNumber("1");
+export const TOKEN_AMOUNT = convert.toBigNumber("10").exponentiatedBy(18);
 
 // #region Querying
 export function getUrl(chainId: number) {
@@ -465,5 +469,243 @@ export function approvePool(
   const formattedAmount = convert.toHex(convert.toToken(amount));
 
   return contract.approve(poolAddress, formattedAmount);
+}
+
+/**
+ *
+ */
+export async function swapExactAmountIn(
+  signer: JsonRpcSigner,
+  poolAddress: string,
+  inputTokenAddress: string,
+  outputTokenAddress: string,
+  amount: string,
+  minimumAmount: BigNumber,
+  maximumPrice: BigNumber
+) {
+  const abi = new Interface(BPool.abi);
+  const contract = new Contract(poolAddress, abi, signer);
+  const gasPrice = await contract.signer.getGasPrice();
+  const args = [
+    inputTokenAddress,
+    amount,
+    outputTokenAddress,
+    convert.toHex(minimumAmount),
+    convert.toHex(maximumPrice),
+  ];
+  const gasLimit = await contract.estimateGas.swapExactAmountIn(...args);
+
+  return contract.swapExactAmountIn(...args, {
+    gasPrice,
+    gasLimit,
+  });
+}
+
+/**
+ *
+ */
+export async function swapExactAmountOut(
+  signer: JsonRpcSigner,
+  poolAddress: string,
+  inputTokenAddress: string,
+  outputTokenAddress: string,
+  amountIn: string,
+  amountOut: string,
+  maximumPrice: BigNumber
+) {
+  const abi = new Interface(BPool.abi);
+  const contract = new Contract(poolAddress, abi, signer);
+  const gasPrice = await contract.signer.getGasPrice();
+  const args = [
+    inputTokenAddress,
+    amountIn,
+    outputTokenAddress,
+    amountOut,
+    convert.toHex(maximumPrice),
+  ];
+  const gasLimit = await contract.estimateGas.swapExactAmountOut(...args);
+
+  return contract.swapExactAmountOut(...args, {
+    gasPrice,
+    gasLimit,
+  });
+}
+
+// #endregion
+
+// #region Etc
+export async function calculateOutputFromInput(
+  poolAddress: string,
+  inputAmount: string,
+  inputToken: NormalizedToken,
+  outputToken: NormalizedToken,
+  swapFee: BigNumber
+) {
+  const inputUpdateData = inputToken.dataFromPoolUpdates[poolAddress];
+  const outputUpdateData = outputToken.dataFromPoolUpdates[poolAddress];
+  const outputPoolData = outputToken.dataByIndexPool[poolAddress];
+  const badResult = {
+    outputAmount: parseFloat(convert.toBalance(ZERO)),
+    price: ZERO,
+    spotPriceAfter: ZERO,
+    isGoodResult: false,
+  };
+
+  if (inputUpdateData && outputUpdateData && outputPoolData) {
+    const {
+      usedBalance: inputUsedBalance,
+      usedDenorm: inputUsedDenorm,
+    } = inputUpdateData;
+    const { denorm: outputDenorm } = outputPoolData;
+    const {
+      balance: outputBalance,
+      usedBalance: outputUsedBalance,
+      usedDenorm: outputUsedDenorm,
+    } = outputUpdateData;
+
+    // Convert all amounts to the tokenized version.
+    const [balanceIn, weightIn, balanceOut, weightOut, amountIn] = [
+      inputUsedBalance,
+      inputUsedDenorm,
+      outputBalance,
+      outputDenorm,
+      convert.toToken(inputAmount.toString()),
+    ]
+      .filter(Boolean)
+      .map((property) => convert.toBigNumber(property!));
+
+    // --
+    if (amountIn.isLessThanOrEqualTo(convert.toBigNumber(outputUsedBalance))) {
+      const amountOut = balancerMath.calcOutGivenIn(
+        balanceIn,
+        weightIn,
+        balanceOut,
+        weightOut,
+        amountIn,
+        swapFee
+      );
+      const spotPriceAfter = balancerMath.calcSpotPrice(
+        balanceIn.plus(amountIn),
+        weightIn,
+        convert.toBigNumber(outputUsedBalance).minus(amountOut),
+        convert.toBigNumber(outputUsedDenorm),
+        swapFee
+      );
+
+      let price: BigNumber = ZERO;
+
+      // Next, compute the price.
+      if (amountIn.isEqualTo(0) || amountOut.isEqualTo(0)) {
+        const oneToken = TOKEN_AMOUNT;
+        const preciseInput = balancerMath.calcOutGivenIn(
+          balanceIn,
+          weightIn,
+          balanceOut,
+          weightOut,
+          oneToken,
+          swapFee
+        );
+        const preciseOutput = preciseInput.dividedBy(TOKEN_AMOUNT);
+
+        price = preciseOutput.dividedBy(ONE);
+      } else {
+        const preciseInput = amountIn.dividedBy(TOKEN_AMOUNT);
+        const preciseOutput = amountOut.dividedBy(TOKEN_AMOUNT);
+
+        price = preciseOutput.dividedBy(preciseInput);
+      }
+
+      return {
+        outputAmount: parseFloat(convert.toBalance(amountOut)),
+        price,
+        spotPriceAfter,
+        isGoodResult: true,
+      };
+    } else {
+      return badResult;
+    }
+  } else {
+    return badResult;
+  }
+}
+
+export async function calculateInputFromOutput(
+  poolAddress: string,
+  outputAmount: string,
+  inputToken: NormalizedToken,
+  outputToken: NormalizedToken,
+  swapFee: BigNumber
+) {
+  const inputUpdateData = inputToken.dataFromPoolUpdates[poolAddress];
+  const outputUpdateData = outputToken.dataFromPoolUpdates[poolAddress];
+  const outputPoolData = outputToken.dataByIndexPool[poolAddress];
+  const badResult = {
+    inputAmount: parseFloat(convert.toBalance(ZERO)),
+    price: ZERO,
+    spotPriceAfter: ZERO,
+    isGoodResult: false,
+  };
+
+  if (inputUpdateData && outputUpdateData && outputPoolData) {
+    const {
+      usedBalance: inputUsedBalance,
+      usedDenorm: inputUsedDenorm,
+    } = inputUpdateData;
+    const {
+      balance: outputBalance,
+      usedBalance: outputUsedBalance,
+      usedDenorm: outputUsedDenorm,
+    } = outputUpdateData;
+    const { denorm: outputDenorm } = outputPoolData;
+    const [balanceIn, weightIn, balanceOut, weightOut, amountOut] = [
+      inputUsedBalance,
+      inputUsedDenorm,
+      outputBalance,
+      outputDenorm,
+      convert.toToken(outputAmount.toString()),
+    ]
+      .filter(Boolean)
+      .map((property) => convert.toBigNumber(property!));
+
+    if (
+      amountOut.isLessThanOrEqualTo(
+        convert.toBigNumber(outputUsedBalance).div(3)
+      )
+    ) {
+      const amountIn = balancerMath.calcInGivenOut(
+        balanceIn,
+        weightIn,
+        balanceOut,
+        weightOut,
+        amountOut,
+        swapFee
+      );
+      const spotPriceAfter = balancerMath.calcSpotPrice(
+        balanceIn.plus(amountIn),
+        weightIn,
+        convert.toBigNumber(outputUsedBalance).minus(amountOut),
+        convert.toBigNumber(outputUsedDenorm),
+        swapFee
+      );
+
+      return {
+        inputAmount: parseFloat(convert.toBalance(amountIn)),
+        spotPriceAfter,
+        isGoodResult: true,
+      };
+    } else {
+      return badResult;
+    }
+  } else {
+    return badResult;
+  }
+}
+
+export function upwardSlippage(num: BigNumber, slippage: number): BigNumber {
+  return num.times(1 + slippage).integerValue();
+}
+
+export function downwardSlippage(num: BigNumber, slippage: number): BigNumber {
+  return num.times(1 - slippage).integerValue();
 }
 // #endregion
