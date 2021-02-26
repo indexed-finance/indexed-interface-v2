@@ -83,10 +83,10 @@ const thunks = {
     const state = getState();
     const pool = selectors.selectPool(state, poolId);
 
-    if (pool) {
+    if (pool && provider) {
       const tokens = selectors.selectPoolUnderlyingTokens(state, poolId);
       const update = await helpers.poolUpdateMulticall(
-        provider!,
+        provider,
         poolId,
         tokens
       );

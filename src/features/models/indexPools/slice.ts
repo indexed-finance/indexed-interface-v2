@@ -1,6 +1,8 @@
+import { FormInstance } from "antd";
 import { NormalizedPool } from "ethereum";
 import { convert } from "helpers";
 import { createEntityAdapter, createSlice } from "@reduxjs/toolkit";
+import { ethers } from "ethers";
 import {
   poolTradesAndSwapsLoaded,
   poolUpdated,
@@ -91,6 +93,52 @@ export const selectors = {
   selectPoolUserData: (state: AppState, poolId: string) => {
     const pool = selectors.selectPool(state, poolId);
     return pool?.dataForUser ?? null;
+  },
+  selectRelevantBalances: (
+    state: AppState,
+    poolId: string,
+    form: FormInstance<any>,
+    provider?: null | ethers.providers.Web3Provider
+  ) => {
+    const pool = selectors.selectPool(state, poolId);
+    const tokenLookup = tokensSelectors.selectTokenLookupBySymbol(state);
+    const emptyBalance = {
+      from: "0.00",
+      to: "0.00",
+    };
+
+    if (provider && pool) {
+      const userData = selectors.selectPoolUserData(state, poolId);
+
+      if (userData) {
+        const {
+          from: { token: inputToken },
+          to: { token: outputToken },
+        } = form.getFieldsValue();
+
+        if (inputToken && outputToken) {
+          const { id: inputTokenAddress } = tokenLookup[
+            inputToken.toLowerCase()
+          ];
+          const { id: outputTokenAddress } = tokenLookup[
+            outputToken.toLowerCase()
+          ];
+          const { balance: fromBalance } = userData[inputTokenAddress];
+          const { balance: toBalance } = userData[outputTokenAddress];
+
+          return {
+            from: convert.toBalance(fromBalance),
+            to: convert.toBalance(toBalance),
+          };
+        } else {
+          return emptyBalance;
+        }
+      } else {
+        return emptyBalance;
+      }
+    } else {
+      return emptyBalance;
+    }
   },
 };
 
