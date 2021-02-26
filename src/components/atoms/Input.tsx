@@ -46,7 +46,6 @@ const S = {
     position: absolute;
     top: -10px;
     left: 10px;
-    background: white;
     color: ${(props) => props.theme.input.label.color};
     padding: 0 4px;
     z-index: 1;

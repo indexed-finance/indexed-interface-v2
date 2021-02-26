@@ -36,7 +36,10 @@ export default function TokenSelector({
                     alt={option.name}
                     title={option.name}
                     faded={!option.selected}
-                    src={require(`assets/images/${option.symbol.toLowerCase()}.png`)}
+                    src={
+                      require(`assets/images/${option.symbol.toLowerCase()}.png`)
+                        .default
+                    }
                     role="button"
                     onClick={() => onSelectOption(option)}
                   />

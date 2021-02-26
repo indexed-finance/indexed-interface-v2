@@ -18,7 +18,7 @@ const thunks = {
    *
    */
   initialize: (): AppThunk => async (dispatch) => {
-    const [userAddress] = await window.ethereum.request({
+    await window.ethereum.request({
       method: "eth_requestAccounts",
     });
 
@@ -211,7 +211,7 @@ const thunks = {
 
       if (inputAddress && outputAddress) {
         if (specifiedSide === "input") {
-          const result = await helpers.swapExactAmountIn(
+          await helpers.swapExactAmountIn(
             signer,
             poolAddress,
             inputAddress,
@@ -221,7 +221,7 @@ const thunks = {
             maximumPrice
           );
         } else {
-          const result = await helpers.swapExactAmountOut(
+          await helpers.swapExactAmountOut(
             signer,
             poolAddress,
             inputAddress,

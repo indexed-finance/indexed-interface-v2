@@ -19,7 +19,9 @@ export default function SelectableToken({ asset, onClick }: Props) {
         avatar={
           <S.Avatar
             alt={asset.symbol}
-            src={`/images/${asset.symbol.toLowerCase()}.png`}
+            src={
+              require(`assets/images/${asset.symbol.toLowerCase()}.png`).default
+            }
           />
         }
         title={asset.symbol}

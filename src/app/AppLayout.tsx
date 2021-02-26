@@ -1,3 +1,4 @@
+import "theme/styles.less";
 import { Affix, Breadcrumb, Grid, Layout, Select, Switch } from "antd";
 import { AiOutlineMenuFold, AiOutlineMenuUnfold } from "react-icons/ai";
 import {
@@ -21,7 +22,7 @@ import routes from "./routes";
 import styled from "styled-components";
 
 const { useBreakpoint } = Grid;
-const { Sider, Content, Header, Footer } = Layout;
+const { Sider, Content, Header } = Layout;
 const { Option } = Select;
 
 export default function AppLayout() {
@@ -43,11 +44,11 @@ export default function AppLayout() {
       <S.Layout className="layout">
         {breakpoint.lg ? (
           // Desktop  sider
-          <Sider width={300}>
+          <S.Sider width={300}>
             <Logo />
             <QuoteCarousel pools={indexPools as FormattedIndexPool[]} />
             <AppMenu />
-          </Sider>
+          </S.Sider>
         ) : (
           // Mobile header
           <>
@@ -110,7 +111,11 @@ export default function AppLayout() {
                     type="link"
                     href={socialMedia.link}
                   >
-                    <S.SocialMediaImage src={`/images/${socialMedia.image}`} />
+                    <S.SocialMediaImage
+                      src={
+                        require(`assets/images/${socialMedia.image}`).default
+                      }
+                    />
                   </Button>
                 ))}
               </Button.Group>
@@ -129,14 +134,11 @@ const S = {
     left: 0;
     width: 100%;
   `,
-  Layout: styled(Layout)`
-    height: 100vh;
-  `,
+  Layout: styled(Layout)``,
   SocialMediaImage: styled.img`
     ${(props) => props.theme.snippets.size32};
     ${(props) => props.theme.snippets.circular};
   `,
-  Footer: styled(Footer)``,
   Rights: styled.div`
     margin-top: ${(props) => props.theme.spacing.small};
   `,
@@ -146,10 +148,6 @@ const S = {
     padding: ${(props) => props.padded && props.theme.spacing.large};
   `,
   Page: styled.div<{ extraPadded?: boolean }>`
-    height: 82vh;
-    overflow: auto;
-    overflow-x: hidden;
-    background: white;
     padding: ${(props) =>
       props.extraPadded
         ? props.theme.spacing.large
@@ -190,11 +188,7 @@ const S = {
     }
   `,
   Header: styled(Header)`
-    border-bottom: 1px solid white;
-    position: fixed;
-    width: 100vw;
     top: 0;
-    color: white;
     ${(props) => props.theme.snippets.spacedBetween};
     z-index: 3;
     padding-right: 0;
@@ -218,8 +212,14 @@ const S = {
     left: 0;
     width: calc(100vw + 1px);
     height: 100vh;
-    overflow: hidden;
     z-index: 2;
-    background: #001529;
+  `,
+  Sider: styled(Sider)`
+    .ant-layout-sider-children {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 299px;
+    }
   `,
 };

@@ -73,7 +73,9 @@ function PageLayout({ children }: Props) {
                 type="link"
                 href={socialMedia.link}
               >
-                <S.SocialMediaImage src={`/images/${socialMedia.image}`} />
+                <S.SocialMediaImage
+                  src={require(`assets/images/${socialMedia.image}`).default}
+                />
               </Button>
             ))}
           </Button.Group>

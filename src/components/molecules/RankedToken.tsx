@@ -11,7 +11,8 @@ export interface Props {
 }
 
 export default function RankedToken({ token, rank }: Props) {
-  const image = `/images/${token.symbol.toLowerCase()}.png`;
+  const image = require(`assets/images/${token.symbol.toLowerCase()}.png`)
+    .default;
   const colorThief = useRef<any>(null);
 
   // Effect:

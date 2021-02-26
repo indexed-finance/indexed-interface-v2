@@ -13,7 +13,9 @@ export interface Props {
 export default function ChartCard({ timeframe }: Props) {
   return (
     <S.ChartCard
-      cover={<img src={`/images/chart.png`} alt="Chart" />}
+      cover={
+        <img src={require("assets/images/chart.png").default} alt="Chart" />
+      }
       extra={
         <S.Menu mode="horizontal" selectedKeys={[timeframe]}>
           {["1D", "1W", "1M", "3M", "1Y"].map((_timeframe) => (

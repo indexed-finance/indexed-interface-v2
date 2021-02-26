@@ -9,7 +9,7 @@ export interface Props {
 export default function Logo({ tagline = true }: Props) {
   return (
     <S.LogoWrapper>
-      <S.Logo src="images/indexed-dark.png"></S.Logo>
+      <S.Logo src={require("assets/images/indexed-dark.png").default}></S.Logo>
       <S.LogoText>
         <S.Title level={3}>Indexed</S.Title>
         {tagline && <S.Title level={4}>This is our tagline.</S.Title>}

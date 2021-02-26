@@ -49,7 +49,7 @@ export interface FeeProps {
 Panel.Fee = function ({ amount, token }) {
   return (
     <Panel
-      image={`/images/${token.toLowerCase()}.png`}
+      image={require(`assets/images/${token.toLowerCase()}.png`)}
       title="Fee"
       value={`${amount} ${token}`}
     />
@@ -65,8 +65,8 @@ export interface RateProps {
 Panel.Rate = function ({ from, rate, to }) {
   return (
     <Panel title="Rate" value={`1 ${from} = ${rate} ${to}`}>
-      <S.RateLeft src={`/images/${from.toLowerCase()}.png`} />
-      <S.RateRight src={`/images/${to.toLowerCase()}.png`} />
+      <S.RateLeft src={require(`assets/images/${from.toLowerCase()}.png`)} />
+      <S.RateRight src={require(`assets/images/${to.toLowerCase()}.png`)} />
     </Panel>
   );
 };

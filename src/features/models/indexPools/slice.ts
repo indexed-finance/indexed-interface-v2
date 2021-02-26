@@ -1,8 +1,6 @@
-import { FormInstance } from "antd";
 import { NormalizedPool } from "ethereum";
 import { convert } from "helpers";
 import { createEntityAdapter, createSlice } from "@reduxjs/toolkit";
-import { ethers } from "ethers";
 import {
   poolTradesAndSwapsLoaded,
   poolUpdated,
@@ -124,48 +122,37 @@ export const selectors = {
   selectRelevantBalances: (
     state: AppState,
     poolId: string,
-    form: FormInstance<any>,
-    provider?: null | ethers.providers.Web3Provider
+    inputTokenSymbol: string,
+    outputTokenSymbol: string
   ) => {
     const pool = selectors.selectPool(state, poolId);
     const tokenLookup = tokensSelectors.selectTokenLookupBySymbol(state);
-    const emptyBalance = {
+    const balance = {
       from: "0.00",
       to: "0.00",
     };
 
-    if (provider && pool) {
+    if (pool) {
       const userData = selectors.selectPoolUserData(state, poolId);
 
-      if (userData) {
-        const {
-          from: { token: inputToken },
-          to: { token: outputToken },
-        } = form.getFieldsValue();
-
-        if (inputToken && outputToken) {
-          const { id: inputTokenAddress } = tokenLookup[
-            inputToken.toLowerCase()
-          ];
-          const { id: outputTokenAddress } = tokenLookup[
-            outputToken.toLowerCase()
-          ];
+      if (userData && inputTokenSymbol && outputTokenSymbol) {
+        if (inputTokenSymbol) {
+          const { id: inputTokenAddress } = tokenLookup[inputTokenSymbol];
           const { balance: fromBalance } = userData[inputTokenAddress];
+
+          balance.from = convert.toBalance(fromBalance);
+        }
+
+        if (outputTokenSymbol) {
+          const { id: outputTokenAddress } = tokenLookup[outputTokenSymbol];
           const { balance: toBalance } = userData[outputTokenAddress];
 
-          return {
-            from: convert.toBalance(fromBalance),
-            to: convert.toBalance(toBalance),
-          };
-        } else {
-          return emptyBalance;
+          balance.to = convert.toBalance(toBalance);
         }
-      } else {
-        return emptyBalance;
       }
-    } else {
-      return emptyBalance;
     }
+
+    return balance;
   },
 };
 

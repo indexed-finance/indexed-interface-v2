@@ -2,7 +2,7 @@ import React from "react";
 import { ThemeProvider } from "styled-components";
 import theme from "../src/theme";
 import "../src/theme/typography.css";
-import "./styles.css";
+import "./styles.less";
 
 function Theming({ children }) {
   return <ThemeProvider theme={theme}>{children}</ThemeProvider>;

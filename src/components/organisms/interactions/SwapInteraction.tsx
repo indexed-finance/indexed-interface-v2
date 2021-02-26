@@ -1,10 +1,4 @@
-import {
-  AppState,
-  FormattedIndexPool,
-  provider,
-  selectors,
-  signer,
-} from "features";
+import { AppState, FormattedIndexPool, selectors, signer } from "features";
 import { Button, Flipper } from "components/atoms";
 import { Form, Typography } from "antd";
 import { actions } from "features";
@@ -46,9 +40,16 @@ export default function SwapInteraction({ pool }: Props) {
   const previousFormValues = useRef<SwapValues>(INITIAL_STATE);
   const lastTouchedField = useRef<"input" | "output">("input");
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
-  const balances = useSelector((state: AppState) =>
-    selectors.selectRelevantBalances(state, pool?.id ?? "", form, provider)
-  );
+  const balances = useSelector((state: AppState) => {
+    const { from, to } = form.getFieldsValue();
+
+    return selectors.selectRelevantBalances(
+      state,
+      pool?.id ?? "",
+      from?.token.toLowerCase() ?? "",
+      to?.token.toLowerCase() ?? ""
+    );
+  });
   const swapFee = useSelector((state: AppState) =>
     selectors.selectSwapFee(state, pool?.id ?? "")
   );

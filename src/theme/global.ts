@@ -1,15 +1,13 @@
-import "./styles.css";
+import "./styles.less";
 import { createGlobalStyle } from "styled-components";
 
 export default createGlobalStyle`
   * {
       font-family: "San Francisco Bold", sans-serif;
   }
-  html,
+  
   body {
-    width: 100vw;
-    height: 100vh;
-    overflow: hidden;
+    overflow-x: hidden;
   }
 
   .ant-message {

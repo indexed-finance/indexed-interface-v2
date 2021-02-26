@@ -26,7 +26,6 @@ export default function RankedTokenList({ pool }: Props) {
 const S = {
   List: styled(List)`
     width: 100%;
-    background: white;
   `,
   RankedTokenWrapper: styled(List.Item)`
     position: relative;

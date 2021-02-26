@@ -19,7 +19,10 @@ export default function CategoryCard({ category }: Props) {
           <>
             <S.Image
               alt={`${category.symbol} Logo`}
-              src={`/images/${category.symbol.toLowerCase()}.png`}
+              src={
+                require(`assets/images/${category.symbol.toLowerCase()}.png`)
+                  .default
+              }
             />
             <S.Name>{category.name}</S.Name>
           </>
@@ -32,7 +35,10 @@ export default function CategoryCard({ category }: Props) {
                 alt={token.name}
                 title={token.name}
                 key={token.id}
-                src={`/images/${token.symbol.toLowerCase()}.png`}
+                src={
+                  require(`assets/images/${token.symbol.toLowerCase()}.png`)
+                    .default
+                }
               />
             ))}
           </S.TokenImageWrapper>,

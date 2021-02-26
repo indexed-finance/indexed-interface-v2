@@ -131,7 +131,10 @@ export default function TokenSelector({
               <>
                 <S.Image
                   alt={value.token}
-                  src={`/images/${value.token.toLowerCase()}.png`}
+                  src={
+                    require(`assets/images/${value.token.toLowerCase()}.png`)
+                      .default
+                  }
                 />
                 {value.token}
               </>

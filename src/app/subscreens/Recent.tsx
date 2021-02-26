@@ -102,8 +102,6 @@ const S = {
     [role="tab"] {
       ${(props) => props.theme.snippets.fancy};
     }
-
-    padding-right: 30px;
   `,
   TabPane: styled(Tabs.TabPane)`
     ${(props) => props.theme.snippets.perfectlyAligned};

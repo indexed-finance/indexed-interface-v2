@@ -63,8 +63,8 @@ export default function PoolDetail() {
         <Row gutter={5}>
           <Col span={24}>{performance}</Col>
           <Col span={24}>{chart}</Col>
-          <Col span={24}>{assets}</Col>
           <Col span={24}>{interactions}</Col>
+          <Col span={24}>{assets}</Col>
           <Col span={24}>{recents}</Col>
         </Row>
       </>
@@ -77,8 +77,8 @@ export default function PoolDetail() {
             {chart}
           </Col>
           <Col span={12}>
-            {interactions}
             {assets}
+            {interactions}
           </Col>
         </Row>
         <Row gutter={10}>
@@ -89,15 +89,20 @@ export default function PoolDetail() {
     const desktopSized = (
       <>
         <Row gutter={20}>
-          <Col span={8}>
-            {performance}
-            {chart}
+          <Col span={16}>
+            <Row gutter={20}>
+              <Col span={12}>
+                {performance}
+                {chart}
+              </Col>
+              <Col span={12}>{interactions}</Col>
+            </Row>
+            <Row gutter={20}>
+              <Col span={24}>{recents}</Col>
+            </Row>
           </Col>
+
           <Col span={8}>{assets}</Col>
-          <Col span={8}>{interactions}</Col>
-        </Row>
-        <Row gutter={20}>
-          <Col span={16}>{recents}</Col>
         </Row>
       </>
     );
@@ -135,9 +140,7 @@ export default function PoolDetail() {
 }
 
 const S = {
-  Tokens: styled(Subscreen)`
-    max-height: 640px;
-  `,
+  Tokens: styled(Subscreen)``,
   Title: styled(({ withMargin: _, centered: __, ...rest }) => (
     <Typography.Title {...rest} />
   ))<{ withMargin?: boolean; centered?: boolean }>`

@@ -49,7 +49,6 @@ const S = {
     font-size: ${(props) => (props.kind === "small" ? "20px" : "32px")};
     margin: 0;
     margin-top: ${(props) => (props.kind === "small" ? "-6px" : "-14px")};
-    color: black;
 
     ${(props) =>
       props.kind === "small" && props.theme.snippets.perfectlyAligned};
@@ -68,7 +67,6 @@ const S = {
 
     span {
       font-size: ${(props) => (props.kind === "small" ? "16px" : "18px")};
-      color: ${(props) => props.theme.colors.grey100};
       margin-left: ${(props) => props.theme.spacing.tiny};
     }
   `,
