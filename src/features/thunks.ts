@@ -16,7 +16,9 @@ const thunks = {
    *
    */
   initialize: (): AppThunk => async (dispatch) => {
-    await window.ethereum.enable();
+    const [userAddress] = await window.ethereum.request({
+      method: "eth_requestAccounts",
+    });
 
     provider = new ethers.providers.Web3Provider(window.ethereum);
     signer = provider.getSigner();
@@ -146,20 +148,6 @@ const thunks = {
         );
       }
     }
-
-    // async updateUserData(): Promise<void> {
-    //   if (!this.userAddress) return;
-    //   const tokens = this.tokens;
-    //   const tokenDatas = await getTokenUserData(this.provider, this.userAddress, this.initializer.address, tokens);
-    //   const abi = require('./abi/IPoolInitializer.json');
-    //   let pool = new Contract(this.initializer.address, abi, this.provider);
-    //   this.userCredit = bnum(await pool.getCreditOf(this.userAddress));
-    //   tokenDatas.forEach(({ allowance, balance }, i) => {
-    //     const address = tokens[i].address;
-    //     this.userAllowances[address] = allowance;
-    //     this.userBalances[address] = balance;
-    //   });
-    // }
   },
   /**
    *
@@ -169,6 +157,26 @@ const thunks = {
     dispatch(actions.requestPoolUpdate(poolId));
     dispatch(actions.requestPoolTradesAndSwaps(poolId));
     dispatch(actions.requestPoolUserData(poolId));
+  },
+  /**
+   *
+   */
+  approvePool: (
+    poolAddress: string,
+    tokenSymbol: string,
+    amount: string
+  ): AppThunk => async (_, getState) => {
+    const state = getState();
+    const tokensBySymbol = selectors.selectTokenLookupBySymbol(state);
+    const tokenAddress = tokensBySymbol[tokenSymbol]?.id ?? "";
+
+    if (signer && tokenAddress) {
+      try {
+        await helpers.approvePool(signer, poolAddress, tokenAddress, amount);
+      } catch {
+        // Handle failed approval.
+      }
+    }
   },
 };
 

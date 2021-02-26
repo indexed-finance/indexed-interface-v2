@@ -138,7 +138,9 @@ const S = {
   Tokens: styled(Subscreen)`
     max-height: 640px;
   `,
-  Title: styled(Typography.Title)<{ withMargin?: boolean; centered?: boolean }>`
+  Title: styled(({ withMargin: _, centered: __, ...rest }) => (
+    <Typography.Title {...rest} />
+  ))<{ withMargin?: boolean; centered?: boolean }>`
     ${(props) =>
       props.withMargin &&
       css`

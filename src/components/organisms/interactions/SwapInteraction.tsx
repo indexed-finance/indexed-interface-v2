@@ -8,13 +8,14 @@ import {
 import { BigNumber } from "@indexed-finance/indexed.js";
 import { Button, Flipper } from "components/atoms";
 import { Form, Typography } from "antd";
+import { actions } from "features";
 import { balancerMath } from "ethereum";
 import { convert } from "helpers";
 import { ethers } from "ethers";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import BPool from "ethereum/abi/BPool.json";
 import IERC20 from "ethereum/abi/IERC20.json";
-import React, { useCallback, useMemo, useRef, useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import TokenSelector from "../TokenSelector";
 import styled from "styled-components";
 
@@ -30,12 +31,12 @@ const FIELD_OPPOSITES = {
 };
 const INITIAL_STATE = {
   from: {
-    token: "UNI",
-    amount: 0,
+    token: "SNX",
+    amount: 2,
   },
   to: {
-    token: "",
-    amount: 0,
+    token: "UNI",
+    amount: 1,
   },
 };
 const SLIPPAGE_RATE = 0.01;
@@ -48,62 +49,50 @@ const TOKEN_AMOUNT = TEN.exponentiatedBy(18);
 
 export default function SwapInteraction({ pool }: Props) {
   const [form] = Form.useForm<SwapValues>();
+  const dispatch = useDispatch();
   const previousFormValues = useRef<SwapValues>(INITIAL_STATE);
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
   const balances = useSelector((state: AppState) =>
     selectors.selectRelevantBalances(state, pool?.id ?? "", form, provider)
-  );
-  const userData = useSelector((state: AppState) =>
-    pool ? selectors.selectPoolUserData(state, pool.id) : {}
   );
   const swapFee = useSelector((state: AppState) =>
     selectors.selectSwapFee(state, pool?.id ?? "")
   );
   const [price, setPrice] = useState(ZERO);
   const [maxPrice, setMaxPrice] = useState(ZERO);
-  const [approvalNeeded, setApprovalNeeded] = useState(true);
   const [, setRenderCount] = useState(0);
+  const approvalNeeded = useSelector((state: AppState) => {
+    const { from } = form.getFieldsValue();
+
+    if (from) {
+      const poolId = pool?.id ?? "";
+      const { token, amount } = from;
+
+      return selectors.selectApprovalStatus(
+        state,
+        poolId,
+        token.toLowerCase(),
+        amount.toString()
+      );
+    } else {
+      return true;
+    }
+  });
 
   /**
    *
    */
-  const handleApprovePool = useCallback(async () => {
-    if (pool && signer) {
-      const { from } = form.getFieldsValue();
-      const tokenAddress = tokenLookup[from.token.toLowerCase()].id;
-      const abi = new ethers.utils.Interface(IERC20);
-      const contract = new ethers.Contract(tokenAddress, abi, signer);
-      const tokenAmount = convert.toToken(from.amount.toString());
-      const amount = convert.toHex(tokenAmount);
-
-      await contract.approve(pool.id, amount);
+  const handleApprovePool = useCallback(() => {
+    if (pool) {
+      const {
+        from: { token, amount },
+      } = form.getFieldsValue();
+      dispatch(
+        actions.approvePool(pool.id, token.toLowerCase(), amount.toString())
+      );
     }
-  }, [form, pool, tokenLookup]);
-  /**
-   *
-   */
-  const checkApprovalStatus = useCallback(() => {
-    if (userData) {
-      const { from } = form.getFieldsValue();
-      const { amount, token } = from;
+  }, [dispatch, form, pool]);
 
-      if (token) {
-        const { id: address } = tokenLookup[token.toLowerCase()];
-        const tokenData = userData[address];
-
-        if (tokenData) {
-          const { allowance } = tokenData;
-          const needsApproval = convert
-            .toBigNumber(amount.toString())
-            .isGreaterThan(convert.toBigNumber(allowance));
-
-          if (needsApproval !== approvalNeeded) {
-            setApprovalNeeded(needsApproval);
-          }
-        }
-      }
-    }
-  }, [form, approvalNeeded, tokenLookup, userData]);
   /**
    *
    */
@@ -316,10 +305,10 @@ export default function SwapInteraction({ pool }: Props) {
         const { amount: inputAmount, token: inputToken } = values.from;
         const { amount: outputAmount, token: outputToken } = values.to;
         const minimumAmount = downwardSlippage(
-          convert.toToken(inputAmount.toString()),
+          convert.toToken(outputAmount.toString()),
           SLIPPAGE_RATE
         );
-        const [input, output] = [inputAmount, outputAmount].map((which) =>
+        const [input] = [inputAmount, outputAmount].map((which) =>
           convert.toHex(convert.toToken(which.toString()))
         );
         const { id: inputAddress } = tokenLookup[inputToken.toLowerCase()];
@@ -329,14 +318,23 @@ export default function SwapInteraction({ pool }: Props) {
           const abi = new ethers.utils.Interface(BPool.abi);
           const contract = new ethers.Contract(pool.id, abi, signer);
           const gasPrice = await contract.signer.getGasPrice();
-          const foo = await contract.estimateGas.swapExactAmountIn(
+          const gasLimit = await contract.estimateGas.swapExactAmountIn(
             inputAddress,
             input,
             outputAddress,
-            /*1,*/ minimumAmount,
-            `0x${"ff".repeat(32)}`, //convert.toHex(maxPrice),
+            convert.toHex(minimumAmount),
+            convert.toHex(maxPrice)
+          );
+
+          await contract.swapExactAmountIn(
+            inputAddress,
+            input,
+            outputAddress,
+            convert.toHex(minimumAmount),
+            convert.toHex(maxPrice),
             {
               gasPrice,
+              gasLimit,
             }
           );
         }
@@ -390,7 +388,6 @@ export default function SwapInteraction({ pool }: Props) {
 
         // Force update.
         setRenderCount((prev) => prev + 1);
-        checkApprovalStatus();
       }}
       onFinish={(values: any) => handleSubmit(values)}
       onFinishFailed={(error) =>
@@ -432,7 +429,7 @@ export default function SwapInteraction({ pool }: Props) {
         </S.Item>
       )}
       <Item>
-        {false ? (
+        {approvalNeeded ? (
           <Button type="primary" htmlType="button" onClick={handleApprovePool}>
             Approve
           </Button>
@@ -453,9 +450,9 @@ const S = {
   `,
 };
 
-function upwardSlippage(num: BigNumber, slippage: number): BigNumber {
-  return num.times(1 + slippage).integerValue();
-}
+// function upwardSlippage(num: BigNumber, slippage: number): BigNumber {
+//   return num.times(1 + slippage).integerValue();
+// }
 
 function downwardSlippage(num: BigNumber, slippage: number): BigNumber {
   return num.times(1 - slippage).integerValue();

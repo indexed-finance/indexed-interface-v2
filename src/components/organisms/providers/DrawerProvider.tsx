@@ -159,7 +159,10 @@ export function useDrawer(page: DrawerPage) {
 // #endregion
 
 const S = {
-  Drawer: styled(AntDrawer)<{ isMobile?: boolean; offset: number }>`
+  Drawer: styled(({ isMobile: _, ...rest }) => <AntDrawer {...rest} />)<{
+    isMobile?: boolean;
+    offset: number;
+  }>`
     ${(props) =>
       props.isMobile
         ? css`

@@ -17,22 +17,26 @@ export default function RankedToken({ token, rank }: Props) {
   // Effect:
   // Load colorThief and generate colors based on token.
   useLayoutEffect(() => {
-    // setTimeout(() => {
-    //   const imageRef = document.querySelector(`[data-token="${token.symbol}"]`);
-    //   const wrapperRef = document.querySelector(
-    //     `[data-tokenwrapper="${token.symbol}"]`
-    //   );
-    //   if (
-    //     imageRef &&
-    //     (imageRef as Element).clientWidth > 0 &&
-    //     (imageRef as any).complete &&
-    //     wrapperRef
-    //   ) {
-    //     colorThief.current = new ColorThief();
-    //     const [red, green, blue] = colorThief.current.getColor(imageRef);
-    //     (wrapperRef as any).style.background = `rgba(${red}, ${green}, ${blue}, 0.15)`;
-    //   }
-    // });
+    setTimeout(() => {
+      try {
+        const imageRef = document.querySelector(
+          `[data-token="${token.symbol}"]`
+        );
+        const wrapperRef = document.querySelector(
+          `[data-tokenwrapper="${token.symbol}"]`
+        );
+        if (
+          imageRef &&
+          (imageRef as Element).clientWidth > 0 &&
+          (imageRef as any).complete &&
+          wrapperRef
+        ) {
+          colorThief.current = new ColorThief();
+          const [red, green, blue] = colorThief.current.getColor(imageRef);
+          (wrapperRef as any).style.background = `rgba(${red}, ${green}, ${blue}, 0.15)`;
+        }
+      } catch {}
+    });
   });
 
   return (

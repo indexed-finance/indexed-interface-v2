@@ -84,7 +84,7 @@ export const selectors = {
   },
   selectSwapFee: (state: AppState, poolId: string) => {
     const pool = selectors.selectPool(state, poolId);
-    return pool ? convert.toBigNumber(pool.swapFee) : null;
+    return pool ? convert.toBigNumber(pool.swapFee).times(1e18) : null;
   },
   selectPoolInitializerAddress: (state: AppState, poolId: string) => {
     const pool = selectors.selectPool(state, poolId);
@@ -93,6 +93,33 @@ export const selectors = {
   selectPoolUserData: (state: AppState, poolId: string) => {
     const pool = selectors.selectPool(state, poolId);
     return pool?.dataForUser ?? null;
+  },
+  selectApprovalStatus: (
+    state: AppState,
+    poolId: string,
+    tokenSymbol: string,
+    amount: string
+  ) => {
+    const userData = selectors.selectPoolUserData(state, poolId);
+
+    if (userData && tokenSymbol) {
+      const tokenLookup = tokensSelectors.selectTokenLookupBySymbol(state);
+      const { id: tokenAddress } = tokenLookup[tokenSymbol];
+      const tokenData = userData[tokenAddress];
+
+      if (tokenData) {
+        const { allowance } = tokenData;
+        const needsApproval = convert
+          .toBigNumber(amount)
+          .isGreaterThan(convert.toBigNumber(allowance));
+
+        return needsApproval;
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
   },
   selectRelevantBalances: (
     state: AppState,

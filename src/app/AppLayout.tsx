@@ -140,7 +140,9 @@ const S = {
   Rights: styled.div`
     margin-top: ${(props) => props.theme.spacing.small};
   `,
-  Content: styled(Content)<{ padded?: boolean }>`
+  Content: styled(({ padded: _, ...rest }) => <Content {...rest} />)<{
+    padded?: boolean;
+  }>`
     padding: ${(props) => props.padded && props.theme.spacing.large};
   `,
   Page: styled.div<{ extraPadded?: boolean }>`

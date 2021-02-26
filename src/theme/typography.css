@@ -1,10 +1,10 @@
-/* @font-face {
+@font-face {
   font-family: "San Francisco";
-  src: url("./Futura.ttc") format("ttc");
+  src: url("./fonts/Text.ttf") format("ttf");
   font-weight: 200;
 }
 
 @font-face {
   font-family: "San Francisco Bold";
-  src: url("./Futura.ttc") format("ttc");
-} */
+  src: url("./fonts/Text.ttf") format("ttf");
+}

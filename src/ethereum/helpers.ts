@@ -1,20 +1,22 @@
 import * as balancerMath from "./balancer-math";
 import * as config from "config";
 import * as queries from "./queries";
+import { Contract } from "ethers";
 import { Interface, Result, defaultAbiCoder } from "ethers/lib/utils";
 import { JsonFragment } from "@ethersproject/abi";
+import { JsonRpcSigner, Provider } from "@ethersproject/providers";
 import {
   NormalizedEntity,
   NormalizedInitialData,
   NormalizedToken,
 } from "./types.d";
-import { Provider } from "@ethersproject/providers";
 import {
   MultiCall as bytecode,
   MultiCallStrict as bytecodeStrict,
 } from "./bytecode.json";
 import { convert } from "helpers";
 import { dedupe } from "helpers";
+import BPool from "./abi/BPool.json";
 import IERC20 from "./abi/IERC20.json";
 import IPool from "./abi/IPool.json";
 import chunk from "lodash.chunk";
@@ -438,5 +440,30 @@ export function formatTokenUserData(
   }, {} as Record<string, { allowance: string; balance: string }>);
 
   return tokens;
+}
+// #endregion
+
+// #region Contract Interaction
+/**
+ *
+ * @remarks
+ * The amount parameter is unformatted (i.e. 1.50)
+ *
+ * @param signer - The user's signing client.
+ * @param poolAddress - Which pool should be approved?
+ * @param tokenAddress - Which token in the pool should be approved?
+ * @param amount - How much should the approval be limited to?
+ */
+export function approvePool(
+  signer: JsonRpcSigner,
+  poolAddress: string,
+  tokenAddress: string,
+  amount: string
+) {
+  const abi = new Interface(IERC20);
+  const contract = new Contract(tokenAddress, abi, signer);
+  const formattedAmount = convert.toHex(convert.toToken(amount));
+
+  return contract.approve(poolAddress, formattedAmount);
 }
 // #endregion
