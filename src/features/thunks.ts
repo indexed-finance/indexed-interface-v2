@@ -25,9 +25,6 @@ const thunks = {
     provider = new ethers.providers.Web3Provider(window.ethereum);
     signer = provider.getSigner();
 
-    (window as any).provider = provider;
-    (window as any).signer = signer;
-
     const { chainId } = await provider.getNetwork();
     const url = helpers.getUrl(chainId);
     const initial = await helpers.queryInitial(url);

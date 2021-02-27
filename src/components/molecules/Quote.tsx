@@ -31,12 +31,16 @@ export default function Quote({
 
   return (
     <div {...rest}>
-      {symbol && <S.Top level={2}>{symbol}</S.Top>}
+      {symbol && (
+        <S.Top level={2}>
+          {symbol} {kind === "normal" && price}
+        </S.Top>
+      )}
       <S.Middle kind={kind}>
-        {price}
+        {kind !== "normal" && price}
         {kind === "small" && bottom}
       </S.Middle>
-      {kind === "normal" && bottom}
+      {kind !== "small" && bottom}
     </div>
   );
 }

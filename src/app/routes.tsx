@@ -1,4 +1,5 @@
 import {
+  CategoryDetail,
   CategoryList,
   Docs,
   FAQ,
@@ -30,10 +31,16 @@ const routes: Route[] = [
     screen: <Splash />,
   },
   {
-    path: "/portfolio",
+    path: "/categories",
     exact: true,
-    sider: "Portfolio",
-    screen: <Portfolio />,
+    sider: "Categories",
+    screen: <CategoryList />,
+    model: "categories",
+  },
+  {
+    path: "/categories/:categoryId",
+    exact: true,
+    screen: <CategoryDetail />,
   },
   {
     path: "/pools",
@@ -48,11 +55,22 @@ const routes: Route[] = [
     screen: <PoolDetail />,
   },
   {
-    path: "/categories",
+    path: "/tokens",
     exact: true,
-    sider: "Categories",
-    screen: <CategoryList />,
-    model: "categories",
+    sider: "Tokens",
+    screen: <>TokenList</>,
+    model: "tokens",
+  },
+  {
+    path: "/tokens/:tokenId",
+    exact: true,
+    screen: <>TokenDetail</>,
+  },
+  {
+    path: "/portfolio",
+    exact: true,
+    sider: "Portfolio",
+    screen: <Portfolio />,
   },
   {
     path: "/stake",

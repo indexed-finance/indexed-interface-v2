@@ -1,4 +1,6 @@
 import { NormalizedPool } from "ethereum";
+import { PLACEHOLDER_TOKEN_IMAGE } from "config";
+import { categoriesSelectors } from "../categories";
 import { convert } from "helpers";
 import { createEntityAdapter, createSlice } from "@reduxjs/toolkit";
 import {
@@ -154,6 +156,33 @@ export const selectors = {
 
     return balance;
   },
+  selectCategoryImage: (state: AppState, poolId: string) => {
+    const pool = selectors.selectPool(state, poolId);
+    const categoryLookup = categoriesSelectors.selectEntities(state);
+
+    if (pool) {
+      const { id } = pool.category;
+      const category = categoryLookup[id];
+
+      if (category && category.localData) {
+        return require(`assets/images/${category.localData.symbol.toLowerCase()}.png`)
+          .default;
+      }
+    }
+
+    return PLACEHOLDER_TOKEN_IMAGE;
+  },
+  selectCategoryImagesByPoolIds: (state: AppState) =>
+    selectors
+      .selectAllPools(state)
+      .map((pool) => ({
+        id: pool.id,
+        image: selectors.selectCategoryImage(state, pool.id),
+      }))
+      .reduce((prev, next) => {
+        prev[next.id] = next.image;
+        return prev;
+      }, {} as Record<string, string>),
 };
 
 export default slice.reducer;

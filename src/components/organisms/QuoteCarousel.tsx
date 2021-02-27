@@ -34,7 +34,7 @@ export default function QuoteCarousel({ pools }: Props) {
 const S = {
   Carousel: styled(Carousel)`
     padding: ${(props) => props.theme.spacing.medium};
-    height: 160px;
     background-size: cover;
+    cursor: pointer;
   `,
 };

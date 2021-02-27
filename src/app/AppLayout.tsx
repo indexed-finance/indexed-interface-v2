@@ -65,13 +65,6 @@ export default function AppLayout() {
         )}
         <Content>
           <S.Top>
-            <S.Breadcrumb>
-              <Breadcrumb.Item>Home</Breadcrumb.Item>
-              <Breadcrumb.Item>List</Breadcrumb.Item>
-              <Breadcrumb.Item>
-                <Link to="/pools/5">App</Link>
-              </Breadcrumb.Item>
-            </S.Breadcrumb>
             {breakpoint.lg && (
               <S.Controls>
                 <S.Select defaultValue="Language: English" bordered={false}>
@@ -161,7 +154,7 @@ const S = {
     top: 0;
     height: 64px;
     width: calc(100% - 299px);
-    left: 299px;
+    left: 298px;
     z-index: 2;
   `,
   Controls: styled.div`
@@ -191,7 +184,7 @@ const S = {
   Header: styled(Header)`
     top: 0;
     ${(props) => props.theme.snippets.spacedBetween};
-    z-index: 3;
+    z-index: 4;
     padding-right: 0;
     padding-left: 12px;
   `,
@@ -225,6 +218,12 @@ const S = {
       left: 0;
       width: 299px;
       background: #111;
+      overflow: auto;
+
+      .ant-menu-sub {
+        max-height: 300px;
+        overflow: auto;
+      }
     }
   `,
 };

@@ -1,11 +1,17 @@
 import { Typography } from "antd";
+import { useHistory } from "react-router-dom";
 import React from "react";
 import styled from "styled-components";
 
 export default function Logo() {
+  const history = useHistory();
+
   return (
     <S.LogoWrapper>
-      <S.Logo src={require("assets/images/indexed-dark.png").default}></S.Logo>
+      <S.Logo
+        src={require("assets/images/indexed-dark.png").default}
+        onClick={() => history.push("/")}
+      />
       <S.LogoText>
         <S.Title level={3}>Indexed</S.Title>
       </S.LogoText>

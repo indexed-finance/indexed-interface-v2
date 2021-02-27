@@ -6,6 +6,7 @@ import {
   Token,
 } from "indexed-types";
 import { Swap as Trade } from "uniswap-types";
+import ZeroExOne from "./local-category-data/0x1.json";
 
 export type PoolUpdate = {
   $blockNumber: string;
@@ -56,16 +57,17 @@ export interface NormalizedPool
   >;
 }
 
-export interface NormalizedCategory
-  extends Omit<Category, "tokens" | "indexPools"> {
+export interface NormalizedCategory {
+  id: string;
   indexPools: string[];
   tokens: string[];
+  localData: typeof ZeroExOne;
 }
 
 export type NormalizedInitialData = {
   categories: NormalizedEntity<NormalizedCategory>;
-  pools: NormalizedEntity<NormalizedPool>;
   dailySnapshots: NormalizedEntity<NormalizedDailySnapshot>;
+  pools: NormalizedEntity<NormalizedPool>;
   tokens: NormalizedEntity<NormalizedToken>;
 };
 

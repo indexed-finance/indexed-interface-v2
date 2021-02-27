@@ -25,8 +25,14 @@
 @breadcrumb-separator-color: @white100;
 
 .ant-layout-header {
-  border-bottom: 1px solid darken(@secondary-color, 20%);
+  border-bottom: 1px solid @primary-color;
 }
 .ant-layout-sider {
-  border-right: 1px solid darken(@secondary-color, 20%);
+  .ant-layout-sider-children {
+    border-right: 1px solid @primary-color;
+  }
+}
+
+.ant-menu-item {
+  padding-left: 24px !important;
 }

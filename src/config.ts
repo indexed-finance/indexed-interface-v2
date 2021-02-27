@@ -38,7 +38,11 @@ export const PROVIDER_OPTIONS = {
     },
   },
 };
-
+export const FALLBACK_CATEGORY_LOCAL_DATA = {
+  description: "(MISSING LOCAL DATA)",
+  symbol: "(MISSING LOCAL DATA)",
+  name: "(MISSING LOCAL DATA)",
+};
 export const NETWORKS = {
   mainnet: {
     id: 1,
@@ -90,6 +94,7 @@ export const SUBGRAPH_URL_UNISWAP =
 //     ? "https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2"
 //     : "https://api.thegraph.com/subgraphs/name/samgos/uniswap-v2-rinkeby";
 
+export const PLACEHOLDER_TOKEN_IMAGE = "https://via.placeholder.com/32";
 export const ETHEREUM_PRICE_URL =
   "https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2";
 

@@ -114,6 +114,20 @@ export const selectors = {
   },
   selectTokenSymbol: (state: AppState, poolId: string) =>
     selectors.selectTokenLookup(state)[poolId]?.symbol ?? "",
+  selectAppMenuTokens: (state: AppState) => {
+    const tokens = selectors.selectAllTokens(state);
+
+    return tokens.map((token) => {
+      const categoryData = token.dataByCategory["0x1"] ?? {
+        name: "",
+      };
+
+      return {
+        id: token.id,
+        name: categoryData.name,
+      };
+    });
+  },
 };
 
 export default slice.reducer;

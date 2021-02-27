@@ -11,7 +11,7 @@ import { settingsSelectors } from "./settings";
 
 const MILLISECONDS_PER_SECOND = 1000;
 
-type ModelKeys = "categories" | "indexPools";
+type ModelKeys = "categories" | "indexPools" | "tokens";
 
 const selectors = {
   ...categoriesSelectors,
@@ -28,14 +28,19 @@ const selectors = {
   ): Record<ModelKeys, Array<{ name: string; id: string }>> => {
     const categories = selectors
       .selectAllCategories(state)
-      .map(({ id }) => ({ name: id, id }));
+      .map(({ id, localData }) => ({
+        name: localData?.name ?? "",
+        id,
+      }));
     const indexPools = selectors
       .selectAllPools(state)
       .map(({ name, id }) => ({ name, id }));
+    const tokens = selectors.selectAppMenuTokens(state);
 
     return {
       categories,
       indexPools,
+      tokens,
     };
   },
   /**

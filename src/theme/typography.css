@@ -1,10 +1,9 @@
-@font-face {
-  font-family: "San Francisco";
-  src: url("./fonts/Text.ttf") format("ttf");
-  font-weight: 200;
+@import url("https://rsms.me/inter/inter.css");
+html {
+  font-family: "Inter", sans-serif;
 }
-
-@font-face {
-  font-family: "San Francisco Bold";
-  src: url("./fonts/Text.ttf") format("ttf");
+@supports (font-variation-settings: normal) {
+  html {
+    font-family: "Inter var", sans-serif;
+  }
 }
