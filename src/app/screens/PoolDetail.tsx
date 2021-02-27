@@ -1,9 +1,9 @@
 import { AiOutlineSwap } from "react-icons/ai";
 import { AppState, actions, selectors } from "features";
-import { Breadcrumb, Col, Grid, Row, Typography } from "antd";
+import { Breadcrumb, Col, Grid, Menu, Row, Typography } from "antd";
 import { ChartCard, PoolInteractions, RankedTokenList } from "components";
+import { Link, Redirect, useParams } from "react-router-dom";
 import { Performance, Recent, Subscreen } from "../subscreens";
-import { Redirect, useParams } from "react-router-dom";
 import { RiWallet3Line } from "react-icons/ri";
 import { useDispatch, useSelector } from "react-redux";
 import React, { useEffect } from "react";
@@ -17,6 +17,8 @@ export default function PoolDetail() {
   const pool = useSelector((state: AppState) =>
     selectors.selectFormattedIndexPool(state, poolId)
   );
+  const { indexPools } = useSelector(selectors.selectMenuModels);
+  const indexPoolsLookup = useSelector(selectors.selectCategoryImagesByPoolIds);
   const breakpoints = useBreakpoint();
 
   // Effect:
@@ -97,16 +99,35 @@ export default function PoolDetail() {
 
     return (
       <>
-        <Breadcrumb>
-          <Breadcrumb.Item>Index Pools</Breadcrumb.Item>
-          <Breadcrumb.Item>{pool.name}</Breadcrumb.Item>
-        </Breadcrumb>
         <S.Title
           level={breakpoints.md ? 1 : 3}
           withMargin={!breakpoints.sm}
           centered={!breakpoints.sm}
         >
-          {pool.name}
+          <span>{pool.name}</span>
+          <Breadcrumb>
+            <Breadcrumb.Item
+              overlay={
+                <Menu>
+                  {indexPools.map(({ id, name }) => {
+                    const image = indexPoolsLookup[id];
+
+                    return (
+                      <Menu.Item key={id}>
+                        <S.ItemInner>
+                          <S.Image alt={name} src={image} />
+                          <span>{name}</span>
+                        </S.ItemInner>
+                      </Menu.Item>
+                    );
+                  })}
+                </Menu>
+              }
+            >
+              <Link to="/pools">Index Pools</Link>
+            </Breadcrumb.Item>
+            <Breadcrumb.Item>{pool.name}</Breadcrumb.Item>
+          </Breadcrumb>
         </S.Title>
         {(() => {
           switch (true) {
@@ -136,6 +157,8 @@ const S = {
   Title: styled(({ withMargin: _, centered: __, ...rest }) => (
     <Typography.Title {...rest} />
   ))<{ withMargin?: boolean; centered?: boolean }>`
+    ${(props) => props.theme.snippets.spacedBetween};
+
     ${(props) =>
       props.withMargin &&
       css`
@@ -146,5 +169,15 @@ const S = {
       css`
         text-align: center;
       `}
+  `,
+  Item: styled(Menu.Item)`
+    ${(props) => props.theme.snippets.fancy};
+  `,
+  ItemInner: styled.div`
+    ${(props) => props.theme.snippets.perfectlyAligned};
+  `,
+  Image: styled.img`
+    ${(props) => props.theme.snippets.size32};
+    margin-right: ${(props) => props.theme.spacing.medium};
   `,
 };

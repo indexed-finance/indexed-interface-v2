@@ -58,6 +58,7 @@ const selectors = {
         symbol: category.symbol,
         name: category.name,
         brief: category.brief,
+        description: category.description,
         indexPools: category.indexPools
           .map((id) => indexPoolLookup[id])
           .filter(Boolean)
