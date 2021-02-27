@@ -1,4 +1,4 @@
-import { DEFAULT_TOKEN, ERRORS, NETWORKS, PROVIDER_OPTIONS } from "config";
+import { DEFAULT_TOKEN, ERRORS, NETWORKS } from "config";
 import {
   PoolHelper,
   StakingPoolHelper,
@@ -7,11 +7,38 @@ import {
 } from "@indexed-finance/indexed.js";
 import { ReactNode } from "react";
 import { getAddress } from "ethers/lib/utils";
+// import Fortmatic from "fortmatic";
 import GraphqlService from "./graphql";
+// import Torus from "@toruslabs/torus-embed";
+// import WalletConnectProvider from "@walletconnect/web3-provider";
 import Web3 from "web3";
 import Web3Modal from "web3modal";
 import noop from "lodash.noop";
 import settings from "settings.json";
+
+const PROVIDER_OPTIONS = {
+  // walletconnect: {
+  //   package: WalletConnectProvider,
+  //   options: {
+  //     infuraId: "442bad44b92344b7b5294e4329190fea",
+  //   },
+  // },
+  // fortmatic: {
+  //   package: Fortmatic,
+  //   options: {
+  //     key: "pk_test_F0261A757AD16AD0",
+  //   },
+  // },
+  // torus: {
+  //   package: Torus,
+  //   options: {
+  //     networkParams: {
+  //       chainId: 1,
+  //       networkId: 1,
+  //     },
+  //   },
+  // },
+};
 
 export interface CategoryToken {
   id: string;

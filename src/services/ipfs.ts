@@ -1,5 +1,6 @@
 import { GATEWAY_URL } from "config";
 import CID from "cids";
+import axios from "axios";
 import multihashes from "multihashes";
 
 export default class IpfsService {
@@ -7,7 +8,7 @@ export default class IpfsService {
     const ipfsHash = shaToCid(sha3Hash);
     const url = `${GATEWAY_URL}${ipfsHash}`;
 
-    return fetch(url).then((response) => response.json());
+    return axios.get(url);
   }
 }
 

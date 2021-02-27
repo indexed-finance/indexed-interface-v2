@@ -1,7 +1,3 @@
-import Fortmatic from "fortmatic";
-import Torus from "@toruslabs/torus-embed";
-import WalletConnectProvider from "@walletconnect/web3-provider";
-
 export const DEFAULT_TOKEN = "UNI";
 export const DEFAULT_DECIMAL_COUNT = 18;
 export const DEFAULT_TOAST_DISPLAY_TIME_IN_SECONDS = 3;
@@ -15,29 +11,6 @@ export const LOCALSTORAGE_KEY = "indexed.finance | Persisted";
 export const WETH_CONTRACT_ADDRESS =
   "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2";
 export const SOCKET_PORT = 13337;
-export const PROVIDER_OPTIONS = {
-  walletconnect: {
-    package: WalletConnectProvider,
-    options: {
-      infuraId: "442bad44b92344b7b5294e4329190fea",
-    },
-  },
-  fortmatic: {
-    package: Fortmatic,
-    options: {
-      key: "pk_test_F0261A757AD16AD0",
-    },
-  },
-  torus: {
-    package: Torus,
-    options: {
-      networkParams: {
-        chainId: 1,
-        networkId: 1,
-      },
-    },
-  },
-};
 export const FALLBACK_CATEGORY_LOCAL_DATA = {
   description: "(MISSING LOCAL DATA)",
   symbol: "(MISSING LOCAL DATA)",

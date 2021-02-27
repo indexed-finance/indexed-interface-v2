@@ -1,19 +1,12 @@
 import { ETHEREUM_PRICE_URL, SUBGRAPH_URL_INDEXED } from "config";
 import IpfsService from "./ipfs";
+import axios from "axios";
 
 export default class GraphqlService {
   public static executeRequest = (
     query: string,
     url: string = SUBGRAPH_URL_INDEXED
-  ) =>
-    fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-      body: JSON.stringify({ query }),
-    }).then((response) => response.json());
+  ) => axios.post(url, JSON.stringify({ query }));
 
   public static getTokenCategories = async (): Promise<
     Array<{

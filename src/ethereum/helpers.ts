@@ -20,6 +20,7 @@ import { dedupe } from "helpers";
 import BPool from "./abi/BPool.json";
 import IERC20 from "./abi/IERC20.json";
 import IPool from "./abi/IPool.json";
+import axios from "axios";
 import chunk from "lodash.chunk";
 import type {
   Category,
@@ -47,19 +48,14 @@ export function getUrl(chainId: number) {
 }
 
 export async function sendQuery(query: string, url: string) {
-  const response = await fetch(url, {
-    method: "POST",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
+  const response = await axios.post(
+    url,
+    JSON.stringify({
       query,
-    }),
-  });
-  const { data } = await response.json();
+    })
+  );
 
-  return data;
+  return response.data;
 }
 
 export async function querySinglePool(
