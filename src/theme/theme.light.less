@@ -1,0 +1,40 @@
+.light {
+  @import "~antd/lib/style/themes/default.less";
+  @import "~antd/dist/antd.less";
+
+  @white100: #f2f2f2;
+  @grey100: #111111;
+  @grey200: #222222;
+
+  @primary-color: #ccccff;
+  @secondary-color: #d664be;
+  @text-color: @grey100;
+  @text-color-secondary: @grey100;
+  @body-background: @white100;
+  @component-background: @white100;
+  @layout-body-background: @white100;
+  @layout-header-background: @white100;
+  @menu-dark-inline-submenu-bg: @white100;
+  @collapse-header-bg: @white100;
+  @collapse-content-bg: @white100;
+  @heading-color: @grey100;
+  @border-color-base: @primary-color;
+  @border-color-split: @primary-color;
+  @menu-dark-selected-item-text-color: @grey100;
+  @breadcrumb-base-color: @grey100;
+  @breadcrumb-last-item-color: darken(@primary-color, 10%);
+  @breadcrumb-separator-color: @grey100;
+
+  .ant-layout-header {
+    border-bottom: 1px solid @primary-color;
+  }
+  .ant-layout-sider {
+    .ant-layout-sider-children {
+      border-right: 1px solid @primary-color;
+    }
+  }
+
+  .ant-menu-item {
+    padding-left: 24px !important;
+  }
+}

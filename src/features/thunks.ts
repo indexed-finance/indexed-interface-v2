@@ -3,11 +3,13 @@ import { AppThunk } from "./store";
 import { BigNumber } from "bignumber.js";
 import { CoinGeckoService } from "services";
 import { SLIPPAGE_RATE, SUBGRAPH_URL_UNISWAP } from "config";
-import { categoriesActions, indexPoolsActions, tokensActions } from "./models";
+import { categoriesActions } from "./categories";
 import { convert } from "helpers";
 import { ethers } from "ethers";
 import { helpers } from "ethereum";
+import { indexPoolsActions } from "./indexPools";
 import { settingsActions } from "./settings";
+import { tokensActions } from "./tokens";
 import selectors from "./selectors";
 
 export let provider: null | ethers.providers.Web3Provider = null;

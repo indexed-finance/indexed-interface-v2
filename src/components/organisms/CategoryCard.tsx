@@ -1,40 +1,48 @@
 import { Button } from "components/atoms";
 import { Card, List } from "antd";
-import { FullCategory } from "services";
 import { Link } from "react-router-dom";
 import React from "react";
 import styled from "styled-components";
 
 export interface Props {
-  category: FullCategory;
+  id?: string;
+  symbol?: string;
+  name?: string;
+  brief?: string;
+  indexPools: Array<{ name: string; symbol: string }>;
+  tokens: Array<{ name: string; symbol: string }>;
 }
 
-export default function CategoryCard({ category }: Props) {
+export default function CategoryCard({
+  id = "",
+  symbol = "",
+  name = "",
+  brief = "",
+  indexPools,
+  tokens,
+}: Props) {
   return (
-    <Link to={`/categories/${category.symbol.toLowerCase()}`}>
+    <Link to={`/categories/${symbol.toLowerCase()}`}>
       <S.Card
-        key={category.id}
+        key={id}
         hoverable={true}
         title={
           <>
             <S.Image
-              alt={`${category.symbol} Logo`}
-              src={
-                require(`assets/images/${category.symbol.toLowerCase()}.png`)
-                  .default
-              }
+              alt={`${symbol} Logo`}
+              src={require(`assets/images/${symbol.toLowerCase()}.png`).default}
             />
-            <S.Name>{category.name}</S.Name>
+            <S.Name>{name}</S.Name>
           </>
         }
         extra={<Button type="primary">More</Button>}
         actions={[
           <S.TokenImageWrapper key="1">
-            {category.tokens.map((token) => (
+            {tokens.map((token) => (
               <S.TokenImage
                 alt={token.name}
                 title={token.name}
-                key={token.id}
+                key={token.symbol}
                 src={
                   require(`assets/images/${token.symbol.toLowerCase()}.png`)
                     .default
@@ -48,9 +56,9 @@ export default function CategoryCard({ category }: Props) {
           <S.Meta
             description={
               <>
-                {category.brief}
+                {brief}
                 <S.List header={<S.FirstListItem>Index Pools</S.FirstListItem>}>
-                  {category.indexPools.map((indexPool) => (
+                  {indexPools.map((indexPool) => (
                     <S.IndexPoolEntry key={indexPool.name}>
                       <span>
                         {indexPool.name} [{indexPool.symbol}]

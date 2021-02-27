@@ -1,17 +1,12 @@
 import { AiOutlineSwap } from "react-icons/ai";
 import { AppState, actions, selectors } from "features";
-import {
-  ChartCard,
-  PoolInteraction,
-  PoolInteractions,
-  RankedTokenList,
-} from "components";
-import { Col, Grid, Row, Typography } from "antd";
+import { Breadcrumb, Col, Grid, Row, Typography } from "antd";
+import { ChartCard, PoolInteractions, RankedTokenList } from "components";
 import { Performance, Recent, Subscreen } from "../subscreens";
 import { Redirect, useParams } from "react-router-dom";
 import { RiWallet3Line } from "react-icons/ri";
 import { useDispatch, useSelector } from "react-redux";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import styled, { css } from "styled-components";
 
 const { useBreakpoint } = Grid;
@@ -19,9 +14,6 @@ const { useBreakpoint } = Grid;
 export default function PoolDetail() {
   const dispatch = useDispatch();
   const { poolId } = useParams<{ poolId: string }>();
-  const [currentInteraction, setCurrentInteraction] = useState<PoolInteraction>(
-    "swap"
-  );
   const pool = useSelector((state: AppState) =>
     selectors.selectFormattedIndexPool(state, poolId)
   );
@@ -48,11 +40,7 @@ export default function PoolDetail() {
     );
     const interactions = (
       <Subscreen icon={<RiWallet3Line />} title="Interact" padding={0}>
-        <PoolInteractions
-          initial={currentInteraction}
-          onChange={setCurrentInteraction}
-          pool={pool}
-        />
+        <PoolInteractions pool={pool} />
       </Subscreen>
     );
     const recents = <Recent pool={pool} />;
@@ -109,6 +97,10 @@ export default function PoolDetail() {
 
     return (
       <>
+        <Breadcrumb>
+          <Breadcrumb.Item>Index Pools</Breadcrumb.Item>
+          <Breadcrumb.Item>{pool.name}</Breadcrumb.Item>
+        </Breadcrumb>
         <S.Title
           level={breakpoints.md ? 1 : 3}
           withMargin={!breakpoints.sm}

@@ -1,13 +1,12 @@
 import { AppState } from "./store";
-import {
-  categoriesSelectors,
-  dailySnapshotsSelectors,
-  indexPoolsSelectors,
-  tokensSelectors,
-} from "./models";
+import { NormalizedPool } from "ethereum";
+import { categoriesSelectors } from "./categories";
 import { convert } from "helpers";
+import { dailySnapshotsSelectors } from "./dailySnapshots";
 import { formatDistance } from "date-fns";
+import { indexPoolsSelectors } from "./indexPools";
 import { settingsSelectors } from "./settings";
+import { tokensSelectors } from "./tokens";
 
 const MILLISECONDS_PER_SECOND = 1000;
 
@@ -28,13 +27,13 @@ const selectors = {
   ): Record<ModelKeys, Array<{ name: string; id: string }>> => {
     const categories = selectors
       .selectAllCategories(state)
-      .map(({ id, localData }) => ({
-        name: localData?.name ?? "",
+      .map(({ id, name }) => ({
+        name,
         id,
       }));
     const indexPools = selectors
       .selectAllPools(state)
-      .map(({ name, id }) => ({ name, id }));
+      .map(({ name, id }) => ({ name: name.replace(/Tokens Index/g, ""), id }));
     const tokens = selectors.selectAppMenuTokens(state);
 
     return {
@@ -42,6 +41,68 @@ const selectors = {
       indexPools,
       tokens,
     };
+  },
+  /**
+   *
+   * @param state -
+   * @param poolId -
+   */
+  selectFormattedCategory: (state: AppState, categoryId: string) => {
+    const category = selectors.selectCategory(state, categoryId);
+    const indexPoolLookup = selectors.selectPoolLookup(state);
+    const tokenLookup = selectors.selectTokenLookup(state);
+
+    if (category) {
+      return {
+        id: category.id,
+        symbol: category.symbol,
+        name: category.name,
+        brief: category.brief,
+        indexPools: category.indexPools
+          .map((id) => indexPoolLookup[id])
+          .filter(Boolean)
+          .map((pool) => {
+            const guaranteedPool = pool as NormalizedPool;
+            const price = convert.toToken(
+              convert
+                .toBigNumber(guaranteedPool.totalValueLockedUSD)
+                .dividedBy(convert.toBigNumber(guaranteedPool.totalSupply))
+            );
+
+            return {
+              name: guaranteedPool.name,
+              symbol: guaranteedPool.symbol,
+              size: guaranteedPool.size.toString(),
+              price: price.toPrecision(2),
+              supply: convert.toComma(
+                parseFloat(convert.toBalance(guaranteedPool.totalSupply))
+              ),
+              marketCap: convert.toCurrency(guaranteedPool.totalValueLockedUSD),
+              swapFee: convert.toPercent(guaranteedPool.swapFee),
+              cumulativeFees: convert.toCurrency(guaranteedPool.feesTotalUSD),
+              volume: convert.toCurrency(guaranteedPool.totalVolumeUSD),
+            };
+          }),
+        tokens: category.tokens
+          .map((id) => tokenLookup[id])
+          .filter(Boolean)
+          .map((token) => {
+            const entry = token!.dataByCategory[categoryId];
+
+            return entry
+              ? {
+                  name: entry.name,
+                  symbol: entry.symbol,
+                }
+              : {
+                  name: "",
+                  symbol: "",
+                };
+          }),
+      };
+    } else {
+      return null;
+    }
   },
   /**
    *
@@ -186,6 +247,25 @@ const selectors = {
 };
 
 export default selectors;
+
+export interface FormattedCategory {
+  id: string;
+  symbol: string;
+  name: string;
+  brief?: string;
+  indexPools: Array<{
+    name: string;
+    symbol: string;
+    size: string;
+    price: string;
+    supply: string;
+    marketCap: string;
+    swapFee: string;
+    cumulativeFees: string;
+    volume: string;
+  }>;
+  tokens: Array<{ name: string; symbol: string }>;
+}
 
 export interface FormattedIndexPool {
   canStake: boolean;

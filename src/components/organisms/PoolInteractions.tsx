@@ -29,7 +29,6 @@ export default function PoolInteractions({
       onChange={(nextInteraction) => {
         const next = nextInteraction as PoolInteraction;
         setInteraction(next);
-        onChange(next);
       }}
     >
       {pool && (

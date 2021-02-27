@@ -3,7 +3,6 @@ import * as config from "config";
 import * as queries from "./queries";
 import { BigNumber } from "bignumber.js";
 import { Contract } from "ethers";
-import { FALLBACK_CATEGORY_LOCAL_DATA } from "config";
 import { Interface, Result, defaultAbiCoder } from "ethers/lib/utils";
 import { JsonFragment } from "@ethersproject/abi";
 import { JsonRpcSigner, Provider } from "@ethersproject/providers";
@@ -275,24 +274,12 @@ export function normalizeInitialData(categories: Category[]) {
       const normalizedTokensForCategory = {
         ids: [],
         entities: {},
+        // Category data.
       } as NormalizedEntity<NormalizedToken>;
-
-      // Category data.
-      let localData;
-
-      try {
-        localData = require(`./local-category-data/${category.id}.json`);
-      } catch {
-        // You need to add a 0xX.json to ./local-category-data, nerd.
-        localData = FALLBACK_CATEGORY_LOCAL_DATA;
-      }
-
       prev.categories.ids.push(category.id);
       prev.categories.entities[category.id] = {
-        id: category.id,
         indexPools: category.indexPools.map(({ id }) => id),
         tokens: category.tokens.map(({ id }) => id),
-        localData,
       };
 
       // Token data.

@@ -9,16 +9,14 @@ import {
   poolUserDataLoaded,
   subgraphDataLoaded,
 } from "features/actions";
-import { tokensSelectors } from "features/models/tokens";
+import { tokensSelectors } from "features/tokens";
 import type { AppState } from "features/store";
 
 const adapter = createEntityAdapter<NormalizedPool>();
 
 const slice = createSlice({
   name: "indexPools",
-  initialState: adapter.getInitialState({
-    active: "",
-  }),
+  initialState: adapter.getInitialState(),
   reducers: {},
   extraReducers: (builder) =>
     builder
@@ -71,6 +69,7 @@ export const selectors = {
   selectPool: (state: AppState, poolId: string) =>
     selectors.selectById(state, poolId),
   selectAllPools: (state: AppState) => selectors.selectAll(state),
+  selectPoolLookup: (state: AppState) => selectors.selectEntities(state),
   selectPoolTokenIds: (state: AppState, poolId: string) => {
     const pool = selectors.selectPool(state, poolId);
     return pool?.tokens ?? [];
@@ -164,8 +163,8 @@ export const selectors = {
       const { id } = pool.category;
       const category = categoryLookup[id];
 
-      if (category && category.localData) {
-        return require(`assets/images/${category.localData.symbol.toLowerCase()}.png`)
+      if (category && category.symbol) {
+        return require(`assets/images/${category.symbol.toLowerCase()}.png`)
           .default;
       }
     }
