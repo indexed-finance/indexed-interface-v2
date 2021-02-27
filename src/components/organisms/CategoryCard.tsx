@@ -9,8 +9,8 @@ export interface Props {
   symbol?: string;
   name?: string;
   brief?: string;
-  indexPools: Array<{ name: string; symbol: string }>;
-  tokens: Array<{ name: string; symbol: string }>;
+  indexPools?: Array<{ name: string; symbol: string }>;
+  tokens?: Array<{ name: string; symbol: string }>;
 }
 
 export default function CategoryCard({
@@ -18,40 +18,40 @@ export default function CategoryCard({
   symbol = "",
   name = "",
   brief = "",
-  indexPools,
-  tokens,
+  indexPools = [],
+  tokens = [],
 }: Props) {
   return (
-    <Link to={`/categories/${symbol.toLowerCase()}`}>
-      <S.Card
-        key={id}
-        hoverable={true}
-        title={
-          <>
-            <S.Image
-              alt={`${symbol} Logo`}
-              src={require(`assets/images/${symbol.toLowerCase()}.png`).default}
+    <S.Card
+      key={id}
+      hoverable={true}
+      title={
+        <>
+          <S.Image
+            alt={`${symbol} Logo`}
+            src={require(`assets/images/${symbol.toLowerCase()}.png`).default}
+          />
+          <S.Name>{name}</S.Name>
+        </>
+      }
+      extra={<Button type="primary">More</Button>}
+      actions={[
+        <S.TokenImageWrapper key="1">
+          {tokens.map((token) => (
+            <S.TokenImage
+              alt={token.name}
+              title={token.name}
+              key={token.symbol}
+              src={
+                require(`assets/images/${token.symbol.toLowerCase()}.png`)
+                  .default
+              }
             />
-            <S.Name>{name}</S.Name>
-          </>
-        }
-        extra={<Button type="primary">More</Button>}
-        actions={[
-          <S.TokenImageWrapper key="1">
-            {tokens.map((token) => (
-              <S.TokenImage
-                alt={token.name}
-                title={token.name}
-                key={token.symbol}
-                src={
-                  require(`assets/images/${token.symbol.toLowerCase()}.png`)
-                    .default
-                }
-              />
-            ))}
-          </S.TokenImageWrapper>,
-        ]}
-      >
+          ))}
+        </S.TokenImageWrapper>,
+      ]}
+    >
+      <Link to={`/categories/${id.toLowerCase()}`}>
         <S.Content>
           <S.Meta
             description={
@@ -71,8 +71,8 @@ export default function CategoryCard({
             }
           />
         </S.Content>
-      </S.Card>
-    </Link>
+      </Link>
+    </S.Card>
   );
 }
 
@@ -91,6 +91,7 @@ const S = {
     .ant-card-body {
       display: flex;
       align-items: center;
+      height: 240px;
     }
     .ant-card-meta-description {
       font-size: ${(props) => props.theme.fontSizes.large};

@@ -16,6 +16,8 @@
     "cids": "^1.1.5",
     "coingecko-api": "^1.0.10",
     "colorthief": "^2.3.2",
+    "craco": "0.0.3",
+    "craco-less": "^1.17.1",
     "date-fns": "^2.17.0",
     "electron": "^11.3.0",
     "ethers": "^5.0.31",

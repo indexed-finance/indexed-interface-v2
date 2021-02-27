@@ -108,6 +108,16 @@ const selectors = {
   /**
    *
    * @param state -
+   */
+  selectAllFormattedCategories: (state: AppState) => {
+    return selectors
+      .selectAllCategories(state)
+      .map((category) => selectors.selectFormattedCategory(state, category.id))
+      .filter(Boolean);
+  },
+  /**
+   *
+   * @param state -
    * @param poolId -
    */
   selectFormattedIndexPool: (

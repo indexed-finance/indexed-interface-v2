@@ -1,6 +1,6 @@
 import { AppState, selectors } from "features";
-import { Breadcrumb, Divider, Grid, Menu, Typography } from "antd";
-import { CategoryTable } from "components";
+import { Breadcrumb, Divider, Grid, Typography } from "antd";
+import { CategoryDropdown, CategoryTable } from "components";
 import { Link } from "react-router-dom";
 import { Redirect, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
@@ -15,7 +15,6 @@ export default function CategoryDetail() {
   const category = useSelector((state: AppState) =>
     selectors.selectFormattedCategory(state, categoryId)
   );
-  const { categories } = useSelector(selectors.selectMenuModels);
   const breakpoints = useBreakpoint();
 
   return category ? (
@@ -27,26 +26,7 @@ export default function CategoryDetail() {
       >
         <span>{category.name}</span>
         <Breadcrumb>
-          <Breadcrumb.Item
-            overlay={
-              <Menu>
-                <Menu>
-                  {categories.map(({ id, name }) => {
-                    return (
-                      <Menu.Item key={id}>
-                        <S.ItemInner>
-                          <S.CategoryId level={3} data-category={true}>
-                            {id}
-                          </S.CategoryId>
-                          <span>{name}</span>
-                        </S.ItemInner>
-                      </Menu.Item>
-                    );
-                  })}
-                </Menu>
-              </Menu>
-            }
-          >
+          <Breadcrumb.Item overlay={<CategoryDropdown />}>
             <Link to="/categories">Categories</Link>
           </Breadcrumb.Item>
           <Breadcrumb.Item>{category.name}</Breadcrumb.Item>
