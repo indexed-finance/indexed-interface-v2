@@ -1,13 +1,7 @@
-import { AppData } from "../services";
 import { NormalizedInitialData, NormalizedPool, PoolUpdate } from "ethereum";
 import { Swap } from "indexed-types";
 import { Swap as Trade } from "uniswap-types";
 import { createAction } from "@reduxjs/toolkit";
-
-/**
- *
- */
-export const web3DataLoaded = createAction<AppData>("web3DataLoaded");
 
 /**
  *

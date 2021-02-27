@@ -4,7 +4,3 @@ export * from "./graphql";
 export { default as GraphqlService } from "./graphql";
 export * from "./ipfs";
 export { default as IpfsService } from "./ipfs";
-export * from "./uniswap";
-export { default as UniswapService } from "./uniswap";
-export * from "./web3";
-export { default as Web3Service } from "./web3";

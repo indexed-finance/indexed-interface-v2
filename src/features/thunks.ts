@@ -20,20 +20,22 @@ const thunks = {
    *
    */
   initialize: (): AppThunk => async (dispatch) => {
-    await window.ethereum.request({
-      method: "eth_requestAccounts",
-    });
+    if ((window as any).ethereum) {
+      await (window as any).ethereum.request({
+        method: "eth_requestAccounts",
+      });
 
-    provider = new ethers.providers.Web3Provider(window.ethereum);
-    signer = provider.getSigner();
+      provider = new ethers.providers.Web3Provider((window as any).ethereum);
+      signer = provider.getSigner();
 
-    const { chainId } = await provider.getNetwork();
-    const url = helpers.getUrl(chainId);
-    const initial = await helpers.queryInitial(url);
-    const formatted = helpers.normalizeInitialData(initial);
+      const { chainId } = await provider.getNetwork();
+      const url = helpers.getUrl(chainId);
+      const initial = await helpers.queryInitial(url);
+      const formatted = helpers.normalizeInitialData(initial);
 
-    dispatch(actions.subgraphDataLoaded(formatted));
-    dispatch(thunks.retrieveCoingeckoIds());
+      dispatch(actions.subgraphDataLoaded(formatted));
+      dispatch(thunks.retrieveCoingeckoIds());
+    }
   },
   /**
    *

@@ -1,16 +1,12 @@
 import { AnyAction } from "redux";
 import { LOCALSTORAGE_KEY } from "config";
-import { Web3Service } from "services";
+import { ThunkAction } from "redux-thunk";
 import { configureStore } from "@reduxjs/toolkit";
 import reducer from "./reducer";
-import thunk, { ThunkAction } from "redux-thunk";
 
 const store = configureStore({
   reducer,
-  middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().prepend(
-      thunk.withExtraArgument(Web3Service.instance)
-    ),
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware(),
   // preloadedState: loadPersistedState(),
 });
 
@@ -28,7 +24,7 @@ export default store;
 
 export type AppState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
-export type AppThunk = ThunkAction<void, AppState, Web3Service, AnyAction>;
+export type AppThunk = ThunkAction<void, AppState, undefined, AnyAction>;
 
 export interface TokenField {
   amount: string;

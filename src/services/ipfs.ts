@@ -8,7 +8,7 @@ export default class IpfsService {
     const ipfsHash = shaToCid(sha3Hash);
     const url = `${GATEWAY_URL}${ipfsHash}`;
 
-    return axios.get(url);
+    return (await axios.get(url)).data;
   }
 }
 

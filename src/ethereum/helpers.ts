@@ -48,14 +48,16 @@ export function getUrl(chainId: number) {
 }
 
 export async function sendQuery(query: string, url: string) {
-  const response = await axios.post(
+  const {
+    data: { data },
+  } = await axios.post(
     url,
     JSON.stringify({
       query,
     })
   );
 
-  return response.data;
+  return data;
 }
 
 export async function querySinglePool(

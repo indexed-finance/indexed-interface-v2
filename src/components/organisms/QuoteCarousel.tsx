@@ -19,6 +19,7 @@ export default function QuoteCarousel({ pools }: Props) {
 
         return (
           <Quote
+            key={filteredPool.symbol}
             onClick={() => history.push(`/pools/${filteredPool.id}`)}
             symbol={filteredPool.symbol}
             price={filteredPool.priceUsd}

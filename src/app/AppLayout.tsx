@@ -18,6 +18,7 @@ import { useSelector } from "react-redux";
 import { useTranslation } from "i18n";
 import AppMenu from "./AppMenu";
 import React, { useCallback, useContext, useState } from "react";
+import SocketClient from "sockets/client";
 import routes from "./routes";
 import styled from "styled-components";
 
@@ -37,6 +38,10 @@ export default function AppLayout() {
     () => setMobileMenuActive((prev) => !prev),
     []
   );
+
+  React.useEffect(() => {
+    SocketClient.ping();
+  }, []);
 
   return (
     <>
