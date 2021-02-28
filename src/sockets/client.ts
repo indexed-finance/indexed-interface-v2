@@ -1,13 +1,23 @@
 import { AppState, actions, store } from "features";
 import { Operation, applyReducer, deepClone } from "fast-json-patch";
+import { message } from "antd";
 
 export let socket: null | WebSocket = null;
+
+const timeInSeconds = [1, 1, 3, 5, 8, 13, 21, 99, 999];
+let retryAttempts = 0;
 
 export default class SocketClient {
   public static connect() {
     socket = new WebSocket("ws://localhost:13337/");
 
-    socket.onopen = () => store.dispatch(actions.connectionEstablished());
+    socket.onopen = () => {
+      message.success("The connection to the server was established.");
+
+      retryAttempts = 0;
+
+      store.dispatch(actions.connectionEstablished());
+    };
 
     socket.onmessage = (message) => {
       const {
@@ -31,13 +41,35 @@ export default class SocketClient {
       }
     };
 
-    socket.onerror = socket.onclose = () =>
+    socket.onerror = async () => {
+      if (retryAttempts > 0) {
+        retryAttempts++;
+
+        const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+        const seconds = timeInSeconds[retryAttempts];
+
+        await sleep(seconds * 1000);
+
+        SocketClient.disconnect();
+        SocketClient.connect();
+      } else {
+        message.error("Unable to connect to the server. Retrying...");
+
+        store.dispatch(actions.connectionLost());
+
+        SocketClient.disconnect();
+        SocketClient.connect();
+
+        retryAttempts = 1;
+      }
+    };
+
+    socket.onclose = () => {
       store.dispatch(actions.connectionLost());
+    };
   }
 
   public static disconnect() {
-    if (socket) {
-      socket.close(1000, "Client manually closed the connection.");
-    }
+    socket?.close(1000);
   }
 }
