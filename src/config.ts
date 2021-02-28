@@ -26,7 +26,10 @@ export const NETWORKS = {
     name: "rinkeby",
   },
 };
-
+export const WEBSOCKET_SERVER_PORT = 13337;
+export const QUIKNODE_WEBSOCKET_PROVIDER =
+  "wss://bold-old-pond.quiknode.pro/7876affe5a6bb6688c659b452fe9d81d4125d21f/";
+export const QUIKNODE_HTTP_PROVIDER = "https://bold-old-pond.quiknode.pro/";
 export const ERRORS = {
   Web3Service: {
     badNetwork: "Web3Service: Bad network.",
@@ -52,10 +55,15 @@ export const ERRORS = {
   },
 };
 
+export const SUBGRAPH_URL_BASE = "https://api.thegraph.com";
 export const SUBGRAPH_URL_INDEXED =
-  "https://api.thegraph.com/subgraphs/name/indexed-finance/indexed";
+  typeof global === "undefined"
+    ? "/subgraphs/name/indexed-finance/indexed"
+    : `${SUBGRAPH_URL_BASE}/subgraphs/name/indexed-finance/indexed`;
 export const SUBGRAPH_URL_UNISWAP =
-  "https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2";
+  typeof global === "undefined"
+    ? "/subgraphs/name/uniswap/uniswap-v2"
+    : `${SUBGRAPH_URL_BASE}/subgraphs/name/uniswap/uniswap-v2`;
 
 // export const SUBGRAPH_URL_INDEXED =
 //   process.env.REACT_APP_ETH_NETWORK === NETWORKS.mainnet.name
@@ -68,8 +76,7 @@ export const SUBGRAPH_URL_UNISWAP =
 //     : "https://api.thegraph.com/subgraphs/name/samgos/uniswap-v2-rinkeby";
 
 export const PLACEHOLDER_TOKEN_IMAGE = "https://via.placeholder.com/32";
-export const ETHEREUM_PRICE_URL =
-  "https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2";
+export const ETHEREUM_PRICE_URL = "/subgraphs/name/uniswap/uniswap-v2";
 
 export const SOCIAL_MEDIA = [
   {

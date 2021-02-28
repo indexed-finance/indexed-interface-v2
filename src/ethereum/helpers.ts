@@ -50,13 +50,9 @@ export function getUrl(chainId: number) {
 export async function sendQuery(query: string, url: string) {
   const {
     data: { data },
-  } = await axios.post(
-    url,
-    JSON.stringify({
-      query,
-    })
-  );
-
+  } = await axios.post(url, {
+    query,
+  });
   return data;
 }
 

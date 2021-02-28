@@ -66,11 +66,7 @@ export default function PageHeader({ links = [], ...rest }: Props) {
             icon={themeVariation === "dark" ? <S.MoonIcon /> : <S.SunIcon />}
             onClick={() => dispatch(actions.themeToggled())}
           />
-          <Button
-            type="link"
-            title="Connect to your wallet"
-            onClick={() => dispatch(actions.initialize())}
-          >
+          <Button type="link" title="Connect to your wallet">
             Connect
           </Button>
         </>

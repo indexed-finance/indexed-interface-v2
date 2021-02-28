@@ -2,6 +2,7 @@
   "name": "ndx",
   "version": "0.1.0",
   "private": true,
+  "proxy": "https://api.thegraph.com",
   "dependencies": {
     "@ant-design/icons": "^4.5.0",
     "@indexed-finance/indexed.js": "^1.0.45",

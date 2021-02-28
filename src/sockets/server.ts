@@ -1,8 +1,49 @@
+import { AppState, actions, store } from "features";
+import { QUIKNODE_HTTP_PROVIDER, WEBSOCKET_SERVER_PORT } from "config";
+import { ethers } from "ethers";
 import WebSocket from "isomorphic-ws";
 
+const log = (...messages: any[]) =>
+  console.info(`Socket Server) `, ...messages);
+
+// #region Store & State
+const { dispatch, getState } = store;
+const quiknodeBasicProvider = new ethers.providers.JsonRpcProvider(
+  QUIKNODE_HTTP_PROVIDER,
+  1
+);
+
+(async () => {
+  log("Waiting for provider...");
+
+  await quiknodeBasicProvider.ready;
+
+  log("Provider ready. Initializing.");
+
+  dispatch(actions.initialize("", quiknodeBasicProvider));
+
+  const waitThenGetPoolDetails = async () => {
+    const state = getState();
+
+    if (state.indexPools.ids.length > 0) {
+      unsubscribe();
+
+      log("Pools loaded, getting details.");
+
+      for (const pool of state.indexPools.ids) {
+        dispatch(actions.requestPoolDetail(pool as string, false));
+      }
+    }
+  };
+
+  const unsubscribe = store.subscribe(waitThenGetPoolDetails);
+})();
+// #endregion
+
+// #region Client Handling
 const wss: WebSocket.Server = new WebSocket.Server(
   {
-    port: 13337,
+    port: WEBSOCKET_SERVER_PORT,
     perMessageDeflate: {
       zlibDeflateOptions: {
         // See zlib defaults.
@@ -27,9 +68,45 @@ const wss: WebSocket.Server = new WebSocket.Server(
 );
 
 const connections: WebSocket[] = [];
+const ipLookup = new WeakMap<WebSocket, string>();
 
-wss.on("connection", (client) => {
+wss.on("connection", (client, foo) => {
+  const ip = foo.headers.origin ?? "";
+
+  log("A client has connected.", ip);
+
+  ipLookup.set(client, ip);
+
   connections.push(client);
 
-  client.send(JSON.stringify({ bar: "foo" }));
+  client.send(JSON.stringify(formatInitialStateResponse(store.getState())));
 });
+
+// Every so often, ensure every client is connected.
+setInterval(async () => {
+  for (const connection of connections) {
+    const ping = (): Promise<any> =>
+      new Promise((resolve, reject) =>
+        connection.ping(null, false, (err) =>
+          err ? reject(err) : resolve(true)
+        )
+      );
+
+    try {
+      await ping();
+    } catch {
+      log("Looks like we lost a connection.", ipLookup.get(connection));
+      connections.splice(connections.indexOf(connection, 1));
+    }
+  }
+}, 2000);
+
+// #endregion
+
+// #region Socket Responses
+const formatInitialStateResponse = (state: AppState) => ({
+  kind: "INITIAL_STATE",
+  data: state,
+});
+
+// #endregion

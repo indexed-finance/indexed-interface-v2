@@ -1,8 +1,10 @@
 import { DrawerProvider } from "components";
 import { Provider, useDispatch, useSelector } from "react-redux";
+import { QUIKNODE_HTTP_PROVIDER } from "config";
 import { BrowserRouter as Router } from "react-router-dom";
 import { ThemeProvider } from "styled-components";
 import { actions, selectors, store } from "features";
+import { ethers } from "ethers";
 import AppLayout from "./AppLayout";
 import React, { useEffect } from "react";
 import getTheme from "theme";
@@ -15,7 +17,24 @@ function Inner() {
   // Effect:
   // --
   useEffect(() => {
-    dispatch(actions.initialize());
+    const attachToProvider = async () => {
+      const ethereum = (window as any).ethereum;
+
+      if (ethereum) {
+        const [selectedAddress] = await ethereum.request({
+          method: "eth_requestAccounts",
+        });
+
+        dispatch(
+          actions.initialize(
+            selectedAddress,
+            new ethers.providers.JsonRpcProvider(QUIKNODE_HTTP_PROVIDER)
+          )
+        );
+      }
+    };
+
+    attachToProvider();
   }, [dispatch]);
 
   return (

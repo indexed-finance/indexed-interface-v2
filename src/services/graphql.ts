@@ -6,7 +6,7 @@ export default class GraphqlService {
   public static executeRequest = (
     query: string,
     url: string = SUBGRAPH_URL_INDEXED
-  ) => axios.post(url, JSON.stringify({ query }));
+  ) => axios.post(url, { query });
 
   public static getTokenCategories = async (): Promise<
     Array<{

@@ -12,29 +12,59 @@ import { settingsActions } from "./settings";
 import { tokensActions } from "./tokens";
 import selectors from "./selectors";
 
-export let provider: null | ethers.providers.Web3Provider = null;
+export let selectedAddress = "";
+export let socketProvider: null | ethers.providers.WebSocketProvider = null;
+export let basicProvider: null | ethers.providers.JsonRpcProvider = null;
 export let signer: null | ethers.providers.JsonRpcSigner = null;
+export let genericProvider:
+  | null
+  | ethers.providers.WebSocketProvider
+  | ethers.providers.JsonRpcProvider = null;
 
 const thunks = {
   /**
    *
    */
-  initialize: (): AppThunk => async (dispatch) => {
-    if ((window as any).ethereum) {
-      await (window as any).ethereum.request({
-        method: "eth_requestAccounts",
-      });
+  initialize: (
+    withSelectedAddress?: string,
+    withBasicProvider?: null | ethers.providers.JsonRpcProvider,
+    withSocketProvider?: null | ethers.providers.WebSocketProvider
+  ): AppThunk => async (dispatch) => {
+    selectedAddress = withSelectedAddress ?? "";
 
-      provider = new ethers.providers.Web3Provider((window as any).ethereum);
-      signer = provider.getSigner();
+    if (!(withBasicProvider || withSocketProvider)) {
+      throw new Error(
+        "This dapplication cannot initialize without some form of provider."
+      );
+    }
 
-      const { chainId } = await provider.getNetwork();
+    if (withBasicProvider) {
+      await withBasicProvider.ready;
+
+      basicProvider = withBasicProvider;
+      signer = basicProvider.getSigner();
+    }
+
+    if (withSocketProvider) {
+      await withSocketProvider.ready;
+
+      socketProvider = withSocketProvider;
+    }
+
+    const providerToUse = socketProvider ?? basicProvider;
+
+    if (providerToUse) {
+      const { chainId } = providerToUse._network;
       const url = helpers.getUrl(chainId);
       const initial = await helpers.queryInitial(url);
       const formatted = helpers.normalizeInitialData(initial);
 
+      genericProvider = providerToUse;
+
       dispatch(actions.subgraphDataLoaded(formatted));
       dispatch(thunks.retrieveCoingeckoIds());
+    } else {
+      // --
     }
   },
   /**
@@ -88,10 +118,10 @@ const thunks = {
     const state = getState();
     const pool = selectors.selectPool(state, poolId);
 
-    if (pool && provider) {
+    if (pool && genericProvider) {
       const tokens = selectors.selectPoolUnderlyingTokens(state, poolId);
       const update = await helpers.poolUpdateMulticall(
-        provider,
+        genericProvider,
         poolId,
         tokens
       );
@@ -108,8 +138,8 @@ const thunks = {
    *
    */
   requestPoolTradesAndSwaps: (poolId: string): AppThunk => async (dispatch) => {
-    if (provider) {
-      const { chainId } = await provider.getNetwork();
+    if (genericProvider) {
+      const { chainId } = genericProvider._network;
       const url = helpers.getUrl(chainId);
       const [trades, swaps] = await Promise.all([
         helpers.queryTrades(SUBGRAPH_URL_UNISWAP, poolId),
@@ -127,17 +157,16 @@ const thunks = {
     dispatch,
     getState
   ) => {
-    if (provider) {
+    if (genericProvider) {
       const state = getState();
-      const {
-        provider: { selectedAddress: sourceAddress },
-      } = provider as any;
+      const sourceAddress =
+        selectedAddress ?? (await genericProvider.listAccounts())[0];
       const destinationAddress = poolId;
       const tokens = selectors.selectPoolUnderlyingTokens(state, poolId);
 
       if (sourceAddress && destinationAddress) {
         const userData = await helpers.tokenUserDataMulticall(
-          provider,
+          genericProvider,
           sourceAddress,
           destinationAddress,
           tokens
@@ -155,11 +184,17 @@ const thunks = {
   /**
    *
    */
-  requestPoolDetail: (poolId: string): AppThunk => async (dispatch) => {
+  requestPoolDetail: (
+    poolId: string,
+    includeUserData = true
+  ): AppThunk => async (dispatch) => {
     dispatch(actions.retrieveCoingeckoData(poolId));
-    dispatch(actions.requestPoolUpdate(poolId));
+    // dispatch(actions.requestPoolUpdate(poolId));
     dispatch(actions.requestPoolTradesAndSwaps(poolId));
-    dispatch(actions.requestPoolUserData(poolId));
+
+    if (includeUserData) {
+      dispatch(actions.requestPoolUserData(poolId));
+    }
   },
   /**
    *
