@@ -15,7 +15,7 @@ import selectors from "./selectors";
 export let selectedAddress = "";
 export let socketProvider: null | ethers.providers.WebSocketProvider = null;
 export let basicProvider: null | ethers.providers.JsonRpcProvider = null;
-export let signer: null | ethers.providers.JsonRpcSigner = null;
+export const signer: null | ethers.providers.JsonRpcSigner = null;
 export let genericProvider:
   | null
   | ethers.providers.WebSocketProvider
@@ -42,7 +42,7 @@ const thunks = {
       await withBasicProvider.ready;
 
       basicProvider = withBasicProvider;
-      signer = basicProvider.getSigner();
+      // signer = basicProvider.getSigner();
     }
 
     if (withSocketProvider) {
@@ -189,9 +189,9 @@ const thunks = {
   ) => {
     dispatch(actions.retrieveCoingeckoData(poolId));
     dispatch(actions.requestPoolTradesAndSwaps(poolId));
+    dispatch(actions.requestPoolUpdate(poolId));
 
     if (includeCalls) {
-      dispatch(actions.requestPoolUpdate(poolId));
       dispatch(actions.requestPoolUserData(poolId));
     }
   },

@@ -1,4 +1,5 @@
 import { AppState, actions, store } from "features";
+import { InfuraProvider } from "@ethersproject/providers";
 import { QUIKNODE_HTTP_PROVIDER, WEBSOCKET_SERVER_PORT } from "config";
 import { ethers } from "ethers";
 import WebSocket from "isomorphic-ws";
@@ -8,9 +9,13 @@ const log = (...messages: any[]) =>
 
 // #region Store & State
 const { dispatch, getState } = store;
-const quiknodeBasicProvider = new ethers.providers.JsonRpcProvider(
-  QUIKNODE_HTTP_PROVIDER,
-  1
+// const quiknodeBasicProvider = new ethers.providers.JsonRpcProvider(
+//   QUIKNODE_HTTP_PROVIDER,
+//   1
+// );
+const quiknodeBasicProvider = new InfuraProvider(
+  "mainnet",
+  "442bad44b92344b7b5294e4329190fea"
 );
 
 (async () => {

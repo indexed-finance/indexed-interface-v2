@@ -29,7 +29,9 @@ export const NETWORKS = {
 export const WEBSOCKET_SERVER_PORT = 13337;
 export const QUIKNODE_WEBSOCKET_PROVIDER =
   "wss://bold-old-pond.quiknode.pro/7876affe5a6bb6688c659b452fe9d81d4125d21f/";
-export const QUIKNODE_HTTP_PROVIDER = "https://bold-old-pond.quiknode.pro/";
+// export const QUIKNODE_HTTP_PROVIDER = "https://bold-old-pond.quiknode.pro/";
+export const QUIKNODE_HTTP_PROVIDER =
+  "https://mainnet.infura.io/v3/442bad44b92344b7b5294e4329190fea";
 export const ERRORS = {
   Web3Service: {
     badNetwork: "Web3Service: Bad network.",
