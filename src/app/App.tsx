@@ -28,7 +28,7 @@ function Inner() {
         dispatch(
           actions.initialize(
             selectedAddress,
-            new ethers.providers.JsonRpcProvider(QUIKNODE_HTTP_PROVIDER)
+            new ethers.providers.JsonRpcProvider(QUIKNODE_HTTP_PROVIDER, 1)
           )
         );
       }

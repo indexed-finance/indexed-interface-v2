@@ -184,15 +184,14 @@ const thunks = {
   /**
    *
    */
-  requestPoolDetail: (
-    poolId: string,
-    includeUserData = true
-  ): AppThunk => async (dispatch) => {
+  requestPoolDetail: (poolId: string, includeCalls = true): AppThunk => async (
+    dispatch
+  ) => {
     dispatch(actions.retrieveCoingeckoData(poolId));
-    // dispatch(actions.requestPoolUpdate(poolId));
     dispatch(actions.requestPoolTradesAndSwaps(poolId));
 
-    if (includeUserData) {
+    if (includeCalls) {
+      dispatch(actions.requestPoolUpdate(poolId));
       dispatch(actions.requestPoolUserData(poolId));
     }
   },
