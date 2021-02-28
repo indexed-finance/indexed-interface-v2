@@ -1,6 +1,5 @@
 import { DrawerProvider } from "components";
 import { Provider, useDispatch, useSelector } from "react-redux";
-import { QUIKNODE_HTTP_PROVIDER } from "config";
 import { BrowserRouter as Router } from "react-router-dom";
 import { ThemeProvider } from "styled-components";
 import { actions, selectors, store } from "features";
@@ -26,10 +25,10 @@ function Inner() {
         });
 
         dispatch(
-          actions.initialize(
+          actions.initialize({
+            provider: new ethers.providers.JsonRpcProvider(ethereum, 1),
             selectedAddress,
-            new ethers.providers.JsonRpcProvider(QUIKNODE_HTTP_PROVIDER, 1)
-          )
+          })
         );
       }
     };

@@ -7,6 +7,8 @@ type Theme = "dark" | "light";
 interface SettingsState {
   languageCode: SupportedLanguageCode;
   theme: Theme;
+  connected: boolean;
+  connectionEnabled: boolean;
 }
 
 const slice = createSlice({
@@ -14,6 +16,8 @@ const slice = createSlice({
   initialState: {
     languageCode: "en-us",
     theme: "dark",
+    connected: false,
+    connectionEnabled: true,
   } as SettingsState,
   reducers: {
     languageChanged: (state, action: PayloadAction<SupportedLanguageCode>) => {
@@ -25,6 +29,22 @@ const slice = createSlice({
     themeToggled: (state) => {
       state.theme = state.theme === "dark" ? "light" : "dark";
     },
+    connectionEstablished: (state) => {
+      state.connected = true;
+    },
+    connectionLost: (state) => {
+      state.connected = false;
+    },
+    connectionToggled: (state) => {
+      const connected = !state.connectionEnabled;
+
+      if (connected) {
+        state.connectionEnabled = true;
+      } else {
+        state.connected = false;
+        state.connectionEnabled = false;
+      }
+    },
   },
 });
 
@@ -33,6 +53,9 @@ export const { actions } = slice;
 export const selectors = {
   selectSettings: (state: AppState) => state.settings,
   selectTheme: (state: AppState) => state.settings.theme,
+  selectConnected: (state: AppState) => state.settings.connected,
+  selectConnectionEnabled: (state: AppState) =>
+    state.settings.connectionEnabled,
 };
 
 export default slice.reducer;

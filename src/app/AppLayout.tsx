@@ -1,5 +1,14 @@
 import "theme/styles.less";
-import { Affix, Breadcrumb, Grid, Layout, Select, Switch } from "antd";
+import {
+  Affix,
+  Breadcrumb,
+  Grid,
+  Layout,
+  Popover,
+  Select,
+  Switch,
+  Typography,
+} from "antd";
 import { AiOutlineMenuFold, AiOutlineMenuUnfold } from "react-icons/ai";
 import {
   Button,
@@ -8,16 +17,17 @@ import {
   PageFooter,
   QuoteCarousel,
 } from "components";
-import { FormattedIndexPool, selectors } from "features";
+import { FormattedIndexPool, actions, selectors } from "features";
 import { GlobalStyles } from "theme";
+import { ImConnection } from "react-icons/im";
 import { Link, Route, Switch as RouterSwitch } from "react-router-dom";
 import { Logo } from "components";
 import { MdAccountBalanceWallet, MdSettings } from "react-icons/md";
 import { SOCIAL_MEDIA } from "config";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "i18n";
 import AppMenu from "./AppMenu";
-import React, { useCallback, useContext, useState } from "react";
+import React, { useCallback, useContext, useMemo, useState } from "react";
 import SocketClient from "sockets/client";
 import routes from "./routes";
 import styled from "styled-components";
@@ -28,7 +38,10 @@ const { Option } = Select;
 
 export default function AppLayout() {
   const translate = useTranslation();
+  const dispatch = useDispatch();
   const { activePage } = useContext(DrawerContext);
+  const isConnected = useSelector(selectors.selectConnected);
+  const isConnectionEnabled = useSelector(selectors.selectConnectionEnabled);
   const indexPools = useSelector(selectors.selectAllFormattedIndexPools);
   const breakpoint = useBreakpoint();
   const [mobileMenuActive, setMobileMenuActive] = useState(false);
@@ -38,10 +51,31 @@ export default function AppLayout() {
     () => setMobileMenuActive((prev) => !prev),
     []
   );
+  const connectionStatus = useMemo(() => {
+    if (isConnectionEnabled) {
+      return {
+        type: (isConnected ? "success" : "danger") as any,
+        top: isConnected ? "Connected to server." : "Not connected to server.",
+        bottom: "Click this icon to disable socket updates.",
+      };
+    } else {
+      return {
+        type: "secondary" as any,
+        top: "Connection disabled.",
+        bottom: "Click this icon to enable socket updates.",
+      };
+    }
+  }, [isConnectionEnabled, isConnected]);
 
+  // Effect
+  // On initial load, open up a connection to the server.
   React.useEffect(() => {
-    SocketClient.ping();
-  }, []);
+    if (isConnectionEnabled) {
+      SocketClient.connect();
+    } else {
+      SocketClient.disconnect();
+    }
+  }, [isConnectionEnabled]);
 
   return (
     <>
@@ -84,6 +118,22 @@ export default function AppLayout() {
                     <MdSettings />
                   </Link>
                 </S.Settings>
+                <Popover
+                  placement="bottomLeft"
+                  content={
+                    <>
+                      <strong>{connectionStatus.top}</strong>
+                      <br />
+                      <em>{connectionStatus.bottom}</em>
+                    </>
+                  }
+                >
+                  <S.Connection type={connectionStatus.type}>
+                    <S.ConnectionStatus
+                      onClick={() => dispatch(actions.connectionToggled())}
+                    />
+                  </S.Connection>
+                </Popover>
               </S.Controls>
             )}
           </S.Top>
@@ -229,6 +279,20 @@ const S = {
         max-height: 300px;
         overflow: auto;
       }
+    }
+  `,
+  Connection: styled(Typography.Text)`
+    ${(props) => props.theme.snippets.perfectlyCentered};
+    margin: 0;
+  `,
+  ConnectionStatus: styled(ImConnection)`
+    margin-left: ${(props) => props.theme.spacing.medium};
+    font-size: ${(props) => props.theme.fontSizes.huge};
+    cursor: pointer;
+    transition: color 0.6s;
+
+    :hover {
+      color: ${(props) => props.theme.colors.primary};
     }
   `,
 };

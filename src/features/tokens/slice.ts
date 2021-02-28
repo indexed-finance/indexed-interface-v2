@@ -5,6 +5,8 @@ import {
   coingeckoDataLoaded,
   coingeckoIdsLoaded,
   poolUpdated,
+  receivedInitialStateFromServer,
+  receivedStatePatchFromServer,
   subgraphDataLoaded,
 } from "features/actions";
 import { convert } from "helpers";
@@ -82,6 +84,16 @@ const slice = createSlice({
             }
           }
         }
+      })
+      .addCase(receivedInitialStateFromServer, (_, action) => {
+        const { tokens } = action.payload;
+
+        return tokens;
+      })
+      .addCase(receivedStatePatchFromServer, (_, action) => {
+        const { tokens } = action.payload;
+
+        return tokens;
       }),
 });
 

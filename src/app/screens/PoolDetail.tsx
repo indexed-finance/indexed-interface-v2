@@ -17,15 +17,18 @@ export default function PoolDetail() {
   const pool = useSelector((state: AppState) =>
     selectors.selectFormattedIndexPool(state, poolId)
   );
+  const isConnected = useSelector(selectors.selectConnected);
   const { indexPools } = useSelector(selectors.selectMenuModels);
   const indexPoolsLookup = useSelector(selectors.selectCategoryImagesByPoolIds);
   const breakpoints = useBreakpoint();
 
   // Effect:
-  // When the pool changes, get the juicy details.
+  // When the pool changes and not connected to the server, get the juicy details.
   useEffect(() => {
-    dispatch(actions.requestPoolDetail(poolId));
-  }, [dispatch, poolId]);
+    if (!isConnected) {
+      dispatch(actions.requestPoolDetail(poolId));
+    }
+  }, [dispatch, poolId, isConnected]);
 
   if (pool) {
     // Subscreens

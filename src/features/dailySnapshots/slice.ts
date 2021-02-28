@@ -1,6 +1,10 @@
 import { DailyPoolSnapshot } from "indexed-types";
 import { createEntityAdapter, createSlice } from "@reduxjs/toolkit";
-import { subgraphDataLoaded } from "features/actions";
+import {
+  receivedInitialStateFromServer,
+  receivedStatePatchFromServer,
+  subgraphDataLoaded,
+} from "features/actions";
 import type { AppState } from "features/store";
 
 const SECONDS_PER_DAY = 24 * 60 * 60;
@@ -13,14 +17,25 @@ const slice = createSlice({
   initialState: adapter.getInitialState(),
   reducers: {},
   extraReducers: (builder) =>
-    builder.addCase(subgraphDataLoaded, (state, action) => {
-      const { dailySnapshots } = action.payload;
-      const fullSnapshots = dailySnapshots.ids.map(
-        (id) => dailySnapshots.entities[id]
-      );
+    builder
+      .addCase(subgraphDataLoaded, (state, action) => {
+        const { dailySnapshots } = action.payload;
+        const fullSnapshots = dailySnapshots.ids.map(
+          (id) => dailySnapshots.entities[id]
+        );
 
-      adapter.addMany(state, fullSnapshots);
-    }),
+        adapter.addMany(state, fullSnapshots);
+      })
+      .addCase(receivedInitialStateFromServer, (_, action) => {
+        const { dailySnapshots } = action.payload;
+
+        return dailySnapshots;
+      })
+      .addCase(receivedStatePatchFromServer, (_, action) => {
+        const { dailySnapshots } = action.payload;
+
+        return dailySnapshots;
+      }),
 });
 
 export const { actions } = slice;

@@ -15,4 +15,7 @@ export default {
 
   // Blues
   blue100: "#1b90ff",
+
+  // Named
+  primary: "#ccccff",
 };

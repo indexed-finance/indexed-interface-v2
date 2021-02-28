@@ -12,59 +12,46 @@ import { settingsActions } from "./settings";
 import { tokensActions } from "./tokens";
 import selectors from "./selectors";
 
-export let selectedAddress = "";
-export let socketProvider: null | ethers.providers.WebSocketProvider = null;
-export let basicProvider: null | ethers.providers.JsonRpcProvider = null;
-export const signer: null | ethers.providers.JsonRpcSigner = null;
-export let genericProvider:
+export let provider:
   | null
-  | ethers.providers.WebSocketProvider
-  | ethers.providers.JsonRpcProvider = null;
+  | ethers.providers.JsonRpcProvider
+  | ethers.providers.InfuraProvider = null;
+export let signer: null | ethers.providers.JsonRpcSigner = null;
+
+type InitialzeOptions = {
+  provider: ethers.providers.JsonRpcProvider | ethers.providers.InfuraProvider;
+  withSigner?: boolean;
+  selectedAddress?: string;
+};
+
+(window as any).provider = provider;
 
 const thunks = {
   /**
    *
    */
-  initialize: (
-    withSelectedAddress?: string,
-    withBasicProvider?: null | ethers.providers.JsonRpcProvider,
-    withSocketProvider?: null | ethers.providers.WebSocketProvider
-  ): AppThunk => async (dispatch) => {
-    selectedAddress = withSelectedAddress ?? "";
+  initialize: (options: InitialzeOptions): AppThunk => async (
+    dispatch,
+    getState
+  ) => {
+    provider = options.provider;
 
-    if (!(withBasicProvider || withSocketProvider)) {
-      throw new Error(
-        "This dapplication cannot initialize without some form of provider."
-      );
+    if (options.withSigner) {
+      signer = provider.getSigner();
     }
 
-    if (withBasicProvider) {
-      await withBasicProvider.ready;
+    const state = getState();
+    const isConnected = selectors.selectConnected(state);
 
-      basicProvider = withBasicProvider;
-      // signer = basicProvider.getSigner();
-    }
+    // If connected to a socket, defer updates to the server.
+    if (!isConnected) {
+      const { chainId } = provider.network;
 
-    if (withSocketProvider) {
-      await withSocketProvider.ready;
-
-      socketProvider = withSocketProvider;
-    }
-
-    const providerToUse = socketProvider ?? basicProvider;
-
-    if (providerToUse) {
-      const { chainId } = providerToUse._network;
       const url = helpers.getUrl(chainId);
       const initial = await helpers.queryInitial(url);
       const formatted = helpers.normalizeInitialData(initial);
 
-      genericProvider = providerToUse;
-
       dispatch(actions.subgraphDataLoaded(formatted));
-      dispatch(thunks.retrieveCoingeckoIds());
-    } else {
-      // --
     }
   },
   /**
@@ -118,10 +105,10 @@ const thunks = {
     const state = getState();
     const pool = selectors.selectPool(state, poolId);
 
-    if (pool && genericProvider) {
+    if (provider && pool) {
       const tokens = selectors.selectPoolUnderlyingTokens(state, poolId);
       const update = await helpers.poolUpdateMulticall(
-        genericProvider,
+        provider,
         poolId,
         tokens
       );
@@ -138,8 +125,8 @@ const thunks = {
    *
    */
   requestPoolTradesAndSwaps: (poolId: string): AppThunk => async (dispatch) => {
-    if (genericProvider) {
-      const { chainId } = genericProvider._network;
+    if (provider) {
+      const { chainId } = await provider.getNetwork();
       const url = helpers.getUrl(chainId);
       const [trades, swaps] = await Promise.all([
         helpers.queryTrades(SUBGRAPH_URL_UNISWAP, poolId),
@@ -157,16 +144,15 @@ const thunks = {
     dispatch,
     getState
   ) => {
-    if (genericProvider) {
+    if (provider) {
       const state = getState();
-      const sourceAddress =
-        selectedAddress ?? (await genericProvider.listAccounts())[0];
+      const sourceAddress = (provider as any).connection.selectedAddress;
       const destinationAddress = poolId;
       const tokens = selectors.selectPoolUnderlyingTokens(state, poolId);
 
       if (sourceAddress && destinationAddress) {
         const userData = await helpers.tokenUserDataMulticall(
-          genericProvider,
+          provider,
           sourceAddress,
           destinationAddress,
           tokens

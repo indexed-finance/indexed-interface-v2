@@ -7,6 +7,8 @@ import {
   poolTradesAndSwapsLoaded,
   poolUpdated,
   poolUserDataLoaded,
+  receivedInitialStateFromServer,
+  receivedStatePatchFromServer,
   subgraphDataLoaded,
 } from "features/actions";
 import { tokensSelectors } from "features/tokens";
@@ -59,6 +61,32 @@ const slice = createSlice({
         if (poolInState) {
           poolInState.dataForUser = userData;
         }
+      })
+      .addCase(receivedInitialStateFromServer, (_, action) => {
+        const { indexPools } = action.payload;
+
+        return indexPools;
+      })
+      .addCase(receivedStatePatchFromServer, (state, action) => {
+        const { indexPools } = action.payload;
+
+        // The server doesn't track user data, so keep it around.
+        return {
+          ...indexPools,
+          entities: Object.entries(indexPools.entities).reduce(
+            (prev, [key, value]) => {
+              const entry = value as NormalizedPool;
+
+              prev[key] = {
+                ...entry,
+                dataForUser: state.entities[key]?.dataForUser ?? null,
+              };
+
+              return prev;
+            },
+            {} as Record<string, NormalizedPool>
+          ),
+        };
       }),
 });
 

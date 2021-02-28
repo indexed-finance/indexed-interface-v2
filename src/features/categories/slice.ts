@@ -1,6 +1,10 @@
 import { NormalizedCategory } from "ethereum";
 import { createEntityAdapter, createSlice } from "@reduxjs/toolkit";
-import { subgraphDataLoaded } from "features/actions";
+import {
+  receivedInitialStateFromServer,
+  receivedStatePatchFromServer,
+  subgraphDataLoaded,
+} from "features/actions";
 import type { AppState } from "features/store";
 
 import ZeroExOne from "./local-data/0x1.json";
@@ -28,17 +32,28 @@ const slice = createSlice({
   initialState: stateWithLocalData,
   reducers: {},
   extraReducers: (builder) =>
-    builder.addCase(subgraphDataLoaded, (state, action) => {
-      const { categories } = action.payload;
-      const mapped = selectors
-        .selectAll({ categories: state } as AppState)
-        .map((existing) => ({
-          ...existing,
-          ...categories.entities[existing.id],
-        }));
+    builder
+      .addCase(subgraphDataLoaded, (state, action) => {
+        const { categories } = action.payload;
+        const mapped = selectors
+          .selectAll({ categories: state } as AppState)
+          .map((existing) => ({
+            ...existing,
+            ...categories.entities[existing.id],
+          }));
 
-      adapter.upsertMany(state, mapped);
-    }),
+        adapter.upsertMany(state, mapped);
+      })
+      .addCase(receivedInitialStateFromServer, (_, action) => {
+        const { categories } = action.payload;
+
+        return categories;
+      })
+      .addCase(receivedStatePatchFromServer, (_, action) => {
+        const { categories } = action.payload;
+
+        return categories;
+      }),
 });
 
 export const { actions } = slice;

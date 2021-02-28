@@ -18,7 +18,7 @@ export default function QuoteCarousel({ pools }: Props) {
         const filteredPool = pool as FormattedIndexPool;
 
         return (
-          <Quote
+          <S.Quote
             key={filteredPool.symbol}
             onClick={() => history.push(`/pools/${filteredPool.id}`)}
             symbol={filteredPool.symbol}
@@ -37,5 +37,9 @@ const S = {
     padding: ${(props) => props.theme.spacing.medium};
     background-size: cover;
     cursor: pointer;
+  `,
+  Quote: styled(Quote)`
+    padding-left: ${(props) => props.theme.spacing.large};
+    border-left: 4px solid ${(props) => props.theme.colors.primary};
   `,
 };
