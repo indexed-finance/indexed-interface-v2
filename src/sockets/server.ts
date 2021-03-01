@@ -100,11 +100,16 @@ const unsubscribeFromInitialWait = store.subscribe(waitThenGetPoolDetails);
 })();
 
 // After stabilizing, request symbol information for all relevant tokens.
+let coinapiClient: WebSocket;
+let symbolToPriceDataLookup: Record<string, PriceData>;
+let prices24HoursAgo: Record<string, null | number>;
+
+// Next, open a CoinAPI socket connection and request data for the relevant symbols.
 const retrieveSymbolsAndOpenSocket = async (symbols: string[]) => {
-  // Next, open a CoinAPI socket connection and request data for the relevant symbols.
-  const coinapiClient = new WebSocket(COINAPI_SANDBOX_URL);
-  const symbolToPriceDataLookup: Record<string, PriceData> = {};
-  const prices24HoursAgo = symbols.reduce((prev, next) => {
+  // Reset the cached values.
+  coinapiClient = new WebSocket(COINAPI_SANDBOX_URL);
+  symbolToPriceDataLookup = {};
+  prices24HoursAgo = symbols.reduce((prev, next) => {
     prev[next] = null;
     return prev;
   }, {} as Record<string, null | number>);
@@ -131,7 +136,7 @@ const retrieveSymbolsAndOpenSocket = async (symbols: string[]) => {
       ["USD", "USDC", "USDT"].includes(asset);
 
     const handlers: Record<string, (data: any) => void> = {
-      exrate: (_data: ExchangeResponse) => {
+      exrate(_data: ExchangeResponse) {
         try {
           const { asset_id_base: from, asset_id_quote: to, rate } = _data;
           const price24HoursAgo = prices24HoursAgo[from];
@@ -151,7 +156,7 @@ const retrieveSymbolsAndOpenSocket = async (symbols: string[]) => {
           }
         } catch {}
       },
-      ohlcv: (_data: OhlcvResponse) => {
+      ohlcv(_data: OhlcvResponse) {
         try {
           // BINANCE _ SPOT _ <ASSET> _ <OTHER ASSET>
           const [, , asset, otherAsset] = _data.symbol_id.split("_");
@@ -169,6 +174,9 @@ const retrieveSymbolsAndOpenSocket = async (symbols: string[]) => {
             }
           }
         } catch {}
+      },
+      reconnect(_data: ReconnectResponse) {
+        retrieveSymbolsAndOpenSocket(symbols);
       },
     };
     const handler =
@@ -322,6 +330,14 @@ const sampleExchangeResponse = {
 };
 
 type ExchangeResponse = typeof sampleExchangeResponse;
+
+const sampleReconnectResponse = {
+  type: "reconnect",
+  within_seconds: 10,
+  before_time: "2020-08-06T19:19:09.7035429Z",
+};
+
+type ReconnectResponse = typeof sampleReconnectResponse;
 
 const priceData = {
   price: 0,

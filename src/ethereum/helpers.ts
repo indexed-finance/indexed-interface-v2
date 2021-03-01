@@ -262,7 +262,7 @@ export async function tokenUserDataMulticall(
 
 // #region Formatters
 export function normalizeInitialData(categories: Category[]) {
-  return categories.reduce(
+  return categories.slice(0, categories.length - 1).reduce(
     (prev, next) => {
       const category = next;
       const normalizedTokensForCategory = {
