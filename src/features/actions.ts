@@ -63,9 +63,3 @@ export const receivedInitialStateFromServer = createAction<any>(
 export const receivedStatePatchFromServer = createAction<any>(
   "receivedStatePatchFromServer"
 );
-/**
- *
- */
-export const receivedCoinapiOpenPrices = createAction<
-  Record<string, null | number>
->("receivedCoinapiOpenPrices");

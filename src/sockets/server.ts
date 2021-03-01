@@ -21,6 +21,7 @@ const provider = new providers.InfuraProvider("mainnet", INFURA_ID);
 const previousState = cloneDeep(store.getState());
 let observer = jsonpatch.observe<AppState>(previousState);
 let sendingUpdate: NodeJS.Timeout;
+let pendingPatches: Operation[] = [];
 
 const updateClients = () => {
   for (const [key, value] of Object.entries(store.getState())) {
@@ -30,15 +31,19 @@ const updateClients = () => {
   const patch = jsonpatch.generate(observer);
 
   if (connections.length > 0 && patch.length > 0) {
+    pendingPatches = pendingPatches.concat(patch);
     clearTimeout(sendingUpdate);
 
     sendingUpdate = setTimeout(() => {
-      log(`The state has changed -- updating ${connections.length} client(s).`);
+      log(
+        `The state has changed and contains ${pendingPatches.length} patches -- updating ${connections.length} client(s).`
+      );
 
       for (const client of connections) {
-        client.send(formatStatePatchResponse(patch));
+        client.send(formatStatePatchResponse(pendingPatches));
       }
 
+      pendingPatches = [];
       observer = jsonpatch.observe<AppState>(previousState);
     }, SERVER_DEBOUNCE_RATE);
   }
@@ -51,6 +56,8 @@ store.subscribe(updateClients);
 let updateCount = 0;
 const getPoolDetails = () => {
   const state = getState();
+
+  dispatch(actions.retrieveInitialData());
 
   for (const pool of state.indexPools.ids) {
     dispatch(actions.requestPoolDetail(pool as string, false));
@@ -96,21 +103,20 @@ const unsubscribeFromInitialWait = store.subscribe(waitThenGetPoolDetails);
 const retrieveSymbolsAndOpenSocket = async (symbols: string[]) => {
   // Next, open a CoinAPI socket connection and request data for the relevant symbols.
   const coinapiClient = new WebSocket(COINAPI_SANDBOX_URL);
+  const symbolToPriceDataLookup: Record<string, PriceData> = {};
+  const prices24HoursAgo = symbols.reduce((prev, next) => {
+    prev[next] = null;
+    return prev;
+  }, {} as Record<string, null | number>);
 
   coinapiClient.onopen = () => {
-    const now = new Date().getTime();
-    const then = now - 24 * 60 * 60 * 1000; // One day ago.
-    const when = new Date(then).toISOString();
-
     // Authenticate.
     coinapiClient.send(
       JSON.stringify({
         type: "hello",
         apikey: COINAPI_API_KEY,
         heartbeat: false,
-        period_id: "1DAY",
-        time_period_start: when,
-        subscribe_data_type: ["ohlcv"],
+        subscribe_data_type: ["ohlcv", "exrate"],
         subscribe_filter_asset_id: symbols,
       })
     );
@@ -119,28 +125,49 @@ const retrieveSymbolsAndOpenSocket = async (symbols: string[]) => {
   // RFC-6455 [https://www.ietf.org/rfc/rfc6455.txt]
   coinapiClient.on("ping", () => coinapiClient.send(formatPongResponse()));
 
-  const prices24HoursAgo = symbols.reduce((prev, next) => {
-    prev[next] = null;
-    return prev;
-  }, {} as Record<string, null | number>);
-
   coinapiClient.onmessage = (event) => {
     const data = JSON.parse(event.data as string);
+    const isUsdLike = (asset: string) =>
+      ["USD", "USDC", "USDT"].includes(asset);
+
     const handlers: Record<string, (data: any) => void> = {
+      exrate: (_data: ExchangeResponse) => {
+        try {
+          const { asset_id_base: from, asset_id_quote: to, rate } = _data;
+          const price24HoursAgo = prices24HoursAgo[from];
+
+          if (isUsdLike(to) && prices24HoursAgo != null) {
+            const change24Hours = rate - price24HoursAgo!;
+            const percentChange24Hours = change24Hours / rate;
+
+            symbolToPriceDataLookup[from] = {
+              price: rate,
+              change24Hours,
+              percentChange24Hours,
+              updatedAt: new Date().getTime(),
+            };
+
+            dispatch(actions.coingeckoDataLoaded(symbolToPriceDataLookup));
+          }
+        } catch {}
+      },
       ohlcv: (_data: OhlcvResponse) => {
         try {
           // BINANCE _ SPOT _ <ASSET> _ <OTHER ASSET>
           const [, , asset, otherAsset] = _data.symbol_id.split("_");
 
-          if (
-            otherAsset === "USD" ||
-            otherAsset === "USDC" ||
-            otherAsset === "USDT"
-          ) {
-            prices24HoursAgo[asset] = _data.price_open;
-          }
+          if (isUsdLike(otherAsset)) {
+            const oneDay = 24 * 60 * 60 * 1000;
+            const twoDays = oneDay * 2;
+            const now = new Date().getTime();
+            const aDayAgo = now - oneDay;
+            const twoDaysAgo = now - twoDays;
+            const when = new Date(_data.time_period_end).getTime();
 
-          dispatch(actions.receivedCoinapiOpenPrices(prices24HoursAgo));
+            if (when > twoDaysAgo && when < aDayAgo) {
+              prices24HoursAgo[asset] = _data.price_close;
+            }
+          }
         } catch {}
       },
     };
@@ -171,7 +198,7 @@ const unsubscribeFromWaitingForSymbols = store.subscribe(() => {
 // #endregion
 
 // #region Client Handling
-const wss: WebSocket.Server = new WebSocket.Server(
+const clientServer: WebSocket.Server = new WebSocket.Server(
   {
     port: WEBSOCKET_SERVER_PORT,
     perMessageDeflate: {
@@ -201,7 +228,7 @@ const connections: WebSocket[] = [];
 const clientToIpLookup = new WeakMap<WebSocket, string>();
 const ipToClientLookup: Record<string, WebSocket> = {};
 
-wss.on("connection", (client, foo) => {
+clientServer.on("connection", (client, foo) => {
   const ip = foo.headers.origin ?? "";
 
   if (!ipToClientLookup[ip]) {
@@ -285,4 +312,23 @@ const sampleOhlcvResponse = {
 };
 
 type OhlcvResponse = typeof sampleOhlcvResponse;
+
+const sampleExchangeResponse = {
+  type: "exrate",
+  asset_id_base: "SNX",
+  asset_id_quote: "USD",
+  time: "2019-06-11T15:26:00.0000000Z",
+  rate: 10065.0319541,
+};
+
+type ExchangeResponse = typeof sampleExchangeResponse;
+
+const priceData = {
+  price: 0,
+  change24Hours: 0,
+  percentChange24Hours: 0,
+  updatedAt: 0,
+};
+
+type PriceData = typeof priceData;
 // #endregion

@@ -30,23 +30,21 @@ const thunks = {
   /**
    *
    */
-  initialize: (options: InitialzeOptions): AppThunk => async (
-    dispatch,
-    getState
-  ) => {
+  initialize: (options: InitialzeOptions): AppThunk => async (dispatch) => {
     provider = options.provider;
 
     if (options.withSigner) {
       signer = provider.getSigner();
     }
 
-    const state = getState();
-    const isConnected = selectors.selectConnected(state);
-
-    // If connected to a socket, defer updates to the server.
-    if (!isConnected) {
+    dispatch(thunks.retrieveInitialData());
+  },
+  /**
+   *
+   */
+  retrieveInitialData: (): AppThunk => async (dispatch) => {
+    if (provider) {
       const { chainId } = provider.network;
-
       const url = helpers.getUrl(chainId);
       const initial = await helpers.queryInitial(url);
       const formatted = helpers.normalizeInitialData(initial);

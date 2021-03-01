@@ -1,7 +1,7 @@
 export const COINAPI_API_KEY = "A90A6131-9B1D-4FF5-BD25-CD9D28C899B8";
 export const COINAPI_SANDBOX_URL = "wss://ws-sandbox.coinapi.io/v1/";
 export const SERVER_DEBOUNCE_RATE = 250;
-export const SERVER_POLL_RATE = 10000;
+export const SERVER_POLL_RATE = 6000;
 export const DEFAULT_TOKEN = "UNI";
 export const DEFAULT_DECIMAL_COUNT = 18;
 export const DEFAULT_TOAST_DISPLAY_TIME_IN_SECONDS = 3;

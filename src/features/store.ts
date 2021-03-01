@@ -7,7 +7,7 @@ import reducer from "./reducer";
 const store = configureStore({
   reducer,
   middleware: (getDefaultMiddleware) => getDefaultMiddleware(),
-  // preloadedState: loadPersistedState(),
+  preloadedState: loadPersistedState(),
 });
 
 store.subscribe(() => {
