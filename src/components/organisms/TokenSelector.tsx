@@ -1,4 +1,4 @@
-import { Button } from "components/atoms";
+import { Area, Button } from "components/atoms";
 import { CaretDownOutlined } from "@ant-design/icons";
 import { FormattedIndexPool } from "features";
 import { InputNumber, List, Space } from "antd";
@@ -77,7 +77,7 @@ export default function TokenSelector({
     }
 
     triggerChange({ token: newToken });
-    closeDrawer();
+    // closeDrawer();
   };
 
   const handleWrapperClick = useCallback(() => {
@@ -87,65 +87,66 @@ export default function TokenSelector({
   }, []);
 
   return (
-    <S.Wrapper onClick={handleWrapperClick}>
-      <S.Space direction="horizontal">
-        <S.Label>{label}</S.Label>
-        <S.Balance>
-          {value.token ? <>Balance: {balance ?? 0}</> : "-"}
-        </S.Balance>
-      </S.Space>
-      <S.Space direction="horizontal">
-        <S.InputNumber
-          ref={input}
-          min={0}
-          step="0.01"
-          value={value.amount ?? amount}
-          onChange={onAmountChange}
-        />
-        <S.InnerSpace>
-          {value.token && (
-            <Button type="dashed" disabled={!balance}>
-              Max
-            </Button>
-          )}
-          <S.Button
-            type={value.token ? "text" : "primary"}
-            onClick={() =>
-              openDrawer(
-                <S.List size="small" bordered={true}>
-                  {pool.assets.map((asset) => (
-                    <SelectableToken
-                      key={asset.name}
-                      asset={asset}
-                      onClick={(selectedAsset) => {
-                        onTokenChange(selectedAsset.symbol);
-                        closeDrawer();
-                      }}
-                    />
-                  ))}
-                </S.List>
-              )
-            }
-          >
-            {value.token ? (
-              <>
-                <S.Image
-                  alt={value.token}
-                  src={
-                    require(`assets/images/${value.token.toLowerCase()}.png`)
-                      .default
-                  }
-                />
-                {value.token}
-              </>
-            ) : (
-              "Select a token"
+    <Area>
+      <S.Wrapper onClick={handleWrapperClick}>
+        <S.Space direction="horizontal">
+          <S.Label>{label}</S.Label>
+          <S.Balance>
+            {value.token ? <>Balance: {balance ?? 0}</> : "-"}
+          </S.Balance>
+        </S.Space>
+        <S.Space direction="horizontal">
+          <S.InputNumber
+            ref={input}
+            min={0}
+            step="0.01"
+            value={value.amount ?? amount}
+            onChange={onAmountChange}
+          />
+          <S.InnerSpace>
+            {value.token && (
+              <Button type="dashed" disabled={!balance}>
+                Max
+              </Button>
             )}
-            <CaretDownOutlined />
-          </S.Button>
-        </S.InnerSpace>
-      </S.Space>
-    </S.Wrapper>
+            <S.Button
+              type={value.token ? "text" : "primary"}
+              onClick={() =>
+                openDrawer(
+                  <S.List size="small">
+                    {pool.assets.map((asset) => (
+                      <SelectableToken
+                        key={asset.name}
+                        asset={asset}
+                        onClick={(selectedAsset) => {
+                          onTokenChange(selectedAsset.symbol);
+                        }}
+                      />
+                    ))}
+                  </S.List>
+                )
+              }
+            >
+              {value.token ? (
+                <>
+                  <S.Image
+                    alt={value.token}
+                    src={
+                      require(`assets/images/${value.token.toLowerCase()}.png`)
+                        .default
+                    }
+                  />
+                  {value.token}
+                </>
+              ) : (
+                "Select a token"
+              )}
+              <CaretDownOutlined />
+            </S.Button>
+          </S.InnerSpace>
+        </S.Space>
+      </S.Wrapper>
+    </Area>
   );
 }
 
@@ -153,7 +154,6 @@ const S = {
   Wrapper: styled.div`
     display: flex;
     flex-direction: column;
-    border: 1px solid ${(props) => props.theme.colors.black100};
     padding: ${(props) => props.theme.spacing.small};
   `,
   InputNumber: styled(InputNumber)`

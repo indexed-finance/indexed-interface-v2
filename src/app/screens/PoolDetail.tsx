@@ -1,7 +1,12 @@
 import { AiOutlineSwap } from "react-icons/ai";
 import { AppState, actions, selectors } from "features";
 import { Breadcrumb, Col, Grid, Menu, Row, Typography } from "antd";
-import { ChartCard, PoolInteractions, RankedTokenList } from "components";
+import {
+  ChartCard,
+  PoolDropdown,
+  PoolInteractions,
+  RankedTokenList,
+} from "components";
 import { Link, Redirect, useParams } from "react-router-dom";
 import { Performance, Recent, Subscreen } from "../subscreens";
 import { RiWallet3Line } from "react-icons/ri";
@@ -18,8 +23,7 @@ export default function PoolDetail() {
     selectors.selectFormattedIndexPool(state, poolId)
   );
   const isConnected = useSelector(selectors.selectConnected);
-  const { indexPools } = useSelector(selectors.selectMenuModels);
-  const indexPoolsLookup = useSelector(selectors.selectCategoryImagesByPoolIds);
+
   const breakpoints = useBreakpoint();
 
   // Effect:
@@ -109,24 +113,7 @@ export default function PoolDetail() {
         >
           <span>{pool.name}</span>
           <Breadcrumb>
-            <Breadcrumb.Item
-              overlay={
-                <Menu>
-                  {indexPools.map(({ id, name }) => {
-                    const image = indexPoolsLookup[id];
-
-                    return (
-                      <Menu.Item key={id}>
-                        <S.ItemInner>
-                          <S.Image alt={name} src={image} />
-                          <span>{name}</span>
-                        </S.ItemInner>
-                      </Menu.Item>
-                    );
-                  })}
-                </Menu>
-              }
-            >
+            <Breadcrumb.Item overlay={<PoolDropdown />}>
               <Link to="/pools">Index Pools</Link>
             </Breadcrumb.Item>
             <Breadcrumb.Item>{pool.name}</Breadcrumb.Item>

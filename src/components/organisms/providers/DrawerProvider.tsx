@@ -175,6 +175,8 @@ const S = {
             }
           `
         : css`
+            height: calc(100vh - 64px);
+            top: 64px;
             z-index: 3;
           `}
   `,

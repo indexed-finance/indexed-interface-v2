@@ -32,7 +32,7 @@ export default function Quote({
   return (
     <div {...rest}>
       {symbol && (
-        <S.Top level={2}>
+        <S.Top level={3}>
           {symbol} {kind === "normal" && price}
         </S.Top>
       )}
@@ -50,7 +50,7 @@ const S = {
     margin: 0;
   `,
   Middle: styled.div<{ kind: Props["kind"] }>`
-    font-size: ${(props) => (props.kind === "small" ? "20px" : "32px")};
+    font-size: ${(props) => (props.kind === "small" ? "18px" : "28px")};
     margin: 0;
     margin-top: ${(props) => (props.kind === "small" ? "-6px" : "-14px")};
 

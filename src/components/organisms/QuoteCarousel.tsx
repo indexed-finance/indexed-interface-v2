@@ -1,3 +1,4 @@
+import { Area } from "components/atoms";
 import { Carousel } from "antd";
 import { Quote } from "components/molecules";
 import { useHistory } from "react-router-dom";
@@ -13,33 +14,34 @@ export default function QuoteCarousel({ pools }: Props) {
   const history = useHistory();
 
   return (
-    <S.Carousel effect="fade" autoplay={true} dots={false}>
-      {pools.map((pool) => {
-        const filteredPool = pool as FormattedIndexPool;
+    <div style={{ margin: "1rem" }}>
+      <Area>
+        <S.Carousel effect="fade" autoplay={true} dots={false}>
+          {pools.map((pool) => {
+            const filteredPool = pool as FormattedIndexPool;
 
-        return (
-          <S.Quote
-            key={filteredPool.symbol}
-            onClick={() => history.push(`/pools/${filteredPool.id}`)}
-            symbol={filteredPool.symbol}
-            price={filteredPool.priceUsd}
-            netChange={filteredPool.netChange}
-            netChangePercent={filteredPool.netChangePercent}
-          />
-        );
-      })}
-    </S.Carousel>
+            return (
+              <S.Quote
+                key={filteredPool.symbol}
+                onClick={() => history.push(`/pools/${filteredPool.id}`)}
+                symbol={filteredPool.symbol}
+                price={filteredPool.priceUsd}
+                netChange={filteredPool.netChange}
+                netChangePercent={filteredPool.netChangePercent}
+              />
+            );
+          })}
+        </S.Carousel>
+      </Area>
+    </div>
   );
 }
 
 const S = {
   Carousel: styled(Carousel)`
-    padding: ${(props) => props.theme.spacing.medium};
+    padding: ${(props) => props.theme.spacing.small};
     background-size: cover;
     cursor: pointer;
   `,
-  Quote: styled(Quote)`
-    padding-left: ${(props) => props.theme.spacing.large};
-    border-left: 4px solid ${(props) => props.theme.colors.primary};
-  `,
+  Quote: styled(Quote)``,
 };

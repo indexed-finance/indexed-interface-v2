@@ -1,4 +1,4 @@
-export default {
+const palette = {
   // Whites
   white100: "#cecece",
   white200: "#e1e6ec",
@@ -8,6 +8,8 @@ export default {
   // Greys
   grey100: "rgba(0, 0, 0, 0.54)",
   grey200: "rgb(102, 102, 102)",
+  grey300: "#1c1c1c",
+  grey400: "#313131",
 
   // Reds
   red100: "rgb(255, 0, 0)",
@@ -18,4 +20,10 @@ export default {
 
   // Named
   primary: "#ccccff",
+};
+
+export default {
+  ...palette,
+  lightestGrey: palette.grey300,
+  lightesterGrey: palette.grey400,
 };
