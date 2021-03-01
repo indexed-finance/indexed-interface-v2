@@ -1,5 +1,12 @@
-import { AppState, actions, store } from "features";
-import { INFURA_ID, SERVER_POLL_RATE, WEBSOCKET_SERVER_PORT } from "config";
+import { AppState, actions, selectors, store } from "features";
+import {
+  COINAPI_API_KEY,
+  COINAPI_SANDBOX_URL,
+  INFURA_ID,
+  SERVER_DEBOUNCE_RATE,
+  SERVER_POLL_RATE,
+  WEBSOCKET_SERVER_PORT,
+} from "config";
 import { providers } from "ethers";
 import WebSocket from "isomorphic-ws";
 import cloneDeep from "lodash.clonedeep";
@@ -11,10 +18,6 @@ const log = (...messages: any[]) =>
 // #region Store & State
 const { dispatch, getState } = store;
 const provider = new providers.InfuraProvider("mainnet", INFURA_ID);
-
-/**
- *
- */
 const previousState = cloneDeep(store.getState());
 let observer = jsonpatch.observe<AppState>(previousState);
 let sendingUpdate: NodeJS.Timeout;
@@ -37,7 +40,7 @@ const updateClients = () => {
       }
 
       observer = jsonpatch.observe<AppState>(previousState);
-    }, 250);
+    }, SERVER_DEBOUNCE_RATE);
   }
 };
 store.subscribe(updateClients);
@@ -73,6 +76,7 @@ const waitThenGetPoolDetails = async () => {
 };
 const unsubscribeFromInitialWait = store.subscribe(waitThenGetPoolDetails);
 
+// Initialize once the provider is ready.
 (async () => {
   log("Waiting for provider...");
 
@@ -87,6 +91,82 @@ const unsubscribeFromInitialWait = store.subscribe(waitThenGetPoolDetails);
     })
   );
 })();
+
+// After stabilizing, request symbol information for all relevant tokens.
+const retrieveSymbolsAndOpenSocket = async (symbols: string[]) => {
+  // Next, open a CoinAPI socket connection and request data for the relevant symbols.
+  const coinapiClient = new WebSocket(COINAPI_SANDBOX_URL);
+
+  coinapiClient.onopen = () => {
+    const now = new Date().getTime();
+    const then = now - 24 * 60 * 60 * 1000; // One day ago.
+    const when = new Date(then).toISOString();
+
+    // Authenticate.
+    coinapiClient.send(
+      JSON.stringify({
+        type: "hello",
+        apikey: COINAPI_API_KEY,
+        heartbeat: false,
+        period_id: "1DAY",
+        time_period_start: when,
+        subscribe_data_type: ["ohlcv"],
+        subscribe_filter_asset_id: symbols,
+      })
+    );
+  };
+
+  // RFC-6455 [https://www.ietf.org/rfc/rfc6455.txt]
+  coinapiClient.on("ping", () => coinapiClient.send(formatPongResponse()));
+
+  const prices24HoursAgo = symbols.reduce((prev, next) => {
+    prev[next] = null;
+    return prev;
+  }, {} as Record<string, null | number>);
+
+  coinapiClient.onmessage = (event) => {
+    const data = JSON.parse(event.data as string);
+    const handlers: Record<string, (data: any) => void> = {
+      ohlcv: (_data: OhlcvResponse) => {
+        try {
+          // BINANCE _ SPOT _ <ASSET> _ <OTHER ASSET>
+          const [, , asset, otherAsset] = _data.symbol_id.split("_");
+
+          if (
+            otherAsset === "USD" ||
+            otherAsset === "USDC" ||
+            otherAsset === "USDT"
+          ) {
+            prices24HoursAgo[asset] = _data.price_open;
+          }
+
+          dispatch(actions.receivedCoinapiOpenPrices(prices24HoursAgo));
+        } catch {}
+      },
+    };
+    const handler =
+      handlers[data.type] ??
+      ((_data) => {
+        log("No handler present for ", _data.type);
+      });
+
+    handler(data);
+  };
+
+  coinapiClient.onclose = () => log("CoinAPI connection was terminated.");
+  coinapiClient.onerror = (error) =>
+    log("CoinAPI connection was terminated.", error);
+};
+
+const unsubscribeFromWaitingForSymbols = store.subscribe(() => {
+  const state = store.getState();
+  const symbols = selectors.selectTokenSymbols(state);
+
+  if (symbols.length > 0) {
+    unsubscribeFromWaitingForSymbols();
+    retrieveSymbolsAndOpenSocket(symbols);
+  }
+});
 
 // #endregion
 
@@ -180,4 +260,29 @@ const formatStatePatchResponse = (patch: Operation[]) =>
     kind: "STATE_PATCH",
     data: patch,
   });
+
+const formatPongResponse = () =>
+  JSON.stringify({
+    type: "pong",
+  });
+// #endregion
+
+// #region Models
+const sampleOhlcvResponse = {
+  type: "ohlcv",
+  symbol_id: "BITSTAMP_SPOT_XRP_USD",
+  sequence: 511,
+  time_period_start: "2019-06-11T15:26:00.0000000Z",
+  time_period_end: "2019-06-11T15:27:00.0000000Z",
+  time_open: "2019-06-11T15:26:07.0000000Z",
+  time_close: "2019-06-11T15:26:36.0000000Z",
+  price_open: 0.3865,
+  price_high: 0.38706,
+  price_low: 0.3865,
+  price_close: 0.38706,
+  volume_traded: 1500.31419084,
+  trades_count: 5,
+};
+
+type OhlcvResponse = typeof sampleOhlcvResponse;
 // #endregion

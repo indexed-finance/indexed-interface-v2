@@ -5,6 +5,7 @@ import {
   coingeckoDataLoaded,
   coingeckoIdsLoaded,
   poolUpdated,
+  receivedCoinapiOpenPrices,
   receivedInitialStateFromServer,
   receivedStatePatchFromServer,
   subgraphDataLoaded,
@@ -94,6 +95,21 @@ const slice = createSlice({
         const { tokens } = action.payload;
 
         return tokens;
+      })
+      .addCase(receivedCoinapiOpenPrices, (state, action) => {
+        const tokens = selectors.selectAllTokens({ tokens: state } as any);
+
+        for (const token of tokens as NormalizedToken[]) {
+          if (
+            state.entities[token.id] &&
+            !state.entities[token.id]!.coinapiPriceData
+          ) {
+            state.entities[token.id]!.coinapiPriceData = {};
+          }
+
+          state.entities[token.id]!.coinapiPriceData!.open =
+            action.payload[token.symbol];
+        }
       }),
 });
 

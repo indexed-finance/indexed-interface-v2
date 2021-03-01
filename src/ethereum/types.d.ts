@@ -39,6 +39,9 @@ export interface NormalizedToken {
   dataByCategory: Record<string, null | Token>;
   dataByIndexPool: Record<string, null | PoolUnderlyingToken>;
   dataFromPoolUpdates: Record<string, null | PoolTokenUpdate>;
+  coinapiPriceData?: {
+    open?: null | number;
+  };
 }
 
 export interface NormalizedPool
