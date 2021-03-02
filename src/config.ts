@@ -1,9 +1,13 @@
-export const CLIENT_STATISTICS_REPORTING_RATE = 10000;
-export const COINAPI_USAGE_REPORT_RATE = 10000;
+export const CLIENT_STATISTICS_REPORTING_RATE = 30 * 1000;
+export const CHECK_NEED_TO_RESTART_RATE = 5000;
+export const NEED_TO_RESTART_THRESHOLD = 300 * 1000;
+export const NEED_TO_RESTART_TIME_LIMIT = 1000 * 60 * 5; // Five minutes.
+export const COINAPI_USAGE_REPORT_RATE = 30 * 1000;
 export const COINAPI_API_KEY = "A90A6131-9B1D-4FF5-BD25-CD9D28C899B8";
 export const COINAPI_SANDBOX_URL = "wss://ws-sandbox.coinapi.io/v1/";
+export const COINAPI_PRODUCTION_URL = "wss://ws.coinapi.io/v1/";
 export const SERVER_DEBOUNCE_RATE = 250;
-export const SERVER_POLL_RATE = 6000;
+export const SERVER_POLL_RATE = 15000;
 export const DEFAULT_TOKEN = "UNI";
 export const DEFAULT_DECIMAL_COUNT = 18;
 export const DEFAULT_TOAST_DISPLAY_TIME_IN_SECONDS = 3;
@@ -37,7 +41,6 @@ export const WEBSOCKET_SERVER_UPDATE_RATE = 1000;
 export const WEBSOCKET_SERVER_PORT = 13337;
 export const QUIKNODE_WEBSOCKET_PROVIDER =
   "wss://bold-old-pond.quiknode.pro/7876affe5a6bb6688c659b452fe9d81d4125d21f/";
-// export const QUIKNODE_HTTP_PROVIDER = "https://bold-old-pond.quiknode.pro/";
 export const ERRORS = {
   Web3Service: {
     badNetwork: "Web3Service: Bad network.",

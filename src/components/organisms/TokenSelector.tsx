@@ -1,7 +1,7 @@
 import { Area, Button } from "components/atoms";
 import { CaretDownOutlined } from "@ant-design/icons";
 import { FormattedIndexPool } from "features";
-import { InputNumber, List, Space } from "antd";
+import { InputNumber, List, Space, Typography } from "antd";
 import { SelectableToken } from "components/molecules";
 import { useDrawer } from "./providers";
 import React, { useCallback, useRef, useState } from "react";
@@ -77,7 +77,7 @@ export default function TokenSelector({
     }
 
     triggerChange({ token: newToken });
-    // closeDrawer();
+    closeDrawer();
   };
 
   const handleWrapperClick = useCallback(() => {
@@ -90,9 +90,16 @@ export default function TokenSelector({
     <Area>
       <S.Wrapper onClick={handleWrapperClick}>
         <S.Space direction="horizontal">
-          <S.Label>{label}</S.Label>
+          <S.Label type="secondary">{label}</S.Label>
           <S.Balance>
-            {value.token ? <>Balance: {balance ?? 0}</> : "-"}
+            {value.token ? (
+              <>
+                <S.BalanceLabel type="secondary">Balance:</S.BalanceLabel>{" "}
+                {balance ?? 0}
+              </>
+            ) : (
+              "-"
+            )}
           </S.Balance>
         </S.Space>
         <S.Space direction="horizontal">
@@ -172,12 +179,16 @@ const S = {
     text-align: right;
     ${(props) => props.theme.snippets.perfectlyCentered};
   `,
-  Label: styled.div`
+  Label: styled(Typography.Text)`
     padding-left: 0.7rem;
+    ${(props) => props.theme.snippets.fancy};
   `,
   Balance: styled.div`
     padding-right: 1rem;
     text-align: right;
+  `,
+  BalanceLabel: styled(Typography.Text)`
+    ${(props) => props.theme.snippets.fancy};
   `,
   InnerSpace: styled.div`
     display: flex;

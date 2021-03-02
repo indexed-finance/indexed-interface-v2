@@ -1,11 +1,15 @@
 import {
+  CHECK_NEED_TO_RESTART_RATE,
   COINAPI_API_KEY,
   COINAPI_SANDBOX_URL,
+  // COINAPI_PRODUCTION_URL,
   COINAPI_USAGE_REPORT_RATE,
+  NEED_TO_RESTART_THRESHOLD,
+  NEED_TO_RESTART_TIME_LIMIT,
 } from "config";
 import { ExchangeResponse, OhlcvResponse } from "./models";
 import { actions, store } from "features";
-import { formatPongResponse, log } from "./helpers";
+import { formatPongResponse, log, sleep } from "./helpers";
 import WebSocket from "isomorphic-ws";
 
 export type PriceData = {
@@ -25,14 +29,27 @@ export const coinapiUsage = {
     exrate: 0,
     unexpected: 0,
   },
+  since: new Date().getTime(),
 };
 
 export let lastSymbols: string[];
 export let coinapiClient: WebSocket;
 export let symbolToPriceDataLookup: Record<string, PriceData>;
 export let prices24HoursAgo: Record<string, null | number>;
+export let reportingCoinapiUsage: NodeJS.Timer;
+export let checkingNeedToRestart: NodeJS.Timer;
 
-export default function setupCoinapiConnection(symbols: string[]) {
+export default async function setupCoinapiConnection(symbols: string[]) {
+  if (coinapiClient) {
+    log("Cleaning up before reopening.");
+
+    coinapiClient.close();
+
+    await sleep(1000);
+
+    coinapiUsage.since = new Date().getTime();
+  }
+
   lastSymbols = symbols;
 
   clearCache();
@@ -46,6 +63,7 @@ export default function setupCoinapiConnection(symbols: string[]) {
   coinapiClient.on("error", handleError);
 
   continuouslyReportCoinapiUsage();
+  continuouslyCheckNeedToRestart();
 }
 
 // #region Helpers
@@ -69,18 +87,26 @@ function isUsdLike(asset: string) {
 /**
  * After opening the connection, immediately authenticate and specify requested data.
  */
-function handleOpen(symbols: string[]) {
-  log("Opened connection to CoinAPI.");
+async function handleOpen(symbols: string[], isRetry = false) {
+  if (!isRetry) {
+    log("Opened connection to CoinAPI.");
+  }
 
-  coinapiClient.send(
-    JSON.stringify({
-      type: "hello",
-      apikey: COINAPI_API_KEY,
-      heartbeat: false,
-      subscribe_data_type: ["ohlcv", "exrate"],
-      subscribe_filter_asset_id: symbols,
-    })
-  );
+  try {
+    coinapiClient.send(
+      JSON.stringify({
+        type: "hello",
+        apikey: COINAPI_API_KEY,
+        heartbeat: true,
+        subscribe_data_type: ["ohlcv", "exrate"],
+        subscribe_filter_asset_id: symbols,
+      })
+    );
+  } catch (error) {
+    log("Was not able to authenticate; trying again soon.");
+    await sleep(2000);
+    handleOpen(symbols, true);
+  }
 }
 /**
  * @see
@@ -103,10 +129,9 @@ function handleMessage(event: string) {
     ping: handlePing,
     exrate: handleExrateResponse,
     ohlcv: handleOhlcvResponse,
-    reconnect: () => {
-      setupCoinapiConnection(lastSymbols);
-      coinapiUsage.restartCount++;
-    },
+    error: handleError,
+    hearbeat: handleHeartbeat, // Lol, come on CoinAPI. "Hearbeat"?
+    reconnect: handleReconnect,
   };
   const handler = handlers[data.type] ?? handleUnexpectedResponse;
 
@@ -182,6 +207,19 @@ function handleOhlcvResponse(data: OhlcvResponse) {
 }
 /**
  *
+ */
+function handleHeartbeat() {
+  log("CoinAPI is still alive.");
+}
+/**
+ *
+ */
+function handleReconnect() {
+  setupCoinapiConnection(lastSymbols);
+  coinapiUsage.restartCount++;
+}
+/**
+ *
  * @param data -
  */
 function handleUnexpectedResponse(data: { type: string }) {
@@ -193,9 +231,50 @@ function handleUnexpectedResponse(data: { type: string }) {
  *
  */
 function continuouslyReportCoinapiUsage() {
-  setTimeout(() => {
-    log("CoinAPI usage:", coinapiUsage);
+  clearTimeout(reportingCoinapiUsage);
+  reportingCoinapiUsage = setTimeout(() => {
+    log("CoinAPI usage:", {
+      ...coinapiUsage,
+      since: new Date(coinapiUsage.since),
+    });
     continuouslyReportCoinapiUsage();
   }, COINAPI_USAGE_REPORT_RATE);
+}
+/**
+ *
+ */
+function continuouslyCheckNeedToRestart() {
+  clearTimeout(checkingNeedToRestart);
+  checkingNeedToRestart = setTimeout(() => {
+    const { messageCount, since } = coinapiUsage;
+    const messagesRemaining = NEED_TO_RESTART_THRESHOLD - messageCount;
+    let needsToRestart = false;
+
+    if (messagesRemaining <= 0) {
+      log("Reached maxiumum message count; ending session and starting over.");
+      needsToRestart = true;
+    } else {
+      log(`${messagesRemaining} messages remain in session.`);
+    }
+
+    const now = new Date().getTime();
+    const elapsed = now - since;
+    const secondsRemaining = parseInt(
+      ((NEED_TO_RESTART_TIME_LIMIT - elapsed) / 1000).toString()
+    );
+
+    if (elapsed >= NEED_TO_RESTART_TIME_LIMIT) {
+      log("Reached maximum time limit; ending session and starting over.");
+      needsToRestart = true;
+    } else {
+      log(`${secondsRemaining} seconds remain in session.`);
+    }
+
+    if (needsToRestart) {
+      setupCoinapiConnection(lastSymbols);
+    }
+
+    continuouslyCheckNeedToRestart();
+  }, CHECK_NEED_TO_RESTART_RATE);
 }
 // #endregion

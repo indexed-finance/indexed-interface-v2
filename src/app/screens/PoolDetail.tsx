@@ -94,7 +94,6 @@ export default function PoolDetail() {
             <Col span={24}>{recents}</Col>
           </Row>
         </Col>
-
         <Col span={8}>{assets}</Col>
       </Row>
     );

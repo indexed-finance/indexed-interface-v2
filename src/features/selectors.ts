@@ -74,7 +74,7 @@ const selectors = {
               name: guaranteedPool.name,
               symbol: guaranteedPool.symbol,
               size: guaranteedPool.size.toString(),
-              price: price.toPrecision(2),
+              price: convert.toCurrency(price.toNumber()),
               supply: convert.toComma(
                 parseFloat(convert.toBalance(guaranteedPool.totalSupply))
               ),

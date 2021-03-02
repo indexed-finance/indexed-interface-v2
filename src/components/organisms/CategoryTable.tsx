@@ -6,8 +6,6 @@ import type { FormattedCategory } from "features";
 export type Props = FormattedCategory;
 
 export default function CategoryTable(props: Props) {
-  console.log({ props });
-
   return (
     <S.Table
       dataSource={props.indexPools}
