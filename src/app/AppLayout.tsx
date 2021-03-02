@@ -2,6 +2,7 @@ import "theme/styles.less";
 import {
   Affix,
   Breadcrumb,
+  Form,
   Grid,
   Layout,
   Popover,
@@ -34,6 +35,7 @@ import styled from "styled-components";
 
 const { useBreakpoint } = Grid;
 const { Sider, Header, Content } = Layout;
+const { Item } = Form;
 const { Option } = Select;
 
 export default function AppLayout() {
@@ -42,6 +44,7 @@ export default function AppLayout() {
   const { activePage } = useContext(DrawerContext);
   const isConnected = useSelector(selectors.selectConnected);
   const isConnectionEnabled = useSelector(selectors.selectConnectionEnabled);
+  const theme = useSelector(selectors.selectTheme);
   const indexPools = useSelector(selectors.selectAllFormattedIndexPools);
   const breakpoint = useBreakpoint();
   const [mobileMenuActive, setMobileMenuActive] = useState(false);
@@ -106,10 +109,24 @@ export default function AppLayout() {
           <S.Top>
             {breakpoint.lg && (
               <S.Controls>
-                <S.Select defaultValue="Language: English" bordered={false}>
-                  <Option value="english">English</Option>
-                </S.Select>
-                <Switch checked={true} />
+                <S.Changeables layout="inline" colon={false}>
+                  <div title="Language">
+                    <Item label="🗣️">
+                      <Select defaultValue="english">
+                        <Option value="english">English 🇺🇸</Option>
+                      </Select>
+                    </Item>
+                  </div>
+                  <div title="Theme">
+                    <Item label={theme === "dark" ? "🌙" : "🔆"}>
+                      <Switch
+                        title="Theme"
+                        checked={theme === "dark"}
+                        onClick={() => dispatch(actions.themeToggled())}
+                      />
+                    </Item>
+                  </div>
+                </S.Changeables>
                 <S.Wallet type="ghost">
                   <MdAccountBalanceWallet />
                 </S.Wallet>
@@ -218,8 +235,7 @@ const S = {
     align-items: center;
     justify-content: flex-end;
   `,
-  Select: styled(Select)`
-    width: 160px;
+  Changeables: styled(Form)`
     margin-right: ${(props) => props.theme.spacing.medium};
   `,
   Wallet: styled(Button)`
