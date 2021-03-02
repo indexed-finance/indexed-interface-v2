@@ -39,17 +39,17 @@ const thunks = {
 
     if (options.withSigner) {
       signer = provider.getSigner();
+
+      if (options.selectedAddress) {
+        selectedAddress = options.selectedAddress;
+      } else if (provider.connection.url === "metamask") {
+        selectedAddress = (provider as any).provider.selectedAddress;
+      } else {
+        throw new Error("Unable to initialize without a selected address.");
+      }
     }
 
     await provider.ready;
-
-    if (options.selectedAddress) {
-      selectedAddress = options.selectedAddress;
-    } else if (provider.connection.url === "metamask") {
-      selectedAddress = (provider as any).provider.selectedAddress;
-    } else {
-      throw new Error("Unable to initialize without a selected address.");
-    }
 
     dispatch(thunks.retrieveInitialData());
   },

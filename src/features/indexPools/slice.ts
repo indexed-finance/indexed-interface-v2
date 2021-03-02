@@ -148,40 +148,22 @@ export const selectors = {
       return false;
     }
   },
-  selectRelevantBalances: (
-    state: AppState,
-    poolId: string,
-    inputTokenSymbol: string,
-    outputTokenSymbol: string
-  ) => {
-    const pool = selectors.selectPool(state, poolId);
-    const tokenLookup = tokensSelectors.selectTokenLookupBySymbol(state);
-    const balance = {
-      from: "0.00",
-      to: "0.00",
-    };
+  selectTokenSymbolsToBalances: (state: AppState, poolId: string) => {
+    const tokenLookup = tokensSelectors.selectTokenLookup(state);
+    const userData = selectors.selectPoolUserData(state, poolId);
 
-    if (pool) {
-      const userData = selectors.selectPoolUserData(state, poolId);
-
-      if (userData && inputTokenSymbol && outputTokenSymbol) {
-        if (inputTokenSymbol) {
-          const { id: inputTokenAddress } = tokenLookup[inputTokenSymbol];
-          const { balance: fromBalance } = userData[inputTokenAddress];
-
-          balance.from = convert.toBalance(fromBalance);
-        }
-
-        if (outputTokenSymbol) {
-          const { id: outputTokenAddress } = tokenLookup[outputTokenSymbol];
-          const { balance: toBalance } = userData[outputTokenAddress];
-
-          balance.to = convert.toBalance(toBalance);
+    return Object.entries(tokenLookup).reduce((prev, [key, value]) => {
+      if (value) {
+        if (userData && userData[key]) {
+          console.log("symbol", value.symbol);
+          prev[value.symbol] = convert.toBalance(userData[key].balance);
+        } else {
+          prev[value.symbol] = "";
         }
       }
-    }
 
-    return balance;
+      return prev;
+    }, {} as Record<string, string>);
   },
   selectCategoryImage: (state: AppState, poolId: string) => {
     const pool = selectors.selectPool(state, poolId);

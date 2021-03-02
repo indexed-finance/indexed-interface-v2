@@ -1,10 +1,17 @@
+import { AppState, FormattedIndexPool, selectors } from "features";
 import { Area, Button } from "components/atoms";
 import { CaretDownOutlined } from "@ant-design/icons";
-import { FormattedIndexPool } from "features";
 import { InputNumber, List, Space, Typography } from "antd";
 import { SelectableToken } from "components/molecules";
 import { useDrawer } from "./providers";
-import React, { useCallback, useRef, useState } from "react";
+import { useSelector } from "react-redux";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import styled from "styled-components";
 
 export type TokenSelectorValue = {
@@ -23,12 +30,15 @@ export interface Props {
 export default function TokenSelector({
   label = "",
   pool,
-  balance,
   value = {},
   onChange,
 }: Props) {
-  const [amount, setAmount] = useState(0);
-  const [token, setToken] = useState("");
+  const [amount, setAmount] = useState(value?.amount ?? 0);
+  const [token, setToken] = useState(value?.token ?? "");
+  const balances = useSelector((state: AppState) =>
+    selectors.selectTokenSymbolsToBalances(state, pool?.id ?? "")
+  );
+  const relevantBalance = useMemo(() => balances[token], [balances, token]);
   const input = useRef<null | HTMLInputElement>(null);
   const { openDrawer, closeDrawer } = useDrawer({
     name: "Select a token",
@@ -44,6 +54,16 @@ export default function TokenSelector({
     ],
     closable: true,
   });
+
+  useEffect(() => {
+    if (value.amount) {
+      setAmount(value.amount);
+    }
+
+    if (value.token) {
+      setToken(value.token);
+    }
+  }, [value]);
 
   const triggerChange = (changedValue: TokenSelectorValue) => {
     if (onChange) {
@@ -93,10 +113,13 @@ export default function TokenSelector({
           <S.Label type="secondary">{label}</S.Label>
           <S.Balance>
             {value.token ? (
-              <>
-                <S.BalanceLabel type="secondary">Balance:</S.BalanceLabel>{" "}
-                {balance ?? 0}
-              </>
+              <S.BalanceLabel type="secondary">
+                {relevantBalance ? (
+                  <>Balance: {relevantBalance}</>
+                ) : (
+                  "No Balance"
+                )}
+              </S.BalanceLabel>
             ) : (
               "-"
             )}
@@ -112,7 +135,7 @@ export default function TokenSelector({
           />
           <S.InnerSpace>
             {value.token && (
-              <Button type="dashed" disabled={!balance}>
+              <Button type="dashed" disabled={!relevantBalance}>
                 Max
               </Button>
             )}
@@ -167,6 +190,7 @@ const S = {
     border: none;
     font-size: 24px;
     font-weight: 500;
+    min-width: 50px;
   `,
   Space: styled(Space)`
     justify-content: space-between;

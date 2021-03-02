@@ -48,16 +48,6 @@ export default function SwapInteraction({ pool }: Props) {
   const previousFormValues = useRef<SwapValues>(INITIAL_STATE);
   const lastTouchedField = useRef<"input" | "output">("input");
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
-  const balances = useSelector((state: AppState) => {
-    const { from, to } = form.getFieldsValue();
-
-    return selectors.selectRelevantBalances(
-      state,
-      pool?.id ?? "",
-      from?.token.toLowerCase() ?? "",
-      to?.token.toLowerCase() ?? ""
-    );
-  });
   const swapFee = useSelector((state: AppState) =>
     selectors.selectSwapFee(state, pool?.id ?? "")
   );
@@ -310,15 +300,13 @@ export default function SwapInteraction({ pool }: Props) {
         <Typography.Title level={2}>Swap</Typography.Title>
       </Item>
       <Item name="from" rules={[{ validator: checkAmount }]}>
-        {pool && (
-          <TokenSelector label="From" balance={balances.from} pool={pool} />
-        )}
+        {pool && <TokenSelector label="From" pool={pool} />}
       </Item>
       <Item>
         <Flipper onFlip={handleFlip} />
       </Item>
       <Item name="to" rules={[{ validator: checkAmount }]}>
-        {pool && <TokenSelector label="To" balance={balances.to} pool={pool} />}
+        {pool && <TokenSelector label="To" pool={pool} />}
       </Item>
       {previousFormValues.current.from && previousFormValues.current.to && (
         <S.Item>
@@ -340,17 +328,6 @@ export default function SwapInteraction({ pool }: Props) {
           </div>
         </S.Item>
       )}
-      {/* <Item>
-        {approvalNeeded ? (
-          <Button type="primary" htmlType="button" onClick={handleApprovePool}>
-            Approve
-          </Button>
-        ) : (
-          <Button type="primary" htmlType="submit">
-            Send Transaction
-          </Button>
-        )}
-      </Item> */}
     </S.Form>
   );
 }
