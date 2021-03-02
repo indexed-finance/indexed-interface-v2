@@ -1,12 +1,25 @@
-import { Collapse, CollapseProps } from "antd";
-import React, { ReactNode } from "react";
+import { Button, Collapse, CollapseProps } from "antd";
+import React, { ReactNode, createContext, useState } from "react";
+import noop from "lodash.noop";
 import styled, { css } from "styled-components";
+
+export type Action = {
+  type: "primary" | "default";
+  title: ReactNode;
+  onClick(): void;
+};
+
+export const SubscreenContext = createContext<{
+  setActions: (actions: Action[]) => void;
+}>({
+  setActions: noop,
+});
 
 interface SubscreenProps extends CollapseProps {
   icon: ReactNode;
   title: ReactNode;
   children: ReactNode;
-  actions?: ReactNode[];
+  defaultActions?: Action[];
   padding?: null | number | string;
   margin?: null | number | string;
 }
@@ -17,29 +30,50 @@ export default function Subscreen({
   icon,
   title,
   children,
-  actions = [],
+  defaultActions = [],
   padding = null,
   ...rest
 }: SubscreenProps) {
+  const [actions, setActions] = useState(defaultActions);
+
   return (
-    <S.Subscreen defaultActiveKey={["1"]} {...rest} padding={padding}>
-      <Panel
-        header={
-          <S.Title>
-            <span>{title}</span> {icon}
-          </S.Title>
-        }
-        key="1"
+    <SubscreenContext.Provider value={{ setActions }}>
+      <S.Subscreen
+        defaultActiveKey={["1"]}
+        {...rest}
+        padding={padding}
+        withActions={actions.length}
       >
-        {children}
-      </Panel>
-    </S.Subscreen>
+        <Panel
+          header={
+            <S.Title>
+              <span>{title}</span> {icon}
+            </S.Title>
+          }
+          key="1"
+        >
+          {children}
+          <S.Actions>
+            {actions.map(({ type, title, onClick }, index) => (
+              <Button type={type} key={index} onClick={onClick}>
+                {title}
+              </Button>
+            ))}
+          </S.Actions>
+        </Panel>
+      </S.Subscreen>
+    </SubscreenContext.Provider>
   );
 }
 
 const S = {
-  Subscreen: styled(Collapse)<{ padding: null | number | string }>`
+  Subscreen: styled(Collapse)<{
+    padding: null | number | string;
+    withActions?: number;
+  }>`
+    position: relative;
     margin-bottom: ${(props) => props.theme.spacing.medium};
+    padding-bottom: ${(props) => props.withActions ?? 0 * 42}px;
     overflow: auto;
 
     ${(props) =>
@@ -65,6 +99,17 @@ const S = {
 
     span {
       margin-right: ${(props) => props.theme.spacing.small};
+    }
+  `,
+  Actions: styled.div`
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+
+    button {
+      height: 42px;
+      margin-bottom: 1px;
+      ${(props) => props.theme.snippets.fancy};
     }
   `,
 };

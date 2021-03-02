@@ -1,11 +1,18 @@
 import { AppState, FormattedIndexPool, selectors, signer } from "features";
-import { Button, Flipper } from "components/atoms";
+import { Flipper } from "components/atoms";
 import { Form, Typography } from "antd";
+import { SubscreenContext } from "app/subscreens/Subscreen";
 import { actions } from "features";
 import { convert } from "helpers";
 import { helpers } from "ethereum";
 import { useDispatch, useSelector } from "react-redux";
-import React, { useCallback, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import TokenSelector from "../TokenSelector";
 import styled from "styled-components";
 
@@ -37,6 +44,7 @@ const ZERO = convert.toBigNumber("0");
 export default function SwapInteraction({ pool }: Props) {
   const [form] = Form.useForm<SwapValues>();
   const dispatch = useDispatch();
+  const { setActions } = useContext(SubscreenContext);
   const previousFormValues = useRef<SwapValues>(INITIAL_STATE);
   const lastTouchedField = useRef<"input" | "output">("input");
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
@@ -246,6 +254,28 @@ export default function SwapInteraction({ pool }: Props) {
     previousFormValues.current = flippedValue;
   };
 
+  // Effect:
+  // When approval status is determined, update the actions of the parent panel accordingly.
+  useEffect(() => {
+    if (approvalNeeded) {
+      setActions([
+        {
+          type: "primary",
+          title: "Approve",
+          onClick: handleApprovePool,
+        },
+      ]);
+    } else {
+      setActions([
+        {
+          type: "primary",
+          title: "Send Transaction",
+          onClick: () => handleSubmit(form.getFieldsValue()),
+        },
+      ]);
+    }
+  }, [form, approvalNeeded, handleApprovePool, handleSubmit, setActions]);
+
   return (
     <S.Form
       form={form}
@@ -310,7 +340,7 @@ export default function SwapInteraction({ pool }: Props) {
           </div>
         </S.Item>
       )}
-      <Item>
+      {/* <Item>
         {approvalNeeded ? (
           <Button type="primary" htmlType="button" onClick={handleApprovePool}>
             Approve
@@ -320,7 +350,7 @@ export default function SwapInteraction({ pool }: Props) {
             Send Transaction
           </Button>
         )}
-      </Item>
+      </Item> */}
     </S.Form>
   );
 }

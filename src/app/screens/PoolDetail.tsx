@@ -1,6 +1,7 @@
 import { AiOutlineSwap } from "react-icons/ai";
 import { AppState, actions, selectors } from "features";
 import { Breadcrumb, Col, Grid, Menu, Row, Typography } from "antd";
+import { CgArrowsExpandRight } from "react-icons/cg";
 import {
   ChartCard,
   PoolDropdown,
@@ -39,7 +40,24 @@ export default function PoolDetail() {
     // Subscreens
     const performance = <Performance pool={pool} />;
     const chart = (
-      <Subscreen icon={<AiOutlineSwap />} title="Chart" padding={0}>
+      <Subscreen
+        icon={<AiOutlineSwap />}
+        title="Chart"
+        padding={0}
+        defaultActions={[
+          {
+            type: "default",
+            title: (
+              <>
+                Expand <CgArrowsExpandRight />
+              </>
+            ),
+            onClick: () => {
+              /* */
+            },
+          },
+        ]}
+      >
         <ChartCard timeframe="1D" />
       </Subscreen>
     );

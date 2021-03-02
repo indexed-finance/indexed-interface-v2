@@ -1,6 +1,5 @@
 import { Button } from "components/atoms";
 import { Card, Menu } from "antd";
-import { CgArrowsExpandRight } from "react-icons/cg";
 import React from "react";
 import styled from "styled-components";
 
@@ -23,11 +22,7 @@ export default function ChartCard({ timeframe }: Props) {
           ))}
         </S.Menu>
       }
-    >
-      <S.Button type="default" title="Expand chart">
-        <CgArrowsExpandRight />
-      </S.Button>
-    </S.ChartCard>
+    ></S.ChartCard>
   );
 }
 

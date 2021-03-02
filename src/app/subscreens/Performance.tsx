@@ -11,14 +11,25 @@ const { useBreakpoint } = Grid;
 
 export default function Performance({ pool }: { pool: FormattedIndexPool }) {
   const breakpoints = useBreakpoint();
-  const stakingButton = (
-    <S.Stake key="stake" type="primary">
-      <S.Tractor /> Stake this pool
-    </S.Stake>
-  );
 
   return (
-    <Subscreen icon={<AiOutlineSwap />} title="Performance">
+    <Subscreen
+      icon={<AiOutlineSwap />}
+      title="Performance"
+      defaultActions={[
+        {
+          type: "primary",
+          title: (
+            <>
+              Stake <FaTractor />
+            </>
+          ),
+          onClick: () => {
+            /* */
+          },
+        },
+      ]}
+    >
       <S.PerformanceSpace
         direction={breakpoints.sm ? "horizontal" : "vertical"}
       >
@@ -38,7 +49,6 @@ export default function Performance({ pool }: { pool: FormattedIndexPool }) {
             <S.Statistic title="Swap Fee" value={pool.swapFee} />
             <S.Statistic title="Cumulative Fees" value={pool.cumulativeFee} />
           </Space>
-          {breakpoints.sm && stakingButton}
         </div>
       </S.PerformanceSpace>
     </Subscreen>

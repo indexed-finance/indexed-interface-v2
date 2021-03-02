@@ -3,7 +3,6 @@ import { FaCoins, FaFireAlt, FaHammer } from "react-icons/fa";
 import { SwapInteraction, TradeInteraction } from "./interactions";
 import { Tabs } from "antd";
 import React, { useState } from "react";
-import noop from "lodash.noop";
 import styled from "styled-components";
 import type { FormattedIndexPool } from "features";
 
@@ -12,14 +11,9 @@ export type PoolInteraction = "burn" | "mint" | "swap" | "trade";
 interface Props {
   pool: null | FormattedIndexPool;
   initial?: PoolInteraction;
-  onChange?(nextInteraction: PoolInteraction): void;
 }
 
-export default function PoolInteractions({
-  pool,
-  initial = "swap",
-  onChange = noop,
-}: Props) {
+export default function PoolInteractions({ pool, initial = "swap" }: Props) {
   const [interaction, setInteraction] = useState<PoolInteraction>(initial);
 
   return (
