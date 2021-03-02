@@ -110,47 +110,48 @@ export default function AppLayout() {
             {breakpoint.lg && (
               <S.Controls>
                 <S.Changeables layout="inline" colon={false}>
-                  <div title="Language">
-                    <Item label="🗣️">
-                      <Select defaultValue="english">
-                        <Option value="english">English 🇺🇸</Option>
-                      </Select>
-                    </Item>
-                  </div>
-                  <div title="Theme">
-                    <Item label={theme === "dark" ? "🌙" : "🔆"}>
-                      <Switch
-                        title="Theme"
-                        checked={theme === "dark"}
-                        onClick={() => dispatch(actions.themeToggled())}
-                      />
-                    </Item>
-                  </div>
-                </S.Changeables>
-                <S.Wallet type="ghost">
-                  <MdAccountBalanceWallet />
-                </S.Wallet>
-                <S.Settings type="ghost">
-                  <Link to="/settings">
-                    <MdSettings />
-                  </Link>
-                </S.Settings>
-                <Popover
-                  placement="bottomLeft"
-                  content={
-                    <>
-                      <strong>{connectionStatus.top}</strong>
-                      <br />
-                      <em>{connectionStatus.bottom}</em>
-                    </>
-                  }
-                >
-                  <S.Connection type={connectionStatus.type}>
-                    <S.ConnectionStatus
-                      onClick={() => dispatch(actions.connectionToggled())}
+                  <Item name="Language" label="🗣️">
+                    <Select defaultValue="english">
+                      <Option value="english">English 🇺🇸</Option>
+                    </Select>
+                  </Item>
+                  <Item name="Theme" label={theme === "dark" ? "🌙" : "🔆"}>
+                    <Switch
+                      checked={theme === "dark"}
+                      onClick={() => dispatch(actions.themeToggled())}
                     />
-                  </S.Connection>
-                </Popover>
+                  </Item>
+                  <Item>
+                    <S.Wallet type="ghost">
+                      <MdAccountBalanceWallet />
+                    </S.Wallet>
+                  </Item>
+                  <Item>
+                    <S.Settings type="ghost">
+                      <Link to="/settings">
+                        <MdSettings />
+                      </Link>
+                    </S.Settings>
+                  </Item>
+                  <Item>
+                    <Popover
+                      placement="bottomLeft"
+                      content={
+                        <>
+                          <strong>{connectionStatus.top}</strong>
+                          <br />
+                          <em>{connectionStatus.bottom}</em>
+                        </>
+                      }
+                    >
+                      <S.Connection type={connectionStatus.type}>
+                        <S.ConnectionStatus
+                          onClick={() => dispatch(actions.connectionToggled())}
+                        />
+                      </S.Connection>
+                    </Popover>
+                  </Item>
+                </S.Changeables>
               </S.Controls>
             )}
           </S.Top>
@@ -235,9 +236,7 @@ const S = {
     align-items: center;
     justify-content: flex-end;
   `,
-  Changeables: styled(Form)`
-    margin-right: ${(props) => props.theme.spacing.medium};
-  `,
+  Changeables: styled(Form)``,
   Wallet: styled(Button)`
     ${(props) => props.theme.snippets.perfectlyCentered};
     font-size: ${(props) => props.theme.fontSizes.huge};
@@ -245,8 +244,7 @@ const S = {
   `,
   Settings: styled(Button)`
     font-size: ${(props) => props.theme.fontSizes.huge};
-    margin-left: ${(props) => props.theme.spacing.medium};
-    ${(props) => props.theme.snippets.perfectlyCentered};
+    ${(props) => props.theme.snippets.perfectlyCentered}
 
     a {
       ${(props) => props.theme.snippets.perfectlyCentered};
@@ -302,7 +300,6 @@ const S = {
     margin: 0;
   `,
   ConnectionStatus: styled(ImConnection)`
-    margin-left: ${(props) => props.theme.spacing.medium};
     font-size: ${(props) => props.theme.fontSizes.huge};
     cursor: pointer;
     transition: color 0.6s;
