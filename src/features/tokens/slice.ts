@@ -46,13 +46,15 @@ const slice = createSlice({
           address,
           { price, change24Hours, percentChange24Hours },
         ] of Object.entries(action.payload)) {
-          const entry = state.entities[address]!;
+          const entry = state.entities[address.toLowerCase()];
 
-          entry.priceData = {
-            price,
-            change24Hours,
-            percentChange24Hours,
-          };
+          if (entry) {
+            entry.priceData = {
+              price,
+              change24Hours,
+              percentChange24Hours,
+            };
+          }
         }
       })
       .addCase(poolUpdated, (state, action) => {

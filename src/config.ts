@@ -1,3 +1,5 @@
+export const CLIENT_STATISTICS_REPORTING_RATE = 10000;
+export const COINAPI_USAGE_REPORT_RATE = 10000;
 export const COINAPI_API_KEY = "A90A6131-9B1D-4FF5-BD25-CD9D28C899B8";
 export const COINAPI_SANDBOX_URL = "wss://ws-sandbox.coinapi.io/v1/";
 export const SERVER_DEBOUNCE_RATE = 250;

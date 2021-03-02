@@ -50,7 +50,6 @@ const unsubscribeFromWaitingForSymbols = subscribe(() => {
 /**
  * Every so often, re-fetch thegraph and pool data.
  */
-let updateCount = 0;
 function continuouslyRetrievePoolDetails() {
   setTimeout(() => {
     const state = getState();
@@ -62,9 +61,6 @@ function continuouslyRetrievePoolDetails() {
       dispatch(actions.requestPoolDetail(pool.id, false));
     }
 
-    updateCount++;
-
-    log(`Polling for updates... (${updateCount})`);
     continuouslyRetrievePoolDetails();
   }, SERVER_POLL_RATE);
 }

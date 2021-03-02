@@ -1,9 +1,10 @@
-import { IncomingMessage } from "http";
 import {
+  CLIENT_STATISTICS_REPORTING_RATE,
   WEBSOCKET_SERVER_PING_RATE,
   WEBSOCKET_SERVER_PORT,
   WEBSOCKET_SERVER_UPDATE_RATE,
 } from "config";
+import { IncomingMessage } from "http";
 import {
   formatInitialStateResponse,
   formatStatePatchResponse,
@@ -12,6 +13,14 @@ import {
 import { store } from "features";
 import WebSocket from "isomorphic-ws";
 import jsonpatch from "fast-json-patch";
+
+// Track usage via reporting statistics.
+export const clientStatistics = {
+  totalConnections: 0,
+  totalErrors: 0,
+  totalStateOperationsSent: 0,
+  totalStatePatchesSent: 0,
+};
 
 // Set up a collection of client connections.
 export const clientToIpLookup = new WeakMap<WebSocket, string>();
@@ -55,6 +64,7 @@ export default function setupClientHandling() {
 
   continuouslyCheckForInactivity();
   continuouslySendUpdates();
+  continuouslyReportStatistics();
 }
 
 // #region helpers
@@ -63,6 +73,8 @@ function handleConnection(client: WebSocket, incoming: IncomingMessage) {
 
   if (!ipToClientLookup[ip]) {
     log("A client has connected.", ip);
+
+    clientStatistics.totalConnections++;
 
     clientToIpLookup.set(client, ip);
 
@@ -89,6 +101,7 @@ function handleClose(client: WebSocket) {
 function handleError(client: WebSocket) {
   log("A client experienced an error.", clientToIpLookup.get(client));
   pruneClient(client);
+  clientStatistics.totalErrors++;
 }
 
 function continuouslyCheckForInactivity() {
@@ -121,16 +134,31 @@ function continuouslySendUpdates() {
     const currentState = store.getState();
     const differences = jsonpatch.compare(previousState, currentState);
 
-    if (differences.length > 0) {
+    if (differences.length > 0 && connections.length > 0) {
+      log(`Updating clients with ${differences.length} patches.`);
+
       for (const client of connections) {
         client.send(formatStatePatchResponse(differences));
       }
+
+      clientStatistics.totalStatePatchesSent += differences.length;
+      clientStatistics.totalStateOperationsSent++;
     }
 
     previousState = jsonpatch.deepClone(currentState);
 
     continuouslySendUpdates();
   }, WEBSOCKET_SERVER_UPDATE_RATE);
+}
+
+function continuouslyReportStatistics() {
+  setTimeout(() => {
+    log("Client statistics:", {
+      currenctConnections: connections.length,
+      ...clientStatistics,
+    });
+    continuouslyReportStatistics();
+  }, CLIENT_STATISTICS_REPORTING_RATE);
 }
 
 function pruneClient(client: WebSocket) {

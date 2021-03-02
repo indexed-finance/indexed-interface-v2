@@ -1,5 +1,9 @@
-import { COINAPI_API_KEY, COINAPI_SANDBOX_URL } from "config";
-import { ExchangeResponse, OhlcvResponse, ReconnectResponse } from "./models";
+import {
+  COINAPI_API_KEY,
+  COINAPI_SANDBOX_URL,
+  COINAPI_USAGE_REPORT_RATE,
+} from "config";
+import { ExchangeResponse, OhlcvResponse } from "./models";
 import { actions, store } from "features";
 import { formatPongResponse, log } from "./helpers";
 import WebSocket from "isomorphic-ws";
@@ -11,10 +15,22 @@ export type PriceData = {
   updatedAt: number;
 };
 
-let lastSymbols: string[];
-let coinapiClient: WebSocket;
-let symbolToPriceDataLookup: Record<string, PriceData>;
-let prices24HoursAgo: Record<string, null | number>;
+export const coinapiUsage = {
+  pingCount: 0,
+  messageCount: 0,
+  errorCount: 0,
+  restartCount: 0,
+  responseCounts: {
+    ohlcv: 0,
+    exrate: 0,
+    unexpected: 0,
+  },
+};
+
+export let lastSymbols: string[];
+export let coinapiClient: WebSocket;
+export let symbolToPriceDataLookup: Record<string, PriceData>;
+export let prices24HoursAgo: Record<string, null | number>;
 
 export default function setupCoinapiConnection(symbols: string[]) {
   lastSymbols = symbols;
@@ -28,9 +44,14 @@ export default function setupCoinapiConnection(symbols: string[]) {
   coinapiClient.on("message", handleMessage);
   coinapiClient.on("close", handleClose);
   coinapiClient.on("error", handleError);
+
+  continuouslyReportCoinapiUsage();
 }
 
 // #region Helpers
+/**
+ *
+ */
 function clearCache() {
   symbolToPriceDataLookup = {};
   prices24HoursAgo = lastSymbols.reduce((prev, next) => {
@@ -38,11 +59,19 @@ function clearCache() {
     return prev;
   }, {} as Record<string, null | number>);
 }
-
+/**
+ *
+ * @param asset -
+ */
+function isUsdLike(asset: string) {
+  return ["USD", "USDC", "USDT"].includes(asset);
+}
 /**
  * After opening the connection, immediately authenticate and specify requested data.
  */
 function handleOpen(symbols: string[]) {
+  log("Opened connection to CoinAPI.");
+
   coinapiClient.send(
     JSON.stringify({
       type: "hello",
@@ -53,77 +82,120 @@ function handleOpen(symbols: string[]) {
     })
   );
 }
-
 /**
  * @see
  * RFC-6455 [https://www.ietf.org/rfc/rfc6455.txt]
  */
 function handlePing() {
+  log("Received ping from CoinAPI.");
+
   coinapiClient.send(formatPongResponse());
+
+  coinapiUsage.pingCount++;
 }
-
-function handleMessage(event: WebSocket.MessageEvent) {
-  const data = JSON.parse(event.data as string);
-  const isUsdLike = (asset: string) => ["USD", "USDC", "USDT"].includes(asset);
-
+/**
+ *
+ * @param event -
+ */
+function handleMessage(event: string) {
+  const data = JSON.parse(event);
   const handlers: Record<string, (data: any) => void> = {
-    exrate(_data: ExchangeResponse) {
-      try {
-        const { asset_id_base: from, asset_id_quote: to, rate } = _data;
-        const price24HoursAgo = prices24HoursAgo[from];
-
-        if (isUsdLike(to) && prices24HoursAgo != null) {
-          const change24Hours = rate - price24HoursAgo!;
-          const percentChange24Hours = change24Hours / rate;
-
-          symbolToPriceDataLookup[from] = {
-            price: rate,
-            change24Hours,
-            percentChange24Hours,
-            updatedAt: new Date().getTime(),
-          };
-
-          store.dispatch(actions.coingeckoDataLoaded(symbolToPriceDataLookup));
-        }
-      } catch {}
-    },
-    ohlcv(_data: OhlcvResponse) {
-      try {
-        // BINANCE _ SPOT _ <ASSET> _ <OTHER ASSET>
-        const [, , asset, otherAsset] = _data.symbol_id.split("_");
-
-        if (isUsdLike(otherAsset)) {
-          const oneDay = 24 * 60 * 60 * 1000;
-          const twoDays = oneDay * 2;
-          const now = new Date().getTime();
-          const aDayAgo = now - oneDay;
-          const twoDaysAgo = now - twoDays;
-          const when = new Date(_data.time_period_end).getTime();
-
-          if (when > twoDaysAgo && when < aDayAgo) {
-            prices24HoursAgo[asset] = _data.price_close;
-          }
-        }
-      } catch {}
-    },
-    reconnect(_data: ReconnectResponse) {
+    ping: handlePing,
+    exrate: handleExrateResponse,
+    ohlcv: handleOhlcvResponse,
+    reconnect: () => {
       setupCoinapiConnection(lastSymbols);
+      coinapiUsage.restartCount++;
     },
   };
-  const handler =
-    handlers[data.type] ??
-    ((_data) => {
-      log("No handler present for ", _data.type);
-    });
+  const handler = handlers[data.type] ?? handleUnexpectedResponse;
 
   handler(data);
-}
 
+  coinapiUsage.messageCount++;
+}
+/**
+ *
+ */
 function handleClose() {
   log("CoinAPI connection was terminated.");
 }
-
+/**
+ *
+ * @param error -
+ */
 function handleError(error: WebSocket.ErrorEvent) {
   log("CoinAPI connection was terminated.", error);
+
+  coinapiUsage.errorCount++;
+}
+/**
+ *
+ * @param data -
+ */
+function handleExrateResponse(data: ExchangeResponse) {
+  try {
+    const { asset_id_base: from, asset_id_quote: to, rate } = data;
+    const price24HoursAgo = prices24HoursAgo[from];
+
+    if (isUsdLike(to) && prices24HoursAgo != null) {
+      const change24Hours = rate - price24HoursAgo!;
+      const percentChange24Hours = change24Hours / rate;
+
+      symbolToPriceDataLookup[from] = {
+        price: rate,
+        change24Hours,
+        percentChange24Hours,
+        updatedAt: new Date().getTime(),
+      };
+
+      store.dispatch(actions.coingeckoDataLoaded(symbolToPriceDataLookup));
+    }
+  } finally {
+    coinapiUsage.responseCounts.exrate++;
+  }
+}
+/**
+ *
+ * @param data -
+ */
+function handleOhlcvResponse(data: OhlcvResponse) {
+  try {
+    // BINANCE _ SPOT _ <ASSET> _ <OTHER ASSET>
+    const [, , asset, otherAsset] = data.symbol_id.split("_");
+
+    if (isUsdLike(otherAsset)) {
+      const oneDay = 24 * 60 * 60 * 1000;
+      const twoDays = oneDay * 2;
+      const now = new Date().getTime();
+      const aDayAgo = now - oneDay;
+      const twoDaysAgo = now - twoDays;
+      const when = new Date(data.time_period_end).getTime();
+
+      if (when > twoDaysAgo && when < aDayAgo) {
+        prices24HoursAgo[asset] = data.price_close;
+      }
+    }
+  } finally {
+    coinapiUsage.responseCounts.ohlcv++;
+  }
+}
+/**
+ *
+ * @param data -
+ */
+function handleUnexpectedResponse(data: { type: string }) {
+  log("Unexpected response; no handler present for ", data.type);
+
+  coinapiUsage.responseCounts.unexpected++;
+}
+/**
+ *
+ */
+function continuouslyReportCoinapiUsage() {
+  setTimeout(() => {
+    log("CoinAPI usage:", coinapiUsage);
+    continuouslyReportCoinapiUsage();
+  }, COINAPI_USAGE_REPORT_RATE);
 }
 // #endregion
