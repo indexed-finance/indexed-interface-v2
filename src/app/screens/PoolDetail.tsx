@@ -23,7 +23,6 @@ export default function PoolDetail() {
     selectors.selectFormattedIndexPool(state, poolId)
   );
   const isConnected = useSelector(selectors.selectConnected);
-
   const breakpoints = useBreakpoint();
 
   // Effect:
@@ -56,15 +55,13 @@ export default function PoolDetail() {
 
     // Variants
     const mobileSized = (
-      <>
-        <Row gutter={5}>
-          <Col span={24}>{performance}</Col>
-          <Col span={24}>{chart}</Col>
-          <Col span={24}>{interactions}</Col>
-          <Col span={24}>{assets}</Col>
-          <Col span={24}>{recents}</Col>
-        </Row>
-      </>
+      <Row gutter={5}>
+        <Col span={24}>{performance}</Col>
+        <Col span={24}>{chart}</Col>
+        <Col span={24}>{interactions}</Col>
+        <Col span={24}>{assets}</Col>
+        <Col span={24}>{recents}</Col>
+      </Row>
     );
     const tabletSized = (
       <>
@@ -84,24 +81,22 @@ export default function PoolDetail() {
       </>
     );
     const desktopSized = (
-      <>
-        <Row gutter={20}>
-          <Col span={16}>
-            <Row gutter={20}>
-              <Col span={12}>
-                {performance}
-                {chart}
-              </Col>
-              <Col span={12}>{interactions}</Col>
-            </Row>
-            <Row gutter={20}>
-              <Col span={24}>{recents}</Col>
-            </Row>
-          </Col>
+      <Row gutter={20}>
+        <Col span={16}>
+          <Row gutter={20}>
+            <Col span={12}>
+              {performance}
+              {chart}
+            </Col>
+            <Col span={12}>{interactions}</Col>
+          </Row>
+          <Row gutter={20}>
+            <Col span={24}>{recents}</Col>
+          </Row>
+        </Col>
 
-          <Col span={8}>{assets}</Col>
-        </Row>
-      </>
+        <Col span={8}>{assets}</Col>
+      </Row>
     );
 
     return (

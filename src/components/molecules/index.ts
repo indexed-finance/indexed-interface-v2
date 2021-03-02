@@ -5,4 +5,5 @@ export { default as PageFooter } from "./PageFooter";
 export { default as PoolDropdown } from "./PoolDropdown";
 export { default as Quote } from "./Quote";
 export { default as RankedToken } from "./RankedToken";
+export { default as ScreenHeader } from "./ScreenHeader";
 export { default as SelectableToken } from "./SelectableToken";
