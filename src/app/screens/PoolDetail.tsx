@@ -28,7 +28,9 @@ export default function PoolDetail() {
   // Effect:
   // When the pool changes and not connected to the server, get the juicy details.
   useEffect(() => {
-    if (!isConnected) {
+    dispatch(actions.requestPoolUserData(poolId));
+
+    if (isConnected) {
       dispatch(actions.requestPoolDetail(poolId));
     }
   }, [dispatch, poolId, isConnected]);

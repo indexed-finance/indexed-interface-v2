@@ -110,7 +110,7 @@ export default function AppLayout() {
             {breakpoint.lg && (
               <S.Controls>
                 <S.Changeables layout="inline" colon={false}>
-                  <Item name="Language" label="🗣️">
+                  <Item name="Language">
                     <Select defaultValue="english">
                       <Option value="english">English 🇺🇸</Option>
                     </Select>

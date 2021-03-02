@@ -9,7 +9,8 @@ import {
 } from "config";
 import { ExchangeResponse, OhlcvResponse } from "./models";
 import { actions, store } from "features";
-import { formatPongResponse, log, sleep } from "./helpers";
+import { formatPongResponse, log } from "./helpers";
+import { sleep } from "helpers";
 import WebSocket from "isomorphic-ws";
 
 export type PriceData = {
@@ -47,6 +48,12 @@ export default async function setupCoinapiConnection(symbols: string[]) {
 
     await sleep(1000);
 
+    coinapiUsage.messageCount = 0;
+    coinapiUsage.responseCounts = {
+      ohlcv: 0,
+      exrate: 0,
+      unexpected: 0,
+    };
     coinapiUsage.since = new Date().getTime();
   }
 
@@ -224,7 +231,6 @@ function handleReconnect() {
  */
 function handleUnexpectedResponse(data: { type: string }) {
   log("Unexpected response; no handler present for ", data.type);
-
   coinapiUsage.responseCounts.unexpected++;
 }
 /**

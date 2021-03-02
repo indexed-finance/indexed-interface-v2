@@ -5,26 +5,30 @@ import { CoinGeckoService } from "services";
 import { SLIPPAGE_RATE, SUBGRAPH_URL_UNISWAP } from "config";
 import { categoriesActions } from "./categories";
 import { convert } from "helpers";
-import { ethers } from "ethers";
 import { helpers } from "ethereum";
 import { indexPoolsActions } from "./indexPools";
+import { providers } from "ethers";
 import { settingsActions } from "./settings";
+import { sleep } from "helpers";
 import { tokensActions } from "./tokens";
 import selectors from "./selectors";
 
 export let provider:
   | null
-  | ethers.providers.JsonRpcProvider
-  | ethers.providers.InfuraProvider = null;
-export let signer: null | ethers.providers.JsonRpcSigner = null;
+  | providers.Web3Provider
+  | providers.JsonRpcProvider
+  | providers.InfuraProvider = null;
+export let signer: null | providers.JsonRpcSigner = null;
+export let selectedAddress: string;
 
 type InitialzeOptions = {
-  provider: ethers.providers.JsonRpcProvider | ethers.providers.InfuraProvider;
+  provider:
+    | providers.Web3Provider
+    | providers.JsonRpcProvider
+    | providers.InfuraProvider;
   withSigner?: boolean;
   selectedAddress?: string;
 };
-
-(window as any).provider = provider;
 
 const thunks = {
   /**
@@ -35,6 +39,16 @@ const thunks = {
 
     if (options.withSigner) {
       signer = provider.getSigner();
+    }
+
+    await provider.ready;
+
+    if (options.selectedAddress) {
+      selectedAddress = options.selectedAddress;
+    } else if (provider.connection.url === "metamask") {
+      selectedAddress = (provider as any).provider.selectedAddress;
+    } else {
+      throw new Error("Unable to initialize without a selected address.");
     }
 
     dispatch(thunks.retrieveInitialData());
@@ -144,7 +158,7 @@ const thunks = {
   ) => {
     if (provider) {
       const state = getState();
-      const sourceAddress = (provider as any).connection.selectedAddress;
+      const sourceAddress = selectedAddress;
       const destinationAddress = poolId;
       const tokens = selectors.selectPoolUnderlyingTokens(state, poolId);
 
@@ -163,6 +177,10 @@ const thunks = {
           })
         );
       }
+    } else {
+      await sleep(500);
+
+      dispatch(thunks.requestPoolUserData(poolId));
     }
   },
   /**

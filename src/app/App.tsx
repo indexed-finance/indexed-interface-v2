@@ -23,16 +23,19 @@ function Inner() {
         const [selectedAddress] = await ethereum.request({
           method: "eth_requestAccounts",
         });
+        const provider = new ethers.providers.Web3Provider(ethereum, 1);
+
+        (window as any).provider = provider;
 
         dispatch(
           actions.initialize({
-            provider: new ethers.providers.JsonRpcProvider(ethereum, 1),
+            provider,
             selectedAddress,
+            withSigner: true,
           })
         );
       }
     };
-
     attachToProvider();
   }, [dispatch]);
 
