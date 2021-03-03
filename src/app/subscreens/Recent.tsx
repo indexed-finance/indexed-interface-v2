@@ -1,6 +1,6 @@
 import { AiOutlineClockCircle, AiOutlineSwap } from "react-icons/ai";
 import { Button } from "components";
-import { Card, Grid, Skeleton, Space, Tabs, Tag } from "antd";
+import { Card, Grid, Skeleton, Space, Tabs, Tag, Typography } from "antd";
 import { ImArrowRight2 } from "react-icons/im";
 import React, { ReactNode, useState } from "react";
 import Subscreen from "./Subscreen";
@@ -57,7 +57,11 @@ function TradeCard(props: Trade) {
   return (
     <BaseCard
       title={<S.Tag color={kind === "buy" ? "green" : "red"}>{kind}</S.Tag>}
-      extra={<S.Amount negative={kind === "sell"}>{amount}</S.Amount>}
+      extra={
+        <S.Amount type={kind === "sell" ? "danger" : "success"}>
+          {amount}
+        </S.Amount>
+      }
       {...rest}
     />
   );
@@ -163,10 +167,10 @@ const S = {
     height: 133px;
     margin-right: ${(props) => props.theme.spacing.small};
   `,
-  Amount: styled.div<{ negative: boolean }>`
+  Amount: styled(Typography.Text)`
     text-align: center;
-    color: ${(props) => (props.negative ? "red" : "green")};
     font-size: ${(props) => props.theme.fontSizes.large};
     margin-top: -10px;
+    display: block;
   `,
 };

@@ -21,10 +21,10 @@ export default function Quote({
   ...rest
 }: Props) {
   const bottom = (
-    <S.Bottom negative={isNegative} kind={kind}>
-      <div>
+    <S.Bottom kind={kind}>
+      <Typography.Text type={isNegative ? "danger" : "success"}>
         {netChange} ({netChangePercent})
-      </div>
+      </Typography.Text>
       <span>Today</span>
     </S.Bottom>
   );
@@ -57,13 +57,12 @@ const S = {
     ${(props) =>
       props.kind === "small" && props.theme.snippets.perfectlyAligned};
   `,
-  Bottom: styled.div<{ negative: boolean; kind: Props["kind"] }>`
+  Bottom: styled.div<{ kind: Props["kind"] }>`
     margin: 0;
     margin-top: ${(props) => (props.kind === "small" ? "0" : "-8px")};
     ${(props) => props.theme.snippets.perfectlyAligned};
 
     div {
-      color: ${(props) => (props.negative ? "red" : "green")};
       font-size: ${(props) => (props.kind === "small" ? "16px" : "18px")};
       margin-left: ${(props) =>
         props.kind === "small" ? props.theme.spacing.small : "0"};

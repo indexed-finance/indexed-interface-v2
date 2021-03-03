@@ -1,6 +1,7 @@
+import { AiOutlineArrowRight } from "react-icons/ai";
+import { Alert, Form, Statistic, Typography } from "antd";
 import { AppState, FormattedIndexPool, selectors, signer } from "features";
 import { Flipper } from "components/atoms";
-import { Form, Typography } from "antd";
 import { SubscreenContext } from "app/subscreens/Subscreen";
 import { actions } from "features";
 import { convert } from "helpers";
@@ -14,7 +15,7 @@ import React, {
   useState,
 } from "react";
 import TokenSelector from "../TokenSelector";
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 
 interface Props {
   pool: null | FormattedIndexPool;
@@ -71,6 +72,16 @@ export default function SwapInteraction({ pool }: Props) {
       return true;
     }
   });
+  const formattedSwapFee = pool
+    ? convert.toPercent(
+        convert
+          .toBigNumber(previousFormValues.current.to.amount.toString())
+          .times(parseFloat(pool.swapFee) / 100)
+          .toNumber()
+      )
+    : "";
+  const baseline = previousFormValues.current.from.token;
+  const comparison = previousFormValues.current.to.token;
 
   /**
    *
@@ -242,6 +253,7 @@ export default function SwapInteraction({ pool }: Props) {
 
     form.setFieldsValue(flippedValue);
     previousFormValues.current = flippedValue;
+    setRenderCount((prev) => prev + 1);
   };
 
   // Effect:
@@ -296,45 +308,115 @@ export default function SwapInteraction({ pool }: Props) {
         console.log("Submission failed. Error was: ", error)
       }
     >
-      <Item>
-        <Typography.Title level={2}>Swap</Typography.Title>
-      </Item>
+      <S.Title>
+        <span>Swap</span>
+        <span>
+          <img
+            src={require(`assets/images/${baseline.toLowerCase()}.png`).default}
+            alt="Baseline"
+          />
+          <S.Swap />
+          <T.Comparison
+            src={
+              require(`assets/images/${comparison.toLowerCase()}.png`).default
+            }
+            alt="Comparison"
+          />
+        </span>
+      </S.Title>
       <Item name="from" rules={[{ validator: checkAmount }]}>
         {pool && <TokenSelector label="From" pool={pool} />}
       </Item>
-      <Item>
-        <Flipper onFlip={handleFlip} />
-      </Item>
+      <Flipper onFlip={handleFlip} />
       <Item name="to" rules={[{ validator: checkAmount }]}>
         {pool && <TokenSelector label="To" pool={pool} />}
       </Item>
       {previousFormValues.current.from && previousFormValues.current.to && (
         <S.Item>
-          <div>
-            <>
-              1 {previousFormValues.current.from.token} ≈ {price.toPrecision(5)}{" "}
-              {previousFormValues.current.to.token}
-            </>
-            {pool && (
-              <div>
-                Fee:{" "}
-                {convert
-                  .toBigNumber(previousFormValues.current.to.amount.toString())
-                  .times(parseFloat(pool.swapFee) / 100)
-                  .toPrecision(5)}{" "}
-                {previousFormValues.current.to.token}
-              </div>
-            )}
-          </div>
+          <TokenExchangeRate
+            baseline={baseline}
+            comparison={comparison}
+            fee={formattedSwapFee}
+            rate={price.toString()}
+          />
         </S.Item>
       )}
     </S.Form>
   );
 }
 
+const blinking = keyframes`
+  0% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 0.3;
+  }
+`;
+
 const S = {
-  Form: styled(Form)``,
+  Swap: styled(AiOutlineArrowRight)`
+    position: absolute;
+    top: 9px;
+    right: 21px;
+  `,
+  Form: styled(Form)`
+    img {
+      ${(props) => props.theme.snippets.size40};
+      opacity: 0.7;
+      border-radius: 50%;
+      animation-name: ${blinking};
+      animation-duration: 2s;
+      animation-iteration-count: infinite;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+    }
+  `,
   Item: styled.div`
     ${(props) => props.theme.snippets.spacedBetween};
+  `,
+  Title: styled(Typography.Title)`
+    ${(props) => props.theme.snippets.spacedBetween};
+    position: relative;
+  `,
+};
+
+export interface TProps {
+  baseline: string;
+  comparison: string;
+  rate: string | number;
+  fee: string;
+}
+
+function TokenExchangeRate({ baseline, comparison, fee, rate }: TProps) {
+  return (
+    <T.Wrapper
+      message={
+        <T.Title level={4}>
+          <Statistic
+            title="Exchange Rate"
+            value={`1 ${baseline} ≈ ${convert.toComma(
+              typeof rate === "number" ? rate : parseFloat(rate)
+            )} ${comparison}`}
+          />
+          <Statistic title="Fee" value={fee} />
+        </T.Title>
+      }
+    />
+  );
+}
+
+const T = {
+  Wrapper: styled(Alert)`
+    position: relative;
+    width: 100%;
+  `,
+  Comparison: styled.img``,
+  Title: styled(Typography.Title)`
+    ${(props) => props.theme.snippets.spacedBetween};
+    flex-wrap: wrap;
+    margin-bottom: 0 !important;
   `,
 };

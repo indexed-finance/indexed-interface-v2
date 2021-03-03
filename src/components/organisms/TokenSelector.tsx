@@ -114,7 +114,7 @@ export default function TokenSelector({
           <S.Balance>
             {value.token ? (
               <S.BalanceLabel type="secondary">
-                {relevantBalance ? (
+                {parseInt(relevantBalance) ? (
                   <>Balance: {relevantBalance}</>
                 ) : (
                   "No Balance"
@@ -136,7 +136,7 @@ export default function TokenSelector({
           <S.InnerSpace>
             {value.token && (
               <Button type="dashed" disabled={!relevantBalance}>
-                Max
+                MAX
               </Button>
             )}
             <S.Button
