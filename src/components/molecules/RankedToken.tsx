@@ -11,8 +11,14 @@ export interface Props {
 }
 
 export default function RankedToken({ token, rank }: Props) {
-  const image = require(`assets/images/${token.symbol.toLowerCase()}.png`)
-    .default;
+  let image;
+
+  try {
+    image = require(`assets/images/${token.symbol.toLowerCase()}.png`).default;
+  } catch {
+    image = "https://placehold.it/50x50";
+  }
+
   const colorThief = useRef<any>(null);
 
   // Effect:

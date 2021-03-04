@@ -9,7 +9,7 @@ export interface Props {
   symbol?: string;
   name?: string;
   brief?: string;
-  indexPools?: Array<{ name: string; symbol: string }>;
+  indexPools?: Array<{ id: string; name: string; symbol: string }>;
   tokens?: Array<{ name: string; symbol: string }>;
 }
 
@@ -63,7 +63,9 @@ export default function CategoryCard({
                       <span>
                         {indexPool.name} [{indexPool.symbol}]
                       </span>
-                      <Button>View</Button>
+                      <Link to={`/pools/${indexPool.id}`}>
+                        <Button>View</Button>
+                      </Link>
                     </S.IndexPoolEntry>
                   ))}
                 </S.List>

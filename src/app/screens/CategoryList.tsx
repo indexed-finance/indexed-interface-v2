@@ -12,6 +12,7 @@ export default function CategoryList() {
   return (
     <>
       <ScreenHeader
+        title="Categories"
         overlay={<CategoryDropdown />}
         activeBreadcrumb={<Link to="/categories">Categories</Link>}
       />

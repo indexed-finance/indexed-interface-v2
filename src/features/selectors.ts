@@ -71,6 +71,7 @@ const selectors = {
             );
 
             return {
+              id: guaranteedPool.id,
               name: guaranteedPool.name,
               symbol: guaranteedPool.symbol,
               size: guaranteedPool.size.toString(),
