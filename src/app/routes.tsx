@@ -1,10 +1,12 @@
 import {
   CategoryDetail,
   CategoryList,
-  Docs,
+  DocsDetail,
+  DocsList,
   FAQ,
   Govern,
-  News,
+  NewsDetail,
+  NewsList,
   PoolDetail,
   PoolList,
   Portfolio,
@@ -88,7 +90,12 @@ const routes: Route[] = [
     path: "/news",
     exact: true,
     sider: "News",
-    screen: <News />,
+    screen: <NewsList />,
+  },
+  {
+    path: "/news/:slug",
+    exact: true,
+    screen: <NewsDetail />,
   },
   {
     path: "/faq",
@@ -100,7 +107,12 @@ const routes: Route[] = [
     path: "/docs",
     exact: true,
     sider: "Docs",
-    screen: <Docs />,
+    screen: <DocsList />,
+  },
+  {
+    path: "/docs/:slug",
+    exact: false,
+    screen: <DocsDetail />,
   },
   {
     path: "/settings",

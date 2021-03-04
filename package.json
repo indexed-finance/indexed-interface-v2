@@ -83,6 +83,7 @@
     "eslint-plugin-tsdoc": "^0.2.11",
     "ignore-loader": "^0.1.2",
     "madge": "^4.0.0",
+    "nodemon": "^2.0.7",
     "pnp-webpack-plugin": "^1.6.4",
     "react-app-polyfill": "^2.0.0",
     "react-dev-utils": "^11.0.3",
@@ -109,7 +110,9 @@
     "check:types": "ttsc --noEmit",
     "server:build": "node ./scripts/build-server",
     "server:start": "node ./webpack/server/server",
-    "server:develop": "npm run server:build && npm run server:start"
+    "server:develop": "npm run server:build && npm run server:start",
+    "data:build": "node ./scripts/build-data",
+    "data:watch": "nodemon --watch ./data --exec \"node ./scripts/build-data.js\" -e js,md"
   },
   "eslintConfig": {
     "extends": [

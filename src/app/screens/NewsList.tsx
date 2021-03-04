@@ -1,0 +1,14 @@
+import { ScreenHeader } from "components";
+import { Subscreen } from "../subscreens";
+import React from "react";
+
+export default function NewsList() {
+  return (
+    <>
+      <ScreenHeader title="News" />
+      <Subscreen icon={null} title="Extras">
+        Lorem
+      </Subscreen>
+    </>
+  );
+}

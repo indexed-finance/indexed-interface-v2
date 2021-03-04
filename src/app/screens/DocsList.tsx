@@ -2,10 +2,10 @@ import { ScreenHeader } from "components";
 import { Subscreen } from "../subscreens";
 import React from "react";
 
-export default function Docs() {
+export default function DocsList() {
   return (
     <>
-      <ScreenHeader title="Documentation" />
+      <ScreenHeader title="Docs" />
       <Subscreen icon={null} title="Extras">
         Lorem
       </Subscreen>
