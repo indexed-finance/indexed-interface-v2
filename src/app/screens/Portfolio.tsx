@@ -1,4 +1,13 @@
-import { Col, Divider, Grid, List, Row, Space, Typography } from "antd";
+import {
+  Col,
+  Divider,
+  Grid,
+  List,
+  Row,
+  Space,
+  Statistic,
+  Typography,
+} from "antd";
 import { IoLogoUsd } from "react-icons/io";
 import { Link } from "react-router-dom";
 import { ScreenHeader } from "components";
@@ -36,15 +45,10 @@ export default function Portfolio() {
   const breakpoints = useBreakpoint();
   const ndx = (
     <Subscreen icon={<IoLogoUsd />} title="NDX">
-      <S.Label type="secondary" level={4}>
-        Balance
-      </S.Label>
-      <S.Label>2800.00 NDX</S.Label>
-      <Divider />
-      <S.Label type="secondary" level={4}>
-        Earned
-      </S.Label>
-      <S.Label>0.00 NDX</S.Label>
+      <Space size="large">
+        <Statistic title="Balance" value="2800.00 NDX" />
+        <Statistic title="Earned" value="0.00 NDX" />
+      </Space>
     </Subscreen>
   );
   const holdings = (
@@ -100,7 +104,7 @@ export default function Portfolio() {
   const smallSized = (
     <Row gutter={20}>
       <Col span={10}>{holdings}</Col>
-      <Col span={6}>{ndx}</Col>
+      <Col span={8}>{ndx}</Col>
     </Row>
   );
 

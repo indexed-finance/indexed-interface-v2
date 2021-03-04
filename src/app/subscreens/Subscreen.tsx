@@ -36,6 +36,10 @@ export default function Subscreen({
 }: SubscreenProps) {
   const [actions, setActions] = useState(defaultActions);
 
+  React.useEffect(() => {
+    setActions(defaultActions);
+  }, [defaultActions]);
+
   return (
     <SubscreenContext.Provider value={{ setActions }}>
       <S.Subscreen

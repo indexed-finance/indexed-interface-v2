@@ -31,7 +31,6 @@ export default function Stake() {
     total: "50,000 NDX",
   };
   const __data = [stakeable, stakeable, stakeable];
-
   const breakpoints = useBreakpoint();
   const description = (
     <Subscreen
@@ -98,15 +97,11 @@ export default function Stake() {
     </Row>
   );
   const desktopSized = (
-    <Row gutter={5}>
+    <Row gutter={20}>
       <Col span={8}>{description}</Col>
       <Col span={12}>{pools}</Col>
     </Row>
   );
-
-  if (breakpoints.xs) {
-  } else {
-  }
 
   return (
     <>

@@ -115,9 +115,11 @@ export default function AppLayout() {
                       <Option value="english">English 🇺🇸</Option>
                     </Select>
                   </Item>
-                  <Item name="Theme" label={theme === "dark" ? "🌙" : "🔆"}>
+                  <Item name="Theme">
                     <Switch
                       checked={theme === "dark"}
+                      checkedChildren="🌙 Dark Mode"
+                      unCheckedChildren="🔆 Light Mode"
                       onClick={() => dispatch(actions.themeToggled())}
                     />
                   </Item>
