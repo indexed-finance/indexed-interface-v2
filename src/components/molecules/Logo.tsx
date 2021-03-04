@@ -3,7 +3,11 @@ import { useHistory } from "react-router-dom";
 import React from "react";
 import styled from "styled-components";
 
-export default function Logo() {
+interface Props {
+  withTitle?: boolean;
+}
+
+export default function Logo({ withTitle = true }: Props) {
   const history = useHistory();
 
   return (
@@ -13,7 +17,7 @@ export default function Logo() {
         onClick={() => history.push("/")}
       />
       <S.LogoText>
-        <S.Title level={3}>Indexed</S.Title>
+        {withTitle && <S.Title level={3}>Indexed</S.Title>}
       </S.LogoText>
     </S.LogoWrapper>
   );

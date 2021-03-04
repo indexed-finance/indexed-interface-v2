@@ -67,7 +67,20 @@ export default function PoolDetail() {
       </S.Tokens>
     );
     const interactions = (
-      <Subscreen icon={<RiWallet3Line />} title="Interact" padding={0}>
+      <Subscreen
+        icon={<RiWallet3Line />}
+        title="Interact"
+        padding={0}
+        defaultActions={[
+          {
+            title: "Swap",
+            onClick: () => {
+              /* */
+            },
+            type: "primary",
+          },
+        ]}
+      >
         <PoolInteractions pool={pool} />
       </Subscreen>
     );

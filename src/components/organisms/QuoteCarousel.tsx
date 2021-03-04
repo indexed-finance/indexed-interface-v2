@@ -19,6 +19,8 @@ export default function QuoteCarousel({ pools }: Props) {
         <S.Carousel effect="fade" autoplay={true} dots={false}>
           {pools.map((pool) => {
             const filteredPool = pool as FormattedIndexPool;
+            const isNegative =
+              parseFloat(filteredPool.netChangePercent.replace(/%/g, "")) < 0;
 
             return (
               <S.Quote
@@ -28,6 +30,7 @@ export default function QuoteCarousel({ pools }: Props) {
                 price={filteredPool.priceUsd}
                 netChange={filteredPool.netChange}
                 netChangePercent={filteredPool.netChangePercent}
+                isNegative={isNegative}
               />
             );
           })}

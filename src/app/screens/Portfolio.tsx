@@ -10,7 +10,7 @@ import {
 } from "antd";
 import { IoLogoUsd } from "react-icons/io";
 import { Link } from "react-router-dom";
-import { ScreenHeader } from "components";
+import { Logo, ScreenHeader } from "components";
 import { Subscreen } from "../subscreens";
 import React from "react";
 import styled from "styled-components";
@@ -45,10 +45,10 @@ export default function Portfolio() {
   const breakpoints = useBreakpoint();
   const ndx = (
     <Subscreen icon={<IoLogoUsd />} title="NDX">
-      <Space size="large">
-        <Statistic title="Balance" value="2800.00 NDX" />
-        <Statistic title="Earned" value="0.00 NDX" />
-      </Space>
+      <S.Centered size="large" split={<Logo withTitle={false} />}>
+        <S.StatisticLeft title="Balance" value="2800.00 NDX" />
+        <S.StatisticRight title="Earned" value="0.00 NDX" />
+      </S.Centered>
     </Subscreen>
   );
   const holdings = (
@@ -59,7 +59,7 @@ export default function Portfolio() {
           <>
             <Divider />
             <S.Totals level={2}>
-              <span>Portfolio Value</span> <span>$20.00</span>
+              <S.StatisticRight title="Portfolio Total Value" value="$20.00" />
             </S.Totals>
           </>
         }
@@ -80,7 +80,9 @@ export default function Portfolio() {
                 </S.Title>
               </Space>
               <S.Number direction="vertical">
-                <S.Staking>Staking {entry.staking}</S.Staking>
+                <S.Staking>
+                  Staking {entry.staking} {entry.symbol}
+                </S.Staking>
                 <S.Title level={3}>
                   {entry.balance} {entry.symbol}
                   <br />
@@ -102,10 +104,14 @@ export default function Portfolio() {
     </Row>
   );
   const smallSized = (
-    <Row gutter={20}>
-      <Col span={10}>{holdings}</Col>
-      <Col span={8}>{ndx}</Col>
-    </Row>
+    <>
+      <Row gutter={20}>
+        <Col span={10}>{holdings}</Col>
+      </Row>
+      <Row gutter={20}>
+        <Col span={10}>{ndx}</Col>
+      </Row>
+    </>
   );
 
   return (
@@ -134,6 +140,7 @@ export default function Portfolio() {
 const S = {
   Totals: styled(Typography.Title)`
     ${(props) => props.theme.snippets.spacedBetween};
+    flex-direction: row-reverse;
   `,
   Title: styled(Typography.Title)`
     margin-bottom: 0 !important;
@@ -169,5 +176,14 @@ const S = {
   `,
   Staking: styled(Typography.Text)`
     font-style: italic;
+  `,
+  Centered: styled(Space)`
+    text-align: center;
+  `,
+  StatisticLeft: styled(Statistic)`
+    text-align: left;
+  `,
+  StatisticRight: styled(Statistic)`
+    text-align: right;
   `,
 };
