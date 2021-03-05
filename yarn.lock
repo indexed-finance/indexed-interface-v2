@@ -13276,6 +13276,11 @@ markdown-to-jsx@^6.11.4:
     prop-types "^15.6.2"
     unquote "^1.1.0"
 
+marked@^0.3.6:
+  version "0.3.19"
+  resolved "https://registry.yarnpkg.com/marked/-/marked-0.3.19.tgz#5d47f709c4c9fc3c216b6d46127280f40b39d790"
+  integrity sha512-ea2eGWOqNxPcXv8dyERdSr/6FmzvWwzjMxpfGB/sbMccXoct+xY+YukPD+QTUZwyvK7BZwcr4m21WBOW41pAkg==
+
 matcher@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/matcher/-/matcher-3.0.0.tgz#bd9060f4c5b70aa8041ccc6f80368760994f30ca"
@@ -13287,6 +13292,14 @@ material-colors@^1.2.1:
   version "1.2.6"
   resolved "https://registry.yarnpkg.com/material-colors/-/material-colors-1.2.6.tgz#6d1958871126992ceecc72f4bcc4d8f010865f46"
   integrity sha512-6qE4B9deFBIa9YSpOc9O0Sgc43zTeVYbgDT5veRKSlB2+ZuHNoVVxA1L/ckMUayV9Ay9y7Z/SZCLcGteW9i7bg==
+
+md-2-json@^1.0.6:
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/md-2-json/-/md-2-json-1.0.6.tgz#99e2f559808d3371d2f848db9bdf561000568442"
+  integrity sha512-QQuxm5U8urUWgR1LTKOxY1qk7gehjTzW6X49CUfFTfyu9mldkGpCx6Q0A3kmkBfPpHVvk+eGGfjCMPOl758IeA==
+  dependencies:
+    marked "^0.3.6"
+    traverse "^0.6.6"
 
 md5.js@^1.3.4:
   version "1.3.5"
@@ -19164,6 +19177,11 @@ transform-class-properties@^1.0.0-beta:
   version "1.0.0-beta"
   resolved "https://registry.yarnpkg.com/transform-class-properties/-/transform-class-properties-1.0.0-beta.tgz#027966a99940dbfffbf406699128f54e24b33d9e"
   integrity sha512-oAVpS2SpCxDk4Q/VmVdwwwt4YAIip96meKj/wNCvQIHyjHJH3pqNpyOY+rvbOlN2WN63qn2v5XnU4CunPVzlnw==
+
+traverse@^0.6.6:
+  version "0.6.6"
+  resolved "https://registry.yarnpkg.com/traverse/-/traverse-0.6.6.tgz#cbdf560fd7b9af632502fed40f918c157ea97137"
+  integrity sha1-y99WD9e5r2MlAv7UD5GMFX6pcTc=
 
 trim-trailing-lines@^1.0.0:
   version "1.1.4"

@@ -1,11 +1,11 @@
 # Foo?
 
-## Bar.
+Bar.
 
 # Foo?
 
-## Bar.
+Bar.
 
 # Foo?
 
-## Bar?
+Bar.

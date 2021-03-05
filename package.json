@@ -30,6 +30,7 @@
     "lodash.clonedeep": "^4.5.0",
     "lodash.merge": "^4.6.2",
     "lodash.noop": "^3.0.1",
+    "md-2-json": "^1.0.6",
     "multihashes": "^3.1.2",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
