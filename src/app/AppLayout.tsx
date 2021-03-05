@@ -1,20 +1,12 @@
 import "theme/styles.less";
 import { Affix, Breadcrumb, Grid, Layout } from "antd";
 import { AiOutlineMenuFold, AiOutlineMenuUnfold } from "react-icons/ai";
-import {
-  Button,
-  Drawer,
-  DrawerContext,
-  PageFooter,
-  QuoteCarousel,
-} from "components";
+import { Drawer, DrawerContext, QuoteCarousel } from "components";
 import { FormattedIndexPool, selectors } from "features";
 import { GlobalStyles } from "theme";
 import { Logo } from "components";
 import { Route, Switch as RouterSwitch } from "react-router-dom";
-import { SOCIAL_MEDIA } from "config";
 import { useSelector } from "react-redux";
-import { useTranslation } from "i18n";
 import AppHeader from "./AppHeader";
 import AppMenu from "./AppMenu";
 import React, { useCallback, useContext, useState } from "react";
@@ -26,7 +18,6 @@ const { useBreakpoint } = Grid;
 const { Sider, Header, Content } = Layout;
 
 export default function AppLayout() {
-  const translate = useTranslation();
   const { activePage } = useContext(DrawerContext);
   const isConnectionEnabled = useSelector(selectors.selectConnectionEnabled);
   const indexPools = useSelector(selectors.selectAllFormattedIndexPools);
@@ -87,27 +78,6 @@ export default function AppLayout() {
 
             {activePage && <Drawer page={activePage} />}
           </S.Page>
-
-          <PageFooter
-            left={<S.Rights>{translate("ALL_RIGHTS_RESERVED")}</S.Rights>}
-            right={
-              <Button.Group>
-                {SOCIAL_MEDIA.map((socialMedia) => (
-                  <Button
-                    key={socialMedia.name}
-                    type="link"
-                    href={socialMedia.link}
-                  >
-                    <S.SocialMediaImage
-                      src={
-                        require(`assets/images/${socialMedia.image}`).default
-                      }
-                    />
-                  </Button>
-                ))}
-              </Button.Group>
-            }
-          ></PageFooter>
         </Content>
       </S.Layout>
     </>

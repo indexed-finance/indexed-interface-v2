@@ -1,6 +1,8 @@
+import { AiOutlineCopyrightCircle } from "react-icons/ai";
 import { Link, useHistory } from "react-router-dom";
 import { Menu, Typography } from "antd";
 import { PLACEHOLDER_TOKEN_IMAGE } from "config";
+import { SOCIAL_MEDIA } from "config";
 import { selectors } from "features";
 import { useSelector } from "react-redux";
 import React from "react";
@@ -22,7 +24,7 @@ export default function AppMenu({ onItemClick = noop, ...rest }: Props) {
   const history = useHistory();
 
   return (
-    <S.Menu theme="dark" mode="inline" {...rest}>
+    <S.Menu theme="dark" mode="inline" defaultOpenKeys={["Social"]} {...rest}>
       {routes
         .filter((route) => route.sider)
         .map((route) => {
@@ -90,6 +92,29 @@ export default function AppMenu({ onItemClick = noop, ...rest }: Props) {
             );
           }
         })}
+      {/* Static */}
+      <SubMenu key="Social" title={<S.Title>Social</S.Title>}>
+        {SOCIAL_MEDIA.map((site) => (
+          <Menu.Item key={site.name}>
+            <S.SocialLink
+              href={site.link}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <S.Image
+                alt={site.name}
+                src={require(`assets/images/${site.image}`).default}
+              />{" "}
+              {site.name}
+            </S.SocialLink>
+          </Menu.Item>
+        ))}
+      </SubMenu>
+      <S.CopyrightWrapper>
+        <S.Copyright level={4}>
+          <AiOutlineCopyrightCircle /> 2021 Indexed
+        </S.Copyright>
+      </S.CopyrightWrapper>
     </S.Menu>
   );
 }
@@ -121,9 +146,30 @@ const S = {
   `,
   Image: styled.img`
     ${(props) => props.theme.snippets.size32};
+    ${(props) => props.theme.snippets.circular};
     margin-right: ${(props) => props.theme.spacing.medium};
   `,
   Title: styled.span`
     ${(props) => props.theme.snippets.fancy};
+  `,
+  SocialLink: styled.a`
+    ${(props) => props.theme.snippets.fancy};
+    ${(props) => props.theme.snippets.spacedBetween};
+  `,
+  CopyrightWrapper: styled(Menu.Item)`
+    ${(props) => props.theme.snippets.perfectlyCentered};
+    position: absolute !important;
+    bottom: 0 !important;
+    left: 0 !important;
+  `,
+  Copyright: styled(Typography.Title)`
+    ${(props) => props.theme.snippets.fancy};
+    ${(props) => props.theme.snippets.perfectlyAligned};
+    margin-bottom: 0 !important;
+
+    svg {
+      margin-right: ${(props) => props.theme.spacing.small};
+      margin-bottom: 3px;
+    }
   `,
 };
