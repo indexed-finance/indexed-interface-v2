@@ -9,6 +9,14 @@ import noop from "lodash.noop";
 import styled, { css } from "styled-components";
 
 const CHANGE_DEBOUNCE_RATE = 250;
+const ENS_ADDRESS_SUFFIXES: Record<string, true> = {
+  eth: true,
+  xyz: true,
+  luxe: true,
+  kred: true,
+  art: true,
+  club: true,
+};
 
 interface Props extends Partial<InputProps> {
   provider?: null | providers.JsonRpcProvider;
@@ -45,7 +53,10 @@ export default function EthereumAddressInput({
 
       try {
         // First, check for ENS address.
-        if (value.endsWith(".eth") && provider) {
+        const segments = value.split(".");
+        const suffix = segments[segments.length - 1];
+
+        if (ENS_ADDRESS_SUFFIXES[suffix] && provider) {
           setIsValid(true);
 
           const address = await provider.resolveName(value);
