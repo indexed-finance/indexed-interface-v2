@@ -11,8 +11,7 @@ import {
   Switch,
   Typography,
 } from "antd";
-import { FaEthereum } from "react-icons/fa";
-import { ScreenHeader } from "components";
+import { EthereumAddressInput, ScreenHeader } from "components";
 import React, { useCallback, useMemo, useState } from "react";
 import styled from "styled-components";
 
@@ -77,11 +76,9 @@ export default function Govern() {
           <Typography.Paragraph>
             Allow someone to vote on your behalf.
           </Typography.Paragraph>
-          <S.Input
-            type="text"
+          <EthereumAddressInput
             placeholder="Enter delegation address"
-            size="large"
-            addonBefore={<FaEthereum />}
+            onError={() => console.error("Bad eth addy")}
           />
         </Subscreen>
       ) : (
@@ -128,11 +125,9 @@ export default function Govern() {
           {initializeKind === "delegate" && (
             <>
               <Divider>Delegate to</Divider>
-              <S.Input
-                type="text"
+              <EthereumAddressInput
                 placeholder="Enter delegation address"
-                size="large"
-                addonBefore={<FaEthereum />}
+                onError={() => console.error("Bad eth addy")}
               />
             </>
           )}

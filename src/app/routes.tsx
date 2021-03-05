@@ -56,18 +56,7 @@ const routes: Route[] = [
     exact: true,
     screen: <PoolDetail />,
   },
-  {
-    path: "/tokens",
-    exact: true,
-    sider: "Tokens",
-    screen: <>TokenList</>,
-    model: "tokens",
-  },
-  {
-    path: "/tokens/:tokenId",
-    exact: true,
-    screen: <>TokenDetail</>,
-  },
+
   {
     path: "/portfolio",
     exact: true,
