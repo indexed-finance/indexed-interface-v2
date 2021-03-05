@@ -19,7 +19,7 @@ interface SubscreenProps extends CollapseProps {
   icon: ReactNode;
   title?: ReactNode;
   children: ReactNode;
-  defaultActions?: Action[];
+  defaultActions?: null | Action[];
   padding?: null | number | string;
   margin?: null | number | string;
 }
@@ -30,7 +30,7 @@ export default function Subscreen({
   icon,
   title = "",
   children,
-  defaultActions = [],
+  defaultActions = null,
   padding = null,
   ...rest
 }: SubscreenProps) {
@@ -46,7 +46,7 @@ export default function Subscreen({
         defaultActiveKey={["1"]}
         {...rest}
         padding={padding}
-        withActions={actions.length}
+        withActions={actions ? actions.length : 0}
       >
         <Panel
           header={
@@ -61,13 +61,15 @@ export default function Subscreen({
           key="1"
         >
           {children}
-          <S.Actions>
-            {actions.map(({ type, title, onClick }, index) => (
-              <Button type={type} key={index} onClick={onClick}>
-                {title}
-              </Button>
-            ))}
-          </S.Actions>
+          {actions && (
+            <S.Actions>
+              {actions.map(({ type, title, onClick }, index) => (
+                <Button type={type} key={index} onClick={onClick}>
+                  {title}
+                </Button>
+              ))}
+            </S.Actions>
+          )}
         </Panel>
       </S.Subscreen>
     </SubscreenContext.Provider>

@@ -1,3 +1,4 @@
+import { Action, Performance, Recent, Subscreen } from "../subscreens";
 import { AiOutlineSwap } from "react-icons/ai";
 import { AppState, actions, selectors } from "features";
 import { Breadcrumb, Col, Grid, Menu, Row, Typography } from "antd";
@@ -9,10 +10,9 @@ import {
   RankedTokenList,
 } from "components";
 import { Link, Redirect, useParams } from "react-router-dom";
-import { Performance, Recent, Subscreen } from "../subscreens";
 import { RiWallet3Line } from "react-icons/ri";
 import { useDispatch, useSelector } from "react-redux";
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import styled, { css } from "styled-components";
 
 const { useBreakpoint } = Grid;
@@ -25,6 +25,36 @@ export default function PoolDetail() {
   );
   const isConnected = useSelector(selectors.selectConnected);
   const breakpoints = useBreakpoint();
+  const chartActions = useMemo(
+    () =>
+      [
+        {
+          type: "default",
+          title: (
+            <>
+              Expand <CgArrowsExpandRight />
+            </>
+          ),
+          onClick: () => {
+            /* */
+          },
+        },
+      ] as Action[],
+    []
+  );
+  const interactionActions = useMemo(
+    () =>
+      [
+        {
+          title: "Swap",
+          onClick: () => {
+            /* */
+          },
+          type: "primary",
+        },
+      ] as Action[],
+    []
+  );
 
   // Effect:
   // When the pool changes and not connected to the server, get the juicy details.
@@ -44,19 +74,7 @@ export default function PoolDetail() {
         icon={<AiOutlineSwap />}
         title="Chart"
         padding={0}
-        defaultActions={[
-          {
-            type: "default",
-            title: (
-              <>
-                Expand <CgArrowsExpandRight />
-              </>
-            ),
-            onClick: () => {
-              /* */
-            },
-          },
-        ]}
+        defaultActions={chartActions}
       >
         <ChartCard timeframe="1D" />
       </Subscreen>
@@ -71,15 +89,7 @@ export default function PoolDetail() {
         icon={<RiWallet3Line />}
         title="Interact"
         padding={0}
-        defaultActions={[
-          {
-            title: "Swap",
-            onClick: () => {
-              /* */
-            },
-            type: "primary",
-          },
-        ]}
+        defaultActions={interactionActions}
       >
         <PoolInteractions pool={pool} />
       </Subscreen>

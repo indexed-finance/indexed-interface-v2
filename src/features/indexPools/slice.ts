@@ -155,7 +155,6 @@ export const selectors = {
     return Object.entries(tokenLookup).reduce((prev, [key, value]) => {
       if (value) {
         if (userData && userData[key]) {
-          console.log("symbol", value.symbol);
           prev[value.symbol] = convert.toBalance(userData[key].balance);
         } else {
           prev[value.symbol] = "";

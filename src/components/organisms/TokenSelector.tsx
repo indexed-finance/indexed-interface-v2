@@ -110,15 +110,19 @@ export default function TokenSelector({
     <Area>
       <S.Wrapper onClick={handleWrapperClick}>
         <S.Space direction="horizontal">
-          <S.Label type="secondary">{label}</S.Label>
+          <S.Label>
+            <Typography.Text type="secondary">{label}</Typography.Text>
+          </S.Label>
           <S.Balance>
             {value.token ? (
-              <S.BalanceLabel type="secondary">
-                {parseInt(relevantBalance) ? (
-                  <>Balance: {relevantBalance}</>
-                ) : (
-                  "No Balance"
-                )}
+              <S.BalanceLabel>
+                <Typography.Text type="secondary">
+                  {parseInt(relevantBalance) ? (
+                    <>Balance: {relevantBalance}</>
+                  ) : (
+                    "No Balance"
+                  )}
+                </Typography.Text>
               </S.BalanceLabel>
             ) : (
               "-"
@@ -203,7 +207,7 @@ const S = {
     text-align: right;
     ${(props) => props.theme.snippets.perfectlyCentered};
   `,
-  Label: styled(Typography.Text)`
+  Label: styled.div`
     padding-left: 0.7rem;
     ${(props) => props.theme.snippets.fancy};
   `,
@@ -211,7 +215,7 @@ const S = {
     padding-right: 1rem;
     text-align: right;
   `,
-  BalanceLabel: styled(Typography.Text)`
+  BalanceLabel: styled.div`
     ${(props) => props.theme.snippets.fancy};
   `,
   InnerSpace: styled.div`

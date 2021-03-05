@@ -1,3 +1,4 @@
+import { Action, Subscreen } from "../subscreens";
 import {
   Col,
   Divider,
@@ -12,7 +13,6 @@ import {
 } from "antd";
 import { FaEthereum } from "react-icons/fa";
 import { ScreenHeader } from "components";
-import { Subscreen } from "../subscreens";
 import React, { useCallback, useMemo, useState } from "react";
 import styled from "styled-components";
 
@@ -33,6 +33,32 @@ export default function Govern() {
     []
   );
   const [isActive, setIsActive] = useState(false);
+  const activeActions = useMemo(
+    () =>
+      [
+        {
+          title: "Delegate",
+          onClick: () => {
+            /* */
+          },
+          type: "primary",
+        },
+      ] as Action[],
+    []
+  );
+  const inactiveActions = useMemo(
+    () =>
+      [
+        {
+          title: "Initialize",
+          onClick: () => {
+            setIsActive(true);
+          },
+          type: "primary",
+        },
+      ] as Action[],
+    []
+  );
   const status = useMemo(
     () =>
       isActive ? (
@@ -43,15 +69,7 @@ export default function Govern() {
               Status: <Typography.Text type="success">Active</Typography.Text>
             </>
           }
-          defaultActions={[
-            {
-              title: "Delegate",
-              onClick: () => {
-                /* */
-              },
-              type: "primary",
-            },
-          ]}
+          defaultActions={activeActions}
         >
           <Statistic title="Balance" value="2800.00 NDX" />
           <Divider />
@@ -74,15 +92,7 @@ export default function Govern() {
               Status: <Typography.Text type="warning">Inactive</Typography.Text>
             </>
           }
-          defaultActions={[
-            {
-              title: "Initialize",
-              onClick: () => {
-                setIsActive(true);
-              },
-              type: "primary",
-            },
-          ]}
+          defaultActions={inactiveActions}
         >
           <S.Centered>
             <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
@@ -128,7 +138,7 @@ export default function Govern() {
           )}
         </Subscreen>
       ),
-    [initializeKind, toggleKind, isActive]
+    [initializeKind, toggleKind, isActive, inactiveActions, activeActions]
   );
   const proposals = (
     <Subscreen icon={null} title="Proposals">

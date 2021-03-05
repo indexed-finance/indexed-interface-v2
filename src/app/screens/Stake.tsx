@@ -1,3 +1,4 @@
+import { Action, Subscreen } from "../subscreens";
 import {
   Avatar,
   Col,
@@ -12,8 +13,7 @@ import {
 import { Button, ScreenHeader } from "components";
 import { FaTractor } from "react-icons/fa";
 import { Link, useHistory } from "react-router-dom";
-import { Subscreen } from "../subscreens";
-import React from "react";
+import React, { useMemo } from "react";
 import styled from "styled-components";
 
 const { useBreakpoint } = Grid;
@@ -32,18 +32,23 @@ export default function Stake() {
   };
   const __data = [stakeable, stakeable, stakeable];
   const breakpoints = useBreakpoint();
-  const description = (
-    <Subscreen
-      icon={null}
-      title="Liquidity mining"
-      padding={0}
-      defaultActions={[
+  const actions = useMemo(
+    () =>
+      [
         {
           title: "Learn more",
           onClick: () => history.push("/docs"),
           type: "primary",
         },
-      ]}
+      ] as Action[],
+    [history]
+  );
+  const description = (
+    <Subscreen
+      icon={null}
+      title="Liquidity mining"
+      padding={0}
+      defaultActions={actions}
     >
       <S.Description>
         Stake index tokens or their associated Uniswap liquidity tokens to earn

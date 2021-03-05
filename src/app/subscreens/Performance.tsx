@@ -3,20 +3,17 @@ import { Button, Quote } from "components";
 import { FaTractor } from "react-icons/fa";
 import { FormattedIndexPool } from "features";
 import { Grid, Space, Statistic } from "antd";
-import React from "react";
-import Subscreen from "./Subscreen";
+import React, { useMemo } from "react";
+import Subscreen, { Action } from "./Subscreen";
 import styled from "styled-components";
 
 const { useBreakpoint } = Grid;
 
 export default function Performance({ pool }: { pool: FormattedIndexPool }) {
   const breakpoints = useBreakpoint();
-
-  return (
-    <Subscreen
-      icon={<AiOutlineSwap />}
-      title="Performance"
-      defaultActions={[
+  const performanceActions = useMemo(
+    () =>
+      [
         {
           type: "primary",
           title: (
@@ -28,7 +25,15 @@ export default function Performance({ pool }: { pool: FormattedIndexPool }) {
             /* */
           },
         },
-      ]}
+      ] as Action[],
+    []
+  );
+
+  return (
+    <Subscreen
+      icon={<AiOutlineSwap />}
+      title="Performance"
+      defaultActions={performanceActions}
     >
       <S.PerformanceSpace
         direction={breakpoints.sm ? "horizontal" : "vertical"}

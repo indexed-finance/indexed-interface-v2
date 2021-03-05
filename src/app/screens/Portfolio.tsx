@@ -81,7 +81,9 @@ export default function Portfolio() {
               </Space>
               <S.Number direction="vertical">
                 <S.Staking>
-                  Staking {entry.staking} {entry.symbol}
+                  <Typography.Text>
+                    Staking {entry.staking} {entry.symbol}
+                  </Typography.Text>
                 </S.Staking>
                 <S.Title level={3}>
                   {entry.balance} {entry.symbol}
@@ -174,7 +176,7 @@ const S = {
     margin-bottom: 0 !important;
     ${(props) => props.theme.snippets.fancy};
   `,
-  Staking: styled(Typography.Text)`
+  Staking: styled.div`
     font-style: italic;
   `,
   Centered: styled(Space)`

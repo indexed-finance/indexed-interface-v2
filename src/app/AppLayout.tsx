@@ -111,7 +111,7 @@ export default function AppLayout() {
               <S.Controls>
                 <S.Changeables layout="inline" colon={false}>
                   <Item name="Language">
-                    <Select defaultValue="english">
+                    <Select>
                       <Option value="english">English 🇺🇸</Option>
                     </Select>
                   </Item>
@@ -146,10 +146,14 @@ export default function AppLayout() {
                         </>
                       }
                     >
-                      <S.Connection type={connectionStatus.type}>
-                        <S.ConnectionStatus
-                          onClick={() => dispatch(actions.connectionToggled())}
-                        />
+                      <S.Connection>
+                        <Typography.Text type={connectionStatus.type}>
+                          <S.ConnectionStatus
+                            onClick={() =>
+                              dispatch(actions.connectionToggled())
+                            }
+                          />
+                        </Typography.Text>
                       </S.Connection>
                     </Popover>
                   </Item>
@@ -297,7 +301,7 @@ const S = {
       }
     }
   `,
-  Connection: styled(Typography.Text)`
+  Connection: styled.div`
     ${(props) => props.theme.snippets.perfectlyCentered};
     margin: 0;
   `,

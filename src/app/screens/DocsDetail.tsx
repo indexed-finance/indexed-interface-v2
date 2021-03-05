@@ -7,10 +7,6 @@ import data from "data.json";
 export default function DocsDetail() {
   const detail = (data as any)[window.location.pathname.slice(1)];
 
-  if (!detail) {
-    window.location.href = "/";
-  }
-
   return detail ? (
     <>
       <ScreenHeader title="Document" />

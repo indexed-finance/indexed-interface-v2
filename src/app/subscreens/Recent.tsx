@@ -58,8 +58,10 @@ function TradeCard(props: Trade) {
     <BaseCard
       title={<S.Tag color={kind === "buy" ? "green" : "red"}>{kind}</S.Tag>}
       extra={
-        <S.Amount type={kind === "sell" ? "danger" : "success"}>
-          {amount}
+        <S.Amount>
+          <Typography.Text type={kind === "sell" ? "danger" : "success"}>
+            {amount}
+          </Typography.Text>
         </S.Amount>
       }
       {...rest}
@@ -167,7 +169,7 @@ const S = {
     height: 133px;
     margin-right: ${(props) => props.theme.spacing.small};
   `,
-  Amount: styled(Typography.Text)`
+  Amount: styled.div`
     text-align: center;
     font-size: ${(props) => props.theme.fontSizes.large};
     margin-top: -10px;
