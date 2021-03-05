@@ -3,7 +3,13 @@ import { FaEthereum } from "react-icons/fa";
 import { provider as globalProvider } from "features";
 import { providers, utils } from "ethers";
 import Identicon from "react-identicons";
-import React, { ChangeEvent, useCallback, useRef, useState } from "react";
+import React, {
+  ChangeEvent,
+  ReactNode,
+  useCallback,
+  useRef,
+  useState,
+} from "react";
 import debounce from "lodash.debounce";
 import noop from "lodash.noop";
 import styled, { css } from "styled-components";
@@ -32,70 +38,95 @@ export default function EthereumAddressInput({
   ...rest
 }: Props) {
   const [isValid, setIsValid] = useState(false);
-  const [ensAddress, setEnsAddress] = useState("");
-  const [ensLookup, setEnsLookup] = useState("");
+  const [ensInfo, setEnsInfo] = useState<ReactNode>(null);
+  const [errorInfo, setErrorInfo] = useState("");
   const [isTouched, setIsTouched] = useState(false);
   const hasError = isTouched && !isValid;
+  const lastValue = useRef("");
   // eslint-disable-next-line
   const handleChange = useCallback(
     debounce(async (event: ChangeEvent<HTMLInputElement>) => {
       const {
         target: { value },
       } = event;
+      const valueIsPotentialEns = value.includes(".");
 
       if (isTouched && value.length === 0) {
         setIsTouched(false);
-        setEnsLookup("");
-        setEnsAddress("");
-      } else if (!isTouched) {
+      } else {
         setIsTouched(true);
       }
 
-      try {
-        // First, check for ENS address.
-        const segments = value.split(".");
-        const suffix = segments[segments.length - 1];
+      if (valueIsPotentialEns) {
+        if (provider) {
+          const segments = value.split(".");
+          const suffix = segments[segments.length - 1];
 
-        if (ENS_ADDRESS_SUFFIXES[suffix] && provider) {
-          setIsValid(true);
+          if (ENS_ADDRESS_SUFFIXES[suffix]) {
+            const address = await provider.resolveName(value);
 
-          const address = await provider.resolveName(value);
-
-          if (address) {
-            setEnsAddress(address);
+            if (address) {
+              setEnsInfo(
+                <>
+                  ENS address resolved to <br />
+                  <Typography.Text code={true}>{address}</Typography.Text>
+                </>
+              );
+              setIsValid(true);
+              onAddressChange(address || value);
+            } else {
+              setErrorInfo("This does not seem to be a valid ENS address.");
+            }
           } else {
-            throw Error();
+            setErrorInfo("This does not have a valid ENS address suffix.");
           }
         } else {
-          // Are there ENS addresses associated?
-          if (provider) {
-            const lookup = (await provider.lookupAddress(value)) ?? "";
-            setEnsLookup(lookup);
-          }
-
-          // Then, check for normal address.
-          // The following throws on bad address.
-          utils.getAddress(value);
+          setErrorInfo(
+            "This looks like an ENS address, but you are not connected to your wallet, so we are unable to look it up."
+          );
         }
+      } else {
+        try {
+          utils.getAddress(value);
 
-        setIsValid(true);
-        onAddressChange(ensAddress || value);
-      } catch {
-        setIsValid(false);
-        setEnsAddress("");
-        setEnsLookup("");
-        onError();
-      } finally {
-        onChange(event);
+          if (provider) {
+            // Are there any ENS names associated with this address?
+            const address = await provider.lookupAddress(value);
+
+            if (address) {
+              setEnsInfo(
+                <>
+                  Did you know? <br />
+                  This ethereum address is associated with the ENS domain{" "}
+                  <Typography.Text code={true}>{address}</Typography.Text>
+                </>
+              );
+            }
+
+            setIsValid(true);
+            onAddressChange(value);
+          }
+        } catch {
+          setErrorInfo(
+            value.length ? "This is not a valid ethereum address." : ""
+          );
+          setEnsInfo("");
+          setIsValid(false);
+          onAddressChange(value);
+          onError();
+        } finally {
+          onChange(event);
+        }
       }
     }, CHANGE_DEBOUNCE_RATE),
     [provider, onChange, onError, isTouched]
   );
-  const lastValue = useRef("");
 
   return (
     <S.Wrapper>
       <S.Input
+        autoFocus={true}
+        spellCheck={false}
         hasError={hasError}
         onChange={handleChange}
         type="text"
@@ -104,38 +135,14 @@ export default function EthereumAddressInput({
         addonAfter={isValid ? <S.Identicon string={lastValue.current} /> : null}
         {...rest}
       />
-      {ensAddress && (
-        <Alert
-          message={
-            <>
-              ENS address resolved to <br />
-              <Typography.Text code={true}>{ensAddress}</Typography.Text>
-            </>
-          }
-          type="info"
-          showIcon
-        />
-      )}
-      {ensLookup && (
-        <Alert
-          message={
-            <>
-              Did you know? <br />
-              This ethereum address is associated with the ENS domain{" "}
-              <Typography.Text strong={true}>{ensLookup}</Typography.Text>
-            </>
-          }
-          type="info"
-          showIcon
-        />
-      )}
-      {hasError && (
+      {errorInfo && (
         <Alert
           message="This is not a valid ethereum address."
           type="error"
           showIcon
         />
       )}
+      {ensInfo && <Alert message={ensInfo} type="info" showIcon />}
     </S.Wrapper>
   );
 }

@@ -2,9 +2,9 @@ import { Action, Subscreen } from "../subscreens";
 import {
   Col,
   Divider,
-  Empty,
   Grid,
   Input,
+  Result,
   Row,
   Space,
   Statistic,
@@ -70,6 +70,12 @@ export default function Govern() {
           }
           defaultActions={activeActions}
         >
+          <S.Result
+            status="success"
+            title="Wallet Active"
+            subTitle="You can now make your voice heard."
+          />
+          <Divider />
           <Statistic title="Balance" value="2800.00 NDX" />
           <Divider />
           <Typography.Title level={3}>Delegate your votes</Typography.Title>
@@ -92,12 +98,11 @@ export default function Govern() {
           defaultActions={inactiveActions}
         >
           <S.Centered>
-            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
-            <S.Heading level={3}>
-              <Typography.Text type="warning">
-                Initialize wallet to vote
-              </Typography.Text>
-            </S.Heading>
+            <S.Result
+              status="warning"
+              title="Wallet Inactive"
+              subTitle="Initialize wallet to vote"
+            />
             <Divider>Select one</Divider>
             <Space size="large" align="start">
               <div>
@@ -122,7 +127,7 @@ export default function Govern() {
               </div>
             </Space>
           </S.Centered>
-          {initializeKind === "delegate" && (
+          {initializeKind === "delegate" ? (
             <>
               <Divider>Delegate to</Divider>
               <EthereumAddressInput
@@ -130,6 +135,8 @@ export default function Govern() {
                 onError={() => console.error("Bad eth addy")}
               />
             </>
+          ) : (
+            <Divider />
           )}
         </Subscreen>
       ),
@@ -154,18 +161,23 @@ export default function Govern() {
       <Col span={24}>{chart}</Col>
     </Row>
   );
-  const desktopSized = (
+  const smallSized = (
     <>
       <Row gutter={20}>
-        <Col span={8}>{status}</Col>
-        <Col span={10} push={6}>
-          {proposals}
-        </Col>
+        <Col span={12}>{status}</Col>
+        <Col span={12}>{proposals}</Col>
       </Row>
       <Row gutter={20}>
         <Col span={24}>{chart}</Col>
       </Row>
     </>
+  );
+  const desktopSized = (
+    <Row gutter={20}>
+      <Col span={8}>{status}</Col>
+      <Col span={8}>{proposals}</Col>
+      <Col span={8}>{chart}</Col>
+    </Row>
   );
 
   return (
@@ -173,8 +185,10 @@ export default function Govern() {
       <ScreenHeader title="Govern" />
       {(() => {
         switch (true) {
-          case breakpoints.sm:
+          case breakpoints.xxl:
             return desktopSized;
+          case breakpoints.sm:
+            return smallSized;
           case breakpoints.xs:
             return mobileSized;
         }
@@ -195,5 +209,8 @@ const S = {
   `,
   Switch: styled(Switch)`
     margin-bottom: ${(props) => props.theme.spacing.medium};
+  `,
+  Result: styled(Result)`
+    padding: 0;
   `,
 };
