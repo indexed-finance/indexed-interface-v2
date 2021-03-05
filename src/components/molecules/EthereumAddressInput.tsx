@@ -3,13 +3,7 @@ import { FaEthereum } from "react-icons/fa";
 import { provider as globalProvider } from "features";
 import { providers, utils } from "ethers";
 import Identicon from "react-identicons";
-import React, {
-  ChangeEvent,
-  ReactNode,
-  useCallback,
-  useRef,
-  useState,
-} from "react";
+import React, { ChangeEvent, ReactNode, useCallback, useState } from "react";
 import debounce from "lodash.debounce";
 import noop from "lodash.noop";
 import styled, { css } from "styled-components";
@@ -42,7 +36,7 @@ export default function EthereumAddressInput({
   const [errorInfo, setErrorInfo] = useState("");
   const [isTouched, setIsTouched] = useState(false);
   const hasError = isTouched && !isValid;
-  const lastValue = useRef("");
+  const [identicon, setIdenticon] = useState("");
   // eslint-disable-next-line
   const handleChange = useCallback(
     debounce(async (event: ChangeEvent<HTMLInputElement>) => {
@@ -74,48 +68,60 @@ export default function EthereumAddressInput({
               );
               setIsValid(true);
               onAddressChange(address || value);
+              setIdenticon(address);
             } else {
               setErrorInfo("This does not seem to be a valid ENS address.");
+              setIsValid(false);
             }
           } else {
             setErrorInfo("This does not have a valid ENS address suffix.");
+            setIsValid(false);
           }
         } else {
           setErrorInfo(
             "This looks like an ENS address, but you are not connected to your wallet, so we are unable to look it up."
           );
+          setIsValid(false);
         }
       } else {
-        try {
-          utils.getAddress(value);
+        if (value.length > 0) {
+          try {
+            utils.getAddress(value);
 
-          if (provider) {
-            // Are there any ENS names associated with this address?
-            const address = await provider.lookupAddress(value);
+            if (provider) {
+              // Are there any ENS names associated with this address?
+              const address = await provider.lookupAddress(value);
 
-            if (address) {
-              setEnsInfo(
-                <>
-                  Did you know? <br />
-                  This ethereum address is associated with the ENS domain{" "}
-                  <Typography.Text code={true}>{address}</Typography.Text>
-                </>
-              );
+              if (address) {
+                setEnsInfo(
+                  <>
+                    Did you know? <br />
+                    This ethereum address is associated with the ENS domain{" "}
+                    <Typography.Text code={true}>{address}</Typography.Text>
+                  </>
+                );
+              }
+
+              setIsValid(true);
+              onAddressChange(value);
+              setIdenticon(address);
             }
-
-            setIsValid(true);
+          } catch {
+            setErrorInfo("This is not a valid ethereum address.");
+            setEnsInfo("");
+            setIsValid(false);
             onAddressChange(value);
+            setIdenticon("");
+            onError();
+          } finally {
+            onChange(event);
           }
-        } catch {
-          setErrorInfo(
-            value.length ? "This is not a valid ethereum address." : ""
-          );
+        } else {
+          setErrorInfo("");
           setEnsInfo("");
           setIsValid(false);
           onAddressChange(value);
-          onError();
-        } finally {
-          onChange(event);
+          setIdenticon("");
         }
       }
     }, CHANGE_DEBOUNCE_RATE),
@@ -132,17 +138,17 @@ export default function EthereumAddressInput({
         type="text"
         size="large"
         addonBefore={<FaEthereum />}
-        addonAfter={isValid ? <S.Identicon string={lastValue.current} /> : null}
+        addonAfter={isValid ? <S.Identicon string={identicon} /> : null}
         {...rest}
       />
-      {errorInfo && (
+      {!isValid && errorInfo && (
         <Alert
           message="This is not a valid ethereum address."
           type="error"
           showIcon
         />
       )}
-      {ensInfo && <Alert message={ensInfo} type="info" showIcon />}
+      {isValid && ensInfo && <Alert message={ensInfo} type="info" showIcon />}
     </S.Wrapper>
   );
 }
