@@ -1,13 +1,13 @@
-import { Space } from "antd";
+import { Space, SpaceProps } from "antd";
 import React, { ReactNode } from "react";
 import styled from "styled-components";
 
-export interface Props {
+export interface Props extends SpaceProps {
   children: ReactNode;
 }
 
 export default function Area(props: Props) {
-  return <S.Area>{props.children}</S.Area>;
+  return <S.Area {...props} />;
 }
 
 const S = {

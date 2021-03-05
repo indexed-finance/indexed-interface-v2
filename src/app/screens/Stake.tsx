@@ -1,4 +1,4 @@
-import { Action, Subscreen } from "../subscreens";
+import { Area, Button, ScreenHeader } from "components";
 import {
   Avatar,
   Col,
@@ -10,16 +10,15 @@ import {
   Statistic,
   Typography,
 } from "antd";
-import { Button, ScreenHeader } from "components";
 import { FaTractor } from "react-icons/fa";
-import { Link, useHistory } from "react-router-dom";
-import React, { useMemo } from "react";
+import { Link } from "react-router-dom";
+import { Subscreen } from "../subscreens";
+import React from "react";
 import styled from "styled-components";
 
 const { useBreakpoint } = Grid;
 
 export default function Stake() {
-  const history = useHistory();
   const stakeable = {
     image: require("assets/images/cc-dark-circular.png").default,
     id: "0x17ac188e09a7890a1844e5e65471fe8b0ccfadf3",
@@ -32,32 +31,17 @@ export default function Stake() {
   };
   const __data = [stakeable, stakeable, stakeable];
   const breakpoints = useBreakpoint();
-  const actions = useMemo(
-    () =>
-      [
-        {
-          title: "Learn more",
-          onClick: () => history.push("/docs"),
-          type: "primary",
-        },
-      ] as Action[],
-    [history]
-  );
-  const description = (
-    <Subscreen
-      icon={null}
-      title="Liquidity mining"
-      padding={0}
-      defaultActions={actions}
-    >
-      <S.Description>
+  const area = (
+    <S.Area direction="vertical">
+      <Typography.Title>Liquidity mining</Typography.Title>
+      <Typography.Paragraph>
         Stake index tokens or their associated Uniswap liquidity tokens to earn
         NDX, the governance token for Indexed Finance.
-      </S.Description>
-    </Subscreen>
+      </Typography.Paragraph>
+    </S.Area>
   );
   const pools = (
-    <Subscreen icon={null} title="Pools">
+    <Subscreen icon={null} title="Available Pools">
       <S.List>
         {__data.map((datum) => (
           <React.Fragment key={datum.id}>
@@ -97,15 +81,19 @@ export default function Stake() {
   // Variants
   const mobileSized = (
     <Row gutter={5}>
-      <Col span={24}>{description}</Col>
+      <Col span={24}>{area}</Col>
       <Col span={24}>{pools}</Col>
     </Row>
   );
   const desktopSized = (
-    <Row gutter={20}>
-      <Col span={8}>{description}</Col>
-      <Col span={12}>{pools}</Col>
-    </Row>
+    <>
+      <Row gutter={20}>
+        <Col span={12}>{area}</Col>
+      </Row>
+      <Row gutter={20}>
+        <Col span={12}>{pools}</Col>
+      </Row>
+    </>
   );
 
   return (
@@ -142,5 +130,11 @@ const S = {
   `,
   Description: styled(Typography.Paragraph)`
     padding: ${(props) => props.theme.spacing.medium};
+  `,
+  Divider: styled(Divider)`
+    ${(props) => props.theme.snippets.fancy};
+  `,
+  Area: styled(Area)`
+    margin-bottom: ${(props) => props.theme.spacing.medium};
   `,
 };

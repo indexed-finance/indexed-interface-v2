@@ -24,7 +24,13 @@ export default function AppMenu({ onItemClick = noop, ...rest }: Props) {
   const history = useHistory();
 
   return (
-    <S.Menu theme="dark" mode="inline" defaultOpenKeys={["Social"]} {...rest}>
+    <S.Menu
+      theme="dark"
+      mode="inline"
+      defaultOpenKeys={["Social"]}
+      selectable={false}
+      {...rest}
+    >
       {routes
         .filter((route) => route.sider)
         .map((route) => {
@@ -87,7 +93,11 @@ export default function AppMenu({ onItemClick = noop, ...rest }: Props) {
           } else {
             return (
               <S.Item key={route.path} onClick={onItemClick}>
-                <Link to={route.path}>{route.sider}</Link>
+                {route.isExternalLink ? (
+                  route.sider
+                ) : (
+                  <Link to={route.path}>{route.sider}</Link>
+                )}
               </S.Item>
             );
           }

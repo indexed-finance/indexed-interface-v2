@@ -4,12 +4,12 @@ import {
   DocsDetail,
   DocsList,
   FAQ,
-  Govern,
   NewsDetail,
   NewsList,
   PoolDetail,
   PoolList,
   Portfolio,
+  ProposalDetail,
   Settings,
   Splash,
   Stake,
@@ -20,9 +20,10 @@ import type { AppState } from "features";
 type Route = {
   path: string;
   exact: boolean;
-  sider?: string;
+  sider?: ReactNode;
   screen: ReactNode;
   model?: keyof AppState;
+  isExternalLink?: boolean;
 };
 
 const routes: Route[] = [
@@ -72,8 +73,17 @@ const routes: Route[] = [
   {
     path: "/govern",
     exact: true,
-    sider: "Govern",
-    screen: <Govern />,
+    sider: (
+      <a
+        href="https://vote.indexed.finance/"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Governance
+      </a>
+    ),
+    screen: null,
+    isExternalLink: true,
   },
   {
     path: "/news",
@@ -108,6 +118,12 @@ const routes: Route[] = [
     exact: true,
     sider: "",
     screen: <Settings />,
+  },
+  {
+    path: "/proposals/:proposalId",
+    exact: true,
+    sider: "",
+    screen: <ProposalDetail />,
   },
 ];
 
