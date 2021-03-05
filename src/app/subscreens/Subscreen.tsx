@@ -17,7 +17,7 @@ export const SubscreenContext = createContext<{
 
 interface SubscreenProps extends CollapseProps {
   icon: ReactNode;
-  title: ReactNode;
+  title?: ReactNode;
   children: ReactNode;
   defaultActions?: Action[];
   padding?: null | number | string;
@@ -28,7 +28,7 @@ const { Panel } = Collapse;
 
 export default function Subscreen({
   icon,
-  title,
+  title = "",
   children,
   defaultActions = [],
   padding = null,
@@ -50,9 +50,13 @@ export default function Subscreen({
       >
         <Panel
           header={
-            <S.Title>
-              <span>{title}</span> {icon}
-            </S.Title>
+            title ? (
+              <S.Title>
+                <span>{title}</span> {icon}
+              </S.Title>
+            ) : (
+              <S.Hidden>_</S.Hidden>
+            )
           }
           key="1"
         >
@@ -115,5 +119,8 @@ const S = {
       margin-bottom: 1px;
       ${(props) => props.theme.snippets.fancy};
     }
+  `,
+  Hidden: styled.span`
+    visibility: hidden;
   `,
 };

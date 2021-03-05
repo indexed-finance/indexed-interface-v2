@@ -16,11 +16,12 @@ async function recursivelyBuildData(
 
     for (const subdirectory of directory) {
       const filePath = path.join(inputPath, subdirectory);
-      const [slug] = subdirectory.split("."); // 'foo.md' -> 'foo'
 
       // Subdirectories are models which have children.
       if ((await fs.stat(filePath)).isDirectory()) {
-        returnedData[`${prefix}${slug}`] = await recursivelyBuildData(
+        returnedData[
+          `${prefix}${subdirectory.split(".")[0]}`
+        ] = await recursivelyBuildData(
           filePath,
           returnedData,
           prefix ? `${prefix}/${subdirectory}` : subdirectory
@@ -28,7 +29,11 @@ async function recursivelyBuildData(
       } else {
         // Top-level files are accessed in their own manner.
         returnedData[
-          `${prefix ? `${prefix}/${slug}` : slug}`
+          `${
+            prefix
+              ? `${prefix}/${subdirectory.split(".")[0]}`
+              : subdirectory.split(".")[0]
+          }`
         ] = await fs.readFile(path.join(inputPath, subdirectory), {
           encoding: "utf8",
         });
