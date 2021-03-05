@@ -1,4 +1,5 @@
 import { Table } from "antd";
+import { useHistory } from "react-router-dom";
 import React from "react";
 import styled from "styled-components";
 import type { FormattedCategory } from "features";
@@ -6,11 +7,16 @@ import type { FormattedCategory } from "features";
 export type Props = FormattedCategory;
 
 export default function CategoryTable(props: Props) {
+  const history = useHistory();
+
   return (
     <S.Table
       dataSource={props.indexPools}
       columns={columns}
       pagination={false}
+      onRow={(record: any) => ({
+        onClick: () => history.push(`/pools/${record.id}`),
+      })}
     />
   );
 }
