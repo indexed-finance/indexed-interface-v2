@@ -161,6 +161,7 @@ const S = {
     position: absolute !important;
     bottom: 0 !important;
     left: 0 !important;
+    background: #121212;
   `,
   Copyright: styled(Typography.Title)`
     ${(props) => props.theme.snippets.fancy};

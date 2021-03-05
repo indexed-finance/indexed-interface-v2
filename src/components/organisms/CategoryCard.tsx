@@ -34,7 +34,11 @@ export default function CategoryCard({
           <S.Name>{name}</S.Name>
         </>
       }
-      extra={<Button type="primary">More</Button>}
+      extra={
+        <Link to={`/categories/${id}`}>
+          <Button type="primary">More</Button>
+        </Link>
+      }
       actions={[
         <S.TokenImageWrapper key="1">
           {tokens.map((token) => (
