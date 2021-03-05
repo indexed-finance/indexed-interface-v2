@@ -5,7 +5,8 @@ import ReactMarkdown from "react-markdown";
 import data from "data.json";
 
 export default function DocsDetail() {
-  const detail = (data as any)[window.location.pathname.slice(1)];
+  // "/foo/bar/baz.md" -> "foo/bar/baz"
+  const detail = (data as any)[window.location.pathname.slice(1).split(".")[0]];
 
   return detail ? (
     <>

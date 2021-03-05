@@ -44,6 +44,7 @@ export default function AppLayout() {
   const { activePage } = useContext(DrawerContext);
   const isConnected = useSelector(selectors.selectConnected);
   const isConnectionEnabled = useSelector(selectors.selectConnectionEnabled);
+  const language = useSelector(selectors.selectLanguageName);
   const theme = useSelector(selectors.selectTheme);
   const indexPools = useSelector(selectors.selectAllFormattedIndexPools);
   const breakpoint = useBreakpoint();
@@ -110,9 +111,9 @@ export default function AppLayout() {
             {breakpoint.lg && (
               <S.Controls>
                 <S.Changeables layout="inline" colon={false}>
-                  <Item name="Language">
-                    <Select>
-                      <Option value="english">English 🇺🇸</Option>
+                  <Item>
+                    <Select value={language}>
+                      <Option value="english">English</Option>
                     </Select>
                   </Item>
                   <Item name="Theme">

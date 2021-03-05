@@ -56,6 +56,15 @@ export const selectors = {
   selectConnected: (state: AppState) => state.settings.connected,
   selectConnectionEnabled: (state: AppState) =>
     state.settings.connectionEnabled,
+  selectLanguageName: (state: AppState) => {
+    const lookup = {
+      "en-us": "English",
+      "es-mx": "Spanish",
+      "zh-cn": "Chinese",
+    };
+
+    return lookup[state.settings.languageCode] ?? "None";
+  },
 };
 
 export default slice.reducer;

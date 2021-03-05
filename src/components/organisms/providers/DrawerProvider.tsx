@@ -118,23 +118,30 @@ export default function DrawerProvider(props: ProviderProps) {
       ...prev,
       [pageName]: actions,
     }));
+  const memoDisplayDrawerPage = React.useCallback(
+    (page: DrawerPage, content?: ReactNode) =>
+      setPages((prevPages) =>
+        prevPages.concat({
+          ...page,
+          content,
+        })
+      ),
+    []
+  );
+  const memoCloseDrawerPage = React.useCallback(
+    () => setPages((prevPages) => prevPages.slice(0, prevPages.length - 1)),
+    []
+  );
   const value: Context = useMemo(
     () => ({
       modifiedActions,
-      activePage: pages[0] || null,
+      activePage: pages[0] ?? null,
       pages,
-      displayDrawerPage: (page: DrawerPage, content?: ReactNode) =>
-        setPages((prevPages) =>
-          prevPages.concat({
-            ...page,
-            content,
-          })
-        ),
+      displayDrawerPage: memoDisplayDrawerPage,
       modifyDrawerActions,
-      closeDrawerPage: () =>
-        setPages((prevPages) => prevPages.slice(0, prevPages.length - 1)),
+      closeDrawerPage: memoCloseDrawerPage,
     }),
-    [modifiedActions, pages]
+    [modifiedActions, pages, memoCloseDrawerPage, memoDisplayDrawerPage]
   );
 
   return (
@@ -147,12 +154,19 @@ export default function DrawerProvider(props: ProviderProps) {
 
 // #region Hooks
 export function useDrawer(page: DrawerPage) {
-  const { closeDrawerPage, displayDrawerPage } = useContext(DrawerContext);
-
-  return {
-    openDrawer: (content: ReactNode) => {
+  const { activePage, closeDrawerPage, displayDrawerPage } = useContext(
+    DrawerContext
+  );
+  const memoOpenDrawer = React.useCallback(
+    (content: ReactNode) => {
       displayDrawerPage(page, content);
     },
+    [page, displayDrawerPage]
+  );
+
+  return {
+    activePage,
+    openDrawer: memoOpenDrawer,
     closeDrawer: closeDrawerPage,
   };
 }

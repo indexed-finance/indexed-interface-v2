@@ -1,0 +1,22 @@
+<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500">
+  <style>
+    svg {
+      mix-blend-mode: difference !important;
+    }
+    @media (prefers-color-scheme: dark) {
+      path {
+        fill: #ffffff !important;
+      }
+      svg {
+        stroke: #111111;
+        stroke-width: 7.5;
+      }
+    }
+    @media (prefers-color-scheme: light) {
+      path {
+        fill: #111111 !important;
+      }
+    }
+  </style>
+  <path d="M144.11,379l37.25,64.23H475.5l-34.92-64.1L357,379,401,306.57,257.62,43.28l-45.11,77.41,41,70.74-82.15-.17L24.5,443.28H105ZM253.57,191.42L355.73,379H144.27Z"/>
+</svg>
