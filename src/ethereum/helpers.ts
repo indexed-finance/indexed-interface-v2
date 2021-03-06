@@ -479,8 +479,8 @@ export async function swapExactAmountIn(
   poolAddress: string,
   inputTokenAddress: string,
   outputTokenAddress: string,
-  amount: string,
-  minimumAmount: BigNumber,
+  amountIn: BigNumber,
+  minimumAmountOut: BigNumber,
   maximumPrice: BigNumber
 ) {
   const abi = new Interface(BPool.abi);
@@ -488,9 +488,9 @@ export async function swapExactAmountIn(
   const gasPrice = await contract.signer.getGasPrice();
   const args = [
     inputTokenAddress,
-    amount,
+    convert.toHex(amountIn),
     outputTokenAddress,
-    convert.toHex(minimumAmount),
+    convert.toHex(minimumAmountOut),
     convert.toHex(maximumPrice),
   ];
   const gasLimit = await contract.estimateGas.swapExactAmountIn(...args);
@@ -509,8 +509,8 @@ export async function swapExactAmountOut(
   poolAddress: string,
   inputTokenAddress: string,
   outputTokenAddress: string,
-  amountIn: string,
-  amountOut: string,
+  maxAmountIn: BigNumber,
+  amountOut: BigNumber,
   maximumPrice: BigNumber
 ) {
   const abi = new Interface(BPool.abi);
@@ -518,9 +518,9 @@ export async function swapExactAmountOut(
   const gasPrice = await contract.signer.getGasPrice();
   const args = [
     inputTokenAddress,
-    amountIn,
+    convert.toHex(maxAmountIn),
     outputTokenAddress,
-    amountOut,
+    convert.toHex(amountOut),
     convert.toHex(maximumPrice),
   ];
   const gasLimit = await contract.estimateGas.swapExactAmountOut(...args);
