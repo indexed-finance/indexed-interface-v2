@@ -62,9 +62,20 @@ export default function PoolDetail() {
   useEffect(() => {
     dispatch(actions.requestPoolUserData(poolId));
 
-    if (isConnected) {
+    if (!isConnected) {
       dispatch(actions.requestPoolDetail(poolId));
     }
+
+    // --
+    const listenerId = dispatch(actions.poolUpdateListenerRegistered(poolId));
+
+    return () => {
+      if (listenerId) {
+        dispatch(
+          actions.listenerUnregistered((listenerId as unknown) as string)
+        );
+      }
+    };
   }, [dispatch, poolId, isConnected]);
 
   if (pool) {

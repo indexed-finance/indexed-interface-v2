@@ -85,8 +85,7 @@ export default function AppMenu({ onItemClick = noop, ...rest }: Props) {
                           {(isIndexPool || isToken) && (
                             <S.Image alt={model.name} src={image} />
                           )}
-
-                          <span>{model.name}</span>
+                          <S.Uppercase>{model.name}</S.Uppercase>
                         </S.ItemInner>
                       </Item>
                     );
@@ -109,7 +108,7 @@ export default function AppMenu({ onItemClick = noop, ...rest }: Props) {
         <SubMenu key="Social" title={<S.Title>Social</S.Title>}>
           {SOCIAL_MEDIA.map((site) => (
             <Menu.Item key={site.name}>
-              <S.SocialLink
+              <S.Uppercase
                 href={site.link}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -119,7 +118,7 @@ export default function AppMenu({ onItemClick = noop, ...rest }: Props) {
                   src={require(`assets/images/${site.image}`).default}
                 />{" "}
                 {site.name}
-              </S.SocialLink>
+              </S.Uppercase>
             </Menu.Item>
           ))}
         </SubMenu>
@@ -143,7 +142,7 @@ const S = {
     ${(props) => props.theme.snippets.fancy};
   `,
   ItemInner: styled.div<{ isCategory?: boolean }>`
-    ${(props) => props.theme.snippets.perfectlyAligned};
+    ${(props) => props.theme.snippets.spacedBetween};
 
     :hover {
       [data-category="true"] {
@@ -168,9 +167,9 @@ const S = {
   Title: styled.span`
     ${(props) => props.theme.snippets.fancy};
   `,
-  SocialLink: styled.a`
-    ${(props) => props.theme.snippets.fancy};
-    ${(props) => props.theme.snippets.spacedBetween};
+  Uppercase: styled.a`
+    text-align: right;
+    text-transform: uppercase;
   `,
   PerfectlyCentered: styled.div`
     ${(props) => props.theme.snippets.perfectlyCentered};

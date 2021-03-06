@@ -1,5 +1,6 @@
 import { AppState } from "./store";
 import { NormalizedPool } from "ethereum";
+import { batcherSelectors } from "./batcher";
 import { categoriesSelectors } from "./categories";
 import { convert } from "helpers";
 import { dailySnapshotsSelectors } from "./dailySnapshots";
@@ -13,6 +14,7 @@ const MILLISECONDS_PER_SECOND = 1000;
 type ModelKeys = "categories" | "indexPools" | "tokens";
 
 const selectors = {
+  ...batcherSelectors,
   ...categoriesSelectors,
   ...dailySnapshotsSelectors,
   ...indexPoolsSelectors,

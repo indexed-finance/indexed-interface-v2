@@ -1,13 +1,32 @@
 import { AnyAction } from "redux";
 import { LOCALSTORAGE_KEY } from "config";
 import { ThunkAction } from "redux-thunk";
+import { batcherActions } from "./batcher";
 import { configureStore } from "@reduxjs/toolkit";
+import { v4 as uuid } from "uuid";
 import reducer from "./reducer";
 
 const store = configureStore({
   reducer,
-  middleware: (getDefaultMiddleware) => getDefaultMiddleware(),
-  preloadedState: loadPersistedState(),
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware().concat(() => (next) => (action) => {
+      if (action.type === batcherActions.listenerRegistered.type) {
+        const id = uuid();
+
+        next({
+          ...action,
+          payload: {
+            ...action.payload,
+            id,
+          },
+        });
+
+        return id;
+      } else {
+        return next(action);
+      }
+    }),
+  // preloadedState: loadPersistedState(),
 });
 
 store.subscribe(() => {
@@ -24,7 +43,12 @@ export default store;
 
 export type AppState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
-export type AppThunk = ThunkAction<void, AppState, undefined, AnyAction>;
+export type AppThunk = ThunkAction<
+  void,
+  AppState,
+  string | undefined,
+  AnyAction
+>;
 
 export interface TokenField {
   amount: string;

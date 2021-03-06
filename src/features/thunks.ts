@@ -3,6 +3,7 @@ import { AppThunk } from "./store";
 import { BigNumber } from "bignumber.js";
 import { CoinGeckoService } from "services";
 import { SLIPPAGE_RATE, SUBGRAPH_URL_UNISWAP } from "config";
+import { batcherActions } from "./batcher";
 import { categoriesActions } from "./categories";
 import { convert } from "helpers";
 import { helpers } from "ethereum";
@@ -34,7 +35,10 @@ const thunks = {
   /**
    *
    */
-  initialize: (options: InitialzeOptions): AppThunk => async (dispatch) => {
+  initialize: (options: InitialzeOptions): AppThunk => async (
+    dispatch,
+    getState
+  ) => {
     provider = options.provider;
 
     if (options.withSigner) {
@@ -52,6 +56,18 @@ const thunks = {
     await provider.ready;
 
     dispatch(thunks.retrieveInitialData());
+
+    /**
+     * When the block number changes,
+     * change the state so that batcher may process.
+     */
+    provider.addListener("block", (blockNumber) => {
+      const blockNumberAtThisTime = selectors.selectBlockNumber(getState());
+
+      if (blockNumber !== blockNumberAtThisTime) {
+        dispatch(actions.blockNumberChanged(blockNumber));
+      }
+    });
   },
   /**
    *
@@ -107,6 +123,22 @@ const thunks = {
 
     dispatch(actions.coingeckoDataLoaded(coingeckoData));
   },
+  poolUpdateListenerRegistered: (poolId: string): AppThunk => (
+    dispatch,
+    getState
+  ) => {
+    const state = getState();
+    const tokens = selectors.selectPoolUnderlyingTokens(state, poolId);
+
+    return dispatch(
+      actions.listenerRegistered({
+        id: "",
+        kind: "PoolData",
+        pool: poolId,
+        args: tokens,
+      })
+    );
+  },
   /**
    *
    */
@@ -116,9 +148,9 @@ const thunks = {
   ) => {
     const state = getState();
     const pool = selectors.selectPool(state, poolId);
+    const tokens = selectors.selectPoolUnderlyingTokens(state, poolId);
 
     if (provider && pool) {
-      const tokens = selectors.selectPoolUnderlyingTokens(state, poolId);
       const update = await helpers.poolUpdateMulticall(
         provider,
         poolId,
@@ -276,6 +308,7 @@ const thunks = {
 };
 
 const actions = {
+  ...batcherActions,
   ...categoriesActions,
   ...indexPoolsActions,
   ...settingsActions,

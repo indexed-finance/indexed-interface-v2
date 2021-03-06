@@ -54,7 +54,58 @@ export default function TokenSelector({
     ],
     closable: true,
   });
+  const triggerChange = useCallback(
+    (changedValue: TokenSelectorValue) => {
+      if (onChange) {
+        onChange({
+          amount,
+          token,
+          ...value,
+          ...changedValue,
+        });
+      }
+    },
+    [onChange, amount, token, value]
+  );
+  const onAmountChange = useCallback(
+    (newAmount?: number | string | null) => {
+      if (newAmount == null || Number.isNaN(amount) || amount < 0) {
+        return;
+      }
 
+      const amountToUse =
+        typeof newAmount === "string" ? parseFloat(newAmount) : newAmount;
+
+      if (!value.hasOwnProperty("amount")) {
+        setAmount(amountToUse);
+      }
+
+      triggerChange({ amount: amountToUse });
+    },
+    [amount, triggerChange, value]
+  );
+  const onTokenChange = useCallback(
+    (newToken: string) => {
+      if (!value.hasOwnProperty("token")) {
+        setToken(newToken);
+      }
+
+      triggerChange({ token: newToken });
+      closeDrawer();
+    },
+    [closeDrawer, triggerChange, value]
+  );
+  const handleWrapperClick = useCallback(() => {
+    if (input.current) {
+      input.current.focus();
+    }
+  }, []);
+  const handleMaxOut = useCallback(() => {
+    onAmountChange(relevantBalance);
+  }, [onAmountChange, relevantBalance]);
+
+  // Effect: Sync parent values with local values.
+  // --
   useEffect(() => {
     if (value.amount) {
       setAmount(value.amount);
@@ -64,47 +115,6 @@ export default function TokenSelector({
       setToken(value.token);
     }
   }, [value]);
-
-  const triggerChange = (changedValue: TokenSelectorValue) => {
-    if (onChange) {
-      onChange({
-        amount,
-        token,
-        ...value,
-        ...changedValue,
-      });
-    }
-  };
-
-  const onAmountChange = (newAmount?: number | string | null) => {
-    if (newAmount == null || Number.isNaN(amount) || amount < 0) {
-      return;
-    }
-
-    const amountToUse =
-      typeof newAmount === "string" ? parseFloat(newAmount) : newAmount;
-
-    if (!value.hasOwnProperty("amount")) {
-      setAmount(amountToUse);
-    }
-
-    triggerChange({ amount: amountToUse });
-  };
-
-  const onTokenChange = (newToken: string) => {
-    if (!value.hasOwnProperty("token")) {
-      setToken(newToken);
-    }
-
-    triggerChange({ token: newToken });
-    closeDrawer();
-  };
-
-  const handleWrapperClick = useCallback(() => {
-    if (input.current) {
-      input.current.focus();
-    }
-  }, []);
 
   return (
     <Area>
@@ -139,7 +149,11 @@ export default function TokenSelector({
           />
           <S.InnerSpace>
             {value.token && (
-              <Button type="dashed" disabled={!relevantBalance}>
+              <Button
+                type="dashed"
+                disabled={!relevantBalance}
+                onClick={handleMaxOut}
+              >
                 MAX
               </Button>
             )}
@@ -194,7 +208,7 @@ const S = {
     border: none;
     font-size: 24px;
     font-weight: 500;
-    min-width: 50px;
+    width: 180px;
   `,
   Space: styled(Space)`
     justify-content: space-between;

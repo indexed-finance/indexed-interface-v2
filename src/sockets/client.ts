@@ -1,4 +1,4 @@
-import { AppState, actions, store } from "features";
+import { AppState, actions, selectors, store } from "features";
 import { Operation, applyReducer, deepClone } from "fast-json-patch";
 import { message } from "antd";
 
@@ -43,8 +43,6 @@ export default class SocketClient {
 
     socket.onerror = async () => {
       if (retryAttempts > 0) {
-        retryAttempts++;
-
         const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
         const seconds = timeInSeconds[retryAttempts];
 
@@ -53,19 +51,27 @@ export default class SocketClient {
         SocketClient.disconnect();
         SocketClient.connect();
       } else {
+        const isConnected = selectors.selectConnected(store.getState());
+
         message.error("Unable to connect to the server. Retrying...");
 
-        store.dispatch(actions.connectionLost());
+        if (isConnected) {
+          store.dispatch(actions.connectionLost());
+        }
 
         SocketClient.disconnect();
         SocketClient.connect();
-
-        retryAttempts = 1;
       }
+
+      retryAttempts++;
     };
 
     socket.onclose = () => {
-      store.dispatch(actions.connectionLost());
+      const isConnected = selectors.selectConnected(store.getState());
+
+      if (isConnected) {
+        store.dispatch(actions.connectionLost());
+      }
     };
   }
 
