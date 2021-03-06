@@ -2,8 +2,7 @@ import "theme/styles.less";
 import { Button } from "components";
 import { Form, Grid, Layout, Popover, Select, Switch, Typography } from "antd";
 import { ImConnection } from "react-icons/im";
-import { Link } from "react-router-dom";
-import { MdAccountBalanceWallet, MdSettings } from "react-icons/md";
+import { MdAccountBalanceWallet } from "react-icons/md";
 import { actions, selectors } from "features";
 import { useDispatch, useSelector } from "react-redux";
 import React, { useMemo } from "react";
@@ -59,13 +58,6 @@ export default function AppHeader() {
               <S.Wallet type="ghost">
                 <MdAccountBalanceWallet />
               </S.Wallet>
-            </Item>
-            <Item>
-              <S.Settings type="ghost">
-                <Link to="/settings">
-                  <MdSettings />
-                </Link>
-              </S.Settings>
             </Item>
             <Item>
               <Popover

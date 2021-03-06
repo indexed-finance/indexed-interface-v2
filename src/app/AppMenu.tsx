@@ -24,114 +24,120 @@ export default function AppMenu({ onItemClick = noop, ...rest }: Props) {
   const history = useHistory();
 
   return (
-    <S.Menu
-      theme="dark"
-      mode="inline"
-      defaultOpenKeys={["Social"]}
-      selectable={false}
-      {...rest}
-    >
-      {routes
-        .filter((route) => route.sider)
-        .map((route) => {
-          if (route.model) {
-            const models =
-              menuModels[route.model as "categories" | "indexPools" | "tokens"];
+    <>
+      <S.Menu
+        theme="dark"
+        mode="inline"
+        defaultOpenKeys={["Social"]}
+        selectable={false}
+        {...rest}
+      >
+        {routes
+          .filter((route) => route.sider)
+          .map((route) => {
+            if (route.model) {
+              const models =
+                menuModels[
+                  route.model as "categories" | "indexPools" | "tokens"
+                ];
 
-            return (
-              <SubMenu
-                key={route.path}
-                title={
-                  <Link to={route.path} onClick={onItemClick}>
-                    <S.Title>{route.sider}</S.Title>
-                  </Link>
-                }
-              >
-                {models.map((model) => {
-                  let image = "";
-                  const isCategory = route.model === "categories";
-                  const isIndexPool = route.model === "indexPools";
-                  const isToken = route.model === "tokens";
-
-                  if (isIndexPool) {
-                    image = indexPoolsLookup[model.id];
-                  } else if (isToken) {
-                    try {
-                      image = require(`assets/images/${
-                        tokenLookup[model.id]?.symbol?.toLowerCase() ?? ""
-                      }.png`).default;
-                    } catch {
-                      image = PLACEHOLDER_TOKEN_IMAGE;
-                    }
+              return (
+                <SubMenu
+                  key={route.path}
+                  title={
+                    <Link to={route.path} onClick={onItemClick}>
+                      <S.Title>{route.sider}</S.Title>
+                    </Link>
                   }
+                >
+                  {models.map((model) => {
+                    let image = "";
+                    const isCategory = route.model === "categories";
+                    const isIndexPool = route.model === "indexPools";
+                    const isToken = route.model === "tokens";
 
-                  return (
-                    <Item
-                      key={model.id}
-                      onClick={() => {
-                        history.push(`${route.path}/${model.id}`);
-                        onItemClick();
-                      }}
-                    >
-                      <S.ItemInner isCategory={isCategory}>
-                        {isCategory && (
-                          <S.CategoryId level={3} data-category={true}>
-                            {model.id}
-                          </S.CategoryId>
-                        )}
-                        {(isIndexPool || isToken) && (
-                          <S.Image alt={model.name} src={image} />
-                        )}
+                    if (isIndexPool) {
+                      image = indexPoolsLookup[model.id];
+                    } else if (isToken) {
+                      try {
+                        image = require(`assets/images/${
+                          tokenLookup[model.id]?.symbol?.toLowerCase() ?? ""
+                        }.png`).default;
+                      } catch {
+                        image = PLACEHOLDER_TOKEN_IMAGE;
+                      }
+                    }
 
-                        <span>{model.name}</span>
-                      </S.ItemInner>
-                    </Item>
-                  );
-                })}
-              </SubMenu>
-            );
-          } else {
-            return (
-              <S.Item key={route.path} onClick={onItemClick}>
-                {route.isExternalLink ? (
-                  route.sider
-                ) : (
-                  <Link to={route.path}>{route.sider}</Link>
-                )}
-              </S.Item>
-            );
-          }
-        })}
-      {/* Static */}
-      <SubMenu key="Social" title={<S.Title>Social</S.Title>}>
-        {SOCIAL_MEDIA.map((site) => (
-          <Menu.Item key={site.name}>
-            <S.SocialLink
-              href={site.link}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <S.Image
-                alt={site.name}
-                src={require(`assets/images/${site.image}`).default}
-              />{" "}
-              {site.name}
-            </S.SocialLink>
-          </Menu.Item>
-        ))}
-      </SubMenu>
-      <S.CopyrightWrapper>
+                    return (
+                      <Item
+                        key={model.id}
+                        onClick={() => {
+                          history.push(`${route.path}/${model.id}`);
+                          onItemClick();
+                        }}
+                      >
+                        <S.ItemInner isCategory={isCategory}>
+                          {isCategory && (
+                            <S.CategoryId level={3} data-category={true}>
+                              {model.id}
+                            </S.CategoryId>
+                          )}
+                          {(isIndexPool || isToken) && (
+                            <S.Image alt={model.name} src={image} />
+                          )}
+
+                          <span>{model.name}</span>
+                        </S.ItemInner>
+                      </Item>
+                    );
+                  })}
+                </SubMenu>
+              );
+            } else {
+              return (
+                <S.Item key={route.path} onClick={onItemClick}>
+                  {route.isExternalLink ? (
+                    route.sider
+                  ) : (
+                    <Link to={route.path}>{route.sider}</Link>
+                  )}
+                </S.Item>
+              );
+            }
+          })}
+        {/* Static */}
+        <SubMenu key="Social" title={<S.Title>Social</S.Title>}>
+          {SOCIAL_MEDIA.map((site) => (
+            <Menu.Item key={site.name}>
+              <S.SocialLink
+                href={site.link}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <S.Image
+                  alt={site.name}
+                  src={require(`assets/images/${site.image}`).default}
+                />{" "}
+                {site.name}
+              </S.SocialLink>
+            </Menu.Item>
+          ))}
+        </SubMenu>
+      </S.Menu>
+      <S.PerfectlyCentered>
         <S.Copyright level={4}>
           <AiOutlineCopyrightCircle /> 2021 Indexed
         </S.Copyright>
-      </S.CopyrightWrapper>
-    </S.Menu>
+      </S.PerfectlyCentered>
+    </>
   );
 }
 
 const S = {
   Menu: styled(Menu)`
+    height: 75%;
     max-width: 100vw;
+    overflow: auto;
   `,
   Item: styled(Item)`
     ${(props) => props.theme.snippets.fancy};
@@ -166,12 +172,11 @@ const S = {
     ${(props) => props.theme.snippets.fancy};
     ${(props) => props.theme.snippets.spacedBetween};
   `,
-  CopyrightWrapper: styled(Menu.Item)`
+  PerfectlyCentered: styled.div`
     ${(props) => props.theme.snippets.perfectlyCentered};
-    position: absolute !important;
-    bottom: 0 !important;
-    left: 0 !important;
-    background: #121212;
+    padding-top: 6px;
+    padding-bottom: 6px;
+    background: #202020;
   `,
   Copyright: styled(Typography.Title)`
     ${(props) => props.theme.snippets.fancy};

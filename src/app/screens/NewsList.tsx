@@ -1,7 +1,6 @@
 import { Button, ScreenHeader } from "components";
 import { Col, List, Row, Typography } from "antd";
 import { Link } from "react-router-dom";
-import { Subscreen } from "../subscreens";
 import React from "react";
 import ReactMarkdown from "react-markdown";
 import S from "string";
@@ -22,38 +21,36 @@ export default function NewsList() {
 
       <Row>
         <Col xs={24} sm={10}>
-          <Subscreen icon={null}>
-            <List>
-              {articlePaths.map((path, index) => {
-                const title = articles[index];
-                const slicedTitle = `${title.slice(0, 20)}...`;
-                const brief = (data as any)[path];
-                const slicedBrief = `${brief.slice(0, 100)}...`;
+          <List>
+            {articlePaths.map((path, index) => {
+              const title = articles[index];
+              const slicedTitle = `${title.slice(0, 20)}...`;
+              const brief = (data as any)[path];
+              const slicedBrief = `${brief.slice(0, 100)}...`;
 
-                return (
-                  <List.Item key={path}>
-                    <List.Item.Meta
-                      title={
-                        <T.Spaced>
-                          <T.Title level={2}>
-                            {title.length > 20 ? slicedTitle : title}
-                          </T.Title>
-                          <Link to={path}>
-                            <Button type="primary">Read</Button>
-                          </Link>
-                        </T.Spaced>
-                      }
-                      description={
-                        <ReactMarkdown>
-                          {brief.length > 100 ? slicedBrief : brief}
-                        </ReactMarkdown>
-                      }
-                    />
-                  </List.Item>
-                );
-              })}
-            </List>
-          </Subscreen>
+              return (
+                <List.Item key={path}>
+                  <List.Item.Meta
+                    title={
+                      <T.Spaced>
+                        <T.Title level={2}>
+                          {title.length > 20 ? slicedTitle : title}
+                        </T.Title>
+                        <Link to={path}>
+                          <Button type="primary">Read</Button>
+                        </Link>
+                      </T.Spaced>
+                    }
+                    description={
+                      <ReactMarkdown>
+                        {brief.length > 100 ? slicedBrief : brief}
+                      </ReactMarkdown>
+                    }
+                  />
+                </List.Item>
+              );
+            })}
+          </List>
         </Col>
       </Row>
     </>

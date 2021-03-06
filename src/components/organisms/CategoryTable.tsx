@@ -70,5 +70,9 @@ const columns = [
 ];
 
 const S = {
-  Table: styled(Table)``,
+  Table: styled(Table)`
+    * {
+      text-align: center !important;
+    }
+  `,
 };

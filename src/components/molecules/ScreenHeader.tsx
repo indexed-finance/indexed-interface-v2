@@ -1,4 +1,4 @@
-import { Breadcrumb, Grid, Typography } from "antd";
+import { Breadcrumb, Divider, Grid, Typography } from "antd";
 import React, { ReactElement } from "react";
 import styled, { css } from "styled-components";
 
@@ -12,23 +12,27 @@ const { useBreakpoint } = Grid;
 
 export default function ScreenHeader(props: Props) {
   const breakpoints = useBreakpoint();
+  const title = props.title ? props.title.replace(/ Tokens Index/g, "") : "";
 
   return (
-    <S.Title
-      level={breakpoints.md ? 1 : 3}
-      withMargin={!breakpoints.sm}
-      centered={!breakpoints.sm}
-    >
-      <span>{props.title}</span>
-      {(props.overlay || props.activeBreadcrumb) && (
-        <Breadcrumb>
-          <Breadcrumb.Item overlay={props.overlay}>
-            {props.activeBreadcrumb}
-          </Breadcrumb.Item>
-          {props.title && <Breadcrumb.Item>{props.title}</Breadcrumb.Item>}
-        </Breadcrumb>
-      )}
-    </S.Title>
+    <>
+      <S.Title
+        level={breakpoints.md ? 1 : 3}
+        withMargin={!breakpoints.sm}
+        centered={!breakpoints.sm}
+      >
+        <S.TitleInner>{title}</S.TitleInner>
+        {(props.overlay || props.activeBreadcrumb) && (
+          <Breadcrumb>
+            <Breadcrumb.Item overlay={props.overlay}>
+              {props.activeBreadcrumb}
+            </Breadcrumb.Item>
+            {props.title && <Breadcrumb.Item>{props.title}</Breadcrumb.Item>}
+          </Breadcrumb>
+        )}
+      </S.Title>
+      <Divider className="screen-header-divider" />
+    </>
   );
 }
 
@@ -37,6 +41,7 @@ const S = {
     <Typography.Title {...rest} />
   ))<{ withMargin?: boolean; centered?: boolean }>`
     ${(props) => props.theme.snippets.spacedBetween};
+    align-items: flex-end;
 
     ${(props) =>
       props.withMargin &&
@@ -48,5 +53,8 @@ const S = {
       css`
         text-align: center;
       `}
+  `,
+  TitleInner: styled.span`
+    ${(props) => props.theme.snippets.fancy};
   `,
 };

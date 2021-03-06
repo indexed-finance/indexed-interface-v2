@@ -3,6 +3,7 @@ import {
   Divider,
   Grid,
   List,
+  Progress,
   Row,
   Space,
   Statistic,
@@ -58,41 +59,52 @@ export default function Portfolio() {
         footer={
           <>
             <Divider />
-            <S.Totals level={2}>
-              <S.StatisticRight title="Portfolio Total Value" value="$20.00" />
-            </S.Totals>
+            <S.SpacedBetween>
+              <Typography.Title type="secondary" level={3}>
+                Total Value
+              </Typography.Title>
+              <Typography.Title type="success" level={2}>
+                $400.00
+              </Typography.Title>
+            </S.SpacedBetween>
           </>
         }
       >
         {__data.map((entry) => (
-          <Item key={entry.symbol}>
-            <S.Left>
-              <S.Weight level={2}>{entry.weight}</S.Weight>
-              <Space direction="vertical" size="small">
-                <S.Title level={4}>
-                  <S.Aligned>
-                    <S.Image alt={entry.symbol} src={entry.image} />{" "}
-                    {entry.symbol}
-                  </S.Aligned>
-                </S.Title>
-                <S.Title level={5}>
-                  <Link to={entry.link}>{entry.name}</Link>
-                </S.Title>
-              </Space>
-              <S.Number direction="vertical">
-                <S.Staking>
-                  <Typography.Text>
-                    Staking {entry.staking} {entry.symbol}
-                  </Typography.Text>
-                </S.Staking>
-                <S.Title level={3}>
-                  {entry.balance} {entry.symbol}
-                  <br />
-                  {entry.value}
-                </S.Title>
-              </S.Number>
-            </S.Left>
-          </Item>
+          <>
+            <Item key={entry.symbol}>
+              <S.Left>
+                <Space direction="vertical" size="small">
+                  <S.Title level={4}>
+                    <S.Aligned>
+                      <S.Image alt={entry.symbol} src={entry.image} />{" "}
+                      {entry.symbol}
+                    </S.Aligned>
+                  </S.Title>
+                  <S.Title level={5}>
+                    <Link to={entry.link}>{entry.name}</Link>
+                  </S.Title>
+                </Space>
+
+                <S.Number direction="vertical">
+                  <S.Staking>
+                    <Typography.Text>
+                      Staking {entry.staking} {entry.symbol}
+                    </Typography.Text>
+                  </S.Staking>
+                  <S.Title level={3}>
+                    {entry.balance} {entry.symbol}
+                    <br />
+                    {entry.value}
+                  </S.Title>
+                </S.Number>
+                <S.Progress
+                  type="dashboard"
+                  percent={parseFloat(entry.weight.replace(/%/g, ""))}
+                />
+              </S.Left>
+            </Item>
+          </>
         ))}
       </List>
     </Subscreen>
@@ -151,13 +163,8 @@ const S = {
     text-align: right;
     flex: 1;
   `,
-  Weight: styled(Typography.Title)`
-    margin-right: ${(props) => props.theme.spacing.medium} !important;
-    margin-bottom: 0 !important;
-  `,
   Left: styled.div`
     ${(props) => props.theme.snippets.perfectlyAligned};
-    align-items: flex-end;
     flex: 1;
 
     .ant-space-item {
@@ -187,5 +194,17 @@ const S = {
   `,
   StatisticRight: styled(Statistic)`
     text-align: right;
+  `,
+  Progress: styled(Progress)`
+    margin-left: ${(props) => props.theme.spacing.large};
+  `,
+  SpacedBetween: styled(Space)`
+    ${(props) => props.theme.snippets.spacedBetween};
+    width: 100%;
+    padding-right: 30px;
+
+    h2 {
+      text-align: right;
+    }
   `,
 };

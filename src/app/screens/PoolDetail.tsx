@@ -1,19 +1,20 @@
 import { Action, Performance, Recent, Subscreen } from "../subscreens";
 import { AiOutlineSwap } from "react-icons/ai";
 import { AppState, actions, selectors } from "features";
-import { Breadcrumb, Col, Grid, Menu, Row, Typography } from "antd";
 import { CgArrowsExpandRight } from "react-icons/cg";
 import {
   ChartCard,
   PoolDropdown,
   PoolInteractions,
   RankedTokenList,
+  ScreenHeader,
 } from "components";
+import { Col, Grid, Menu, Row } from "antd";
 import { Link, Redirect, useParams } from "react-router-dom";
 import { RiWallet3Line } from "react-icons/ri";
 import { useDispatch, useSelector } from "react-redux";
 import React, { useEffect, useMemo } from "react";
-import styled, { css } from "styled-components";
+import styled from "styled-components";
 
 const { useBreakpoint } = Grid;
 
@@ -143,19 +144,11 @@ export default function PoolDetail() {
 
     return (
       <>
-        <S.Title
-          level={breakpoints.md ? 1 : 3}
-          withMargin={!breakpoints.sm}
-          centered={!breakpoints.sm}
-        >
-          <span>{pool.name}</span>
-          <Breadcrumb>
-            <Breadcrumb.Item overlay={<PoolDropdown />}>
-              <Link to="/pools">Index Pools</Link>
-            </Breadcrumb.Item>
-            <Breadcrumb.Item>{pool.name}</Breadcrumb.Item>
-          </Breadcrumb>
-        </S.Title>
+        <ScreenHeader
+          title={pool.name}
+          overlay={<PoolDropdown />}
+          activeBreadcrumb={<Link to="/pools">Index Pools</Link>}
+        />
         {(() => {
           switch (true) {
             case breakpoints.xxl:
@@ -181,22 +174,6 @@ export default function PoolDetail() {
 
 const S = {
   Tokens: styled(Subscreen)``,
-  Title: styled(({ withMargin: _, centered: __, ...rest }) => (
-    <Typography.Title {...rest} />
-  ))<{ withMargin?: boolean; centered?: boolean }>`
-    ${(props) => props.theme.snippets.spacedBetween};
-
-    ${(props) =>
-      props.withMargin &&
-      css`
-        margin-top: ${(props) => props.theme.spacing.medium};
-      `}
-    ${(props) =>
-      props.centered &&
-      css`
-        text-align: center;
-      `}
-  `,
   Item: styled(Menu.Item)`
     ${(props) => props.theme.snippets.fancy};
   `,
