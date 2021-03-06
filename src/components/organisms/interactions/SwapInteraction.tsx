@@ -73,12 +73,10 @@ export default function SwapInteraction({ pool }: Props) {
     }
   });
   const formattedSwapFee = pool
-    ? convert.toPercent(
-        convert
-          .toBigNumber(previousFormValues.current.to.amount.toString())
-          .times(parseFloat(pool.swapFee) / 100)
-          .toNumber()
-      )
+    ? convert
+      .toBigNumber(previousFormValues.current.to.amount.toString())
+      .times(parseFloat(pool.swapFee) / 100)
+      .toString(10)
     : "";
   const baseline = previousFormValues.current.from.token;
   const comparison = previousFormValues.current.to.token;
