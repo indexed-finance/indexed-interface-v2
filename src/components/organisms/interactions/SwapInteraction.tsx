@@ -66,7 +66,7 @@ export default function SwapInteraction({ pool }: Props) {
         state,
         poolId,
         token.toLowerCase(),
-        amount.toString()
+        convert.toToken(amount.toString()).toString(10)
       );
     } else {
       return true;
