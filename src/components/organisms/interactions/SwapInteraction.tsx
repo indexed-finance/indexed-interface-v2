@@ -153,7 +153,7 @@ export default function SwapInteraction({ pool }: Props) {
 
           if (isGoodResult) {
             setPrice(price);
-            setMaxPrice(spotPriceAfter.times(SLIPPAGE_RATE));
+            setMaxPrice(helpers.upwardSlippage(spotPriceAfter, SLIPPAGE_RATE));
 
             form.setFieldsValue({
               to: {
