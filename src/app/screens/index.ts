@@ -7,7 +7,6 @@ export { default as NewsDetail } from "./NewsDetail";
 export { default as NewsList } from "./NewsList";
 export { default as PoolDetail } from "./PoolDetail";
 export { default as PoolList } from "./PoolList";
-export { default as ProposalDetail } from "./ProposalDetail";
 export { default as Portfolio } from "./Portfolio";
 export { default as Settings } from "./Settings";
 export { default as Splash } from "./Splash";

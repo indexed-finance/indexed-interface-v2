@@ -5,27 +5,31 @@ import { batcherActions } from "./batcher";
 import { configureStore } from "@reduxjs/toolkit";
 import { v4 as uuid } from "uuid";
 import reducer from "./reducer";
-
+// blockNumberChanged
 const store = configureStore({
   reducer,
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(() => (next) => (action) => {
-      if (action.type === batcherActions.listenerRegistered.type) {
-        const id = uuid();
+    getDefaultMiddleware()
+      // The listener ID is returned for later use in unregistering.
+      .concat(function listenerIdMiddleware() {
+        return (next) => (action) => {
+          if (action.type === batcherActions.listenerRegistered.type) {
+            const id = uuid();
 
-        next({
-          ...action,
-          payload: {
-            ...action.payload,
-            id,
-          },
-        });
+            next({
+              ...action,
+              payload: {
+                ...action.payload,
+                id,
+              },
+            });
 
-        return id;
-      } else {
-        return next(action);
-      }
-    }),
+            return id;
+          } else {
+            return next(action);
+          }
+        };
+      }),
   // preloadedState: loadPersistedState(),
 });
 

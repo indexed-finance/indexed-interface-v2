@@ -10,8 +10,8 @@ import { helpers } from "ethereum";
 import { indexPoolsActions } from "./indexPools";
 import { providers } from "ethers";
 import { settingsActions } from "./settings";
-import { sleep } from "helpers";
 import { tokensActions } from "./tokens";
+import debounce from "lodash.debounce";
 import selectors from "./selectors";
 
 export let provider:
@@ -61,13 +61,25 @@ const thunks = {
      * When the block number changes,
      * change the state so that batcher may process.
      */
-    provider.addListener("block", (blockNumber) => {
+    const debouncedBlockHandler = debounce((blockNumber) => {
       const blockNumberAtThisTime = selectors.selectBlockNumber(getState());
 
       if (blockNumber !== blockNumberAtThisTime) {
-        dispatch(actions.blockNumberChanged(blockNumber));
+        dispatch(thunks.changeBlockNumber(blockNumber));
       }
-    });
+    }, 250);
+
+    provider.addListener("block", debouncedBlockHandler);
+  },
+  /**
+   *
+   */
+  changeBlockNumber: (blockNumber: number): AppThunk => async (
+    dispatch,
+    getState
+  ) => {
+    dispatch(actions.blockNumberChanged(blockNumber));
+    dispatch(thunks.sendBatch());
   },
   /**
    *
@@ -139,35 +151,22 @@ const thunks = {
       })
     );
   },
-  /**
-   *
-   */
-  requestPoolUpdate: (poolId: string): AppThunk => async (
+  tokenUserDataListenerRegistered: (poolId: string): AppThunk => (
     dispatch,
     getState
   ) => {
     const state = getState();
-    const pool = selectors.selectPool(state, poolId);
     const tokens = selectors.selectPoolUnderlyingTokens(state, poolId);
 
-    if (provider && pool) {
-      const update = await helpers.poolUpdateMulticall(
-        provider,
-        poolId,
-        tokens
-      );
-
-      dispatch(
-        actions.poolUpdated({
-          pool,
-          update,
-        })
-      );
-    }
+    return dispatch(
+      actions.listenerRegistered({
+        id: "",
+        kind: "TokenUserData",
+        pool: poolId,
+        args: tokens,
+      })
+    );
   },
-  /**
-   *
-   */
   requestPoolTradesAndSwaps: (poolId: string): AppThunk => async (dispatch) => {
     if (provider) {
       const { chainId } = await provider.getNetwork();
@@ -178,55 +177,6 @@ const thunks = {
       ]);
 
       dispatch(actions.poolTradesAndSwapsLoaded({ poolId, trades, swaps }));
-    }
-  },
-  /**
-   *
-   * @param poolId -
-   */
-  requestPoolUserData: (poolId: string): AppThunk => async (
-    dispatch,
-    getState
-  ) => {
-    if (provider) {
-      const state = getState();
-      const sourceAddress = selectedAddress;
-      const destinationAddress = poolId;
-      const tokens = selectors.selectPoolUnderlyingTokens(state, poolId);
-
-      if (sourceAddress && destinationAddress) {
-        const userData = await helpers.tokenUserDataMulticall(
-          provider,
-          sourceAddress,
-          destinationAddress,
-          tokens
-        );
-
-        dispatch(
-          actions.poolUserDataLoaded({
-            poolId,
-            userData,
-          })
-        );
-      }
-    } else {
-      await sleep(500);
-
-      dispatch(thunks.requestPoolUserData(poolId));
-    }
-  },
-  /**
-   *
-   */
-  requestPoolDetail: (poolId: string, includeCalls = true): AppThunk => async (
-    dispatch
-  ) => {
-    dispatch(actions.retrieveCoingeckoData(poolId));
-    dispatch(actions.requestPoolTradesAndSwaps(poolId));
-    dispatch(actions.requestPoolUpdate(poolId));
-
-    if (includeCalls) {
-      dispatch(actions.requestPoolUserData(poolId));
     }
   },
   /**
@@ -302,6 +252,48 @@ const thunks = {
         }
       } else {
         // --
+      }
+    }
+  },
+  sendBatch: (): AppThunk => async (dispatch, getState) => {
+    if (provider) {
+      const state = getState();
+      const batch = selectors.selectBatch(state);
+
+      for (const task of batch.poolDataTasks) {
+        const pool = selectors.selectPool(state, task.pool);
+
+        if (pool) {
+          const update = await helpers.poolUpdateMulticall(
+            provider,
+            pool.id,
+            task.args
+          );
+
+          dispatch(actions.poolUpdated({ pool, update }));
+        }
+      }
+
+      for (const task of batch.tokenUserDataTasks) {
+        const pool = selectors.selectPool(state, task.pool);
+        const sourceAddress = selectedAddress;
+        const destinationAddress = task.pool;
+
+        if (pool) {
+          const userData = await helpers.tokenUserDataMulticall(
+            provider,
+            sourceAddress,
+            destinationAddress,
+            task.args
+          );
+
+          dispatch(
+            actions.poolUserDataLoaded({
+              poolId: pool.id,
+              userData,
+            })
+          );
+        }
       }
     }
   },

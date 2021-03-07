@@ -60,21 +60,29 @@ export default function PoolDetail() {
   // Effect:
   // When the pool changes and not connected to the server, get the juicy details.
   useEffect(() => {
-    dispatch(actions.requestPoolUserData(poolId));
+    let poolUpdateListenerId: string;
 
+    // This screen always needs user data.
+    const tokenUserDataListenerId = (dispatch(
+      actions.tokenUserDataListenerRegistered(poolId)
+    ) as unknown) as string;
+
+    // Pool updates and TheGraph/CoinGecko data is only required if not receiving data from the server.
     if (!isConnected) {
-      dispatch(actions.requestPoolDetail(poolId));
+      poolUpdateListenerId = (dispatch(
+        actions.poolUpdateListenerRegistered(poolId)
+      ) as unknown) as string;
+
+      dispatch(actions.retrieveCoingeckoData(poolId));
+      dispatch(actions.requestPoolTradesAndSwaps(poolId));
     }
 
-    // --
-    const listenerId = dispatch(actions.poolUpdateListenerRegistered(poolId));
+    dispatch(actions.sendBatch());
 
     return () => {
-      if (listenerId) {
-        dispatch(
-          actions.listenerUnregistered((listenerId as unknown) as string)
-        );
-      }
+      [tokenUserDataListenerId, poolUpdateListenerId]
+        .filter(Boolean)
+        .forEach((id) => dispatch(actions.listenerUnregistered(id)));
     };
   }, [dispatch, poolId, isConnected]);
 

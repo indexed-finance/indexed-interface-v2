@@ -9,7 +9,6 @@ import {
   PoolDetail,
   PoolList,
   Portfolio,
-  ProposalDetail,
   Settings,
   Splash,
   Stake,
@@ -118,12 +117,6 @@ const routes: Route[] = [
     exact: true,
     sider: "",
     screen: <Settings />,
-  },
-  {
-    path: "/proposals/:proposalId",
-    exact: true,
-    sider: "",
-    screen: <ProposalDetail />,
   },
 ];
 

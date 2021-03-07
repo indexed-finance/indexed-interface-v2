@@ -58,7 +58,8 @@ function continuouslyRetrievePoolDetails() {
     dispatch(actions.retrieveInitialData());
 
     for (const pool of pools) {
-      dispatch(actions.requestPoolDetail(pool.id, false));
+      dispatch(actions.retrieveCoingeckoData(pool.id));
+      dispatch(actions.requestPoolTradesAndSwaps(pool.id));
     }
 
     continuouslyRetrievePoolDetails();
