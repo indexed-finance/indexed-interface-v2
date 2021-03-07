@@ -1,4 +1,5 @@
 declare module "*.png";
+declare module "*.less";
 
 declare module "colorthief";
 declare module "coingecko-api";

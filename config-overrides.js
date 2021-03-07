@@ -33,7 +33,6 @@ module.exports = override(
   addLessLoader({
     lessOptions: {
       javascriptEnabled: true,
-      modifyVars: path.join(__dirname, "./src/theme/variables.less"),
     },
   })
 );

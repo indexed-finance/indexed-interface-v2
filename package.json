@@ -110,8 +110,6 @@
     "deploy": "git push && npm run storybook:deploy",
     "generate:types": "graphql-codegen",
     "lint": "eslint . --fix --ignore-path .gitignore --ext .ts,.tsx,.js",
-    "themes:build": "node scripts/build-themes",
-    "themes:watch": "nodemon --watch ./src/theme --exec \"node scripts/build-themes\" -e less,ts",
     "storybook": "start-storybook -p 6006",
     "storybook:build": "build-storybook",
     "storybook:deploy": "storybook-to-ghpages",

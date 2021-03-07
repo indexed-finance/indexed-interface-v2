@@ -15,7 +15,7 @@ const slice = createSlice({
   name: "settings",
   initialState: {
     languageCode: "en-us",
-    theme: "dark",
+    theme: "light",
     connected: false,
     connectionEnabled: true,
   } as SettingsState,
