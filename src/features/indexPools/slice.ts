@@ -38,25 +38,6 @@ const slice = createSlice({
             ...poolInState,
             ...rest,
           };
-
-          for (const token of tokens) {
-            const denorm = convert.toBigNumber(
-              state.entities[pool.id]!.tokens.entities[token.address].denorm
-            );
-            const totalWeight = convert.toBigNumber(pool.totalWeight);
-            const prescaled = denorm.dividedBy(totalWeight);
-            const scalePower = convert.toBigNumber(
-              DEFAULT_DECIMAL_COUNT.toString()
-            );
-            const scaleMultiplier = convert.toBigNumber("10").pow(scalePower);
-            const weight = prescaled.multipliedBy(scaleMultiplier);
-
-            state.entities[pool.id]!.tokens.entities[token.address] = {
-              ...state.entities[pool.id]!.tokens.entities[token.address],
-              ...token,
-              weight: weight.toString(),
-            };
-          }
         }
       })
       .addCase(poolTradesAndSwapsLoaded, (state, action) => {
@@ -138,6 +119,34 @@ export const selectors = {
     return Object.values(
       state.indexPools.entities[poolId]?.tokens.entities ?? {}
     );
+  },
+  selectTokenWeights: (state: AppState, poolId: string, tokenIds: string[]) => {
+    const pool = selectors.selectPool(state, poolId);
+    const weights = tokenIds.reduce((prev, next) => {
+      prev[next] = "-";
+      return prev;
+    }, {} as Record<string, string>);
+
+    try {
+      if (pool) {
+        for (const tokenId of tokenIds) {
+          const denorm = convert.toBigNumber(
+            pool.tokens.entities[tokenId].denorm
+          );
+          const totalWeight = convert.toBigNumber(pool.totalWeight);
+          const prescaled = denorm.dividedBy(totalWeight);
+          const scalePower = convert.toBigNumber(
+            DEFAULT_DECIMAL_COUNT.toString()
+          );
+          const scaleMultiplier = convert.toBigNumber("10").pow(scalePower);
+          const weight = prescaled.multipliedBy(scaleMultiplier);
+
+          weights[tokenId] = weight.toString();
+        }
+      }
+    } catch {}
+
+    return weights;
   },
 };
 

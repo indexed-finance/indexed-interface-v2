@@ -115,6 +115,11 @@ const selectors = {
 
     if (pool) {
       const tokens = selectors.selectTokenLookup(state);
+      const tokenWeights = selectors.selectTokenWeights(
+        state,
+        poolId,
+        pool.tokens.ids
+      );
       const category = selectors.selectCategory(state, pool.category.id);
       const stats = selectors.selectPoolStats(state, poolId);
       const withDisplayedSigns = { signDisplay: "always" };
@@ -179,7 +184,6 @@ const selectors = {
 
             if (category && token) {
               const categoryToken = category.tokens.entities[token.id];
-              const updateData = pool.tokens.entities[poolTokenId];
               const coingeckoData = token.priceData || {};
               const { balance } = pool.tokens.entities[token.id];
               const parsedBalance = parseFloat(balance.replace(/,/g, ""));
@@ -188,7 +192,7 @@ const selectors = {
                     (coingeckoData.price * parsedBalance).toString()
                   )
                 : null;
-              const tokenWeight = updateData.weight ?? "-";
+              const tokenWeight = tokenWeights[token.id];
               const weightPercentage = tokenWeight
                 ? convert.toPercent(parseFloat(convert.toBalance(tokenWeight)))
                 : "-";

@@ -30,7 +30,7 @@ const store = configureStore({
           }
         };
       }),
-  // preloadedState: loadPersistedState(),
+  preloadedState: loadPersistedState(),
 });
 
 store.subscribe(() => {
