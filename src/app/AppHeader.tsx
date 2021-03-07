@@ -37,7 +37,7 @@ export default function AppHeader() {
   const breakpoint = useBreakpoint();
 
   return (
-    <S.Top>
+    <S.Top mode={theme}>
       {breakpoint.lg && (
         <S.Controls>
           <S.Changeables layout="inline" colon={false}>
@@ -87,7 +87,7 @@ export default function AppHeader() {
 }
 
 const S = {
-  Top: styled(Header)`
+  Top: styled(Header)<{ mode: string }>`
     ${(props) => props.theme.snippets.spacedBetween};
     margin-bottom: ${(props) => props.theme.spacing.large};
     position: fixed;
@@ -96,6 +96,10 @@ const S = {
     width: calc(100% - 299px);
     left: 298px;
     z-index: 2;
+
+    // Theme
+    background: ${(props) =>
+      `${props.theme.modes[props.mode].layoutHeaderBackground}`};
   `,
   Connection: styled.div`
     ${(props) => props.theme.snippets.perfectlyCentered};

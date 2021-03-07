@@ -1,16 +1,15 @@
 import { DrawerProvider } from "components";
-import { Provider, useDispatch, useSelector } from "react-redux";
+import { Provider, useDispatch } from "react-redux";
 import { BrowserRouter as Router } from "react-router-dom";
 import { ThemeProvider } from "styled-components";
-import { actions, selectors, store } from "features";
+import { actions, store } from "features";
 import { ethers } from "ethers";
 import AppLayout from "./AppLayout";
 import React, { useEffect } from "react";
 import getTheme from "theme";
 
 function Inner() {
-  const themeVariation = useSelector(selectors.selectTheme);
-  const theme = getTheme(themeVariation);
+  const theme = getTheme();
   const dispatch = useDispatch();
 
   // Effect:

@@ -1,29 +1,19 @@
 const palette = {
-  // Whites
-  white100: "#cecece",
-  white200: "#e1e6ec",
-  white300: "#eaedf0",
-  white400: "#efefef",
+  black100: "#000", // e.g. Dark body background.
+  black200: "#0A0A0A", // e.g. Dark panel header.
+  black250: "#141414", // e.g. Dark menu background.
+  black300: "#151515", // e.g. Dark panel body.
 
-  // Greys
-  grey100: "rgba(0, 0, 0, 0.54)",
-  grey200: "rgb(102, 102, 102)",
-  grey300: "#1c1c1c",
-  grey400: "#313131",
+  grey100: "#434343", // e.g. Dark panel border.
+  grey200: "#333", // e.g. Dark panel border.
 
-  // Reds
-  red100: "rgb(255, 0, 0)",
-  red200: "#f44336",
+  purple100: "#4D4D80", // e.g. Main theme color, darker
+  purple200: "#ccccff", // e.g. Main theme color
+  purple300: "#E6E6FF", // e.g. Main theme color, lighter
 
-  // Blues
-  blue100: "#1b90ff",
-
-  // Named
-  primary: "#ccccff",
+  white100: "#eee",
+  white200: "#EFF2F5", // e.g. Light body background,
+  white300: "#FAFAFA", // e.g. Light panel header.
 };
 
-export default {
-  ...palette,
-  lightestGrey: palette.grey300,
-  lightesterGrey: palette.grey400,
-};
+export default palette;

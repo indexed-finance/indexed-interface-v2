@@ -1,8 +1,7 @@
 import { AiOutlineCopyrightCircle } from "react-icons/ai";
 import { Link, useHistory } from "react-router-dom";
 import { Menu, Typography } from "antd";
-import { PLACEHOLDER_TOKEN_IMAGE } from "config";
-import { SOCIAL_MEDIA } from "config";
+import { PLACEHOLDER_TOKEN_IMAGE, SOCIAL_MEDIA } from "config";
 import { selectors } from "features";
 import { useSelector } from "react-redux";
 import React from "react";
@@ -26,7 +25,6 @@ export default function AppMenu({ onItemClick = noop, ...rest }: Props) {
   return (
     <>
       <S.Menu
-        theme="dark"
         mode="inline"
         defaultOpenKeys={["Social"]}
         selectable={false}

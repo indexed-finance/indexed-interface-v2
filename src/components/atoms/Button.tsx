@@ -1,11 +1,15 @@
 import { Button as AntButton, ButtonProps } from "antd";
+import { selectors } from "features";
+import { useSelector } from "react-redux";
 import React, { HTMLProps } from "react";
 import styled, { css } from "styled-components";
 
 export type Props = ButtonProps;
 
 function BaseButton(props: Props) {
-  return <S.Button {...props} />;
+  const mode = useSelector(selectors.selectTheme);
+
+  return <S.Button mode={mode} {...props} />;
 }
 
 type WithExtras = typeof BaseButton & {
@@ -37,7 +41,9 @@ Button.Group = function ({
 // #endregion
 
 const S = {
-  Button: styled(AntButton)``,
+  Button: styled(AntButton)<{ mode: string }>`
+    color: ${(props) => props.theme.modes[props.mode].textColor};
+  `,
   Group: styled.div<ButtonGroupProps>`
     display: flex;
 

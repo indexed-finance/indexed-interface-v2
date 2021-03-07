@@ -1,4 +1,3 @@
-import "theme/styles.less";
 import { Affix, Breadcrumb, Grid, Layout } from "antd";
 import { AiOutlineMenuFold, AiOutlineMenuUnfold } from "react-icons/ai";
 import { Drawer, DrawerContext, QuoteCarousel } from "components";
@@ -6,6 +5,7 @@ import { FormattedIndexPool, selectors } from "features";
 import { GlobalStyles } from "theme";
 import { Logo } from "components";
 import { Route, Switch as RouterSwitch } from "react-router-dom";
+import { changeMode } from "theme";
 import { useSelector } from "react-redux";
 import AppHeader from "./AppHeader";
 import AppMenu from "./AppMenu";
@@ -21,6 +21,7 @@ export default function AppLayout() {
   const { activePage } = useContext(DrawerContext);
   const isConnectionEnabled = useSelector(selectors.selectConnectionEnabled);
   const indexPools = useSelector(selectors.selectAllFormattedIndexPools);
+  const theme = useSelector(selectors.selectTheme);
   const breakpoint = useBreakpoint();
   const [mobileMenuActive, setMobileMenuActive] = useState(false);
   const MobileMenuIcon = mobileMenuActive ? S.MenuFold : S.MenuUnfold;
@@ -29,6 +30,12 @@ export default function AppLayout() {
     () => setMobileMenuActive((prev) => !prev),
     []
   );
+
+  // Effect
+  // When the user changes the mode, call out to the window.less object.
+  React.useEffect(() => {
+    changeMode(theme);
+  }, [theme]);
 
   // Effect
   // On initial load, open up a connection to the server.
@@ -43,10 +50,10 @@ export default function AppLayout() {
   return (
     <>
       <GlobalStyles />
-      <S.Layout className="layout">
+      <S.Layout className="layout" mode={theme}>
         {breakpoint.lg ? (
           // Desktop  sider
-          <S.Sider width={300}>
+          <S.Sider width={300} mode={theme}>
             <Logo />
             <QuoteCarousel pools={indexPools as FormattedIndexPool[]} />
             <AppMenu />
@@ -91,7 +98,80 @@ const S = {
     left: 0;
     width: 100%;
   `,
-  Layout: styled(Layout)``,
+  Layout: styled(Layout)<{ mode: string }>`
+    background: ${(props) =>
+      props.theme.modes[props.mode].layoutBodyBackground};
+
+    [role="tab"],
+    .ant-form-item-no-colon {
+      text-transform: uppercase;
+      font-weight: bold;
+    }
+
+    .ant-typography {
+      color: ${(props) => props.theme.modes[props.mode].textColor};
+    }
+    .ant-menu {
+      background: ${(props) => props.theme.modes[props.mode].menuBg};
+      border-right: none;
+
+      &-item {
+        padding-left: 24px !important;
+        border-right: none;
+
+        a {
+          color: ${(props) => props.theme.modes[props.mode].menuItemColor};
+        }
+      }
+    }
+    .ant-collapse {
+      border: 1px solid
+        ${(props) => props.theme.modes[props.mode].collapseBorderColor};
+      border-bottom: none !important;
+      border-radius: 0 !important;
+      padding-bottom: 0;
+
+      &-header {
+        background: ${(props) =>
+          props.theme.modes[props.mode].collapseHeaderBg};
+        border-radius: 0;
+        border-bottom: 1px solid
+          ${(props) => props.theme.modes[props.mode].collapseBorderColor} !important;
+        color: ${(props) => props.theme.modes[props.mode].textColor} !important;
+      }
+      &-content {
+        background: ${(props) =>
+          props.theme.modes[props.mode].collapseContentBg};
+        border-top: none;
+        border-bottom: 1px solid
+          ${(props) => props.theme.modes[props.mode].collapseBorderColor} !important;
+        color: ${(props) => props.theme.modes[props.mode].textColor} !important;
+      }
+      &-item {
+        border-bottom: none;
+      }
+    }
+    .ant-statistic {
+      &-header {
+        color: ${(props) => props.theme.modes[props.mode].textColor} !important;
+      }
+      &-content {
+        color: ${(props) => props.theme.modes[props.mode].textColor} !important;
+      }
+    }
+    .ant-layout {
+      &-header {
+        border-bottom: 1px solid
+          ${(props) => props.theme.modes[props.mode].layoutHeaderBorderColor} !important;
+      }
+      &-sider {
+        &-children {
+          border-right: 1px solid
+            ${(props) => props.theme.modes[props.mode].layoutHeaderBorderColor} !important;
+        }
+      }
+    }
+  `,
   SocialMediaImage: styled.img`
     ${(props) => props.theme.snippets.size32};
     ${(props) => props.theme.snippets.circular};
@@ -138,7 +218,7 @@ const S = {
     height: 100vh;
     z-index: 2;
   `,
-  Sider: styled(Sider)`
+  Sider: styled(Sider)<{ mode: string }>`
     height: 100vh;
 
     .ant-layout-sider-children {
@@ -147,13 +227,17 @@ const S = {
       bottom: 0;
       left: 0;
       width: 299px;
-      background: #111;
       overflow: auto;
 
       .ant-menu-sub {
         max-height: 300px;
         overflow: auto;
       }
+
+      // Theme
+      background: ${(props) =>
+        props.theme.modes[props.mode].layoutSiderBackground};
+      color: ${(props) => props.theme.modes[props.mode].layoutSiderColor};
     }
   `,
 };
