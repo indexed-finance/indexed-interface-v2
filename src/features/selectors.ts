@@ -139,7 +139,7 @@ const selectors = {
         totalValueLockedPercent: convert.toPercent(
           stats.deltas.totalValueLockedUSD.day.percent
         ),
-        swapFee: convert.toPercent(parseFloat(pool.swapFee)),
+        swapFee: convert.toPercent(parseFloat(convert.toBalance(pool.swapFee))),
         cumulativeFee: convert.toCurrency(pool.feesTotalUSD),
         recent: {
           swaps: pool.swaps.map((swap) => {
