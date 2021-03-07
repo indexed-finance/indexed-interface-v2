@@ -8,6 +8,7 @@ import { formatDistance } from "date-fns";
 import { indexPoolsSelectors } from "./indexPools";
 import { settingsSelectors } from "./settings";
 import { tokensSelectors } from "./tokens";
+import { userSelectors } from "./user";
 
 const MILLISECONDS_PER_SECOND = 1000;
 
@@ -20,6 +21,7 @@ const selectors = {
   ...indexPoolsSelectors,
   ...settingsSelectors,
   ...tokensSelectors,
+  ...userSelectors,
   /**
    *
    * @param state -
@@ -82,7 +84,7 @@ const selectors = {
                 parseFloat(convert.toBalance(guaranteedPool.totalSupply))
               ),
               marketCap: convert.toCurrency(guaranteedPool.totalValueLockedUSD),
-              swapFee: convert.toPercent(guaranteedPool.swapFee),
+              swapFee: convert.toPercent(parseFloat(guaranteedPool.swapFee)),
               cumulativeFees: convert.toCurrency(guaranteedPool.feesTotalUSD),
               volume: convert.toCurrency(guaranteedPool.totalVolumeUSD),
             };
@@ -154,60 +156,54 @@ const selectors = {
         totalValueLockedPercent: convert.toPercent(
           stats.deltas.totalValueLockedUSD.day.percent
         ),
-        swapFee: convert.toPercent(pool.swapFee),
+        swapFee: convert.toPercent(parseFloat(pool.swapFee)),
         cumulativeFee: convert.toCurrency(pool.feesTotalUSD),
         recent: {
-          swaps: pool.dataForTradesAndSwaps
-            ? pool.dataForTradesAndSwaps.swaps.map((swap) => {
-                const from = selectors.selectTokenSymbol(state, swap.tokenIn);
-                const to = selectors.selectTokenSymbol(state, swap.tokenOut);
-                const [transactionHash] = swap.id.split("-");
+          swaps: pool.swaps.map((swap) => {
+            const from = selectors.selectTokenSymbol(state, swap.tokenIn);
+            const to = selectors.selectTokenSymbol(state, swap.tokenOut);
+            const [transactionHash] = swap.id.split("-");
 
-                return {
-                  when: formatDistance(
-                    new Date(swap.timestamp * MILLISECONDS_PER_SECOND),
-                    new Date()
-                  ),
-                  from,
-                  to,
-                  transactionHash,
-                };
-              })
-            : [],
-          trades: pool.dataForTradesAndSwaps
-            ? pool.dataForTradesAndSwaps.trades.map((trade) => ({
-                when: formatDistance(
-                  new Date(parseInt(trade.timestamp) * MILLISECONDS_PER_SECOND),
-                  new Date()
-                ),
-                from: trade.pair.token0.symbol,
-                to: trade.pair.token1.symbol,
-                amount: convert.toCurrency(parseFloat(trade.amountUSD)),
-                kind:
-                  trade.pair.token0.symbol.toLowerCase() ===
-                  pool.symbol.toLowerCase()
-                    ? "sell"
-                    : "buy",
-                transactionHash: trade.transaction.id,
-              }))
-            : [],
+            return {
+              when: formatDistance(
+                new Date(swap.timestamp * MILLISECONDS_PER_SECOND),
+                new Date()
+              ),
+              from,
+              to,
+              transactionHash,
+            };
+          }),
+          trades: pool.trades.map((trade) => ({
+            when: formatDistance(
+              new Date(parseInt(trade.timestamp) * MILLISECONDS_PER_SECOND),
+              new Date()
+            ),
+            from: trade.pair.token0.symbol,
+            to: trade.pair.token1.symbol,
+            amount: convert.toCurrency(parseFloat(trade.amountUSD)),
+            kind:
+              trade.pair.token0.symbol.toLowerCase() ===
+              pool.symbol.toLowerCase()
+                ? "sell"
+                : "buy",
+            transactionHash: trade.transaction.id,
+          })),
         },
-        assets: pool.tokens
+        assets: pool.tokens.ids
           .map((poolTokenId) => {
             const token = tokens[poolTokenId]!;
             const categoryToken = token.dataByCategory[pool.category.id]!;
-            const poolToken = token.dataByIndexPool[pool.id]!;
-            const updateData = token.dataFromPoolUpdates;
+            const updateData = pool.tokens.entities[poolTokenId];
             const coingeckoData = token.priceData || {};
-            const { balance } = poolToken;
+            const { balance } = pool.tokens.entities[token.id];
             const parsedBalance = parseFloat(balance.replace(/,/g, ""));
             const balanceUsd = coingeckoData.price
               ? convert.toBalance(
                   (coingeckoData.price * parsedBalance).toString()
                 )
               : null;
-            const tokenWeight =
-              updateData && updateData[pool.id] && updateData[pool.id]!.weight;
+            const tokenWeight = updateData.weight ?? "-";
             const weightPercentage = tokenWeight
               ? convert.toPercent(parseFloat(convert.toBalance(tokenWeight)))
               : "-";
@@ -215,7 +211,7 @@ const selectors = {
             return {
               symbol: token.symbol,
               name: categoryToken.name,
-              balance: convert.toBalance(poolToken.balance),
+              balance: convert.toBalance(balance),
               balanceUsd,
               price: coingeckoData.price
                 ? convert.toCurrency(coingeckoData.price)

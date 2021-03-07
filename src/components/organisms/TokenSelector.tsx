@@ -36,7 +36,7 @@ export default function TokenSelector({
   const [amount, setAmount] = useState(value?.amount ?? 0);
   const [token, setToken] = useState(value?.token ?? "");
   const balances = useSelector((state: AppState) =>
-    selectors.selectTokenSymbolsToBalances(state, pool?.id ?? "")
+    selectors.selectTokenSymbolsToBalances(state)
   );
   const relevantBalance = useMemo(() => balances[token], [balances, token]);
   const input = useRef<null | HTMLInputElement>(null);

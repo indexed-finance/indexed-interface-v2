@@ -5,6 +5,7 @@ import { dailySnapshotsReducer } from "./dailySnapshots";
 import { indexPoolsReducer } from "./indexPools";
 import { settingsReducer } from "./settings";
 import { tokensReducer } from "./tokens";
+import { userReducer } from "./user";
 
 export default combineReducers({
   batcher: batcherReducer,
@@ -13,4 +14,5 @@ export default combineReducers({
   indexPools: indexPoolsReducer,
   settings: settingsReducer,
   tokens: tokensReducer,
+  user: userReducer,
 });

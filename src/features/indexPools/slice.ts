@@ -1,12 +1,11 @@
+import { DEFAULT_DECIMAL_COUNT, PLACEHOLDER_TOKEN_IMAGE } from "config";
 import { NormalizedPool } from "ethereum";
-import { PLACEHOLDER_TOKEN_IMAGE } from "config";
 import { categoriesSelectors } from "../categories";
 import { convert } from "helpers";
 import { createEntityAdapter, createSlice } from "@reduxjs/toolkit";
 import {
   poolTradesAndSwapsLoaded,
   poolUpdated,
-  poolUserDataLoaded,
   receivedInitialStateFromServer,
   receivedStatePatchFromServer,
   subgraphDataLoaded,
@@ -33,9 +32,31 @@ const slice = createSlice({
         const poolInState = state.entities[pool.id];
 
         if (poolInState) {
-          const { tokens: _, ...rest } = update;
+          const { $blockNumber: _, tokens, ...rest } = update;
 
-          poolInState.dataFromUpdates = rest;
+          state.entities[pool.id] = {
+            ...poolInState,
+            ...rest,
+          };
+
+          for (const token of tokens) {
+            const denorm = convert.toBigNumber(
+              state.entities[pool.id]!.tokens.entities[token.address].denorm
+            );
+            const totalWeight = convert.toBigNumber(pool.totalWeight);
+            const prescaled = denorm.dividedBy(totalWeight);
+            const scalePower = convert.toBigNumber(
+              DEFAULT_DECIMAL_COUNT.toString()
+            );
+            const scaleMultiplier = convert.toBigNumber("10").pow(scalePower);
+            const weight = prescaled.multipliedBy(scaleMultiplier);
+
+            state.entities[pool.id]!.tokens.entities[token.address] = {
+              ...state.entities[pool.id]!.tokens.entities[token.address],
+              ...token,
+              weight: weight.toString(),
+            };
+          }
         }
       })
       .addCase(poolTradesAndSwapsLoaded, (state, action) => {
@@ -43,23 +64,8 @@ const slice = createSlice({
         const poolInState = state.entities[poolId];
 
         if (poolInState) {
-          if (!poolInState.dataForTradesAndSwaps) {
-            poolInState.dataForTradesAndSwaps = {
-              trades: [],
-              swaps: [],
-            };
-          }
-
-          poolInState.dataForTradesAndSwaps.trades = trades;
-          poolInState.dataForTradesAndSwaps.swaps = swaps;
-        }
-      })
-      .addCase(poolUserDataLoaded, (state, action) => {
-        const { poolId, userData } = action.payload;
-        const poolInState = state.entities[poolId];
-
-        if (poolInState) {
-          poolInState.dataForUser = userData;
+          poolInState.trades = trades ?? poolInState.trades;
+          poolInState.swaps = swaps ?? poolInState.swaps;
         }
       })
       .addCase(receivedInitialStateFromServer, (_, action) => {
@@ -67,26 +73,10 @@ const slice = createSlice({
 
         return indexPools;
       })
-      .addCase(receivedStatePatchFromServer, (state, action) => {
+      .addCase(receivedStatePatchFromServer, (_, action) => {
         const { indexPools } = action.payload;
 
-        // The server doesn't track user data, so keep it around.
-        return {
-          ...indexPools,
-          entities: Object.entries(indexPools.entities).reduce(
-            (prev, [key, value]) => {
-              const entry = value as NormalizedPool;
-
-              prev[key] = {
-                ...entry,
-                dataForUser: state.entities[key]?.dataForUser ?? null,
-              };
-
-              return prev;
-            },
-            {} as Record<string, NormalizedPool>
-          ),
-        };
+        return indexPools;
       }),
 });
 
@@ -100,7 +90,7 @@ export const selectors = {
   selectPoolLookup: (state: AppState) => selectors.selectEntities(state),
   selectPoolTokenIds: (state: AppState, poolId: string) => {
     const pool = selectors.selectPool(state, poolId);
-    return pool?.tokens ?? [];
+    return pool?.tokens.ids ?? [];
   },
   selectPoolTokenSymbols: (state: AppState, poolId: string) => {
     const tokenIds = selectors.selectPoolTokenIds(state, poolId);
@@ -116,53 +106,6 @@ export const selectors = {
   selectPoolInitializerAddress: (state: AppState, poolId: string) => {
     const pool = selectors.selectPool(state, poolId);
     return pool?.poolInitializer?.id ?? null;
-  },
-  selectPoolUserData: (state: AppState, poolId: string) => {
-    const pool = selectors.selectPool(state, poolId);
-    return pool?.dataForUser ?? null;
-  },
-  selectApprovalStatus: (
-    state: AppState,
-    poolId: string,
-    tokenSymbol: string,
-    amount: string
-  ) => {
-    const userData = selectors.selectPoolUserData(state, poolId);
-
-    if (userData && tokenSymbol) {
-      const tokenLookup = tokensSelectors.selectTokenLookupBySymbol(state);
-      const { id: tokenAddress } = tokenLookup[tokenSymbol];
-      const tokenData = userData[tokenAddress];
-
-      if (tokenData) {
-        const { allowance } = tokenData;
-        const needsApproval = convert
-          .toBigNumber(amount)
-          .isGreaterThan(convert.toBigNumber(allowance));
-
-        return needsApproval;
-      } else {
-        return false;
-      }
-    } else {
-      return false;
-    }
-  },
-  selectTokenSymbolsToBalances: (state: AppState, poolId: string) => {
-    const tokenLookup = tokensSelectors.selectTokenLookup(state);
-    const userData = selectors.selectPoolUserData(state, poolId);
-
-    return Object.entries(tokenLookup).reduce((prev, [key, value]) => {
-      if (value) {
-        if (userData && userData[key]) {
-          prev[value.symbol] = convert.toBalance(userData[key].balance);
-        } else {
-          prev[value.symbol] = "";
-        }
-      }
-
-      return prev;
-    }, {} as Record<string, string>);
   },
   selectCategoryImage: (state: AppState, poolId: string) => {
     const pool = selectors.selectPool(state, poolId);
@@ -191,6 +134,11 @@ export const selectors = {
         prev[next.id] = next.image;
         return prev;
       }, {} as Record<string, string>),
+  selectPoolUnderlyingTokens: (state: AppState, poolId: string) => {
+    return Object.values(
+      state.indexPools.entities[poolId]?.tokens.entities ?? {}
+    );
+  },
 };
 
 export default slice.reducer;

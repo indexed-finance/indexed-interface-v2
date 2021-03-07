@@ -9,7 +9,9 @@ import { JsonRpcSigner, Provider } from "@ethersproject/providers";
 import {
   NormalizedEntity,
   NormalizedInitialData,
+  NormalizedPool,
   NormalizedToken,
+  PoolTokenUpdate,
 } from "./types.d";
 import {
   MultiCall as bytecode,
@@ -256,7 +258,10 @@ export async function tokenUserDataMulticall(
     true
   );
 
-  return formatTokenUserData(result, _tokenAddresses);
+  return {
+    blockNumber: result.blockNumber,
+    data: formatTokenUserData(result, _tokenAddresses),
+  };
 }
 // #endregion
 
@@ -290,8 +295,6 @@ export function normalizeInitialData(categories: Category[]) {
           dataByCategory: {
             [category.id]: categoryToken,
           },
-          dataByIndexPool: {},
-          dataFromPoolUpdates: {},
         };
       }
 
@@ -310,23 +313,35 @@ export function normalizeInitialData(categories: Category[]) {
         }
 
         const tokenIds = [];
+        const tokenEntities: Record<
+          string,
+          PoolTokenUpdate & PoolUnderlyingToken
+        > = {};
         for (const token of tokens ?? []) {
           const [, tokenId] = token.id.split("-");
 
           tokenIds.push(tokenId);
-          normalizedTokensForCategory.entities[tokenId].dataByIndexPool[
-            indexPool.id
-          ] = token;
+
+          tokenEntities[tokenId] = {
+            ...(tokenEntities[tokenId] ?? {}),
+            ...token,
+          };
         }
 
         prev.pools.ids.push(indexPool.id);
         prev.pools.entities[indexPool.id] = {
           ...indexPool,
           dailySnapshots: dailySnapshotIds,
-          tokens: tokenIds,
-          dataFromUpdates: null,
-          dataForTradesAndSwaps: null,
-          dataForUser: null,
+          tokens: {
+            ids: tokenIds,
+            entities: tokenEntities,
+          },
+          trades: [],
+          swaps: [],
+          totalDenorm: "0",
+          totalSupply: "0",
+          maxTotalSupply: "0",
+          swapFee: "0",
         };
       }
 
@@ -343,10 +358,6 @@ export function normalizeInitialData(categories: Category[]) {
           dataByCategory: {
             ...oldData.dataByCategory,
             ...newData.dataByCategory,
-          },
-          dataByIndexPool: {
-            ...oldData.dataByIndexPool,
-            ...newData.dataByIndexPool,
           },
         };
       }
@@ -535,15 +546,14 @@ export async function swapExactAmountOut(
 
 // #region Etc
 export async function calculateOutputFromInput(
-  poolAddress: string,
+  pool: NormalizedPool,
   inputAmount: string,
   inputToken: NormalizedToken,
   outputToken: NormalizedToken,
   swapFee: BigNumber
 ) {
-  const inputUpdateData = inputToken.dataFromPoolUpdates[poolAddress];
-  const outputUpdateData = outputToken.dataFromPoolUpdates[poolAddress];
-  const outputPoolData = outputToken.dataByIndexPool[poolAddress];
+  const inputData = pool.tokens.entities[inputToken.id];
+  const outputData = pool.tokens.entities[outputToken.id];
   const badResult = {
     outputAmount: parseFloat(convert.toBalance(ZERO)),
     price: ZERO,
@@ -551,17 +561,17 @@ export async function calculateOutputFromInput(
     isGoodResult: false,
   };
 
-  if (inputUpdateData && outputUpdateData && outputPoolData) {
+  if (inputData && outputData) {
     const {
       usedBalance: inputUsedBalance,
       usedDenorm: inputUsedDenorm,
-    } = inputUpdateData;
-    const { denorm: outputDenorm } = outputPoolData;
+    } = inputData;
     const {
+      denorm: outputDenorm,
       balance: outputBalance,
       usedBalance: outputUsedBalance,
       usedDenorm: outputUsedDenorm,
-    } = outputUpdateData;
+    } = outputData;
 
     // Convert all amounts to the tokenized version.
     const [balanceIn, weightIn, balanceOut, weightOut, amountIn] = [
@@ -630,15 +640,14 @@ export async function calculateOutputFromInput(
 }
 
 export async function calculateInputFromOutput(
-  poolAddress: string,
+  pool: NormalizedPool,
   outputAmount: string,
   inputToken: NormalizedToken,
   outputToken: NormalizedToken,
   swapFee: BigNumber
 ) {
-  const inputUpdateData = inputToken.dataFromPoolUpdates[poolAddress];
-  const outputUpdateData = outputToken.dataFromPoolUpdates[poolAddress];
-  const outputPoolData = outputToken.dataByIndexPool[poolAddress];
+  const inputData = pool.tokens.entities[inputToken.id];
+  const outputData = pool.tokens.entities[outputToken.id];
   const badResult = {
     inputAmount: parseFloat(convert.toBalance(ZERO)),
     price: ZERO,
@@ -646,17 +655,17 @@ export async function calculateInputFromOutput(
     isGoodResult: false,
   };
 
-  if (inputUpdateData && outputUpdateData && outputPoolData) {
+  if (inputData && outputData) {
     const {
       usedBalance: inputUsedBalance,
       usedDenorm: inputUsedDenorm,
-    } = inputUpdateData;
+    } = inputData;
     const {
       balance: outputBalance,
       usedBalance: outputUsedBalance,
+      denorm: outputDenorm,
       usedDenorm: outputUsedDenorm,
-    } = outputUpdateData;
-    const { denorm: outputDenorm } = outputPoolData;
+    } = outputData;
     const [balanceIn, weightIn, balanceOut, weightOut, amountOut] = [
       inputUsedBalance,
       inputUsedDenorm,

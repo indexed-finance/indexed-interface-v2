@@ -72,11 +72,9 @@ export default function PoolDetail() {
       poolUpdateListenerId = (dispatch(
         actions.poolUpdateListenerRegistered(poolId)
       ) as unknown) as string;
-
-      dispatch(actions.retrieveCoingeckoData(poolId));
-      dispatch(actions.requestPoolTradesAndSwaps(poolId));
     }
 
+    // After adding the listeners, trigger a batch send so the user can see data fast.
     dispatch(actions.sendBatch());
 
     return () => {

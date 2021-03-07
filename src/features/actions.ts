@@ -48,6 +48,7 @@ export const poolTradesAndSwapsLoaded = createAction<{
  *
  */
 export const poolUserDataLoaded = createAction<{
+  blockNumber: number;
   poolId: string;
   userData: Record<string, { allowance: string; balance: string }>;
 }>("poolUserDataLoaded");

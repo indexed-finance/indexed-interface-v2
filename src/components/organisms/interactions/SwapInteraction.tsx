@@ -46,6 +46,9 @@ export default function SwapInteraction({ pool }: Props) {
   const [form] = Form.useForm<SwapValues>();
   const dispatch = useDispatch();
   const { setActions } = useContext(SubscreenContext);
+  const fullPool = useSelector((state: AppState) =>
+    selectors.selectPool(state, pool?.id ?? "")
+  );
   const previousFormValues = useRef<SwapValues>(INITIAL_STATE);
   const lastTouchedField = useRef<"input" | "output">("input");
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
@@ -132,7 +135,7 @@ export default function SwapInteraction({ pool }: Props) {
    */
   const calculateOutputFromInput = useCallback(
     async (changedValues: SwapValues) => {
-      if (pool && swapFee) {
+      if (fullPool && swapFee) {
         const { amount: inputAmount } = changedValues.from;
         const { token: inputToken } = previousFormValues.current.from;
         const { token: outputToken } = previousFormValues.current.to;
@@ -146,7 +149,7 @@ export default function SwapInteraction({ pool }: Props) {
             spotPriceAfter,
             isGoodResult,
           } = await helpers.calculateOutputFromInput(
-            pool.id,
+            fullPool,
             inputAmount.toString(),
             inputTokenData,
             outputTokenData,
@@ -166,14 +169,14 @@ export default function SwapInteraction({ pool }: Props) {
         }
       }
     },
-    [form, pool, tokenLookup, swapFee]
+    [form, fullPool, tokenLookup, swapFee]
   );
   /**
    *
    */
   const calculateInputFromOutput = useCallback(
     async (changedValues: SwapValues) => {
-      if (pool && swapFee) {
+      if (fullPool && swapFee) {
         const { amount: outputAmount } = changedValues.to;
         const { token: outputToken } = previousFormValues.current.to;
         const { token: inputToken } = previousFormValues.current.from;
@@ -186,7 +189,7 @@ export default function SwapInteraction({ pool }: Props) {
             spotPriceAfter,
             isGoodResult,
           } = await helpers.calculateInputFromOutput(
-            pool.id,
+            fullPool,
             outputAmount.toString(),
             inputTokenData,
             outputTokenData,
@@ -205,7 +208,7 @@ export default function SwapInteraction({ pool }: Props) {
         }
       }
     },
-    [form, pool, tokenLookup, swapFee]
+    [form, fullPool, tokenLookup, swapFee]
   );
   /**
    *

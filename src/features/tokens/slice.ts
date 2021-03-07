@@ -1,15 +1,11 @@
-import { DEFAULT_DECIMAL_COUNT } from "config";
 import { NormalizedToken } from "ethereum";
-import { PoolUnderlyingToken } from "indexed-types";
 import {
   coingeckoDataLoaded,
   coingeckoIdsLoaded,
-  poolUpdated,
   receivedInitialStateFromServer,
   receivedStatePatchFromServer,
   subgraphDataLoaded,
 } from "features/actions";
-import { convert } from "helpers";
 import { createEntityAdapter, createSlice } from "@reduxjs/toolkit";
 import type { AppState } from "features/store";
 
@@ -57,36 +53,6 @@ const slice = createSlice({
           }
         }
       })
-      .addCase(poolUpdated, (state, action) => {
-        const { pool, update } = action.payload;
-
-        if (pool) {
-          for (const tokenData of update.tokens) {
-            const token = state.entities[tokenData.address];
-
-            if (token) {
-              token.dataFromPoolUpdates[pool.id] = tokenData;
-
-              const tokenIndexPoolData = token.dataByIndexPool[pool.id];
-
-              if (tokenIndexPoolData) {
-                const denorm = convert.toBigNumber(tokenIndexPoolData.denorm);
-                const totalWeight = convert.toBigNumber(pool.totalWeight);
-                const prescaled = denorm.dividedBy(totalWeight);
-                const scalePower = convert.toBigNumber(
-                  DEFAULT_DECIMAL_COUNT.toString()
-                );
-                const scaleMultiplier = convert
-                  .toBigNumber("10")
-                  .pow(scalePower);
-                const weight = prescaled.multipliedBy(scaleMultiplier);
-
-                token.dataFromPoolUpdates[pool.id]!.weight = weight.toString();
-              }
-            }
-          }
-        }
-      })
       .addCase(receivedInitialStateFromServer, (_, action) => {
         const { tokens } = action.payload;
 
@@ -113,19 +79,7 @@ export const selectors = {
     }, {} as Record<string, NormalizedToken>),
   selectTokenSymbols: (state: AppState) =>
     selectors.selectAll(state).map(({ symbol }) => symbol),
-  selectPoolUnderlyingTokens: (state: AppState, poolId: string) => {
-    const tokens = selectors.selectAll(state);
 
-    return tokens.reduce((prev, next) => {
-      const poolData = next.dataByIndexPool[poolId];
-
-      if (poolData) {
-        prev.push(poolData);
-      }
-
-      return prev;
-    }, [] as PoolUnderlyingToken[]);
-  },
   selectTokenSymbol: (state: AppState, poolId: string) =>
     selectors.selectTokenLookup(state)[poolId]?.symbol ?? "",
   selectAppMenuTokens: (state: AppState) => {

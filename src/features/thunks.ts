@@ -11,6 +11,7 @@ import { indexPoolsActions } from "./indexPools";
 import { providers } from "ethers";
 import { settingsActions } from "./settings";
 import { tokensActions } from "./tokens";
+import { userActions } from "./user";
 import debounce from "lodash.debounce";
 import selectors from "./selectors";
 
@@ -20,7 +21,6 @@ export let provider:
   | providers.JsonRpcProvider
   | providers.InfuraProvider = null;
 export let signer: null | providers.JsonRpcSigner = null;
-export let selectedAddress: string;
 
 type InitialzeOptions = {
   provider:
@@ -31,6 +31,12 @@ type InitialzeOptions = {
   selectedAddress?: string;
 };
 
+/**
+ * Since the handler can fire multiple times in quick succession,
+ * we need to batch the calls to avoid unnecessary updates.
+ */
+const BLOCK_HANDLER_DEBOUNCE_RATE = 250;
+
 const thunks = {
   /**
    *
@@ -39,6 +45,8 @@ const thunks = {
     dispatch,
     getState
   ) => {
+    let selectedAddress = "";
+
     provider = options.provider;
 
     if (options.withSigner) {
@@ -57,6 +65,10 @@ const thunks = {
 
     dispatch(thunks.retrieveInitialData());
 
+    if (selectedAddress) {
+      dispatch(actions.userAddressSelected(selectedAddress));
+    }
+
     /**
      * When the block number changes,
      * change the state so that batcher may process.
@@ -67,7 +79,7 @@ const thunks = {
       if (blockNumber !== blockNumberAtThisTime) {
         dispatch(thunks.changeBlockNumber(blockNumber));
       }
-    }, 250);
+    }, BLOCK_HANDLER_DEBOUNCE_RATE);
 
     provider.addListener("block", debouncedBlockHandler);
   },
@@ -259,6 +271,7 @@ const thunks = {
     if (provider) {
       const state = getState();
       const batch = selectors.selectBatch(state);
+      const sourceAddress = selectors.selectUserAddress(state);
 
       for (const task of batch.poolDataTasks) {
         const pool = selectors.selectPool(state, task.pool);
@@ -271,16 +284,20 @@ const thunks = {
           );
 
           dispatch(actions.poolUpdated({ pool, update }));
+          dispatch(actions.retrieveCoingeckoData(pool.id));
+          dispatch(actions.requestPoolTradesAndSwaps(pool.id));
         }
       }
 
       for (const task of batch.tokenUserDataTasks) {
         const pool = selectors.selectPool(state, task.pool);
-        const sourceAddress = selectedAddress;
         const destinationAddress = task.pool;
 
         if (pool) {
-          const userData = await helpers.tokenUserDataMulticall(
+          const {
+            blockNumber,
+            data: userData,
+          } = await helpers.tokenUserDataMulticall(
             provider,
             sourceAddress,
             destinationAddress,
@@ -289,6 +306,7 @@ const thunks = {
 
           dispatch(
             actions.poolUserDataLoaded({
+              blockNumber: blockNumber.toNumber(),
               poolId: pool.id,
               userData,
             })
@@ -305,6 +323,7 @@ const actions = {
   ...indexPoolsActions,
   ...settingsActions,
   ...tokensActions,
+  ...userActions,
   ...topLevelActions,
   ...thunks,
 };
