@@ -37,9 +37,7 @@ export default function AppMenu({ onItemClick = noop, ...rest }: Props) {
           .map((route) => {
             if (route.model) {
               const models =
-                menuModels[
-                  route.model as "categories" | "indexPools" | "tokens"
-                ];
+                menuModels[route.model as "categories" | "indexPools"];
 
               return (
                 <SubMenu

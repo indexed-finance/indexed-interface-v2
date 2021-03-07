@@ -20,7 +20,7 @@ export default function CategoryDetail() {
         overlay={<CategoryDropdown />}
         activeBreadcrumb={<Link to="/categories">Categories</Link>}
       />
-      <CategoryTable {...category} />
+      <CategoryTable pools={category.indexPools} />
       <Divider />
       <ReactMarkdown>{category.description}</ReactMarkdown>
     </>

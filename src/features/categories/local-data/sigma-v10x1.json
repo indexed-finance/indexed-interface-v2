@@ -4,6 +4,9 @@
   "symbol": "???",
   "brief": "???",
   "description": "???",
-  "tokens": [],
+  "tokens": {
+    "ids": [],
+    "entities": {}
+  },
   "indexPools": []
 }

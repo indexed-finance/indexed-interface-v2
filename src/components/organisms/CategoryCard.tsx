@@ -3,6 +3,7 @@ import { Card, List } from "antd";
 import { Link } from "react-router-dom";
 import React from "react";
 import styled from "styled-components";
+import type { Token } from "indexed-types";
 
 export interface Props {
   id?: string;
@@ -10,7 +11,10 @@ export interface Props {
   name?: string;
   brief?: string;
   indexPools?: Array<{ id: string; name: string; symbol: string }>;
-  tokens?: Array<{ name: string; symbol: string }>;
+  tokens?: {
+    ids: string[];
+    entities: Record<string, Token>;
+  };
 }
 
 export default function CategoryCard({
@@ -19,7 +23,10 @@ export default function CategoryCard({
   name = "",
   brief = "",
   indexPools = [],
-  tokens = [],
+  tokens = {
+    ids: [],
+    entities: {},
+  },
 }: Props) {
   return (
     <S.Card
@@ -41,7 +48,7 @@ export default function CategoryCard({
       }
       actions={[
         <S.TokenImageWrapper key="1">
-          {tokens.map((token) => (
+          {Object.values(tokens.entities).map((token) => (
             <S.TokenImage
               alt={token.name}
               title={token.name}

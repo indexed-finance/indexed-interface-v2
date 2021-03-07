@@ -4,14 +4,16 @@ import React from "react";
 import styled from "styled-components";
 import type { FormattedCategory } from "features";
 
-export type Props = FormattedCategory;
+export type Props = {
+  pools: FormattedCategory["indexPools"];
+};
 
 export default function CategoryTable(props: Props) {
   const history = useHistory();
 
   return (
     <S.Table
-      dataSource={props.indexPools}
+      dataSource={props.pools}
       columns={columns}
       pagination={false}
       onRow={(record: any) => ({

@@ -21,7 +21,7 @@ const LOCAL_DATA_LOOKUP: Record<string, typeof ZeroExOne> = {
 
 const adapter = createEntityAdapter<NormalizedCategory>();
 const initialState = adapter.getInitialState();
-const stateWithLocalData = adapter.addMany(
+const withLocalData = adapter.addMany(
   initialState,
   Object.values(LOCAL_DATA_LOOKUP)
 );
@@ -29,7 +29,7 @@ const stateWithLocalData = adapter.addMany(
 
 const slice = createSlice({
   name: "categories",
-  initialState: stateWithLocalData,
+  initialState: withLocalData,
   reducers: {},
   extraReducers: (builder) =>
     builder

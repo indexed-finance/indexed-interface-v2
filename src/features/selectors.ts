@@ -12,7 +12,7 @@ import { userSelectors } from "./user";
 
 const MILLISECONDS_PER_SECOND = 1000;
 
-type ModelKeys = "categories" | "indexPools" | "tokens";
+type ModelKeys = "categories" | "indexPools";
 
 const selectors = {
   ...batcherSelectors,
@@ -38,12 +38,10 @@ const selectors = {
     const indexPools = selectors
       .selectAllPools(state)
       .map(({ name, id }) => ({ name: name.replace(/Tokens Index/g, ""), id }));
-    const tokens = selectors.selectAppMenuTokens(state);
 
     return {
       categories,
       indexPools,
-      tokens,
     };
   },
   /**
@@ -54,7 +52,6 @@ const selectors = {
   selectFormattedCategory: (state: AppState, categoryId: string) => {
     const category = selectors.selectCategory(state, categoryId);
     const indexPoolLookup = selectors.selectPoolLookup(state);
-    const tokenLookup = selectors.selectTokenLookup(state);
 
     if (category) {
       return {
@@ -89,22 +86,7 @@ const selectors = {
               volume: convert.toCurrency(guaranteedPool.totalVolumeUSD),
             };
           }),
-        tokens: category.tokens
-          .map((id) => tokenLookup[id])
-          .filter(Boolean)
-          .map((token) => {
-            const entry = token!.dataByCategory[categoryId];
-
-            return entry
-              ? {
-                  name: entry.name,
-                  symbol: entry.symbol,
-                }
-              : {
-                  name: "",
-                  symbol: "",
-                };
-          }),
+        tokens: category.tokens,
       };
     } else {
       return null;
@@ -133,6 +115,7 @@ const selectors = {
 
     if (pool) {
       const tokens = selectors.selectTokenLookup(state);
+      const category = selectors.selectCategory(state, pool.category.id);
       const stats = selectors.selectPoolStats(state, poolId);
       const withDisplayedSigns = { signDisplay: "always" };
 
@@ -192,47 +175,62 @@ const selectors = {
         },
         assets: pool.tokens.ids
           .map((poolTokenId) => {
-            const token = tokens[poolTokenId]!;
-            const categoryToken = token.dataByCategory[pool.category.id]!;
-            const updateData = pool.tokens.entities[poolTokenId];
-            const coingeckoData = token.priceData || {};
-            const { balance } = pool.tokens.entities[token.id];
-            const parsedBalance = parseFloat(balance.replace(/,/g, ""));
-            const balanceUsd = coingeckoData.price
-              ? convert.toBalance(
-                  (coingeckoData.price * parsedBalance).toString()
-                )
-              : null;
-            const tokenWeight = updateData.weight ?? "-";
-            const weightPercentage = tokenWeight
-              ? convert.toPercent(parseFloat(convert.toBalance(tokenWeight)))
-              : "-";
+            const token = tokens[poolTokenId];
 
-            return {
-              symbol: token.symbol,
-              name: categoryToken.name,
-              balance: convert.toBalance(balance),
-              balanceUsd,
-              price: coingeckoData.price
-                ? convert.toCurrency(coingeckoData.price)
-                : "-",
-              netChange: coingeckoData.change24Hours
-                ? convert.toCurrency(
-                    coingeckoData.change24Hours,
-                    withDisplayedSigns
+            if (category && token) {
+              const categoryToken = category.tokens.entities[token.id];
+              const updateData = pool.tokens.entities[poolTokenId];
+              const coingeckoData = token.priceData || {};
+              const { balance } = pool.tokens.entities[token.id];
+              const parsedBalance = parseFloat(balance.replace(/,/g, ""));
+              const balanceUsd = coingeckoData.price
+                ? convert.toBalance(
+                    (coingeckoData.price * parsedBalance).toString()
                   )
-                : "-",
-              netChangePercent: coingeckoData.percentChange24Hours
-                ? convert.toPercent(
-                    coingeckoData.percentChange24Hours / 100,
-                    withDisplayedSigns
-                  )
-                : "-",
-              isNegative: Boolean(
-                coingeckoData.change24Hours && coingeckoData.change24Hours < 0
-              ),
-              weightPercentage,
-            };
+                : null;
+              const tokenWeight = updateData.weight ?? "-";
+              const weightPercentage = tokenWeight
+                ? convert.toPercent(parseFloat(convert.toBalance(tokenWeight)))
+                : "-";
+
+              return {
+                symbol: token.symbol,
+                name: categoryToken.name,
+                balance: convert.toBalance(balance),
+                balanceUsd,
+                price: coingeckoData.price
+                  ? convert.toCurrency(coingeckoData.price)
+                  : "-",
+                netChange: coingeckoData.change24Hours
+                  ? convert.toCurrency(
+                      coingeckoData.change24Hours,
+                      withDisplayedSigns
+                    )
+                  : "-",
+                netChangePercent: coingeckoData.percentChange24Hours
+                  ? convert.toPercent(
+                      coingeckoData.percentChange24Hours / 100,
+                      withDisplayedSigns
+                    )
+                  : "-",
+                isNegative: Boolean(
+                  coingeckoData.change24Hours && coingeckoData.change24Hours < 0
+                ),
+                weightPercentage,
+              };
+            } else {
+              return {
+                symbol: "",
+                name: "",
+                balance: "",
+                balanceUsd: "",
+                price: "-",
+                netChange: "-",
+                netChangePercent: "-",
+                isNegative: false,
+                weightPercentage: "",
+              };
+            }
           })
           .sort(
             (left, right) =>

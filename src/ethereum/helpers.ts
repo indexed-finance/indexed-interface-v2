@@ -29,6 +29,7 @@ import type {
   IndexPool,
   PoolUnderlyingToken,
   Swap,
+  Token,
 } from "indexed-types";
 import type { Swap as Trade } from "uniswap-types";
 
@@ -278,7 +279,13 @@ export function normalizeInitialData(categories: Category[]) {
       prev.categories.ids.push(category.id);
       prev.categories.entities[category.id] = {
         indexPools: category.indexPools.map(({ id }) => id),
-        tokens: category.tokens.map(({ id }) => id),
+        tokens: {
+          ids: category.tokens.map(({ id }) => id),
+          entities: category.tokens.reduce((prev, next) => {
+            prev[next.id] = next;
+            return prev;
+          }, {} as Record<string, Token>),
+        },
       };
 
       // Token data.
@@ -292,9 +299,6 @@ export function normalizeInitialData(categories: Category[]) {
           id: tokenId,
           symbol,
           coingeckoId: "",
-          dataByCategory: {
-            [category.id]: categoryToken,
-          },
         };
       }
 
@@ -350,16 +354,7 @@ export function normalizeInitialData(categories: Category[]) {
       );
 
       for (const id of normalizedTokensForCategory.ids) {
-        const { ...oldData } = prev.tokens.entities[id] ?? {};
-        const { ...newData } = normalizedTokensForCategory.entities[id];
-
-        prev.tokens.entities[id] = {
-          ...newData,
-          dataByCategory: {
-            ...oldData.dataByCategory,
-            ...newData.dataByCategory,
-          },
-        };
+        prev.tokens.entities[id] = normalizedTokensForCategory.entities[id];
       }
 
       return prev;

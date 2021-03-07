@@ -37,7 +37,10 @@ export interface NormalizedCategory {
   brief: string;
   description: string;
   indexPools: string[];
-  tokens: string[];
+  tokens: {
+    ids: string[];
+    entities: Record<string, Token>;
+  };
 }
 
 export interface NormalizedPool
@@ -67,7 +70,6 @@ export interface NormalizedToken {
     change24Hours?: number;
     percentChange24Hours?: number;
   };
-  dataByCategory: Record<string, null | Token>;
 }
 
 export type NormalizedInitialData = {

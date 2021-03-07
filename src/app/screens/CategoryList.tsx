@@ -18,7 +18,7 @@ export default function CategoryList() {
       />
       <S.Space wrap={true} size="large" align="start">
         {categories.map((category) => (
-          <CategoryCard key={category!.id} {...category} />
+          <CategoryCard key={category!.id} {...category!} />
         ))}
       </S.Space>
     </>
