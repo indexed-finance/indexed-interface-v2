@@ -56,6 +56,8 @@ const S = {
 
     ${(props) =>
       props.kind === "small" && props.theme.snippets.perfectlyAligned};
+
+    font-size: ${(props) => (props.kind === "small" ? "13px" : "16px")};
   `,
   Bottom: styled.div<{ kind: Props["kind"] }>`
     margin: 0;
@@ -63,13 +65,13 @@ const S = {
     ${(props) => props.theme.snippets.perfectlyAligned};
 
     div {
-      font-size: ${(props) => (props.kind === "small" ? "16px" : "18px")};
+      font-size: ${(props) => (props.kind === "small" ? "13px" : "16px")};
       margin-left: ${(props) =>
         props.kind === "small" ? props.theme.spacing.small : "0"};
     }
 
     span {
-      font-size: ${(props) => (props.kind === "small" ? "16px" : "18px")};
+      font-size: ${(props) => (props.kind === "small" ? "13px" : "16px")};
       margin-left: ${(props) => props.theme.spacing.tiny};
     }
   `,

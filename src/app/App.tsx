@@ -1,6 +1,6 @@
+import { BrowserRouter } from "react-router-dom";
 import { DrawerProvider } from "components";
 import { Provider } from "react-redux";
-import { BrowserRouter as Router } from "react-router-dom";
 import { ThemeProvider } from "styled-components";
 import { notification } from "antd";
 import { store } from "features";
@@ -18,13 +18,13 @@ function Inner() {
   const theme = getTheme();
 
   return (
-    <Router>
+    <BrowserRouter>
       <ThemeProvider theme={theme}>
         <DrawerProvider>
           <AppLayout />
         </DrawerProvider>
       </ThemeProvider>
-    </Router>
+    </BrowserRouter>
   );
 }
 

@@ -34,6 +34,13 @@ const routes: Route[] = [
     screen: <Splash />,
   },
   {
+    path: "/pools",
+    exact: true,
+    sider: "Pools",
+    screen: <PoolList />,
+    model: "indexPools",
+  },
+  {
     path: "/categories",
     exact: true,
     sider: "Categories",
@@ -44,13 +51,6 @@ const routes: Route[] = [
     path: "/categories/:categoryId",
     exact: true,
     screen: <CategoryDetail />,
-  },
-  {
-    path: "/pools",
-    exact: true,
-    sider: "Pools",
-    screen: <PoolList />,
-    model: "indexPools",
   },
   {
     path: "/pools/:poolId",
