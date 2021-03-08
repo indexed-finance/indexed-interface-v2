@@ -28,5 +28,6 @@ const S = {
     position: relative;
     overflow: hidden;
     padding: ${(props) => props.theme.spacing.small} !important;
+    width: 100%;
   `,
 };

@@ -25,7 +25,6 @@ export default function Quote({
       <Typography.Text type={isNegative ? "danger" : "success"}>
         {netChange} ({netChangePercent})
       </Typography.Text>
-      <span>Today</span>
     </S.Bottom>
   );
 

@@ -5,7 +5,7 @@ import styled, { css } from "styled-components";
 export type Props = ButtonProps;
 
 function BaseButton(props: Props) {
-  return <AntButton {...props} />;
+  return <S.Button {...props} />;
 }
 
 type WithExtras = typeof BaseButton & {
@@ -37,6 +37,9 @@ Button.Group = function ({
 // #endregion
 
 const S = {
+  Button: styled(AntButton)`
+    ${(props) => props.theme.snippets.fancy};
+  `,
   Group: styled.div<ButtonGroupProps>`
     display: flex;
 

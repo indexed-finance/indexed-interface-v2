@@ -1,5 +1,13 @@
 import { Button } from "components";
-import { Form, Grid, Layout, Popover, Select, Switch, Typography } from "antd";
+import {
+  Form,
+  Grid,
+  Layout,
+  Popconfirm,
+  Select,
+  Switch,
+  Typography,
+} from "antd";
 import { ImConnection } from "react-icons/im";
 import { JazzIcon } from "components";
 import { MdAccountBalanceWallet } from "react-icons/md";
@@ -25,13 +33,13 @@ export default function AppHeader() {
       return {
         type: (isConnected ? "success" : "danger") as any,
         top: isConnected ? "Connected to server." : "Not connected to server.",
-        bottom: "Click this icon to disable socket updates.",
+        bottom: "Disable server connection?",
       };
     } else {
       return {
         type: "secondary" as any,
         top: "Connection disabled.",
-        bottom: "Click this icon to enable socket updates.",
+        bottom: "Enable server connection?",
       };
     }
   }, [isConnectionEnabled, isConnected]);
@@ -68,24 +76,29 @@ export default function AppHeader() {
               )}
             </Item>
             <S.SelfCentered>
-              <Popover
-                placement="bottomLeft"
-                content={
-                  <>
-                    <strong>{connectionStatus.top}</strong>
-                    <br />
-                    <em>{connectionStatus.bottom}</em>
-                  </>
+              <Popconfirm
+                icon={null}
+                placement="topLeft"
+                title={
+                  <S.PerfectlyCentered>
+                    <S.ConnectionStatus />
+                    <div>
+                      <strong>{connectionStatus.top}</strong>
+                      <br />
+                      <em>{connectionStatus.bottom}</em>
+                    </div>
+                  </S.PerfectlyCentered>
                 }
+                onConfirm={() => dispatch(actions.connectionToggled())}
+                okText="Yes"
+                cancelText="No"
               >
                 <S.Connection>
                   <Typography.Text type={connectionStatus.type}>
-                    <S.ConnectionStatus
-                      onClick={() => dispatch(actions.connectionToggled())}
-                    />
+                    <S.ConnectionStatus />
                   </Typography.Text>
                 </S.Connection>
-              </Popover>
+              </Popconfirm>
             </S.SelfCentered>
           </S.Changeables>
         </S.Controls>
@@ -140,5 +153,12 @@ const S = {
   `,
   SelfCentered: styled(Item)`
     align-self: center;
+  `,
+  PerfectlyCentered: styled.div`
+    ${(props) => props.theme.snippets.perfectlyCentered};
+
+    svg {
+      margin-right: ${(props) => props.theme.spacing.medium};
+    }
   `,
 };
