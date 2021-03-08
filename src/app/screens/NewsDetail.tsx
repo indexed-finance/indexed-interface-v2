@@ -1,5 +1,4 @@
 import { ScreenHeader } from "components";
-import { Subscreen } from "../subscreens";
 import React from "react";
 import ReactMarkdown from "react-markdown";
 import data from "data.json";
@@ -14,9 +13,7 @@ export default function NewsDetail() {
   return detail ? (
     <>
       <ScreenHeader title="News" />
-      <Subscreen icon={null} title="Extras">
-        <ReactMarkdown>{detail}</ReactMarkdown>
-      </Subscreen>
+      <ReactMarkdown>{detail}</ReactMarkdown>
     </>
   ) : null;
 }

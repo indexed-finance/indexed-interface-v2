@@ -1,82 +1,98 @@
-// @import "~antd/lib/style/themes/default.less";
-// @import "~antd/dist/antd.less";
+@white100: #f2f2f2;
+@grey100: #111111;
+@grey200: #222222;
 
-// @white100: #f2f2f2;
-// @grey100: #111111;
-// @grey200: #222222;
+@primary-color: darken(#ccccff, 20%);
+@layout-header-background: @grey100;
 
-// @primary-color: darken(#ccccff, 20%);
-// @layout-header-background: @grey100;
+.ant-layout-header {
+  border-bottom: 1px solid @primary-color;
+  animation: glowing-bottom 3s infinite;
+}
 
-// .ant-layout-header {
-//   border-bottom: 1px solid @primary-color;
-//   animation: glowing-bottom 3s infinite;
-// }
+.ant-layout-sider {
+  .ant-layout-sider-children {
+    border-right: 1px solid @primary-color;
+    animation: glowing-right 3s infinite;
+  }
+}
 
-// .ant-layout-sider {
-//   .ant-layout-sider-children {
-//     border-right: 1px solid @primary-color;
-//     animation: glowing-right 3s infinite;
-//   }
-// }
+.ant-menu-item {
+  padding-left: 24px !important;
 
-// .ant-menu-item {
-//   padding-left: 24px !important;
-// }
+  a {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
 
-// [role="tab"],
-// .ant-form-item-no-colon {
-//   text-transform: uppercase;
-//   font-weight: bold;
-// }
+[role="tab"],
+.ant-form-item-no-colon {
+  text-transform: uppercase;
+  font-weight: bold;
+}
 
-// @keyframes glowing-all {
-//   0% {
-//     border: 1px solid fade(@primary-color, 35%);
-//   }
-//   50% {
-//     border: 1px solid fade(@primary-color, 15%);
-//   }
-//   100% {
-//     border: 1px solid fade(@primary-color, 35%);
-//   }
-// }
+@keyframes glowing-all {
+  0% {
+    border: 1px solid fade(@primary-color, 35%);
+  }
+  50% {
+    border: 1px solid fade(@primary-color, 15%);
+  }
+  100% {
+    border: 1px solid fade(@primary-color, 35%);
+  }
+}
 
-// @keyframes glowing-right {
-//   0% {
-//     border-right: 1px solid fade(@primary-color, 35%);
-//   }
-//   50% {
-//     border-right: 1px solid fade(@primary-color, 15%);
-//   }
-//   100% {
-//     border-right: 1px solid fade(@primary-color, 35%);
-//   }
-// }
+@keyframes glowing-right {
+  0% {
+    border-right: 1px solid fade(@primary-color, 35%);
+  }
+  50% {
+    border-right: 1px solid fade(@primary-color, 15%);
+  }
+  100% {
+    border-right: 1px solid fade(@primary-color, 35%);
+  }
+}
 
-// @keyframes glowing-bottom {
-//   0% {
-//     border-bottom: 1px solid fade(@primary-color, 35%);
-//   }
-//   50% {
-//     border-bottom: 1px solid fade(@primary-color, 15%);
-//   }
-//   100% {
-//     border-bottom: 1px solid fade(@primary-color, 35%);
-//   }
-// }
+@keyframes glowing-bottom {
+  0% {
+    border-bottom: 1px solid fade(@primary-color, 35%);
+  }
+  50% {
+    border-bottom: 1px solid fade(@primary-color, 15%);
+  }
+  100% {
+    border-bottom: 1px solid fade(@primary-color, 35%);
+  }
+}
 
-// .ant-collapse {
-//   border: 1px solid fade(@primary-color, 25%);
-//   animation: glowing-all 8s ease-in-out infinite;
-// }
+.ant-collapse {
+  border: 1px solid fade(@primary-color, 25%);
+  animation: glowing-all 8s ease-in-out infinite;
+}
 
-// .ant-collapse-header {
-//   border-bottom: 1px solid fade(@primary-color, 25%);
-//   animation: glowing-bottom 8s ease-in-out infinite;
-// }
+.ant-collapse-header {
+  border-bottom: 1px solid fade(@primary-color, 25%);
+  animation: glowing-bottom 8s ease-in-out infinite;
+}
 
-// .screen-header-divider {
-//   border: 1px solid fade(@primary-color, 25%);
-//   animation: glowing-all 8s ease-in-out infinite;
-// }
+.screen-header-divider {
+  border: 1px solid fade(@primary-color, 25%);
+  animation: glowing-all 8s ease-in-out infinite;
+}
+
+.social-link {
+  font-size: 16px !important;
+}
+
+.app-menu {
+  border-top: 1px solid #b3b3e6;
+}
+
+.ant-progress-inner:not(.ant-progress-circle-gradient)
+  .ant-progress-circle-path {
+  stroke: #b3b3e6;
+}

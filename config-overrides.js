@@ -1,4 +1,3 @@
-const path = require("path");
 const { override, fixBabelImports, addLessLoader } = require("customize-cra");
 const FilterWarningsPlugin = require("webpack-filter-warnings-plugin");
 
@@ -33,6 +32,12 @@ module.exports = override(
   addLessLoader({
     lessOptions: {
       javascriptEnabled: true,
+      modifyVars: {
+        "primary-color": "#333366",
+        "link-color": "#b3b3e6",
+        "box-shadow": "none",
+        "layout-header-background": "rgba(51, 51, 102, 0.5)",
+      },
     },
   })
 );

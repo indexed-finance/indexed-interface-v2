@@ -25,6 +25,7 @@ export default function AppMenu({ onItemClick = noop, ...rest }: Props) {
   return (
     <>
       <S.Menu
+        className="app-menu"
         mode="inline"
         defaultOpenKeys={["Social"]}
         selectable={false}
@@ -113,14 +114,14 @@ export default function AppMenu({ onItemClick = noop, ...rest }: Props) {
                   alt={site.name}
                   src={require(`assets/images/${site.image}`).default}
                 />{" "}
-                {site.name}
+                <span className="social-link">{site.name}</span>
               </S.Uppercase>
             </Menu.Item>
           ))}
         </SubMenu>
       </S.Menu>
-      <S.PerfectlyCentered>
-        <S.Copyright level={4}>
+      <S.PerfectlyCentered className="copyright">
+        <S.Copyright level={5}>
           <AiOutlineCopyrightCircle /> 2021 Indexed
         </S.Copyright>
       </S.PerfectlyCentered>
@@ -164,14 +165,14 @@ const S = {
     ${(props) => props.theme.snippets.fancy};
   `,
   Uppercase: styled.a`
+    ${(props) => props.theme.snippets.fancy};
+    font-size: ${(props) => props.theme.fontSizes.tiny};
     text-align: right;
-    text-transform: uppercase;
   `,
   PerfectlyCentered: styled.div`
     ${(props) => props.theme.snippets.perfectlyCentered};
     padding-top: 6px;
     padding-bottom: 6px;
-    background: #202020;
   `,
   Copyright: styled(Typography.Title)`
     ${(props) => props.theme.snippets.fancy};

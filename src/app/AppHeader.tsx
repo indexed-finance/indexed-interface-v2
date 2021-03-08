@@ -1,4 +1,3 @@
-import "theme/styles.less";
 import { Button } from "components";
 import { Form, Grid, Layout, Popover, Select, Switch, Typography } from "antd";
 import { ImConnection } from "react-icons/im";
@@ -94,7 +93,7 @@ const S = {
     top: 0;
     height: 64px;
     width: calc(100% - 299px);
-    left: 298px;
+    left: 300px;
     z-index: 2;
   `,
   Connection: styled.div`

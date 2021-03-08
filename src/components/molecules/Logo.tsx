@@ -1,5 +1,7 @@
 import { Typography } from "antd";
+import { selectors } from "features";
 import { useHistory } from "react-router-dom";
+import { useSelector } from "react-redux";
 import React from "react";
 import styled from "styled-components";
 
@@ -9,11 +11,12 @@ interface Props {
 
 export default function Logo({ withTitle = true }: Props) {
   const history = useHistory();
+  const theme = useSelector(selectors.selectTheme);
 
   return (
     <S.LogoWrapper>
       <S.Logo
-        src={require("assets/images/indexed-dark.png").default}
+        src={require(`assets/images/indexed-${theme}.png`).default}
         onClick={() => history.push("/")}
       />
       <S.LogoText>
