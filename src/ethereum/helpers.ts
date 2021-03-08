@@ -1,17 +1,8 @@
 import * as balancerMath from "./utils/balancer-math";
 import { BigNumber } from "bignumber.js";
 
-import {
-  NormalizedPool,
-  NormalizedToken,
-  PoolTokenUpdate,
-} from "./types.d";
-
+import { PoolTokenUpdate } from "./types.d";
 import { convert } from "helpers";
-import { useSelector } from "react-redux";
-import { selectors } from "features/indexPools/slice";
-import { AppState } from "features";
-import { PoolUnderlyingToken } from "indexed-types";
 
 export * from "./utils";
 export * from "./subgraph";

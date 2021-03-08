@@ -1,3 +1,4 @@
+import { MIN_WEIGHT } from "./balancer-math";
 import { dedupe } from "helpers";
 
 import {
@@ -12,7 +13,6 @@ import type {
   PoolUnderlyingToken,
   Token,
 } from "indexed-types";
-import { MIN_WEIGHT } from "./balancer-math";
 
 export function normalizeInitialData(categories: Category[]) {
   return categories.slice(0, categories.length - 1).reduce(

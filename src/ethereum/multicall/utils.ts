@@ -1,5 +1,5 @@
-import { BigNumber } from "@ethersproject/bignumber";
 import { Result as AbiCoderResult, FunctionFragment, Interface, JsonFragment, ParamType, defaultAbiCoder } from "@ethersproject/abi";
+import { BigNumber } from "@ethersproject/bignumber";
 import { Provider } from "@ethersproject/providers";
 
 import {
