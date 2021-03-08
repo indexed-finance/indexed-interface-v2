@@ -34,9 +34,10 @@ module.exports = override(
       javascriptEnabled: true,
       modifyVars: {
         "primary-color": "#333366",
+        "secondary-color": "#b3b3e6",
+        "info-color": "#b3b3e6",
         "link-color": "#b3b3e6",
         "box-shadow": "none",
-        "layout-header-background": "rgba(51, 51, 102, 0.5)",
       },
     },
   })

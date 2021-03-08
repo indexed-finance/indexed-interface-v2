@@ -84,7 +84,9 @@ export default function AppLayout() {
           </>
         )}
         <AppHeader />
-        <Content>
+        <S.Content>
+          <S.Screen className="ant-layout-screen" />{" "}
+          {/*// Dull the background image */}
           <S.Page extraPadded={breakpoint.sm}>
             <RouterSwitch>
               {routes.map((route, index) => (
@@ -96,7 +98,7 @@ export default function AppLayout() {
 
             {activePage && <Drawer page={activePage} />}
           </S.Page>
-        </Content>
+        </S.Content>
       </S.Layout>
     </ModeWrapper>
   );
@@ -172,5 +174,15 @@ const S = {
         overflow: auto;
       }
     }
+  `,
+  Content: styled(Content)`
+    position: relative;
+  `,
+  Screen: styled.div`
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
   `,
 };

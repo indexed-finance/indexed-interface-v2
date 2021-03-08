@@ -176,7 +176,7 @@ const S = {
   `,
   Copyright: styled(Typography.Title)`
     ${(props) => props.theme.snippets.fancy};
-    ${(props) => props.theme.snippets.perfectlyAligned};
+    ${(props) => props.theme.snippets.perfectlyCentered};
     margin-bottom: 0 !important;
 
     svg {
