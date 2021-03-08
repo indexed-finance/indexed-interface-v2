@@ -226,17 +226,13 @@ const thunks = {
     if (signer) {
       const state = getState();
       const tokensBySymbol = selectors.selectTokenLookupBySymbol(state);
-      const slippageFunction =
-        specifiedSide === "input"
-          ? helpers.downwardSlippage
-          : helpers.upwardSlippage;
-      const minimumAmount = slippageFunction(
-        convert.toToken(outputAmount),
-        SLIPPAGE_RATE
-      );
-      const [input, output] = [inputAmount, outputAmount].map((which) =>
-        convert.toHex(convert.toToken(which.toString()))
-      );
+      
+      let [input, output] = [inputAmount, outputAmount].map(convert.toToken);
+      if (specifiedSide == "input") {
+        output = helpers.downwardSlippage(output, SLIPPAGE_RATE);
+      } else {
+        input = helpers.upwardSlippage(input, SLIPPAGE_RATE);
+      }
       const { id: inputAddress } = tokensBySymbol[inputTokenSymbol];
       const { id: outputAddress } = tokensBySymbol[outputTokenSymbol];
 
@@ -248,7 +244,7 @@ const thunks = {
             inputAddress,
             outputAddress,
             input,
-            minimumAmount,
+            output,
             maximumPrice
           );
         } else {

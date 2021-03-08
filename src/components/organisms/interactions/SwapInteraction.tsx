@@ -69,19 +69,17 @@ export default function SwapInteraction({ pool }: Props) {
         state,
         poolId,
         token.toLowerCase(),
-        amount.toString()
+        convert.toToken(amount.toString()).toString(10)
       );
     } else {
       return true;
     }
   });
   const formattedSwapFee = pool
-    ? convert.toPercent(
-        convert
-          .toBigNumber(previousFormValues.current.to.amount.toString())
-          .times(parseFloat(pool.swapFee) / 100)
-          .toNumber()
-      )
+    ? convert
+      .toBigNumber(previousFormValues.current.to.amount.toString())
+      .times(parseFloat(pool.swapFee) / 100)
+      .toString(10)
     : "";
   const baseline = previousFormValues.current.from.token;
   const comparison = previousFormValues.current.to.token;
@@ -158,7 +156,7 @@ export default function SwapInteraction({ pool }: Props) {
 
           if (isGoodResult) {
             setPrice(price);
-            setMaxPrice(spotPriceAfter.times(SLIPPAGE_RATE));
+            setMaxPrice(helpers.upwardSlippage(spotPriceAfter, SLIPPAGE_RATE));
 
             form.setFieldsValue({
               to: {
