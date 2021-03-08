@@ -1,6 +1,6 @@
 import { Badge, Card, List, Typography } from "antd";
 import { FormattedIndexPool } from "features";
-import { Link } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import RankedTokenList from "./RankedTokenList";
 import React from "react";
 import styled from "styled-components";
@@ -13,48 +13,46 @@ export interface Props {
 
 export default function PoolCard({ pool }: Props) {
   const { assets, name, id } = pool;
+  const history = useHistory();
 
   return (
-    <Link to={`/pools/${id}`}>
-      <S.Badge text={`${assets.length} assets`} placement="end" color="purple">
-        <S.Card
-          key={id}
-          hoverable={true}
-          size="small"
-          title={
-            <>
-              <S.Category type="secondary">{pool.category}</S.Category> <br />
-              {name}
-            </>
-          }
-          actions={[
-            <S.TokenImageWrapper key="1">
-              {assets.map((token) => {
-                let assetImage = PLACEHOLDER_IMAGE;
+    <S.Card
+      onClick={() => history.push(`/pools/${id}`)}
+      key={id}
+      hoverable={true}
+      size="small"
+      title={
+        <>
+          <S.Category type="secondary">{pool.category}</S.Category> <br />
+          {name}
+        </>
+      }
+      actions={[
+        <S.TokenImageWrapper key="1">
+          {assets.map((token, index) => {
+            let assetImage = PLACEHOLDER_IMAGE;
 
-                try {
-                  assetImage = require(`assets/images/${token.symbol.toLowerCase()}.png`)
-                    .default;
-                } catch {}
+            try {
+              assetImage = require(`assets/images/${token.symbol.toLowerCase()}.png`)
+                .default;
+            } catch {}
 
-                return (
-                  <S.TokenImage
-                    alt={token.name}
-                    title={token.name}
-                    key={token.symbol}
-                    src={assetImage}
-                  />
-                );
-              })}
-            </S.TokenImageWrapper>,
-          ]}
-        >
-          <S.Content>
-            <RankedTokenList pool={pool} />
-          </S.Content>
-        </S.Card>
-      </S.Badge>
-    </Link>
+            return (
+              <S.TokenImage
+                alt={token.name}
+                title={token.name}
+                key={index}
+                src={assetImage}
+              />
+            );
+          })}
+        </S.TokenImageWrapper>,
+      ]}
+    >
+      <S.Content>
+        <RankedTokenList pool={pool} />
+      </S.Content>
+    </S.Card>
   );
 }
 
@@ -71,6 +69,7 @@ const S = {
     }
     .ant-card-body {
       display: flex;
+      min-width: 370px;
       height: 390px;
       overflow: auto;
     }
@@ -85,7 +84,7 @@ const S = {
     display: inline-flex;
     align-items: flex-start;
     flex-wrap: wrap;
-    /* overflow: auto; */
+    overflow: auto;
   `,
   Image: styled.img`
     flex: 1;
