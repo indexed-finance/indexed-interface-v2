@@ -1,4 +1,4 @@
-import { Dropdown, Menu } from "antd";
+import { Dropdown, Menu, notification } from "antd";
 import { actions } from "features";
 import { useDispatch } from "react-redux";
 import React, { useEffect, useRef } from "react";
@@ -13,7 +13,26 @@ interface Props {
 export default function JazzIcon({ address }: Props) {
   const dispatch = useDispatch();
   const blockie = useRef<null | HTMLSpanElement>(null);
+  const handleDisconnect = React.useCallback(() => {
+    dispatch(actions.userDisconnected());
 
+    notification.info({
+      message: "Disconnected From Wallet",
+      description: "You have successfully disconnected your wallet.",
+    });
+  }, [dispatch]);
+
+  // Effect:
+  // On load, display a success notification.
+  useEffect(() => {
+    notification.success({
+      message: "Connected To Wallet",
+      description: "You have successfully connected your wallet.",
+    });
+  }, []);
+
+  // Effect:
+  // Use refs to integrate the third party library for displaying a wallet identicon.
   useEffect(() => {
     const _blockie = blockie.current;
 
@@ -52,9 +71,7 @@ export default function JazzIcon({ address }: Props) {
                 View on Etherscan
               </a>
             </Menu.Item>
-            <Menu.Item onClick={() => dispatch(actions.userDisconnected())}>
-              Disconnect
-            </Menu.Item>
+            <Menu.Item onClick={handleDisconnect}>Disconnect</Menu.Item>
           </Menu>
         }
       >

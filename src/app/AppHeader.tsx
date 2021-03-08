@@ -67,7 +67,7 @@ export default function AppHeader() {
                 </S.Wallet>
               )}
             </Item>
-            <Item>
+            <S.SelfCentered>
               <Popover
                 placement="bottomLeft"
                 content={
@@ -86,7 +86,7 @@ export default function AppHeader() {
                   </Typography.Text>
                 </S.Connection>
               </Popover>
-            </Item>
+            </S.SelfCentered>
           </S.Changeables>
         </S.Controls>
       )}
@@ -137,5 +137,8 @@ const S = {
     a {
       ${(props) => props.theme.snippets.perfectlyCentered};
     }
+  `,
+  SelfCentered: styled(Item)`
+    align-self: center;
   `,
 };

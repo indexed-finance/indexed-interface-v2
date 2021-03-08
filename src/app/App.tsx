@@ -2,10 +2,17 @@ import { DrawerProvider } from "components";
 import { Provider } from "react-redux";
 import { BrowserRouter as Router } from "react-router-dom";
 import { ThemeProvider } from "styled-components";
+import { notification } from "antd";
 import { store } from "features";
 import AppLayout from "./AppLayout";
 import React from "react";
 import getTheme from "theme";
+
+notification.config({
+  placement: "topRight",
+  top: 66,
+  duration: 4.2,
+});
 
 function Inner() {
   const theme = getTheme();

@@ -1,5 +1,6 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { PoolUnderlyingToken } from "indexed-types";
+import { userActions } from "../user";
 import type { AppState } from "features/store";
 
 type ListenerKind = "PoolData" | "TokenUserData";
@@ -43,6 +44,11 @@ const slice = createSlice({
       state.batch = state.batch.filter((listenerId) => listenerId !== id);
     },
   },
+  extraReducers: (builder) =>
+    builder.addCase(userActions.userDisconnected.type, (state) => {
+      state.batch = [];
+      state.listeners = {};
+    }),
 });
 
 export const { actions } = slice;

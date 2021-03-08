@@ -320,7 +320,7 @@ const thunks = {
         const pool = selectors.selectPool(state, task.pool);
         const destinationAddress = task.pool;
 
-        if (pool) {
+        if (provider && pool) {
           const {
             blockNumber,
             data: userData,
