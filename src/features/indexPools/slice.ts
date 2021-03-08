@@ -11,8 +11,9 @@ import {
   subgraphDataLoaded,
 } from "features/actions";
 import { tokensSelectors } from "features/tokens";
-import type { AppState } from "features/store";
+
 import { PoolUnderlyingToken } from "indexed-types";
+import type { AppState } from "features/store";
 
 const adapter = createEntityAdapter<NormalizedPool>();
 
