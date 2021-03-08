@@ -61,7 +61,7 @@ export default function Stake() {
               <List.Item.Meta
                 title={
                   <Link to={`/pools/${datum.id}`}>
-                    <Avatar src={datum.image} />
+                    <S.Avatar src={datum.image} />
                     {datum.name} [{datum.symbol}]
                   </Link>
                 }
@@ -135,6 +135,9 @@ const S = {
     ${(props) => props.theme.snippets.fancy};
   `,
   Area: styled(Area)`
-    margin-bottom: ${(props) => props.theme.spacing.medium};
+    margin-bottom: ${(props) => props.theme.spacing.large};
+  `,
+  Avatar: styled(Avatar)`
+    margin-right: ${(props) => props.theme.spacing.small};
   `,
 };

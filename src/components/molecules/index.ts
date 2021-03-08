@@ -1,6 +1,7 @@
 export { default as CategoryDropdown } from "./CategoryDropdown";
 export { default as ChartCard } from "./ChartCard";
 export { default as EthereumAddressInput } from "./EthereumAddressInput";
+export { default as JazzIcon } from "./JazzIcon";
 export { default as Logo } from "./Logo";
 export { default as PoolDropdown } from "./PoolDropdown";
 export { default as Quote } from "./Quote";

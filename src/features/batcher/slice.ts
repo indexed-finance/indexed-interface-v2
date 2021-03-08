@@ -52,7 +52,7 @@ export const selectors = {
   selectBatch: (state: AppState) => {
     const filled = state.batcher.batch.map((id) => state.batcher.listeners[id]);
     const taskCache: Record<string, true> = {};
-    const separatedTasks = [...filled, ...filled].reduce(
+    const separatedTasks = filled.reduce(
       (prev, next) => {
         const task = next;
         const uniqueArgs = task.args.filter(

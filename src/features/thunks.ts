@@ -6,6 +6,7 @@ import { SLIPPAGE_RATE, SUBGRAPH_URL_UNISWAP } from "config";
 import { batcherActions } from "./batcher";
 import { categoriesActions } from "./categories";
 import { convert } from "helpers";
+import { ethers } from "ethers";
 import { helpers } from "ethereum";
 import { indexPoolsActions } from "./indexPools";
 import { providers } from "ethers";
@@ -15,12 +16,23 @@ import { userActions } from "./user";
 import debounce from "lodash.debounce";
 import selectors from "./selectors";
 
+// #region Provider
+/**
+ * A global reference to the provider (always) and signer (for end users) is established
+ * and is accessible elsewhere.
+ */
 export let provider:
   | null
   | providers.Web3Provider
   | providers.JsonRpcProvider
   | providers.InfuraProvider = null;
 export let signer: null | providers.JsonRpcSigner = null;
+
+export const disconnectFromProvider = () => {
+  provider = null;
+  signer = null;
+};
+// #endregion
 
 type InitialzeOptions = {
   provider:
@@ -38,6 +50,27 @@ type InitialzeOptions = {
 const BLOCK_HANDLER_DEBOUNCE_RATE = 250;
 
 const thunks = {
+  /**
+   *
+   */
+  attachToProvider: (): AppThunk => async (dispatch) => {
+    const ethereum = (window as any).ethereum;
+
+    if (ethereum) {
+      const [selectedAddress] = await ethereum.request({
+        method: "eth_requestAccounts",
+      });
+      const provider = new ethers.providers.Web3Provider(ethereum, 1);
+
+      dispatch(
+        actions.initialize({
+          provider,
+          selectedAddress,
+          withSigner: true,
+        })
+      );
+    }
+  },
   /**
    *
    */
@@ -86,10 +119,7 @@ const thunks = {
   /**
    *
    */
-  changeBlockNumber: (blockNumber: number): AppThunk => async (
-    dispatch,
-    getState
-  ) => {
+  changeBlockNumber: (blockNumber: number): AppThunk => async (dispatch) => {
     dispatch(actions.blockNumberChanged(blockNumber));
     dispatch(thunks.sendBatch());
   },

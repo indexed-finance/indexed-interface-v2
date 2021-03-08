@@ -33,6 +33,7 @@ export default function AppLayout() {
   const modeWrapper = useRef(
     require(`./${theme === "dark" ? "Dark" : "Light"}ModeWrapper.tsx`).default
   );
+  const ModeWrapper = modeWrapper.current ?? "div";
 
   // Effect
   // When the user changes the mode, call out to the window.less object.
@@ -41,12 +42,6 @@ export default function AppLayout() {
       window.location.reload();
     }
   }, [theme]);
-  const Derp = ({ children, ...rest }: any) => (
-    <div className="none" {...rest}>
-      {children}
-    </div>
-  );
-  const ModeWrapper = modeWrapper.current ?? Derp;
 
   // Effect
   // On initial load, open up a connection to the server.
@@ -85,8 +80,8 @@ export default function AppLayout() {
         )}
         <AppHeader />
         <S.Content>
-          <S.Screen className="ant-layout-screen" />{" "}
-          {/*// Dull the background image */}
+          {/* Dull the background image */}
+          <S.Screen className="ant-layout-screen" />
           <S.Page extraPadded={breakpoint.sm}>
             <RouterSwitch>
               {routes.map((route, index) => (

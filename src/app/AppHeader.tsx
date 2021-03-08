@@ -1,6 +1,7 @@
 import { Button } from "components";
 import { Form, Grid, Layout, Popover, Select, Switch, Typography } from "antd";
 import { ImConnection } from "react-icons/im";
+import { JazzIcon } from "components";
 import { MdAccountBalanceWallet } from "react-icons/md";
 import { actions, selectors } from "features";
 import { useDispatch, useSelector } from "react-redux";
@@ -16,6 +17,7 @@ export default function AppHeader() {
   const dispatch = useDispatch();
   const language = useSelector(selectors.selectLanguageName);
   const theme = useSelector(selectors.selectTheme);
+  const selectedAddress = useSelector(selectors.selectUserAddress);
   const isConnected = useSelector(selectors.selectConnected);
   const isConnectionEnabled = useSelector(selectors.selectConnectionEnabled);
   const connectionStatus = useMemo(() => {
@@ -54,9 +56,16 @@ export default function AppHeader() {
               />
             </Item>
             <Item>
-              <S.Wallet type="ghost">
-                <MdAccountBalanceWallet />
-              </S.Wallet>
+              {selectedAddress ? (
+                <JazzIcon address={selectedAddress} />
+              ) : (
+                <S.Wallet
+                  type="ghost"
+                  onClick={() => dispatch(actions.attachToProvider())}
+                >
+                  <MdAccountBalanceWallet />
+                </S.Wallet>
+              )}
             </Item>
             <Item>
               <Popover

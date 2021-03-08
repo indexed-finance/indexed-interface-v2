@@ -3,9 +3,11 @@ import { LOCALSTORAGE_KEY } from "config";
 import { ThunkAction } from "redux-thunk";
 import { batcherActions } from "./batcher";
 import { configureStore } from "@reduxjs/toolkit";
+import { disconnectFromProvider } from "./thunks";
+import { userActions } from "./user";
 import { v4 as uuid } from "uuid";
 import reducer from "./reducer";
-// blockNumberChanged
+
 const store = configureStore({
   reducer,
   middleware: (getDefaultMiddleware) =>
@@ -31,6 +33,16 @@ const store = configureStore({
           } else {
             return next(action);
           }
+        };
+      })
+      // When the user disconnects, remove the global provider and signer.
+      .concat(function userDisconnectionMiddleware() {
+        return (next) => (action) => {
+          if (action.type === userActions.userDisconnected.type) {
+            disconnectFromProvider();
+          }
+
+          return next(action);
         };
       }),
   preloadedState: loadPersistedState(),
@@ -67,7 +79,14 @@ export function loadPersistedState() {
   try {
     const persistedState = window.localStorage.getItem(LOCALSTORAGE_KEY);
 
-    return persistedState ? JSON.parse(persistedState) : undefined;
+    if (persistedState) {
+      const state = JSON.parse(persistedState);
+
+      delete state.batcher;
+      delete state.user;
+
+      return state;
+    }
   } catch (error) {
     return undefined;
   }

@@ -5,17 +5,24 @@ import { tokensSelectors } from "features/tokens";
 import type { AppState } from "features/store";
 import type { NormalizedUser } from "ethereum/types";
 
+const initialState: NormalizedUser & {
+  recentPoolUpdates: Record<string, number>;
+} = {
+  address: "",
+  allowances: {},
+  balances: {},
+  recentPoolUpdates: {},
+};
+
 const slice = createSlice({
   name: "user",
-  initialState: {
-    address: "",
-    allowances: {},
-    balances: {},
-    recentPoolUpdates: {},
-  } as NormalizedUser & { recentPoolUpdates: Record<string, number> },
+  initialState,
   reducers: {
     userAddressSelected(state, action: PayloadAction<string>) {
       state.address = action.payload;
+    },
+    userDisconnected() {
+      return initialState;
     },
   },
   extraReducers: (builder) =>
