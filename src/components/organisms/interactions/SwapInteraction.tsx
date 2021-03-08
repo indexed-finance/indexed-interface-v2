@@ -11,6 +11,7 @@ import React, {
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from "react";
@@ -57,6 +58,8 @@ export default function SwapInteraction({ pool }: Props) {
   );
   const [price, setPrice] = useState(ZERO);
   const [maxPrice, setMaxPrice] = useState(ZERO);
+  const [formattedSwapFee, setFormattedSwapFee] = useState("")
+
   const [, setRenderCount] = useState(0);
   const approvalNeeded = useSelector((state: AppState) => {
     const { from } = form.getFieldsValue();
@@ -75,14 +78,15 @@ export default function SwapInteraction({ pool }: Props) {
       return true;
     }
   });
-  const formattedSwapFee = pool
-    ? convert
-      .toBigNumber(previousFormValues.current.to.amount.toString())
-      .times(parseFloat(pool.swapFee) / 100)
-      .toString(10)
-    : "";
+
   const baseline = previousFormValues.current.from.token;
   const comparison = previousFormValues.current.to.token;
+  const getFormattedSwapFee = (outputAmount: number): string => convert
+    .toBigNumber(outputAmount.toString(10))
+    .times(convert.toBigNumber(
+      (parseFloat(pool?.swapFee || "0") / 100).toString()
+    ))
+    .toString(10)
 
   /**
    *
@@ -137,32 +141,29 @@ export default function SwapInteraction({ pool }: Props) {
         const { amount: inputAmount } = changedValues.from;
         const { token: inputToken } = previousFormValues.current.from;
         const { token: outputToken } = previousFormValues.current.to;
-        const inputTokenData = tokenLookup[inputToken.toLowerCase()];
-        const outputTokenData = tokenLookup[outputToken.toLowerCase()];
 
-        if (inputTokenData && outputTokenData) {
+        const inputData = fullPool.tokens.entities[tokenLookup[inputToken.toLowerCase()].id.toLowerCase()];
+        const outputData = fullPool.tokens.entities[tokenLookup[outputToken.toLowerCase()].id.toLowerCase()];
+
+        if (inputData && outputData) {
           const {
             outputAmount,
             price,
             spotPriceAfter,
             isGoodResult,
           } = await helpers.calculateOutputFromInput(
-            fullPool,
+            inputData,
+            outputData,
             inputAmount.toString(),
-            inputTokenData,
-            outputTokenData,
             swapFee
           );
 
           if (isGoodResult) {
             setPrice(price);
             setMaxPrice(helpers.upwardSlippage(spotPriceAfter, SLIPPAGE_RATE));
+            setFormattedSwapFee(getFormattedSwapFee(outputAmount));
 
-            form.setFieldsValue({
-              to: {
-                amount: outputAmount,
-              },
-            });
+            form.setFieldsValue({ to: { amount: outputAmount } });
           }
         }
       }
@@ -178,30 +179,26 @@ export default function SwapInteraction({ pool }: Props) {
         const { amount: outputAmount } = changedValues.to;
         const { token: outputToken } = previousFormValues.current.to;
         const { token: inputToken } = previousFormValues.current.from;
-        const inputTokenData = tokenLookup[inputToken.toLowerCase()];
-        const outputTokenData = tokenLookup[outputToken.toLowerCase()];
 
-        if (inputTokenData && outputTokenData) {
+        const inputData = fullPool.tokens.entities[tokenLookup[inputToken.toLowerCase()].id.toLowerCase()];
+        const outputData = fullPool.tokens.entities[tokenLookup[outputToken.toLowerCase()].id.toLowerCase()];
+
+        if (inputData && outputData) {
           const {
             inputAmount,
             spotPriceAfter,
             isGoodResult,
           } = await helpers.calculateInputFromOutput(
-            fullPool,
+            inputData,
+            outputData,
             outputAmount.toString(),
-            inputTokenData,
-            outputTokenData,
             swapFee
           );
 
           if (isGoodResult) {
             setMaxPrice(spotPriceAfter.times(SLIPPAGE_RATE));
 
-            form.setFieldsValue({
-              to: {
-                amount: inputAmount,
-              },
-            });
+            form.setFieldsValue({ from: { amount: inputAmount }});
           }
         }
       }
