@@ -125,6 +125,7 @@ const selectors = {
       const withDisplayedSigns = { signDisplay: "always" };
 
       return {
+        category: category?.name ?? "",
         canStake: false,
         id: pool.id,
         symbol: pool.symbol,
@@ -138,7 +139,7 @@ const selectors = {
           withDisplayedSigns
         ),
         isNegative: stats.deltas.price.day.value < 0,
-        name: pool.name,
+        name: pool.name.replace(/Tokens Index/g, ""),
         volume: convert.toCurrency(stats.deltas.volume.day),
         totalValueLocked: convert.toCurrency(pool.totalValueLockedUSD),
         totalValueLockedPercent: convert.toPercent(
@@ -280,6 +281,7 @@ export interface FormattedCategory {
 }
 
 export interface FormattedIndexPool {
+  category: string;
   canStake: boolean;
   id: string;
   symbol: string;

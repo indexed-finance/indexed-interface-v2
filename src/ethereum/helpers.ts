@@ -579,6 +579,14 @@ export async function calculateOutputFromInput(
       .filter(Boolean)
       .map((property) => convert.toBigNumber(property!));
 
+    console.log(
+      "balanceIn, weightIn, balanceOut, weightOut, amountIn",
+      balanceIn,
+      weightIn,
+      balanceOut,
+      weightOut,
+      amountIn
+    );
     // --
     if (amountIn.isLessThanOrEqualTo(convert.toBigNumber(outputUsedBalance))) {
       const amountOut = balancerMath.calcOutGivenIn(

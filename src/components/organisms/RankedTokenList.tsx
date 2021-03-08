@@ -12,10 +12,7 @@ export default function RankedTokenList({ pool }: Props) {
   return (
     <S.List size="large" bordered={true}>
       {pool.assets.map((token, index) => (
-        <S.RankedTokenWrapper
-          key={token.symbol}
-          data-tokenwrapper={token.symbol}
-        >
+        <S.RankedTokenWrapper key={index} data-tokenwrapper={token.symbol}>
           <RankedToken token={token} rank={index + 1} />
         </S.RankedTokenWrapper>
       ))}

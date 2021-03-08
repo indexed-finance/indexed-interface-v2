@@ -9,7 +9,10 @@ import reducer from "./reducer";
 const store = configureStore({
   reducer,
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware()
+    getDefaultMiddleware({
+      immutableCheck: false,
+      serializableCheck: false,
+    })
       // The listener ID is returned for later use in unregistering.
       .concat(function listenerIdMiddleware() {
         return (next) => (action) => {
