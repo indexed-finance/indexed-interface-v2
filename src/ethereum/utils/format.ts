@@ -8,11 +8,7 @@ import {
   PoolTokenUpdate,
 } from "ethereum/types.d";
 
-import type {
-  Category,
-  PoolUnderlyingToken,
-  Token,
-} from "indexed-types";
+import type { Category, PoolUnderlyingToken, Token } from "indexed-types";
 
 export function normalizeInitialData(categories: Category[]) {
   return categories.slice(0, categories.length - 1).reduce(
@@ -72,13 +68,15 @@ export function normalizeInitialData(categories: Category[]) {
           const [, tokenId] = token.id.split("-");
 
           tokenIds.push(tokenId);
-          const extras = token.ready ? {
-            usedBalance: token.balance,
-            usedDenorm: token.denorm
-          } : {
-            usedBalance: token.minimumBalance,
-            usedDenorm: MIN_WEIGHT
-          }
+          const extras = token.ready
+            ? {
+                usedBalance: token.balance,
+                usedDenorm: token.denorm,
+              }
+            : {
+                usedBalance: token.minimumBalance,
+                usedDenorm: MIN_WEIGHT,
+              };
           tokenEntities[tokenId] = {
             ...(tokenEntities[tokenId] ?? {}),
             ...token,

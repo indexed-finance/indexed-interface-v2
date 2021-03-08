@@ -1,4 +1,11 @@
-import { Result as AbiCoderResult, FunctionFragment, Interface, JsonFragment, ParamType, defaultAbiCoder } from "@ethersproject/abi";
+import {
+  Result as AbiCoderResult,
+  FunctionFragment,
+  Interface,
+  JsonFragment,
+  ParamType,
+  defaultAbiCoder,
+} from "@ethersproject/abi";
 import { BigNumber } from "@ethersproject/bignumber";
 import { Provider } from "@ethersproject/providers";
 
@@ -20,7 +27,10 @@ export type CondensedCalls = {
   targets: string[];
 };
 
-export function condenseCalls(_interface: Interface, _calls: Call[]): CondensedCalls {
+export function condenseCalls(
+  _interface: Interface,
+  _calls: Call[]
+): CondensedCalls {
   return _calls.reduce(
     (prev, next) => {
       const {
@@ -53,7 +63,7 @@ function getDefaultForBaseType(baseType: string) {
   if (baseType.includes("string")) return "";
   if (baseType.includes("bytes")) {
     if (hasNumber(baseType)) {
-      const num = +(baseType.slice(5));
+      const num = +baseType.slice(5);
       return "0x".padEnd((num + 1) * 2, "00");
     }
     return "0x";
@@ -75,7 +85,7 @@ function getDefaultForParamType(param: ParamType): any {
 function getDefaultResultForFunction(fn: FunctionFragment): any[] {
   const { outputs } = fn;
   if (!outputs) return [];
-  return outputs.map(t => getDefaultForParamType(t));
+  return outputs.map((t) => getDefaultForParamType(t));
 }
 
 export async function multicallViaInterface(
@@ -83,7 +93,7 @@ export async function multicallViaInterface(
   _interface: Interface,
   _calls: Call[],
   _strict: boolean
-): Promise<{ blockNumber: string, results: AbiCoderResult[] }> {
+): Promise<{ blockNumber: string; results: AbiCoderResult[] }> {
   const { callData, targets } = condenseCalls(_interface, _calls);
   const inputData = defaultAbiCoder.encode(
     ["address[]", "bytes[]"],
@@ -99,14 +109,17 @@ export async function multicallViaInterface(
   );
   const formattedResults = (decodedResult as string[])
     // .filter((result, index) => result !== "0x" && Boolean(_calls[index]))
-    .map((result, index) =>
-      {
-        // console.log((_calls[index] as Call).function)
-        return (result !== "0x")
-        ? _interface.decodeFunctionResult((_calls[index] as Call).function, result)
-        : getDefaultResultForFunction(_interface.getFunction((_calls[index] as Call).function))
-      }
-    );
+    .map((result, index) => {
+      // console.log((_calls[index] as Call).function)
+      return result !== "0x"
+        ? _interface.decodeFunctionResult(
+            (_calls[index] as Call).function,
+            result
+          )
+        : getDefaultResultForFunction(
+            _interface.getFunction((_calls[index] as Call).function)
+          );
+    });
 
   return {
     blockNumber,

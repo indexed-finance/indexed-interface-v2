@@ -16,7 +16,7 @@ export const BONE = balancerMath.BONE;
 type PoolTokenData = {
   usedDenorm: string;
   usedBalance: string;
-}
+};
 
 export async function calculateOutputFromInput(
   inputData: PoolTokenData,
@@ -33,13 +33,12 @@ export async function calculateOutputFromInput(
 
   if (inputData && outputData) {
     // --
-    const [balanceIn, weightIn, balanceOut, weightOut, amountIn] = 
-    [
+    const [balanceIn, weightIn, balanceOut, weightOut, amountIn] = [
       convert.toBigNumber(inputData.usedBalance),
       convert.toBigNumber(inputData.usedDenorm),
       convert.toBigNumber(outputData.usedBalance),
       convert.toBigNumber(outputData.usedDenorm),
-      convert.toToken(inputAmount)
+      convert.toToken(inputAmount),
     ];
     if (amountIn.isLessThanOrEqualTo(balanceIn.div(2))) {
       const amountOut = balancerMath.calcOutGivenIn(

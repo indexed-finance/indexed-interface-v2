@@ -1,13 +1,10 @@
-import { Result as AbiCoderResult } from "ethers/lib/utils";
-import { Provider } from "@ethersproject/providers";
-import chunk from "lodash.chunk";
-
-import { IPool } from "ethereum/abi";
-
 import * as balancerMath from "ethereum/utils/balancer-math";
+import { Result as AbiCoderResult } from "ethers/lib/utils";
+import { IPool } from "ethereum/abi";
+import { Provider } from "@ethersproject/providers";
 import { convert } from "helpers";
 import { multicallViaInterface } from "./utils";
-
+import chunk from "lodash.chunk";
 import type { Call } from "./utils";
 import type { PoolUnderlyingToken } from "indexed-types";
 
@@ -70,11 +67,9 @@ function formatPoolUpdate(
   { blockNumber, results }: { blockNumber: string; results: AbiCoderResult[] },
   tokenAddresses: string[]
 ) {
-  const [
-    totalDenorm,
-    totalSupply,
-    swapFee,
-  ] = results.map(([raw]) => convert.toBigNumber(raw));
+  const [totalDenorm, totalSupply, swapFee] = results.map(([raw]) =>
+    convert.toBigNumber(raw)
+  );
   const tokenDataResponses = results.slice(
     POOL_UPDATE_TOKEN_DATA_STARTING_INDEX
   );
@@ -85,7 +80,7 @@ function formatPoolUpdate(
     prev[tokenAddresses[index]] = next;
     return prev;
   }, {} as Record<string, AbiCoderResult[]>);
-  
+
   const tokens = tokenAddresses
     .map((address) => responseDataByTokenAddress[address])
     .map((response, index) => {

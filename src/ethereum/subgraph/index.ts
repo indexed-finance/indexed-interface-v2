@@ -1,12 +1,7 @@
 import * as config from "config";
 import * as queries from "./queries";
 import axios from "axios";
-
-import type {
-  Category,
-  IndexPool,
-  Swap,
-} from "indexed-types";
+import type { Category, IndexPool, Swap } from "indexed-types";
 import type { Swap as Trade } from "uniswap-types";
 
 export function getUrl(chainId: number) {

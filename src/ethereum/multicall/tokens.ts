@@ -1,12 +1,9 @@
 import { Result as AbiCoderResult } from "ethers/lib/utils";
-import { Provider } from "@ethersproject/providers";
-import chunk from "lodash.chunk";
-
 import { IERC20 } from "ethereum/abi";
-
+import { Provider } from "@ethersproject/providers";
 import { convert } from "helpers";
-
 import { multicallViaInterface } from "./utils";
+import chunk from "lodash.chunk";
 import type { Call } from "./utils";
 import type { PoolUnderlyingToken } from "indexed-types";
 

@@ -1,8 +1,7 @@
 import { BigNumber } from "./utils/balancer-math";
 import { Contract } from "ethers";
-import { JsonRpcSigner } from "@ethersproject/providers";
-
 import { IERC20, IPool } from "./abi";
+import { JsonRpcSigner } from "@ethersproject/providers";
 import { convert } from "helpers";
 
 /**
@@ -15,7 +14,7 @@ import { convert } from "helpers";
  * @param tokenAddress - Which token in the pool should be approved?
  * @param amount - How much should the approval be limited to?
  */
- export function approvePool(
+export function approvePool(
   signer: JsonRpcSigner,
   poolAddress: string,
   tokenAddress: string,
