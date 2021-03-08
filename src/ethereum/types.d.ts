@@ -10,17 +10,18 @@ import { Swap as Trade } from "uniswap-types";
 export type PoolTokenUpdate = {
   address: string;
   balance: string;
-  weight?: string;
+  minimumBalance: string;
   usedBalance: string;
-  usedWeight: string;
+  weight?: string;
+  denorm: string;
   usedDenorm: string;
+  usedWeight: string;
 };
 
 export type PoolUpdate = {
   $blockNumber: string;
   totalDenorm: string;
   totalSupply: string;
-  maxTotalSupply: string;
   swapFee: string;
   tokens: PoolTokenUpdate[];
 };

@@ -1,5 +1,5 @@
 import { DEFAULT_DECIMAL_COUNT, PLACEHOLDER_TOKEN_IMAGE } from "config";
-import { NormalizedPool } from "ethereum";
+import { NormalizedPool, PoolTokenUpdate } from "ethereum";
 import { categoriesSelectors } from "../categories";
 import { convert } from "helpers";
 import { createEntityAdapter, createSlice } from "@reduxjs/toolkit";
@@ -11,6 +11,8 @@ import {
   subgraphDataLoaded,
 } from "features/actions";
 import { tokensSelectors } from "features/tokens";
+
+import { PoolUnderlyingToken } from "indexed-types";
 import type { AppState } from "features/store";
 
 const adapter = createEntityAdapter<NormalizedPool>();
@@ -24,34 +26,53 @@ const slice = createSlice({
       .addCase(subgraphDataLoaded, (state, action) => {
         const { pools } = action.payload;
         const fullPools = pools.ids.map((id) => pools.entities[id]);
-
+        fullPools.forEach(pool => pool.tokens.ids.forEach(tokenId => {
+          const token = pool.tokens.entities[tokenId];
+          
+          [token.usedDenorm, token.usedBalance] = token.ready ? [token.denorm, token.balance] : [token.desiredDenorm, token.minimumBalance];
+        }));
         adapter.addMany(state, fullPools);
       })
       .addCase(poolUpdated, (state, action) => {
         const { pool, update } = action.payload;
+
         const poolInState = state.entities[pool.id];
 
         if (poolInState) {
           const { $blockNumber: _, tokens, ...rest } = update;
+          const tokenEntities: Record<
+            string,
+            PoolTokenUpdate & PoolUnderlyingToken & { weight?: string }
+          > = {};
+          for (const token of tokens) {
+            const { address, ...tokenUpdate } = token;
+            const tokenInState = pool.tokens.entities[address];
+            tokenEntities[address] = {
+              ...tokenInState,
+              ...tokenUpdate
+            }
 
+          }
           state.entities[pool.id] = {
             ...poolInState,
             ...rest,
+            tokens: {
+              ids: poolInState.tokens.ids,
+              entities: tokenEntities
+            }
           };
         }
       })
       .addCase(poolTradesAndSwapsLoaded, (state, action) => {
         const { poolId, trades, swaps } = action.payload;
         const poolInState = state.entities[poolId];
-
         if (poolInState) {
-          poolInState.trades = trades ?? poolInState.trades;
-          poolInState.swaps = swaps ?? poolInState.swaps;
+          poolInState.trades = trades || poolInState.trades;
+          poolInState.swaps = swaps || poolInState.swaps;
         }
       })
       .addCase(receivedInitialStateFromServer, (_, action) => {
         const { indexPools } = action.payload;
-
         return indexPools;
       })
       .addCase(receivedStatePatchFromServer, (_, action) => {
@@ -82,7 +103,7 @@ export const selectors = {
   },
   selectSwapFee: (state: AppState, poolId: string) => {
     const pool = selectors.selectPool(state, poolId);
-    return pool ? convert.toBigNumber(pool.swapFee).times(1e18) : null;
+    return pool ? convert.toBigNumber(pool.swapFee) : null;
   },
   selectPoolInitializerAddress: (state: AppState, poolId: string) => {
     const pool = selectors.selectPool(state, poolId);

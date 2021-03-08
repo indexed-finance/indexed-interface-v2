@@ -228,7 +228,7 @@ const thunks = {
       const tokensBySymbol = selectors.selectTokenLookupBySymbol(state);
       
       let [input, output] = [inputAmount, outputAmount].map(convert.toToken);
-      if (specifiedSide == "input") {
+      if (specifiedSide === "input") {
         output = helpers.downwardSlippage(output, SLIPPAGE_RATE);
       } else {
         input = helpers.upwardSlippage(input, SLIPPAGE_RATE);
@@ -302,7 +302,7 @@ const thunks = {
 
           dispatch(
             actions.poolUserDataLoaded({
-              blockNumber: blockNumber.toNumber(),
+              blockNumber: +blockNumber,
               poolId: pool.id,
               userData,
             })
