@@ -226,8 +226,9 @@ const thunks = {
     if (signer) {
       const state = getState();
       const tokensBySymbol = selectors.selectTokenLookupBySymbol(state);
-      
+
       let [input, output] = [inputAmount, outputAmount].map(convert.toToken);
+
       if (specifiedSide === "input") {
         output = helpers.downwardSlippage(output, SLIPPAGE_RATE);
       } else {

@@ -11,7 +11,6 @@ import React, {
   useCallback,
   useContext,
   useEffect,
-  useMemo,
   useRef,
   useState,
 } from "react";
@@ -58,7 +57,7 @@ export default function SwapInteraction({ pool }: Props) {
   );
   const [price, setPrice] = useState(ZERO);
   const [maxPrice, setMaxPrice] = useState(ZERO);
-  const [formattedSwapFee, setFormattedSwapFee] = useState("")
+  const [formattedSwapFee, setFormattedSwapFee] = useState("");
 
   const [, setRenderCount] = useState(0);
   const approvalNeeded = useSelector((state: AppState) => {
@@ -78,15 +77,21 @@ export default function SwapInteraction({ pool }: Props) {
       return true;
     }
   });
+  const getFormattedSwapFee = useCallback(
+    (outputAmount: number): string =>
+      convert
+        .toBigNumber(outputAmount.toString(10))
+        .times(
+          convert.toBigNumber(
+            (parseFloat(pool?.swapFee || "0") / 100).toString()
+          )
+        )
+        .toString(10),
+    [pool]
+  );
 
   const baseline = previousFormValues.current.from.token;
   const comparison = previousFormValues.current.to.token;
-  const getFormattedSwapFee = (outputAmount: number): string => convert
-    .toBigNumber(outputAmount.toString(10))
-    .times(convert.toBigNumber(
-      (parseFloat(pool?.swapFee || "0") / 100).toString()
-    ))
-    .toString(10)
 
   /**
    *
@@ -142,8 +147,14 @@ export default function SwapInteraction({ pool }: Props) {
         const { token: inputToken } = previousFormValues.current.from;
         const { token: outputToken } = previousFormValues.current.to;
 
-        const inputData = fullPool.tokens.entities[tokenLookup[inputToken.toLowerCase()].id.toLowerCase()];
-        const outputData = fullPool.tokens.entities[tokenLookup[outputToken.toLowerCase()].id.toLowerCase()];
+        const inputData =
+          fullPool.tokens.entities[
+            tokenLookup[inputToken.toLowerCase()].id.toLowerCase()
+          ];
+        const outputData =
+          fullPool.tokens.entities[
+            tokenLookup[outputToken.toLowerCase()].id.toLowerCase()
+          ];
 
         if (inputData && outputData) {
           const {
@@ -168,7 +179,7 @@ export default function SwapInteraction({ pool }: Props) {
         }
       }
     },
-    [form, fullPool, tokenLookup, swapFee]
+    [form, fullPool, tokenLookup, swapFee, getFormattedSwapFee]
   );
   /**
    *
@@ -180,8 +191,14 @@ export default function SwapInteraction({ pool }: Props) {
         const { token: outputToken } = previousFormValues.current.to;
         const { token: inputToken } = previousFormValues.current.from;
 
-        const inputData = fullPool.tokens.entities[tokenLookup[inputToken.toLowerCase()].id.toLowerCase()];
-        const outputData = fullPool.tokens.entities[tokenLookup[outputToken.toLowerCase()].id.toLowerCase()];
+        const inputData =
+          fullPool.tokens.entities[
+            tokenLookup[inputToken.toLowerCase()].id.toLowerCase()
+          ];
+        const outputData =
+          fullPool.tokens.entities[
+            tokenLookup[outputToken.toLowerCase()].id.toLowerCase()
+          ];
 
         if (inputData && outputData) {
           const {
@@ -198,7 +215,7 @@ export default function SwapInteraction({ pool }: Props) {
           if (isGoodResult) {
             setMaxPrice(spotPriceAfter.times(SLIPPAGE_RATE));
 
-            form.setFieldsValue({ from: { amount: inputAmount }});
+            form.setFieldsValue({ from: { amount: inputAmount } });
           }
         }
       }

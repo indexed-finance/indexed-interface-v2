@@ -1,4 +1,3 @@
-import { ChainId } from '@uniswap/sdk'
 import { Interface } from "ethers/lib/utils";
 
 import IERC20_ABI from "./IERC20.json";

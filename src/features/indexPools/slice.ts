@@ -26,11 +26,21 @@ const slice = createSlice({
       .addCase(subgraphDataLoaded, (state, action) => {
         const { pools } = action.payload;
         const fullPools = pools.ids.map((id) => pools.entities[id]);
-        fullPools.forEach(pool => pool.tokens.ids.forEach(tokenId => {
-          const token = pool.tokens.entities[tokenId];
-          
-          [token.usedDenorm, token.usedBalance] = token.ready ? [token.denorm, token.balance] : [token.desiredDenorm, token.minimumBalance];
-        }));
+
+        for (const { tokens } of fullPools) {
+          for (const tokenId of tokens.ids) {
+            const token = tokens.entities[tokenId];
+
+            if (token.ready) {
+              token.usedDenorm = token.denorm;
+              token.usedBalance = token.balance;
+            } else {
+              token.usedDenorm = token.desiredDenorm;
+              token.usedBalance = token.minimumBalance;
+            }
+          }
+        }
+
         adapter.addMany(state, fullPools);
       })
       .addCase(poolUpdated, (state, action) => {
@@ -44,22 +54,24 @@ const slice = createSlice({
             string,
             PoolTokenUpdate & PoolUnderlyingToken & { weight?: string }
           > = {};
+
           for (const token of tokens) {
             const { address, ...tokenUpdate } = token;
             const tokenInState = pool.tokens.entities[address];
+
             tokenEntities[address] = {
               ...tokenInState,
-              ...tokenUpdate
-            }
-
+              ...tokenUpdate,
+            };
           }
+
           state.entities[pool.id] = {
             ...poolInState,
             ...rest,
             tokens: {
               ids: poolInState.tokens.ids,
-              entities: tokenEntities
-            }
+              entities: tokenEntities,
+            },
           };
         }
       })
