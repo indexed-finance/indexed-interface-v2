@@ -14,6 +14,7 @@ import {
   Stake,
 } from "./screens";
 import React, { ReactNode } from "react";
+import flags from "feature-flags";
 import type { AppState } from "features";
 
 type Route = {
@@ -85,21 +86,9 @@ const routes: Route[] = [
     isExternalLink: true,
   },
   {
-    path: "/news",
-    exact: true,
-    sider: "News",
-    screen: <NewsList />,
-  },
-  {
     path: "/news/:slug",
     exact: true,
     screen: <NewsDetail />,
-  },
-  {
-    path: "/faq",
-    exact: true,
-    sider: "FAQ",
-    screen: <FAQ />,
   },
   {
     path: "/docs",
@@ -119,5 +108,23 @@ const routes: Route[] = [
     screen: <Settings />,
   },
 ];
+
+if (flags.showFaqLink) {
+  routes.push({
+    path: "/faq",
+    exact: true,
+    sider: "FAQ",
+    screen: <FAQ />,
+  });
+}
+
+if (flags.showNewsLink) {
+  routes.push({
+    path: "/news",
+    exact: true,
+    sider: "News",
+    screen: <NewsList />,
+  });
+}
 
 export default routes;
