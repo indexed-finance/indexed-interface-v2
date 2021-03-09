@@ -1,5 +1,5 @@
 import { AppState, FormattedIndexPool, selectors } from "features";
-import { Area, Button } from "components/atoms";
+import { Area, Button, Token } from "components/atoms";
 import { CaretDownOutlined } from "@ant-design/icons";
 import { InputNumber, List, Space, Typography } from "antd";
 import { SelectableToken } from "components/molecules";
@@ -177,13 +177,7 @@ export default function TokenSelector({
             >
               {value.token ? (
                 <>
-                  <S.Image
-                    alt={value.token}
-                    src={
-                      require(`assets/images/${value.token.toLowerCase()}.png`)
-                        .default
-                    }
-                  />
+                  <S.Token name={value.token} image={value.token} />
                   {value.token}
                 </>
               ) : (
@@ -246,9 +240,7 @@ const S = {
       align-items: center;
     }
   `,
-  Image: styled.img`
-    ${(props) => props.theme.snippets.circular};
-    ${(props) => props.theme.snippets.size32};
+  Token: styled(Token)`
     margin-right: ${(props) => props.theme.spacing.small};
   `,
 };

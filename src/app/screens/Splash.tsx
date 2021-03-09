@@ -42,10 +42,9 @@ export default function Splash() {
 
   return (
     <S.Splash>
-      <S.Title>Decentralized Trading Protocol</S.Title>
+      <S.Title>Decentralized Index Protocol</S.Title>
       <S.Subtitle level={5}>
-        Guaranteed liquidity for millions of users and hundreds of Ethereum
-        applications.
+        Passively managed, autonomous AMM pools powering the future of finance
       </S.Subtitle>
       <S.Actions level={3}>
         <S.GetStarted>Get started today:</S.GetStarted>
@@ -82,6 +81,7 @@ const S = {
   `,
   GetStarted: styled.span`
     margin-right: ${(props) => props.theme.spacing.large};
+    font-weight: 200 !important;
   `,
   Splash: styled.div`
     display: flex;
@@ -102,5 +102,6 @@ const S = {
   `,
   Subtitle: styled(Typography.Title)`
     font-size: 1.5rem !important;
+    font-weight: 200 !important;
   `,
 };

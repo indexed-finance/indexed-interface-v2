@@ -1,7 +1,7 @@
 import { AiOutlineArrowRight } from "react-icons/ai";
 import { Alert, Form, Statistic, Typography } from "antd";
 import { AppState, FormattedIndexPool, selectors, signer } from "features";
-import { Flipper } from "components/atoms";
+import { Flipper, Token } from "components/atoms";
 import { SubscreenContext } from "app/subscreens/Subscreen";
 import { actions } from "features";
 import { convert } from "helpers";
@@ -326,17 +326,9 @@ export default function SwapInteraction({ pool }: Props) {
       <S.Title>
         <span>Swap</span>
         <span>
-          <img
-            src={require(`assets/images/${baseline.toLowerCase()}.png`).default}
-            alt="Baseline"
-          />
+          <Token name="Baseline" image={baseline} />
           <S.Swap />
-          <T.Comparison
-            src={
-              require(`assets/images/${comparison.toLowerCase()}.png`).default
-            }
-            alt="Comparison"
-          />
+          <Token name="Comparison" image={comparison} />
         </span>
       </S.Title>
       <Item name="from" rules={[{ validator: checkAmount }]}>
@@ -428,7 +420,6 @@ const T = {
     position: relative;
     width: 100%;
   `,
-  Comparison: styled.img``,
   Title: styled(Typography.Title)`
     ${(props) => props.theme.snippets.spacedBetween};
     flex-wrap: wrap;

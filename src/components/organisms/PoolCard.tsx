@@ -1,11 +1,10 @@
 import { Badge, Card, List, Typography } from "antd";
 import { FormattedIndexPool } from "features";
+import { Token } from "components/atoms";
 import { useHistory } from "react-router-dom";
 import RankedTokenList from "./RankedTokenList";
 import React from "react";
 import styled from "styled-components";
-
-const PLACEHOLDER_IMAGE = "https://placehold.it/32x32";
 
 export interface Props {
   pool: FormattedIndexPool;
@@ -29,23 +28,9 @@ export default function PoolCard({ pool }: Props) {
       }
       actions={[
         <S.TokenImageWrapper key="1">
-          {assets.map((token, index) => {
-            let assetImage = PLACEHOLDER_IMAGE;
-
-            try {
-              assetImage = require(`assets/images/${token.symbol.toLowerCase()}.png`)
-                .default;
-            } catch {}
-
-            return (
-              <S.TokenImage
-                alt={token.name}
-                title={token.name}
-                key={index}
-                src={assetImage}
-              />
-            );
-          })}
+          {assets.map((token, index) => (
+            <Token key={index} name={token.symbol} image={token.symbol} />
+          ))}
         </S.TokenImageWrapper>,
       ]}
     >
@@ -62,6 +47,7 @@ const S = {
   `,
   Card: styled(Card)`
     flex: 1;
+    max-width: 450px;
 
     .ant-card-head-title {
       ${(props) => props.theme.snippets.fancy};
@@ -101,11 +87,6 @@ const S = {
     display: flex;
     align-items: center;
     justify-content: space-evenly;
-  `,
-  TokenImage: styled.img`
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
   `,
   List: styled(List)`
     margin-top: ${(props) => props.theme.spacing.medium};

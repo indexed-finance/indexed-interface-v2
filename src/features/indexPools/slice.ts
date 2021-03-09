@@ -1,4 +1,4 @@
-import { DEFAULT_DECIMAL_COUNT, PLACEHOLDER_TOKEN_IMAGE } from "config";
+import { DEFAULT_DECIMAL_COUNT } from "config";
 import { NormalizedPool, PoolTokenUpdate } from "ethereum";
 import { PoolUnderlyingToken } from "indexed-types";
 import { categoriesSelectors } from "../categories";
@@ -134,21 +134,16 @@ export const selectors = {
   },
   selectCategoryImage: (state: AppState, poolId: string) => {
     const pool = selectors.selectPool(state, poolId);
-    const categoryLookup = categoriesSelectors.selectEntities(state);
 
-    try {
-      if (pool) {
-        const { id } = pool.category;
-        const category = categoryLookup[id];
+    if (pool) {
+      const { id } = pool.category;
+      const categoryLookup = categoriesSelectors.selectEntities(state);
+      const category = categoryLookup[id];
 
-        if (category && category.symbol) {
-          return require(`assets/images/${category.symbol.toLowerCase()}.png`)
-            .default;
-        }
-      }
-    } catch {}
-
-    return PLACEHOLDER_TOKEN_IMAGE;
+      return category?.symbol ?? "";
+    } else {
+      return "";
+    }
   },
   selectCategoryImagesByPoolIds: (state: AppState) =>
     selectors

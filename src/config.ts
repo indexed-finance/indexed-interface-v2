@@ -92,32 +92,32 @@ export const ETHEREUM_PRICE_URL = "/subgraphs/name/uniswap/uniswap-v2";
 export const SOCIAL_MEDIA = [
   {
     name: "Snapshot",
-    image: "snapshot.png",
+    image: "snapshot",
     link: "https://gov.indexed.finance/#/",
   },
   {
     name: "Discourse",
-    image: "discourse.png",
+    image: "discourse",
     link: "https://forum.indexed.finance/",
   },
   {
     name: "Twitter",
-    image: "twitter.png",
+    image: "twitter",
     link: "https://twitter.com/ndxfi",
   },
   {
     name: "Discord",
-    image: "discord.png",
+    image: "discord",
     link: "https://discord.gg/jaeSTNPNt9",
   },
   {
     name: "Medium",
-    image: "medium.png",
+    image: "medium",
     link: "https://ndxfi.medium.com/",
   },
   {
     name: "GitHub",
-    image: "github.png",
+    image: "github",
     link: "https://github.com/indexed-finance",
   },
 ];

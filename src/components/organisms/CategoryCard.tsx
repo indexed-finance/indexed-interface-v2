@@ -1,11 +1,9 @@
-import { Button } from "components/atoms";
+import { Button, Token } from "components/atoms";
 import { Card, List } from "antd";
 import { Link, useHistory } from "react-router-dom";
 import React from "react";
 import styled from "styled-components";
-import type { Token } from "indexed-types";
-
-const PLACEHOLDER_IMAGE = "https://placehold.it/32x32";
+import type { Token as TokenType } from "indexed-types";
 
 export interface Props {
   id?: string;
@@ -21,7 +19,7 @@ export interface Props {
   }>;
   tokens?: {
     ids: string[];
-    entities: Record<string, Token>;
+    entities: Record<string, TokenType>;
   };
 }
 
@@ -39,20 +37,13 @@ export default function CategoryCard({
 }: Props) {
   const history = useHistory();
 
-  let categoryImage = PLACEHOLDER_IMAGE;
-
-  try {
-    categoryImage = require(`assets/images/${symbol.toLowerCase()}.png`)
-      .default;
-  } catch {}
-
   return (
     <S.Card
       key={id}
       hoverable={true}
       title={
         <>
-          <S.Image alt={`${symbol} Logo`} src={categoryImage} />
+          <S.Token name={name} image={symbol} />
           <S.Name>{name}</S.Name>
         </>
       }
@@ -63,23 +54,9 @@ export default function CategoryCard({
       }
       actions={[
         <S.TokenImageWrapper key="1">
-          {Object.values(tokens.entities).map((token) => {
-            let assetImage = PLACEHOLDER_IMAGE;
-
-            try {
-              assetImage = require(`assets/images/${token.symbol.toLowerCase()}.png`)
-                .default;
-            } catch {}
-
-            return (
-              <S.TokenImage
-                alt={token.name}
-                title={token.name}
-                key={token.symbol}
-                src={assetImage}
-              />
-            );
-          })}
+          {Object.values(tokens.entities).map((token) => (
+            <Token key={token.symbol} name={token.name} image={token.symbol} />
+          ))}
         </S.TokenImageWrapper>,
       ]}
     >
@@ -144,10 +121,8 @@ const S = {
     align-items: flex-start;
     flex: 1;
   `,
-  Image: styled.img`
+  Token: styled(Token)`
     flex: 1;
-    width: 32px;
-    height: 32px;
     margin: ${(props) => props.theme.spacing.medium} 0;
     margin-right: ${(props) => props.theme.spacing.huge};
   `,
@@ -158,11 +133,6 @@ const S = {
     display: flex;
     align-items: center;
     justify-content: space-evenly;
-  `,
-  TokenImage: styled.img`
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
   `,
   List: styled(List)`
     margin-top: ${(props) => props.theme.spacing.medium};

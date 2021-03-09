@@ -1,7 +1,8 @@
 import { AiOutlineCopyrightCircle } from "react-icons/ai";
 import { Link, useHistory } from "react-router-dom";
 import { Menu, Typography } from "antd";
-import { PLACEHOLDER_TOKEN_IMAGE, SOCIAL_MEDIA } from "config";
+import { SOCIAL_MEDIA } from "config";
+import { Token } from "components";
 import { selectors } from "features";
 import { useSelector } from "react-redux";
 import React from "react";
@@ -48,21 +49,11 @@ export default function AppMenu({ onItemClick = noop, ...rest }: Props) {
                   }
                 >
                   {models.map((model) => {
-                    let image = "";
                     const isCategory = route.model === "categories";
                     const isIndexPool = route.model === "indexPools";
-
-                    if (isIndexPool) {
-                      image = indexPoolsLookup[model.id];
-                    } else if (isCategory) {
-                      try {
-                        image = require(`assets/images/${
-                          categoryLookup[model.id]?.symbol?.toLowerCase() ?? ""
-                        }.png`).default;
-                      } catch {
-                        image = PLACEHOLDER_TOKEN_IMAGE;
-                      }
-                    }
+                    const image = isIndexPool
+                      ? indexPoolsLookup[model.id]
+                      : categoryLookup[model.id]?.symbol ?? "";
 
                     return (
                       <Item
@@ -73,7 +64,7 @@ export default function AppMenu({ onItemClick = noop, ...rest }: Props) {
                         }}
                       >
                         <S.ItemInner isCategory={isCategory}>
-                          <S.Image alt={model.name} src={image} />
+                          <S.Token name={model.name} image={image} />
                           <S.Uppercase>{model.name}</S.Uppercase>
                         </S.ItemInner>
                       </Item>
@@ -102,10 +93,7 @@ export default function AppMenu({ onItemClick = noop, ...rest }: Props) {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <S.Image
-                  alt={site.name}
-                  src={require(`assets/images/${site.image}`).default}
-                />{" "}
+                <S.Token name={site.name} image={site.image} />
                 <span className="social-link">{site.name}</span>
               </S.Uppercase>
             </Menu.Item>
@@ -140,9 +128,7 @@ const S = {
       }
     }
   `,
-  Image: styled.img`
-    ${(props) => props.theme.snippets.size32};
-    ${(props) => props.theme.snippets.circular};
+  Token: styled(Token)`
     margin-right: ${(props) => props.theme.spacing.medium};
   `,
   Title: styled.span`

@@ -1,5 +1,6 @@
 import { Asset } from "features";
 import { CgDollar } from "react-icons/cg";
+import { Token } from "components/atoms";
 import { actions, selectors } from "features";
 import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
@@ -17,15 +18,6 @@ export interface Props {
 export default function RankedToken({ token, rank }: Props) {
   const dispatch = useDispatch();
   const colorCache = useSelector(selectors.selectColorCache);
-
-  let image;
-
-  try {
-    image = require(`assets/images/${token.symbol.toLowerCase()}.png`).default;
-  } catch {
-    image = "https://placehold.it/50x50";
-  }
-
   const colorThief = useRef<any>(null);
 
   // Effect:
@@ -106,7 +98,7 @@ export default function RankedToken({ token, rank }: Props) {
       <S.RankedToken>
         <T.Top>
           <S.Left>
-            <S.Image src={image} alt={token.symbol} />
+            <S.Token image={token.symbol} name={token.symbol} />
             <S.Title>
               <h2>{token.symbol}</h2>
               <h3>{token.name}</h3>
@@ -130,9 +122,10 @@ export default function RankedToken({ token, rank }: Props) {
           </S.Balance>
           <S.Balance>
             <div>{token.balance}</div>
-            <S.BalanceImage
-              src={image}
-              alt={token.symbol}
+            <S.BalanceToken
+              size="small"
+              image={token.symbol}
+              name={token.symbol}
               data-token={token.symbol}
             />
           </S.Balance>
@@ -194,19 +187,18 @@ const S = {
     ${(props) => props.theme.snippets.perfectlyAligned};
     font-size: ${(props) => props.theme.fontSizes.medium};
   `,
-  Image: styled.img`
+  Token: styled(Token)`
     position: absolute;
     top: 0;
     left: -55px;
     ${(props) => props.theme.snippets.imageFadedLeftRight};
     ${(props) => props.theme.snippets.size100};
   `,
+  BalanceToken: styled(Token)`
+    margin-left: ${(props) => props.theme.spacing.tiny};
+  `,
   Weight: styled.div`
     font-size: ${(props) => props.theme.fontSizes.medium};
-  `,
-  BalanceImage: styled.img`
-    ${(props) => props.theme.snippets.size16};
-    margin-left: ${(props) => props.theme.spacing.tiny};
   `,
   Left: styled.div`
     display: flex;
