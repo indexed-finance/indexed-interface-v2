@@ -12,12 +12,12 @@ export interface Props {
 }
 
 export default function PoolCard({ pool }: Props) {
-  const { assets, name, id } = pool;
+  const { assets, name, id, slug } = pool;
   const history = useHistory();
 
   return (
     <S.Card
-      onClick={() => history.push(`/pools/${id}`)}
+      onClick={() => history.push(`/pools/${slug}`)}
       key={id}
       hoverable={true}
       size="small"

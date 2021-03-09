@@ -1,5 +1,6 @@
 import { DEFAULT_DECIMAL_COUNT, PLACEHOLDER_TOKEN_IMAGE } from "config";
 import { NormalizedPool, PoolTokenUpdate } from "ethereum";
+import { PoolUnderlyingToken } from "indexed-types";
 import { categoriesSelectors } from "../categories";
 import { convert } from "helpers";
 import { createEntityAdapter, createSlice } from "@reduxjs/toolkit";
@@ -11,8 +12,7 @@ import {
   subgraphDataLoaded,
 } from "features/actions";
 import { tokensSelectors } from "features/tokens";
-
-import { PoolUnderlyingToken } from "indexed-types";
+import S from "string";
 import type { AppState } from "features/store";
 
 const adapter = createEntityAdapter<NormalizedPool>();
@@ -100,6 +100,16 @@ export const selectors = {
   ...adapter.getSelectors((state: AppState) => state.indexPools),
   selectPool: (state: AppState, poolId: string) =>
     selectors.selectById(state, poolId),
+  selectPoolByName: (state: AppState, name: string) => {
+    const formatName = (from: string) => S(from).camelize().s.toLowerCase();
+    const formattedName = formatName(name);
+    const pools = selectors.selectAllPools(state).reduce((prev, next) => {
+      prev[formatName(next.name)] = next;
+      return prev;
+    }, {} as Record<string, NormalizedPool>);
+
+    return pools[formattedName] ?? null;
+  },
   selectAllPools: (state: AppState) => selectors.selectAll(state),
   selectPoolLookup: (state: AppState) => selectors.selectEntities(state),
   selectPoolTokenIds: (state: AppState, poolId: string) => {

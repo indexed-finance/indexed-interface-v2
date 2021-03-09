@@ -8,9 +8,9 @@ import React from "react";
 import ReactMarkdown from "react-markdown";
 
 export default function CategoryDetail() {
-  const { categoryId } = useParams<{ categoryId: string }>();
+  const { categoryName } = useParams<{ categoryName: string }>();
   const category = useSelector((state: AppState) =>
-    selectors.selectFormattedCategory(state, categoryId)
+    selectors.selectFormattedCategory(state, categoryName)
   );
 
   return category ? (

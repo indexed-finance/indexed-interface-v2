@@ -9,6 +9,7 @@ import { indexPoolsSelectors } from "./indexPools";
 import { settingsSelectors } from "./settings";
 import { tokensSelectors } from "./tokens";
 import { userSelectors } from "./user";
+import S from "string";
 
 const MILLISECONDS_PER_SECOND = 1000;
 
@@ -28,16 +29,22 @@ const selectors = {
    */
   selectMenuModels: (
     state: AppState
-  ): Record<ModelKeys, Array<{ name: string; id: string }>> => {
+  ): Record<ModelKeys, Array<{ name: string; id: string; slug: string }>> => {
     const categories = selectors
-      .selectAllCategories(state)
-      .map(({ id, name }) => ({
-        name,
+      .selectAllFormattedCategories(state)
+      .map(({ slug, id, name }: any) => ({
         id,
+        name,
+        slug,
       }));
     const indexPools = selectors
-      .selectAllPools(state)
-      .map(({ name, id }) => ({ name: name.replace(/Tokens Index/g, ""), id }));
+      .selectAllFormattedIndexPools(state)
+      .filter(Boolean)
+      .map(({ slug, id, name }: any) => ({
+        name: name.replace(/Tokens Index/g, ""),
+        id,
+        slug,
+      }));
 
     return {
       categories,
@@ -49,8 +56,8 @@ const selectors = {
    * @param state -
    * @param poolId -
    */
-  selectFormattedCategory: (state: AppState, categoryId: string) => {
-    const category = selectors.selectCategory(state, categoryId);
+  selectFormattedCategory: (state: AppState, categoryName: string) => {
+    const category = selectors.selectCategoryByName(state, categoryName);
     const indexPoolLookup = selectors.selectPoolLookup(state);
 
     if (category) {
@@ -58,6 +65,7 @@ const selectors = {
         id: category.id,
         symbol: category.symbol,
         name: category.name,
+        slug: S(category.name).slugify().s,
         brief: category.brief,
         description: category.description,
         indexPools: category.indexPools
@@ -74,6 +82,7 @@ const selectors = {
             return {
               id: guaranteedPool.id,
               name: guaranteedPool.name,
+              slug: S(guaranteedPool.name).slugify().s,
               symbol: guaranteedPool.symbol,
               size: guaranteedPool.size.toString(),
               price: convert.toCurrency(price.toNumber()),
@@ -99,29 +108,31 @@ const selectors = {
   selectAllFormattedCategories: (state: AppState) => {
     return selectors
       .selectAllCategories(state)
-      .map((category) => selectors.selectFormattedCategory(state, category.id))
+      .map((category) =>
+        selectors.selectFormattedCategory(state, category.name)
+      )
       .filter(Boolean);
   },
   /**
    *
    * @param state -
-   * @param poolId -
+   * @param poolName -
    */
   selectFormattedIndexPool: (
     state: AppState,
-    poolId: string
+    poolName: string
   ): null | FormattedIndexPool => {
-    const pool = selectors.selectPool(state, poolId);
+    const pool = selectors.selectPoolByName(state, poolName);
 
     if (pool) {
       const tokens = selectors.selectTokenLookup(state);
       const tokenWeights = selectors.selectTokenWeights(
         state,
-        poolId,
+        pool.id,
         pool.tokens.ids
       );
       const category = selectors.selectCategory(state, pool.category.id);
-      const stats = selectors.selectPoolStats(state, poolId);
+      const stats = selectors.selectPoolStats(state, pool.id);
       const withDisplayedSigns = { signDisplay: "always" };
 
       return {
@@ -140,6 +151,7 @@ const selectors = {
         ),
         isNegative: stats.deltas.price.day.value < 0,
         name: pool.name.replace(/Tokens Index/g, ""),
+        slug: S(pool.name).slugify().s,
         volume: convert.toCurrency(stats.deltas.volume.day),
         totalValueLocked: convert.toCurrency(pool.totalValueLockedUSD),
         totalValueLockedPercent: convert.toPercent(
@@ -254,7 +266,7 @@ const selectors = {
   selectAllFormattedIndexPools: (state: AppState) => {
     return selectors
       .selectAllPools(state)
-      .map((pool) => selectors.selectFormattedIndexPool(state, pool.id))
+      .map((pool) => selectors.selectFormattedIndexPool(state, pool.name))
       .filter(Boolean);
   },
 };
@@ -265,9 +277,11 @@ export interface FormattedCategory {
   id: string;
   symbol: string;
   name: string;
+  slug: string;
   brief?: string;
   indexPools: Array<{
     name: string;
+    slug: string;
     symbol: string;
     size: string;
     price: string;
@@ -290,6 +304,7 @@ export interface FormattedIndexPool {
   netChangePercent: string;
   isNegative: boolean;
   name: string;
+  slug: string;
   volume: string;
   totalValueLocked: string;
   totalValueLockedPercent: string;

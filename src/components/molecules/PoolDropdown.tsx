@@ -10,12 +10,12 @@ export default function PoolDropdown() {
 
   return (
     <Menu>
-      {indexPools.map(({ id, name }) => {
+      {indexPools.map(({ id, name, slug }) => {
         const image = indexPoolsLookup[id];
 
         return (
           <Menu.Item key={id}>
-            <Link to={`/pools/${id}`}>
+            <Link to={`/pools/${slug}`}>
               <S.ItemInner>
                 <S.Image alt={name} src={image} />
                 <span>{name}</span>

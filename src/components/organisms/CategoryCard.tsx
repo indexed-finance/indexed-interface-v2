@@ -9,8 +9,14 @@ export interface Props {
   id?: string;
   symbol?: string;
   name?: string;
+  slug?: string;
   brief?: string;
-  indexPools?: Array<{ id: string; name: string; symbol: string }>;
+  indexPools?: Array<{
+    id: string;
+    name: string;
+    slug: string;
+    symbol: string;
+  }>;
   tokens?: {
     ids: string[];
     entities: Record<string, Token>;
@@ -21,6 +27,7 @@ export default function CategoryCard({
   id = "",
   symbol = "",
   name = "",
+  slug = "",
   brief = "",
   indexPools = [],
   tokens = {
@@ -42,7 +49,7 @@ export default function CategoryCard({
         </>
       }
       extra={
-        <Link to={`/categories/${id}`}>
+        <Link to={`/categories/${slug}`}>
           <Button type="primary">More</Button>
         </Link>
       }
@@ -63,7 +70,7 @@ export default function CategoryCard({
       ]}
     >
       <S.Content>
-        <Link to={`/categories/${id.toLowerCase()}`}>
+        <Link to={`/categories/${slug}`}>
           <S.Meta
             description={
               <>
@@ -74,7 +81,7 @@ export default function CategoryCard({
                       <span>
                         {indexPool.name} [{indexPool.symbol}]
                       </span>
-                      <Link to={`/pools/${indexPool.id}`}>
+                      <Link to={`/pools/${indexPool.slug}`}>
                         <Button>View</Button>
                       </Link>
                     </S.IndexPoolEntry>

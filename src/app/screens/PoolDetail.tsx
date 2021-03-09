@@ -20,10 +20,11 @@ const { useBreakpoint } = Grid;
 
 export default function PoolDetail() {
   const dispatch = useDispatch();
-  const { poolId } = useParams<{ poolId: string }>();
+  const { poolName } = useParams<{ poolName: string }>();
   const pool = useSelector((state: AppState) =>
-    selectors.selectFormattedIndexPool(state, poolId)
+    selectors.selectFormattedIndexPool(state, poolName)
   );
+  const id = useMemo(() => pool?.id ?? "", [pool]);
   const isConnected = useSelector(selectors.selectConnected);
   const breakpoints = useBreakpoint();
   const chartActions = useMemo(
@@ -64,13 +65,13 @@ export default function PoolDetail() {
 
     // This screen always needs user data.
     const tokenUserDataListenerId = (dispatch(
-      actions.tokenUserDataListenerRegistered(poolId)
+      actions.tokenUserDataListenerRegistered(id)
     ) as unknown) as string;
 
     // Pool updates and TheGraph/CoinGecko data is only required if not receiving data from the server.
     if (!isConnected) {
       poolUpdateListenerId = (dispatch(
-        actions.poolUpdateListenerRegistered(poolId)
+        actions.poolUpdateListenerRegistered(id)
       ) as unknown) as string;
     }
 
@@ -80,9 +81,9 @@ export default function PoolDetail() {
     return () => {
       [tokenUserDataListenerId, poolUpdateListenerId]
         .filter(Boolean)
-        .forEach((id) => dispatch(actions.listenerUnregistered(id)));
+        .forEach((_id) => dispatch(actions.listenerUnregistered(_id)));
     };
-  }, [dispatch, poolId, isConnected]);
+  }, [dispatch, id, isConnected]);
 
   if (pool) {
     // Subscreens

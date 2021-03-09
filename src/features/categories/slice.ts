@@ -5,11 +5,11 @@ import {
   receivedStatePatchFromServer,
   subgraphDataLoaded,
 } from "features/actions";
-import type { AppState } from "features/store";
-
+import S from "string";
 import ZeroExOne from "./local-data/0x1.json";
 import ZeroExThree from "./local-data/0x3.json";
 import ZeroExTwo from "./local-data/0x2.json";
+import type { AppState } from "features/store";
 
 // #region Local Data Initialization
 // --
@@ -63,6 +63,18 @@ export const selectors = {
   selectCategory: (state: AppState, categoryId: string) =>
     selectors.selectById(state, categoryId),
   selectAllCategories: (state: AppState) => selectors.selectAll(state),
+  selectCategoryByName: (state: AppState, name: string) => {
+    const formatName = (from: string) => S(from).camelize().s.toLowerCase();
+    const formattedName = formatName(name);
+    const categories = selectors
+      .selectAllCategories(state)
+      .reduce((prev, next) => {
+        prev[formatName(next.name)] = next;
+        return prev;
+      }, {} as Record<string, NormalizedCategory>);
+
+    return categories[formattedName] ?? null;
+  },
 };
 
 export default slice.reducer;

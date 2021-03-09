@@ -69,7 +69,7 @@ export default function AppMenu({ onItemClick = noop, ...rest }: Props) {
                       <Item
                         key={model.id}
                         onClick={() => {
-                          history.push(`${route.path}/${model.id}`);
+                          history.push(`${route.path}/${model.slug}`);
                           onItemClick();
                         }}
                       >

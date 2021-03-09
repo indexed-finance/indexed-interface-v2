@@ -22,6 +22,7 @@ export default function Stake() {
   const stakeable = {
     image: require("assets/images/cc-dark-circular.png").default,
     id: "0x17ac188e09a7890a1844e5e65471fe8b0ccfadf3",
+    slug: "cryptocurrency-top-10-tokens-index",
     name: "Cryptocurrency Top 10",
     symbol: "CC10",
     staked: "0.00 CC10",
@@ -60,7 +61,7 @@ export default function Stake() {
             >
               <List.Item.Meta
                 title={
-                  <Link to={`/pools/${datum.id}`}>
+                  <Link to={`/pools/${datum.slug}`}>
                     <S.Avatar src={datum.image} />
                     {datum.name} [{datum.symbol}]
                   </Link>

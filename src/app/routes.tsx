@@ -48,16 +48,15 @@ const routes: Route[] = [
     model: "categories",
   },
   {
-    path: "/categories/:categoryId",
+    path: "/categories/:categoryName",
     exact: true,
     screen: <CategoryDetail />,
   },
   {
-    path: "/pools/:poolId",
+    path: "/pools/:poolName",
     exact: true,
     screen: <PoolDetail />,
   },
-
   {
     path: "/portfolio",
     exact: true,

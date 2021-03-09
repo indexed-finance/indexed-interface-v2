@@ -9,10 +9,10 @@ export default function CategoryDropdown() {
 
   return (
     <Menu>
-      {categories.map(({ id, name }) => {
+      {categories.map(({ id, name, slug }) => {
         return (
           <Menu.Item key={id}>
-            <Link to={`/categories/${id}`}>
+            <Link to={`/categories/${slug}`}>
               <S.ItemInner>
                 <S.CategoryId level={3} data-category={true}>
                   {id}

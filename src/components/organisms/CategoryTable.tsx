@@ -17,7 +17,7 @@ export default function CategoryTable(props: Props) {
       columns={columns}
       pagination={false}
       onRow={(record: any) => ({
-        onClick: () => history.push(`/pools/${record.id}`),
+        onClick: () => history.push(`/pools/${record.slug}`),
       })}
     />
   );
