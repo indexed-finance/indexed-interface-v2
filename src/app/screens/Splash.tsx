@@ -13,6 +13,19 @@ const STEP_PROGRESSION_DURATION = 2500;
 
 export default function Splash() {
   const [step, setStep] = useState(0);
+  const docsButton = <Button type="default">Read the Documentation</Button>;
+  const DocsButton = () =>
+    flags.useInternalDocs ? (
+      <Link to="/docs">{docsButton}</Link>
+    ) : (
+      <S.External
+        target="_blank"
+        rel="noopener noreferrer"
+        href="https://docs.indexed.finance/"
+      >
+        {docsButton}
+      </S.External>
+    );
 
   // Effect:
   // Continuously progress through the steps on the splash page.
@@ -52,9 +65,7 @@ export default function Splash() {
           <Link to="/pools">
             <Button type="ghost">View Index Pools</Button>
           </Link>
-          <Link to="/docs">
-            <Button type="default">Read the Documentation</Button>
-          </Link>
+          <DocsButton />
           {flags.showFaqLink && (
             <Link to="/faq">
               <Button type="default">Check out the FAQ</Button>
@@ -103,5 +114,8 @@ const S = {
   Subtitle: styled(Typography.Title)`
     font-size: 1.5rem !important;
     font-weight: 200 !important;
+  `,
+  External: styled.a`
+    margin-left: ${(props) => props.theme.spacing.medium};
   `,
 };

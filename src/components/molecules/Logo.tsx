@@ -10,6 +10,7 @@ interface Props {
   title?: string;
   withTitle?: boolean;
   size?: "small" | "large";
+  animated?: boolean;
 }
 
 export default function Logo({
@@ -17,12 +18,13 @@ export default function Logo({
   withTitle = true,
   title = "Indexed",
   size = "large",
+  animated = false,
 }: Props) {
   const history = useHistory();
   const theme = useSelector(selectors.selectTheme);
 
   return (
-    <S.LogoWrapper onClick={() => history.push(link)}>
+    <S.LogoWrapper onClick={() => history.push(link)} animated={animated}>
       <S.Logo
         src={require(`assets/images/indexed-${theme}.png`).default}
         size={size}
@@ -33,7 +35,7 @@ export default function Logo({
 }
 
 const S = {
-  LogoWrapper: styled.div`
+  LogoWrapper: styled.div<{ animated: Props["animated"] }>`
     ${(props) => props.theme.snippets.perfectlyAligned};
     ${(props) => props.theme.snippets.fancy};
     padding: ${(props) => props.theme.spacing.medium};

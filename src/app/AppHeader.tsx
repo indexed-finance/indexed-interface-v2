@@ -50,7 +50,12 @@ export default function AppHeader() {
       {breakpoint.lg && (
         <S.Controls>
           {selectedAddress ? (
-            <Logo title="2800.00 NDX" link="/portfolio" size="small" />
+            <Logo
+              title="2800.00 NDX"
+              link="/portfolio"
+              size="small"
+              animated={true}
+            />
           ) : (
             <span />
           )}

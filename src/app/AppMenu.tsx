@@ -82,7 +82,10 @@ export default function AppMenu({ onItemClick = noop, ...rest }: Props) {
                   {route.isExternalLink ? (
                     route.sider
                   ) : (
-                    <Link to={route.path}>{route.sider}</Link>
+                    <S.SingleLink to={route.path}>
+                      <span>{route.sider}</span>
+                      {route.icon ?? null}
+                    </S.SingleLink>
                   )}
                 </S.Item>
               );
@@ -157,5 +160,8 @@ const S = {
       margin-right: ${(props) => props.theme.spacing.small};
       margin-bottom: 3px;
     }
+  `,
+  SingleLink: styled(Link)`
+    ${(props) => props.theme.snippets.spacedBetween};
   `,
 };

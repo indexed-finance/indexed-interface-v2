@@ -107,19 +107,16 @@ export async function multicallViaInterface(
     ["uint256", "bytes[]"],
     encodedResult
   );
-  const formattedResults = (decodedResult as string[])
-    // .filter((result, index) => result !== "0x" && Boolean(_calls[index]))
-    .map((result, index) => {
-      // console.log((_calls[index] as Call).function)
-      return result !== "0x"
-        ? _interface.decodeFunctionResult(
-            (_calls[index] as Call).function,
-            result
-          )
-        : getDefaultResultForFunction(
-            _interface.getFunction((_calls[index] as Call).function)
-          );
-    });
+  const formattedResults = (decodedResult as string[]).map((result, index) => {
+    return result === "0x"
+      ? getDefaultResultForFunction(
+          _interface.getFunction((_calls[index] as Call).function)
+        )
+      : _interface.decodeFunctionResult(
+          (_calls[index] as Call).function,
+          result
+        );
+  });
 
   return {
     blockNumber,
