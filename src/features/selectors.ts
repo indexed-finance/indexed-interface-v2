@@ -123,13 +123,14 @@ const selectors = {
     poolName: string
   ): null | FormattedIndexPool => {
     const pool = selectors.selectPoolByName(state, poolName);
+    const tokenIds = pool?.tokens.ids ?? [];
 
     if (pool) {
       const tokens = selectors.selectTokenLookup(state);
       const tokenWeights = selectors.selectTokenWeights(
         state,
         pool.id,
-        pool.tokens.ids
+        tokenIds
       );
       const category = selectors.selectCategory(state, pool.category.id);
       const stats = selectors.selectPoolStats(state, pool.id);
@@ -160,7 +161,7 @@ const selectors = {
         swapFee: convert.toPercent(parseFloat(convert.toBalance(pool.swapFee))),
         cumulativeFee: convert.toCurrency(pool.feesTotalUSD),
         recent: {
-          swaps: pool.swaps.map((swap) => {
+          swaps: (pool.swaps ?? []).map((swap) => {
             const from = selectors.selectTokenSymbol(state, swap.tokenIn);
             const to = selectors.selectTokenSymbol(state, swap.tokenOut);
             const [transactionHash] = swap.id.split("-");
@@ -175,7 +176,7 @@ const selectors = {
               transactionHash,
             };
           }),
-          trades: pool.trades.map((trade) => ({
+          trades: (pool.trades ?? []).map((trade) => ({
             when: formatDistance(
               new Date(parseInt(trade.timestamp) * MILLISECONDS_PER_SECOND),
               new Date()
@@ -191,7 +192,7 @@ const selectors = {
             transactionHash: trade.transaction.id,
           })),
         },
-        assets: pool.tokens.ids
+        assets: tokenIds
           .map((poolTokenId) => {
             const token = tokens[poolTokenId];
 

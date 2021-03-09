@@ -1,6 +1,6 @@
 import { Button } from "components/atoms";
 import { Card, List } from "antd";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import React from "react";
 import styled from "styled-components";
 import type { Token } from "indexed-types";
@@ -35,6 +35,8 @@ export default function CategoryCard({
     entities: {},
   },
 }: Props) {
+  const history = useHistory();
+
   return (
     <S.Card
       key={id}
@@ -70,7 +72,7 @@ export default function CategoryCard({
       ]}
     >
       <S.Content>
-        <Link to={`/categories/${slug}`}>
+        <div onClick={() => history.push(`/categories/${slug}`)}>
           <S.Meta
             description={
               <>
@@ -90,7 +92,7 @@ export default function CategoryCard({
               </>
             }
           />
-        </Link>
+        </div>
       </S.Content>
     </S.Card>
   );

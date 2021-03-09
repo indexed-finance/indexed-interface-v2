@@ -5,7 +5,8 @@ import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
 import ColorThief from "colorthief";
 import Quote from "./Quote";
-import React, { useLayoutEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
+import flags from "feature-flags";
 import styled from "styled-components";
 
 export interface Props {
@@ -29,50 +30,72 @@ export default function RankedToken({ token, rank }: Props) {
 
   // Effect:
   // Load colorThief and generate colors based on token.
-  useLayoutEffect(() => {
-    try {
-      const imageRef = document.querySelector(`[data-token="${token.symbol}"]`);
-      const wrapperRef = document.querySelector(
-        `[data-tokenwrapper="${token.symbol}"]`
-      );
-      let red = 0;
-      let green = 0;
-      let blue = 0;
+  useEffect(() => {
+    if (flags.useColorThief) {
+      try {
+        const imageRef = document.querySelector(
+          `[data-token="${token.symbol}"]`
+        );
+        const wrapperRef = document.querySelector(
+          `[data-tokenwrapper="${token.symbol}"]`
+        );
+        let red = 0;
+        let green = 0;
+        let blue = 0;
 
-      if (imageRef) {
-        const cacheEntry = colorCache[token.id];
+        if (imageRef) {
+          const cacheEntry = colorCache[token.id];
 
-        if (cacheEntry) {
-          const [r, g, b] = cacheEntry;
+          if (cacheEntry) {
+            const [r, g, b] = cacheEntry;
 
-          red = r;
-          green = g;
-          blue = b;
-        } else if (
-          (imageRef as Element).clientWidth > 0 &&
-          (imageRef as any).complete &&
-          wrapperRef
-        ) {
-          colorThief.current = new ColorThief();
-          const [r, g, b] = colorThief.current.getColor(imageRef);
+            red = r;
+            green = g;
+            blue = b;
+          } else if (
+            (imageRef as Element).clientWidth > 0 &&
+            (imageRef as any).complete &&
+            wrapperRef
+          ) {
+            colorThief.current = new ColorThief();
+            const [r, g, b] = colorThief.current.getColor(imageRef);
 
-          red = r;
-          green = g;
-          blue = b;
+            red = r;
+            green = g;
+            blue = b;
 
-          dispatch(
-            actions.tokenColorCached({
-              tokenId: token.id,
-              color: [red, green, blue],
-            })
+            dispatch(
+              actions.tokenColorCached({
+                tokenId: token.id,
+                color: [red, green, blue],
+              })
+            );
+          }
+
+          // (wrapperRef as any).style.background = `rgba(${red}, ${green}, ${blue}, 0.15)`;
+          // (wrapperRef as any).style.transition = `background 0.33s ease-in-out`;
+          (wrapperRef as any).animate(
+            [
+              {
+                background: `rgba(${red}, ${green}, ${blue}, 0.05)`,
+              },
+              {
+                background: `rgba(${red}, ${green}, ${blue}, 0.15)`,
+              },
+              {
+                background: `rgba(${red}, ${green}, ${blue}, 0.05)`,
+              },
+            ],
+            {
+              duration: 7000,
+              easing: "ease-in-out",
+              iterations: Infinity,
+            }
           );
         }
-
-        (wrapperRef as any).style.background = `rgba(${red}, ${green}, ${blue}, 0.15)`;
-        (wrapperRef as any).style.transition = `background 0.33s ease-in-out`;
-      }
-    } catch {}
-  });
+      } catch {}
+    }
+  }, [dispatch, colorCache, token.id, token.symbol]);
 
   return (
     <S.Wrapper>

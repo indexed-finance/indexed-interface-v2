@@ -52,7 +52,7 @@ const slice = createSlice({
           const { $blockNumber: _, tokens, ...rest } = update;
           const tokenEntities: Record<
             string,
-            PoolTokenUpdate & PoolUnderlyingToken & { weight?: string }
+            PoolTokenUpdate & PoolUnderlyingToken
           > = {};
 
           for (const token of tokens) {
@@ -78,9 +78,10 @@ const slice = createSlice({
       .addCase(poolTradesAndSwapsLoaded, (state, action) => {
         const { poolId, trades, swaps } = action.payload;
         const poolInState = state.entities[poolId];
+
         if (poolInState) {
-          poolInState.trades = trades || poolInState.trades;
-          poolInState.swaps = swaps || poolInState.swaps;
+          poolInState.trades = trades ?? poolInState.trades;
+          poolInState.swaps = swaps ?? poolInState.swaps;
         }
       })
       .addCase(receivedInitialStateFromServer, (_, action) => {

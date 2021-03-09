@@ -1,8 +1,10 @@
-import { Area, Button } from "components";
+import { Button } from "components";
 import { Divider, Steps, Typography } from "antd";
+import { Link } from "react-router-dom";
 import CategoryList from "./CategoryList";
 import PoolList from "./PoolList";
 import React, { useEffect, useState } from "react";
+import flags from "feature-flags";
 import styled from "styled-components";
 
 const { Step } = Steps;
@@ -40,23 +42,27 @@ export default function Splash() {
 
   return (
     <S.Splash>
-      <S.Title>
-        <div>Decentralized Trading Protocol</div>
-        <Typography.Title level={5}>
-          Guaranteed liquidity for millions of users and hundreds of Ethereum
-          applications.
-        </Typography.Title>
-      </S.Title>
-      <Area>
-        <S.Actions level={3}>
-          <S.GetStarted>Get started today:</S.GetStarted>
-          <Button.Group orientation="horizontal">
+      <S.Title>Decentralized Trading Protocol</S.Title>
+      <S.Subtitle level={5}>
+        Guaranteed liquidity for millions of users and hundreds of Ethereum
+        applications.
+      </S.Subtitle>
+      <S.Actions level={3}>
+        <S.GetStarted>Get started today:</S.GetStarted>
+        <Button.Group orientation="horizontal">
+          <Link to="/pools">
             <Button type="ghost">View Index Pools</Button>
+          </Link>
+          <Link to="/docs">
             <Button type="default">Read the Documentation</Button>
-            <Button type="default">Check out the FAQ</Button>
-          </Button.Group>
-        </S.Actions>
-      </Area>
+          </Link>
+          {flags.showFaqLink && (
+            <Link to="/faq">
+              <Button type="default">Check out the FAQ</Button>
+            </Link>
+          )}
+        </Button.Group>
+      </S.Actions>
       <S.Steps progressDot current={step}>
         <Step title="1. Foo" subTitle="First thing" />
         <Step title="2. Bar" subTitle="First thing" />
@@ -88,15 +94,13 @@ const S = {
     max-width: 960px;
   `,
   Title: styled(Typography.Title)`
-    div {
-      ${(props) => props.theme.snippets.fancy};
-      font-size: 86px;
-      max-width: 960px;
-      line-height: 1.1;
-    }
-    h5 {
-      font-size: 1.5rem;
-      /* margin-bottom: ${(props) => props.theme.spacing.huge}; */
-    }
+    ${(props) => props.theme.snippets.fancy};
+    font-size: 86px !important;
+    max-width: 960px;
+    line-height: 1.1;
+    margin-bottom: 0 !important;
+  `,
+  Subtitle: styled(Typography.Title)`
+    font-size: 1.5rem !important;
   `,
 };
