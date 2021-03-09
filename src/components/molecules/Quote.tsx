@@ -1,4 +1,6 @@
 import { Typography } from "antd";
+import { selectors } from "features";
+import { useSelector } from "react-redux";
 import React, { HTMLProps } from "react";
 import styled from "styled-components";
 
@@ -20,6 +22,7 @@ export default function Quote({
   kind = "normal",
   ...rest
 }: Props) {
+  const theme = useSelector(selectors.selectTheme);
   const bottom = (
     <S.Bottom kind={kind}>
       <Typography.Text type={isNegative ? "danger" : "success"}>
@@ -32,7 +35,10 @@ export default function Quote({
     <div {...rest}>
       {symbol && (
         <S.Top level={3}>
-          {symbol} {kind === "normal" && price}
+          <span style={{ color: theme === "dark" ? "#ccccff" : "#4D4D80" }}>
+            {symbol}
+          </span>{" "}
+          {kind === "normal" && price}
         </S.Top>
       )}
       <S.Middle kind={kind}>

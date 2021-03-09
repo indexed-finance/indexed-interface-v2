@@ -8,7 +8,13 @@ import { Route, Switch as RouterSwitch } from "react-router-dom";
 import { useSelector } from "react-redux";
 import AppHeader from "./AppHeader";
 import AppMenu from "./AppMenu";
-import React, { useCallback, useContext, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import SocketClient from "sockets/client";
 import routes from "./routes";
 import styled from "styled-components";
@@ -31,13 +37,14 @@ export default function AppLayout() {
   );
   const originalMode = useRef(theme);
   const modeWrapper = useRef(
-    require(`./${theme === "dark" ? "Dark" : "Light"}ModeWrapper.tsx`).default
+    require(`./modes/${theme === "dark" ? "Dark" : "Light"}ModeWrapper.tsx`)
+      .default
   );
   const ModeWrapper = modeWrapper.current ?? "div";
 
   // Effect
   // When the user changes the mode, call out to the window.less object.
-  React.useEffect(() => {
+  useEffect(() => {
     if (window && theme !== originalMode.current) {
       window.location.reload();
     }
@@ -45,12 +52,16 @@ export default function AppLayout() {
 
   // Effect
   // On initial load, open up a connection to the server.
-  React.useEffect(() => {
+  useEffect(() => {
     if (isConnectionEnabled) {
       SocketClient.connect();
     } else {
       SocketClient.disconnect();
     }
+
+    return () => {
+      SocketClient.disconnect();
+    };
   }, [isConnectionEnabled]);
 
   return (
