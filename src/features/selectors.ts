@@ -29,21 +29,26 @@ const selectors = {
    */
   selectMenuModels: (
     state: AppState
-  ): Record<ModelKeys, Array<{ name: string; id: string; slug: string }>> => {
+  ): Record<
+    ModelKeys,
+    Array<{ name: string; id: string; symbol: string; slug: string }>
+  > => {
     const categories = selectors
       .selectAllFormattedCategories(state)
-      .map(({ slug, id, name }: any) => ({
+      .map(({ slug, id, symbol, name }: any) => ({
         id,
+        symbol,
         name,
         slug,
       }));
     const indexPools = selectors
       .selectAllFormattedIndexPools(state)
       .filter(Boolean)
-      .map(({ slug, id, name }: any) => ({
-        name: name.replace(/Tokens Index/g, ""),
+      .map(({ slug, id, symbol, name }: any) => ({
         id,
+        symbol,
         slug,
+        name: name.replace(/Tokens Index/g, ""),
       }));
 
     return {

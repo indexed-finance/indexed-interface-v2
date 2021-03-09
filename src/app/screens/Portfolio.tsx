@@ -11,7 +11,7 @@ import {
 } from "antd";
 import { IoLogoUsd } from "react-icons/io";
 import { Link } from "react-router-dom";
-import { Logo, ScreenHeader } from "components";
+import { Logo, ScreenHeader, Token } from "components";
 import { Subscreen } from "../subscreens";
 import React from "react";
 import styled from "styled-components";
@@ -77,7 +77,11 @@ export default function Portfolio() {
                 <Space direction="vertical" size="small">
                   <S.Title level={4}>
                     <S.Aligned>
-                      <S.Image alt={entry.symbol} src={entry.image} />{" "}
+                      <S.Token
+                        size="small"
+                        name={entry.symbol}
+                        image={entry.image}
+                      />
                       {entry.symbol}
                     </S.Aligned>
                   </S.Title>
@@ -171,9 +175,8 @@ const S = {
       margin-bottom: 0 !important;
     }
   `,
-  Image: styled.img`
-    ${(props) => props.theme.snippets.size20};
-    margin-right: ${(props) => props.theme.spacing.medium};
+  Token: styled(Token)`
+    margin-right: ${(props) => props.theme.spacing.small};
   `,
   Aligned: styled.div`
     ${(props) => props.theme.snippets.perfectlyAligned};

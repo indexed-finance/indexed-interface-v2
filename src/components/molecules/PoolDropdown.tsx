@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { Menu, Typography } from "antd";
+import { Token } from "components/atoms";
 import { selectors } from "features";
 import { useSelector } from "react-redux";
 import styled from "styled-components";
@@ -17,7 +18,7 @@ export default function PoolDropdown() {
           <Menu.Item key={id}>
             <Link to={`/pools/${slug}`}>
               <S.ItemInner>
-                <S.Image alt={name} src={image} />
+                <S.Token name={name} image={image} />
                 <span>{name}</span>
               </S.ItemInner>
             </Link>
@@ -47,8 +48,7 @@ const S = {
       }
     }
   `,
-  Image: styled.img`
-    ${(props) => props.theme.snippets.size32};
+  Token: styled(Token)`
     margin-right: ${(props) => props.theme.spacing.medium};
   `,
 };

@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
-import { Menu, Typography } from "antd";
+import { Menu } from "antd";
+import { Token } from "components/atoms";
 import { selectors } from "features";
 import { useSelector } from "react-redux";
 import styled from "styled-components";
@@ -9,14 +10,12 @@ export default function CategoryDropdown() {
 
   return (
     <Menu>
-      {categories.map(({ id, name, slug }) => {
+      {categories.map(({ id, name, symbol, slug }) => {
         return (
           <Menu.Item key={id}>
             <Link to={`/categories/${slug}`}>
               <S.ItemInner>
-                <S.CategoryId level={3} data-category={true}>
-                  {id}
-                </S.CategoryId>
+                <S.Token name={symbol} image={symbol} />
                 <span>{name}</span>
               </S.ItemInner>
             </Link>
@@ -28,14 +27,6 @@ export default function CategoryDropdown() {
 }
 
 const S = {
-  CategoryId: styled(Typography.Title)`
-    position: relative;
-    left: 9px;
-    opacity: 0.2;
-    text-transform: lowercase;
-
-    transition: color 0.6s linear;
-  `,
   ItemInner: styled.div<{ isCategory?: boolean }>`
     ${(props) => props.theme.snippets.perfectlyAligned};
 
@@ -45,5 +36,8 @@ const S = {
         color: #ccccff;
       }
     }
+  `,
+  Token: styled(Token)`
+    margin-right: ${(props) => props.theme.spacing.medium};
   `,
 };

@@ -45,6 +45,18 @@
   }
 }
 
+@keyframes glowing-top {
+  0% {
+    border-top: 1px solid fade(@primary-color, 35%);
+  }
+  50% {
+    border-top: 1px solid fade(@primary-color, 15%);
+  }
+  100% {
+    border-top: 1px solid fade(@primary-color, 35%);
+  }
+}
+
 @keyframes glowing-right {
   0% {
     border-right: 1px solid fade(@primary-color, 35%);
@@ -71,17 +83,17 @@
 
 .ant-collapse {
   border: 1px solid fade(@primary-color, 25%);
-  animation: glowing-all 8s ease-in-out infinite;
+  animation: glowing-all 4s ease-in-out infinite;
 }
 
 .ant-collapse-header {
   border-bottom: 1px solid fade(@primary-color, 25%);
-  animation: glowing-bottom 8s ease-in-out infinite;
+  animation: glowing-bottom 4s ease-in-out infinite;
 }
 
 .screen-header-divider {
   border: 1px solid fade(@primary-color, 25%);
-  animation: glowing-all 8s ease-in-out infinite;
+  animation: glowing-all 4s ease-in-out infinite;
 }
 
 .social-link {
@@ -89,7 +101,8 @@
 }
 
 .app-menu {
-  border-top: 1px solid #b3b3e6;
+  border-top: 1px solid @primary-color;
+  animation: glowing-all 4s ease-in-out infinite;
 }
 
 .ant-progress-inner:not(.ant-progress-circle-gradient)
