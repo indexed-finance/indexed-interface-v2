@@ -40,6 +40,7 @@ export default function TokenSelector({
   );
   const relevantBalance = useMemo(() => balances[token], [balances, token]);
   const input = useRef<null | HTMLInputElement>(null);
+  const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
   const { openDrawer, closeDrawer } = useDrawer({
     name: "Select a token",
     title: "Select a token",
@@ -177,7 +178,11 @@ export default function TokenSelector({
             >
               {value.token ? (
                 <>
-                  <S.Token name={value.token} image={value.token} />
+                  <S.Token
+                    name={value.token}
+                    image={value.token}
+                    address={tokenLookup[value.token]?.id ?? ""}
+                  />
                   {value.token}
                 </>
               ) : (

@@ -18,7 +18,7 @@ export default function PoolDropdown() {
           <Menu.Item key={id}>
             <Link to={`/pools/${slug}`}>
               <S.ItemInner>
-                <S.Token name={name} image={image} />
+                <S.Token address={id} name={name} image={image} />
                 <span>{name}</span>
               </S.ItemInner>
             </Link>

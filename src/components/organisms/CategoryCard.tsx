@@ -55,7 +55,12 @@ export default function CategoryCard({
       actions={[
         <S.TokenImageWrapper key="1">
           {Object.values(tokens.entities).map((token) => (
-            <Token key={token.symbol} name={token.name} image={token.symbol} />
+            <Token
+              key={token.symbol}
+              address={token.id}
+              name={token.name}
+              image={token.symbol}
+            />
           ))}
         </S.TokenImageWrapper>,
       ]}

@@ -98,7 +98,11 @@ export default function RankedToken({ token, rank }: Props) {
       <S.RankedToken>
         <T.Top>
           <S.Left>
-            <S.Token image={token.symbol} name={token.symbol} />
+            <S.Token
+              address={token.id}
+              image={token.symbol}
+              name={token.symbol}
+            />
             <S.Title>
               <h2>{token.symbol}</h2>
               <h3>{token.name}</h3>

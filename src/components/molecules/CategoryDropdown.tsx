@@ -15,7 +15,7 @@ export default function CategoryDropdown() {
           <Menu.Item key={id}>
             <Link to={`/categories/${slug}`}>
               <S.ItemInner>
-                <S.Token name={symbol} image={symbol} />
+                <S.Token address={id} name={symbol} image={symbol} />
                 <span>{name}</span>
               </S.ItemInner>
             </Link>

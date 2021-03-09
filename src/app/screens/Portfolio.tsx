@@ -22,6 +22,7 @@ const { Item } = List;
 export default function Portfolio() {
   const __data = [
     {
+      address: "0x17ac188e09a7890a1844e5e65471fe8b0ccfadf3",
       image: "cc-dark-circular",
       link: "/pools/0x17ac188e09a7890a1844e5e65471fe8b0ccfadf3",
       symbol: "CC10",
@@ -32,6 +33,7 @@ export default function Portfolio() {
       weight: "50%",
     },
     {
+      address: "0x17ac188e09a7890a1844e5e65471fe8b0ccfadf3",
       image: "defi-dark-circular",
       link: "/pools/0xfa6de2697d59e88ed7fc4dfe5a33dac43565ea41",
       symbol: "DEFI5",
@@ -79,6 +81,7 @@ export default function Portfolio() {
                     <S.Aligned>
                       <S.Token
                         size="small"
+                        address={entry.address}
                         name={entry.symbol}
                         image={entry.image}
                       />

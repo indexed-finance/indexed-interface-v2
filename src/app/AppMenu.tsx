@@ -64,7 +64,11 @@ export default function AppMenu({ onItemClick = noop, ...rest }: Props) {
                         }}
                       >
                         <S.ItemInner isCategory={isCategory}>
-                          <S.Token name={model.name} image={image} />
+                          <S.Token
+                            name={model.name}
+                            image={image}
+                            address={model.id}
+                          />
                           <S.Uppercase>{model.name}</S.Uppercase>
                         </S.ItemInner>
                       </Item>

@@ -29,7 +29,12 @@ export default function PoolCard({ pool }: Props) {
       actions={[
         <S.TokenImageWrapper key="1">
           {assets.map((token, index) => (
-            <Token key={index} name={token.symbol} image={token.symbol} />
+            <Token
+              key={index}
+              address={token.id}
+              name={token.symbol}
+              image={token.symbol}
+            />
           ))}
         </S.TokenImageWrapper>,
       ]}
