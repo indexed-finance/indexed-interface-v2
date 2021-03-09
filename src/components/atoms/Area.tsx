@@ -13,9 +13,16 @@ export default function Area(props: Props) {
 const S = {
   Area: styled(Space)`
     padding: ${(props) => props.theme.spacing.medium};
-    border-left: 2px solid ${(props) => props.theme.colors.purple100};
+    border-left: 2px solid
+      ${(props) =>
+        props.theme.mode === "dark"
+          ? props.theme.colors.purple300
+          : props.theme.colors.purple100};
     display: block;
-    background: ${(props) => props.theme.colors.black400};
+    background: ${(props) =>
+      props.theme.mode === "dark"
+        ? props.theme.colors.black400
+        : props.theme.colors.purple300};
 
     a {
       display: block;

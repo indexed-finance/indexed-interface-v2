@@ -56,5 +56,6 @@ const S = {
   `,
   TitleInner: styled.span`
     ${(props) => props.theme.snippets.fancy};
+    font-weight: 200;
   `,
 };

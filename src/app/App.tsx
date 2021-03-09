@@ -1,9 +1,9 @@
 import { BrowserRouter } from "react-router-dom";
 import { DrawerProvider } from "components";
-import { Provider } from "react-redux";
+import { Provider, useSelector } from "react-redux";
 import { ThemeProvider } from "styled-components";
 import { notification } from "antd";
-import { store } from "features";
+import { selectors, store } from "features";
 import AppLayout from "./AppLayout";
 import React from "react";
 import getTheme from "theme";
@@ -15,7 +15,8 @@ notification.config({
 });
 
 function Inner() {
-  const theme = getTheme();
+  const themeInStore = useSelector(selectors.selectTheme);
+  const theme = getTheme(themeInStore);
 
   return (
     <BrowserRouter>
