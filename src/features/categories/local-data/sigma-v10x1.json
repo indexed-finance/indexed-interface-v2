@@ -1,9 +1,9 @@
 {
   "id": "sigma-v10x1",
-  "name": "Sigma",
-  "symbol": "???",
-  "brief": "???",
-  "description": "???",
+  "name": "DEGEN Index",
+  "symbol": "DEGEN",
+  "brief": "This category tracks Ethereum-based protocol tokens, DeFi governance tokens and wrapped blockchain currencies with a high market cap.",
+  "description": "# DEGEN Index (DEGEN)\n\nAs the name implies, the DEGEN Index aims to seek out alpha via higher risk/reward emerging projects with exceptionally high growth potential, predominantly in the DeFi sector. Candidate members have strong communities and large total addressable markets, with circulating market capitalisations ranging from US$50 million to US$2 billion. If any constituent tokens fall out of these bounds, they will be replaced via periodic re-indexing by the largest market cap tokens drawn from a list of alternatives. In this way, the index will constantly evolve to capture upside from tokens during their most rapid growth phases.\n\n## Methodology\n\nThe DEGEN Index weights components according to the square root of their circulating market cap, the data for which is queried from off-chain data sources using an oracle service. DEGEN has a 'candidate' list of eligible tokens, which is filtered on-chain to remove any tokens with market capitalisations outside of the above bounds. The candidate list is sorted once a month in descending order of market capitalisation, and the top 10 eligible assets are selected as the target index constituents. The constituent assets are re-weighted weekly.\n\n## Inclusion Criteria\nThe DEGEN Index has the following criteria for inclusion:\n\n* The token has a market cap ranging from US$50 million to US$2 billion (as calculated by a rolling 14-day TWAP on Uniswap).\n* No major vulnerabilities have been discovered in the token contract.\n* The token’s supply can not be arbitrarily inflated or deflated maliciously.\n    * The control model should be considered if the supply can be modified through governance decisions.\n* The token does not have transfer fees or other non-standard balance updates.\n* The token meets the requirements of the ERC20 standard.\n  * Boolean return values are not required.\n* Sufficient liquidity is locked in the Uniswap market pair between the token and WETH.\n* The token is one of:\n  * Protocol token for an Ethereum-based project.\n  * Governance token for a DeFi project.\n  * Wrapper token for a blockchain’s native currency.",
   "tokens": {
     "ids": [],
     "entities": {}

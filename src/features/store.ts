@@ -6,6 +6,7 @@ import { configureStore } from "@reduxjs/toolkit";
 import { disconnectFromProvider } from "./thunks";
 import { userActions } from "./user";
 import { v4 as uuid } from "uuid";
+import flags from "feature-flags";
 import reducer from "./reducer";
 
 const store = configureStore({
@@ -45,7 +46,9 @@ const store = configureStore({
           return next(action);
         };
       }),
-  preloadedState: loadPersistedState(),
+  preloadedState: flags.saveStateAcrossSessions
+    ? loadPersistedState()
+    : undefined,
 });
 
 store.subscribe(() => {

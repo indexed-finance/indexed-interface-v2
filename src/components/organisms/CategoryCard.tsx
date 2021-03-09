@@ -5,6 +5,8 @@ import React from "react";
 import styled from "styled-components";
 import type { Token } from "indexed-types";
 
+const PLACEHOLDER_IMAGE = "https://placehold.it/32x32";
+
 export interface Props {
   id?: string;
   symbol?: string;
@@ -37,16 +39,20 @@ export default function CategoryCard({
 }: Props) {
   const history = useHistory();
 
+  let categoryImage = PLACEHOLDER_IMAGE;
+
+  try {
+    categoryImage = require(`assets/images/${symbol.toLowerCase()}.png`)
+      .default;
+  } catch {}
+
   return (
     <S.Card
       key={id}
       hoverable={true}
       title={
         <>
-          <S.Image
-            alt={`${symbol} Logo`}
-            src={require(`assets/images/${symbol.toLowerCase()}.png`).default}
-          />
+          <S.Image alt={`${symbol} Logo`} src={categoryImage} />
           <S.Name>{name}</S.Name>
         </>
       }
@@ -57,17 +63,23 @@ export default function CategoryCard({
       }
       actions={[
         <S.TokenImageWrapper key="1">
-          {Object.values(tokens.entities).map((token) => (
-            <S.TokenImage
-              alt={token.name}
-              title={token.name}
-              key={token.symbol}
-              src={
-                require(`assets/images/${token.symbol.toLowerCase()}.png`)
-                  .default
-              }
-            />
-          ))}
+          {Object.values(tokens.entities).map((token) => {
+            let assetImage = PLACEHOLDER_IMAGE;
+
+            try {
+              assetImage = require(`assets/images/${token.symbol.toLowerCase()}.png`)
+                .default;
+            } catch {}
+
+            return (
+              <S.TokenImage
+                alt={token.name}
+                title={token.name}
+                key={token.symbol}
+                src={assetImage}
+              />
+            );
+          })}
         </S.TokenImageWrapper>,
       ]}
     >

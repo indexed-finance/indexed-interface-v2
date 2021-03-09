@@ -18,7 +18,7 @@ const { Item, SubMenu } = Menu;
 
 export default function AppMenu({ onItemClick = noop, ...rest }: Props) {
   const menuModels = useSelector(selectors.selectMenuModels);
-  const tokenLookup = useSelector(selectors.selectTokenLookup);
+  const categoryLookup = useSelector(selectors.selectCategoryLookup);
   const indexPoolsLookup = useSelector(selectors.selectCategoryImagesByPoolIds);
   const history = useHistory();
 
@@ -51,14 +51,13 @@ export default function AppMenu({ onItemClick = noop, ...rest }: Props) {
                     let image = "";
                     const isCategory = route.model === "categories";
                     const isIndexPool = route.model === "indexPools";
-                    const isToken = route.model === "tokens";
 
                     if (isIndexPool) {
                       image = indexPoolsLookup[model.id];
-                    } else if (isToken) {
+                    } else if (isCategory) {
                       try {
                         image = require(`assets/images/${
-                          tokenLookup[model.id]?.symbol?.toLowerCase() ?? ""
+                          categoryLookup[model.id]?.symbol?.toLowerCase() ?? ""
                         }.png`).default;
                       } catch {
                         image = PLACEHOLDER_TOKEN_IMAGE;
@@ -74,14 +73,7 @@ export default function AppMenu({ onItemClick = noop, ...rest }: Props) {
                         }}
                       >
                         <S.ItemInner isCategory={isCategory}>
-                          {isCategory && (
-                            <S.CategoryId level={3} data-category={true}>
-                              {model.id}
-                            </S.CategoryId>
-                          )}
-                          {(isIndexPool || isToken) && (
-                            <S.Image alt={model.name} src={image} />
-                          )}
+                          <S.Image alt={model.name} src={image} />
                           <S.Uppercase>{model.name}</S.Uppercase>
                         </S.ItemInner>
                       </Item>
@@ -147,14 +139,6 @@ const S = {
         color: #ccccff;
       }
     }
-  `,
-  CategoryId: styled(Typography.Title)`
-    position: relative;
-    left: 9px;
-    opacity: 0.2;
-    text-transform: lowercase;
-
-    transition: color 0.6s linear;
   `,
   Image: styled.img`
     ${(props) => props.theme.snippets.size32};

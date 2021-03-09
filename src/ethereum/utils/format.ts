@@ -11,6 +11,8 @@ import {
 import type { Category, PoolUnderlyingToken, Token } from "indexed-types";
 
 export function normalizeInitialData(categories: Category[]) {
+  console.log({ categories });
+
   return categories.slice(0, categories.length - 1).reduce(
     (prev, next) => {
       const category = next;
