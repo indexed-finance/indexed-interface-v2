@@ -85,6 +85,7 @@ const S = {
     align-items: flex-start;
     flex-wrap: wrap;
     overflow: auto;
+    flex: 1;
   `,
   Image: styled.img`
     flex: 1;

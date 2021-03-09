@@ -9,7 +9,7 @@ import {
   Typography,
 } from "antd";
 import { ImConnection } from "react-icons/im";
-import { JazzIcon } from "components";
+import { JazzIcon, Logo } from "components";
 import { MdAccountBalanceWallet } from "react-icons/md";
 import { actions, selectors } from "features";
 import { useDispatch, useSelector } from "react-redux";
@@ -49,6 +49,11 @@ export default function AppHeader() {
     <S.Top>
       {breakpoint.lg && (
         <S.Controls>
+          {selectedAddress ? (
+            <Logo title="2800.00 NDX" link="/portfolio" size="small" />
+          ) : (
+            <span />
+          )}
           <S.Changeables layout="inline" colon={false}>
             <Item>
               <Select value={language}>
@@ -132,10 +137,8 @@ const S = {
     }
   `,
   Controls: styled.div`
+    ${(props) => props.theme.snippets.spacedBetween};
     flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
   `,
   Changeables: styled(Form)``,
   Wallet: styled(Button)`

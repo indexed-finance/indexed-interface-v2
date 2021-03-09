@@ -17,7 +17,7 @@ export default function JazzIcon({ address }: Props) {
     dispatch(actions.userDisconnected());
 
     notification.info({
-      message: "Disconnected From Wallet",
+      message: "Disconnected",
       description: "You have successfully disconnected your wallet.",
     });
   }, [dispatch]);
@@ -26,7 +26,7 @@ export default function JazzIcon({ address }: Props) {
   // On load, display a success notification.
   useEffect(() => {
     notification.success({
-      message: "Connected To Wallet",
+      message: "Connected",
       description: "You have successfully connected your wallet.",
     });
   }, []);

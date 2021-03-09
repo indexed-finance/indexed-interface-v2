@@ -62,8 +62,8 @@ export default function CategoryCard({
         </S.TokenImageWrapper>,
       ]}
     >
-      <Link to={`/categories/${id.toLowerCase()}`}>
-        <S.Content>
+      <S.Content>
+        <Link to={`/categories/${id.toLowerCase()}`}>
           <S.Meta
             description={
               <>
@@ -83,8 +83,8 @@ export default function CategoryCard({
               </>
             }
           />
-        </S.Content>
-      </Link>
+        </Link>
+      </S.Content>
     </S.Card>
   );
 }
@@ -108,7 +108,9 @@ const S = {
     }
     .ant-card-meta-description {
       font-size: ${(props) => props.theme.fontSizes.large};
-      min-height: 194px;
+      height: 194px;
+
+      width: 570px;
     }
   `,
   Title: styled.h1`
@@ -119,6 +121,7 @@ const S = {
   Content: styled.div`
     display: flex;
     align-items: flex-start;
+    flex: 1;
   `,
   Image: styled.img`
     flex: 1;
