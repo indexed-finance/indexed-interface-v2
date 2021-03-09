@@ -15,7 +15,7 @@ const S = {
     padding: ${(props) => props.theme.spacing.medium};
     border-left: 2px solid ${(props) => props.theme.colors.purple100};
     display: block;
-    background: ${(props) => props.theme.colors.lightestGrey};
+    background: ${(props) => props.theme.colors.black400};
 
     a {
       display: block;

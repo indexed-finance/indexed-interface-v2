@@ -3,6 +3,7 @@ const palette = {
   black200: "#0A0A0A", // e.g. Dark panel header.
   black250: "#141414", // e.g. Dark menu background.
   black300: "#151515", // e.g. Dark panel body.
+  black400: "#1D1D1D", // e.g. Dark area background.
 
   grey100: "#434343", // e.g. Dark panel border.
   grey200: "#333", // e.g. Dark panel border.

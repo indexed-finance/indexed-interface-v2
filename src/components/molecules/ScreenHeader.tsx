@@ -1,4 +1,3 @@
-import { Area } from "components/atoms";
 import { Breadcrumb, Divider, Grid, Typography } from "antd";
 import React, { ReactElement } from "react";
 import styled, { css } from "styled-components";
@@ -22,9 +21,7 @@ export default function ScreenHeader(props: Props) {
         withMargin={!breakpoints.sm}
         centered={!breakpoints.sm}
       >
-        <Area>
-          <S.TitleInner>{title}</S.TitleInner>
-        </Area>
+        <S.TitleInner>{title}</S.TitleInner>
         {(props.overlay || props.activeBreadcrumb) && (
           <Breadcrumb>
             <Breadcrumb.Item overlay={props.overlay}>
