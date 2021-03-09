@@ -209,6 +209,10 @@ const S = {
     font-size: 24px;
     font-weight: 500;
     width: 180px;
+    background: ${(props) =>
+      props.theme.mode === "dark"
+        ? props.theme.colors.black400
+        : props.theme.colors.purple300};
   `,
   Space: styled(Space)`
     justify-content: space-between;
