@@ -1,20 +1,41 @@
 import { NormalizedToken } from "ethereum";
 import {
+  PayloadAction,
+  createEntityAdapter,
+  createSlice,
+} from "@reduxjs/toolkit";
+import {
   coingeckoDataLoaded,
   coingeckoIdsLoaded,
   receivedInitialStateFromServer,
   receivedStatePatchFromServer,
   subgraphDataLoaded,
 } from "features/actions";
-import { createEntityAdapter, createSlice } from "@reduxjs/toolkit";
 import type { AppState } from "features/store";
 
 const adapter = createEntityAdapter<NormalizedToken>();
 
 const slice = createSlice({
   name: "tokens",
-  initialState: adapter.getInitialState(),
-  reducers: {},
+  initialState: adapter.getInitialState<{
+    // Token ID -> [red, green, blue]
+    colorCache: Record<string, [number, number, number]>;
+  }>({
+    colorCache: {},
+  }),
+  reducers: {
+    tokenColorCached(
+      state,
+      action: PayloadAction<{
+        tokenId: string;
+        color: [number, number, number];
+      }>
+    ) {
+      const { tokenId, color } = action.payload;
+
+      state.colorCache[tokenId] = color;
+    },
+  },
   extraReducers: (builder) =>
     builder
       .addCase(subgraphDataLoaded, (state, action) => {
@@ -79,9 +100,9 @@ export const selectors = {
     }, {} as Record<string, NormalizedToken>),
   selectTokenSymbols: (state: AppState) =>
     selectors.selectAll(state).map(({ symbol }) => symbol),
-
   selectTokenSymbol: (state: AppState, poolId: string) =>
     selectors.selectTokenLookup(state)[poolId]?.symbol ?? "",
+  selectColorCache: (state: AppState) => state.tokens.colorCache,
 };
 
 export default slice.reducer;

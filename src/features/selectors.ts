@@ -211,6 +211,7 @@ const selectors = {
                 : "-";
 
               return {
+                id: token.id,
                 symbol: token.symbol,
                 name: categoryToken.name,
                 balance: convert.toBalance(balance),
@@ -237,6 +238,7 @@ const selectors = {
               };
             } else {
               return {
+                id: "",
                 symbol: "",
                 name: "",
                 balance: "",
@@ -328,6 +330,7 @@ export interface FormattedIndexPool {
     }>;
   };
   assets: Array<{
+    id: string;
     symbol: string;
     name: string;
     price: string;
