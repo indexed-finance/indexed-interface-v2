@@ -133,6 +133,8 @@ const thunks = {
       const initial = await helpers.queryInitial(url);
       const formatted = helpers.normalizeInitialData(initial);
 
+      console.log("formatted was", formatted);
+
       dispatch(actions.subgraphDataLoaded(formatted));
     }
   },

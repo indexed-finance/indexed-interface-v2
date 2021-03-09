@@ -4,8 +4,6 @@ import {
   DocsDetail,
   DocsList,
   FAQ,
-  NewsDetail,
-  NewsList,
   PoolDetail,
   PoolList,
   Portfolio,
@@ -85,11 +83,6 @@ const routes: Route[] = [
     isExternalLink: true,
   },
   {
-    path: "/news/:slug",
-    exact: true,
-    screen: <NewsDetail />,
-  },
-  {
     path: "/docs",
     exact: true,
     sider: "Docs",
@@ -121,8 +114,17 @@ if (flags.showNewsLink) {
   routes.push({
     path: "/news",
     exact: true,
-    sider: "News",
-    screen: <NewsList />,
+    sider: (
+      <a
+        href="https://theindexedtimes.substack.com/p/coming-soon"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        News
+      </a>
+    ),
+    screen: null,
+    isExternalLink: true,
   });
 }
 

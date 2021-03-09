@@ -214,7 +214,7 @@ const selectors = {
               return {
                 id: token.id,
                 symbol: token.symbol,
-                name: categoryToken.name,
+                name: categoryToken?.name ?? "",
                 balance: convert.toBalance(balance),
                 balanceUsd,
                 price: coingeckoData.price

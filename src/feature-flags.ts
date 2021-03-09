@@ -1,5 +1,5 @@
 export default {
-  showNewsLink: false,
+  showNewsLink: true,
   showFaqLink: false,
   useColorThief: false,
   saveStateAcrossSessions: true,

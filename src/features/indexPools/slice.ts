@@ -136,15 +136,17 @@ export const selectors = {
     const pool = selectors.selectPool(state, poolId);
     const categoryLookup = categoriesSelectors.selectEntities(state);
 
-    if (pool) {
-      const { id } = pool.category;
-      const category = categoryLookup[id];
+    try {
+      if (pool) {
+        const { id } = pool.category;
+        const category = categoryLookup[id];
 
-      if (category && category.symbol) {
-        return require(`assets/images/${category.symbol.toLowerCase()}.png`)
-          .default;
+        if (category && category.symbol) {
+          return require(`assets/images/${category.symbol.toLowerCase()}.png`)
+            .default;
+        }
       }
-    }
+    } catch {}
 
     return PLACEHOLDER_TOKEN_IMAGE;
   },
