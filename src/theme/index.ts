@@ -4,6 +4,8 @@ import variables from "./variables";
 
 export { default as GlobalStyles } from "./global";
 
+export { colors };
+
 export default function getTheme(mode: "dark" | "light") {
   return {
     mode,

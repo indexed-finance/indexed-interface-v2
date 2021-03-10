@@ -1,7 +1,9 @@
 import { Button } from "components/atoms";
 import { Card, Menu, Switch } from "antd";
 import { NormalizedPool } from "ethereum";
-import React, { useCallback, useState } from "react";
+import { colors } from "theme";
+import { createChart } from "lightweight-charts";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 
 type Kind = "Value" | "TotalValueLocked";
@@ -28,12 +30,54 @@ export default function ChartCard({ pool }: Props) {
       ),
     []
   );
+  const cardRef = useRef<null | HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (cardRef.current) {
+      const chart = createChart(cardRef.current, { width: 400, height: 300 });
+
+      (window as any).ccc = chart;
+
+      chart.applyOptions({
+        layout: {
+          backgroundColor: colors.black400,
+          fontFamily: "sans-serif",
+          textColor: colors.purple200,
+          fontSize: 16,
+        },
+        grid: {
+          vertLines: {
+            color: colors.purple100,
+            style: 1,
+            visible: true,
+          },
+          horzLines: {
+            color: colors.purple100,
+            style: 1,
+            visible: true,
+          },
+        },
+      });
+
+      const lineSeries = chart.addLineSeries();
+
+      lineSeries.setData([
+        { time: "2019-04-11", value: 80.01 },
+        { time: "2019-04-12", value: 96.63 },
+        { time: "2019-04-13", value: 76.64 },
+        { time: "2019-04-14", value: 81.89 },
+        { time: "2019-04-15", value: 74.43 },
+        { time: "2019-04-16", value: 80.01 },
+        { time: "2019-04-17", value: 96.63 },
+        { time: "2019-04-18", value: 76.64 },
+        { time: "2019-04-19", value: 81.89 },
+        { time: "2019-04-20", value: 74.43 },
+      ]);
+    }
+  }, []);
 
   return (
     <S.ChartCard
-      cover={
-        <img src={require("assets/images/chart.png").default} alt="Chart" />
-      }
       actions={[
         <>
           <S.Switch key="1" checked={kind === "Value"} onClick={toggleKind} />
@@ -61,7 +105,9 @@ export default function ChartCard({ pool }: Props) {
           ))}
         </S.Menu>
       }
-    ></S.ChartCard>
+    >
+      <div ref={cardRef} />
+    </S.ChartCard>
   );
 }
 
