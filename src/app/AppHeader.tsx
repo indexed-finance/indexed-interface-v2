@@ -9,8 +9,7 @@ import {
   Typography,
 } from "antd";
 import { ImConnection } from "react-icons/im";
-import { JazzIcon, Logo } from "components";
-import { MdAccountBalanceWallet } from "react-icons/md";
+import { JazzIcon, Logo, WalletConnectorButton } from "components";
 import { actions, selectors } from "features";
 import { useDispatch, useSelector } from "react-redux";
 import React, { useMemo } from "react";
@@ -77,12 +76,7 @@ export default function AppHeader() {
               {selectedAddress ? (
                 <JazzIcon address={selectedAddress} />
               ) : (
-                <S.Wallet
-                  type="ghost"
-                  onClick={() => dispatch(actions.attachToProvider())}
-                >
-                  <MdAccountBalanceWallet />
-                </S.Wallet>
+                <WalletConnectorButton />
               )}
             </Item>
             <S.SelfCentered>
@@ -146,11 +140,6 @@ const S = {
     flex: 1;
   `,
   Changeables: styled(Form)``,
-  Wallet: styled(Button)`
-    ${(props) => props.theme.snippets.perfectlyCentered};
-    font-size: ${(props) => props.theme.fontSizes.huge};
-    margin-left: ${(props) => props.theme.spacing.medium};
-  `,
   Settings: styled(Button)`
     font-size: ${(props) => props.theme.fontSizes.huge};
     ${(props) => props.theme.snippets.perfectlyCentered}

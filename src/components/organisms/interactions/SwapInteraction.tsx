@@ -43,8 +43,8 @@ const { Item } = Form;
 const ZERO = convert.toBigNumber("0");
 
 export default function SwapInteraction({ pool }: Props) {
-  const [form] = Form.useForm<SwapValues>();
   const dispatch = useDispatch();
+  const [form] = Form.useForm<SwapValues>();
   const { setActions } = useContext(SubscreenContext);
   const fullPool = useSelector((state: AppState) =>
     selectors.selectPool(state, pool?.id ?? "")
@@ -387,6 +387,7 @@ const S = {
   Title: styled(Typography.Title)`
     ${(props) => props.theme.snippets.spacedBetween};
     position: relative;
+    font-weight: 200 !important;
   `,
 };
 

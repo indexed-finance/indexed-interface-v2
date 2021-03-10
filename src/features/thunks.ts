@@ -32,6 +32,10 @@ export const disconnectFromProvider = () => {
   provider = null;
   signer = null;
 };
+
+export function useProvider() {
+  return [provider, signer];
+}
 // #endregion
 
 type InitialzeOptions = {
