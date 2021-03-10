@@ -1,11 +1,10 @@
-import { AiOutlineCopyrightCircle } from "react-icons/ai";
+import { Grid, Menu } from "antd";
 import { Link, useHistory } from "react-router-dom";
-import { Menu, Typography } from "antd";
 import { SOCIAL_MEDIA } from "config";
 import { Token } from "components";
 import { selectors } from "features";
 import { useSelector } from "react-redux";
-import React from "react";
+import React, { useEffect } from "react";
 import noop from "lodash.noop";
 import routes from "./routes";
 import styled from "styled-components";
@@ -15,6 +14,7 @@ interface Props {
   className?: string;
 }
 
+const { useBreakpoint } = Grid;
 const { Item, SubMenu } = Menu;
 
 export default function AppMenu({ onItemClick = noop, ...rest }: Props) {
@@ -22,6 +22,11 @@ export default function AppMenu({ onItemClick = noop, ...rest }: Props) {
   const categoryLookup = useSelector(selectors.selectCategoryLookup);
   const indexPoolsLookup = useSelector(selectors.selectCategoryImagesByPoolIds);
   const history = useHistory();
+  const breakpoints = useBreakpoint();
+
+  // Effect:
+  // In 'xs' and 'sm' modes, the menu is only visible when overlaying the body, so scrolling is confusing.
+  useScrollPrevention(!breakpoints.md);
 
   return (
     <>
@@ -107,20 +112,15 @@ export default function AppMenu({ onItemClick = noop, ...rest }: Props) {
           ))}
         </SubMenu>
       </S.Menu>
-      <S.PerfectlyCentered className="copyright">
-        <S.Copyright level={5}>
-          <AiOutlineCopyrightCircle /> 2021 Indexed
-        </S.Copyright>
-      </S.PerfectlyCentered>
     </>
   );
 }
 
 const S = {
   Menu: styled(Menu)`
-    height: 75%;
+    height: calc(100% - 65px);
     max-width: 100vw;
-    overflow: auto;
+    overflow: hidden;
   `,
   Item: styled(Item)`
     ${(props) => props.theme.snippets.fancy};
@@ -151,17 +151,68 @@ const S = {
     padding-top: 6px;
     padding-bottom: 6px;
   `,
-  Copyright: styled(Typography.Title)`
-    ${(props) => props.theme.snippets.fancy};
-    ${(props) => props.theme.snippets.perfectlyCentered};
-    margin-bottom: 0 !important;
-
-    svg {
-      margin-right: ${(props) => props.theme.spacing.small};
-      margin-bottom: 3px;
-    }
-  `,
   SingleLink: styled(Link)`
     ${(props) => props.theme.snippets.spacedBetween};
   `,
 };
+
+// Code adapted from https://stackoverflow.com/questions/4770025/how-to-disable-scrolling-temporarily
+function useScrollPrevention(shouldPreventScroll: boolean) {
+  useEffect(() => {
+    if (shouldPreventScroll) {
+      // modern Chrome requires { passive: false } when adding event
+      let supportsPassive = false;
+      try {
+        (window as any).addEventListener(
+          "test",
+          null,
+          Object.defineProperty({}, "passive", {
+            get: function () {
+              supportsPassive = true;
+            },
+          })
+        );
+      } catch {}
+
+      // left: 37, up: 38, right: 39, down: 40,
+      // spacebar: 32, pageup: 33, pagedown: 34, end: 35, home: 36
+      const keys: Record<number, number> = { 37: 1, 38: 1, 39: 1, 40: 1 };
+      const preventDefault = (event: Event) => event.preventDefault();
+      const preventDefaultForScrollKeys = (
+        event: Event & { keyCode: number }
+      ) => {
+        if (keys[event.keyCode]) {
+          preventDefault(event);
+          return false;
+        }
+      };
+      const wheelOptions = supportsPassive ? { passive: false } : false;
+      const wheelEvent =
+        "onwheel" in document.createElement("div") ? "wheel" : "mousewheel";
+
+      window.addEventListener("DOMMouseScroll", preventDefault, false); // older FF
+      window.addEventListener(wheelEvent, preventDefault, wheelOptions); // modern desktop
+      window.addEventListener("touchmove", preventDefault, wheelOptions); // mobile
+      window.addEventListener("keydown", preventDefaultForScrollKeys, false);
+
+      return () => {
+        window.removeEventListener("DOMMouseScroll", preventDefault, false);
+        window.removeEventListener(
+          wheelEvent,
+          preventDefault,
+          wheelOptions as any
+        );
+        window.removeEventListener(
+          "touchmove",
+          preventDefault,
+          wheelOptions as any
+        );
+        window.removeEventListener(
+          "keydown",
+          preventDefaultForScrollKeys,
+          false
+        );
+      };
+    }
+  }, [shouldPreventScroll]);
+}

@@ -173,6 +173,7 @@ const S = {
       bottom: 0;
       left: 0;
       width: 299px;
+      height: 100vh;
       overflow: auto;
 
       .ant-menu-sub {
