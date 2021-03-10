@@ -96,7 +96,6 @@ export const selectors = {
   selectTokenLookupBySymbol: (state: AppState) =>
     selectors.selectAllTokens(state).reduce((prev, next) => {
       prev[next.symbol.toLowerCase()] = next;
-      prev[next.symbol.toUpperCase()] = next;
       return prev;
     }, {} as Record<string, NormalizedToken>),
   selectTokenSymbols: (state: AppState) =>

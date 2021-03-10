@@ -187,7 +187,7 @@ export default function TokenSelector({
                   {value.token}
                 </>
               ) : (
-                "Select a token"
+                "Select"
               )}
               <CaretDownOutlined />
             </S.Button>
@@ -208,7 +208,7 @@ const S = {
     border: none;
     font-size: 24px;
     font-weight: 500;
-    width: 180px;
+    min-width: 130px;
     background: ${(props) =>
       props.theme.mode === "dark"
         ? props.theme.colors.black400

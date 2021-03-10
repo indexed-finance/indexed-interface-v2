@@ -4,9 +4,10 @@ import { AppState, FormattedIndexPool, selectors, signer } from "features";
 import { Flipper, Token } from "components/atoms";
 import { SubscreenContext } from "app/subscreens/Subscreen";
 import { actions } from "features";
-import { convert } from "helpers";
+import { convert, getRandomEntries } from "helpers";
 import { helpers } from "ethereum";
 import { useDispatch, useSelector } from "react-redux";
+import { useHistory } from "react-router-dom";
 import React, {
   useCallback,
   useContext,
@@ -29,12 +30,12 @@ const FIELD_OPPOSITES = {
 };
 const INITIAL_STATE = {
   from: {
-    token: "SNX",
-    amount: 2,
+    token: "",
+    amount: 0,
   },
   to: {
-    token: "UNI",
-    amount: 1,
+    token: "",
+    amount: 0,
   },
 };
 const SLIPPAGE_RATE = 0.01;
@@ -44,6 +45,7 @@ const ZERO = convert.toBigNumber("0");
 
 export default function SwapInteraction({ pool }: Props) {
   const dispatch = useDispatch();
+  const history = useHistory();
   const [form] = Form.useForm<SwapValues>();
   const { setActions } = useContext(SubscreenContext);
   const fullPool = useSelector((state: AppState) =>
@@ -58,8 +60,9 @@ export default function SwapInteraction({ pool }: Props) {
   const [price, setPrice] = useState(ZERO);
   const [maxPrice, setMaxPrice] = useState(ZERO);
   const [formattedSwapFee, setFormattedSwapFee] = useState("");
-
   const [, setRenderCount] = useState(0);
+  const baseline = previousFormValues.current.from.token;
+  const comparison = previousFormValues.current.to.token;
   const approvalNeeded = useSelector((state: AppState) => {
     const { from } = form.getFieldsValue();
 
@@ -89,9 +92,7 @@ export default function SwapInteraction({ pool }: Props) {
         .toString(10),
     [pool]
   );
-
-  const baseline = previousFormValues.current.from.token;
-  const comparison = previousFormValues.current.to.token;
+  const triggerUpdate = () => setRenderCount((prev) => prev + 1);
 
   /**
    *
@@ -147,34 +148,43 @@ export default function SwapInteraction({ pool }: Props) {
         const { token: inputToken } = previousFormValues.current.from;
         const { token: outputToken } = previousFormValues.current.to;
 
-        const inputData =
-          fullPool.tokens.entities[
-            tokenLookup[inputToken.toLowerCase()].id.toLowerCase()
-          ];
-        const outputData =
-          fullPool.tokens.entities[
-            tokenLookup[outputToken.toLowerCase()].id.toLowerCase()
-          ];
+        if (inputToken && outputToken) {
+          const inputEntry = tokenLookup[inputToken.toLowerCase()];
+          const outputEntry = tokenLookup[inputToken.toLowerCase()];
 
-        if (inputData && outputData) {
-          const {
-            outputAmount,
-            price,
-            spotPriceAfter,
-            isGoodResult,
-          } = await helpers.calculateOutputFromInput(
-            inputData,
-            outputData,
-            inputAmount.toString(),
-            swapFee
-          );
+          if (inputEntry && outputEntry) {
+            const inputData =
+              fullPool.tokens.entities[
+                tokenLookup[inputToken.toLowerCase()].id.toLowerCase()
+              ];
+            const outputData =
+              fullPool.tokens.entities[
+                tokenLookup[outputToken.toLowerCase()].id.toLowerCase()
+              ];
 
-          if (isGoodResult) {
-            setPrice(price);
-            setMaxPrice(helpers.upwardSlippage(spotPriceAfter, SLIPPAGE_RATE));
-            setFormattedSwapFee(getFormattedSwapFee(outputAmount));
+            if (inputData && outputData) {
+              const {
+                outputAmount,
+                price,
+                spotPriceAfter,
+                isGoodResult,
+              } = await helpers.calculateOutputFromInput(
+                inputData,
+                outputData,
+                inputAmount.toString(),
+                swapFee
+              );
 
-            form.setFieldsValue({ to: { amount: outputAmount } });
+              if (isGoodResult) {
+                setPrice(price);
+                setMaxPrice(
+                  helpers.upwardSlippage(spotPriceAfter, SLIPPAGE_RATE)
+                );
+                setFormattedSwapFee(getFormattedSwapFee(outputAmount));
+
+                form.setFieldsValue({ to: { amount: outputAmount } });
+              }
+            }
           }
         }
       }
@@ -190,32 +200,36 @@ export default function SwapInteraction({ pool }: Props) {
         const { amount: outputAmount } = changedValues.to;
         const { token: outputToken } = previousFormValues.current.to;
         const { token: inputToken } = previousFormValues.current.from;
+        const inputEntry = tokenLookup[inputToken.toLowerCase()];
+        const outputEntry = tokenLookup[inputToken.toLowerCase()];
 
-        const inputData =
-          fullPool.tokens.entities[
-            tokenLookup[inputToken.toLowerCase()].id.toLowerCase()
-          ];
-        const outputData =
-          fullPool.tokens.entities[
-            tokenLookup[outputToken.toLowerCase()].id.toLowerCase()
-          ];
+        if (inputEntry && outputEntry) {
+          const inputData =
+            fullPool.tokens.entities[
+              tokenLookup[inputToken.toLowerCase()].id.toLowerCase()
+            ];
+          const outputData =
+            fullPool.tokens.entities[
+              tokenLookup[outputToken.toLowerCase()].id.toLowerCase()
+            ];
 
-        if (inputData && outputData) {
-          const {
-            inputAmount,
-            spotPriceAfter,
-            isGoodResult,
-          } = await helpers.calculateInputFromOutput(
-            inputData,
-            outputData,
-            outputAmount.toString(),
-            swapFee
-          );
+          if (inputData && outputData) {
+            const {
+              inputAmount,
+              spotPriceAfter,
+              isGoodResult,
+            } = await helpers.calculateInputFromOutput(
+              inputData,
+              outputData,
+              outputAmount.toString(),
+              swapFee
+            );
 
-          if (isGoodResult) {
-            setMaxPrice(spotPriceAfter.times(SLIPPAGE_RATE));
+            if (isGoodResult) {
+              setMaxPrice(spotPriceAfter.times(SLIPPAGE_RATE));
 
-            form.setFieldsValue({ from: { amount: inputAmount } });
+              form.setFieldsValue({ from: { amount: inputAmount } });
+            }
           }
         }
       }
@@ -268,8 +282,34 @@ export default function SwapInteraction({ pool }: Props) {
 
     form.setFieldsValue(flippedValue);
     previousFormValues.current = flippedValue;
-    setRenderCount((prev) => prev + 1);
+    triggerUpdate();
   };
+
+  // Effect:
+  // On initial token load, select two to swap.
+  useEffect(() => {
+    if (pool) {
+      const { assets: tokens } = pool;
+      const { from, to } = form.getFieldsValue();
+
+      if (!from.token && !to.token && tokens.length > 1) {
+        const [fromToken, toToken] = getRandomEntries(2, tokens);
+
+        form.setFieldsValue({
+          from: {
+            token: fromToken.symbol,
+          },
+          to: {
+            token: toToken.symbol,
+          },
+        });
+
+        triggerUpdate();
+
+        previousFormValues.current = form.getFieldsValue();
+      }
+    }
+  }, [form, pool]);
 
   // Effect:
   // When approval status is determined, update the actions of the parent panel accordingly.
@@ -293,6 +333,16 @@ export default function SwapInteraction({ pool }: Props) {
     }
   }, [form, approvalNeeded, handleApprovePool, handleSubmit, setActions]);
 
+  // Effect:
+  // When the page changes, clear the form.
+  useEffect(() => {
+    const unregister = history.listen(() => form.resetFields());
+
+    return () => {
+      unregister();
+    };
+  }, [history, form]);
+
   return (
     <S.Form
       form={form}
@@ -315,8 +365,7 @@ export default function SwapInteraction({ pool }: Props) {
           calculateInputFromOutput(changedValues);
         }
 
-        // Force update.
-        setRenderCount((prev) => prev + 1);
+        triggerUpdate();
       }}
       onFinish={(values: any) => handleSubmit(values)}
       onFinishFailed={(error) =>
@@ -325,11 +374,13 @@ export default function SwapInteraction({ pool }: Props) {
     >
       <S.Title>
         <span>Swap</span>
-        <span>
-          <Token name="Baseline" image={baseline} />
-          <S.Swap />
-          <Token name="Comparison" image={comparison} />
-        </span>
+        {baseline && comparison && (
+          <span>
+            <Token name="Baseline" image={baseline} />
+            <S.Swap />
+            <Token name="Comparison" image={comparison} />
+          </span>
+        )}
       </S.Title>
       <Item name="from" rules={[{ validator: checkAmount }]}>
         {pool && <TokenSelector label="From" pool={pool} />}
@@ -338,16 +389,17 @@ export default function SwapInteraction({ pool }: Props) {
       <Item name="to" rules={[{ validator: checkAmount }]}>
         {pool && <TokenSelector label="To" pool={pool} />}
       </Item>
-      {previousFormValues.current.from && previousFormValues.current.to && (
-        <S.Item>
-          <TokenExchangeRate
-            baseline={baseline}
-            comparison={comparison}
-            fee={formattedSwapFee}
-            rate={price.toString()}
-          />
-        </S.Item>
-      )}
+      {previousFormValues.current.from.token &&
+        previousFormValues.current.to.token && (
+          <S.Item>
+            <TokenExchangeRate
+              baseline={baseline}
+              comparison={comparison}
+              fee={formattedSwapFee}
+              rate={price.toString()}
+            />
+          </S.Item>
+        )}
     </S.Form>
   );
 }

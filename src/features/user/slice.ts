@@ -60,13 +60,19 @@ export const selectors = {
     amount: string
   ) {
     const tokenLookup = tokensSelectors.selectTokenLookupBySymbol(state);
-    const { id: tokenId } = tokenLookup[tokenSymbol];
-    const allowance = selectors.selectPoolAllowance(state, poolId, tokenId);
-    const needsApproval = convert
-      .toBigNumber(amount)
-      .isGreaterThan(convert.toBigNumber(allowance));
+    const entry = tokenLookup[tokenSymbol];
 
-    return needsApproval;
+    if (entry) {
+      const { id: tokenId } = tokenLookup[tokenSymbol];
+      const allowance = selectors.selectPoolAllowance(state, poolId, tokenId);
+      const needsApproval = convert
+        .toBigNumber(amount)
+        .isGreaterThan(convert.toBigNumber(allowance));
+
+      return needsApproval;
+    } else {
+      return true;
+    }
   },
   selectTokenSymbolsToBalances(state: AppState) {
     const tokenLookup = tokensSelectors.selectTokenLookup(state);
