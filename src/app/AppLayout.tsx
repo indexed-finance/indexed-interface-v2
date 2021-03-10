@@ -11,7 +11,7 @@ import AppMenu from "./AppMenu";
 import React, { useContext, useEffect, useRef } from "react";
 import SocketClient from "sockets/client";
 import routes from "./routes";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 
 const { Sider, Content } = Layout;
 
@@ -66,7 +66,7 @@ export default function AppLayout() {
         <S.Content>
           {/* Dull the background image */}
           <S.Screen className="ant-layout-screen" />
-          <S.Page extraPadded={breakpoints.sm}>
+          <S.Page extraPadded={breakpoints.xs} isMobile={!breakpoints.md}>
             <RouterSwitch>
               {routes.map((route, index) => (
                 <Route key={index} path={route.path} exact={route.exact}>
@@ -74,7 +74,6 @@ export default function AppLayout() {
                 </Route>
               ))}
             </RouterSwitch>
-
             {activePage && <Drawer page={activePage} />}
           </S.Page>
         </S.Content>
@@ -98,14 +97,18 @@ const S = {
   Rights: styled.div`
     margin-top: ${(props) => props.theme.spacing.small};
   `,
-  Page: styled.div<{ extraPadded?: boolean }>`
+  Page: styled.div<{ extraPadded?: boolean; isMobile: boolean }>`
     padding: ${(props) =>
       props.extraPadded
         ? props.theme.spacing.large
         : props.theme.spacing.small};
     ${(props) => props.theme.snippets.dropshadow};
     position: relative;
-    padding-top: 112px;
+    ${(props) =>
+      !props.isMobile &&
+      css`
+        padding-top: 112px;
+      `}
   `,
   Breadcrumb: styled(Breadcrumb)`
     flex: 1;

@@ -15,11 +15,7 @@ export default function ScreenHeader(props: Props) {
 
   return (
     <>
-      <S.Title
-        level={breakpoints.md ? 1 : 3}
-        withMargin={!breakpoints.sm}
-        centered={!breakpoints.sm}
-      >
+      <S.Title level={breakpoints.md ? 1 : 3} compact={!breakpoints.sm}>
         <S.TitleInner>{title}</S.TitleInner>
         {(props.overlay || props.activeBreadcrumb) && (
           <Breadcrumb>
@@ -36,25 +32,30 @@ export default function ScreenHeader(props: Props) {
 }
 
 const S = {
-  Title: styled(({ withMargin: _, centered: __, ...rest }) => (
-    <Typography.Title {...rest} />
-  ))<{ withMargin?: boolean; centered?: boolean }>`
+  Title: styled(({ compact, ...rest }) => <Typography.Title {...rest} />)<{
+    compact?: boolean;
+  }>`
     ${(props) => props.theme.snippets.spacedBetween};
     align-items: flex-end;
+    margin-top: 0 !important;
 
     ${(props) =>
-      props.withMargin &&
+      props.compact &&
       css`
-        margin-top: ${(props) => props.theme.spacing.huge};
-      `}
-    ${(props) =>
-      props.centered &&
-      css`
+        display: flex;
+        flex-direction: column-reverse;
         text-align: center;
+        align-items: center;
+        margin-top: ${(props) => props.theme.spacing.huge};
+
+        .ant-breadcrumb {
+          margin-bottom: ${(props) => props.theme.spacing.medium};
+        }
       `}
   `,
   TitleInner: styled.span`
     ${(props) => props.theme.snippets.fancy};
     font-weight: 200;
+    margin-top: 0;
   `,
 };
