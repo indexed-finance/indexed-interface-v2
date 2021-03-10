@@ -1,6 +1,6 @@
 import { AiOutlineMenuFold, AiOutlineMenuUnfold } from "react-icons/ai";
 import { Button } from "components";
-import { Form, Grid, Layout, Space } from "antd";
+import { Form, Layout, Space } from "antd";
 import {
   JazzIcon,
   LanguageSelector,
@@ -8,18 +8,18 @@ import {
   WalletConnectorButton,
 } from "components";
 import { selectors } from "features";
+import { useBreakpoints } from "helpers";
 import { useCallback, useState } from "react";
 import { useSelector } from "react-redux";
 import AppMenu from "./AppMenu";
 import styled from "styled-components";
 
-const { useBreakpoint } = Grid;
 const { Header } = Layout;
 const { Item } = Form;
 
 export default function AppHeader() {
   const selectedAddress = useSelector(selectors.selectUserAddress);
-  const breakpoints = useBreakpoint();
+  const breakpoints = useBreakpoints();
 
   // Mobile
   const [mobileMenuActive, setMobileMenuActive] = useState(false);

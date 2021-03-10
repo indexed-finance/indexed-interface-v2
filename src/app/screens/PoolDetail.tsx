@@ -10,14 +10,13 @@ import {
   RankedTokenList,
   ScreenHeader,
 } from "components";
-import { Col, Grid, Menu, Row } from "antd";
+import { Col, Menu, Row } from "antd";
 import { Link, Redirect, useParams } from "react-router-dom";
 import { RiWallet3Line } from "react-icons/ri";
+import { useBreakpoints } from "helpers";
 import { useDispatch, useSelector } from "react-redux";
 import React, { useEffect, useMemo } from "react";
 import styled from "styled-components";
-
-const { useBreakpoint } = Grid;
 
 export default function PoolDetail() {
   const dispatch = useDispatch();
@@ -27,7 +26,7 @@ export default function PoolDetail() {
   );
   const id = useMemo(() => pool?.id ?? "", [pool]);
   const isConnected = useSelector(selectors.selectConnected);
-  const breakpoints = useBreakpoint();
+  const breakpoints = useBreakpoints();
   const chartActions = useMemo(
     () =>
       [

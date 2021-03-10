@@ -1,4 +1,4 @@
-import { Divider, Grid, Menu } from "antd";
+import { Divider, Menu } from "antd";
 import {
   LanguageSelector,
   ModeSwitch,
@@ -8,6 +8,7 @@ import {
 import { Link, useHistory } from "react-router-dom";
 import { SOCIAL_MEDIA } from "config";
 import { selectors } from "features";
+import { useBreakpoints } from "helpers";
 import { useSelector } from "react-redux";
 import React, { useEffect } from "react";
 import noop from "lodash.noop";
@@ -19,7 +20,6 @@ interface Props {
   className?: string;
 }
 
-const { useBreakpoint } = Grid;
 const { Item, SubMenu } = Menu;
 
 export default function AppMenu({ onItemClick = noop, ...rest }: Props) {
@@ -27,7 +27,7 @@ export default function AppMenu({ onItemClick = noop, ...rest }: Props) {
   const categoryLookup = useSelector(selectors.selectCategoryLookup);
   const indexPoolsLookup = useSelector(selectors.selectCategoryImagesByPoolIds);
   const history = useHistory();
-  const breakpoints = useBreakpoint();
+  const breakpoints = useBreakpoints();
   const isMobile = !breakpoints.md;
 
   // Effect:

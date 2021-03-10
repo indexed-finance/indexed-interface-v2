@@ -2,15 +2,14 @@ import { AiOutlineSwap } from "react-icons/ai";
 import { Button, Quote } from "components";
 import { FaTractor } from "react-icons/fa";
 import { FormattedIndexPool } from "features";
-import { Grid, Space, Statistic } from "antd";
+import { Space, Statistic } from "antd";
+import { useBreakpoints } from "helpers";
 import React, { useMemo } from "react";
 import Subscreen, { Action } from "./Subscreen";
 import styled from "styled-components";
 
-const { useBreakpoint } = Grid;
-
 export default function Performance({ pool }: { pool: FormattedIndexPool }) {
-  const breakpoints = useBreakpoint();
+  const breakpoints = useBreakpoints();
   const performanceActions = useMemo(
     () =>
       [

@@ -1,4 +1,5 @@
-import { Breadcrumb, Divider, Grid, Typography } from "antd";
+import { Breadcrumb, Divider, Typography } from "antd";
+import { useBreakpoints } from "helpers";
 import React, { ReactElement } from "react";
 import styled, { css } from "styled-components";
 
@@ -8,10 +9,8 @@ interface Props {
   activeBreadcrumb?: ReactElement;
 }
 
-const { useBreakpoint } = Grid;
-
 export default function ScreenHeader(props: Props) {
-  const breakpoints = useBreakpoint();
+  const breakpoints = useBreakpoints();
   const title = props.title ? props.title.replace(/ Tokens Index/g, "") : "";
 
   return (

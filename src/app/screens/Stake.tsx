@@ -3,7 +3,6 @@ import {
   Avatar,
   Col,
   Divider,
-  Grid,
   List,
   Row,
   Space,
@@ -13,10 +12,9 @@ import {
 import { FaTractor } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { Subscreen } from "../subscreens";
+import { useBreakpoints } from "helpers";
 import React from "react";
 import styled from "styled-components";
-
-const { useBreakpoint } = Grid;
 
 export default function Stake() {
   const stakeable = {
@@ -31,7 +29,7 @@ export default function Stake() {
     total: "50,000 NDX",
   };
   const __data = [stakeable, stakeable, stakeable];
-  const breakpoints = useBreakpoint();
+  const breakpoints = useBreakpoints();
   const area = (
     <S.Area direction="vertical">
       <Typography.Title>Liquidity mining</Typography.Title>

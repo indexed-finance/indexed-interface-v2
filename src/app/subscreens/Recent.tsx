@@ -1,13 +1,12 @@
 import { AiOutlineClockCircle, AiOutlineSwap } from "react-icons/ai";
 import { Button } from "components";
-import { Card, Grid, Skeleton, Space, Tabs, Tag, Typography } from "antd";
+import { Card, Skeleton, Space, Tabs, Tag, Typography } from "antd";
 import { ImArrowRight2 } from "react-icons/im";
+import { useBreakpoints } from "helpers";
 import React, { ReactNode, useState } from "react";
 import Subscreen from "./Subscreen";
 import styled, { css } from "styled-components";
 import type { FormattedIndexPool, Swap, Trade } from "features";
-
-const { useBreakpoint } = Grid;
 
 function BaseCard({
   when,
@@ -17,7 +16,7 @@ function BaseCard({
   title = null,
   extra = null,
 }: Swap & { title?: ReactNode; extra?: ReactNode }) {
-  const breakpoints = useBreakpoint();
+  const breakpoints = useBreakpoints();
 
   return (
     <S.Card
@@ -74,7 +73,7 @@ function SwapCard(props: Swap) {
 }
 
 export default function Recent({ pool }: { pool: FormattedIndexPool }) {
-  const breakpoints = useBreakpoint();
+  const breakpoints = useBreakpoints();
   const [mode, setMode] = useState("Trades");
   const tradesEmpty = pool.recent.trades.length === 0;
   const swapsEmpty = pool.recent.swaps.length === 0;

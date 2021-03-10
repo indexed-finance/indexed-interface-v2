@@ -3,3 +3,4 @@ export { default as createLookup } from "./create-lookup";
 export { default as dedupe } from "./dedupe";
 export { default as getRandomEntries } from "./get-random-entries";
 export { default as sleep } from "./sleep";
+export { default as useBreakpoints } from "./use-breakpoints";

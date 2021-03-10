@@ -1,5 +1,6 @@
-import { Drawer as AntDrawer, Grid, Menu } from "antd";
+import { Drawer as AntDrawer, Menu } from "antd";
 import { Button } from "components/atoms";
+import { useBreakpoints } from "helpers";
 import React, {
   ReactNode,
   createContext,
@@ -34,12 +35,10 @@ interface Props {
   page: DrawerPage;
 }
 
-const { useBreakpoint } = Grid;
-
 export function Drawer({ page }: Props) {
   const { closeDrawerPage, modifiedActions } = useContext(DrawerContext);
   const name = page.name ?? "";
-  const breakpoints = useBreakpoint();
+  const breakpoints = useBreakpoints();
   const allActions = modifiedActions[name]
     ? [...page.actions, ...modifiedActions[name]]
     : page.actions;

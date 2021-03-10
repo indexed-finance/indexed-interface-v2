@@ -1,11 +1,11 @@
 import { Dropdown, Menu, notification } from "antd";
 import { actions } from "features";
+import { useBreakpoints } from "helpers";
 import { useDispatch } from "react-redux";
 import React, { useEffect, useRef } from "react";
 import ReactDOM from "react-dom";
 import jazzicon from "@metamask/jazzicon";
 import styled from "styled-components";
-import useBreakpoint from "antd/lib/grid/hooks/useBreakpoint";
 
 interface Props {
   address: string;
@@ -22,7 +22,7 @@ export default function JazzIcon({ address }: Props) {
       description: "You have successfully disconnected your wallet.",
     });
   }, [dispatch]);
-  const breakpoints = useBreakpoint();
+  const breakpoints = useBreakpoints();
 
   // Effect:
   // On load, display a success notification.

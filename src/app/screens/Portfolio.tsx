@@ -1,7 +1,6 @@
 import {
   Col,
   Divider,
-  Grid,
   List,
   Progress,
   Row,
@@ -18,10 +17,10 @@ import {
   Token,
 } from "components";
 import { Subscreen } from "../subscreens";
+import { useBreakpoints } from "helpers";
 import React from "react";
 import styled from "styled-components";
 
-const { useBreakpoint } = Grid;
 const { Item } = List;
 
 export default function Portfolio() {
@@ -49,7 +48,7 @@ export default function Portfolio() {
       weight: "50%",
     },
   ];
-  const breakpoints = useBreakpoint();
+  const breakpoints = useBreakpoints();
   const ndx = (
     <Subscreen icon={<IoLogoUsd />} title="NDX">
       <S.Centered size="large" split={<Logo withTitle={false} />}>

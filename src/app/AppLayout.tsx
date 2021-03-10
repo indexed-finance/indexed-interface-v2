@@ -1,9 +1,10 @@
-import { Affix, Breadcrumb, Grid, Layout } from "antd";
+import { Affix, Breadcrumb, Layout } from "antd";
 import { Drawer, DrawerContext, QuoteCarousel } from "components";
 import { FormattedIndexPool, selectors } from "features";
 import { GlobalStyles } from "theme";
 import { Logo } from "components";
 import { Route, Switch as RouterSwitch } from "react-router-dom";
+import { useBreakpoints } from "helpers";
 import { useSelector } from "react-redux";
 import AppHeader from "./AppHeader";
 import AppMenu from "./AppMenu";
@@ -12,7 +13,6 @@ import SocketClient from "sockets/client";
 import routes from "./routes";
 import styled from "styled-components";
 
-const { useBreakpoint } = Grid;
 const { Sider, Content } = Layout;
 
 export default function AppLayout() {
@@ -20,7 +20,7 @@ export default function AppLayout() {
   const isConnectionEnabled = useSelector(selectors.selectConnectionEnabled);
   const indexPools = useSelector(selectors.selectAllFormattedIndexPools);
   const theme = useSelector(selectors.selectTheme);
-  const breakpoints = useBreakpoint();
+  const breakpoints = useBreakpoints();
   const originalMode = useRef(theme);
   const modeWrapper = useRef(
     require(`./modes/${theme === "dark" ? "Dark" : "Light"}ModeWrapper.tsx`)
