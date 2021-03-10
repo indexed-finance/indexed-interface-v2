@@ -25,6 +25,9 @@ export default function PoolDetail() {
   const pool = useSelector((state: AppState) =>
     selectors.selectFormattedIndexPool(state, poolName)
   );
+  const normalizedPool = useSelector((state: AppState) =>
+    pool ? selectors.selectPool(state, pool.id) : null
+  );
   const id = useMemo(() => pool?.id ?? "", [pool]);
   const isConnected = useSelector(selectors.selectConnected);
   const breakpoints = useBreakpoint();
@@ -96,13 +99,7 @@ export default function PoolDetail() {
         padding={0}
         defaultActions={chartActions}
       >
-        <ChartCard
-          timeframe="Day"
-          kind="Value"
-          onChange={() => {
-            /**/
-          }}
-        />
+        {normalizedPool ? <ChartCard pool={normalizedPool} /> : null}
       </Subscreen>
     );
     const assets = (

@@ -1,18 +1,34 @@
 import { Button } from "components/atoms";
 import { Card, Menu, Switch } from "antd";
-import React from "react";
+import { NormalizedPool } from "ethereum";
+import React, { useCallback, useState } from "react";
 import styled from "styled-components";
 
 type Kind = "Value" | "TotalValueLocked";
 type Timeframe = "Day" | "Week";
 
 export interface Props {
-  kind: Kind;
-  timeframe: Timeframe;
-  onChange(kind: Kind): void;
+  pool: NormalizedPool;
 }
 
-export default function ChartCard({ kind, timeframe, onChange }: Props) {
+export default function ChartCard({ pool }: Props) {
+  const [kind, setKind] = useState<Kind>("Value");
+  const [timeframe, setTimeframe] = useState<Timeframe>("Day");
+  const toggleKind = useCallback(
+    () =>
+      setKind((prevKind) =>
+        prevKind === "Value" ? "TotalValueLocked" : "Value"
+      ),
+    []
+  );
+  const toggleTimeframe = useCallback(
+    () =>
+      setTimeframe((prevTimeframe) =>
+        prevTimeframe === "Day" ? "Week" : "Day"
+      ),
+    []
+  );
+
   return (
     <S.ChartCard
       cover={
@@ -20,18 +36,14 @@ export default function ChartCard({ kind, timeframe, onChange }: Props) {
       }
       actions={[
         <>
-          <S.Switch
-            key="1"
-            checked={kind === "Value"}
-            onClick={() => onChange("Value")}
-          />
+          <S.Switch key="1" checked={kind === "Value"} onClick={toggleKind} />
           Value
         </>,
         <>
           <S.Switch
             key="2"
             checked={kind === "TotalValueLocked"}
-            onClick={() => onChange("TotalValueLocked")}
+            onClick={toggleKind}
           />
           Total Value Locked
         </>,
@@ -39,7 +51,13 @@ export default function ChartCard({ kind, timeframe, onChange }: Props) {
       extra={
         <S.Menu mode="horizontal" selectedKeys={[timeframe]}>
           {["Day", "Week"].map((_timeframe) => (
-            <S.MenuItem key={_timeframe}>{_timeframe}</S.MenuItem>
+            <S.MenuItem
+              key={_timeframe}
+              active={_timeframe === timeframe}
+              onClick={toggleTimeframe}
+            >
+              {_timeframe}
+            </S.MenuItem>
           ))}
         </S.Menu>
       }
