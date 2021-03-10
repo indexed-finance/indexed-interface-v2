@@ -1,19 +1,19 @@
 import { Button } from "components/atoms";
 import { Card, Menu, Switch } from "antd";
-import { NormalizedPool } from "ethereum";
 import { colors } from "theme";
 import { createChart } from "lightweight-charts";
+import { selectors } from "features";
+import { useSelector } from "react-redux";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 
-type Kind = "Value" | "TotalValueLocked";
-type Timeframe = "Day" | "Week";
-
 export interface Props {
-  pool: NormalizedPool;
+  poolId: string;
+  expanded?: boolean;
 }
 
-export default function ChartCard({ pool }: Props) {
+export default function ChartCard({ poolId, expanded = false }: Props) {
+  const theme = useSelector(selectors.selectTheme);
   const [kind, setKind] = useState<Kind>("Value");
   const [timeframe, setTimeframe] = useState<Timeframe>("Day");
   const toggleKind = useCallback(
@@ -34,32 +34,14 @@ export default function ChartCard({ pool }: Props) {
 
   useEffect(() => {
     if (cardRef.current) {
-      const chart = createChart(cardRef.current, { width: 400, height: 300 });
-
-      (window as any).ccc = chart;
-
-      chart.applyOptions({
-        layout: {
-          backgroundColor: colors.black400,
-          fontFamily: "sans-serif",
-          textColor: colors.purple200,
-          fontSize: 16,
-        },
-        grid: {
-          vertLines: {
-            color: colors.purple100,
-            style: 1,
-            visible: true,
-          },
-          horzLines: {
-            color: colors.purple100,
-            style: 1,
-            visible: true,
-          },
-        },
-      });
-
+      const size = expanded
+        ? { width: 1200, height: 500 }
+        : { width: 400, height: 300 };
+      const chart = createChart(cardRef.current, size);
+      const options = CHART_MODES[theme];
       const lineSeries = chart.addLineSeries();
+
+      chart.applyOptions(options);
 
       lineSeries.setData([
         { time: "2019-04-11", value: 80.01 },
@@ -74,23 +56,19 @@ export default function ChartCard({ pool }: Props) {
         { time: "2019-04-20", value: 74.43 },
       ]);
     }
-  }, []);
+  }, [theme, expanded]);
 
   return (
     <S.ChartCard
       actions={[
-        <>
-          <S.Switch key="1" checked={kind === "Value"} onClick={toggleKind} />
+        <div onClick={toggleKind}>
+          <S.Switch key="1" checked={kind === "Value"} />
           Value
-        </>,
-        <>
-          <S.Switch
-            key="2"
-            checked={kind === "TotalValueLocked"}
-            onClick={toggleKind}
-          />
+        </div>,
+        <div onClick={toggleKind}>
+          <S.Switch key="2" checked={kind === "TotalValueLocked"} />
           Total Value Locked
-        </>,
+        </div>,
       ]}
       extra={
         <S.Menu mode="horizontal" selectedKeys={[timeframe]}>
@@ -136,4 +114,44 @@ const S = {
   Switch: styled(Switch)`
     margin-right: ${(props) => props.theme.spacing.medium};
   `,
+};
+
+type Kind = "Value" | "TotalValueLocked";
+type Timeframe = "Day" | "Week";
+
+const COMMON_LAYOUT_OPTIONS = {
+  fontFamily: "sans-serif",
+  fontSize: 16,
+};
+const CHART_MODES = {
+  dark: {
+    layout: {
+      ...COMMON_LAYOUT_OPTIONS,
+      backgroundColor: colors.black400,
+      textColor: colors.purple200,
+    },
+    grid: {
+      vertLines: {
+        color: colors.purple100,
+      },
+      horzLines: {
+        color: colors.purple100,
+      },
+    },
+  },
+  light: {
+    layout: {
+      ...COMMON_LAYOUT_OPTIONS,
+      backgroundColor: colors.white300,
+      textColor: colors.black200,
+    },
+    grid: {
+      vertLines: {
+        color: colors.purple300,
+      },
+      horzLines: {
+        color: colors.purple300,
+      },
+    },
+  },
 };

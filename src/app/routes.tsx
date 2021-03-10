@@ -4,6 +4,7 @@ import {
   DocsDetail,
   DocsList,
   FAQ,
+  PoolChart,
   PoolDetail,
   PoolList,
   Portfolio,
@@ -59,6 +60,11 @@ const routes: Route[] = [
     path: "/pools/:poolName",
     exact: true,
     screen: <PoolDetail />,
+  },
+  {
+    path: "/pools/:poolName/chart",
+    exact: true,
+    screen: <PoolChart />,
   },
   {
     icon: <RiSafe2Line />,

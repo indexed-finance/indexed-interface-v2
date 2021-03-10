@@ -25,9 +25,6 @@ export default function PoolDetail() {
   const pool = useSelector((state: AppState) =>
     selectors.selectFormattedIndexPool(state, poolName)
   );
-  const normalizedPool = useSelector((state: AppState) =>
-    pool ? selectors.selectPool(state, pool.id) : null
-  );
   const id = useMemo(() => pool?.id ?? "", [pool]);
   const isConnected = useSelector(selectors.selectConnected);
   const breakpoints = useBreakpoint();
@@ -37,16 +34,16 @@ export default function PoolDetail() {
         {
           type: "default",
           title: (
-            <>
+            <Link to={`/pools/${poolName}/chart`}>
               Expand <CgArrowsExpandRight />
-            </>
+            </Link>
           ),
           onClick: () => {
             /* */
           },
         },
       ] as Action[],
-    []
+    [poolName]
   );
   const interactionActions = useMemo(
     () =>
@@ -99,7 +96,7 @@ export default function PoolDetail() {
         padding={0}
         defaultActions={chartActions}
       >
-        {normalizedPool ? <ChartCard pool={normalizedPool} /> : null}
+        {id ? <ChartCard poolId={id} /> : null}
       </Subscreen>
     );
     const assets = (

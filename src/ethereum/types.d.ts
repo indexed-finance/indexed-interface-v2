@@ -51,10 +51,7 @@ export interface NormalizedPool
   swaps: Swap[];
   tokens: {
     ids: string[];
-    entities: Record<
-      string,
-      PoolTokenUpdate & PoolUnderlyingToken & { weight?: string }
-    >;
+    entities: Record<string, PoolTokenUpdate & PoolUnderlyingToken>;
   };
   totalDenorm: string;
   totalSupply: string;
