@@ -1,7 +1,12 @@
-import { Grid, Menu } from "antd";
+import { Divider, Grid, Menu } from "antd";
+import {
+  LanguageSelector,
+  ModeSwitch,
+  ServerConnection,
+  Token,
+} from "components";
 import { Link, useHistory } from "react-router-dom";
 import { SOCIAL_MEDIA } from "config";
-import { Token } from "components";
 import { selectors } from "features";
 import { useSelector } from "react-redux";
 import React, { useEffect } from "react";
@@ -23,10 +28,11 @@ export default function AppMenu({ onItemClick = noop, ...rest }: Props) {
   const indexPoolsLookup = useSelector(selectors.selectCategoryImagesByPoolIds);
   const history = useHistory();
   const breakpoints = useBreakpoint();
+  const isMobile = !breakpoints.md;
 
   // Effect:
   // In 'xs' and 'sm' modes, the menu is only visible when overlaying the body, so scrolling is confusing.
-  useScrollPrevention(!breakpoints.md);
+  useScrollPrevention(isMobile);
 
   return (
     <>
@@ -37,6 +43,13 @@ export default function AppMenu({ onItemClick = noop, ...rest }: Props) {
         selectable={false}
         {...rest}
       >
+        <S.TopItem>
+          <S.Aligned>
+            <ServerConnection showText={true} />
+            <ModeSwitch />
+            {isMobile && <LanguageSelector />}
+          </S.Aligned>
+        </S.TopItem>
         {routes
           .filter((route) => route.sider)
           .map((route) => {
@@ -154,8 +167,18 @@ const S = {
   SingleLink: styled(Link)`
     ${(props) => props.theme.snippets.spacedBetween};
   `,
+  Divider: styled(Divider)`
+    margin: 0;
+  `,
+  TopItem: styled(Item)`
+    margin-bottom: 0 !important;
+  `,
+  Aligned: styled.div`
+    ${(props) => props.theme.snippets.spacedBetween};
+  `,
 };
 
+// #region Helpers
 // Code adapted from https://stackoverflow.com/questions/4770025/how-to-disable-scrolling-temporarily
 function useScrollPrevention(shouldPreventScroll: boolean) {
   useEffect(() => {
@@ -216,3 +239,4 @@ function useScrollPrevention(shouldPreventScroll: boolean) {
     }
   }, [shouldPreventScroll]);
 }
+// #endregion

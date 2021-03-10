@@ -5,6 +5,7 @@ import React, { useEffect, useRef } from "react";
 import ReactDOM from "react-dom";
 import jazzicon from "@metamask/jazzicon";
 import styled from "styled-components";
+import useBreakpoint from "antd/lib/grid/hooks/useBreakpoint";
 
 interface Props {
   address: string;
@@ -21,6 +22,7 @@ export default function JazzIcon({ address }: Props) {
       description: "You have successfully disconnected your wallet.",
     });
   }, [dispatch]);
+  const breakpoints = useBreakpoint();
 
   // Effect:
   // On load, display a success notification.
@@ -35,22 +37,27 @@ export default function JazzIcon({ address }: Props) {
   // Use refs to integrate the third party library for displaying a wallet identicon.
   useEffect(() => {
     const _blockie = blockie.current;
+    let element: any;
 
     if (_blockie) {
       const parsedAddress = parseInt(address.slice(2, 10), 16);
-      const element = jazzicon(35, parsedAddress);
 
+      element = jazzicon(breakpoints.md ? 35 : 25, parsedAddress);
       element.style.border = "2px solid #ccccff";
 
       _blockie.appendChild(element);
     }
 
     return () => {
+      if (element) {
+        element.remove();
+      }
+
       if (_blockie) {
         ReactDOM.unmountComponentAtNode(_blockie);
       }
     };
-  }, [address]);
+  }, [address, breakpoints.md]);
 
   return (
     <a

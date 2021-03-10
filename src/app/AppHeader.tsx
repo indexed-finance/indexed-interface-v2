@@ -1,113 +1,80 @@
+import { AiOutlineMenuFold, AiOutlineMenuUnfold } from "react-icons/ai";
 import { Button } from "components";
+import { Form, Grid, Layout, Space } from "antd";
 import {
-  Form,
-  Grid,
-  Layout,
-  Popconfirm,
-  Select,
-  Switch,
-  Typography,
-} from "antd";
-import { ImConnection } from "react-icons/im";
-import { JazzIcon, Logo, WalletConnectorButton } from "components";
-import { actions, selectors } from "features";
-import { useDispatch, useSelector } from "react-redux";
-import React, { useMemo } from "react";
+  JazzIcon,
+  LanguageSelector,
+  Logo,
+  WalletConnectorButton,
+} from "components";
+import { selectors } from "features";
+import { useCallback, useState } from "react";
+import { useSelector } from "react-redux";
+import AppMenu from "./AppMenu";
 import styled from "styled-components";
 
 const { useBreakpoint } = Grid;
 const { Header } = Layout;
 const { Item } = Form;
-const { Option } = Select;
 
 export default function AppHeader() {
-  const dispatch = useDispatch();
-  const language = useSelector(selectors.selectLanguageName);
-  const theme = useSelector(selectors.selectTheme);
   const selectedAddress = useSelector(selectors.selectUserAddress);
-  const isConnected = useSelector(selectors.selectConnected);
-  const isConnectionEnabled = useSelector(selectors.selectConnectionEnabled);
-  const connectionStatus = useMemo(() => {
-    if (isConnectionEnabled) {
-      return {
-        type: (isConnected ? "success" : "danger") as any,
-        top: isConnected ? "Connected to server." : "Not connected to server.",
-        bottom: "Disable server connection?",
-      };
-    } else {
-      return {
-        type: "secondary" as any,
-        top: "Connection disabled.",
-        bottom: "Enable server connection?",
-      };
-    }
-  }, [isConnectionEnabled, isConnected]);
-  const breakpoint = useBreakpoint();
+  const breakpoints = useBreakpoint();
 
-  return (
+  // Mobile
+  const [mobileMenuActive, setMobileMenuActive] = useState(false);
+  const MobileMenuIcon = mobileMenuActive ? S.MenuFold : S.MenuUnfold;
+  const closeMobileMenu = useCallback(() => setMobileMenuActive(false), []);
+  const toggleMobileMenu = useCallback(
+    () => setMobileMenuActive((prev) => !prev),
+    []
+  );
+
+  // Common
+  const walletButton = selectedAddress ? (
+    <JazzIcon address={selectedAddress} />
+  ) : (
+    <WalletConnectorButton />
+  );
+
+  return breakpoints.lg ? (
     <S.Top>
-      {breakpoint.lg && (
-        <S.Controls>
-          {selectedAddress ? (
-            <Logo
-              title="2800.00 NDX"
-              link="/portfolio"
-              size="small"
-              animated={true}
-            />
-          ) : (
-            <span />
-          )}
-          <S.Changeables layout="inline" colon={false}>
-            <Item>
-              <Select value={language}>
-                <Option value="english">English</Option>
-              </Select>
-            </Item>
-            <Item name="Theme">
-              <Switch
-                checked={theme === "dark"}
-                checkedChildren="🌙 Dark"
-                unCheckedChildren="🔆 Light"
-                onClick={() => dispatch(actions.themeToggled())}
-              />
-            </Item>
-            <Item>
-              {selectedAddress ? (
-                <JazzIcon address={selectedAddress} />
-              ) : (
-                <WalletConnectorButton />
-              )}
-            </Item>
-            <S.SelfCentered>
-              <Popconfirm
-                icon={null}
-                placement="topLeft"
-                title={
-                  <S.PerfectlyCentered>
-                    <S.ConnectionStatus />
-                    <div>
-                      <strong>{connectionStatus.top}</strong>
-                      <br />
-                      <em>{connectionStatus.bottom}</em>
-                    </div>
-                  </S.PerfectlyCentered>
-                }
-                onConfirm={() => dispatch(actions.connectionToggled())}
-                okText="Yes"
-                cancelText="No"
-              >
-                <S.Connection>
-                  <Typography.Text type={connectionStatus.type}>
-                    <S.ConnectionStatus />
-                  </Typography.Text>
-                </S.Connection>
-              </Popconfirm>
-            </S.SelfCentered>
-          </S.Changeables>
-        </S.Controls>
-      )}
+      <S.Controls>
+        {selectedAddress ? (
+          <Logo
+            title="2800.00 NDX"
+            link="/portfolio"
+            size="small"
+            animated={true}
+          />
+        ) : (
+          <span />
+        )}
+        <S.Changeables layout="inline" colon={false}>
+          <S.ChangeItem>
+            <LanguageSelector />
+          </S.ChangeItem>
+          <S.ChangeItem>{walletButton}</S.ChangeItem>
+        </S.Changeables>
+      </S.Controls>
     </S.Top>
+  ) : (
+    <>
+      <S.Header>
+        <S.Space align="center">
+          <Button type="ghost">
+            <MobileMenuIcon onClick={toggleMobileMenu} />
+          </Button>
+          {walletButton}
+        </S.Space>
+        <Logo />
+      </S.Header>
+      {mobileMenuActive && (
+        <S.MobileMenu>
+          <S.AppMenu onItemClick={closeMobileMenu} />
+        </S.MobileMenu>
+      )}
+    </>
   );
 }
 
@@ -122,19 +89,6 @@ const S = {
     left: 300px;
     z-index: 2;
   `,
-  Connection: styled.div`
-    ${(props) => props.theme.snippets.perfectlyCentered};
-    margin: 0;
-  `,
-  ConnectionStatus: styled(ImConnection)`
-    font-size: ${(props) => props.theme.fontSizes.huge};
-    cursor: pointer;
-    transition: color 0.6s;
-
-    :hover {
-      color: ${(props) => props.theme.colors.primary};
-    }
-  `,
   Controls: styled.div`
     ${(props) => props.theme.snippets.spacedBetween};
     flex: 1;
@@ -148,14 +102,41 @@ const S = {
       ${(props) => props.theme.snippets.perfectlyCentered};
     }
   `,
-  SelfCentered: styled(Item)`
-    align-self: center;
+  MobileMenu: styled.div`
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: calc(100vw + 1px);
+    height: 100vh;
+    z-index: 2;
   `,
-  PerfectlyCentered: styled.div`
-    ${(props) => props.theme.snippets.perfectlyCentered};
+  MenuFold: styled(AiOutlineMenuFold)`
+    font-size: ${(props) => props.theme.fontSizes.huge};
+  `,
+  MenuUnfold: styled(AiOutlineMenuUnfold)`
+    font-size: ${(props) => props.theme.fontSizes.huge};
+  `,
+  Header: styled(Header)`
+    top: 0;
+    ${(props) => props.theme.snippets.spacedBetween};
+    z-index: 4;
+    padding-right: 0;
+    padding-left: 12px;
+  `,
+  AppMenu: styled(AppMenu)`
+    position: fixed;
+    top: 65px;
+    left: 0;
+    z-index: 2;
+  `,
+  ChangeItem: styled(Item)``,
+  Space: styled(Space)`
+    position: relative;
+    top: 4px;
 
-    svg {
-      margin-right: ${(props) => props.theme.spacing.medium};
+    .ant-btn {
+      padding-left: 4px;
+      padding-right: 4px;
     }
   `,
 };

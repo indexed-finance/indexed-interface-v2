@@ -1,5 +1,4 @@
 import { Affix, Breadcrumb, Grid, Layout } from "antd";
-import { AiOutlineMenuFold, AiOutlineMenuUnfold } from "react-icons/ai";
 import { Drawer, DrawerContext, QuoteCarousel } from "components";
 import { FormattedIndexPool, selectors } from "features";
 import { GlobalStyles } from "theme";
@@ -8,33 +7,20 @@ import { Route, Switch as RouterSwitch } from "react-router-dom";
 import { useSelector } from "react-redux";
 import AppHeader from "./AppHeader";
 import AppMenu from "./AppMenu";
-import React, {
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import React, { useContext, useEffect, useRef } from "react";
 import SocketClient from "sockets/client";
 import routes from "./routes";
 import styled from "styled-components";
 
 const { useBreakpoint } = Grid;
-const { Sider, Header, Content } = Layout;
+const { Sider, Content } = Layout;
 
 export default function AppLayout() {
   const { activePage } = useContext(DrawerContext);
   const isConnectionEnabled = useSelector(selectors.selectConnectionEnabled);
   const indexPools = useSelector(selectors.selectAllFormattedIndexPools);
   const theme = useSelector(selectors.selectTheme);
-  const breakpoint = useBreakpoint();
-  const [mobileMenuActive, setMobileMenuActive] = useState(false);
-  const MobileMenuIcon = mobileMenuActive ? S.MenuFold : S.MenuUnfold;
-  const closeMobileMenu = useCallback(() => setMobileMenuActive(false), []);
-  const toggleMobileMenu = useCallback(
-    () => setMobileMenuActive((prev) => !prev),
-    []
-  );
+  const breakpoints = useBreakpoint();
   const originalMode = useRef(theme);
   const modeWrapper = useRef(
     require(`./modes/${theme === "dark" ? "Dark" : "Light"}ModeWrapper.tsx`)
@@ -68,32 +54,19 @@ export default function AppLayout() {
     <ModeWrapper className={theme}>
       <GlobalStyles />
       <S.Layout className="layout">
-        {breakpoint.lg ? (
+        {breakpoints.lg && (
           // Desktop  sider
           <S.Sider width={300}>
             <Logo />
             <QuoteCarousel pools={indexPools as FormattedIndexPool[]} />
             <AppMenu />
           </S.Sider>
-        ) : (
-          // Mobile header
-          <>
-            <S.Header>
-              <MobileMenuIcon onClick={toggleMobileMenu} />
-              <Logo />
-            </S.Header>
-            {mobileMenuActive && (
-              <S.MobileMenu>
-                <S.AppMenu onItemClick={closeMobileMenu} />
-              </S.MobileMenu>
-            )}
-          </>
         )}
         <AppHeader />
         <S.Content>
           {/* Dull the background image */}
           <S.Screen className="ant-layout-screen" />
-          <S.Page extraPadded={breakpoint.sm}>
+          <S.Page extraPadded={breakpoints.sm}>
             <RouterSwitch>
               {routes.map((route, index) => (
                 <Route key={index} path={route.path} exact={route.exact}>
@@ -136,33 +109,6 @@ const S = {
   `,
   Breadcrumb: styled(Breadcrumb)`
     flex: 1;
-  `,
-  Header: styled(Header)`
-    top: 0;
-    ${(props) => props.theme.snippets.spacedBetween};
-    z-index: 4;
-    padding-right: 0;
-    padding-left: 12px;
-  `,
-  AppMenu: styled(AppMenu)`
-    position: fixed;
-    top: 65px;
-    left: 0;
-    z-index: 2;
-  `,
-  MenuFold: styled(AiOutlineMenuFold)`
-    font-size: 24px;
-  `,
-  MenuUnfold: styled(AiOutlineMenuUnfold)`
-    font-size: 24px;
-  `,
-  MobileMenu: styled.div`
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: calc(100vw + 1px);
-    height: 100vh;
-    z-index: 2;
   `,
   Sider: styled(Sider)`
     height: 100vh;
