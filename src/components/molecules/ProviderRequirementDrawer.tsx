@@ -1,6 +1,6 @@
 import { Drawer, DrawerProps, Result } from "antd";
-import { actions, useProvider } from "features";
-import { useDispatch } from "react-redux";
+import { actions, selectors, useProvider } from "features";
+import { useDispatch, useSelector } from "react-redux";
 import React from "react";
 import styled from "styled-components";
 
@@ -11,8 +11,11 @@ interface Props {
 
 export function useProviderRequirement(includeSignerRequirement = false) {
   const [provider, signer] = useProvider();
+  const address = useSelector(selectors.selectUserAddress);
 
-  if (includeSignerRequirement) {
+  if (address) {
+    return true;
+  } else if (includeSignerRequirement) {
     return Boolean(provider && signer);
   } else {
     return Boolean(provider);

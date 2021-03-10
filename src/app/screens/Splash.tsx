@@ -57,7 +57,7 @@ export default function Splash() {
     <S.Splash>
       <S.Title>Decentralized Index Protocol</S.Title>
       <S.Subtitle level={5}>
-        Passively managed, autonomous AMM pools powering the future of finance
+        Passively managed, autonomous AMM pools powering the future of finance.
       </S.Subtitle>
       <S.Actions level={3}>
         <S.GetStarted>Get started today:</S.GetStarted>
