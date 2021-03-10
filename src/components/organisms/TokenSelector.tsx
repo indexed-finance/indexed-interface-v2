@@ -23,6 +23,7 @@ export interface Props {
   label?: string;
   pool: FormattedIndexPool;
   value?: TokenSelectorValue;
+  selectable?: boolean;
   balance?: string;
   onChange?: (value: TokenSelectorValue) => void;
 }
@@ -31,6 +32,7 @@ export default function TokenSelector({
   label = "",
   pool,
   value = {},
+  selectable = true,
   onChange,
 }: Props) {
   const [amount, setAmount] = useState(value?.amount ?? 0);
@@ -149,18 +151,15 @@ export default function TokenSelector({
             onChange={onAmountChange}
           />
           <S.InnerSpace>
-            {value.token && (
-              <Button
-                type="dashed"
-                disabled={!relevantBalance}
-                onClick={handleMaxOut}
-              >
+            {value.token && parseFloat(relevantBalance) > 0 && (
+              <Button type="dashed" onClick={handleMaxOut}>
                 MAX
               </Button>
             )}
             <S.Button
               type={value.token ? "text" : "primary"}
               onClick={() =>
+                selectable &&
                 openDrawer(
                   <S.List size="small">
                     <S.SelectOne level={3}>Select one</S.SelectOne>
@@ -189,7 +188,7 @@ export default function TokenSelector({
               ) : (
                 "Select"
               )}
-              <CaretDownOutlined />
+              {selectable && <CaretDownOutlined />}
             </S.Button>
           </S.InnerSpace>
         </S.Space>

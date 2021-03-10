@@ -10,4 +10,5 @@ export { default as Quote } from "./Quote";
 export { default as RankedToken } from "./RankedToken";
 export { default as ScreenHeader } from "./ScreenHeader";
 export { default as SelectableToken } from "./SelectableToken";
+export { default as TokenExchangeRate } from "./TokenExchangeRate";
 export { default as WalletConnectorButton } from "./WalletConnectorButton";

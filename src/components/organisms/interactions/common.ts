@@ -13,14 +13,29 @@ export function useTokenRandomizer(options: TokenRandomizerOptions) {
     if (options.pool) {
       const { assets: tokens } = options.pool;
 
-      if (!options.from && !options.to && tokens.length > 1) {
-        const [fromToken, toToken] = getRandomEntries(2, tokens);
+      if (options.hasOwnProperty("from")) {
+        if (!options.from && !options.to && tokens.length > 1) {
+          const [fromToken, toToken] = getRandomEntries(2, tokens);
 
-        options.changeFrom(fromToken.symbol);
-        options.changeTo(toToken.symbol);
+          if (options.changeFrom) {
+            options.changeFrom(fromToken.symbol);
+          }
 
-        if (options.callback) {
-          options.callback();
+          options.changeTo(toToken.symbol);
+
+          if (options.callback) {
+            options.callback();
+          }
+        }
+      } else {
+        if (!options.to && tokens.length > 0) {
+          const [toToken] = getRandomEntries(1, tokens);
+
+          options.changeTo(toToken.symbol);
+
+          if (options.callback) {
+            options.callback();
+          }
         }
       }
     }
@@ -113,9 +128,9 @@ export function useHistoryChangeCallback(callback: () => void) {
 // #region Models
 type TokenRandomizerOptions = {
   pool: null | FormattedIndexPool;
-  from: string;
+  from?: string;
   to: string;
-  changeFrom(symbol: string): void;
+  changeFrom?(symbol: string): void;
   changeTo(symbol: string): void;
   callback?(): void;
 };

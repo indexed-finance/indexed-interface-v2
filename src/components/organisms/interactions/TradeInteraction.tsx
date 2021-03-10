@@ -1,6 +1,8 @@
-import { Flipper } from "components";
-import { Form } from "antd";
+import { AiOutlineArrowRight } from "react-icons/ai";
+import { Flipper, Token } from "components";
+import { Form, Typography } from "antd";
 import { FormattedIndexPool } from "features";
+import { TokenExchangeRate } from "components/molecules";
 import {
   useHistoryChangeCallback,
   useTokenApproval,
@@ -9,6 +11,7 @@ import {
 import React, { useCallback, useMemo, useState } from "react";
 import TokenSelector from "../TokenSelector";
 import cloneDeep from "lodash.clonedeep";
+import styled, { keyframes } from "styled-components";
 
 interface FieldData {
   name: string | number | (string | number)[];
@@ -25,7 +28,7 @@ interface Props {
 const INITIAL_FROM: FieldData = {
   name: "from",
   value: {
-    token: "",
+    token: "ETH",
     amount: 0,
   },
 };
@@ -44,12 +47,17 @@ export default function TradeInteraction({ pool }: Props) {
   const fields = useMemo(() => [from, to], [from, to]);
   const handleFlip = useCallback(() => {
     const flippedValue = {
-      from: to,
-      to: from,
+      from: to.value,
+      to: from.value,
     };
+    const nextFrom = cloneDeep(from);
+    const nextTo = cloneDeep(to);
 
-    setFrom(flippedValue.from);
-    setTo(flippedValue.to);
+    nextFrom.value = flippedValue.from;
+    nextTo.value = flippedValue.to;
+
+    setFrom(nextFrom);
+    setTo(nextTo);
   }, [from, to]);
 
   useTokenApproval({
@@ -63,14 +71,7 @@ export default function TradeInteraction({ pool }: Props) {
 
   useTokenRandomizer({
     pool,
-    from: from.value.token,
     to: to.value.token,
-    changeFrom: (newFrom: string) =>
-      setFrom((prevFrom) => {
-        const nextFrom = cloneDeep(prevFrom);
-        nextFrom.value.token = newFrom;
-        return nextFrom;
-      }),
     changeTo: (newTo: string) =>
       setTo((prevTo) => {
         const nextTo = cloneDeep(prevTo);
@@ -85,20 +86,91 @@ export default function TradeInteraction({ pool }: Props) {
   });
 
   return (
-    <Form
+    <S.Form
       fields={fields}
       onFieldsChange={(_, [newFrom, newTo]) => {
         setFrom(newFrom);
         setTo(newTo);
       }}
     >
+      <S.Title>
+        <span>Trade</span>
+        {from.value.token && to.value.token && (
+          <span>
+            <Token name="Baseline" image={from.value.token} />
+            <S.Swap />
+            <Token name="Comparison" image={to.value.token} />
+          </span>
+        )}
+      </S.Title>
       <Form.Item name="from">
-        {pool && <TokenSelector label="From" pool={pool} />}
+        {pool && (
+          <TokenSelector
+            label="From"
+            pool={pool}
+            selectable={from.value.token !== "ETH"}
+          />
+        )}
       </Form.Item>
       <Flipper onFlip={handleFlip} />
       <Form.Item name="to">
-        {pool && <TokenSelector label="To" pool={pool} />}
+        {pool && (
+          <TokenSelector
+            label="To"
+            pool={pool}
+            selectable={to.value.token !== "ETH"}
+          />
+        )}
       </Form.Item>
-    </Form>
+      {from.value.token && to.value.token && (
+        <S.LastItem>
+          <TokenExchangeRate
+            baseline={from.value.token}
+            comparison={to.value.token}
+            rate="1.00"
+            fee="1.00"
+          />
+        </S.LastItem>
+      )}
+    </S.Form>
   );
 }
+
+const blinking = keyframes`
+  0% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 0.3;
+  }
+`;
+
+const S = {
+  Form: styled(Form)`
+    img {
+      ${(props) => props.theme.snippets.size40};
+      opacity: 0.7;
+      border-radius: 50%;
+      animation-name: ${blinking};
+      animation-duration: 2s;
+      animation-iteration-count: infinite;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+    }
+  `,
+  Title: styled(Typography.Title)`
+    ${(props) => props.theme.snippets.spacedBetween};
+    position: relative;
+    font-weight: 200 !important;
+  `,
+  Swap: styled(AiOutlineArrowRight)`
+    position: absolute;
+    top: 9px;
+    right: 21px;
+  `,
+  LastItem: styled(Form.Item)`
+    margin-bottom: 0;
+  `,
+};

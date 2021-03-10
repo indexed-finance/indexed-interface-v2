@@ -1,7 +1,8 @@
 import { AiOutlineArrowRight } from "react-icons/ai";
-import { Alert, Form, Statistic, Typography } from "antd";
 import { AppState, FormattedIndexPool, selectors, signer } from "features";
 import { Flipper, Token } from "components/atoms";
+import { Form, Typography } from "antd";
+import { TokenExchangeRate } from "components/molecules";
 import { actions } from "features";
 import { convert } from "helpers";
 import { helpers } from "ethereum";
@@ -387,42 +388,5 @@ const S = {
     ${(props) => props.theme.snippets.spacedBetween};
     position: relative;
     font-weight: 200 !important;
-  `,
-};
-
-export interface TProps {
-  baseline: string;
-  comparison: string;
-  rate: string | number;
-  fee: string;
-}
-
-function TokenExchangeRate({ baseline, comparison, fee, rate }: TProps) {
-  return (
-    <T.Wrapper
-      message={
-        <T.Title level={4}>
-          <Statistic
-            title="Exchange Rate"
-            value={`1 ${baseline} ≈ ${convert.toComma(
-              typeof rate === "number" ? rate : parseFloat(rate)
-            )} ${comparison}`}
-          />
-          <Statistic title="Fee" value={fee} />
-        </T.Title>
-      }
-    />
-  );
-}
-
-const T = {
-  Wrapper: styled(Alert)`
-    position: relative;
-    width: 100%;
-  `,
-  Title: styled(Typography.Title)`
-    ${(props) => props.theme.snippets.spacedBetween};
-    flex-wrap: wrap;
-    margin-bottom: 0 !important;
   `,
 };
