@@ -43,7 +43,7 @@ export default function TokenSelector({
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
   const { openDrawer, closeDrawer } = useDrawer({
     name: "Select a token",
-    title: "Select a token",
+    title: "",
     mask: true,
     width: 420,
     actions: [
@@ -163,6 +163,7 @@ export default function TokenSelector({
               onClick={() =>
                 openDrawer(
                   <S.List size="small">
+                    <S.SelectOne level={3}>Select one</S.SelectOne>
                     {pool.assets.map((asset) => (
                       <SelectableToken
                         key={asset.name}
@@ -247,5 +248,8 @@ const S = {
   `,
   Token: styled(Token)`
     margin-right: ${(props) => props.theme.spacing.small};
+  `,
+  SelectOne: styled(Typography.Title)`
+    ${(props) => props.theme.snippets.fancy};
   `,
 };
