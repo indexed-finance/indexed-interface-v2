@@ -11,7 +11,12 @@ import {
 } from "antd";
 import { IoLogoUsd } from "react-icons/io";
 import { Link } from "react-router-dom";
-import { Logo, ScreenHeader, Token } from "components";
+import {
+  Logo,
+  ProviderRequirementDrawer,
+  ScreenHeader,
+  Token,
+} from "components";
 import { Subscreen } from "../subscreens";
 import React from "react";
 import styled from "styled-components";
@@ -44,7 +49,6 @@ export default function Portfolio() {
       weight: "50%",
     },
   ];
-
   const breakpoints = useBreakpoint();
   const ndx = (
     <Subscreen icon={<IoLogoUsd />} title="NDX">
@@ -136,7 +140,11 @@ export default function Portfolio() {
   );
 
   return (
-    <>
+    <div>
+      <ProviderRequirementDrawer
+        includeSignerRequirement={true}
+        placement="right"
+      />
       <ScreenHeader title="Portfolio" />
       {(() => {
         switch (true) {
@@ -154,7 +162,7 @@ export default function Portfolio() {
             return mobileSized;
         }
       })()}
-    </>
+    </div>
   );
 }
 

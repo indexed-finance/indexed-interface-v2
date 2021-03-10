@@ -9,7 +9,6 @@ import {
   ProviderRequirementDrawer,
   RankedTokenList,
   ScreenHeader,
-  useProviderRequirement,
 } from "components";
 import { Col, Grid, Menu, Row } from "antd";
 import { Link, Redirect, useParams } from "react-router-dom";
@@ -59,7 +58,6 @@ export default function PoolDetail() {
       ] as Action[],
     []
   );
-  const meetsSignerRequirements = useProviderRequirement(true);
 
   // Effect:
   // When the pool changes and not connected to the server, get the juicy details.
@@ -113,10 +111,7 @@ export default function PoolDetail() {
         padding={0}
         defaultActions={interactionActions}
       >
-        <ProviderRequirementDrawer
-          meetsRequirement={meetsSignerRequirements}
-          includeSignerRequirement={true}
-        />
+        <ProviderRequirementDrawer includeSignerRequirement={true} />
         <PoolInteractions pool={pool} />
       </Subscreen>
     );

@@ -81,6 +81,18 @@
   }
 }
 
+@keyframes glowing-left {
+  0% {
+    border-left: 1px solid fade(@primary-color, 35%);
+  }
+  50% {
+    border-left: 1px solid fade(@primary-color, 15%);
+  }
+  100% {
+    border-left: 1px solid fade(@primary-color, 35%);
+  }
+}
+
 .ant-collapse {
   border: 1px solid fade(@primary-color, 25%);
   animation: glowing-all 4s ease-in-out infinite;
@@ -120,9 +132,10 @@
   font-size: 14px !important;
 }
 
-.bottom-drawer {
+.requirement-drawer {
   .ant-drawer-content-wrapper {
-    animation: glowing-top 4s ease-in-out infinite;
+    animation: glowing-top 4s ease-in-out infinite,
+      glowing-left 4s ease-in-out infinite;
 
     :hover {
       cursor: pointer;
