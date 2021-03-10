@@ -6,15 +6,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import noop from "lodash.noop";
 
-type TokenRandomizerOptions = {
-  pool: null | FormattedIndexPool;
-  from: string;
-  to: string;
-  changeFrom(symbol: string): void;
-  changeTo(symbol: string): void;
-  callback?(): void;
-};
-
 // Effect:
 // On initial token load, select two to swap.
 export function useTokenRandomizer(options: TokenRandomizerOptions) {
@@ -35,15 +26,6 @@ export function useTokenRandomizer(options: TokenRandomizerOptions) {
     }
   }, [options]);
 }
-
-type TokenSide = { token: string; amount: number };
-
-type TokenApprovalOptions = {
-  pool: null | FormattedIndexPool;
-  from: TokenSide;
-  to: TokenSide;
-  onSendTransaction?(values: { from: TokenSide; to: TokenSide }): void;
-};
 
 // Effect:
 // Given a pool and token, provide properties and methods associated with token approval.
@@ -127,3 +109,23 @@ export function useHistoryChangeCallback(callback: () => void) {
     };
   }, [history, callback]);
 }
+
+// #region Models
+type TokenRandomizerOptions = {
+  pool: null | FormattedIndexPool;
+  from: string;
+  to: string;
+  changeFrom(symbol: string): void;
+  changeTo(symbol: string): void;
+  callback?(): void;
+};
+
+type TokenSide = { token: string; amount: number };
+
+type TokenApprovalOptions = {
+  pool: null | FormattedIndexPool;
+  from: TokenSide;
+  to: TokenSide;
+  onSendTransaction?(values: { from: TokenSide; to: TokenSide }): void;
+};
+// #endregion
