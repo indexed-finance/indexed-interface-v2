@@ -67,7 +67,7 @@ export const selectors = {
       const allowance = selectors.selectPoolAllowance(state, poolId, tokenId);
       const needsApproval = convert
         .toBigNumber(amount)
-        .isGreaterThan(convert.toBigNumber(allowance));
+        .isGreaterThanOrEqualTo(convert.toBigNumber(allowance));
 
       return needsApproval;
     } else {

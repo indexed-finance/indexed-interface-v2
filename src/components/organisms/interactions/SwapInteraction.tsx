@@ -2,19 +2,16 @@ import { AiOutlineArrowRight } from "react-icons/ai";
 import { Alert, Form, Statistic, Typography } from "antd";
 import { AppState, FormattedIndexPool, selectors, signer } from "features";
 import { Flipper, Token } from "components/atoms";
-import { SubscreenContext } from "app/subscreens/Subscreen";
 import { actions } from "features";
-import { convert, getRandomEntries } from "helpers";
+import { convert } from "helpers";
 import { helpers } from "ethereum";
 import { useDispatch, useSelector } from "react-redux";
-import { useHistory } from "react-router-dom";
-import React, {
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import {
+  useHistoryChangeCallback,
+  useTokenApproval,
+  useTokenRandomizer,
+} from "./common";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import TokenSelector from "../TokenSelector";
 import styled, { keyframes } from "styled-components";
 
@@ -45,9 +42,7 @@ const ZERO = convert.toBigNumber("0");
 
 export default function SwapInteraction({ pool }: Props) {
   const dispatch = useDispatch();
-  const history = useHistory();
   const [form] = Form.useForm<SwapValues>();
-  const { setActions } = useContext(SubscreenContext);
   const fullPool = useSelector((state: AppState) =>
     selectors.selectPool(state, pool?.id ?? "")
   );
@@ -60,26 +55,30 @@ export default function SwapInteraction({ pool }: Props) {
   const [price, setPrice] = useState(ZERO);
   const [maxPrice, setMaxPrice] = useState(ZERO);
   const [formattedSwapFee, setFormattedSwapFee] = useState("");
-  const [, setRenderCount] = useState(0);
+  const [renderCount, setRenderCount] = useState(0);
   const baseline = previousFormValues.current.from.token;
   const comparison = previousFormValues.current.to.token;
-  const approvalNeeded = useSelector((state: AppState) => {
-    const { from } = form.getFieldsValue();
-
-    if (from) {
-      const poolId = pool?.id ?? "";
-      const { token, amount } = from;
-
-      return selectors.selectApprovalStatus(
-        state,
-        poolId,
-        token.toLowerCase(),
-        convert.toToken(amount.toString()).toString(10)
-      );
-    } else {
-      return true;
+  const previousFrom = useMemo(() => {
+    if (renderCount > -1) {
+      return previousFormValues.current.from;
     }
-  });
+  }, [renderCount]);
+  const previousTo = useMemo(() => {
+    if (renderCount > -1) {
+      return previousFormValues.current.to;
+    }
+  }, [renderCount]);
+  const handleFlip = () => {
+    const { from, to } = previousFormValues.current;
+    const flippedValue = {
+      from: to,
+      to: from,
+    };
+
+    form.setFieldsValue(flippedValue);
+    previousFormValues.current = flippedValue;
+    triggerUpdate();
+  };
   const getFormattedSwapFee = useCallback(
     (outputAmount: number): string =>
       convert
@@ -93,20 +92,6 @@ export default function SwapInteraction({ pool }: Props) {
     [pool]
   );
   const triggerUpdate = () => setRenderCount((prev) => prev + 1);
-
-  /**
-   *
-   */
-  const handleApprovePool = useCallback(() => {
-    if (pool) {
-      const {
-        from: { token, amount },
-      } = form.getFieldsValue();
-      dispatch(
-        actions.approvePool(pool.id, token.toLowerCase(), amount.toString())
-      );
-    }
-  }, [dispatch, form, pool]);
 
   /**
    *
@@ -270,78 +255,40 @@ export default function SwapInteraction({ pool }: Props) {
       ? Promise.resolve()
       : Promise.reject("Amount must be greater than zero.");
   };
-  /**
-   *
-   */
-  const handleFlip = () => {
-    const { from, to } = previousFormValues.current;
-    const flippedValue = {
-      from: to,
-      to: from,
-    };
+  const handleSendTransaction = useCallback((values) => handleSubmit(values), [
+    handleSubmit,
+  ]);
 
-    form.setFieldsValue(flippedValue);
-    previousFormValues.current = flippedValue;
-    triggerUpdate();
-  };
-
-  // Effect:
-  // On initial token load, select two to swap.
-  useEffect(() => {
-    if (pool) {
-      const { assets: tokens } = pool;
-      const { from, to } = form.getFieldsValue();
-
-      if (!from.token && !to.token && tokens.length > 1) {
-        const [fromToken, toToken] = getRandomEntries(2, tokens);
-
-        form.setFieldsValue({
-          from: {
-            token: fromToken.symbol,
-          },
-          to: {
-            token: toToken.symbol,
-          },
-        });
-
-        triggerUpdate();
-
-        previousFormValues.current = form.getFieldsValue();
-      }
-    }
-  }, [form, pool]);
-
-  // Effect:
-  // When approval status is determined, update the actions of the parent panel accordingly.
-  useEffect(() => {
-    if (approvalNeeded) {
-      setActions([
-        {
-          type: "primary",
-          title: "Approve",
-          onClick: handleApprovePool,
+  useTokenRandomizer({
+    pool,
+    from: baseline,
+    to: comparison,
+    changeFrom: (newFrom: string) =>
+      form.setFieldsValue({
+        from: {
+          token: newFrom,
         },
-      ]);
-    } else {
-      setActions([
-        {
-          type: "primary",
-          title: "Send Transaction",
-          onClick: () => handleSubmit(form.getFieldsValue()),
+      }),
+    changeTo: (newTo: string) =>
+      form.setFieldsValue({
+        to: {
+          token: newTo,
         },
-      ]);
-    }
-  }, [form, approvalNeeded, handleApprovePool, handleSubmit, setActions]);
+      }),
+    callback: () => {
+      triggerUpdate();
+      previousFormValues.current = form.getFieldsValue();
+    },
+  });
 
-  // Effect:
-  // When the page changes, clear the form.
-  useEffect(() => {
-    const unregister = history.listen(() => form.resetFields());
+  useTokenApproval({
+    pool,
+    from: previousFrom!,
+    to: previousTo!,
+    onSendTransaction: handleSendTransaction,
+  });
 
-    return () => {
-      unregister();
-    };
-  }, [history, form]);
+  useHistoryChangeCallback(() => form.resetFields());
 
   return (
     <S.Form

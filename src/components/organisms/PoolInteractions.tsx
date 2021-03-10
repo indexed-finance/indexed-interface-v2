@@ -35,7 +35,7 @@ export default function PoolInteractions({ pool, initial = "swap" }: Props) {
             }
             key="trade"
           >
-            <TradeInteraction />
+            <TradeInteraction pool={pool} />
           </Tabs.TabPane>
           <Tabs.TabPane
             tab={
