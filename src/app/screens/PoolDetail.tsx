@@ -96,7 +96,13 @@ export default function PoolDetail() {
         padding={0}
         defaultActions={chartActions}
       >
-        <ChartCard timeframe="1D" />
+        <ChartCard
+          timeframe="Day"
+          kind="Value"
+          onChange={() => {
+            /**/
+          }}
+        />
       </Subscreen>
     );
     const assets = (

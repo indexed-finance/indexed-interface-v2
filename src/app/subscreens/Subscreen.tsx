@@ -120,6 +120,7 @@ const S = {
       height: 42px;
       margin-bottom: 1px;
       ${(props) => props.theme.snippets.fancy};
+      border-bottom: none;
     }
   `,
   Hidden: styled.span`
