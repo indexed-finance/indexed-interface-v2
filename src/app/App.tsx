@@ -1,3 +1,4 @@
+import "theme/index.less";
 import { BrowserRouter } from "react-router-dom";
 import { DEBUGScreenSize, DrawerProvider } from "components";
 import { Provider } from "react-redux";

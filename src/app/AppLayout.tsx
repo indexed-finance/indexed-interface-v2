@@ -36,7 +36,7 @@ export default function AppLayout() {
   return (
     <Layout className="layout">
       <AppHeader />
-      {breakpoints.lg && (
+      {/* {breakpoints.lg && (
         // Desktop  sider
         <Sider width={300}>
           <Logo />
@@ -55,7 +55,7 @@ export default function AppLayout() {
           </RouterSwitch>
           {activePage && <Drawer page={activePage} />}
         </div>
-      </Content>
+      </Content> */}
     </Layout>
   );
 }

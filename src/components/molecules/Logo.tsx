@@ -21,8 +21,12 @@ export default function Logo({
   const theme = useSelector(selectors.selectTheme);
 
   return (
-    <div onClick={() => history.push(link)}>
-      <img alt="" src={require(`assets/images/indexed-${theme}.png`).default} />
+    <div className="Logo" onClick={() => history.push(link)}>
+      <img
+        className="size-32 small-margin-right"
+        alt=""
+        src={require(`assets/images/indexed-${theme}.png`).default}
+      />
       {withTitle && <Typography.Title level={3}>{title}</Typography.Title>}
     </div>
   );

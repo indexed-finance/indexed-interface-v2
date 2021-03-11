@@ -1,3 +1,4 @@
+const path = require("path");
 const { override, fixBabelImports, addLessLoader } = require("customize-cra");
 const FilterWarningsPlugin = require("webpack-filter-warnings-plugin");
 

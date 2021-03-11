@@ -29,5 +29,5 @@ export default function Token({
     }
   }
 
-  return <img alt={name} src={tokenImage} {...rest} />;
+  return <img className="Token" alt={name} src={tokenImage} {...rest} />;
 }

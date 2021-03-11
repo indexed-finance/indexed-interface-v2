@@ -1,11 +1,6 @@
 import { AiOutlineMenuFold, AiOutlineMenuUnfold } from "react-icons/ai";
-import { Button, Form, Layout } from "antd";
-import {
-  JazzIcon,
-  LanguageSelector,
-  Logo,
-  WalletConnectorButton,
-} from "components";
+import { JazzIcon, LanguageSelector, Logo, WalletConnector } from "components";
+import { Layout, Menu } from "antd";
 import { selectors } from "features";
 import { useBreakpoints } from "helpers";
 import { useCallback, useState } from "react";
@@ -13,7 +8,6 @@ import { useSelector } from "react-redux";
 import AppMenu from "./AppMenu";
 
 const { Header } = Layout;
-const { Item } = Form;
 
 export default function AppHeader() {
   const selectedAddress = useSelector(selectors.selectUserAddress);
@@ -31,44 +25,51 @@ export default function AppHeader() {
   );
 
   // Common
-  const walletButton = selectedAddress ? (
-    <JazzIcon address={selectedAddress} />
+  const ndxAmount = selectedAddress ? (
+    <Logo title="2800.00 NDX" link="/portfolio" size="small" animated={true} />
   ) : (
-    <WalletConnectorButton />
+    <span />
   );
 
-  return breakpoints.lg ? (
-    <Header>
-      <div>
-        {selectedAddress ? (
-          <Logo
-            title="2800.00 NDX"
-            link="/portfolio"
-            size="small"
-            animated={true}
-          />
-        ) : (
-          <span />
-        )}
-        <Form layout="inline" colon={false}>
-          <Item>
-            <LanguageSelector />
-          </Item>
-          <Item>{walletButton}</Item>
-        </Form>
-      </div>
-    </Header>
-  ) : (
+  return (
     <>
-      <Header>
+      <Header
+        className="AppHeader"
+        style={{
+          flexDirection: breakpoints.isMobile ? "row-reverse" : "row",
+        }}
+      >
         <div>
-          <Button
-            icon={<MobileMenuIcon onClick={toggleMobileMenu} />}
-            type="ghost"
-          />
-          {walletButton}
+          <Logo withTitle={true} />
+          {breakpoints.lg && ndxAmount}
         </div>
-        <Logo />
+        <div>
+          {!breakpoints.isMobile && <LanguageSelector />}
+          <Menu
+            mode="horizontal"
+            className="AppHeader-menu"
+            style={{
+              left: breakpoints.isMobile ? 0 : "unset",
+              right: breakpoints.isMobile ? "unset" : 0,
+            }}
+          >
+            {breakpoints.isMobile && (
+              <Menu.Item
+                icon={<MobileMenuIcon className="MenuButton" />}
+                onClick={toggleMobileMenu}
+              />
+            )}
+            <Menu.Item
+              icon={
+                selectedAddress ? (
+                  <JazzIcon address={selectedAddress} />
+                ) : (
+                  <WalletConnector />
+                )
+              }
+            />
+          </Menu>
+        </div>
       </Header>
       {mobileMenuActive && <AppMenu onItemClick={closeMobileMenu} />}
     </>

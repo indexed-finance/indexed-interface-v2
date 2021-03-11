@@ -1,0 +1,115 @@
+// This file should not contain any color information.
+
+// -- Fonts
+@font-face {
+  font-family: "Main";
+  src: url("./fonts/Futura.ttc");
+}
+
+// -- Variables
+@spacing-small: 12px;
+
+// -- Antd Changes
+.ant-typography {
+  &:extend(.fancy);
+}
+
+// -- Global
+body {
+  * {
+    font-family: "Main", sans-serif;
+  }
+}
+
+// -- Utilities
+.circular {
+  border-radius: 50%;
+}
+
+.flex-center {
+  display: flex;
+  align-items: center;
+}
+
+.spaced-between {
+  &:extend(.flex-center);
+  justify-content: space-between;
+}
+
+.size-32 {
+  width: 32px;
+  height: 32px;
+}
+
+.no-margin-bottom {
+  margin-bottom: 0 !important;
+}
+
+.small-margin-right {
+  margin-right: @spacing-small;
+}
+
+.fancy {
+  text-transform: uppercase;
+  letter-spacing: 1.5;
+}
+
+// -- Components
+.Token {
+  &:extend(.circular, .size-32);
+}
+
+.DEBUGScreenSize {
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+  padding: 1rem;
+  border: 1px solid white;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 2;
+}
+
+.AppHeader {
+  &:extend(.spaced-between);
+
+  position: fixed;
+  width: 100%;
+  z-index: 2;
+
+  .ant-form-item {
+    margin-bottom: 14px;
+  }
+
+  &-menu {
+    position: absolute;
+    top: 0;
+    right: 0;
+
+    svg {
+      position: relative;
+      top: 5px;
+    }
+  }
+}
+
+.MenuButton {
+  font-size: 24px !important;
+}
+
+.WalletConnector {
+  font-size: 24px;
+}
+
+.Logo {
+  &:extend(.flex-center);
+
+  .ant-typography {
+    &:extend(.no-margin-bottom);
+  }
+}
+
+.LanguageSelector {
+  position: relative;
+  right: 20px;
+  width: 130px;
+}

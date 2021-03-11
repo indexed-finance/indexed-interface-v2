@@ -15,7 +15,7 @@ export default function DEBUGScreenSize() {
   const successOrDanger = (factor: boolean) => (factor ? "success" : "danger");
 
   return (
-    <>
+    <div className="DEBUGScreenSize">
       <Typography.Paragraph type={successOrDanger(isMobile)}>
         Is mobile?
       </Typography.Paragraph>
@@ -37,6 +37,6 @@ export default function DEBUGScreenSize() {
       <Typography.Paragraph type={successOrDanger(xxl)}>
         Huge
       </Typography.Paragraph>
-    </>
+    </div>
   );
 }

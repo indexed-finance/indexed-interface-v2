@@ -9,7 +9,7 @@ export default function LanguageSelector() {
   const language = useSelector(selectors.selectLanguageName);
 
   return (
-    <Select value={language}>
+    <Select value={language} className="LanguageSelector">
       <Option value="english">English</Option>
     </Select>
   );

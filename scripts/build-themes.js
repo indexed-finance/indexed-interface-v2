@@ -6,7 +6,12 @@ const options = {
   antDir: path.join(__dirname, "../node_modules/antd"),
   varFile: path.join(__dirname, "../src/theme/variables.less"),
   mainLessFile: path.join(__dirname, "../src/theme/index.less"),
-  themeVariables: ["@primary-color"],
+  themeVariables: [
+    "@primary-color",
+    "@heading-color",
+    "@text-color",
+    "@layout-header-background",
+  ],
   indexFileName: "index.html",
   outputFilePath: path.join(__dirname, "../public/color.less"),
 };
