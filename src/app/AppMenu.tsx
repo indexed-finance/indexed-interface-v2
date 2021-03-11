@@ -36,7 +36,7 @@ export default function AppMenu({ onItemClick = noop, ...rest }: Props) {
   return (
     <>
       <Menu
-        className="app-menu"
+        className="AppMenu"
         mode="inline"
         defaultOpenKeys={["Social"]}
         selectable={false}

@@ -7,11 +7,20 @@
 }
 
 // -- Variables
+@header-height: 64px;
 @spacing-small: 12px;
 
 // -- Antd Changes
 .ant-typography {
   &:extend(.fancy);
+}
+
+.ant-layout-sider-children {
+  position: fixed;
+  top: @header-height;
+  width: 300px;
+  height: calc(100% - @header-height);
+  z-index: 2;
 }
 
 // -- Global
@@ -54,27 +63,22 @@ body {
   letter-spacing: 1.5;
 }
 
-// -- Components
-.Token {
-  &:extend(.circular, .size-32);
-}
-
-.DEBUGScreenSize {
-  position: fixed;
-  bottom: 10px;
-  right: 10px;
-  padding: 1rem;
-  border: 1px solid white;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 2;
-}
-
+// -- Layout
 .AppHeader {
   &:extend(.spaced-between);
 
   position: fixed;
+  top: 0;
+  left: 0;
   width: 100%;
   z-index: 2;
+
+  @media screen and (max-width: 480px) {
+    left: 0;
+    width: 100%;
+    max-width: 100%;
+    padding: 0 24px;
+  }
 
   .ant-form-item {
     margin-bottom: 14px;
@@ -90,6 +94,25 @@ body {
       top: 5px;
     }
   }
+}
+
+.AppMenu {
+  visibility: visible;
+}
+
+// -- Components
+.Token {
+  &:extend(.circular, .size-32);
+}
+
+.DEBUGScreenSize {
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+  padding: 1rem;
+  border: 1px solid white;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 2;
 }
 
 .MenuButton {
@@ -110,6 +133,6 @@ body {
 
 .LanguageSelector {
   position: relative;
-  right: 20px;
+  right: 45px;
   width: 130px;
 }

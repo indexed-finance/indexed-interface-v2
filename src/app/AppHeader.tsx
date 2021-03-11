@@ -3,33 +3,25 @@ import { JazzIcon, LanguageSelector, Logo, WalletConnector } from "components";
 import { Layout, Menu } from "antd";
 import { selectors } from "features";
 import { useBreakpoints } from "helpers";
-import { useCallback, useState } from "react";
 import { useSelector } from "react-redux";
-import AppMenu from "./AppMenu";
+import React from "react";
+
+interface Props {
+  mobileMenuActive: boolean;
+  onToggleMobileMenu(): void;
+}
 
 const { Header } = Layout;
 
-export default function AppHeader() {
+export default function AppHeader({
+  mobileMenuActive,
+  onToggleMobileMenu,
+}: Props) {
   const selectedAddress = useSelector(selectors.selectUserAddress);
   const breakpoints = useBreakpoints();
-
-  // Mobile
-  const [mobileMenuActive, setMobileMenuActive] = useState(false);
   const MobileMenuIcon = mobileMenuActive
     ? AiOutlineMenuFold
     : AiOutlineMenuUnfold;
-  const closeMobileMenu = useCallback(() => setMobileMenuActive(false), []);
-  const toggleMobileMenu = useCallback(
-    () => setMobileMenuActive((prev) => !prev),
-    []
-  );
-
-  // Common
-  const ndxAmount = selectedAddress ? (
-    <Logo title="2800.00 NDX" link="/portfolio" size="small" animated={true} />
-  ) : (
-    <span />
-  );
 
   return (
     <>
@@ -39,13 +31,11 @@ export default function AppHeader() {
           flexDirection: breakpoints.isMobile ? "row-reverse" : "row",
         }}
       >
-        <div>
-          <Logo withTitle={true} />
-          {breakpoints.lg && ndxAmount}
-        </div>
+        <Logo withTitle={true} />
         <div>
           {!breakpoints.isMobile && <LanguageSelector />}
           <Menu
+            selectable={false}
             mode="horizontal"
             className="AppHeader-menu"
             style={{
@@ -56,7 +46,7 @@ export default function AppHeader() {
             {breakpoints.isMobile && (
               <Menu.Item
                 icon={<MobileMenuIcon className="MenuButton" />}
-                onClick={toggleMobileMenu}
+                onClick={onToggleMobileMenu}
               />
             )}
             <Menu.Item
@@ -71,7 +61,6 @@ export default function AppHeader() {
           </Menu>
         </div>
       </Header>
-      {mobileMenuActive && <AppMenu onItemClick={closeMobileMenu} />}
     </>
   );
 }

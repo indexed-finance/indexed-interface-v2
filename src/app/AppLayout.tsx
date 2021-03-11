@@ -7,7 +7,7 @@ import { useBreakpoints } from "helpers";
 import { useSelector } from "react-redux";
 import AppHeader from "./AppHeader";
 import AppMenu from "./AppMenu";
-import React, { useContext, useEffect } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import SocketClient from "sockets/client";
 import routes from "./routes";
 
@@ -18,6 +18,12 @@ export default function AppLayout() {
   const isConnectionEnabled = useSelector(selectors.selectConnectionEnabled);
   const indexPools = useSelector(selectors.selectAllFormattedIndexPools);
   const breakpoints = useBreakpoints();
+  const [mobileMenuActive, setMobileMenuActive] = useState(false);
+  const closeMobileMenu = useCallback(() => setMobileMenuActive(false), []);
+  const toggleMobileMenu = useCallback(
+    () => setMobileMenuActive((prev) => !prev),
+    []
+  );
 
   // Effect
   // On initial load, open up a connection to the server.
@@ -35,15 +41,19 @@ export default function AppLayout() {
 
   return (
     <Layout className="layout">
-      <AppHeader />
-      {/* {breakpoints.lg && (
-        // Desktop  sider
+      <AppHeader
+        mobileMenuActive={mobileMenuActive}
+        onToggleMobileMenu={toggleMobileMenu}
+      />
+
+      {(mobileMenuActive || breakpoints.lg) && (
         <Sider width={300}>
-          <Logo />
           <QuoteCarousel pools={indexPools as FormattedIndexPool[]} />
-          <AppMenu />
+          <AppMenu onItemClick={closeMobileMenu} />
         </Sider>
       )}
+
+      {/* 
       <Content>
         <div>
           <RouterSwitch>
