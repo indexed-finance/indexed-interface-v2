@@ -1,6 +1,5 @@
 import { CategoryCard, CategoryDropdown, ScreenHeader } from "components";
 import { Link } from "react-router-dom";
-import { Space } from "antd";
 import { selectors } from "features";
 import { useSelector } from "react-redux";
 import React from "react";
@@ -26,7 +25,7 @@ export default function CategoryList({
   return (
     <S.CategoryList centered={centered}>
       <ScreenHeader title="Categories" {...headerProps} />
-      <S.Space wrap={true} size="large" align={centered ? "center" : "start"}>
+      <S.Space>
         {categories.map((category) => (
           <CategoryCard key={category!.id} {...category!} />
         ))}
@@ -46,15 +45,14 @@ const S = {
         }
       `}
   `,
-  Space: styled(Space)`
-    .ant-space-item {
-      flex: 1;
-    }
+  Space: styled.div`
+    display: flex;
+    align-items: stretch;
+    flex-wrap: wrap;
+    justify-content: center;
 
-    ${(props) =>
-      props.align === "center" &&
-      css`
-        justify-content: space-around;
-      `}
+    .ant-card {
+      margin: ${(props) => props.theme.spacing.medium};
+    }
   `,
 };

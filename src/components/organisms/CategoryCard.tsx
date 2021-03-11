@@ -1,6 +1,6 @@
-import { Button, Token } from "components/atoms";
 import { Card, List } from "antd";
 import { Link, useHistory } from "react-router-dom";
+import { Token } from "components/atoms";
 import React from "react";
 import styled from "styled-components";
 import type { Token as TokenType } from "indexed-types";
@@ -41,17 +41,7 @@ export default function CategoryCard({
     <S.Card
       key={id}
       hoverable={true}
-      title={
-        <>
-          <S.Token name={name} image={symbol} />
-          <S.Name>{name}</S.Name>
-        </>
-      }
-      extra={
-        <Link to={`/categories/${slug}`}>
-          <Button type="primary">More</Button>
-        </Link>
-      }
+      title={name}
       actions={[
         <S.TokenImageWrapper key="1">
           {Object.values(tokens.entities).map((token) => (
@@ -74,11 +64,8 @@ export default function CategoryCard({
                 <S.List header={<S.FirstListItem>Index Pools</S.FirstListItem>}>
                   {indexPools.map((indexPool) => (
                     <S.IndexPoolEntry key={indexPool.name}>
-                      <span>
-                        {indexPool.name} [{indexPool.symbol}]
-                      </span>
                       <Link to={`/pools/${indexPool.slug}`}>
-                        <Button>View</Button>
+                        {indexPool.name} [{indexPool.symbol}]
                       </Link>
                     </S.IndexPoolEntry>
                   ))}
@@ -97,8 +84,7 @@ const S = {
     font-size: ${(props) => props.theme.fontSizes.huge};
   `,
   Card: styled(Card)`
-    flex: 1;
-    max-width: 700px;
+    width: ${(props) => (props.theme.isMobile ? "330px" : "375px")};
 
     .ant-card-head-title {
       ${(props) => props.theme.snippets.fancy};
@@ -107,13 +93,10 @@ const S = {
     .ant-card-body {
       display: flex;
       align-items: center;
-      height: 240px;
+      height: 300px;
     }
     .ant-card-meta-description {
       font-size: ${(props) => props.theme.fontSizes.large};
-      height: 194px;
-
-      width: 570px;
     }
   `,
   Title: styled.h1`
@@ -135,9 +118,11 @@ const S = {
     flex: 2;
   `,
   TokenImageWrapper: styled.div`
+    flex: 1;
     display: flex;
     align-items: center;
-    justify-content: space-evenly;
+    justify-content: center;
+    flex-wrap: wrap;
   `,
   List: styled(List)`
     margin-top: ${(props) => props.theme.spacing.medium};
@@ -147,6 +132,9 @@ const S = {
     font-weight: bolder;
   `,
   IndexPoolEntry: styled(List.Item)`
-    ${(props) => props.theme.snippets.spacedBetween};
+    ${(props) => props.theme.snippets.perfectlyCentered};
+  `,
+  CardTitle: styled.div`
+    ${(props) => props.theme.snippets.perfectlyAligned};
   `,
 };

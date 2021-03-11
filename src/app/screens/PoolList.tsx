@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 import { PoolCard, PoolDropdown, ScreenHeader } from "components";
-import { Space } from "antd";
 import { selectors } from "features";
 import { useSelector } from "react-redux";
 import React from "react";
@@ -26,7 +25,7 @@ export default function PoolList({
   return (
     <S.PoolList centered={centered}>
       <ScreenHeader title="Pools" {...headerProps} />
-      <S.Space wrap={true} size="large" align={centered ? "center" : "start"}>
+      <S.Space>
         {pools.map((pool) => (
           <PoolCard key={pool!.id} pool={pool!} />
         ))}
@@ -46,15 +45,14 @@ const S = {
         }
       `}
   `,
-  Space: styled(Space)`
-    .ant-space-item {
-      flex: 1;
-    }
+  Space: styled.div`
+    display: flex;
+    align-items: stretch;
+    flex-wrap: wrap;
+    justify-content: center;
 
-    ${(props) =>
-      props.align === "center" &&
-      css`
-        justify-content: space-between;
-      `}
+    .ant-card {
+      margin: ${(props) => props.theme.spacing.medium};
+    }
   `,
 };

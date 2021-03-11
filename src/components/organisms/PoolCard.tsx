@@ -51,8 +51,9 @@ const S = {
     font-size: ${(props) => props.theme.fontSizes.huge};
   `,
   Card: styled(Card)`
-    flex: 1;
-    max-width: 450px;
+    width: ${(props) => (props.theme.isMobile ? "330px" : "375px")};
+    height: 515px;
+    overflow: auto;
 
     .ant-card-head-title {
       ${(props) => props.theme.snippets.fancy};
@@ -60,7 +61,7 @@ const S = {
     }
     .ant-card-body {
       display: flex;
-      min-width: 370px;
+      width: 370px;
       height: 390px;
       overflow: auto;
     }
@@ -92,6 +93,7 @@ const S = {
     display: flex;
     align-items: center;
     justify-content: space-evenly;
+    flex-wrap: wrap;
   `,
   List: styled(List)`
     margin-top: ${(props) => props.theme.spacing.medium};

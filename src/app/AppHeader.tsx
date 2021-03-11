@@ -1,6 +1,6 @@
 import { AiOutlineMenuFold, AiOutlineMenuUnfold } from "react-icons/ai";
 import { Button } from "components";
-import { Form, Layout, Space } from "antd";
+import { Form, Layout } from "antd";
 import {
   JazzIcon,
   LanguageSelector,
@@ -51,22 +51,23 @@ export default function AppHeader() {
           <span />
         )}
         <S.Changeables layout="inline" colon={false}>
-          <S.ChangeItem>
+          <Item>
             <LanguageSelector />
-          </S.ChangeItem>
-          <S.ChangeItem>{walletButton}</S.ChangeItem>
+          </Item>
+          <Item>{walletButton}</Item>
         </S.Changeables>
       </S.Controls>
     </S.Top>
   ) : (
     <>
       <S.Header>
-        <S.Space align="center">
-          <Button type="ghost">
-            <MobileMenuIcon onClick={toggleMobileMenu} />
-          </Button>
+        <S.Left>
+          <Button
+            icon={<MobileMenuIcon onClick={toggleMobileMenu} />}
+            type="ghost"
+          />
           {walletButton}
-        </S.Space>
+        </S.Left>
         <Logo />
       </S.Header>
       {mobileMenuActive && (
@@ -132,14 +133,11 @@ const S = {
     left: 0;
     z-index: 2;
   `,
-  ChangeItem: styled(Item)``,
-  Space: styled(Space)`
-    position: relative;
-    top: 4px;
+  Left: styled.div`
+    ${(props) => props.theme.snippets.perfectlyCentered};
 
-    .ant-btn {
-      padding-left: 4px;
-      padding-right: 4px;
+    > :first-child {
+      margin-right: 10px;
     }
   `,
 };

@@ -66,7 +66,7 @@ export default function AppLayout() {
         <S.Content>
           {/* Dull the background image */}
           <S.Screen className="ant-layout-screen" />
-          <S.Page extraPadded={breakpoints.xs} isMobile={!breakpoints.md}>
+          <S.Page isMobile={!breakpoints.md}>
             <RouterSwitch>
               {routes.map((route, index) => (
                 <Route key={index} path={route.path} exact={route.exact}>
@@ -89,7 +89,9 @@ const S = {
     left: 0;
     width: 100%;
   `,
-  Layout: styled(Layout)``,
+  Layout: styled(Layout)`
+    overflow-x: hidden;
+  `,
   SocialMediaImage: styled.img`
     ${(props) => props.theme.snippets.size32};
     ${(props) => props.theme.snippets.circular};
@@ -98,17 +100,17 @@ const S = {
     margin-top: ${(props) => props.theme.spacing.small};
   `,
   Page: styled.div<{ extraPadded?: boolean; isMobile: boolean }>`
-    padding: ${(props) =>
-      props.extraPadded
-        ? props.theme.spacing.large
-        : props.theme.spacing.small};
+    padding: ${(props) => props.theme.spacing.large};
     ${(props) => props.theme.snippets.dropshadow};
     position: relative;
     ${(props) =>
-      !props.isMobile &&
-      css`
-        padding-top: 112px;
-      `}
+      props.isMobile
+        ? css`
+            padding-top: 112px;
+          `
+        : css`
+            padding-top: 124px;
+          `}
   `,
   Breadcrumb: styled(Breadcrumb)`
     flex: 1;
