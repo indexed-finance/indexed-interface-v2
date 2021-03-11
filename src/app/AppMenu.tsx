@@ -1,4 +1,3 @@
-import { Divider, Menu } from "antd";
 import {
   LanguageSelector,
   ModeSwitch,
@@ -6,6 +5,7 @@ import {
   Token,
 } from "components";
 import { Link, useHistory } from "react-router-dom";
+import { Menu } from "antd";
 import { SOCIAL_MEDIA } from "config";
 import { selectors } from "features";
 import { useBreakpoints } from "helpers";
@@ -13,7 +13,6 @@ import { useSelector } from "react-redux";
 import React, { useEffect } from "react";
 import noop from "lodash.noop";
 import routes from "./routes";
-import styled from "styled-components";
 
 interface Props {
   onItemClick?(): void;
@@ -36,20 +35,20 @@ export default function AppMenu({ onItemClick = noop, ...rest }: Props) {
 
   return (
     <>
-      <S.Menu
+      <Menu
         className="app-menu"
         mode="inline"
         defaultOpenKeys={["Social"]}
         selectable={false}
         {...rest}
       >
-        <S.TopItem>
-          <S.Aligned>
+        <Item>
+          <div>
             <ServerConnection showText={true} />
             <ModeSwitch />
             {isMobile && <LanguageSelector />}
-          </S.Aligned>
-        </S.TopItem>
+          </div>
+        </Item>
         {routes
           .filter((route) => route.sider)
           .map((route) => {
@@ -62,12 +61,11 @@ export default function AppMenu({ onItemClick = noop, ...rest }: Props) {
                   key={route.path}
                   title={
                     <Link to={route.path} onClick={onItemClick}>
-                      <S.Title>{route.sider}</S.Title>
+                      {route.sider}
                     </Link>
                   }
                 >
                   {models.map((model) => {
-                    const isCategory = route.model === "categories";
                     const isIndexPool = route.model === "indexPools";
                     const image = isIndexPool
                       ? indexPoolsLookup[model.id]
@@ -81,14 +79,14 @@ export default function AppMenu({ onItemClick = noop, ...rest }: Props) {
                           onItemClick();
                         }}
                       >
-                        <S.ItemInner isCategory={isCategory}>
-                          <S.Token
+                        <div>
+                          <Token
                             name={model.name}
                             image={image}
                             address={model.id}
                           />
-                          <S.Uppercase>{model.name}</S.Uppercase>
-                        </S.ItemInner>
+                          {model.name}
+                        </div>
                       </Item>
                     );
                   })}
@@ -96,88 +94,34 @@ export default function AppMenu({ onItemClick = noop, ...rest }: Props) {
               );
             } else {
               return (
-                <S.Item key={route.path} onClick={onItemClick}>
+                <Item key={route.path} onClick={onItemClick}>
                   {route.isExternalLink ? (
                     route.sider
                   ) : (
-                    <S.SingleLink to={route.path}>
+                    <Link to={route.path}>
                       <span>{route.sider}</span>
                       {route.icon ?? null}
-                    </S.SingleLink>
+                    </Link>
                   )}
-                </S.Item>
+                </Item>
               );
             }
           })}
         {/* Static */}
-        <SubMenu key="Social" title={<S.Title>Social</S.Title>}>
+        <SubMenu key="Social" title="Social">
           {SOCIAL_MEDIA.map((site) => (
             <Menu.Item key={site.name}>
-              <S.Uppercase
-                href={site.link}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <S.Token name={site.name} image={site.image} />
+              <a href={site.link} target="_blank" rel="noopener noreferrer">
+                <Token name={site.name} image={site.image} />
                 <span className="social-link">{site.name}</span>
-              </S.Uppercase>
+              </a>
             </Menu.Item>
           ))}
         </SubMenu>
-      </S.Menu>
+      </Menu>
     </>
   );
 }
-
-const S = {
-  Menu: styled(Menu)`
-    max-width: 400px !important;
-    height: calc(100% - 65px);
-    max-width: 100vw;
-    overflow: hidden;
-  `,
-  Item: styled(Item)`
-    ${(props) => props.theme.snippets.fancy};
-  `,
-  ItemInner: styled.div<{ isCategory?: boolean }>`
-    ${(props) => props.theme.snippets.spacedBetween};
-
-    :hover {
-      [data-category="true"] {
-        opacity: 0.6;
-        color: #ccccff;
-      }
-    }
-  `,
-  Token: styled(Token)`
-    margin-right: ${(props) => props.theme.spacing.medium};
-  `,
-  Title: styled.span`
-    ${(props) => props.theme.snippets.fancy};
-  `,
-  Uppercase: styled.a`
-    ${(props) => props.theme.snippets.fancy};
-    font-size: ${(props) => props.theme.fontSizes.tiny};
-    text-align: right;
-  `,
-  PerfectlyCentered: styled.div`
-    ${(props) => props.theme.snippets.perfectlyCentered};
-    padding-top: 6px;
-    padding-bottom: 6px;
-  `,
-  SingleLink: styled(Link)`
-    ${(props) => props.theme.snippets.spacedBetween};
-  `,
-  Divider: styled(Divider)`
-    margin: 0;
-  `,
-  TopItem: styled(Item)`
-    margin-bottom: 0 !important;
-  `,
-  Aligned: styled.div`
-    ${(props) => props.theme.snippets.spacedBetween};
-  `,
-};
 
 // #region Helpers
 // Code adapted from https://stackoverflow.com/questions/4770025/how-to-disable-scrolling-temporarily

@@ -11,7 +11,6 @@ import {
 import React, { useCallback, useMemo, useState } from "react";
 import TokenSelector from "../TokenSelector";
 import cloneDeep from "lodash.clonedeep";
-import styled, { keyframes } from "styled-components";
 
 interface FieldData {
   name: string | number | (string | number)[];
@@ -86,23 +85,23 @@ export default function TradeInteraction({ pool }: Props) {
   });
 
   return (
-    <S.Form
+    <Form
       fields={fields}
       onFieldsChange={(_, [newFrom, newTo]) => {
         setFrom(newFrom);
         setTo(newTo);
       }}
     >
-      <S.Title>
+      <Typography.Title>
         <span>Trade</span>
         {from.value.token && to.value.token && (
           <span>
             <Token name="Baseline" image={from.value.token} />
-            <S.Swap />
+            <AiOutlineArrowRight />
             <Token name="Comparison" image={to.value.token} />
           </span>
         )}
-      </S.Title>
+      </Typography.Title>
       <Form.Item name="from">
         {pool && (
           <TokenSelector
@@ -123,54 +122,15 @@ export default function TradeInteraction({ pool }: Props) {
         )}
       </Form.Item>
       {from.value.token && to.value.token && (
-        <S.LastItem>
+        <Form.Item>
           <TokenExchangeRate
             baseline={from.value.token}
             comparison={to.value.token}
             rate="1.00"
             fee="1.00"
           />
-        </S.LastItem>
+        </Form.Item>
       )}
-    </S.Form>
+    </Form>
   );
 }
-
-const blinking = keyframes`
-  0% {
-    opacity: 0.3;
-  }
-  50% {
-    opacity: 0.7;
-  }
-  100% {
-    opacity: 0.3;
-  }
-`;
-
-const S = {
-  Form: styled(Form)`
-    img {
-      ${(props) => props.theme.snippets.size40};
-      opacity: 0.7;
-      border-radius: 50%;
-      animation-name: ${blinking};
-      animation-duration: 2s;
-      animation-iteration-count: infinite;
-      border: 1px solid rgba(255, 255, 255, 0.4);
-    }
-  `,
-  Title: styled(Typography.Title)`
-    ${(props) => props.theme.snippets.spacedBetween};
-    position: relative;
-    font-weight: 200 !important;
-  `,
-  Swap: styled(AiOutlineArrowRight)`
-    position: absolute;
-    top: 9px;
-    right: 21px;
-  `,
-  LastItem: styled(Form.Item)`
-    margin-bottom: 0;
-  `,
-};

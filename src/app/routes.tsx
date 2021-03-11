@@ -8,7 +8,6 @@ import {
   PoolDetail,
   PoolList,
   Portfolio,
-  Settings,
   Splash,
   Stake,
 } from "./screens";
@@ -17,7 +16,6 @@ import { GiStakeHammer } from "react-icons/gi";
 import { RiSafe2Line } from "react-icons/ri";
 import React, { ReactNode } from "react";
 import flags from "feature-flags";
-import styled from "styled-components";
 import type { AppState } from "features";
 
 type Route = {
@@ -89,12 +87,6 @@ const routes: Route[] = [
     screen: null,
     isExternalLink: true,
   },
-  {
-    path: "/settings",
-    exact: true,
-    sider: "",
-    screen: <Settings />,
-  },
 ];
 
 if (flags.showFaqLink) {
@@ -155,18 +147,10 @@ interface Props {
 
 function ExternalLink(props: Props) {
   return (
-    <S.Link href={props.link} target="_blank" rel="noopener noreferrer">
+    <a href={props.link} target="_blank" rel="noopener noreferrer">
       <span>{props.title}</span>
       <FiExternalLink />
-    </S.Link>
+    </a>
   );
 }
-
-const S = {
-  Link: styled.a`
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  `,
-};
 // #endregion

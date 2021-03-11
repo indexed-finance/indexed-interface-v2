@@ -1,11 +1,8 @@
-import { Button } from "components/atoms";
 import { Card, Menu, Switch } from "antd";
-import { colors } from "theme";
 import { createChart } from "lightweight-charts";
 import { selectors } from "features";
 import { useSelector } from "react-redux";
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import styled from "styled-components";
 
 export interface Props {
   poolId: string;
@@ -68,67 +65,35 @@ export default function ChartCard({ poolId, expanded = false }: Props) {
   }, [theme, expanded]);
 
   return (
-    <S.ChartCard
+    <Card
       actions={[
-        <S.Switcher key="1" onClick={toggleKind}>
-          <S.Switch checked={kind === "Value"} />
+        <div key="1" onClick={toggleKind}>
+          <Switch checked={kind === "Value"} />
           Value
-        </S.Switcher>,
-        <S.Switcher key="2" onClick={toggleKind}>
-          <S.Switch checked={kind === "TotalValueLocked"} />
+        </div>,
+        <div key="2" onClick={toggleKind}>
+          <Switch checked={kind === "TotalValueLocked"} />
           Total Value Locked
-        </S.Switcher>,
+        </div>,
       ]}
       extra={
-        <S.Menu mode="horizontal" selectedKeys={[timeframe]}>
+        <Menu mode="horizontal" selectedKeys={[timeframe]}>
           {["Day", "Week"].map((_timeframe) => (
-            <S.MenuItem
+            <Menu.Item
               key={_timeframe}
               active={_timeframe === timeframe}
               onClick={toggleTimeframe}
             >
               {_timeframe}
-            </S.MenuItem>
+            </Menu.Item>
           ))}
-        </S.Menu>
+        </Menu>
       }
     >
       <div ref={cardRef} />
-    </S.ChartCard>
+    </Card>
   );
 }
-
-const S = {
-  ChartCard: styled(Card)`
-    position: relative;
-    margin-bottom: ${(props) => props.theme.spacing.medium};
-
-    .ant-card-extra {
-      width: 100%;
-    }
-  `,
-  Button: styled(Button)`
-    position: absolute;
-    right: ${(props) => props.theme.spacing.small};
-    bottom: ${(props) => props.theme.spacing.small};
-    ${(props) => props.theme.snippets.perfectlyCentered};
-  `,
-  Menu: styled(Menu)`
-    display: flex;
-  `,
-  MenuItem: styled(Menu.Item)`
-    flex: 1;
-    text-align: center;
-  `,
-  Switch: styled(Switch)`
-    margin-bottom: ${(props) => props.theme.spacing.medium};
-  `,
-  Switcher: styled.div`
-    ${(props) => props.theme.snippets.perfectlyCentered};
-    flex-direction: column;
-    text-align: center;
-  `,
-};
 
 type Kind = "Value" | "TotalValueLocked";
 type Timeframe = "Day" | "Week";
@@ -141,30 +106,30 @@ const CHART_MODES = {
   dark: {
     layout: {
       ...COMMON_LAYOUT_OPTIONS,
-      backgroundColor: colors.black400,
-      textColor: colors.purple200,
+      backgroundColor: "black",
+      textColor: "purple",
     },
     grid: {
       vertLines: {
-        color: colors.purple100,
+        color: "purple",
       },
       horzLines: {
-        color: colors.purple100,
+        color: "purple",
       },
     },
   },
   light: {
     layout: {
       ...COMMON_LAYOUT_OPTIONS,
-      backgroundColor: colors.white300,
-      textColor: colors.black200,
+      backgroundColor: "white",
+      textColor: "black",
     },
     grid: {
       vertLines: {
-        color: colors.purple300,
+        color: "purple",
       },
       horzLines: {
-        color: colors.purple300,
+        color: "purple",
       },
     },
   },

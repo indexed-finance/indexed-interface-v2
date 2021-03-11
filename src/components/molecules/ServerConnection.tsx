@@ -3,7 +3,6 @@ import { ImConnection } from "react-icons/im";
 import { actions, selectors } from "features";
 import { useDispatch, useSelector } from "react-redux";
 import React, { useMemo } from "react";
-import styled from "styled-components";
 
 interface Props {
   showText?: boolean;
@@ -34,66 +33,31 @@ export default function ServerConnection({ showText = false }: Props) {
   }, [isConnectionEnabled, isConnected]);
 
   return (
-    <S.SelfCentered>
+    <Item>
       <Popconfirm
         icon={null}
         placement="topLeft"
         title={
-          <S.PerfectlyCentered>
-            <S.ConnectionStatus />
+          <div>
+            <ImConnection />
             <div>
               <strong>{connectionStatus.top}</strong>
               <br />
               <em>{connectionStatus.bottom}</em>
             </div>
-          </S.PerfectlyCentered>
+          </div>
         }
         onConfirm={() => dispatch(actions.connectionToggled())}
         okText="Yes"
         cancelText="No"
       >
-        <S.Connection>
-          <S.Status type={connectionStatus.type}>
-            <S.ConnectionStatus />
-            {showText && <S.Text>{connectionStatus.text}</S.Text>}
-          </S.Status>
-        </S.Connection>
+        <div>
+          <Typography.Text type={connectionStatus.type}>
+            <ImConnection />
+            {showText && connectionStatus.text}
+          </Typography.Text>
+        </div>
       </Popconfirm>
-    </S.SelfCentered>
+    </Item>
   );
 }
-
-const S = {
-  Connection: styled.div`
-    ${(props) => props.theme.snippets.perfectlyCentered};
-    margin: 0;
-  `,
-  ConnectionStatus: styled(ImConnection)`
-    font-size: ${(props) => props.theme.fontSizes.huge};
-    cursor: pointer;
-    transition: color 0.6s;
-
-    :hover {
-      color: ${(props) => props.theme.colors.primary};
-    }
-  `,
-  PerfectlyCentered: styled.div`
-    ${(props) => props.theme.snippets.perfectlyCentered};
-
-    svg {
-      margin-right: ${(props) => props.theme.spacing.medium};
-    }
-  `,
-  SelfCentered: styled(Item)`
-    align-self: center;
-    margin-bottom: 0;
-  `,
-  Status: styled(Typography.Text)`
-    ${(props) => props.theme.snippets.perfectlyCentered};
-  `,
-  Text: styled.span`
-    margin-left: ${(props) => props.theme.spacing.small};
-    ${(props) => props.theme.snippets.fancy};
-    font-size: ${(props) => props.theme.fontSizes.tiny};
-  `,
-};

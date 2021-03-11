@@ -1,7 +1,6 @@
 import { Alert, Statistic, Typography } from "antd";
 import { convert } from "helpers";
 import React from "react";
-import styled from "styled-components";
 
 export interface Props {
   baseline: string;
@@ -17,9 +16,9 @@ export default function TokenExchangeRate({
   rate,
 }: Props) {
   return (
-    <S.Wrapper
+    <Alert
       message={
-        <S.Title level={4}>
+        <Typography.Title level={4}>
           <Statistic
             title="Exchange Rate"
             value={`1 ${baseline} ≈ ${convert.toComma(
@@ -27,20 +26,8 @@ export default function TokenExchangeRate({
             )} ${comparison}`}
           />
           <Statistic title="Fee" value={fee} />
-        </S.Title>
+        </Typography.Title>
       }
     />
   );
 }
-
-const S = {
-  Wrapper: styled(Alert)`
-    position: relative;
-    width: 100%;
-  `,
-  Title: styled(Typography.Title)`
-    ${(props) => props.theme.snippets.spacedBetween};
-    flex-wrap: wrap;
-    margin-bottom: 0 !important;
-  `,
-};

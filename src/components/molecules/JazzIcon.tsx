@@ -5,7 +5,6 @@ import { useDispatch } from "react-redux";
 import React, { useEffect, useRef } from "react";
 import ReactDOM from "react-dom";
 import jazzicon from "@metamask/jazzicon";
-import styled from "styled-components";
 
 interface Props {
   address: string;
@@ -82,21 +81,8 @@ export default function JazzIcon({ address }: Props) {
           </Menu>
         }
       >
-        <S.Blockie ref={blockie} />
+        <span ref={blockie} />
       </Dropdown>
     </a>
   );
 }
-
-const S = {
-  JazzIcon: styled.div`
-    position: relative;
-  `,
-  Blockie: styled.span`
-    /* position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%; */
-  `,
-};

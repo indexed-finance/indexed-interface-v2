@@ -19,7 +19,6 @@ import {
 import { Subscreen } from "../subscreens";
 import { useBreakpoints } from "helpers";
 import React from "react";
-import styled from "styled-components";
 
 const { Item } = List;
 
@@ -51,10 +50,10 @@ export default function Portfolio() {
   const breakpoints = useBreakpoints();
   const ndx = (
     <Subscreen icon={<IoLogoUsd />} title="NDX">
-      <S.Centered size="large" split={<Logo withTitle={false} />}>
-        <S.StatisticLeft title="Balance" value="2800.00 NDX" />
-        <S.StatisticRight title="Earned" value="0.00 NDX" />
-      </S.Centered>
+      <Space size="large" split={<Logo withTitle={false} />}>
+        <Statistic title="Balance" value="2800.00 NDX" />
+        <Statistic title="Earned" value="0.00 NDX" />
+      </Space>
     </Subscreen>
   );
   const holdings = (
@@ -64,55 +63,55 @@ export default function Portfolio() {
         footer={
           <>
             <Divider />
-            <S.SpacedBetween>
+            <div>
               <Typography.Title type="secondary" level={3}>
                 Total Value
               </Typography.Title>
               <Typography.Title type="success" level={2}>
                 $400.00
               </Typography.Title>
-            </S.SpacedBetween>
+            </div>
           </>
         }
       >
         {__data.map((entry) => (
           <>
             <Item key={entry.symbol}>
-              <S.Left>
+              <div>
                 <Space direction="vertical" size="small">
-                  <S.Title level={4}>
-                    <S.Aligned>
-                      <S.Token
+                  <Typography.Title level={4}>
+                    <div>
+                      <Token
                         size="small"
                         address={entry.address}
                         name={entry.symbol}
                         image={entry.image}
                       />
                       {entry.symbol}
-                    </S.Aligned>
-                  </S.Title>
-                  <S.Title level={5}>
+                    </div>
+                  </Typography.Title>
+                  <Typography.Title level={5}>
                     <Link to={entry.link}>{entry.name}</Link>
-                  </S.Title>
+                  </Typography.Title>
                 </Space>
 
-                <S.Number direction="vertical">
-                  <S.Staking>
+                <Space direction="vertical">
+                  <em>
                     <Typography.Text>
                       Staking {entry.staking} {entry.symbol}
                     </Typography.Text>
-                  </S.Staking>
-                  <S.Title level={3}>
+                  </em>
+                  <Typography.Title level={3}>
                     {entry.balance} {entry.symbol}
                     <br />
                     {entry.value}
-                  </S.Title>
-                </S.Number>
-                <S.Progress
+                  </Typography.Title>
+                </Space>
+                <Progress
                   type="dashboard"
                   percent={parseFloat(entry.weight.replace(/%/g, ""))}
                 />
-              </S.Left>
+              </div>
             </Item>
           </>
         ))}
@@ -164,60 +163,3 @@ export default function Portfolio() {
     </div>
   );
 }
-
-const S = {
-  Totals: styled(Typography.Title)`
-    ${(props) => props.theme.snippets.spacedBetween};
-    flex-direction: row-reverse;
-  `,
-  Title: styled(Typography.Title)`
-    margin-bottom: 0 !important;
-  `,
-  Number: styled(Space)`
-    text-align: right;
-    flex: 1;
-  `,
-  Left: styled.div`
-    ${(props) => props.theme.snippets.perfectlyAligned};
-    flex: 1;
-
-    .ant-space-item {
-      margin-bottom: 0 !important;
-    }
-  `,
-  Token: styled(Token)`
-    margin-right: ${(props) => props.theme.spacing.small};
-  `,
-  Aligned: styled.div`
-    ${(props) => props.theme.snippets.perfectlyAligned};
-  `,
-  Label: styled(Typography.Title)`
-    margin-top: 0 !important;
-    margin-bottom: 0 !important;
-    ${(props) => props.theme.snippets.fancy};
-  `,
-  Staking: styled.div`
-    font-style: italic;
-  `,
-  Centered: styled(Space)`
-    text-align: center;
-  `,
-  StatisticLeft: styled(Statistic)`
-    text-align: left;
-  `,
-  StatisticRight: styled(Statistic)`
-    text-align: right;
-  `,
-  Progress: styled(Progress)`
-    margin-left: ${(props) => props.theme.spacing.large};
-  `,
-  SpacedBetween: styled(Space)`
-    ${(props) => props.theme.snippets.spacedBetween};
-    width: 100%;
-    padding-right: 30px;
-
-    h2 {
-      text-align: right;
-    }
-  `,
-};

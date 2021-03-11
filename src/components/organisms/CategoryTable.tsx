@@ -1,7 +1,6 @@
 import { Table } from "antd";
 import { useHistory } from "react-router-dom";
 import React from "react";
-import styled from "styled-components";
 import type { FormattedCategory } from "features";
 
 export type Props = {
@@ -12,7 +11,7 @@ export default function CategoryTable(props: Props) {
   const history = useHistory();
 
   return (
-    <S.Table
+    <Table
       dataSource={props.pools}
       columns={columns}
       pagination={false}
@@ -70,11 +69,3 @@ const columns = [
     key: "action",
   },
 ];
-
-const S = {
-  Table: styled(Table)`
-    * {
-      text-align: center !important;
-    }
-  `,
-};

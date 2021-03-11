@@ -2,7 +2,6 @@ import { Drawer, DrawerProps, Result } from "antd";
 import { actions, selectors, useProvider } from "features";
 import { useDispatch, useSelector } from "react-redux";
 import React from "react";
-import styled from "styled-components";
 
 interface Props {
   includeSignerRequirement?: boolean;
@@ -50,7 +49,7 @@ export default function ProviderRequirementDrawer({
 
   return (
     <div onClick={() => dispatch(actions.attachToProvider())}>
-      <S.Drawer
+      <Drawer
         className="requirement-drawer"
         placement={placement}
         closable={false}
@@ -58,7 +57,7 @@ export default function ProviderRequirementDrawer({
         getContainer={false}
         {...placementProps[placement]}
       >
-        <S.Result
+        <Result
           status="warning"
           title={title}
           subTitle={
@@ -67,24 +66,8 @@ export default function ProviderRequirementDrawer({
               {content}
             </>
           }
-        ></S.Result>
-      </S.Drawer>
+        ></Result>
+      </Drawer>
     </div>
   );
 }
-
-const S = {
-  Drawer: styled(Drawer)`
-    position: absolute;
-  `,
-  Result: styled(Result)`
-    text-align: center;
-    ${(props) => props.theme.snippets.perfectlyCentered};
-    flex-direction: column;
-    height: 100%;
-
-    .ant-result-title {
-      ${(props) => props.theme.snippets.fancy};
-    }
-  `,
-};

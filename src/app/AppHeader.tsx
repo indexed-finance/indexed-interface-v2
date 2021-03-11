@@ -1,6 +1,5 @@
 import { AiOutlineMenuFold, AiOutlineMenuUnfold } from "react-icons/ai";
-import { Button } from "components";
-import { Form, Layout } from "antd";
+import { Button, Form, Layout } from "antd";
 import {
   JazzIcon,
   LanguageSelector,
@@ -12,7 +11,6 @@ import { useBreakpoints } from "helpers";
 import { useCallback, useState } from "react";
 import { useSelector } from "react-redux";
 import AppMenu from "./AppMenu";
-import styled from "styled-components";
 
 const { Header } = Layout;
 const { Item } = Form;
@@ -23,7 +21,9 @@ export default function AppHeader() {
 
   // Mobile
   const [mobileMenuActive, setMobileMenuActive] = useState(false);
-  const MobileMenuIcon = mobileMenuActive ? S.MenuFold : S.MenuUnfold;
+  const MobileMenuIcon = mobileMenuActive
+    ? AiOutlineMenuFold
+    : AiOutlineMenuUnfold;
   const closeMobileMenu = useCallback(() => setMobileMenuActive(false), []);
   const toggleMobileMenu = useCallback(
     () => setMobileMenuActive((prev) => !prev),
@@ -32,16 +32,14 @@ export default function AppHeader() {
 
   // Common
   const walletButton = selectedAddress ? (
-    <S.Wallet>
-      <JazzIcon address={selectedAddress} />
-    </S.Wallet>
+    <JazzIcon address={selectedAddress} />
   ) : (
     <WalletConnectorButton />
   );
 
   return breakpoints.lg ? (
-    <S.Top>
-      <S.Controls>
+    <Header>
+      <div>
         {selectedAddress ? (
           <Logo
             title="2800.00 NDX"
@@ -52,98 +50,27 @@ export default function AppHeader() {
         ) : (
           <span />
         )}
-        <S.Changeables layout="inline" colon={false}>
+        <Form layout="inline" colon={false}>
           <Item>
             <LanguageSelector />
           </Item>
           <Item>{walletButton}</Item>
-        </S.Changeables>
-      </S.Controls>
-    </S.Top>
+        </Form>
+      </div>
+    </Header>
   ) : (
     <>
-      <S.Header>
-        <S.Left>
+      <Header>
+        <div>
           <Button
             icon={<MobileMenuIcon onClick={toggleMobileMenu} />}
             type="ghost"
           />
           {walletButton}
-        </S.Left>
+        </div>
         <Logo />
-      </S.Header>
-      {mobileMenuActive && (
-        <S.MobileMenu>
-          <S.AppMenu onItemClick={closeMobileMenu} />
-        </S.MobileMenu>
-      )}
+      </Header>
+      {mobileMenuActive && <AppMenu onItemClick={closeMobileMenu} />}
     </>
   );
 }
-
-const S = {
-  Top: styled(Header)`
-    ${(props) => props.theme.snippets.spacedBetween};
-    margin-bottom: ${(props) => props.theme.spacing.large};
-    position: fixed;
-    top: 0;
-    height: 64px;
-    width: calc(100% - 299px);
-    left: 300px;
-    z-index: 2;
-  `,
-  Controls: styled.div`
-    ${(props) => props.theme.snippets.spacedBetween};
-    flex: 1;
-  `,
-  Changeables: styled(Form)``,
-  Settings: styled(Button)`
-    font-size: ${(props) => props.theme.fontSizes.huge};
-    ${(props) => props.theme.snippets.perfectlyCentered}
-
-    a {
-      ${(props) => props.theme.snippets.perfectlyCentered};
-    }
-  `,
-  MobileMenu: styled.div`
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: calc(100vw + 1px);
-    height: 100vh;
-    z-index: 2;
-  `,
-  MenuFold: styled(AiOutlineMenuFold)`
-    font-size: ${(props) => props.theme.fontSizes.huge};
-  `,
-  MenuUnfold: styled(AiOutlineMenuUnfold)`
-    font-size: ${(props) => props.theme.fontSizes.huge};
-  `,
-  Header: styled(Header)`
-    ${(props) => props.theme.snippets.spacedBetween};
-    position: fixed;
-    top: 0;
-    height: 64px;
-    width: 100vw;
-    z-index: 4;
-    padding-right: 0;
-    padding-left: 12px;
-  `,
-  AppMenu: styled(AppMenu)`
-    position: fixed;
-    top: 65px;
-    left: 0;
-    z-index: 2;
-  `,
-  Left: styled.div`
-    ${(props) => props.theme.snippets.perfectlyCentered};
-
-    > :first-child {
-      margin-right: 10px;
-    }
-  `,
-  Wallet: styled.div`
-    position: relative;
-    top: 4px;
-  `,
-};

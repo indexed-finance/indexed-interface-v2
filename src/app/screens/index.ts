@@ -7,6 +7,5 @@ export { default as PoolChart } from "./PoolChart";
 export { default as PoolDetail } from "./PoolDetail";
 export { default as PoolList } from "./PoolList";
 export { default as Portfolio } from "./Portfolio";
-export { default as Settings } from "./Settings";
 export { default as Splash } from "./Splash";
 export { default as Stake } from "./Stake";

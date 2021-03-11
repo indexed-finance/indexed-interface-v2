@@ -10,13 +10,12 @@ import {
   RankedTokenList,
   ScreenHeader,
 } from "components";
-import { Col, Menu, Row } from "antd";
+import { Col, Row } from "antd";
 import { Link, Redirect, useParams } from "react-router-dom";
 import { RiWallet3Line } from "react-icons/ri";
 import { useBreakpoints } from "helpers";
 import { useDispatch, useSelector } from "react-redux";
 import React, { useEffect, useMemo } from "react";
-import styled from "styled-components";
 
 export default function PoolDetail() {
   const dispatch = useDispatch();
@@ -99,9 +98,9 @@ export default function PoolDetail() {
       </Subscreen>
     );
     const assets = (
-      <S.Tokens icon={<AiOutlineSwap />} title="Assets" padding={0}>
+      <Subscreen icon={<AiOutlineSwap />} title="Assets" padding={0}>
         <RankedTokenList pool={pool} />
-      </S.Tokens>
+      </Subscreen>
     );
     const interactions = (
       <Subscreen
@@ -190,17 +189,3 @@ export default function PoolDetail() {
     return <Redirect to="/pools" />;
   }
 }
-
-const S = {
-  Tokens: styled(Subscreen)``,
-  Item: styled(Menu.Item)`
-    ${(props) => props.theme.snippets.fancy};
-  `,
-  ItemInner: styled.div`
-    ${(props) => props.theme.snippets.perfectlyAligned};
-  `,
-  Image: styled.img`
-    ${(props) => props.theme.snippets.size32};
-    margin-right: ${(props) => props.theme.spacing.medium};
-  `,
-};
