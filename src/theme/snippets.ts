@@ -29,8 +29,8 @@ const snippets = {
     letter-spacing: 2px;
   `,
   dropshadow: css`
-    -webkit-box-shadow: 5px 5px 15px 5px rgba(23, 23, 23, 0.34);
-    box-shadow: 5px 5px 15px 5px rgba(23, 23, 23, 0.17);
+    -webkit-box-shadow: 5px 5px 15px 5px rgba(204, 204, 255, 0.17);
+    box-shadow: 0px 0px 5px 5px rgba(204, 204, 255, 0.17);
     z-index: 1;
   `,
   imageFadedLeftRight: css`
