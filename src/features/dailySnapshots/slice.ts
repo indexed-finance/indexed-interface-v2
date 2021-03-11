@@ -7,6 +7,8 @@ import {
 } from "features/actions";
 import type { AppState } from "features/store";
 
+export type SnapshotKey = keyof Omit<DailyPoolSnapshot, "date">;
+
 const SECONDS_PER_DAY = 24 * 60 * 60;
 const SECONDS_PER_WEEK = SECONDS_PER_DAY * 7;
 
@@ -42,21 +44,36 @@ export const { actions } = slice;
 
 export const selectors = {
   ...adapter.getSelectors((state: AppState) => state.dailySnapshots),
-  selectDailySnapshotsOfPool: (state: AppState, poolId: string) => {
+  selectSortedSnapshotsOfPool: (state: AppState, poolId: string, direction: 'asc' | 'desc' = 'asc') => {
     const snapshots = selectors
       .selectAll(state)
       .filter((dailySnapshot) => dailySnapshot.id.includes(poolId));
 
-    return [...snapshots].sort((left, right) => left.date - right.date);
+    return [...snapshots].sort(
+      (left, right) => direction === 'asc' ? left.date - right.date : right.date - left.date
+    );
+  },
+  selectSortedSnapshotsOfPoolInTimeframe: (state: AppState, poolId: string, maxAgeInSeconds: number) => {
+    const snapshots = selectors.selectSortedSnapshotsOfPool(state, poolId, 'asc');
+    const unixNow = Date.now() / 1000;
+    return [...snapshots].filter((snapshot) => unixNow - snapshot.date <= maxAgeInSeconds);
+  },
+  selectTimeSeriesSnapshotData: (state: AppState, poolId: string, timeframe: "Day" | "Week", key: SnapshotKey) => {
+    const maxAgeInSeconds = timeframe === "Day" ? 86400 : 604800;
+    const snapshots = selectors.selectSortedSnapshotsOfPoolInTimeframe(state, poolId, maxAgeInSeconds);
+    console.log(`Getting Time Series Data: ${timeframe} ${key}`);
+    console.log(snapshots[0]);
+    const timeSeriesData = snapshots.map((snapshot) => ({ time: snapshot.date, value: snapshot[key] }));
+    console.log(timeSeriesData);
+    return timeSeriesData;
   },
   selectMostRecentSnapshotOfPool: (state: AppState, poolId: string) => {
-    const snapshots = selectors.selectDailySnapshotsOfPool(state, poolId);
-    const mostRecent = snapshots[snapshots.length - 1];
-
+    const snapshots = selectors.selectSortedSnapshotsOfPool(state, poolId, "desc");
+    const mostRecent = snapshots[0];
     return mostRecent;
   },
   selectSnapshotPeriodsForPool: (state: AppState, poolId: string) => {
-    const allSnapshots = selectors.selectDailySnapshotsOfPool(state, poolId);
+    const allSnapshots = selectors.selectSortedSnapshotsOfPoolInTimeframe(state, poolId, 86400);
     const mostRecentSnapshot = selectors.selectMostRecentSnapshotOfPool(
       state,
       poolId
