@@ -32,7 +32,9 @@ export default function AppHeader() {
 
   // Common
   const walletButton = selectedAddress ? (
-    <JazzIcon address={selectedAddress} />
+    <S.Wallet>
+      <JazzIcon address={selectedAddress} />
+    </S.Wallet>
   ) : (
     <WalletConnectorButton />
   );
@@ -139,5 +141,9 @@ const S = {
     > :first-child {
       margin-right: 10px;
     }
+  `,
+  Wallet: styled.div`
+    position: relative;
+    top: 4px;
   `,
 };

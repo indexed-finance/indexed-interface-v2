@@ -118,7 +118,7 @@ export default function PoolDetail() {
 
     // Variants
     const mobileSized = (
-      <Row gutter={5}>
+      <Row gutter={25}>
         <Col span={24}>{performance}</Col>
         <Col span={24}>{chart}</Col>
         <Col span={24}>{interactions}</Col>
@@ -128,7 +128,7 @@ export default function PoolDetail() {
     );
     const tabletSized = (
       <>
-        <Row gutter={10}>
+        <Row gutter={25}>
           <Col span={12}>
             {performance}
             {chart}
@@ -138,7 +138,7 @@ export default function PoolDetail() {
             {interactions}
           </Col>
         </Row>
-        <Row gutter={10}>
+        <Row gutter={25}>
           <Col span={24}>{recents}</Col>
         </Row>
       </>
@@ -146,14 +146,14 @@ export default function PoolDetail() {
     const desktopSized = (
       <Row gutter={20}>
         <Col span={16}>
-          <Row gutter={20}>
+          <Row gutter={25}>
             <Col span={12}>
               {performance}
               {chart}
             </Col>
             <Col span={12}>{interactions}</Col>
           </Row>
-          <Row gutter={20}>
+          <Row gutter={25}>
             <Col span={24}>{recents}</Col>
           </Row>
         </Col>

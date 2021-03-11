@@ -131,6 +131,7 @@ export default function AppMenu({ onItemClick = noop, ...rest }: Props) {
 
 const S = {
   Menu: styled(Menu)`
+    max-width: 400px !important;
     height: calc(100% - 65px);
     max-width: 100vw;
     overflow: hidden;

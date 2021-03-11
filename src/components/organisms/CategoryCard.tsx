@@ -2,7 +2,7 @@ import { Card, List } from "antd";
 import { Link, useHistory } from "react-router-dom";
 import { Token } from "components/atoms";
 import React from "react";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import type { Token as TokenType } from "indexed-types";
 
 export interface Props {
@@ -84,8 +84,6 @@ const S = {
     font-size: ${(props) => props.theme.fontSizes.huge};
   `,
   Card: styled(Card)`
-    width: ${(props) => (props.theme.isMobile ? "330px" : "375px")};
-
     .ant-card-head-title {
       ${(props) => props.theme.snippets.fancy};
       font-size: ${(props) => props.theme.fontSizes.large};
@@ -93,7 +91,12 @@ const S = {
     .ant-card-body {
       display: flex;
       align-items: center;
-      height: 300px;
+
+      ${(props) =>
+        !props.theme.isMobile &&
+        css`
+          max-width: 375px;
+        `}
     }
     .ant-card-meta-description {
       font-size: ${(props) => props.theme.fontSizes.large};

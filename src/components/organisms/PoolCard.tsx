@@ -4,7 +4,7 @@ import { Token } from "components/atoms";
 import { useHistory } from "react-router-dom";
 import RankedTokenList from "./RankedTokenList";
 import React from "react";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 
 export interface Props {
   pool: FormattedIndexPool;
@@ -51,8 +51,6 @@ const S = {
     font-size: ${(props) => props.theme.fontSizes.huge};
   `,
   Card: styled(Card)`
-    width: ${(props) => (props.theme.isMobile ? "330px" : "375px")};
-    height: 515px;
     overflow: auto;
 
     .ant-card-head-title {
@@ -61,9 +59,14 @@ const S = {
     }
     .ant-card-body {
       display: flex;
-      width: 370px;
-      height: 390px;
+      max-height: 515px;
       overflow: auto;
+
+      ${(props) =>
+        !props.theme.isMobile &&
+        css`
+          max-width: 375px;
+        `}
     }
   `,
   Title: styled.h1`

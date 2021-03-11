@@ -75,10 +75,22 @@ export default function Splash() {
           )}
         </Button.Group>
       </S.Actions>
-      <S.Steps progressDot current={step} responsive={true}>
-        <Step title="1. Foo" subTitle="First thing" />
-        <Step title="2. Bar" subTitle="First thing" />
-        <Step title="3. Baz" subTitle="First thing" />
+      <S.Steps progressDot={true} current={step} responsive={true}>
+        <Step
+          title="Foo"
+          subTitle="First thing"
+          description="Lorem ipsum dolor sit amet"
+        />
+        <Step
+          title="Bar"
+          subTitle="First thing"
+          description="Lorem ipsum dolor sit amet"
+        />
+        <Step
+          title="Baz"
+          subTitle="First thing"
+          description="Lorem ipsum dolor sit amet"
+        />
       </S.Steps>
       <Divider />
       <PoolList withBreadcrumb={false} centered={true} />
@@ -108,15 +120,21 @@ const S = {
     flex-direction: column;
     align-items: center;
     text-align: center;
+    padding-top: 3.5rem;
   `,
   Steps: styled(Steps)`
     margin-top: ${(props) => props.theme.spacing.huge};
+    align-items: center;
     max-width: 960px;
   `,
   Title: styled(Typography.Title)`
     ${(props) => props.theme.snippets.fancy};
     font-size: ${(props) =>
-      props.theme.isMobile ? "32px" : "86px"} !important;
+      props.theme.breakpoints.xl
+        ? "86px"
+        : props.theme.breakpoints.lg
+        ? "64px"
+        : "48px"} !important;
     max-width: 960px;
     line-height: 1.1;
     margin-bottom: 0 !important;

@@ -55,20 +55,29 @@ export default function ChartCard({ poolId, expanded = false }: Props) {
         { time: "2019-04-19", value: 81.89 },
         { time: "2019-04-20", value: 74.43 },
       ]);
+
+      setTimeout(() => {
+        if (cardRef.current) {
+          chart.resize(
+            cardRef.current.clientWidth,
+            cardRef.current.clientHeight
+          );
+        }
+      }, 250);
     }
   }, [theme, expanded]);
 
   return (
     <S.ChartCard
       actions={[
-        <div onClick={toggleKind}>
-          <S.Switch key="1" checked={kind === "Value"} />
+        <S.Switcher key="1" onClick={toggleKind}>
+          <S.Switch checked={kind === "Value"} />
           Value
-        </div>,
-        <div onClick={toggleKind}>
-          <S.Switch key="2" checked={kind === "TotalValueLocked"} />
+        </S.Switcher>,
+        <S.Switcher key="2" onClick={toggleKind}>
+          <S.Switch checked={kind === "TotalValueLocked"} />
           Total Value Locked
-        </div>,
+        </S.Switcher>,
       ]}
       extra={
         <S.Menu mode="horizontal" selectedKeys={[timeframe]}>
@@ -112,7 +121,12 @@ const S = {
     text-align: center;
   `,
   Switch: styled(Switch)`
-    margin-right: ${(props) => props.theme.spacing.medium};
+    margin-bottom: ${(props) => props.theme.spacing.medium};
+  `,
+  Switcher: styled.div`
+    ${(props) => props.theme.snippets.perfectlyCentered};
+    flex-direction: column;
+    text-align: center;
   `,
 };
 

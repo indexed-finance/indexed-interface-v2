@@ -66,7 +66,7 @@ export default function AppLayout() {
         <S.Content>
           {/* Dull the background image */}
           <S.Screen className="ant-layout-screen" />
-          <S.Page isMobile={!breakpoints.md}>
+          <S.Page extraPadded={breakpoints.md} isMobile={!breakpoints.md}>
             <RouterSwitch>
               {routes.map((route, index) => (
                 <Route key={index} path={route.path} exact={route.exact}>
@@ -89,9 +89,7 @@ const S = {
     left: 0;
     width: 100%;
   `,
-  Layout: styled(Layout)`
-    overflow-x: hidden;
-  `,
+  Layout: styled(Layout)``,
   SocialMediaImage: styled.img`
     ${(props) => props.theme.snippets.size32};
     ${(props) => props.theme.snippets.circular};
@@ -100,16 +98,47 @@ const S = {
     margin-top: ${(props) => props.theme.spacing.small};
   `,
   Page: styled.div<{ extraPadded?: boolean; isMobile: boolean }>`
-    padding: ${(props) => props.theme.spacing.large};
-    ${(props) => props.theme.snippets.dropshadow};
+    max-width: 1450px;
+    margin: 0 auto;
     position: relative;
+    padding: ${(props) =>
+      props.extraPadded
+        ? props.theme.spacing.large
+        : props.theme.spacing.medium};
+
+    ${(props) => props.theme.snippets.dropshadow};
+
     ${(props) =>
       props.isMobile
         ? css`
-            padding-top: 112px;
+            margin-top: 112px;
+
+            ${(props) =>
+              !props.theme.breakpoints.xxl &&
+              css`
+                margin-right: 20px;
+                margin-left: 20px;
+              `}
           `
         : css`
-            padding-top: 124px;
+            margin-top: 124px;
+            padding-top: 18px;
+
+            ${(props) =>
+              !props.theme.breakpoints.xxl &&
+              css`
+                margin-right: 40px;
+                margin-left: 40px;
+              `}
+          `}
+
+    ${(props) =>
+      props.theme.mode === "dark"
+        ? css`
+            background: ${(props) => props.theme.colors.black200};
+          `
+        : css`
+            background: ${(props) => props.theme.colors.white300};
           `}
   `,
   Breadcrumb: styled(Breadcrumb)`

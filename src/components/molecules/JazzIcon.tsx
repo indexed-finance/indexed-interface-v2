@@ -42,7 +42,7 @@ export default function JazzIcon({ address }: Props) {
     if (_blockie) {
       const parsedAddress = parseInt(address.slice(2, 10), 16);
 
-      element = jazzicon(breakpoints.md ? 35 : 25, parsedAddress);
+      element = jazzicon(25, parsedAddress);
       element.style.border = "2px solid #ccccff";
 
       _blockie.appendChild(element);
@@ -90,7 +90,7 @@ export default function JazzIcon({ address }: Props) {
 
 const S = {
   JazzIcon: styled.div`
-    /* position: relative; */
+    position: relative;
   `,
   Blockie: styled.span`
     /* position: absolute;

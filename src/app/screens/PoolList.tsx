@@ -41,7 +41,6 @@ const S = {
       css`
         h1 > span {
           width: 100%;
-          text-align: center;
         }
       `}
   `,

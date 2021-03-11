@@ -14,7 +14,7 @@ export default function PoolChart() {
     return (
       <>
         <ScreenHeader
-          title={pool.name}
+          title={`${pool.name} Chart`}
           overlay={<PoolDropdown />}
           activeBreadcrumb={<Link to="/pools">Index Pools</Link>}
         />
