@@ -1,8 +1,11 @@
-import { Card, Menu, Switch } from "antd";
-import { createChart } from "lightweight-charts";
-import { selectors } from "features";
+import { AppState, selectors } from "features";
+import { Card, Menu, Radio } from "antd";
+import { SnapshotKey } from "features";
 import { useSelector } from "react-redux";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import LineSeriesChart from "./LineSeriesChart";
+import React, { useCallback, useState } from "react";
+
+type Timeframe = "Day" | "Week";
 
 export interface Props {
   poolId: string;
@@ -10,16 +13,8 @@ export interface Props {
 }
 
 export default function ChartCard({ poolId, expanded = false }: Props) {
-  const theme = useSelector(selectors.selectTheme);
-  const [kind, setKind] = useState<Kind>("Value");
+  const [key, setKey] = useState<SnapshotKey>("value");
   const [timeframe, setTimeframe] = useState<Timeframe>("Day");
-  const toggleKind = useCallback(
-    () =>
-      setKind((prevKind) =>
-        prevKind === "Value" ? "TotalValueLocked" : "Value"
-      ),
-    []
-  );
   const toggleTimeframe = useCallback(
     () =>
       setTimeframe((prevTimeframe) =>
@@ -27,54 +22,24 @@ export default function ChartCard({ poolId, expanded = false }: Props) {
       ),
     []
   );
-  const cardRef = useRef<null | HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (cardRef.current) {
-      const size = expanded
-        ? { width: 1200, height: 500 }
-        : { width: 400, height: 300 };
-      const chart = createChart(cardRef.current, size);
-      const options = CHART_MODES[theme];
-      const lineSeries = chart.addLineSeries();
-
-      chart.applyOptions(options);
-
-      lineSeries.setData([
-        { time: "2019-04-11", value: 80.01 },
-        { time: "2019-04-12", value: 96.63 },
-        { time: "2019-04-13", value: 76.64 },
-        { time: "2019-04-14", value: 81.89 },
-        { time: "2019-04-15", value: 74.43 },
-        { time: "2019-04-16", value: 80.01 },
-        { time: "2019-04-17", value: 96.63 },
-        { time: "2019-04-18", value: 76.64 },
-        { time: "2019-04-19", value: 81.89 },
-        { time: "2019-04-20", value: 74.43 },
-      ]);
-
-      setTimeout(() => {
-        if (cardRef.current) {
-          chart.resize(
-            cardRef.current.clientWidth,
-            cardRef.current.clientHeight
-          );
-        }
-      }, 250);
-    }
-  }, [theme, expanded]);
+  const data = useSelector((state: AppState) =>
+    selectors.selectTimeSeriesSnapshotData(state, poolId, timeframe, key)
+  );
 
   return (
     <Card
       actions={[
-        <div key="1" onClick={toggleKind}>
-          <Switch checked={kind === "Value"} />
-          Value
-        </div>,
-        <div key="2" onClick={toggleKind}>
-          <Switch checked={kind === "TotalValueLocked"} />
-          Total Value Locked
-        </div>,
+        <Radio.Group
+          value={key}
+          onChange={(e) => setKey(e.target.value as SnapshotKey)}
+        >
+          <Radio value={"value"}>Value</Radio>
+          <Radio value={"totalSupply"}>Supply</Radio>
+          <Radio value={"totalValueLockedUSD"}>Total Value Locked</Radio>
+          <Radio value={"totalSwapVolumeUSD"}>Total Swap Volume</Radio>
+          <Radio value={"feesTotalUSD"}>Total Swap Fees</Radio>
+        </Radio.Group>,
       ]}
       extra={
         <Menu mode="horizontal" selectedKeys={[timeframe]}>
@@ -90,47 +55,7 @@ export default function ChartCard({ poolId, expanded = false }: Props) {
         </Menu>
       }
     >
-      <div ref={cardRef} />
+      <LineSeriesChart data={data} expanded={expanded} />
     </Card>
   );
 }
-
-type Kind = "Value" | "TotalValueLocked";
-type Timeframe = "Day" | "Week";
-
-const COMMON_LAYOUT_OPTIONS = {
-  fontFamily: "sans-serif",
-  fontSize: 16,
-};
-const CHART_MODES = {
-  dark: {
-    layout: {
-      ...COMMON_LAYOUT_OPTIONS,
-      backgroundColor: "black",
-      textColor: "purple",
-    },
-    grid: {
-      vertLines: {
-        color: "purple",
-      },
-      horzLines: {
-        color: "purple",
-      },
-    },
-  },
-  light: {
-    layout: {
-      ...COMMON_LAYOUT_OPTIONS,
-      backgroundColor: "white",
-      textColor: "black",
-    },
-    grid: {
-      vertLines: {
-        color: "purple",
-      },
-      horzLines: {
-        color: "purple",
-      },
-    },
-  },
-};

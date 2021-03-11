@@ -1,3 +1,4 @@
+export * from "./slice";
 export {
   actions as dailySnapshotsActions,
   selectors as dailySnapshotsSelectors,
