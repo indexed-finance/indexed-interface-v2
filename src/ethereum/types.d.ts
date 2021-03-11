@@ -59,8 +59,21 @@ export interface NormalizedPool
   swapFee: string;
 }
 
+export interface NormalizedPairSide {
+  token: string;
+  reserves: string;
+}
+
+export interface NormalizedPair {
+  id: string; // Uniswap pair address
+  tokenZero: NormalizedPairSide;
+  tokenOne: NormalizedPairSide;
+}
+
 export interface NormalizedToken {
   id: string;
+  decimals: number;
+  name?: string;
   symbol: string;
   coingeckoId: string;
   priceData?: {
