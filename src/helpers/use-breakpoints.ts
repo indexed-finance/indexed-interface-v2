@@ -5,5 +5,8 @@ const { useBreakpoint } = Grid;
 export default function useBreakpoints() {
   const breakpoints = useBreakpoint();
 
-  return breakpoints;
+  return {
+    ...breakpoints,
+    isMobile: breakpoints.hasOwnProperty("md") && !breakpoints.md,
+  };
 }

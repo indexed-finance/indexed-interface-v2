@@ -117,8 +117,11 @@ const S = {
     font-size: ${(props) => props.theme.fontSizes.huge};
   `,
   Header: styled(Header)`
-    top: 0;
     ${(props) => props.theme.snippets.spacedBetween};
+    position: fixed;
+    top: 0;
+    height: 64px;
+    width: 100vw;
     z-index: 4;
     padding-right: 0;
     padding-left: 12px;

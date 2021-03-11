@@ -1,11 +1,12 @@
 import { Button } from "components";
 import { Divider, Steps, Typography } from "antd";
 import { Link } from "react-router-dom";
+import { useBreakpoints } from "helpers";
 import CategoryList from "./CategoryList";
 import PoolList from "./PoolList";
 import React, { useEffect, useState } from "react";
 import flags from "feature-flags";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 
 const { Step } = Steps;
 const STEP_COUNT = 3;
@@ -26,6 +27,7 @@ export default function Splash() {
         {docsButton}
       </S.External>
     );
+  const { isMobile } = useBreakpoints();
 
   // Effect:
   // Continuously progress through the steps on the splash page.
@@ -60,8 +62,8 @@ export default function Splash() {
         Passively managed, autonomous AMM pools powering the future of finance.
       </S.Subtitle>
       <S.Actions level={3}>
-        <S.GetStarted>Get started today:</S.GetStarted>
-        <Button.Group orientation="horizontal">
+        <Button.Group orientation={isMobile ? "vertical" : "horizontal"}>
+          <S.GetStarted>Get started today:</S.GetStarted>
           <Link to="/pools">
             <Button type="ghost">View Index Pools</Button>
           </Link>
@@ -73,7 +75,7 @@ export default function Splash() {
           )}
         </Button.Group>
       </S.Actions>
-      <S.Steps progressDot current={step}>
+      <S.Steps progressDot current={step} responsive={true}>
         <Step title="1. Foo" subTitle="First thing" />
         <Step title="2. Bar" subTitle="First thing" />
         <Step title="3. Baz" subTitle="First thing" />
@@ -91,7 +93,14 @@ const S = {
     ${(props) => props.theme.snippets.perfectlyAligned};
   `,
   GetStarted: styled.span`
-    margin-right: ${(props) => props.theme.spacing.large};
+    ${(props) =>
+      props.theme.isMobile
+        ? css`
+            margin-bottom: ${(props) => props.theme.spacing.medium};
+          `
+        : css`
+            margin-right: ${(props) => props.theme.spacing.large};
+          `}
     font-weight: 200 !important;
   `,
   Splash: styled.div`
@@ -106,7 +115,8 @@ const S = {
   `,
   Title: styled(Typography.Title)`
     ${(props) => props.theme.snippets.fancy};
-    font-size: 86px !important;
+    font-size: ${(props) =>
+      props.theme.isMobile ? "32px" : "86px"} !important;
     max-width: 960px;
     line-height: 1.1;
     margin-bottom: 0 !important;

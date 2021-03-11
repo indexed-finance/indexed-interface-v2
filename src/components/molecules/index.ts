@@ -1,5 +1,6 @@
 export { default as CategoryDropdown } from "./CategoryDropdown";
 export { default as ChartCard } from "./ChartCard";
+export { default as DEBUGScreenSize } from "./DEBUGScreenSize";
 export { default as EthereumAddressInput } from "./EthereumAddressInput";
 export { default as JazzIcon } from "./JazzIcon";
 export { default as LanguageSelector } from "./LanguageSelector";

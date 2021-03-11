@@ -54,6 +54,7 @@ export default function AppLayout() {
     <ModeWrapper className={theme}>
       <GlobalStyles />
       <S.Layout className="layout">
+        <AppHeader />
         {breakpoints.lg && (
           // Desktop  sider
           <S.Sider width={300}>
@@ -62,7 +63,6 @@ export default function AppLayout() {
             <AppMenu />
           </S.Sider>
         )}
-        <AppHeader />
         <S.Content>
           {/* Dull the background image */}
           <S.Screen className="ant-layout-screen" />

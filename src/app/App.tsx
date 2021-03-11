@@ -1,12 +1,13 @@
 import { BrowserRouter } from "react-router-dom";
-import { DrawerProvider } from "components";
+import { DEBUGScreenSize, DrawerProvider } from "components";
 import { Provider, useSelector } from "react-redux";
 import { ThemeProvider } from "styled-components";
 import { notification } from "antd";
 import { selectors, store } from "features";
 import AppLayout from "./AppLayout";
 import React from "react";
-import getTheme from "theme";
+import flags from "feature-flags";
+import useTheme from "theme";
 
 notification.config({
   placement: "topRight",
@@ -16,16 +17,19 @@ notification.config({
 
 function Inner() {
   const themeInStore = useSelector(selectors.selectTheme);
-  const theme = getTheme(themeInStore);
+  const theme = useTheme(themeInStore);
 
   return (
-    <BrowserRouter>
-      <ThemeProvider theme={theme}>
-        <DrawerProvider>
-          <AppLayout />
-        </DrawerProvider>
-      </ThemeProvider>
-    </BrowserRouter>
+    <>
+      <BrowserRouter>
+        <ThemeProvider theme={theme}>
+          <DrawerProvider>
+            <AppLayout />
+          </DrawerProvider>
+        </ThemeProvider>
+      </BrowserRouter>
+      {flags.showScreenSize && <DEBUGScreenSize />}
+    </>
   );
 }
 
