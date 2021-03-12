@@ -1,53 +1,39 @@
 import { Result as AbiCoderResult } from "ethers/lib/utils";
 import { IERC20 } from "ethereum/abi";
-import { Provider } from "@ethersproject/providers";
+import { MultiCallResults } from "./utils";
 import { convert } from "helpers";
-import { multicallViaInterface } from "./utils";
 import chunk from "lodash.chunk";
 import type { Call } from "./utils";
-import type { PoolUnderlyingToken } from "indexed-types";
 
 const TOKEN_USER_DATA_CALL_COUNT = 2;
 
-export async function tokenUserDataMulticall(
-  _provider: Provider,
+export function buildTokenUserDataCalls(
   _sourceAddress: string,
   _spenderAddress: string,
-  _tokens: PoolUnderlyingToken[]
-) {
+  _tokenAddresses: string[]
+): Call[] {
   const _interface = IERC20;
-  const _tokenAddresses = _tokens.map(({ token: { id } }) => id);
-  const _tokenCalls = _tokens.reduce((prev, next) => {
+  return _tokenAddresses.reduce((prev, next) => {
     prev.push(
       {
-        target: next.token.id,
+        target: next,
+        interface: _interface,
         function: "allowance",
         args: [_sourceAddress, _spenderAddress],
       },
       {
-        target: next.token.id,
+        target: next,
+        interface: _interface,
         function: "balanceOf",
         args: [_sourceAddress],
       }
     );
     return prev;
   }, [] as Call[]);
-
-  const result = await multicallViaInterface(
-    _provider,
-    _interface,
-    _tokenCalls,
-    true
-  );
-
-  return {
-    blockNumber: result.blockNumber,
-    data: formatTokenUserData(result, _tokenAddresses),
-  };
 }
 
-function formatTokenUserData(
-  { results }: { blockNumber: string; results: AbiCoderResult[] },
+export function formatTokenUserDataResults(
+  { blockNumber, results }: MultiCallResults,
   tokenAddresses: string[]
 ) {
   const responseDataByTokenAddress = chunk(
@@ -66,5 +52,8 @@ function formatTokenUserData(
     return prev;
   }, {} as Record<string, { allowance: string; balance: string }>);
 
-  return tokens;
+  return {
+    blockNumber,
+    data: tokens
+  };
 }
