@@ -1,5 +1,4 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import { PoolUnderlyingToken } from "indexed-types";
 import { userActions } from "../user";
 import type { AppState } from "features/store";
 
