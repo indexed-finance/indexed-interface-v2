@@ -1,42 +1,30 @@
+import { BigNumber } from "@ethersproject/bignumber";
 import {
-  Result as AbiCoderResult,
   FunctionFragment,
   Interface,
   JsonFragment,
   ParamType,
   defaultAbiCoder,
 } from "@ethersproject/abi";
-import { BigNumber } from "@ethersproject/bignumber";
 import { Provider } from "@ethersproject/providers";
 import { chunk } from "lodash";
+import type { Call, MultiCallResults } from "./types";
 
 import {
   MultiCall as bytecode,
   MultiCallStrict as bytecodeStrict,
 } from "./bytecode.json";
 
-export type Call = {
-  target: string;
-  interface?: Interface | JsonFragment[];
-  function: string;
-  args?: Array<any>;
-};
-
-export interface CondensedCall {
+interface CondensedCall {
   target: string;
   callData: string;
   interface: Interface;
 }
 
-export type MultiCallResults = {
-  blockNumber: number;
-  results: AbiCoderResult[];
-}
-
 const toInterface = (_interface: Interface | JsonFragment[]) =>
   Array.isArray(_interface) ? new Interface(_interface) : _interface;
 
-export function condenseCalls(
+function condenseCalls(
   _calls: Call[],
   _interface?: Interface,
 ): CondensedCall[] {

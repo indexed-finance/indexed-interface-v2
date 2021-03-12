@@ -1,30 +1,11 @@
 import { BigNumber } from "@ethersproject/bignumber";
-import { MultiCallResults } from "./utils";
+import { MultiCallTaskHandler, UniswapPairsDataTask } from "./types";
 import { Pair } from "ethereum/abi";
 import { PairReservesUpdate } from "ethereum/types";
-import type { Call } from "./utils";
+import { actions } from "features";
+import type { Call, MultiCallResults } from "./types";
 
-export interface UniswapReserves {
-  reserves0: string;
-  reserves1: string;
-}
-
-export function buildPairReservesDataCalls(
-  _pairs: string[]
-): Call[] {
-  const _interface = Pair;
-  return _pairs.map(
-    (pair) => ({
-      target: pair,
-      interface: _interface,
-      function: "getReserves",
-      args: [],
-    }),
-    [] as Call[]
-  );
-}
-
-export function formatPairReservesResults(
+function parsePairReservesResults(
   results: MultiCallResults,
   pairs: string[]
 ): PairReservesUpdate[] {
@@ -40,3 +21,25 @@ export function formatPairReservesResults(
     return [...prev, pairUpdate];
   }, [] as PairReservesUpdate[]) as PairReservesUpdate[];
 }
+
+const UniswapPairsDataTaskHandler: MultiCallTaskHandler<UniswapPairsDataTask> = {
+  kind: "UniswapPairsData",
+  constructCalls: (_, pairs) => {
+    const _interface = Pair;
+    return pairs.map(
+      (pair) => ({
+        target: pair,
+        interface: _interface,
+        function: "getReserves",
+        args: [],
+      }),
+      [] as Call[]
+    );
+  },
+  handleResults: ({ dispatch }, pairs, results) => {
+    const updates = parsePairReservesResults(results, pairs);
+    dispatch(actions.uniswapPairsUpdated(updates));
+  }
+}
+
+export default UniswapPairsDataTaskHandler;

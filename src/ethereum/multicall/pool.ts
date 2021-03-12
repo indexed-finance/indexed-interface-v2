@@ -1,15 +1,17 @@
 import * as balancerMath from "ethereum/utils/balancer-math";
 import { Result as AbiCoderResult } from "ethers/lib/utils";
 import { IPool } from "ethereum/abi";
-import { MultiCallResults } from "./utils";
+import { MultiCallTaskHandler, PoolDataTask } from "./types";
+import { NormalizedPool } from "ethereum/types";
+import { actions, selectors } from "features";
 import { convert } from "helpers";
 import chunk from "lodash.chunk";
-import type { Call } from "./utils";
+import type { Call, MultiCallResults } from "./types";
 
 const POOL_UPDATE_TOKEN_DATA_STARTING_INDEX = 3;
 const POOL_UPDATE_TOKEN_CALL_COUNT = 3;
 
-export function buildPoolUpdateCalls(
+function buildPoolUpdateCalls(
   _poolId: string,
   _tokenAddresses: string[]
 ): Call[] {
@@ -58,7 +60,7 @@ export function buildPoolUpdateCalls(
   return _poolCalls;
 }
 
-export function formatPoolUpdateResults(
+function formatPoolUpdateResults(
   { blockNumber, results }: MultiCallResults,
   tokenAddresses: string[]
 ) {
@@ -105,3 +107,19 @@ export function formatPoolUpdateResults(
     tokens,
   };
 }
+
+const PoolDataTaskHandler: MultiCallTaskHandler<PoolDataTask> = {
+  kind: "PoolData",
+  constructCalls: (_, { pool, tokens }) => buildPoolUpdateCalls(pool, tokens),
+  handleResults: ({ dispatch, state }, { pool, tokens }, results) => {
+    const update = formatPoolUpdateResults(results, tokens);
+    const _pool = selectors.selectPool(state, pool) as NormalizedPool;
+    if (pool) {
+      dispatch(actions.poolUpdated({ pool: _pool, update }));
+      dispatch(actions.retrieveCoingeckoData(pool));
+      dispatch(actions.requestPoolTradesAndSwaps(pool));
+    }
+  }
+}
+
+export default PoolDataTaskHandler;

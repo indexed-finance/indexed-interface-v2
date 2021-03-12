@@ -1,12 +1,10 @@
 import * as topLevelActions from "./actions";
 import { AppThunk } from "./store";
 import { BigNumber } from "bignumber.js";
-import { Call, multicall } from "ethereum/multicall/utils";
+import { Call, TaskHandlersByKind, multicall } from "ethereum/multicall";
 import { CoinGeckoService } from "services";
 import { SLIPPAGE_RATE, SUBGRAPH_URL_UNISWAP } from "config";
 import { batcherActions } from "./batcher";
-import { buildPairReservesDataCalls, formatPairReservesResults } from "ethereum/multicall/uniswap";
-import { buildPoolUpdateCalls, buildTokenUserDataCalls, formatPoolUpdateResults, formatTokenUserDataResults } from "ethereum/multicall";
 import { categoriesActions } from "./categories";
 import { convert } from "helpers";
 import { ethers } from "ethers";
@@ -195,8 +193,10 @@ const thunks = {
       actions.listenerRegistered({
         id: "",
         kind: "PoolData",
-        otherArgs: poolId,
-        args: tokens.map(t => t.token.id),
+        args: {
+          pool: poolId,
+          tokens: tokens.map(t => t.token.id),
+        }
       })
     );
   },
@@ -211,8 +211,10 @@ const thunks = {
       actions.listenerRegistered({
         id: "",
         kind: "TokenUserData",
-        otherArgs: poolId,
-        args: tokens.map(t => t.token.id),
+        args: {
+          pool: poolId,
+          tokens: tokens.map(t => t.token.id),
+        }
       })
     );
   },
@@ -222,7 +224,7 @@ const thunks = {
     return dispatch(
       actions.listenerRegistered({
         id: "",
-        kind: "PairReservesData",
+        kind: "UniswapPairsData",
         args: pairs,
       })
     );
@@ -315,73 +317,23 @@ const thunks = {
   sendBatch: (): AppThunk => async (dispatch, getState) => {
     if (provider) {
       const state = getState();
-      const batch = selectors.selectBatch(state);
-      const sourceAddress = selectors.selectUserAddress(state);
-      const allCalls: Call[] = [];
-      const taskCallCounts: ({ index: number; count: number; })[] = [];
-      const putCalls = (taskCalls: Call[]) => {
-        taskCallCounts.push({ index: allCalls.length, count: taskCalls.length });
-        allCalls.push(...taskCalls);
-      }
-      for (const task of batch.poolDataTasks) {
-        const pool = selectors.selectPool(state, task.otherArgs);
-        const taskCalls = pool ? buildPoolUpdateCalls(task.otherArgs, task.args) : [];
-        putCalls(taskCalls);
-      }
-      for (const task of batch.tokenUserDataTasks) {
-        const pool = selectors.selectPool(state, task.otherArgs);
-        const destinationAddress = task.otherArgs;
-        const taskCalls = pool ? buildTokenUserDataCalls(
-          sourceAddress,
-          destinationAddress,
-          task.args
-        ) : [];
-        putCalls(taskCalls);
-      }
-      for (const task of batch.pairReservesTasks) {
-        const taskCalls = buildPairReservesDataCalls(task.args);
-        putCalls(taskCalls);
-      }
+      const account = selectors.selectUserAddress(state);
+      const context = { state, dispatch, account };
+  
+      const { calls, counts, tasks } = selectors.selectBatch(state);
       const { blockNumber, results: allResults } = await multicall(
         provider,
-        allCalls
+        calls
       );
-      let resultsI = 0;
-      const sliceTaskResults = () => {
-        const { index, count } = taskCallCounts[resultsI++];
+      let resultIndex = 0;
+      for (const task of tasks) {
+        const { index, count } = counts[resultIndex++];
         const results = allResults.slice(index, index + count);
-        return { blockNumber, results };
-      }
-
-      for (const task of batch.poolDataTasks) {
-        const update = formatPoolUpdateResults(sliceTaskResults(), task.args);
-        const pool = selectors.selectPool(state, task.otherArgs);
-        if (pool) {
-          dispatch(actions.poolUpdated({ pool, update }));
-          dispatch(actions.retrieveCoingeckoData(pool.id));
-          dispatch(actions.requestPoolTradesAndSwaps(pool.id));
-        }
-      }
-
-      for (const task of batch.tokenUserDataTasks) {
-        const pool = selectors.selectPool(state, task.otherArgs);
-        const results = sliceTaskResults();
-        if (provider && pool) {
-          const { blockNumber, data: userData } = formatTokenUserDataResults(results, task.args);
-          dispatch(
-            actions.poolUserDataLoaded({
-              blockNumber: +blockNumber,
-              poolId: pool.id,
-              userData,
-            })
-          );
-        }
-      }
-
-      for (const task of batch.pairReservesTasks) {
-        const results = sliceTaskResults();
-        const updates = formatPairReservesResults(results, task.args);
-        dispatch(actions.uniswapPairsUpdated(updates));
+        TaskHandlersByKind[task.kind].handleResults(
+          context,
+          task.args,
+          { blockNumber, results }
+        )
       }
     }
   },

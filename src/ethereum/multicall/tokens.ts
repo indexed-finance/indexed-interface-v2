@@ -1,38 +1,14 @@
 import { Result as AbiCoderResult } from "ethers/lib/utils";
 import { IERC20 } from "ethereum/abi";
-import { MultiCallResults } from "./utils";
+import { MultiCallTaskHandler, TokenUserDataTask } from "./types";
+import { actions, selectors } from "features";
 import { convert } from "helpers";
 import chunk from "lodash.chunk";
-import type { Call } from "./utils";
+import type { Call, MultiCallResults } from "./types";
 
 const TOKEN_USER_DATA_CALL_COUNT = 2;
 
-export function buildTokenUserDataCalls(
-  _sourceAddress: string,
-  _spenderAddress: string,
-  _tokenAddresses: string[]
-): Call[] {
-  const _interface = IERC20;
-  return _tokenAddresses.reduce((prev, next) => {
-    prev.push(
-      {
-        target: next,
-        interface: _interface,
-        function: "allowance",
-        args: [_sourceAddress, _spenderAddress],
-      },
-      {
-        target: next,
-        interface: _interface,
-        function: "balanceOf",
-        args: [_sourceAddress],
-      }
-    );
-    return prev;
-  }, [] as Call[]);
-}
-
-export function formatTokenUserDataResults(
+function formatTokenUserDataResults(
   { blockNumber, results }: MultiCallResults,
   tokenAddresses: string[]
 ) {
@@ -57,3 +33,45 @@ export function formatTokenUserDataResults(
     data: tokens
   };
 }
+
+const TokenUserDataTaskHandler: MultiCallTaskHandler<TokenUserDataTask> = {
+  kind: "TokenUserData",
+  constructCalls: (
+    { account, state }, { pool, tokens }
+  ): Call[] => {
+    const _pool = selectors.selectPool(state, pool);
+    if (!account || !_pool) return [];
+    const _interface = IERC20;
+    return tokens.reduce((prev, next) => {
+      prev.push(
+        {
+          target: next,
+          interface: _interface,
+          function: "allowance",
+          args: [account, pool],
+        },
+        {
+          target: next,
+          interface: _interface,
+          function: "balanceOf",
+          args: [account],
+        }
+      );
+      return prev;
+    }, [] as Call[]);
+  },
+
+  handleResults: ({ dispatch }, { pool, tokens }, results) => {
+    if (!results.results.length) return;
+    const { blockNumber, data: userData } = formatTokenUserDataResults(results, tokens);
+    dispatch(
+      actions.poolUserDataLoaded({
+        blockNumber: +blockNumber,
+        poolId: pool,
+        userData,
+      })
+    );
+  }
+}
+
+export default TokenUserDataTaskHandler;
