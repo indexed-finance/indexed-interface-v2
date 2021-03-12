@@ -1,3 +1,4 @@
+import { COMMON_BASE_TOKENS } from "config";
 import { NormalizedToken } from "ethereum";
 import {
   PayloadAction,
@@ -41,6 +42,11 @@ const slice = createSlice({
       .addCase(subgraphDataLoaded, (state, action) => {
         const { tokens } = action.payload;
         const fullTokens = tokens.ids.map((id) => tokens.entities[id]);
+        for (const commonToken of COMMON_BASE_TOKENS) {
+          if (!tokens.entities[commonToken.id]) {
+            fullTokens.push({ ...commonToken, coingeckoId: "" });
+          }
+        }
 
         adapter.addMany(state, fullTokens);
       })
@@ -91,6 +97,14 @@ export const { actions } = slice;
 export const selectors = {
   ...adapter.getSelectors((state: AppState) => state.tokens),
   selectTokens: (state: AppState) => state.tokens,
+  selectTokenById: (state: AppState, id: string) => selectors.selectById(state, id),
+  selectTokensById: (state: AppState, ids: string[]): (NormalizedToken | undefined)[] => {
+    const tokens = selectors.selectTokens(state);
+    return ids.reduce((prev, next) => ([
+      ...prev,
+      tokens.entities[next.toLowerCase()]
+    ]), [] as (NormalizedToken | undefined)[]);
+  },
   selectAllTokens: (state: AppState) => selectors.selectAll(state),
   selectTokenLookup: (state: AppState) => selectors.selectEntities(state),
   selectTokenLookupBySymbol: (state: AppState) =>
