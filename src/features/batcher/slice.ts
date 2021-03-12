@@ -4,26 +4,6 @@ import type { AppState } from "features/store";
 
 import { Call, MultiCallTaskConfig, TaskHandlersByKind } from "ethereum/multicall";
 
-// type ListenerKind = "PoolData" | "TokenUserData" | "PairReservesData";
-
-// /**
-//  * The `args` prop is given to the batch updater which then constructs the relevant contract calls.
-//  * `args` can be anything, but each entry should be specific to a particular call to execute, i.e.
-//  * if creating a batch of calls where each call then requires multiple params, each `args` entry
-//  * should be a tuple.
-//  *
-//  * @param id - Unique listener ID, set with middleware
-//  * @param kind - Type of batch to execute
-//  * @param args - Arguments given to the batch executor
-//  * @param otherArgs - Any other relevant data given to the batch executor
-//  */
-// interface ListenerConfig {
-//   id: string;
-//   kind: ListenerKind;
-//   args: any[];
-//   otherArgs?: any;
-// }
-
 interface BatcherState {
   blockNumber: number;
   batch: string[];
