@@ -1,10 +1,12 @@
-import { FormattedIndexPool } from "features";
 import { List } from "antd";
 import { Token } from "components/atoms";
 import React from "react";
 import styled from "styled-components";
 
-type Asset = FormattedIndexPool["assets"][0];
+type Asset = {
+  name: string;
+  symbol: string;
+};
 
 interface Props {
   asset: Asset;
