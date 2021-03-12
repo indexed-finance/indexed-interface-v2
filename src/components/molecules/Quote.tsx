@@ -1,7 +1,7 @@
+import { HTMLProps } from "react";
 import { Typography } from "antd";
 import { selectors } from "features";
 import { useSelector } from "react-redux";
-import React, { HTMLProps } from "react";
 
 export interface Props extends HTMLProps<HTMLDivElement> {
   symbol?: string;

@@ -1,7 +1,7 @@
 import { Card, List } from "antd";
 import { Link, useHistory } from "react-router-dom";
 import { Token } from "components/atoms";
-import React from "react";
+
 import type { Token as TokenType } from "indexed-types";
 
 export interface Props {

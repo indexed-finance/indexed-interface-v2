@@ -1,5 +1,5 @@
 import Layout from "../Layout";
-import React from "react";
+
 import SwapForm from "./SwapForm";
 
 export const Basic = () => (

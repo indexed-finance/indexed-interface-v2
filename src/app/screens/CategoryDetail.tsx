@@ -4,7 +4,7 @@ import { Divider } from "antd";
 import { Link } from "react-router-dom";
 import { Redirect, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
-import React from "react";
+
 import ReactMarkdown from "react-markdown";
 
 export default function CategoryDetail() {

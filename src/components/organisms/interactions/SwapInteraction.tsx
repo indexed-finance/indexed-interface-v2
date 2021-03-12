@@ -6,13 +6,13 @@ import { TokenExchangeRate } from "components/molecules";
 import { actions } from "features";
 import { convert } from "helpers";
 import { helpers } from "ethereum";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   useHistoryChangeCallback,
   useTokenApproval,
   useTokenRandomizer,
 } from "./common";
-import React, { useCallback, useMemo, useRef, useState } from "react";
 import TokenSelector from "../TokenSelector";
 
 interface Props {

@@ -3,12 +3,12 @@ import { Flipper, Token } from "components";
 import { Form, Typography } from "antd";
 import { FormattedIndexPool } from "features";
 import { TokenExchangeRate } from "components/molecules";
+import { useCallback, useMemo, useState } from "react";
 import {
   useHistoryChangeCallback,
   useTokenApproval,
   useTokenRandomizer,
 } from "./common";
-import React, { useCallback, useMemo, useState } from "react";
 import TokenSelector from "../TokenSelector";
 import cloneDeep from "lodash.clonedeep";
 

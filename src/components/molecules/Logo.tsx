@@ -2,7 +2,6 @@ import { Typography } from "antd";
 import { selectors } from "features";
 import { useHistory } from "react-router-dom";
 import { useSelector } from "react-redux";
-import React from "react";
 
 interface Props {
   link?: string;

@@ -1,8 +1,8 @@
 import { Button, Divider, Steps, Typography } from "antd";
 import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
 import CategoryList from "./CategoryList";
 import PoolList from "./PoolList";
-import React, { useEffect, useState } from "react";
 import flags from "feature-flags";
 
 const { Step } = Steps;

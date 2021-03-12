@@ -1,9 +1,9 @@
 import { Alert, Input, InputProps, Typography } from "antd";
+import { ChangeEvent, ReactNode, useCallback, useState } from "react";
 import { FaEthereum } from "react-icons/fa";
 import { provider as globalProvider } from "features";
 import { providers, utils } from "ethers";
 import Identicon from "react-identicons";
-import React, { ChangeEvent, ReactNode, useCallback, useState } from "react";
 import debounce from "lodash.debounce";
 import noop from "lodash.noop";
 

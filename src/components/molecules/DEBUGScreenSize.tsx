@@ -1,6 +1,5 @@
 import { Typography } from "antd";
 import { useBreakpoints } from "helpers";
-import React from "react";
 
 export default function DEBUGScreenSize() {
   const {

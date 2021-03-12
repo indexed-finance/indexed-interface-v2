@@ -1,9 +1,9 @@
 import { AppState, selectors } from "features";
 import { Card, Menu, Radio } from "antd";
 import { SnapshotKey } from "features";
+import { useCallback, useState } from "react";
 import { useSelector } from "react-redux";
 import LineSeriesChart from "./LineSeriesChart";
-import React, { useCallback, useState } from "react";
 
 type Timeframe = "Day" | "Week";
 

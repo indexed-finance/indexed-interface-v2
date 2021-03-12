@@ -1,5 +1,5 @@
 import { Button, Collapse, CollapseProps } from "antd";
-import React, { ReactNode, createContext, useState } from "react";
+import { ReactNode, createContext, useEffect, useState } from "react";
 import noop from "lodash.noop";
 
 export type Action = {
@@ -15,7 +15,6 @@ export const SubscreenContext = createContext<{
 });
 
 interface SubscreenProps extends CollapseProps {
-  icon: ReactNode;
   title?: ReactNode;
   children: ReactNode;
   defaultActions?: null | Action[];
@@ -26,7 +25,6 @@ interface SubscreenProps extends CollapseProps {
 const { Panel } = Collapse;
 
 export default function Subscreen({
-  icon,
   title = "",
   children,
   defaultActions = null,
@@ -35,7 +33,7 @@ export default function Subscreen({
 }: SubscreenProps) {
   const [actions, setActions] = useState(defaultActions);
 
-  React.useEffect(() => {
+  useEffect(() => {
     setActions(defaultActions);
   }, [defaultActions]);
 
@@ -46,7 +44,7 @@ export default function Subscreen({
           header={
             title ? (
               <>
-                <span>{title}</span> {icon}
+                <span>{title}</span>
               </>
             ) : (
               <span>_</span>

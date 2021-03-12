@@ -5,7 +5,7 @@ import { Provider } from "react-redux";
 import { notification } from "antd";
 import { store } from "features";
 import AppLayout from "./AppLayout";
-import React from "react";
+
 import flags from "feature-flags";
 
 notification.config({

@@ -13,8 +13,8 @@ import {
 } from "./screens";
 import { FiExternalLink } from "react-icons/fi";
 import { GiStakeHammer } from "react-icons/gi";
+import { ReactNode } from "react";
 import { RiSafe2Line } from "react-icons/ri";
-import React, { ReactNode } from "react";
 import flags from "feature-flags";
 import type { AppState } from "features";
 

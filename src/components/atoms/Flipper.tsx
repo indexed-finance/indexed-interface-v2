@@ -1,6 +1,6 @@
 import { Button } from "antd";
 import { MdSwapCalls } from "react-icons/md";
-import React, { ReactNode } from "react";
+import { ReactNode } from "react";
 
 interface Props {
   left?: ReactNode;

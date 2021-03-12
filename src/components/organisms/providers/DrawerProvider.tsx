@@ -1,12 +1,13 @@
 import { Drawer as AntDrawer, Button } from "antd";
-import { useBreakpoints } from "helpers";
-import React, {
+import {
   ReactNode,
   createContext,
+  useCallback,
   useContext,
   useMemo,
   useState,
 } from "react";
+import { useBreakpoints } from "helpers";
 import noop from "lodash.noop";
 
 export interface DrawerAction {
@@ -111,7 +112,7 @@ export default function DrawerProvider(props: ProviderProps) {
       ...prev,
       [pageName]: actions,
     }));
-  const memoDisplayDrawerPage = React.useCallback(
+  const memoDisplayDrawerPage = useCallback(
     (page: DrawerPage, content?: ReactNode) =>
       setPages((prevPages) =>
         prevPages.concat({
@@ -121,7 +122,7 @@ export default function DrawerProvider(props: ProviderProps) {
       ),
     []
   );
-  const memoCloseDrawerPage = React.useCallback(
+  const memoCloseDrawerPage = useCallback(
     () => setPages((prevPages) => prevPages.slice(0, prevPages.length - 1)),
     []
   );
@@ -150,7 +151,7 @@ export function useDrawer(page: DrawerPage) {
   const { activePage, closeDrawerPage, displayDrawerPage } = useContext(
     DrawerContext
   );
-  const memoOpenDrawer = React.useCallback(
+  const memoOpenDrawer = useCallback(
     (content: ReactNode) => {
       displayDrawerPage(page, content);
     },

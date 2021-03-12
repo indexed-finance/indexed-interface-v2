@@ -2,7 +2,6 @@ import { AppState, selectors } from "features";
 import { ChartCard, PoolDropdown, ScreenHeader } from "components";
 import { Link, Redirect, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
-import React from "react";
 
 export default function PoolChart() {
   const { poolName } = useParams<{ poolName: string }>();

@@ -1,10 +1,9 @@
 import { AiOutlineMenuFold, AiOutlineMenuUnfold } from "react-icons/ai";
 import { JazzIcon, LanguageSelector, Logo, WalletConnector } from "components";
-import { Layout, Menu } from "antd";
+import { Layout } from "antd";
 import { selectors } from "features";
 import { useBreakpoints } from "helpers";
 import { useSelector } from "react-redux";
-import React from "react";
 
 interface Props {
   mobileMenuActive: boolean;
@@ -34,31 +33,17 @@ export default function AppHeader({
         <Logo withTitle={true} />
         <div>
           {!breakpoints.isMobile && <LanguageSelector />}
-          <Menu
-            selectable={false}
-            mode="horizontal"
-            className="AppHeader-menu"
-            style={{
-              left: breakpoints.isMobile ? 0 : "unset",
-              right: breakpoints.isMobile ? "unset" : 0,
-            }}
-          >
-            {breakpoints.isMobile && (
-              <Menu.Item
-                icon={<MobileMenuIcon className="MenuButton" />}
-                onClick={onToggleMobileMenu}
-              />
-            )}
-            <Menu.Item
-              icon={
-                selectedAddress ? (
-                  <JazzIcon address={selectedAddress} />
-                ) : (
-                  <WalletConnector />
-                )
-              }
+          {breakpoints.isMobile && (
+            <MobileMenuIcon
+              className="MenuButton"
+              onClick={onToggleMobileMenu}
             />
-          </Menu>
+          )}
+          {selectedAddress ? (
+            <JazzIcon address={selectedAddress} />
+          ) : (
+            <WalletConnector />
+          )}
         </div>
       </Header>
     </>

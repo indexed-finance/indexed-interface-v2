@@ -1,3 +1,4 @@
+import { Divider, Menu } from "antd";
 import {
   LanguageSelector,
   ModeSwitch,
@@ -5,12 +6,10 @@ import {
   Token,
 } from "components";
 import { Link, useHistory } from "react-router-dom";
-import { Menu } from "antd";
 import { SOCIAL_MEDIA } from "config";
 import { selectors } from "features";
 import { useBreakpoints } from "helpers";
 import { useSelector } from "react-redux";
-import React, { useEffect } from "react";
 import noop from "lodash.noop";
 import routes from "./routes";
 
@@ -29,12 +28,9 @@ export default function AppMenu({ onItemClick = noop, ...rest }: Props) {
   const breakpoints = useBreakpoints();
   const isMobile = !breakpoints.md;
 
-  // Effect:
-  // In 'xs' and 'sm' modes, the menu is only visible when overlaying the body, so scrolling is confusing.
-  useScrollPrevention(isMobile);
-
   return (
     <>
+      <Divider className="no-margin-bottom" />
       <Menu
         className="AppMenu"
         mode="inline"
@@ -42,13 +38,28 @@ export default function AppMenu({ onItemClick = noop, ...rest }: Props) {
         selectable={false}
         {...rest}
       >
-        <Item>
-          <div>
-            <ServerConnection showText={true} />
-            <ModeSwitch />
-            {isMobile && <LanguageSelector />}
-          </div>
-        </Item>
+        {isMobile ? (
+          <>
+            <Item>
+              <div className="perfectly-centered">
+                <ServerConnection showText={true} />
+              </div>
+            </Item>
+            <Item>
+              <div className="spaced-between">
+                <ModeSwitch />
+                <LanguageSelector />
+              </div>
+            </Item>
+          </>
+        ) : (
+          <Item>
+            <div className="spaced-between">
+              <ServerConnection showText={true} />
+              <ModeSwitch />
+            </div>
+          </Item>
+        )}
         {routes
           .filter((route) => route.sider)
           .map((route) => {
@@ -118,66 +129,3 @@ export default function AppMenu({ onItemClick = noop, ...rest }: Props) {
     </>
   );
 }
-
-// #region Helpers
-// Code adapted from https://stackoverflow.com/questions/4770025/how-to-disable-scrolling-temporarily
-function useScrollPrevention(shouldPreventScroll: boolean) {
-  useEffect(() => {
-    if (shouldPreventScroll) {
-      // modern Chrome requires { passive: false } when adding event
-      let supportsPassive = false;
-      try {
-        (window as any).addEventListener(
-          "test",
-          null,
-          Object.defineProperty({}, "passive", {
-            get: function () {
-              supportsPassive = true;
-            },
-          })
-        );
-      } catch {}
-
-      // left: 37, up: 38, right: 39, down: 40,
-      // spacebar: 32, pageup: 33, pagedown: 34, end: 35, home: 36
-      const keys: Record<number, number> = { 37: 1, 38: 1, 39: 1, 40: 1 };
-      const preventDefault = (event: Event) => event.preventDefault();
-      const preventDefaultForScrollKeys = (
-        event: Event & { keyCode: number }
-      ) => {
-        if (keys[event.keyCode]) {
-          preventDefault(event);
-          return false;
-        }
-      };
-      const wheelOptions = supportsPassive ? { passive: false } : false;
-      const wheelEvent =
-        "onwheel" in document.createElement("div") ? "wheel" : "mousewheel";
-
-      window.addEventListener("DOMMouseScroll", preventDefault, false); // older FF
-      window.addEventListener(wheelEvent, preventDefault, wheelOptions); // modern desktop
-      window.addEventListener("touchmove", preventDefault, wheelOptions); // mobile
-      window.addEventListener("keydown", preventDefaultForScrollKeys, false);
-
-      return () => {
-        window.removeEventListener("DOMMouseScroll", preventDefault, false);
-        window.removeEventListener(
-          wheelEvent,
-          preventDefault,
-          wheelOptions as any
-        );
-        window.removeEventListener(
-          "touchmove",
-          preventDefault,
-          wheelOptions as any
-        );
-        window.removeEventListener(
-          "keydown",
-          preventDefaultForScrollKeys,
-          false
-        );
-      };
-    }
-  }, [shouldPreventScroll]);
-}
-// #endregion

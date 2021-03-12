@@ -2,7 +2,6 @@ import { CategoryCard, CategoryDropdown, ScreenHeader } from "components";
 import { Link } from "react-router-dom";
 import { selectors } from "features";
 import { useSelector } from "react-redux";
-import React from "react";
 
 interface Props {
   withBreadcrumb?: boolean;

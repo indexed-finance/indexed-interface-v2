@@ -1,6 +1,5 @@
 import { Alert, Statistic, Typography } from "antd";
 import { convert } from "helpers";
-import React from "react";
 
 export interface Props {
   baseline: string;

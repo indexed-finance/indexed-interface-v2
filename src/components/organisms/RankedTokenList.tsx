@@ -1,7 +1,6 @@
 import { FormattedIndexPool } from "features";
 import { List } from "antd";
 import { RankedToken } from "components/molecules";
-import React from "react";
 
 export interface Props {
   pool: FormattedIndexPool;

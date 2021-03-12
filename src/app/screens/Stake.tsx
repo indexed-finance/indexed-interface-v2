@@ -40,7 +40,7 @@ export default function Stake() {
     </>
   );
   const pools = (
-    <Subscreen icon={null} title="Available Pools">
+    <Subscreen title="Available Pools">
       <List>
         {__data.map((datum) => (
           <React.Fragment key={datum.id}>

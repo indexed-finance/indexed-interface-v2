@@ -1,10 +1,9 @@
-import { AiOutlineSwap } from "react-icons/ai";
 import { FaTractor } from "react-icons/fa";
 import { FormattedIndexPool } from "features";
 import { Quote } from "components";
 import { Space, Statistic } from "antd";
 import { useBreakpoints } from "helpers";
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import Subscreen, { Action } from "./Subscreen";
 
 export default function Performance({ pool }: { pool: FormattedIndexPool }) {
@@ -28,11 +27,7 @@ export default function Performance({ pool }: { pool: FormattedIndexPool }) {
   );
 
   return (
-    <Subscreen
-      icon={<AiOutlineSwap />}
-      title="Performance"
-      defaultActions={performanceActions}
-    >
+    <Subscreen title="Performance" defaultActions={performanceActions}>
       <Space direction={breakpoints.sm ? "horizontal" : "vertical"}>
         <Quote
           symbol={pool.symbol}

@@ -2,7 +2,7 @@ import { Form, Popconfirm, Typography } from "antd";
 import { ImConnection } from "react-icons/im";
 import { actions, selectors } from "features";
 import { useDispatch, useSelector } from "react-redux";
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 
 interface Props {
   showText?: boolean;
@@ -33,7 +33,7 @@ export default function ServerConnection({ showText = false }: Props) {
   }, [isConnectionEnabled, isConnected]);
 
   return (
-    <Item>
+    <Item className="ServerConnection">
       <Popconfirm
         icon={null}
         placement="topLeft"

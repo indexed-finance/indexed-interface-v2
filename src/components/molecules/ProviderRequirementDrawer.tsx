@@ -1,7 +1,6 @@
 import { Drawer, DrawerProps, Result } from "antd";
 import { actions, selectors, useProvider } from "features";
 import { useDispatch, useSelector } from "react-redux";
-import React from "react";
 
 interface Props {
   includeSignerRequirement?: boolean;

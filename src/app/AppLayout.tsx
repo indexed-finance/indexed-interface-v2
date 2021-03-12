@@ -1,13 +1,12 @@
 import { Drawer, DrawerContext, QuoteCarousel } from "components";
 import { FormattedIndexPool, selectors } from "features";
 import { Layout } from "antd";
-import { Logo } from "components";
 import { Route, Switch as RouterSwitch } from "react-router-dom";
 import { useBreakpoints } from "helpers";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import AppHeader from "./AppHeader";
 import AppMenu from "./AppMenu";
-import React, { useCallback, useContext, useEffect, useState } from "react";
 import SocketClient from "sockets/client";
 import routes from "./routes";
 
@@ -40,7 +39,7 @@ export default function AppLayout() {
   }, [isConnectionEnabled]);
 
   return (
-    <Layout className="layout">
+    <Layout className="AppLayout">
       <AppHeader
         mobileMenuActive={mobileMenuActive}
         onToggleMobileMenu={toggleMobileMenu}
@@ -53,9 +52,8 @@ export default function AppLayout() {
         </Sider>
       )}
 
-      {/* 
       <Content>
-        <div>
+        <div className="Page">
           <RouterSwitch>
             {routes.map((route, index) => (
               <Route key={index} path={route.path} exact={route.exact}>
@@ -65,7 +63,7 @@ export default function AppLayout() {
           </RouterSwitch>
           {activePage && <Drawer page={activePage} />}
         </div>
-      </Content> */}
+      </Content>
     </Layout>
   );
 }

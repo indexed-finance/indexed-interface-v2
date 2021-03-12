@@ -1,8 +1,8 @@
 import { Dropdown, Menu, notification } from "antd";
 import { actions } from "features";
 import { useBreakpoints } from "helpers";
+import { useCallback, useEffect, useRef } from "react";
 import { useDispatch } from "react-redux";
-import React, { useEffect, useRef } from "react";
 import ReactDOM from "react-dom";
 import jazzicon from "@metamask/jazzicon";
 
@@ -13,7 +13,7 @@ interface Props {
 export default function JazzIcon({ address }: Props) {
   const dispatch = useDispatch();
   const blockie = useRef<null | HTMLSpanElement>(null);
-  const handleDisconnect = React.useCallback(() => {
+  const handleDisconnect = useCallback(() => {
     dispatch(actions.userDisconnected());
 
     notification.info({

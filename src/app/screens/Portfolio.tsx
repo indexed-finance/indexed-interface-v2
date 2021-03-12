@@ -8,7 +8,6 @@ import {
   Statistic,
   Typography,
 } from "antd";
-import { IoLogoUsd } from "react-icons/io";
 import { Link } from "react-router-dom";
 import {
   Logo,
@@ -18,7 +17,6 @@ import {
 } from "components";
 import { Subscreen } from "../subscreens";
 import { useBreakpoints } from "helpers";
-import React from "react";
 
 const { Item } = List;
 
@@ -49,7 +47,7 @@ export default function Portfolio() {
   ];
   const breakpoints = useBreakpoints();
   const ndx = (
-    <Subscreen icon={<IoLogoUsd />} title="NDX">
+    <Subscreen title="NDX">
       <Space size="large" split={<Logo withTitle={false} />}>
         <Statistic title="Balance" value="2800.00 NDX" />
         <Statistic title="Earned" value="0.00 NDX" />
@@ -57,7 +55,7 @@ export default function Portfolio() {
     </Subscreen>
   );
   const holdings = (
-    <Subscreen icon={<IoLogoUsd />} title="Holdings">
+    <Subscreen title="Holdings">
       <List
         size="small"
         footer={

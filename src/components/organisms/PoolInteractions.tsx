@@ -2,7 +2,7 @@ import { AiOutlineSwap } from "react-icons/ai";
 import { FaCoins, FaFireAlt, FaHammer } from "react-icons/fa";
 import { SwapInteraction, TradeInteraction } from "./interactions";
 import { Tabs } from "antd";
-import React, { useState } from "react";
+import { useState } from "react";
 import type { FormattedIndexPool } from "features";
 
 export type PoolInteraction = "burn" | "mint" | "swap" | "trade";

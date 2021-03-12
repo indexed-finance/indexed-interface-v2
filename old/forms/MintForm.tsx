@@ -4,7 +4,7 @@ import { FormattedIndexPool, SlippageRate, actions, selectors } from "features";
 import { Link } from "gatsby";
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "i18n";
-import React, { useCallback } from "react";
+import { useCallback } from "react";
 import styled from "styled-components";
 
 export default function MintForm({ pool }: { pool: FormattedIndexPool }) {

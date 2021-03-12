@@ -1,5 +1,4 @@
 import { PLACEHOLDER_TOKEN_IMAGE } from "config";
-import React from "react";
 
 interface Props {
   address?: string;

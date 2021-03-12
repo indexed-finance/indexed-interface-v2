@@ -1,7 +1,6 @@
 import { FormattedIndexPool } from "features";
 import { List } from "antd";
 import { Token } from "components/atoms";
-import React from "react";
 
 type Asset = FormattedIndexPool["assets"][0];
 

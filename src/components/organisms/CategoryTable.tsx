@@ -1,6 +1,6 @@
 import { Table } from "antd";
 import { useHistory } from "react-router-dom";
-import React from "react";
+
 import type { FormattedCategory } from "features";
 
 export type Props = {

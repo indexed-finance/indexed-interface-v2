@@ -3,15 +3,9 @@ import { Button, InputNumber, List, Space, Typography } from "antd";
 import { CaretDownOutlined } from "@ant-design/icons";
 import { SelectableToken } from "components/molecules";
 import { Token } from "components/atoms";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useDrawer } from "./providers";
 import { useSelector } from "react-redux";
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
 
 export type TokenSelectorValue = {
   amount?: number;

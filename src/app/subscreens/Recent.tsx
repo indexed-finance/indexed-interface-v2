@@ -1,7 +1,7 @@
-import { AiOutlineClockCircle, AiOutlineSwap } from "react-icons/ai";
+import { AiOutlineClockCircle } from "react-icons/ai";
 import { Button, Card, Skeleton, Space, Tabs, Tag, Typography } from "antd";
 import { ImArrowRight2 } from "react-icons/im";
-import React, { ReactNode, useState } from "react";
+import { ReactNode, useState } from "react";
 import Subscreen from "./Subscreen";
 import type { FormattedIndexPool, Swap, Trade } from "features";
 
@@ -77,7 +77,7 @@ export default function Recent({ pool }: { pool: FormattedIndexPool }) {
   ));
 
   return (
-    <Subscreen icon={<AiOutlineSwap />} title="Recent" padding={0}>
+    <Subscreen title="Recent" padding={0}>
       <Tabs
         size="large"
         centered={true}

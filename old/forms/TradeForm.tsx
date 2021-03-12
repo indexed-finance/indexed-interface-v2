@@ -4,7 +4,7 @@ import { Space } from "antd";
 import { actions, selectors } from "features";
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "i18n";
-import React from "react";
+
 import styled from "styled-components";
 
 export default function TradeForm() {

@@ -3,7 +3,6 @@ import { FormattedIndexPool } from "features";
 import { Token } from "components/atoms";
 import { useHistory } from "react-router-dom";
 import RankedTokenList from "./RankedTokenList";
-import React from "react";
 
 export interface Props {
   pool: FormattedIndexPool;

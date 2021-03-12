@@ -4,10 +4,10 @@ import { Token } from "components/atoms";
 import { Typography } from "antd";
 import { actions, selectors } from "features";
 import { useDispatch } from "react-redux";
+import { useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import ColorThief from "colorthief";
 import Quote from "./Quote";
-import React, { useEffect, useRef } from "react";
 import flags from "feature-flags";
 
 export interface Props {

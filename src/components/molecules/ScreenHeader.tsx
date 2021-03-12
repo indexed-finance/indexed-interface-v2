@@ -1,6 +1,6 @@
 import { Breadcrumb, Divider, Typography } from "antd";
+import { ReactElement } from "react";
 import { useBreakpoints } from "helpers";
-import React, { ReactElement } from "react";
 
 interface Props {
   title?: string;
@@ -14,7 +14,7 @@ export default function ScreenHeader(props: Props) {
 
   return (
     <>
-      <Typography.Title level={breakpoints.md ? 1 : 3}>
+      <Typography.Title level={breakpoints.md ? 1 : 3} className="ScreenHeader">
         {title}
         {(props.overlay || props.activeBreadcrumb) && (
           <Breadcrumb>
