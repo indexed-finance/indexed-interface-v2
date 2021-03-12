@@ -64,10 +64,20 @@ export interface NormalizedPairSide {
   reserves: string;
 }
 
+export interface PairReservesUpdate {
+  id: string; // Uniswap pair address
+  exists: boolean;
+  reserves0: string;
+  reserves1: string;
+}
+
 export interface NormalizedPair {
   id: string; // Uniswap pair address
-  tokenZero: NormalizedPairSide;
-  tokenOne: NormalizedPairSide;
+  exists: boolean | undefined;
+  token0: string;
+  token1: string;
+  reserves0?: string;
+  reserves1?: string;
 }
 
 export interface NormalizedToken {
