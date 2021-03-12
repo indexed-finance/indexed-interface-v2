@@ -3,13 +3,24 @@ import { PoolUnderlyingToken } from "indexed-types";
 import { userActions } from "../user";
 import type { AppState } from "features/store";
 
-type ListenerKind = "PoolData" | "TokenUserData";
+type ListenerKind = "PoolData" | "TokenUserData" | "PairReservesData";
 
+/**
+ * The `args` prop is given to the batch updater which then constructs the relevant contract calls.
+ * `args` can be anything, but each entry should be specific to a particular call to execute, i.e.
+ * if creating a batch of calls where each call then requires multiple params, each `args` entry
+ * should be a tuple.
+ *
+ * @param id - Unique listener ID, set with middleware
+ * @param kind - Type of batch to execute
+ * @param args - Arguments given to the batch executor
+ * @param otherArgs - Any other relevant data given to the batch executor
+ */
 interface ListenerConfig {
   id: string;
-  pool: string;
   kind: ListenerKind;
   args: any[];
+  otherArgs?: any;
 }
 
 interface BatcherState {
@@ -61,16 +72,18 @@ export const selectors = {
     const separatedTasks = filled.reduce(
       (prev, next) => {
         const task = next;
+        // Filter out any duplicate args entries
         const uniqueArgs = task.args.filter(
           (taskArg) =>
-            !taskCache[createTaskId(next.kind, next.pool, taskArg.token.id)]
-        ) as PoolUnderlyingToken[];
+            !taskCache[createTaskId(next.kind, JSON.stringify(next.otherArgs || ""), JSON.stringify(taskArg))]
+        );
 
         if (uniqueArgs.length > 0) {
           const listenerKindToProperty: Record<
             ListenerKind,
             ListenerConfig[]
           > = {
+            PairReservesData: prev.pairReservesTasks,
             PoolData: prev.poolDataTasks,
             TokenUserData: prev.tokenUserDataTasks,
           };
@@ -78,7 +91,7 @@ export const selectors = {
 
           for (const taskArg of uniqueArgs) {
             taskCache[
-              createTaskId(next.kind, next.pool, taskArg.token.id)
+              createTaskId(next.kind, JSON.stringify(next.otherArgs || ""), JSON.stringify(taskArg))
             ] = true;
           }
 
@@ -91,6 +104,7 @@ export const selectors = {
         return prev;
       },
       {
+        pairReservesTasks: [],
         poolDataTasks: [],
         tokenUserDataTasks: [],
       } as Record<string, ListenerConfig[]>
@@ -103,7 +117,7 @@ export const selectors = {
 export default slice.reducer;
 
 // #region Helpers
-function createTaskId(kind: ListenerKind, poolId: string, tokenId: string) {
-  return `${kind}-${poolId}-${tokenId}`;
+function createTaskId(...args: string[]) {
+  return args.join("-");
 }
 // #endregion
