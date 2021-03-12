@@ -1,39 +1,38 @@
 import * as balancerMath from "ethereum/utils/balancer-math";
 import { Result as AbiCoderResult } from "ethers/lib/utils";
 import { IPool } from "ethereum/abi";
-import { Provider } from "@ethersproject/providers";
+import { MultiCallResults } from "./utils";
 import { convert } from "helpers";
-import { multicallViaInterface } from "./utils";
 import chunk from "lodash.chunk";
 import type { Call } from "./utils";
-import type { PoolUnderlyingToken } from "indexed-types";
 
 const POOL_UPDATE_TOKEN_DATA_STARTING_INDEX = 3;
 const POOL_UPDATE_TOKEN_CALL_COUNT = 3;
 
-export async function poolUpdateMulticall(
-  _provider: Provider,
+export function buildPoolUpdateCalls(
   _poolId: string,
-  _tokens: PoolUnderlyingToken[]
-) {
+  _tokenAddresses: string[]
+): Call[] {
   const _interface = IPool;
-  const _tokenAddresses = _tokens.map(({ token: { id } }) => id);
-  const _tokenCalls = _tokens.reduce((prev, next) => {
+  const _tokenCalls = _tokenAddresses.reduce((prev, next) => {
     prev.push(
       {
         target: _poolId,
+        interface: _interface,
         function: "getBalance",
-        args: [next.token.id],
+        args: [next],
       },
       {
         target: _poolId,
+        interface: _interface,
         function: "getMinimumBalance",
-        args: [next.token.id],
+        args: [next],
       },
       {
         target: _poolId,
+        interface: _interface,
         function: "getDenormalizedWeight",
-        args: [next.token.id],
+        args: [next],
       }
     );
     return prev;
@@ -41,30 +40,26 @@ export async function poolUpdateMulticall(
   const _poolCalls = [
     {
       target: _poolId,
+      interface: _interface,
       function: "getTotalDenormalizedWeight",
     },
     {
       target: _poolId,
+      interface: _interface,
       function: "totalSupply",
     },
     {
       target: _poolId,
+      interface: _interface,
       function: "getSwapFee",
     },
     ..._tokenCalls,
   ];
-  const result = await multicallViaInterface(
-    _provider,
-    _interface,
-    _poolCalls,
-    false
-  );
-
-  return formatPoolUpdate(result, _tokenAddresses);
+  return _poolCalls;
 }
 
-function formatPoolUpdate(
-  { blockNumber, results }: { blockNumber: string; results: AbiCoderResult[] },
+export function formatPoolUpdateResults(
+  { blockNumber, results }: MultiCallResults,
   tokenAddresses: string[]
 ) {
   const [totalDenorm, totalSupply, swapFee] = results.map(([raw]) =>

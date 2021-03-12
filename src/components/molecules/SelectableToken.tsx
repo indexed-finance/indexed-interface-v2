@@ -1,8 +1,10 @@
-import { FormattedIndexPool } from "features";
 import { List } from "antd";
 import { Token } from "components/atoms";
 
-type Asset = FormattedIndexPool["assets"][0];
+type Asset = {
+  name: string;
+  symbol: string;
+};
 
 interface Props {
   asset: Asset;

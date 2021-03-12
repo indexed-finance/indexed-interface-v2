@@ -1,4 +1,4 @@
-import { AppState, FormattedIndexPool, selectors } from "features";
+import { AppState, selectors } from "features";
 import { Button, InputNumber, List, Space, Typography } from "antd";
 import { CaretDownOutlined } from "@ant-design/icons";
 import { SelectableToken } from "components/molecules";
@@ -12,9 +12,14 @@ export type TokenSelectorValue = {
   token?: string;
 };
 
+type Asset = {
+  name: string;
+  symbol: string;
+};
+
 export interface Props {
   label?: string;
-  pool: FormattedIndexPool;
+  assets: Asset[];
   value?: TokenSelectorValue;
   selectable?: boolean;
   balance?: string;
@@ -23,7 +28,7 @@ export interface Props {
 
 export default function TokenSelector({
   label = "",
-  pool,
+  assets,
   value = {},
   selectable = true,
   onChange,
@@ -151,7 +156,7 @@ export default function TokenSelector({
               openDrawer(
                 <List size="small">
                   <Typography.Title level={3}>Select one</Typography.Title>
-                  {pool.assets.map((asset) => (
+                  {assets.map((asset) => (
                     <SelectableToken
                       key={asset.name}
                       asset={asset}

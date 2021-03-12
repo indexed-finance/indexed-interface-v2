@@ -1,4 +1,4 @@
-import { NormalizedInitialData, NormalizedPool, PoolUpdate } from "ethereum";
+import { NormalizedInitialData, NormalizedPair, NormalizedPool, PairReservesUpdate, PoolUpdate } from "ethereum";
 import { Swap } from "indexed-types";
 import { Swap as Trade } from "uniswap-types";
 import { createAction } from "@reduxjs/toolkit";
@@ -63,4 +63,12 @@ export const receivedInitialStateFromServer = createAction<any>(
  */
 export const receivedStatePatchFromServer = createAction<any>(
   "receivedStatePatchFromServer"
+);
+
+export const uniswapPairsUpdated = createAction<PairReservesUpdate[]>(
+  "uniswapPairsUpdated"
+);
+
+export const uniswapPairsRegistered = createAction<NormalizedPair[]>(
+  "uniswapPairsRegistered"
 );

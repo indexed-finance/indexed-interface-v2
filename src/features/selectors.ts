@@ -1,11 +1,12 @@
 import { AppState } from "./store";
-import { NormalizedPool } from "ethereum";
+import { NormalizedPool, NormalizedToken } from "ethereum";
 import { batcherSelectors } from "./batcher";
 import { categoriesSelectors } from "./categories";
 import { convert } from "helpers";
 import { dailySnapshotsSelectors } from "./dailySnapshots";
 import { formatDistance } from "date-fns";
 import { indexPoolsSelectors } from "./indexPools";
+import { pairsSelectors } from "./pairs";
 import { settingsSelectors } from "./settings";
 import { tokensSelectors } from "./tokens";
 import { userSelectors } from "./user";
@@ -23,6 +24,7 @@ const selectors = {
   ...settingsSelectors,
   ...tokensSelectors,
   ...userSelectors,
+  ...pairsSelectors,
   /**
    *
    * @param state -
@@ -347,6 +349,15 @@ export interface FormattedIndexPool {
     isNegative: boolean;
     weightPercentage: string;
   }>;
+}
+
+export interface FormattedPair {
+  id: string;
+  exists: boolean;
+  token0: NormalizedToken;
+  token1: NormalizedToken;
+  reserves0: string;
+  reserves1: string;
 }
 
 export type Swap = FormattedIndexPool["recent"]["swaps"][0];

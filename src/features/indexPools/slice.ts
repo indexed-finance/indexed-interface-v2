@@ -1,6 +1,7 @@
 import { DEFAULT_DECIMAL_COUNT } from "config";
 import { NormalizedPool, PoolTokenUpdate } from "ethereum";
 import { PoolUnderlyingToken } from "indexed-types";
+import { buildCommonTokenPairs } from "ethereum/utils/uniswap";
 import { categoriesSelectors } from "../categories";
 import { convert } from "helpers";
 import { createEntityAdapter, createSlice } from "@reduxjs/toolkit";
@@ -116,6 +117,10 @@ export const selectors = {
   selectPoolTokenIds: (state: AppState, poolId: string) => {
     const pool = selectors.selectPool(state, poolId);
     return pool?.tokens.ids ?? [];
+  },
+  selectPoolTokenAddresses: (state: AppState, poolId: string) => {
+    const pool = selectors.selectPool(state, poolId);
+    return pool?.tokens.ids.map(t => pool.tokens.entities[t].token.id) ?? [];
   },
   selectPoolTokenSymbols: (state: AppState, poolId: string) => {
     const tokenIds = selectors.selectPoolTokenIds(state, poolId);
