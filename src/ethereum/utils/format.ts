@@ -35,7 +35,6 @@ export function normalizeInitialData(categories: Category[]) {
       const categoryTokenIds = [];
       for (const categoryToken of category.tokens) {
         const { id: tokenId, symbol, name, decimals } = categoryToken;
-
         categoryTokenIds.push(tokenId);
         normalizedTokensForCategory.ids.push(tokenId);
         normalizedTokensForCategory.entities[tokenId] = {
@@ -100,6 +99,17 @@ export function normalizeInitialData(categories: Category[]) {
           totalSupply: "0",
           swapFee: "0",
         };
+
+        if (indexPool.initialized) {
+          prev.tokens.ids.push(indexPool.id.toLowerCase());
+          prev.tokens.entities[indexPool.id.toLowerCase()] = {
+            id: indexPool.id.toLowerCase(),
+            name: indexPool.name,
+            symbol: indexPool.symbol,
+            decimals: 18,
+            coingeckoId: ""
+          }
+        }
       }
 
       prev.tokens.ids = dedupe(
