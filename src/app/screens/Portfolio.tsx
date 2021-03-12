@@ -1,7 +1,8 @@
 import {
+  Badge,
+  Card,
   Col,
   Divider,
-  List,
   Progress,
   Row,
   Space,
@@ -9,16 +10,11 @@ import {
   Typography,
 } from "antd";
 import { Link } from "react-router-dom";
-import {
-  Logo,
-  ProviderRequirementDrawer,
-  ScreenHeader,
-  Token,
-} from "components";
+import { ProviderRequirementDrawer, ScreenHeader, Token } from "components";
 import { Subscreen } from "../subscreens";
 import { useBreakpoints } from "helpers";
 
-const { Item } = List;
+const { Meta } = Card;
 
 export default function Portfolio() {
   const __data = [
@@ -48,70 +44,76 @@ export default function Portfolio() {
   const breakpoints = useBreakpoints();
   const ndx = (
     <Subscreen title="NDX">
-      <Space size="large" split={<Logo withTitle={false} />}>
+      <Space size="large" style={{ width: "100%" }} align="start">
         <Statistic title="Balance" value="2800.00 NDX" />
-        <Statistic title="Earned" value="0.00 NDX" />
+        <Statistic
+          title="Earned"
+          value="0.00 NDX"
+          style={{ textAlign: "right" }}
+        />
       </Space>
     </Subscreen>
   );
   const holdings = (
     <Subscreen title="Holdings">
-      <List
-        size="small"
-        footer={
-          <>
-            <Divider />
-            <div>
-              <Typography.Title
-                type="secondary"
-                level={3}
-                className="spaced-between"
+      <Space wrap={true} size="large">
+        {__data.map((datum) => {
+          const card = (
+            <Link to={datum.link}>
+              <Card
+                key={datum.address}
+                hoverable={true}
+                cover={
+                  <div
+                    className="perfectly-centered"
+                    style={{
+                      paddingTop: "1.5rem",
+                    }}
+                  >
+                    <Progress
+                      type="dashboard"
+                      percent={parseFloat(datum.weight.replace(/%/g, ""))}
+                    />
+                  </div>
+                }
+                actions={[
+                  <Typography.Title type="success" level={2}>
+                    {datum.value}
+                  </Typography.Title>,
+                ]}
               >
-                <span>Total Value</span>
-                <Typography.Text type="success">$400.00</Typography.Text>
-              </Typography.Title>
-            </div>
-          </>
-        }
-      >
-        {__data.map((entry) => (
-          <>
-            <Item key={entry.symbol}>
-              <Space direction="vertical" size="large">
-                <Typography.Title level={4}>
-                  <Token
-                    size="small"
-                    address={entry.address}
-                    name={entry.symbol}
-                    image={entry.image}
-                  />
-                  {entry.symbol}
-                </Typography.Title>
-                <Typography.Title level={5}>
-                  <Link to={entry.link}>{entry.name}</Link>
-                </Typography.Title>
-              </Space>
+                <Meta
+                  avatar={
+                    <>
+                      <Token
+                        size="small"
+                        address={datum.address}
+                        name={datum.symbol}
+                        image={datum.image}
+                      />
+                      <div>{datum.balance}</div>
+                    </>
+                  }
+                  title={<>{datum.symbol}</>}
+                  description={datum.name}
+                />
+              </Card>
+            </Link>
+          );
 
-              <Space direction="vertical">
-                <Typography.Text>
-                  <em>
-                    Staking {entry.staking} {entry.symbol}
-                  </em>
-                </Typography.Text>
-                <Typography.Title level={3}>
-                  {entry.balance} {entry.symbol}
-                  <br />
-                  {entry.value}
-                </Typography.Title>
-              </Space>
-              <Progress
-                type="dashboard"
-                percent={parseFloat(entry.weight.replace(/%/g, ""))}
-              />
-            </Item>
-          </>
-        ))}
-      </List>
+          return datum.staking ? (
+            <Badge.Ribbon text={`Staking ${datum.staking}`} color="blue">
+              {card}
+            </Badge.Ribbon>
+          ) : (
+            card
+          );
+        })}
+      </Space>
+      <Divider />
+      <Typography.Title style={{ textAlign: "right" }}>
+        Total Value: <Typography.Text type="success">$400.00</Typography.Text>
+      </Typography.Title>
     </Subscreen>
   );
 
@@ -119,6 +121,12 @@ export default function Portfolio() {
   const mobileSized = (
     <Row gutter={5}>
       <Col span={24}>{ndx}</Col>
+      <Col span={24}>{holdings}</Col>
+    </Row>
+  );
+  const smallSized = (
+    <Row gutter={10}>
+      <Col span={10}>{ndx}</Col>
       <Col span={24}>{holdings}</Col>
     </Row>
   );
@@ -132,16 +140,8 @@ export default function Portfolio() {
       <ScreenHeader title="Portfolio" />
       {(() => {
         switch (true) {
-          // case breakpoints.xxl:
-          //   return desktopSized;
-          // case breakpoints.xl:
-          //   return tabletSized;
-          // case breakpoints.lg:
-          //   return tabletSized;
-          // case breakpoints.md:
-          //   return tabletSized;
           case breakpoints.sm:
-            return mobileSized;
+            return smallSized;
           case breakpoints.xs:
             return mobileSized;
         }

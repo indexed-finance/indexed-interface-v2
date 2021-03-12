@@ -54,6 +54,10 @@
     display: none;
   }
 }
+
+.ant-space-item {
+  flex: 1;
+}
 // -- Global
 body {
   * {
@@ -67,13 +71,13 @@ body {
 }
 
 .flex-center {
-  display: flex;
-  align-items: center;
+  display: flex !important;
+  align-items: center !important;
 }
 
 .perfectly-centered {
   &:extend(.flex-center);
-  justify-content: center;
+  justify-content: center !important;
 }
 
 .spaced-between {
@@ -153,6 +157,7 @@ body {
     &:extend(.effect8);
 
     max-width: 1240px;
+    min-height: 100vh;
     margin: 8rem auto 0 auto;
     padding: @spacing-large;
     background: @page-background;
@@ -181,7 +186,7 @@ body {
 }
 
 .Token {
-  &:extend(.circular, .size-32, .medium-margin-right);
+  &:extend(.circular, .size-32, .small-margin-right);
 
   animation: blinking 2s infinite ease-in-out;
 
