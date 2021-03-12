@@ -1,6 +1,6 @@
-import { Area, Button, ScreenHeader } from "components";
 import {
   Avatar,
+  Button,
   Col,
   Divider,
   List,
@@ -11,10 +11,10 @@ import {
 } from "antd";
 import { FaTractor } from "react-icons/fa";
 import { Link } from "react-router-dom";
+import { ScreenHeader } from "components";
 import { Subscreen } from "../subscreens";
 import { useBreakpoints } from "helpers";
 import React from "react";
-import styled from "styled-components";
 
 export default function Stake() {
   const stakeable = {
@@ -31,17 +31,17 @@ export default function Stake() {
   const __data = [stakeable, stakeable, stakeable];
   const breakpoints = useBreakpoints();
   const area = (
-    <S.Area direction="vertical">
+    <>
       <Typography.Title>Liquidity mining</Typography.Title>
       <Typography.Paragraph>
         Stake index tokens or their associated Uniswap liquidity tokens to earn
         NDX, the governance token for Indexed Finance.
       </Typography.Paragraph>
-    </S.Area>
+    </>
   );
   const pools = (
-    <Subscreen icon={null} title="Available Pools">
-      <S.List>
+    <Subscreen title="Available Pools">
+      <List>
         {__data.map((datum) => (
           <React.Fragment key={datum.id}>
             <List.Item
@@ -50,9 +50,9 @@ export default function Stake() {
                   <Statistic title="APY" value={datum.apy} />
                   <Space direction="vertical">
                     <Statistic title="Staked" value={datum.staked} />
-                    <S.Button type="primary" icon={<FaTractor />}>
+                    <Button type="primary" icon={<FaTractor />}>
                       Stake pool
-                    </S.Button>
+                    </Button>
                   </Space>
                 </Space>
               }
@@ -60,7 +60,7 @@ export default function Stake() {
               <List.Item.Meta
                 title={
                   <Link to={`/pools/${datum.slug}`}>
-                    <S.Avatar src={datum.image} />
+                    <Avatar src={datum.image} />
                     {datum.name} [{datum.symbol}]
                   </Link>
                 }
@@ -73,7 +73,7 @@ export default function Stake() {
             </List.Item>
           </React.Fragment>
         ))}
-      </S.List>
+      </List>
     </Subscreen>
   );
 
@@ -109,34 +109,3 @@ export default function Stake() {
     </>
   );
 }
-
-const S = {
-  List: styled(List)`
-    .ant-space {
-      flex: 1;
-      align-items: flex-start;
-    }
-    .ant-list-item {
-      align-items: flex-start;
-    }
-  `,
-  Button: styled(Button)`
-    ${(props) => props.theme.snippets.fancy};
-
-    svg {
-      margin-right: ${(props) => props.theme.spacing.small};
-    }
-  `,
-  Description: styled(Typography.Paragraph)`
-    padding: ${(props) => props.theme.spacing.medium};
-  `,
-  Divider: styled(Divider)`
-    ${(props) => props.theme.snippets.fancy};
-  `,
-  Area: styled(Area)`
-    margin-bottom: ${(props) => props.theme.spacing.large};
-  `,
-  Avatar: styled(Avatar)`
-    margin-right: ${(props) => props.theme.spacing.small};
-  `,
-};

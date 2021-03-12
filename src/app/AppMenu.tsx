@@ -10,10 +10,8 @@ import { SOCIAL_MEDIA } from "config";
 import { selectors } from "features";
 import { useBreakpoints } from "helpers";
 import { useSelector } from "react-redux";
-import React, { useEffect } from "react";
 import noop from "lodash.noop";
 import routes from "./routes";
-import styled from "styled-components";
 
 interface Props {
   onItemClick?(): void;
@@ -30,26 +28,38 @@ export default function AppMenu({ onItemClick = noop, ...rest }: Props) {
   const breakpoints = useBreakpoints();
   const isMobile = !breakpoints.md;
 
-  // Effect:
-  // In 'xs' and 'sm' modes, the menu is only visible when overlaying the body, so scrolling is confusing.
-  useScrollPrevention(isMobile);
-
   return (
     <>
-      <S.Menu
-        className="app-menu"
+      <Divider className="no-margin-bottom" />
+      <Menu
+        className="AppMenu"
         mode="inline"
         defaultOpenKeys={["Social"]}
         selectable={false}
         {...rest}
       >
-        <S.TopItem>
-          <S.Aligned>
-            <ServerConnection showText={true} />
-            <ModeSwitch />
-            {isMobile && <LanguageSelector />}
-          </S.Aligned>
-        </S.TopItem>
+        {isMobile ? (
+          <>
+            <Item>
+              <div className="perfectly-centered">
+                <ServerConnection showText={true} />
+              </div>
+            </Item>
+            <Item>
+              <div className="spaced-between">
+                <ModeSwitch />
+                <LanguageSelector />
+              </div>
+            </Item>
+          </>
+        ) : (
+          <Item>
+            <div className="spaced-between">
+              <ServerConnection showText={true} />
+              <ModeSwitch />
+            </div>
+          </Item>
+        )}
         {routes
           .filter((route) => route.sider)
           .map((route) => {
@@ -60,14 +70,9 @@ export default function AppMenu({ onItemClick = noop, ...rest }: Props) {
               return (
                 <SubMenu
                   key={route.path}
-                  title={
-                    <Link to={route.path} onClick={onItemClick}>
-                      <S.Title>{route.sider}</S.Title>
-                    </Link>
-                  }
+                  title={<Link to={route.path}>{route.sider}</Link>}
                 >
                   {models.map((model) => {
-                    const isCategory = route.model === "categories";
                     const isIndexPool = route.model === "indexPools";
                     const image = isIndexPool
                       ? indexPoolsLookup[model.id]
@@ -81,14 +86,14 @@ export default function AppMenu({ onItemClick = noop, ...rest }: Props) {
                           onItemClick();
                         }}
                       >
-                        <S.ItemInner isCategory={isCategory}>
-                          <S.Token
+                        <div>
+                          <Token
                             name={model.name}
                             image={image}
                             address={model.id}
                           />
-                          <S.Uppercase>{model.name}</S.Uppercase>
-                        </S.ItemInner>
+                          {model.name}
+                        </div>
                       </Item>
                     );
                   })}
@@ -96,148 +101,31 @@ export default function AppMenu({ onItemClick = noop, ...rest }: Props) {
               );
             } else {
               return (
-                <S.Item key={route.path} onClick={onItemClick}>
+                <Item key={route.path} onClick={onItemClick}>
                   {route.isExternalLink ? (
                     route.sider
                   ) : (
-                    <S.SingleLink to={route.path}>
+                    <Link to={route.path}>
                       <span>{route.sider}</span>
                       {route.icon ?? null}
-                    </S.SingleLink>
+                    </Link>
                   )}
-                </S.Item>
+                </Item>
               );
             }
           })}
         {/* Static */}
-        <SubMenu key="Social" title={<S.Title>Social</S.Title>}>
+        <SubMenu key="Social" title="Social">
           {SOCIAL_MEDIA.map((site) => (
             <Menu.Item key={site.name}>
-              <S.Uppercase
-                href={site.link}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <S.Token name={site.name} image={site.image} />
+              <a href={site.link} target="_blank" rel="noopener noreferrer">
+                <Token name={site.name} image={site.image} />
                 <span className="social-link">{site.name}</span>
-              </S.Uppercase>
+              </a>
             </Menu.Item>
           ))}
         </SubMenu>
-      </S.Menu>
+      </Menu>
     </>
   );
 }
-
-const S = {
-  Menu: styled(Menu)`
-    max-width: 400px !important;
-    height: calc(100% - 65px);
-    max-width: 100vw;
-    overflow: hidden;
-  `,
-  Item: styled(Item)`
-    ${(props) => props.theme.snippets.fancy};
-  `,
-  ItemInner: styled.div<{ isCategory?: boolean }>`
-    ${(props) => props.theme.snippets.spacedBetween};
-
-    :hover {
-      [data-category="true"] {
-        opacity: 0.6;
-        color: #ccccff;
-      }
-    }
-  `,
-  Token: styled(Token)`
-    margin-right: ${(props) => props.theme.spacing.medium};
-  `,
-  Title: styled.span`
-    ${(props) => props.theme.snippets.fancy};
-  `,
-  Uppercase: styled.a`
-    ${(props) => props.theme.snippets.fancy};
-    font-size: ${(props) => props.theme.fontSizes.tiny};
-    text-align: right;
-  `,
-  PerfectlyCentered: styled.div`
-    ${(props) => props.theme.snippets.perfectlyCentered};
-    padding-top: 6px;
-    padding-bottom: 6px;
-  `,
-  SingleLink: styled(Link)`
-    ${(props) => props.theme.snippets.spacedBetween};
-  `,
-  Divider: styled(Divider)`
-    margin: 0;
-  `,
-  TopItem: styled(Item)`
-    margin-bottom: 0 !important;
-  `,
-  Aligned: styled.div`
-    ${(props) => props.theme.snippets.spacedBetween};
-  `,
-};
-
-// #region Helpers
-// Code adapted from https://stackoverflow.com/questions/4770025/how-to-disable-scrolling-temporarily
-function useScrollPrevention(shouldPreventScroll: boolean) {
-  useEffect(() => {
-    if (shouldPreventScroll) {
-      // modern Chrome requires { passive: false } when adding event
-      let supportsPassive = false;
-      try {
-        (window as any).addEventListener(
-          "test",
-          null,
-          Object.defineProperty({}, "passive", {
-            get: function () {
-              supportsPassive = true;
-            },
-          })
-        );
-      } catch {}
-
-      // left: 37, up: 38, right: 39, down: 40,
-      // spacebar: 32, pageup: 33, pagedown: 34, end: 35, home: 36
-      const keys: Record<number, number> = { 37: 1, 38: 1, 39: 1, 40: 1 };
-      const preventDefault = (event: Event) => event.preventDefault();
-      const preventDefaultForScrollKeys = (
-        event: Event & { keyCode: number }
-      ) => {
-        if (keys[event.keyCode]) {
-          preventDefault(event);
-          return false;
-        }
-      };
-      const wheelOptions = supportsPassive ? { passive: false } : false;
-      const wheelEvent =
-        "onwheel" in document.createElement("div") ? "wheel" : "mousewheel";
-
-      window.addEventListener("DOMMouseScroll", preventDefault, false); // older FF
-      window.addEventListener(wheelEvent, preventDefault, wheelOptions); // modern desktop
-      window.addEventListener("touchmove", preventDefault, wheelOptions); // mobile
-      window.addEventListener("keydown", preventDefaultForScrollKeys, false);
-
-      return () => {
-        window.removeEventListener("DOMMouseScroll", preventDefault, false);
-        window.removeEventListener(
-          wheelEvent,
-          preventDefault,
-          wheelOptions as any
-        );
-        window.removeEventListener(
-          "touchmove",
-          preventDefault,
-          wheelOptions as any
-        );
-        window.removeEventListener(
-          "keydown",
-          preventDefaultForScrollKeys,
-          false
-        );
-      };
-    }
-  }, [shouldPreventScroll]);
-}
-// #endregion

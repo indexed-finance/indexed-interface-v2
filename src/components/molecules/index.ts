@@ -15,6 +15,5 @@ export { default as ScreenHeader } from "./ScreenHeader";
 export { default as SelectableToken } from "./SelectableToken";
 export { default as ServerConnection } from "./ServerConnection";
 export { default as TokenExchangeRate } from "./TokenExchangeRate";
-export { default as WalletConnectorButton } from "./WalletConnectorButton";
+export { default as WalletConnector } from "./WalletConnector";
 export { default as LineSeriesChart } from "./LineSeriesChart";
-

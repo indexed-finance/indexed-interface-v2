@@ -1,6 +1,5 @@
 import Layout from "../Layout";
 import MintForm from "./MintForm";
-import React from "react";
 
 export const Basic = () => (
   <Layout>

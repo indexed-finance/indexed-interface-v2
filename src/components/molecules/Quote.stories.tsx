@@ -1,5 +1,4 @@
 import Quote, { Props } from "./Quote";
-import React from "react";
 
 export const Basic = (args: Props) => <Quote {...args} />;
 

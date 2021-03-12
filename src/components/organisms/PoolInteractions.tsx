@@ -2,8 +2,7 @@ import { AiOutlineSwap } from "react-icons/ai";
 import { FaCoins, FaFireAlt, FaHammer } from "react-icons/fa";
 import { SwapInteraction, TradeInteraction } from "./interactions";
 import { Tabs } from "antd";
-import React, { useState } from "react";
-import styled from "styled-components";
+import { useState } from "react";
 import type { FormattedIndexPool } from "features";
 
 export type PoolInteraction = "burn" | "mint" | "swap" | "trade";
@@ -17,7 +16,7 @@ export default function PoolInteractions({ pool, initial = "swap" }: Props) {
   const [interaction, setInteraction] = useState<PoolInteraction>(initial);
 
   return (
-    <S.Tabs
+    <Tabs
       centered={true}
       activeKey={interaction}
       onChange={(nextInteraction) => {
@@ -29,9 +28,9 @@ export default function PoolInteractions({ pool, initial = "swap" }: Props) {
         <>
           <Tabs.TabPane
             tab={
-              <S.TabWrapper>
+              <div>
                 <FaCoins /> <span>Trade</span>
-              </S.TabWrapper>
+              </div>
             }
             key="trade"
           >
@@ -39,9 +38,9 @@ export default function PoolInteractions({ pool, initial = "swap" }: Props) {
           </Tabs.TabPane>
           <Tabs.TabPane
             tab={
-              <S.TabWrapper>
+              <div>
                 <FaHammer /> <span>Mint</span>
-              </S.TabWrapper>
+              </div>
             }
             key="mint"
           >
@@ -49,9 +48,9 @@ export default function PoolInteractions({ pool, initial = "swap" }: Props) {
           </Tabs.TabPane>
           <Tabs.TabPane
             tab={
-              <S.TabWrapper>
+              <div>
                 <FaFireAlt /> <span>Burn</span>
-              </S.TabWrapper>
+              </div>
             }
             key="burn"
           >
@@ -59,9 +58,9 @@ export default function PoolInteractions({ pool, initial = "swap" }: Props) {
           </Tabs.TabPane>
           <Tabs.TabPane
             tab={
-              <S.TabWrapper>
+              <div>
                 <AiOutlineSwap /> <span>Swap</span>
-              </S.TabWrapper>
+              </div>
             }
             key="swap"
           >
@@ -69,30 +68,6 @@ export default function PoolInteractions({ pool, initial = "swap" }: Props) {
           </Tabs.TabPane>
         </>
       )}
-    </S.Tabs>
+    </Tabs>
   );
 }
-
-const S = {
-  Tabs: styled(Tabs)`
-    [role="tab"] {
-      font-size: 12px;
-    }
-
-    padding-top: 0;
-    padding-left: 24px;
-    padding-right: 24px;
-    margin-bottom: 48px;
-
-    .ant-tabs-tab:nth-child(4) {
-      margin-right: 0;
-    }
-  `,
-  TabWrapper: styled.div`
-    ${(props) => props.theme.snippets.perfectlyAligned};
-
-    span {
-      margin-left: ${(props) => props.theme.spacing.small};
-    }
-  `,
-};

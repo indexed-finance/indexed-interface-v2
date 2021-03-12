@@ -11,7 +11,6 @@ import { useSelector } from "react-redux";
 import { useUniswapTradingPairs } from "ethereum/helpers";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import TokenSelector from "../TokenSelector";
-import styled, { keyframes } from "styled-components";
 
 interface Props {
   pool: null | FormattedIndexPool;
@@ -155,7 +154,7 @@ export default function TradeInteraction({ pool }: Props) {
   }, [assets, form]);
 
   return (
-    <S.Form
+    <Form
       form={form}
       initialValues={INITIAL_STATE}
       onValuesChange={(changedValues) => {
@@ -168,16 +167,16 @@ export default function TradeInteraction({ pool }: Props) {
         }
       }}
     >
-      <S.Title>
+      <Typography.Title>
         <span>Trade</span>
         {baseline && comparison && (
           <span>
             <Token name="Baseline" image={baseline} />
-            <S.Swap />
+            <AiOutlineArrowRight />
             <Token name="Comparison" image={comparison} />
           </span>
         )}
-      </S.Title>
+      </Typography.Title>
       <Item name="from" rules={[{ validator: checkAmount }]}>
         {pool && <TokenSelector label="From" assets={fromOptions as any} />}
       </Item>
@@ -185,50 +184,11 @@ export default function TradeInteraction({ pool }: Props) {
       <Item name="to" rules={[{ validator: checkAmount }]}>
         {pool && <TokenSelector label="To" assets={toOptions as any} />}
       </Item>
-      <S.LastItem>
+      <Item>
         <TokenExchangeRate
           { ...{ baseline, comparison, fee, rate: price } }
         />
-      </S.LastItem>
-    </S.Form>
+      </Item>
+    </Form>
   );
 }
-
-const blinking = keyframes`
-  0% {
-    opacity: 0.3;
-  }
-  50% {
-    opacity: 0.7;
-  }
-  100% {
-    opacity: 0.3;
-  }
-`;
-
-const S = {
-  Form: styled(Form)`
-    img {
-      ${(props) => props.theme.snippets.size40};
-      opacity: 0.7;
-      border-radius: 50%;
-      animation-name: ${blinking};
-      animation-duration: 2s;
-      animation-iteration-count: infinite;
-      border: 1px solid rgba(255, 255, 255, 0.4);
-    }
-  `,
-  Title: styled(Typography.Title)`
-    ${(props) => props.theme.snippets.spacedBetween};
-    position: relative;
-    font-weight: 200 !important;
-  `,
-  Swap: styled(AiOutlineArrowRight)`
-    position: absolute;
-    top: 9px;
-    right: 21px;
-  `,
-  LastItem: styled(Form.Item)`
-    margin-bottom: 0;
-  `,
-};

@@ -1,14 +1,14 @@
 import { Asset } from "features";
 import { CgDollar } from "react-icons/cg";
 import { Token } from "components/atoms";
+import { Typography } from "antd";
 import { actions, selectors } from "features";
 import { useDispatch } from "react-redux";
+import { useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import ColorThief from "colorthief";
 import Quote from "./Quote";
-import React, { useEffect, useRef } from "react";
 import flags from "feature-flags";
-import styled from "styled-components";
 
 export interface Props {
   token: Asset;
@@ -90,23 +90,23 @@ export default function RankedToken({ token, rank }: Props) {
   }, [dispatch, colorCache, token.id, token.symbol]);
 
   return (
-    <S.Wrapper>
-      <S.Rank>
+    <div>
+      <Typography.Title level={3}>
         <span>#</span>
         {rank}
-      </S.Rank>
-      <S.RankedToken>
-        <T.Top>
-          <S.Left>
-            <S.Token
+      </Typography.Title>
+      <div>
+        <div>
+          <div>
+            <Token
               address={token.id}
               image={token.symbol}
               name={token.symbol}
             />
-            <S.Title>
+            <div>
               <h2>{token.symbol}</h2>
               <h3>{token.name}</h3>
-            </S.Title>
+            </div>
             <Quote
               price={token.price}
               netChange={token.netChange}
@@ -114,108 +114,27 @@ export default function RankedToken({ token, rank }: Props) {
               isNegative={token.isNegative}
               kind="small"
             />
-          </S.Left>
-          <S.Right>
-            <S.Weight color="blue">{token.weightPercentage}</S.Weight>
-          </S.Right>
-        </T.Top>
-        <T.Bottom>
-          <S.Balance>
+          </div>
+          <div>
+            <div>{token.weightPercentage}</div>
+          </div>
+        </div>
+        <div>
+          <div>
             <CgDollar />
             <div>{token.balanceUsd}</div>
-          </S.Balance>
-          <S.Balance>
+          </div>
+          <div>
             <div>{token.balance}</div>
-            <S.BalanceToken
+            <Token
               size="small"
               image={token.symbol}
               name={token.symbol}
               data-token={token.symbol}
             />
-          </S.Balance>
-        </T.Bottom>
-      </S.RankedToken>
-    </S.Wrapper>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
-
-const T = {
-  Top: styled.div`
-    ${(props) => props.theme.snippets.spacedBetween};
-    width: 100%;
-  `,
-  Bottom: styled.div`
-    ${(props) => props.theme.snippets.spacedBetween};
-    width: 100%;
-  `,
-};
-
-const S = {
-  Wrapper: styled.div`
-    display: flex;
-    align-items: flex-start;
-    width: 100%;
-  `,
-  Rank: styled.h1`
-    margin: 0;
-    font-size: 30px;
-    margin-right: ${(props) => props.theme.spacing.medium};
-
-    span {
-      font-size: ${(props) => props.theme.fontSizes.medium};
-    }
-  `,
-  RankedToken: styled.div`
-    ${(props) => props.theme.snippets.spacedBetween};
-    flex-direction: column;
-    align-items: flex-start;
-    flex: 1;
-  `,
-  Title: styled.div`
-    ${(props) => props.theme.snippets.perfectlyAligned};
-    h2,
-    h3 {
-      margin: 0;
-      ${(props) => props.theme.snippets.fancy};
-    }
-
-    h2 {
-      font-size: ${(props) => props.theme.fontSizes.medium};
-      margin-right: ${(props) => props.theme.spacing.small};
-    }
-    h3 {
-      font-size: ${(props) => props.theme.fontSizes.tiny};
-    }
-  `,
-  Balance: styled.div`
-    ${(props) => props.theme.snippets.perfectlyAligned};
-    font-size: ${(props) => props.theme.fontSizes.medium};
-  `,
-  Token: styled(Token)`
-    position: absolute;
-    top: 0;
-    left: -55px;
-    ${(props) => props.theme.snippets.imageFadedLeftRight};
-    ${(props) => props.theme.snippets.size100};
-  `,
-  BalanceToken: styled(Token)`
-    margin-left: ${(props) => props.theme.spacing.tiny};
-  `,
-  Weight: styled.div`
-    font-size: ${(props) => props.theme.fontSizes.medium};
-  `,
-  Left: styled.div`
-    display: flex;
-    flex-direction: column;
-    margin-right: ${(props) => props.theme.spacing.large};
-  `,
-  Right: styled.div`
-    text-align: right;
-    flex: 1;
-  `,
-  Quote: styled(Quote)`
-    * {
-      font-size: ${(props) => props.theme.fontSizes.small} !important;
-    }
-  `,
-};

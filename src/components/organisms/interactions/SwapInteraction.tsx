@@ -1,20 +1,19 @@
 import { AiOutlineArrowRight } from "react-icons/ai";
 import { AppState, FormattedIndexPool, selectors, signer } from "features";
 import { Flipper, Token } from "components/atoms";
-import { Form, Typography } from "antd";
+import { Form, Space, Typography } from "antd";
 import { TokenExchangeRate } from "components/molecules";
 import { actions } from "features";
 import { convert } from "helpers";
 import { helpers } from "ethereum";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   useHistoryChangeCallback,
   useTokenApproval,
   useTokenRandomizer,
 } from "./common";
-import React, { useCallback, useMemo, useRef, useState } from "react";
 import TokenSelector from "../TokenSelector";
-import styled, { keyframes } from "styled-components";
 
 interface Props {
   pool: null | FormattedIndexPool;
@@ -292,7 +291,7 @@ export default function SwapInteraction({ pool }: Props) {
   useHistoryChangeCallback(() => form.resetFields());
 
   return (
-    <S.Form
+    <Form
       form={form}
       name="swap"
       size="large"
@@ -320,16 +319,21 @@ export default function SwapInteraction({ pool }: Props) {
         console.log("Submission failed. Error was: ", error)
       }
     >
-      <S.Title>
-        <span>Swap</span>
+      <Space align="center" className="spaced-between">
+        <Typography.Title className="no-margin-bottom">Swap</Typography.Title>
         {baseline && comparison && (
-          <span>
+          <div style={{ position: "relative", top: 0, right: 0 }}>
             <Token name="Baseline" image={baseline} />
-            <S.Swap />
+            <AiOutlineArrowRight
+              style={{
+                position: "absolute",
+                fontSize: "32px",
+              }}
+            />
             <Token name="Comparison" image={comparison} />
-          </span>
+          </div>
         )}
-      </S.Title>
+      </Space>
       <Item name="from" rules={[{ validator: checkAmount }]}>
         {pool && <TokenSelector label="From" assets={pool.assets} />}
       </Item>
@@ -339,54 +343,15 @@ export default function SwapInteraction({ pool }: Props) {
       </Item>
       {previousFormValues.current.from.token &&
         previousFormValues.current.to.token && (
-          <S.Item>
+          <div>
             <TokenExchangeRate
               baseline={baseline}
               comparison={comparison}
               fee={formattedSwapFee}
               rate={price.toString()}
             />
-          </S.Item>
+          </div>
         )}
-    </S.Form>
+    </Form>
   );
 }
-
-const blinking = keyframes`
-  0% {
-    opacity: 0.3;
-  }
-  50% {
-    opacity: 0.7;
-  }
-  100% {
-    opacity: 0.3;
-  }
-`;
-
-const S = {
-  Swap: styled(AiOutlineArrowRight)`
-    position: absolute;
-    top: 9px;
-    right: 21px;
-  `,
-  Form: styled(Form)`
-    img {
-      ${(props) => props.theme.snippets.size40};
-      opacity: 0.7;
-      border-radius: 50%;
-      animation-name: ${blinking};
-      animation-duration: 2s;
-      animation-iteration-count: infinite;
-      border: 1px solid rgba(255, 255, 255, 0.4);
-    }
-  `,
-  Item: styled.div`
-    ${(props) => props.theme.snippets.spacedBetween};
-  `,
-  Title: styled(Typography.Title)`
-    ${(props) => props.theme.snippets.spacedBetween};
-    position: relative;
-    font-weight: 200 !important;
-  `,
-};

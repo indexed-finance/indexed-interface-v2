@@ -1,11 +1,11 @@
 import { AppState, selectors } from "features";
-import { Button, Radio } from "components/atoms";
-import { Card, Menu, Switch } from "antd";
-import { LineSeriesChart } from "components/molecules";
-import { SnapshotKey } from "features/dailySnapshots/slice";
+import { Card, Menu, Radio } from "antd";
+import { SnapshotKey } from "features";
+import { useCallback, useState } from "react";
 import { useSelector } from "react-redux";
-import React, { useCallback, useState } from "react";
-import styled from "styled-components";
+import LineSeriesChart from "./LineSeriesChart";
+
+type Timeframe = "Day" | "Week";
 
 export interface Props {
   poolId: string;
@@ -15,7 +15,6 @@ export interface Props {
 export default function ChartCard({ poolId, expanded = false }: Props) {
   const [key, setKey] = useState<SnapshotKey>("value");
   const [timeframe, setTimeframe] = useState<Timeframe>("Day");
-
   const toggleTimeframe = useCallback(
     () =>
       setTimeframe((prevTimeframe) =>
@@ -24,68 +23,39 @@ export default function ChartCard({ poolId, expanded = false }: Props) {
     []
   );
 
-  const data = useSelector((state: AppState) => selectors.selectTimeSeriesSnapshotData(state, poolId, timeframe, key));
+  const data = useSelector((state: AppState) =>
+    selectors.selectTimeSeriesSnapshotData(state, poolId, timeframe, key)
+  );
 
   return (
-    <S.ChartCard
+    <Card
       actions={[
-        <Radio.Group value={key} onChange={(e) => setKey(e.target.value as SnapshotKey)}>
+        <Radio.Group
+          value={key}
+          onChange={(e) => setKey(e.target.value as SnapshotKey)}
+        >
           <Radio value={"value"}>Value</Radio>
           <Radio value={"totalSupply"}>Supply</Radio>
           <Radio value={"totalValueLockedUSD"}>Total Value Locked</Radio>
           <Radio value={"totalSwapVolumeUSD"}>Total Swap Volume</Radio>
           <Radio value={"feesTotalUSD"}>Total Swap Fees</Radio>
-        </Radio.Group>
+        </Radio.Group>,
       ]}
       extra={
-        <S.Menu mode="horizontal" selectedKeys={[timeframe]}>
+        <Menu mode="horizontal" selectedKeys={[timeframe]}>
           {["Day", "Week"].map((_timeframe) => (
-            <S.MenuItem
+            <Menu.Item
               key={_timeframe}
               active={_timeframe === timeframe}
               onClick={toggleTimeframe}
             >
               {_timeframe}
-            </S.MenuItem>
+            </Menu.Item>
           ))}
-        </S.Menu>
+        </Menu>
       }
     >
       <LineSeriesChart data={data} expanded={expanded} />
-    </S.ChartCard>
+    </Card>
   );
 }
-
-const S = {
-  ChartCard: styled(Card)`
-    position: relative;
-    margin-bottom: ${(props) => props.theme.spacing.medium};
-
-    .ant-card-extra {
-      width: 100%;
-    }
-  `,
-  Button: styled(Button)`
-    position: absolute;
-    right: ${(props) => props.theme.spacing.small};
-    bottom: ${(props) => props.theme.spacing.small};
-    ${(props) => props.theme.snippets.perfectlyCentered};
-  `,
-  Menu: styled(Menu)`
-    display: flex;
-  `,
-  MenuItem: styled(Menu.Item)`
-    flex: 1;
-    text-align: center;
-  `,
-  Switch: styled(Switch)`
-    margin-bottom: ${(props) => props.theme.spacing.medium};
-  `,
-  Switcher: styled.div`
-    ${(props) => props.theme.snippets.perfectlyCentered};
-    flex-direction: column;
-    text-align: center;
-  `,
-};
-
-type Timeframe = "Day" | "Week";

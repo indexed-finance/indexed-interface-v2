@@ -1,11 +1,10 @@
 import { Dropdown, Menu, notification } from "antd";
 import { actions } from "features";
 import { useBreakpoints } from "helpers";
+import { useCallback, useEffect, useRef } from "react";
 import { useDispatch } from "react-redux";
-import React, { useEffect, useRef } from "react";
 import ReactDOM from "react-dom";
 import jazzicon from "@metamask/jazzicon";
-import styled from "styled-components";
 
 interface Props {
   address: string;
@@ -14,7 +13,7 @@ interface Props {
 export default function JazzIcon({ address }: Props) {
   const dispatch = useDispatch();
   const blockie = useRef<null | HTMLSpanElement>(null);
-  const handleDisconnect = React.useCallback(() => {
+  const handleDisconnect = useCallback(() => {
     dispatch(actions.userDisconnected());
 
     notification.info({
@@ -42,8 +41,10 @@ export default function JazzIcon({ address }: Props) {
     if (_blockie) {
       const parsedAddress = parseInt(address.slice(2, 10), 16);
 
-      element = jazzicon(25, parsedAddress);
+      element = jazzicon(35, parsedAddress);
       element.style.border = "2px solid #ccccff";
+      element.style.position = "relative";
+      element.style.top = "12px";
 
       _blockie.appendChild(element);
     }
@@ -82,21 +83,8 @@ export default function JazzIcon({ address }: Props) {
           </Menu>
         }
       >
-        <S.Blockie ref={blockie} />
+        <span ref={blockie} />
       </Dropdown>
     </a>
   );
 }
-
-const S = {
-  JazzIcon: styled.div`
-    position: relative;
-  `,
-  Blockie: styled.span`
-    /* position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%; */
-  `,
-};

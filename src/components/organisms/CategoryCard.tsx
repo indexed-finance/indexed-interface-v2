@@ -1,8 +1,7 @@
 import { Card, List } from "antd";
 import { Link, useHistory } from "react-router-dom";
 import { Token } from "components/atoms";
-import React from "react";
-import styled, { css } from "styled-components";
+
 import type { Token as TokenType } from "indexed-types";
 
 export interface Props {
@@ -38,12 +37,12 @@ export default function CategoryCard({
   const history = useHistory();
 
   return (
-    <S.Card
+    <Card
       key={id}
       hoverable={true}
       title={name}
       actions={[
-        <S.TokenImageWrapper key="1">
+        <div key="1">
           {Object.values(tokens.entities).map((token) => (
             <Token
               key={token.symbol}
@@ -52,92 +51,29 @@ export default function CategoryCard({
               image={token.symbol}
             />
           ))}
-        </S.TokenImageWrapper>,
+        </div>,
       ]}
     >
-      <S.Content>
+      <div>
         <div onClick={() => history.push(`/categories/${slug}`)}>
-          <S.Meta
+          <Card.Meta
             description={
               <>
                 {brief}
-                <S.List header={<S.FirstListItem>Index Pools</S.FirstListItem>}>
+                <List header="Index Pools">
                   {indexPools.map((indexPool) => (
-                    <S.IndexPoolEntry key={indexPool.name}>
+                    <List.Item key={indexPool.name}>
                       <Link to={`/pools/${indexPool.slug}`}>
                         {indexPool.name} [{indexPool.symbol}]
                       </Link>
-                    </S.IndexPoolEntry>
+                    </List.Item>
                   ))}
-                </S.List>
+                </List>
               </>
             }
           />
         </div>
-      </S.Content>
-    </S.Card>
+      </div>
+    </Card>
   );
 }
-
-const S = {
-  Name: styled.span`
-    font-size: ${(props) => props.theme.fontSizes.huge};
-  `,
-  Card: styled(Card)`
-    .ant-card-head-title {
-      ${(props) => props.theme.snippets.fancy};
-      font-size: ${(props) => props.theme.fontSizes.large};
-    }
-    .ant-card-body {
-      display: flex;
-      align-items: center;
-
-      ${(props) =>
-        !props.theme.isMobile &&
-        css`
-          max-width: 375px;
-        `}
-    }
-    .ant-card-meta-description {
-      font-size: ${(props) => props.theme.fontSizes.large};
-    }
-  `,
-  Title: styled.h1`
-    align-items: center;
-    text-align: right;
-    ${(props) => props.theme.snippets.perfectlyAligned};
-  `,
-  Content: styled.div`
-    display: flex;
-    align-items: flex-start;
-    flex: 1;
-  `,
-  Token: styled(Token)`
-    flex: 1;
-    margin: ${(props) => props.theme.spacing.medium} 0;
-    margin-right: ${(props) => props.theme.spacing.huge};
-  `,
-  Meta: styled(Card.Meta)`
-    flex: 2;
-  `,
-  TokenImageWrapper: styled.div`
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-wrap: wrap;
-  `,
-  List: styled(List)`
-    margin-top: ${(props) => props.theme.spacing.medium};
-  `,
-  FirstListItem: styled.span`
-    ${(props) => props.theme.snippets.fancy};
-    font-weight: bolder;
-  `,
-  IndexPoolEntry: styled(List.Item)`
-    ${(props) => props.theme.snippets.perfectlyCentered};
-  `,
-  CardTitle: styled.div`
-    ${(props) => props.theme.snippets.perfectlyAligned};
-  `,
-};

@@ -1,8 +1,7 @@
 import { IChartApi, ISeriesApi, createChart } from "lightweight-charts";
-import { colors } from "theme";
 import { selectors } from "features";
+import { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
-import React, { useEffect, useRef, useState } from "react";
 
 export interface SeriesDataItem {
   time: number;
@@ -25,7 +24,7 @@ export default function LineSeriesChart({ data, expanded = false }: Props) {
       const size = expanded
         ? { width: 1200, height: 500 }
         : { width: 400, height: 300 };
-      
+
       const chart_ = createChart(cardRef.current, size);
       setChart(chart_);
       const options = CHART_MODES[theme];
@@ -41,7 +40,7 @@ export default function LineSeriesChart({ data, expanded = false }: Props) {
         }
       }, 250);
     }
-  }, [expanded, theme]);
+  }, [expanded, theme, series]);
 
   useEffect(() => {
     if (cardRef.current && series) {
@@ -64,9 +63,9 @@ export default function LineSeriesChart({ data, expanded = false }: Props) {
         }
       }, 250);
     }
-  }, [expanded, theme, chart])
+  }, [expanded, theme, chart]);
 
-  return <div ref={cardRef} />
+  return <div ref={cardRef} />;
 }
 
 const COMMON_LAYOUT_OPTIONS = {
@@ -77,30 +76,30 @@ const CHART_MODES = {
   dark: {
     layout: {
       ...COMMON_LAYOUT_OPTIONS,
-      backgroundColor: colors.black400,
-      textColor: colors.purple200,
+      backgroundColor: "black",
+      textColor: "purple",
     },
     grid: {
       vertLines: {
-        color: colors.purple100,
+        color: "purple",
       },
       horzLines: {
-        color: colors.purple100,
+        color: "purple",
       },
     },
   },
   light: {
     layout: {
       ...COMMON_LAYOUT_OPTIONS,
-      backgroundColor: colors.white300,
-      textColor: colors.black200,
+      backgroundColor: "white",
+      textColor: "black",
     },
     grid: {
       vertLines: {
-        color: colors.purple300,
+        color: "purple",
       },
       horzLines: {
-        color: colors.purple300,
+        color: "purple",
       },
     },
   },

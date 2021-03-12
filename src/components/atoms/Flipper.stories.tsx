@@ -1,5 +1,4 @@
 import Flipper from "./Flipper";
-import React from "react";
 
 export const Basic = () => <Flipper onFlip={() => 1} />;
 

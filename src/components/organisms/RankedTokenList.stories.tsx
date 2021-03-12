@@ -1,5 +1,4 @@
 import RankedTokenList, { Props } from "./RankedTokenList";
-import React from "react";
 
 export const Basic = (args: Props) => <RankedTokenList {...args} />;
 

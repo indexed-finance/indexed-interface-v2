@@ -1,5 +1,5 @@
+import { useContext } from "react";
 import DrawerProvider, { DrawerContext } from "./DrawerProvider";
-import React, { useContext } from "react";
 
 function Inner() {
   const { displayDrawerPage } = useContext(DrawerContext);

@@ -1,0 +1,347 @@
+// This file should not contain any color information.
+@import "./variables.less";
+
+// -- Fonts
+@font-face {
+  font-family: "Main";
+  src: url("./fonts/Futura.ttc");
+}
+
+// -- Variables
+@header-height: 64px;
+@header-icon-size: 2rem;
+@spacing-tiny: 0.66rem;
+@spacing-small: 1rem;
+@spacing-medium: 2rem;
+@spacing-large: 2rem;
+
+// -- Antd Changes
+.ant-typography {
+  &:extend(.fancy);
+}
+
+.ant-layout {
+  background-image: url("../assets/images/light-bg.png") !important;
+
+  &-sider-children {
+    &:extend(.effect8f);
+
+    position: fixed;
+    top: @header-height;
+    width: 300px;
+    height: calc(100% - @header-height);
+    z-index: 2;
+
+    @media screen and (max-width: 480px) {
+      width: 100%;
+    }
+
+    // COLOR
+    border-right: 1px solid #f0f0f0;
+  }
+}
+
+.ant-collapse {
+  margin-bottom: @spacing-medium !important;
+
+  &-header {
+    &:extend(.fancy);
+  }
+}
+
+.ant-tabs-tab {
+  &:last-child {
+    display: none;
+  }
+}
+
+.ant-space-item {
+  flex: 1;
+}
+// -- Global
+body {
+  * {
+    font-family: "Main", sans-serif;
+  }
+}
+
+// -- Utilities
+.circular {
+  border-radius: 50%;
+}
+
+.flex-center {
+  display: flex !important;
+  align-items: center !important;
+}
+
+.perfectly-centered {
+  &:extend(.flex-center);
+  justify-content: center !important;
+}
+
+.spaced-between {
+  &:extend(.flex-center);
+  justify-content: space-between;
+}
+
+.size-32 {
+  width: 32px;
+  height: 32px;
+}
+
+.no-margin {
+  margin: 0 !important;
+}
+
+.no-margin-bottom {
+  margin-bottom: 0 !important;
+}
+
+.tiny-margin-right {
+  margin-right: @spacing-tiny !important;
+}
+
+.small-margin-right {
+  margin-right: @spacing-small !important;
+}
+
+.medium-margin-right {
+  margin-right: @spacing-medium !important;
+}
+
+.fancy {
+  text-transform: uppercase;
+  letter-spacing: 1.5;
+}
+
+// -- Layout
+.AppHeader {
+  &:extend(.spaced-between, .effect6);
+
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 2;
+
+  .ant-form-item {
+    margin-bottom: 14px;
+  }
+
+  // COLOR
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.AppMenu {
+  visibility: visible;
+  .ant-menu-item,
+  .ant-menu-submenu-title {
+    &:extend(.fancy);
+
+    padding-left: @spacing-medium !important;
+
+    a {
+      &:extend(.spaced-between);
+    }
+
+    @media screen and (max-width: 480px) {
+      height: 32px !important;
+      line-height: 32px !important;
+    }
+  }
+}
+
+.AppLayout {
+  .Page {
+    &:extend(.effect8);
+
+    max-width: 1240px;
+    min-height: 100vh;
+    margin: 8rem auto 0 auto;
+    padding: @spacing-large;
+    background: @page-background;
+  }
+}
+
+// -- Animations
+@keyframes blinking {
+  0% {
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.8;
+  }
+}
+
+// -- Components
+.Carousel {
+  &:extend(.perfectly-centered);
+
+  text-align: center;
+  padding: @spacing-medium @spacing-medium 0 @spacing-medium;
+}
+
+.Token {
+  &:extend(.circular, .size-32, .small-margin-right);
+
+  animation: blinking 2s infinite ease-in-out;
+
+  @media screen and (max-width: 480px) {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.DEBUGScreenSize {
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+  padding: 1rem;
+  border: 1px solid white;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 2;
+}
+
+.WalletConnector,
+.MenuButton {
+  font-size: @header-icon-size !important;
+  position: relative;
+  top: 9px;
+}
+
+.Logo {
+  &:extend(.spaced-between);
+
+  .ant-typography {
+    &:extend(.no-margin-bottom);
+  }
+}
+
+.LanguageSelector {
+  &.is-controlled {
+    position: relative;
+    right: 45px;
+    width: 130px;
+  }
+}
+
+.ServerConnection {
+  &:extend(.no-margin-bottom);
+
+  svg {
+    &:extend(.tiny-margin-right);
+    position: relative;
+    top: 2px;
+  }
+}
+
+.ScreenHeader {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+}
+
+// -- External
+.effect6 {
+  position: fixed;
+  -webkit-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3),
+    0 0 40px rgba(0, 0, 0, 0.1) inset;
+  -moz-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3),
+    0 0 40px rgba(0, 0, 0, 0.1) inset;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.1) inset;
+}
+.effect6:before,
+.effect6:after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  -webkit-box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+  -moz-box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+  top: 50%;
+  bottom: 0;
+  left: 10px;
+  right: 10px;
+  -moz-border-radius: 100px / 10px;
+  border-radius: 100px / 10px;
+}
+.effect6:after {
+  right: 10px;
+  left: auto;
+  -webkit-transform: skew(8deg) rotate(3deg);
+  -moz-transform: skew(8deg) rotate(3deg);
+  -ms-transform: skew(8deg) rotate(3deg);
+  -o-transform: skew(8deg) rotate(3deg);
+  transform: skew(8deg) rotate(3deg);
+}
+
+.effect8 {
+  position: relative;
+  -webkit-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3),
+    0 0 40px rgba(0, 0, 0, 0.1) inset;
+  -moz-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3),
+    0 0 40px rgba(0, 0, 0, 0.1) inset;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.1) inset;
+}
+.effect8:before,
+.effect8:after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  -webkit-box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+  -moz-box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+  top: 10px;
+  bottom: 10px;
+  left: 0;
+  right: 0;
+  -moz-border-radius: 100px / 10px;
+  border-radius: 100px / 10px;
+}
+.effect8:after {
+  right: 10px;
+  left: auto;
+  -webkit-transform: skew(8deg) rotate(3deg);
+  -moz-transform: skew(8deg) rotate(3deg);
+  -ms-transform: skew(8deg) rotate(3deg);
+  -o-transform: skew(8deg) rotate(3deg);
+  transform: skew(8deg) rotate(3deg);
+}
+
+.effect8f {
+  position: fixed;
+  -webkit-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3),
+    0 0 40px rgba(0, 0, 0, 0.1) inset;
+  -moz-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3),
+    0 0 40px rgba(0, 0, 0, 0.1) inset;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.1) inset;
+}
+.effect8f:before,
+.effect8f:after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  -webkit-box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+  -moz-box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+  top: 10px;
+  bottom: 10px;
+  left: 0;
+  right: 0;
+  -moz-border-radius: 100px / 10px;
+  border-radius: 100px / 10px;
+}
+.effect8f:after {
+  right: 10px;
+  left: auto;
+  -webkit-transform: skew(8deg) rotate(3deg);
+  -moz-transform: skew(8deg) rotate(3deg);
+  -ms-transform: skew(8deg) rotate(3deg);
+  -o-transform: skew(8deg) rotate(3deg);
+  transform: skew(8deg) rotate(3deg);
+}

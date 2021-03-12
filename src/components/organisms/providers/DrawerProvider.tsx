@@ -1,15 +1,14 @@
-import { Drawer as AntDrawer, Menu } from "antd";
-import { Button } from "components/atoms";
-import { useBreakpoints } from "helpers";
-import React, {
+import { Drawer as AntDrawer, Button } from "antd";
+import {
   ReactNode,
   createContext,
+  useCallback,
   useContext,
   useMemo,
   useState,
 } from "react";
+import { useBreakpoints } from "helpers";
 import noop from "lodash.noop";
-import styled, { css } from "styled-components";
 
 export interface DrawerAction {
   label: ReactNode;
@@ -42,12 +41,9 @@ export function Drawer({ page }: Props) {
   const allActions = modifiedActions[name]
     ? [...page.actions, ...modifiedActions[name]]
     : page.actions;
-  const offset = page.offset ?? 0;
-  const padding = page.padding ?? 24;
 
   return (
-    <S.Drawer
-      isMobile={!breakpoints.sm}
+    <AntDrawer
       title={page.title}
       placement="right"
       onClose={closeDrawerPage}
@@ -56,19 +52,18 @@ export function Drawer({ page }: Props) {
       width={breakpoints.sm ? page.width : undefined}
       closable={page.closable ?? true}
       getContainer={false}
-      offset={offset}
       footer={
         allActions.length > 0 ? (
-          <Button.Group orientation="horizontal" compact={true}>
+          <Button.Group>
             {allActions.map((action) => (
-              <S.Button
+              <Button
                 key={action.label?.toString()}
                 onClick={action.onClick}
                 type={action.type ?? "default"}
                 disabled={action.disabled}
               >
                 {action.label}
-              </S.Button>
+              </Button>
             ))}
           </Button.Group>
         ) : null
@@ -78,8 +73,8 @@ export function Drawer({ page }: Props) {
         height: allActions.length > 0 ? "60px" : 0,
       }}
     >
-      <S.Inner padding={padding}>{page.content ?? null}</S.Inner>
-    </S.Drawer>
+      {page.content ?? null}
+    </AntDrawer>
   );
 }
 // #endregion
@@ -117,7 +112,7 @@ export default function DrawerProvider(props: ProviderProps) {
       ...prev,
       [pageName]: actions,
     }));
-  const memoDisplayDrawerPage = React.useCallback(
+  const memoDisplayDrawerPage = useCallback(
     (page: DrawerPage, content?: ReactNode) =>
       setPages((prevPages) =>
         prevPages.concat({
@@ -127,7 +122,7 @@ export default function DrawerProvider(props: ProviderProps) {
       ),
     []
   );
-  const memoCloseDrawerPage = React.useCallback(
+  const memoCloseDrawerPage = useCallback(
     () => setPages((prevPages) => prevPages.slice(0, prevPages.length - 1)),
     []
   );
@@ -156,7 +151,7 @@ export function useDrawer(page: DrawerPage) {
   const { activePage, closeDrawerPage, displayDrawerPage } = useContext(
     DrawerContext
   );
-  const memoOpenDrawer = React.useCallback(
+  const memoOpenDrawer = useCallback(
     (content: ReactNode) => {
       displayDrawerPage(page, content);
     },
@@ -170,56 +165,3 @@ export function useDrawer(page: DrawerPage) {
   };
 }
 // #endregion
-
-const S = {
-  Drawer: styled(({ isMobile: _, ...rest }) => <AntDrawer {...rest} />)<{
-    isMobile?: boolean;
-    offset: number;
-  }>`
-    ${(props) =>
-      props.isMobile
-        ? css`
-            position: absolute;
-            right: ${props.offset}px !important;
-
-            .ant-drawer-body {
-              position: relative;
-              padding: 0;
-            }
-          `
-        : css`
-            height: calc(100vh - 64px);
-            top: 64px;
-            z-index: 3;
-          `}
-  `,
-  Inner: styled.div<{ padding: number }>`
-    padding: ${(props) => props.padding} !important;
-    padding-top: 0;
-  `,
-  Divider: styled.div`
-    margin-top: ${(props) => props.theme.spacing.large};
-  `,
-  Menu: styled(Menu)`
-    height: 100%;
-
-    [role="menuitem"] {
-      margin: 0 !important;
-      margin-top: 0 !important;
-      margin-bottom: 0 !important;
-      position: relative;
-      height: 100%;
-    }
-  `,
-  MenuItem: styled(Menu.Item)`
-    ${(props) => props.theme.snippets.fancy};
-    text-align: center;
-    background: ${(props) => props.theme.colors.white200};
-    margin: 0;
-  `,
-  Button: styled(Button)`
-    flex: 1 0 50%;
-    height: 60px;
-    border-radius: 0;
-  `,
-};

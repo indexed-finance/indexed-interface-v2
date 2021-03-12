@@ -1,5 +1,4 @@
 import { Action, Performance, Recent, Subscreen } from "../subscreens";
-import { AiOutlineSwap } from "react-icons/ai";
 import { AppState, actions, selectors } from "features";
 import { CgArrowsExpandRight } from "react-icons/cg";
 import {
@@ -10,13 +9,11 @@ import {
   RankedTokenList,
   ScreenHeader,
 } from "components";
-import { Col, Menu, Row } from "antd";
+import { Col, Row } from "antd";
 import { Link, Redirect, useParams } from "react-router-dom";
-import { RiWallet3Line } from "react-icons/ri";
 import { useBreakpoints } from "helpers";
 import { useDispatch, useSelector } from "react-redux";
-import React, { useEffect, useMemo } from "react";
-import styled from "styled-components";
+import { useEffect, useMemo } from "react";
 
 export default function PoolDetail() {
   const dispatch = useDispatch();
@@ -89,23 +86,17 @@ export default function PoolDetail() {
     // Subscreens
     const performance = <Performance pool={pool} />;
     const chart = (
-      <Subscreen
-        icon={<AiOutlineSwap />}
-        title="Chart"
-        padding={0}
-        defaultActions={chartActions}
-      >
+      <Subscreen title="Chart" padding={0} defaultActions={chartActions}>
         {id ? <ChartCard poolId={id} /> : null}
       </Subscreen>
     );
     const assets = (
-      <S.Tokens icon={<AiOutlineSwap />} title="Assets" padding={0}>
+      <Subscreen title="Assets" padding={0}>
         <RankedTokenList pool={pool} />
-      </S.Tokens>
+      </Subscreen>
     );
     const interactions = (
       <Subscreen
-        icon={<RiWallet3Line />}
         title="Interact"
         padding={0}
         defaultActions={interactionActions}
@@ -190,17 +181,3 @@ export default function PoolDetail() {
     return <Redirect to="/pools" />;
   }
 }
-
-const S = {
-  Tokens: styled(Subscreen)``,
-  Item: styled(Menu.Item)`
-    ${(props) => props.theme.snippets.fancy};
-  `,
-  ItemInner: styled.div`
-    ${(props) => props.theme.snippets.perfectlyAligned};
-  `,
-  Image: styled.img`
-    ${(props) => props.theme.snippets.size32};
-    margin-right: ${(props) => props.theme.spacing.medium};
-  `,
-};

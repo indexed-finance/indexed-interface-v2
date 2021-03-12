@@ -1,12 +1,11 @@
 import { Alert, Input, InputProps, Typography } from "antd";
+import { ChangeEvent, ReactNode, useCallback, useState } from "react";
 import { FaEthereum } from "react-icons/fa";
 import { provider as globalProvider } from "features";
 import { providers, utils } from "ethers";
 import Identicon from "react-identicons";
-import React, { ChangeEvent, ReactNode, useCallback, useState } from "react";
 import debounce from "lodash.debounce";
 import noop from "lodash.noop";
-import styled, { css } from "styled-components";
 
 const CHANGE_DEBOUNCE_RATE = 250;
 const ENS_ADDRESS_SUFFIXES: Record<string, true> = {
@@ -35,7 +34,6 @@ export default function EthereumAddressInput({
   const [ensInfo, setEnsInfo] = useState<ReactNode>(null);
   const [errorInfo, setErrorInfo] = useState("");
   const [isTouched, setIsTouched] = useState(false);
-  const hasError = isTouched && !isValid;
   const [identicon, setIdenticon] = useState("");
   // eslint-disable-next-line
   const handleChange = useCallback(
@@ -129,16 +127,15 @@ export default function EthereumAddressInput({
   );
 
   return (
-    <S.Wrapper>
-      <S.Input
+    <div>
+      <Input
         autoFocus={true}
         spellCheck={false}
-        hasError={hasError}
         onChange={handleChange}
         type="text"
         size="large"
         addonBefore={<FaEthereum />}
-        addonAfter={isValid ? <S.Identicon string={identicon} /> : null}
+        addonAfter={isValid ? <Identicon string={identicon} /> : null}
         {...rest}
       />
       {!isValid && errorInfo && (
@@ -149,34 +146,6 @@ export default function EthereumAddressInput({
         />
       )}
       {isValid && ensInfo && <Alert message={ensInfo} type="info" showIcon />}
-    </S.Wrapper>
+    </div>
   );
 }
-
-const S = {
-  Wrapper: styled.div`
-    margin-bottom: ${(props) => props.theme.spacing.large};
-  `,
-  Input: styled(({ hasError, ...rest }) => <Input {...rest} />)<{
-    hasError?: boolean;
-  }>`
-    ${(props) =>
-      props.hasError
-        ? css`
-            .ant-input-group-addon,
-            .ant-input {
-              border: 1px solid #58181c !important;
-            }
-
-            svg {
-              color: #58181c;
-            }
-          `
-        : ""};
-  `,
-  Identicon: styled(Identicon)`
-    width: 24px !important;
-    height: 24px !important;
-    border-radius: 50%;
-  `,
-};
