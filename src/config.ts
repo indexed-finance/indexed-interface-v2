@@ -1,3 +1,4 @@
+// API
 export const CLIENT_STATISTICS_REPORTING_RATE = 30 * 1000;
 export const CHECK_NEED_TO_RESTART_RATE = 5000;
 export const NEED_TO_RESTART_THRESHOLD = 300 * 1000;
@@ -17,30 +18,11 @@ export const SLIPPAGE_RATE = 0.01;
 export const TRADE_PRICE_INPUT_MODIFIER = 0.99;
 export const TRADE_PRICE_OUTPUT_MODIFIER = 1.02;
 export const GATEWAY_URL = "https://gateway.temporal.cloud/ipfs/";
-export const LOCALSTORAGE_KEY = "indexed.finance | Persisted";
-export const WETH_CONTRACT_ADDRESS =
-  "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2";
 export const SOCKET_PORT = 13337;
-export const FALLBACK_CATEGORY_LOCAL_DATA = {
-  description: "(MISSING LOCAL DATA)",
-  symbol: "(MISSING LOCAL DATA)",
-  name: "(MISSING LOCAL DATA)",
-};
-export const NETWORKS = {
-  mainnet: {
-    id: 1,
-    name: "mainnet",
-  },
-  rinkeby: {
-    id: 4,
-    name: "rinkeby",
-  },
-};
 export const WEBSOCKET_SERVER_PING_RATE = 2000;
 export const WEBSOCKET_SERVER_UPDATE_RATE = 1000;
 export const WEBSOCKET_SERVER_PORT = 13337;
-export const QUIKNODE_WEBSOCKET_PROVIDER =
-  "wss://bold-old-pond.quiknode.pro/7876affe5a6bb6688c659b452fe9d81d4125d21f/";
+export const QUIKNODE_WEBSOCKET_PROVIDER = "wss://bold-old-pond.quiknode.pro/7876affe5a6bb6688c659b452fe9d81d4125d21f/";
 export const ERRORS = {
   Web3Service: {
     badNetwork: "Web3Service: Bad network.",
@@ -76,18 +58,35 @@ export const SUBGRAPH_URL_UNISWAP =
     ? "/subgraphs/name/uniswap/uniswap-v2"
     : `${SUBGRAPH_URL_BASE}/subgraphs/name/uniswap/uniswap-v2`;
 
-// export const SUBGRAPH_URL_INDEXED =
-//   process.env.REACT_APP_ETH_NETWORK === NETWORKS.mainnet.name
-//     ? "https://api.thegraph.com/subgraphs/name/indexed-finance/indexed"
-//     : "https://api.thegraph.com/subgraphs/name/indexed-finance/indexed-v1";
+export const ETHEREUM_PRICE_URL = "/subgraphs/name/uniswap/uniswap-v2";
+export const INDEXED_SUBGRAPH_URL =
+  "https://api.thegraph.com/subgraphs/name/indexed-finance/indexed";
+export const INDEXED_RINKEBY_SUBGRAPH_URL =
+  "https://api.thegraph.com/subgraphs/name/indexed-finance/indexed-v1";
+export const UNISWAP_SUBGRAPH_URL =
+  "https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2";
+export const UNISWAP_SUBGRAPH_URL_RINKEBY =
+  "https://api.thegraph.com/subgraphs/name/samgos/uniswap-v2-rinkeby";
 
-// export const SUBGRAPH_URL_UNISWAP =
-//   process.env.REACT_APP_ETH_NETWORK === NETWORKS.mainnet.name
-//     ? "https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2"
-//     : "https://api.thegraph.com/subgraphs/name/samgos/uniswap-v2-rinkeby";
+// App
+export const LOCALSTORAGE_KEY = "indexed.finance | Persisted";
+export const FALLBACK_CATEGORY_LOCAL_DATA = {
+  description: "(MISSING LOCAL DATA)",
+  symbol: "(MISSING LOCAL DATA)",
+  name: "(MISSING LOCAL DATA)",
+};
+export const NETWORKS = {
+  mainnet: {
+    id: 1,
+    name: "mainnet",
+  },
+  rinkeby: {
+    id: 4,
+    name: "rinkeby",
+  },
+};
 
 export const PLACEHOLDER_TOKEN_IMAGE = "https://via.placeholder.com/32";
-export const ETHEREUM_PRICE_URL = "/subgraphs/name/uniswap/uniswap-v2";
 
 export const SOCIAL_MEDIA = [
   {
@@ -122,11 +121,21 @@ export const SOCIAL_MEDIA = [
   },
 ];
 
-export const INDEXED_SUBGRAPH_URL =
-  "https://api.thegraph.com/subgraphs/name/indexed-finance/indexed";
-export const INDEXED_RINKEBY_SUBGRAPH_URL =
-  "https://api.thegraph.com/subgraphs/name/indexed-finance/indexed-v1";
-export const UNISWAP_SUBGRAPH_URL =
-  "https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2";
-export const UNISWAP_SUBGRAPH_URL_RINKEBY =
-  "https://api.thegraph.com/subgraphs/name/samgos/uniswap-v2-rinkeby";
+// Contracts
+export const UNISWAP_FACTORY_ADDRESS = '0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f';
+export const UNISWAP_ROUTER_ADDRESS = '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D';
+export const WETH_CONTRACT_ADDRESS = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2";
+
+export const COMMON_BASE_TOKENS = [
+  {
+    id: "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    symbol: "WETH",
+    name: "Wrapped Ether",
+    decimals: 18
+  }, {
+    id: "0x6b175474e89094c44da98b954eedeac495271d0f",
+    symbol: "DAI",
+    name: "Dai Stablecoin",
+    decimals: 18
+  },
+];
