@@ -331,11 +331,11 @@ export default function SwapInteraction({ pool }: Props) {
         )}
       </S.Title>
       <Item name="from" rules={[{ validator: checkAmount }]}>
-        {pool && <TokenSelector label="From" pool={pool} />}
+        {pool && <TokenSelector label="From" assets={pool.assets} />}
       </Item>
       <Flipper onFlip={handleFlip} />
       <Item name="to" rules={[{ validator: checkAmount }]}>
-        {pool && <TokenSelector label="To" pool={pool} />}
+        {pool && <TokenSelector label="To" assets={pool.assets} />}
       </Item>
       {previousFormValues.current.from.token &&
         previousFormValues.current.to.token && (
