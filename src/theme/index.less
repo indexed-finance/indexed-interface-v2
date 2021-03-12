@@ -8,7 +8,9 @@
 
 // -- Variables
 @header-height: 64px;
+@header-icon-size: 24px;
 @spacing-small: 12px;
+@spacing-medium: 24px;
 
 // -- Antd Changes
 .ant-typography {
@@ -21,6 +23,9 @@
   width: 300px;
   height: calc(100% - @header-height);
   z-index: 2;
+
+  // COLOR
+  border-right: 1px solid #f0f0f0;
 }
 
 // -- Global
@@ -55,7 +60,11 @@ body {
 }
 
 .small-margin-right {
-  margin-right: @spacing-small;
+  margin-right: @spacing-small !important;
+}
+
+.medium-margin-right {
+  margin-right: @spacing-medium !important;
 }
 
 .fancy {
@@ -73,13 +82,6 @@ body {
   width: 100%;
   z-index: 2;
 
-  @media screen and (max-width: 480px) {
-    left: 0;
-    width: 100%;
-    max-width: 100%;
-    padding: 0 24px;
-  }
-
   .ant-form-item {
     margin-bottom: 14px;
   }
@@ -94,15 +96,53 @@ body {
       top: 5px;
     }
   }
+
+  // COLOR
+  border-bottom: 1px solid #f0f0f0;
 }
 
 .AppMenu {
   visibility: visible;
+  .ant-menu-item,
+  .ant-menu-submenu-title {
+    &:extend(.fancy);
+
+    padding-left: 24px !important;
+
+    a {
+      &:extend(.spaced-between);
+    }
+
+    @media screen and (max-width: 480px) {
+      height: 30px !important;
+      line-height: 30px !important;
+    }
+  }
+}
+
+// -- Animations
+@keyframes blinking {
+  0% {
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.8;
+  }
 }
 
 // -- Components
 .Token {
-  &:extend(.circular, .size-32);
+  &:extend(.circular, .size-32, .medium-margin-right);
+
+  animation: blinking 2s infinite ease-in-out;
+
+  @media screen and (max-width: 480px) {
+    width: 20px;
+    height: 20px;
+  }
 }
 
 .DEBUGScreenSize {
@@ -115,12 +155,9 @@ body {
   z-index: 2;
 }
 
+.WalletConnector,
 .MenuButton {
-  font-size: 24px !important;
-}
-
-.WalletConnector {
-  font-size: 24px;
+  font-size: @header-icon-size !important;
 }
 
 .Logo {

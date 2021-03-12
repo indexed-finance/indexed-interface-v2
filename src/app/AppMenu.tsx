@@ -59,11 +59,7 @@ export default function AppMenu({ onItemClick = noop, ...rest }: Props) {
               return (
                 <SubMenu
                   key={route.path}
-                  title={
-                    <Link to={route.path} onClick={onItemClick}>
-                      {route.sider}
-                    </Link>
-                  }
+                  title={<Link to={route.path}>{route.sider}</Link>}
                 >
                   {models.map((model) => {
                     const isIndexPool = route.model === "indexPools";
