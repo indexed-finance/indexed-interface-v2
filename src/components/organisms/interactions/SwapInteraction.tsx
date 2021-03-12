@@ -1,7 +1,7 @@
 import { AiOutlineArrowRight } from "react-icons/ai";
 import { AppState, FormattedIndexPool, selectors, signer } from "features";
 import { Flipper, Token } from "components/atoms";
-import { Form, Typography } from "antd";
+import { Form, Space, Typography } from "antd";
 import { TokenExchangeRate } from "components/molecules";
 import { actions } from "features";
 import { convert } from "helpers";
@@ -319,16 +319,21 @@ export default function SwapInteraction({ pool }: Props) {
         console.log("Submission failed. Error was: ", error)
       }
     >
-      <Typography.Title>
-        <span>Swap</span>
+      <Space align="center" className="spaced-between">
+        <Typography.Title className="no-margin-bottom">Swap</Typography.Title>
         {baseline && comparison && (
-          <span>
+          <div style={{ position: "relative", top: 0, right: 0 }}>
             <Token name="Baseline" image={baseline} />
-            <AiOutlineArrowRight />
+            <AiOutlineArrowRight
+              style={{
+                position: "absolute",
+                fontSize: "32px",
+              }}
+            />
             <Token name="Comparison" image={comparison} />
-          </span>
+          </div>
         )}
-      </Typography.Title>
+      </Space>
       <Item name="from" rules={[{ validator: checkAmount }]}>
         {pool && <TokenSelector label="From" pool={pool} />}
       </Item>

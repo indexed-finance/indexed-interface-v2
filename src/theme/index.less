@@ -41,8 +41,18 @@
   }
 }
 
-.ant-collapse-header {
-  &:extend(.fancy);
+.ant-collapse {
+  margin-bottom: @spacing-medium !important;
+
+  &-header {
+    &:extend(.fancy);
+  }
+}
+
+.ant-tabs-tab {
+  &:last-child {
+    display: none;
+  }
 }
 // -- Global
 body {
@@ -74,6 +84,10 @@ body {
 .size-32 {
   width: 32px;
   height: 32px;
+}
+
+.no-margin {
+  margin: 0 !important;
 }
 
 .no-margin-bottom {

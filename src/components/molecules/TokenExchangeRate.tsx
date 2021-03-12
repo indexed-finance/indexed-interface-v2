@@ -1,4 +1,4 @@
-import { Alert, Statistic, Typography } from "antd";
+import { Alert, Space, Statistic } from "antd";
 import { convert } from "helpers";
 
 export interface Props {
@@ -17,15 +17,19 @@ export default function TokenExchangeRate({
   return (
     <Alert
       message={
-        <Typography.Title level={4}>
+        <Space style={{ width: "100%" }}>
           <Statistic
             title="Exchange Rate"
             value={`1 ${baseline} ≈ ${convert.toComma(
               typeof rate === "number" ? rate : parseFloat(rate)
             )} ${comparison}`}
           />
-          <Statistic title="Fee" value={fee} />
-        </Typography.Title>
+          <Statistic
+            title="Fee"
+            value={fee}
+            style={{ flex: 1, textAlign: "right" }}
+          />
+        </Space>
       }
     />
   );

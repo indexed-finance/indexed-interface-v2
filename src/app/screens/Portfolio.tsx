@@ -62,11 +62,13 @@ export default function Portfolio() {
           <>
             <Divider />
             <div>
-              <Typography.Title type="secondary" level={3}>
-                Total Value
-              </Typography.Title>
-              <Typography.Title type="success" level={2}>
-                $400.00
+              <Typography.Title
+                type="secondary"
+                level={3}
+                className="spaced-between"
+              >
+                <span>Total Value</span>
+                <Typography.Text type="success">$400.00</Typography.Text>
               </Typography.Title>
             </div>
           </>
@@ -75,41 +77,37 @@ export default function Portfolio() {
         {__data.map((entry) => (
           <>
             <Item key={entry.symbol}>
-              <div>
-                <Space direction="vertical" size="small">
-                  <Typography.Title level={4}>
-                    <div>
-                      <Token
-                        size="small"
-                        address={entry.address}
-                        name={entry.symbol}
-                        image={entry.image}
-                      />
-                      {entry.symbol}
-                    </div>
-                  </Typography.Title>
-                  <Typography.Title level={5}>
-                    <Link to={entry.link}>{entry.name}</Link>
-                  </Typography.Title>
-                </Space>
+              <Space direction="vertical" size="large">
+                <Typography.Title level={4}>
+                  <Token
+                    size="small"
+                    address={entry.address}
+                    name={entry.symbol}
+                    image={entry.image}
+                  />
+                  {entry.symbol}
+                </Typography.Title>
+                <Typography.Title level={5}>
+                  <Link to={entry.link}>{entry.name}</Link>
+                </Typography.Title>
+              </Space>
 
-                <Space direction="vertical">
+              <Space direction="vertical">
+                <Typography.Text>
                   <em>
-                    <Typography.Text>
-                      Staking {entry.staking} {entry.symbol}
-                    </Typography.Text>
+                    Staking {entry.staking} {entry.symbol}
                   </em>
-                  <Typography.Title level={3}>
-                    {entry.balance} {entry.symbol}
-                    <br />
-                    {entry.value}
-                  </Typography.Title>
-                </Space>
-                <Progress
-                  type="dashboard"
-                  percent={parseFloat(entry.weight.replace(/%/g, ""))}
-                />
-              </div>
+                </Typography.Text>
+                <Typography.Title level={3}>
+                  {entry.balance} {entry.symbol}
+                  <br />
+                  {entry.value}
+                </Typography.Title>
+              </Space>
+              <Progress
+                type="dashboard"
+                percent={parseFloat(entry.weight.replace(/%/g, ""))}
+              />
             </Item>
           </>
         ))}
@@ -120,19 +118,9 @@ export default function Portfolio() {
   // Variants
   const mobileSized = (
     <Row gutter={5}>
-      <Col span={24}>{holdings}</Col>
       <Col span={24}>{ndx}</Col>
+      <Col span={24}>{holdings}</Col>
     </Row>
-  );
-  const smallSized = (
-    <>
-      <Row gutter={20}>
-        <Col span={10}>{holdings}</Col>
-      </Row>
-      <Row gutter={20}>
-        <Col span={10}>{ndx}</Col>
-      </Row>
-    </>
   );
 
   return (
@@ -153,7 +141,7 @@ export default function Portfolio() {
           // case breakpoints.md:
           //   return tabletSized;
           case breakpoints.sm:
-            return smallSized;
+            return mobileSized;
           case breakpoints.xs:
             return mobileSized;
         }
