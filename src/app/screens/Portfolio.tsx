@@ -21,7 +21,7 @@ export default function Portfolio() {
     {
       address: "0x17ac188e09a7890a1844e5e65471fe8b0ccfadf3",
       image: "cc-dark-circular",
-      link: "/pools/0x17ac188e09a7890a1844e5e65471fe8b0ccfadf3",
+      link: "/pools/cryptocurrency-top-10-tokens-index",
       symbol: "CC10",
       name: "Cryptocurrency Top 10",
       balance: "20.00",
@@ -32,7 +32,7 @@ export default function Portfolio() {
     {
       address: "0x17ac188e09a7890a1844e5e65471fe8b0ccfadf3",
       image: "defi-dark-circular",
-      link: "/pools/0xfa6de2697d59e88ed7fc4dfe5a33dac43565ea41",
+      link: "/pools/defi-top-5-tokens-index",
       symbol: "DEFI5",
       name: "Decentralized Finance Top 5",
       balance: "20.00",

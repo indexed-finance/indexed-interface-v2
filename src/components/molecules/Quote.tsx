@@ -8,6 +8,7 @@ export interface Props extends HTMLProps<HTMLDivElement> {
   netChangePercent: string;
   isNegative?: boolean;
   kind?: "small" | "normal";
+  centered?: boolean;
 }
 
 export default function Quote({
@@ -16,9 +17,10 @@ export default function Quote({
   netChange,
   netChangePercent,
   isNegative = false,
+  centered = true,
 }: Props) {
   return (
-    <div style={{ textAlign: "center", flex: 1 }}>
+    <div style={{ textAlign: centered ? "center" : "right", flex: 2 }}>
       <Typography.Title level={2} className="no-margin">
         {symbol}
       </Typography.Title>

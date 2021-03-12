@@ -6,10 +6,10 @@ import {
   PoolDropdown,
   PoolInteractions,
   ProviderRequirementDrawer,
-  RankedTokenList,
+  RankedToken,
   ScreenHeader,
 } from "components";
-import { Col, Row } from "antd";
+import { Col, Row, Space } from "antd";
 import { Link, Redirect, useParams } from "react-router-dom";
 import { useBreakpoints } from "helpers";
 import { useDispatch, useSelector } from "react-redux";
@@ -92,7 +92,12 @@ export default function PoolDetail() {
     );
     const assets = (
       <Subscreen title="Assets" padding={0}>
-        <RankedTokenList pool={pool} />
+        <Space wrap={true} align="start">
+          {pool.assets.map((token, index) => (
+            <RankedToken key={token.symbol} rank={index + 1} token={token} />
+          ))}
+        </Space>
+        {/* */}
       </Subscreen>
     );
     const interactions = (

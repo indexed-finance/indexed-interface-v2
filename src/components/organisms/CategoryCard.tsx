@@ -1,4 +1,4 @@
-import { Card, List } from "antd";
+import { Card, List, Typography } from "antd";
 import { Link, useHistory } from "react-router-dom";
 import { Token } from "components/atoms";
 
@@ -40,7 +40,7 @@ export default function CategoryCard({
     <Card
       key={id}
       hoverable={true}
-      title={name}
+      title={<Typography.Title level={2}>{name}</Typography.Title>}
       actions={[
         <div key="1">
           {Object.values(tokens.entities).map((token) => (
@@ -54,25 +54,23 @@ export default function CategoryCard({
         </div>,
       ]}
     >
-      <div>
-        <div onClick={() => history.push(`/categories/${slug}`)}>
-          <Card.Meta
-            description={
-              <>
-                {brief}
-                <List header="Index Pools">
-                  {indexPools.map((indexPool) => (
-                    <List.Item key={indexPool.name}>
-                      <Link to={`/pools/${indexPool.slug}`}>
-                        {indexPool.name} [{indexPool.symbol}]
-                      </Link>
-                    </List.Item>
-                  ))}
-                </List>
-              </>
-            }
-          />
-        </div>
+      <div onClick={() => history.push(`/categories/${slug}`)}>
+        <Card.Meta
+          description={
+            <>
+              {brief}
+              <List header="Index Pools">
+                {indexPools.map((indexPool) => (
+                  <List.Item key={indexPool.name}>
+                    <Link to={`/pools/${indexPool.slug}`}>
+                      {indexPool.name} [{indexPool.symbol}]
+                    </Link>
+                  </List.Item>
+                ))}
+              </List>
+            </>
+          }
+        />
       </div>
     </Card>
   );

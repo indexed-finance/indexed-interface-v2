@@ -1,14 +1,8 @@
 import { Asset } from "features";
+import { Card, Space, Typography } from "antd";
 import { CgDollar } from "react-icons/cg";
 import { Token } from "components/atoms";
-import { Typography } from "antd";
-import { actions, selectors } from "features";
-import { useDispatch } from "react-redux";
-import { useEffect, useRef } from "react";
-import { useSelector } from "react-redux";
-import ColorThief from "colorthief";
 import Quote from "./Quote";
-import flags from "feature-flags";
 
 export interface Props {
   token: Asset;
@@ -16,78 +10,47 @@ export interface Props {
 }
 
 export default function RankedToken({ token, rank }: Props) {
-  const dispatch = useDispatch();
-  const colorCache = useSelector(selectors.selectColorCache);
-  const colorThief = useRef<any>(null);
-
-  // Effect:
-  // Load colorThief and generate colors based on token.
-  useEffect(() => {
-    if (flags.useColorThief) {
-      try {
-        const imageRef = document.querySelector(
-          `[data-token="${token.symbol}"]`
-        );
-        const wrapperRef = document.querySelector(
-          `[data-tokenwrapper="${token.symbol}"]`
-        );
-        let red = 0;
-        let green = 0;
-        let blue = 0;
-
-        if (imageRef) {
-          const cacheEntry = colorCache[token.id];
-
-          if (cacheEntry) {
-            const [r, g, b] = cacheEntry;
-
-            red = r;
-            green = g;
-            blue = b;
-          } else if (
-            (imageRef as Element).clientWidth > 0 &&
-            (imageRef as any).complete &&
-            wrapperRef
-          ) {
-            colorThief.current = new ColorThief();
-            const [r, g, b] = colorThief.current.getColor(imageRef);
-
-            red = r;
-            green = g;
-            blue = b;
-
-            dispatch(
-              actions.tokenColorCached({
-                tokenId: token.id,
-                color: [red, green, blue],
-              })
-            );
-          }
-
-          // (wrapperRef as any).style.background = `rgba(${red}, ${green}, ${blue}, 0.15)`;
-          // (wrapperRef as any).style.transition = `background 0.33s ease-in-out`;
-          (wrapperRef as any).animate(
-            [
-              {
-                background: `rgba(${red}, ${green}, ${blue}, 0.05)`,
-              },
-              {
-                background: `rgba(${red}, ${green}, ${blue}, 0.15)`,
-              },
-              {
-                background: `rgba(${red}, ${green}, ${blue}, 0.05)`,
-              },
-            ],
-            {
-              duration: 7000,
-              easing: "ease-in-out",
-              iterations: Infinity,
-            }
-          );
+  return (
+    <Card style={{ width: 340 }} size="small" className="RankedToken">
+      <Space
+        align="center"
+        className="spaced-between"
+        style={{
+          width: "100%",
+        }}
+      />
+      <div style={{ flex: 1 }}>
+        <Token
+          address={token.id}
+          name={token.name}
+          image={token.symbol}
+          size="medium"
+        />
+      </div>
+      <Card.Meta
+        title={<Typography.Title level={4}>{token.symbol}</Typography.Title>}
+        description={
+          <Typography.Title
+            level={5}
+            type="secondary"
+            style={{
+              marginTop: 0,
+              marginBottom: 0,
+            }}
+          >
+            {token.name}
+          </Typography.Title>
         }
-      } catch {}
-    }
-  }, [dispatch, colorCache, token.id, token.symbol]);
+      />
+      <Quote
+        price={token.price}
+        netChange={token.netChange}
+        netChangePercent={token.netChangePercent}
+        isNegative={token.isNegative}
+        kind="small"
+      />
+    </Card>
+  );
 
   return (
     <div>
@@ -107,13 +70,6 @@ export default function RankedToken({ token, rank }: Props) {
               <h2>{token.symbol}</h2>
               <h3>{token.name}</h3>
             </div>
-            <Quote
-              price={token.price}
-              netChange={token.netChange}
-              netChangePercent={token.netChangePercent}
-              isNegative={token.isNegative}
-              kind="small"
-            />
           </div>
           <div>
             <div>{token.weightPercentage}</div>
