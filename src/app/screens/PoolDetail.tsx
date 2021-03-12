@@ -62,13 +62,13 @@ export default function PoolDetail() {
 
     // This screen always needs user data.
     const tokenUserDataListenerId = (dispatch(
-      actions.tokenUserDataListenerRegistered(id)
+      actions.registerTokenUserDataListener(id)
     ) as unknown) as string;
 
     // Pool updates and TheGraph/CoinGecko data is only required if not receiving data from the server.
     if (!isConnected) {
       poolUpdateListenerId = (dispatch(
-        actions.poolUpdateListenerRegistered(id)
+        actions.registerPoolUpdateListener(id)
       ) as unknown) as string;
     }
 

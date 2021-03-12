@@ -1,8 +1,7 @@
-import { Result as AbiCoderResult } from "ethers/lib/utils";
+import { BigNumber } from "@ethersproject/bignumber";
+import { MultiCallResults } from "./utils";
 import { Pair } from "ethereum/abi";
-import { Provider } from "@ethersproject/providers";
-
-import { multicallViaInterface } from "./utils";
+import { PairReservesUpdate } from "ethereum/types";
 import type { Call } from "./utils";
 
 export interface UniswapReserves {
@@ -10,38 +9,34 @@ export interface UniswapReserves {
   reserves1: string;
 }
 
-export async function uniswapUpdateMulticall(
-  _provider: Provider,
+export function buildPairReservesDataCalls(
   _pairs: string[]
-) {
+): Call[] {
   const _interface = Pair;
-  const _pairCalls = _pairs.map(
+  return _pairs.map(
     (pair) => ({
       target: pair,
+      interface: _interface,
       function: "getReserves",
       args: [],
     }),
     [] as Call[]
   );
-  const result = await multicallViaInterface(
-    _provider,
-    _interface,
-    _pairCalls,
-    false
-  );
-  return formatPairs(result, _pairs);
 }
 
-export function formatPairs(
-  { results }: { blockNumber: string; results: AbiCoderResult[] },
+export function formatPairReservesResults(
+  results: MultiCallResults,
   pairs: string[]
-): Record<string, UniswapReserves> {
-  return pairs.reduce((prev, next, i) => {
-    const [reserves0, reserves1] = results[i];
-    prev[next] = {
+): PairReservesUpdate[] {
+  return results.results.reduce((prev, next, index) => {
+    const [reserves0, reserves1] = next;
+    const exists = !(BigNumber.from(reserves0.toString()).eq(0));
+    const pairUpdate: PairReservesUpdate = {
+      id: pairs[index].toLowerCase(),
+      exists,
       reserves0: reserves0.toString(),
-      reserves1: reserves1.toString(),
+      reserves1: reserves1.toString()
     };
-    return prev;
-  }, {} as Record<string, UniswapReserves>);
+    return [...prev, pairUpdate];
+  }, [] as PairReservesUpdate[]) as PairReservesUpdate[];
 }

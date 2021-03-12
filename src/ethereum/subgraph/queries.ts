@@ -10,6 +10,7 @@ export const pool = `
   name
   symbol
   isPublic
+  initialized
   totalSupply
   totalWeight
   maxTotalSupply
@@ -84,6 +85,7 @@ export const initial = `
         name
         symbol
         isPublic
+        initialized
         totalSupply
         totalWeight
         maxTotalSupply

@@ -8,6 +8,7 @@ import {
 } from "@ethersproject/abi";
 import { BigNumber } from "@ethersproject/bignumber";
 import { Provider } from "@ethersproject/providers";
+import { chunk } from "lodash";
 
 import {
   MultiCall as bytecode,
@@ -21,16 +22,24 @@ export type Call = {
   args?: Array<any>;
 };
 
-export type CondensedCalls = {
-  callData: string[];
-  interfaces: (Interface | JsonFragment[] | undefined)[];
-  targets: string[];
-};
+export interface CondensedCall {
+  target: string;
+  callData: string;
+  interface: Interface;
+}
+
+export type MultiCallResults = {
+  blockNumber: number;
+  results: AbiCoderResult[];
+}
+
+const toInterface = (_interface: Interface | JsonFragment[]) =>
+  Array.isArray(_interface) ? new Interface(_interface) : _interface;
 
 export function condenseCalls(
-  _interface: Interface,
-  _calls: Call[]
-): CondensedCalls {
+  _calls: Call[],
+  _interface?: Interface,
+): CondensedCall[] {
   return _calls.reduce(
     (prev, next) => {
       const {
@@ -39,19 +48,15 @@ export function condenseCalls(
         args,
         interface: callInterface,
       } = next;
-      const callData = _interface.encodeFunctionData(callFunction, args);
-
-      prev.callData.push(callData);
-      prev.interfaces.push(callInterface);
-      prev.targets.push(target);
-
+      const interface_ = callInterface ? toInterface(callInterface) : _interface;
+      if (!interface_) {
+        throw new Error(`Interface not provided for call`);
+      }
+      const callData = interface_.encodeFunctionData(callFunction, args);
+      prev.push({ callData, interface: interface_, target });
       return prev;
     },
-    {
-      callData: [],
-      interfaces: [],
-      targets: [],
-    } as CondensedCalls
+    [] as CondensedCall[]
   );
 }
 
@@ -88,16 +93,14 @@ function getDefaultResultForFunction(fn: FunctionFragment): any[] {
   return outputs.map((t) => getDefaultForParamType(t));
 }
 
-export async function multicallViaInterface(
+async function executeChunk(
   _provider: Provider,
-  _interface: Interface,
-  _calls: Call[],
-  _strict: boolean
-): Promise<{ blockNumber: string; results: AbiCoderResult[] }> {
-  const { callData, targets } = condenseCalls(_interface, _calls);
+  _calls: CondensedCall[],
+  _strict?: boolean,
+) {
   const inputData = defaultAbiCoder.encode(
     ["address[]", "bytes[]"],
-    [targets, callData]
+    [_calls.map(c => c.target), _calls.map(c => c.callData)]
   );
   const bytecodeToUse = _strict ? bytecodeStrict : bytecode;
   const without0x = inputData.slice(2);
@@ -107,12 +110,26 @@ export async function multicallViaInterface(
     ["uint256", "bytes[]"],
     encodedResult
   );
+  return { blockNumber, decodedResult };
+}
+
+export async function multicall(
+  _provider: Provider,
+  _calls: Call[],
+  _interface?: Interface,
+  _strict?: boolean,
+): Promise<MultiCallResults> {
+  const calls = condenseCalls(_calls, _interface);
+  const chunks = chunk(calls, 30);
+  const allResults = await Promise.all(chunks.map(chunk => executeChunk(_provider, chunk, _strict)));
+  const blockNumber = allResults.map(r => r.blockNumber).sort()[0];
+  const decodedResult = allResults.reduce((prev, next) => ([...prev, ...next.decodedResult]), [] as string[]);
   const formattedResults = (decodedResult as string[]).map((result, index) => {
     return result === "0x"
       ? getDefaultResultForFunction(
-          _interface.getFunction((_calls[index] as Call).function)
+          calls[index].interface.getFunction((_calls[index] as Call).function)
         )
-      : _interface.decodeFunctionResult(
+      : calls[index].interface.decodeFunctionResult(
           (_calls[index] as Call).function,
           result
         );

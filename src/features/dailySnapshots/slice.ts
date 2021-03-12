@@ -61,10 +61,7 @@ export const selectors = {
   selectTimeSeriesSnapshotData: (state: AppState, poolId: string, timeframe: "Day" | "Week", key: SnapshotKey) => {
     const maxAgeInSeconds = timeframe === "Day" ? 86400 : 604800;
     const snapshots = selectors.selectSortedSnapshotsOfPoolInTimeframe(state, poolId, maxAgeInSeconds);
-    console.log(`Getting Time Series Data: ${timeframe} ${key}`);
-    console.log(snapshots[0]);
     const timeSeriesData = snapshots.map((snapshot) => ({ time: snapshot.date, value: snapshot[key] }));
-    console.log(timeSeriesData);
     return timeSeriesData;
   },
   selectMostRecentSnapshotOfPool: (state: AppState, poolId: string) => {
