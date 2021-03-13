@@ -190,7 +190,6 @@ export function useUniswapPairs(
   );
 
   useEffect(() => {
-    console.log(`useUniswapPairs: useEffect`);
     const pairs = tokenPairs.map(([tokenA, tokenB]) => {
       const [token0, token1] = sortTokens(tokenA, tokenB);
       const pair = computeUniswapPairAddress(token0, token1);
@@ -216,16 +215,15 @@ export function useUniswapPairs(
     if (loading) {
       return [undefined, true];
     }
-    const goodPairs = (pairDatas as FormattedPair[]).filter((p) => p.exists);
-    console.log(goodPairs);
+    const goodPairs = (pairDatas as FormattedPair[]).filter(
+      ({ exists }) => exists
+    );
     const uniSdkPairs = goodPairs.map(convert.toUniswapSDKPair) as Pair[];
     return [uniSdkPairs, false];
   }, [pairDatas]);
 }
 
 export function useUniswapTradingPairs(baseTokens: string[]) {
-  console.log(`useUniswapTradingPairs - BASE TOKENS`);
-  console.log(baseTokens);
   const [pairs, loading] = useUniswapPairs(baseTokens);
 
   const calculateBestTradeForExactInput = useCallback(
@@ -234,9 +232,6 @@ export function useUniswapTradingPairs(baseTokens: string[]) {
       tokenOut: NormalizedToken,
       amountIn: string // Should be formatted as a token amount in base 10 or hex
     ): Trade | undefined => {
-      console.log(`calculateBestTradeForExactInput`);
-      console.log(tokenIn);
-      console.log(tokenOut);
       if (loading) return undefined;
       const bestTrade = bestTradeExactIn(
         pairs as Pair[],

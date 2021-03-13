@@ -1,31 +1,13 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import { userActions } from "../user";
+import { userActions, userSelectors } from "../user";
 import type { AppState } from "features/store";
 
-type ListenerKind = "PoolData" | "TokenUserData" | "PairReservesData";
-
-/**
- * The `args` prop is given to the batch updater which then constructs the relevant contract calls.
- * `args` can be anything, but each entry should be specific to a particular call to execute, i.e.
- * if creating a batch of calls where each call then requires multiple params, each `args` entry
- * should be a tuple.
- *
- * @param id - Unique listener ID, set with middleware
- * @param kind - Type of batch to execute
- * @param args - Arguments given to the batch executor
- * @param otherArgs - Any other relevant data given to the batch executor
- */
-interface ListenerConfig {
-  id: string;
-  kind: ListenerKind;
-  args: any[];
-  otherArgs?: any;
-}
+import { Call, MultiCallTaskConfig, TaskHandlersByKind } from "ethereum/multicall";
 
 interface BatcherState {
   blockNumber: number;
   batch: string[];
-  listeners: Record<string, ListenerConfig>;
+  listeners: Record<string, MultiCallTaskConfig>;
 }
 
 const slice = createSlice({
@@ -39,10 +21,10 @@ const slice = createSlice({
     blockNumberChanged: (state, action: PayloadAction<number>) => {
       state.blockNumber = action.payload;
     },
-    listenerRegistered: (state, action: PayloadAction<ListenerConfig>) => {
+    listenerRegistered: (state, action: PayloadAction<MultiCallTaskConfig>) => {
       const { id } = action.payload;
 
-      state.listeners[id] = action.payload as ListenerConfig;
+      state.listeners[id] = action.payload;
       state.batch.push(id);
 
       return state;
@@ -65,52 +47,30 @@ export const { actions } = slice;
 
 export const selectors = {
   selectBlockNumber: (state: AppState) => state.batcher.blockNumber,
+  selectTasks: (state: AppState) => state.batcher.batch.map((id) => state.batcher.listeners[id]),
   selectBatch: (state: AppState) => {
-    const filled = state.batcher.batch.map((id) => state.batcher.listeners[id]);
-    const taskCache: Record<string, true> = {};
-    const separatedTasks = filled.reduce(
+    const tasks = selectors.selectTasks(state);
+    const account = userSelectors.selectUserAddress(state);
+    const context = { state, account };
+  
+    return tasks.reduce(
       (prev, next) => {
-        const task = next;
-        // Filter out any duplicate args entries
-        const uniqueArgs = task.args.filter(
-          (taskArg) =>
-            !taskCache[createTaskId(next.kind, JSON.stringify(next.otherArgs || ""), JSON.stringify(taskArg))]
+        const taskCalls = TaskHandlersByKind[next.kind].constructCalls(
+          context, next.args
         );
-
-        if (uniqueArgs.length > 0) {
-          const listenerKindToProperty: Record<
-            ListenerKind,
-            ListenerConfig[]
-          > = {
-            PairReservesData: prev.pairReservesTasks,
-            PoolData: prev.poolDataTasks,
-            TokenUserData: prev.tokenUserDataTasks,
-          };
-          const propertyToPushTo = listenerKindToProperty[next.kind];
-
-          for (const taskArg of uniqueArgs) {
-            taskCache[
-              createTaskId(next.kind, JSON.stringify(next.otherArgs || ""), JSON.stringify(taskArg))
-            ] = true;
-          }
-
-          propertyToPushTo.push({
-            ...task,
-            args: uniqueArgs,
-          });
-        }
-
+        const callCounts = { index: prev.calls.length, count: taskCalls.length };
+        prev.calls.push(...taskCalls);
+        prev.counts.push(callCounts);
+          
         return prev;
       },
       {
-        pairReservesTasks: [],
-        poolDataTasks: [],
-        tokenUserDataTasks: [],
-      } as Record<string, ListenerConfig[]>
+        calls: [] as Call[],
+        counts: [] as { index: number; count: number; }[],
+        tasks
+      }
     );
-
-    return separatedTasks;
-  },
+  }
 };
 
 export default slice.reducer;
