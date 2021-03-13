@@ -13,7 +13,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import TokenSelector from "../TokenSelector";
 
 interface Props {
-  pool: null | FormattedIndexPool;
+  pool: FormattedIndexPool;
 }
 
 type TradeValues = typeof INITIAL_STATE;
@@ -34,11 +34,7 @@ const { Item } = Form;
 export default function TradeInteraction({ pool }: Props) {
   const [form] = Form.useForm<TradeValues>();
   const [trade, setTrade] = useState<Trade | undefined>();
-
-  const previousFormValues = useRef<TradeValues>(INITIAL_STATE);
   const lastTouchedField = useRef<"input" | "output">("input");
-
-  const [renderCount, setRenderCount] = useState(0);
 
   const handleFlip = () => {
     const { from, to } = form.getFieldsValue();
@@ -48,15 +44,11 @@ export default function TradeInteraction({ pool }: Props) {
     };
 
     form.setFieldsValue(flippedValue);
-    previousFormValues.current = flippedValue;
-    triggerUpdate();
   };
-  const triggerUpdate = () => setRenderCount((prev) => prev + 1);
+  const tokenIds = useMemo(() => {
+    return [pool.id, ...COMMON_BASE_TOKENS.map(c => c.id)];
+  }, [pool.id]);
 
-  // const poolToken = useSelector((state: AppState) => selectors.selectTokenById(state, pool?.id ?? ""));
-  const tokenIds = useMemo(() => [
-    pool?.id ?? "", ...COMMON_BASE_TOKENS.map(c => c.id)
-  ], [pool]);
   const { calculateBestTradeForExactInput, calculateBestTradeForExactOutput } = useUniswapTradingPairs(tokenIds);
   const assets = useSelector((state: AppState) => selectors.selectTokensById(state, tokenIds));
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
@@ -99,7 +91,7 @@ export default function TradeInteraction({ pool }: Props) {
   }, [calculateBestTradeForExactOutput, form, tokenLookup]);
 
   const calculateOutputForExactInput = useCallback((changedValues: TradeValues) => {
-    const { to } = form.getFieldsValue();
+    const { from, to } = form.getFieldsValue();
     if (!changedValues.from.token || !to.token) return;
     let amountOut: number;
     if (!changedValues.from.amount) {
