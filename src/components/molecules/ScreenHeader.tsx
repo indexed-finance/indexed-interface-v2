@@ -1,4 +1,4 @@
-import { Breadcrumb, Divider, Typography } from "antd";
+import { Breadcrumb, Divider, Space, Typography } from "antd";
 import { ReactElement } from "react";
 import { useBreakpoints } from "helpers";
 
@@ -14,17 +14,22 @@ export default function ScreenHeader(props: Props) {
 
   return (
     <>
-      <Typography.Title level={breakpoints.md ? 1 : 3} className="ScreenHeader">
-        {title}
+      <Space align="center" wrap={true} className="spaced-between">
+        <Typography.Title
+          level={breakpoints.md ? 1 : 3}
+          className="ScreenHeader"
+        >
+          {title}
+        </Typography.Title>
         {(props.overlay || props.activeBreadcrumb) && (
-          <Breadcrumb>
+          <Breadcrumb style={{ fontSize: 18 }}>
             <Breadcrumb.Item overlay={props.overlay}>
               {props.activeBreadcrumb}
             </Breadcrumb.Item>
             {props.title && <Breadcrumb.Item>{props.title}</Breadcrumb.Item>}
           </Breadcrumb>
         )}
-      </Typography.Title>
+      </Space>
       <Divider className="screen-header-divider" />
     </>
   );

@@ -77,7 +77,7 @@ export default function Recent({ pool }: { pool: FormattedIndexPool }) {
   ));
 
   return (
-    <Subscreen title="Recent" padding={0}>
+    <Subscreen title="Recent">
       <Tabs
         size="large"
         centered={true}

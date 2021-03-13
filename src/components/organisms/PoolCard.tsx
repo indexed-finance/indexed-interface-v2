@@ -17,7 +17,6 @@ export default function PoolCard({ pool }: Props) {
       onClick={() => history.push(`/pools/${slug}`)}
       key={id}
       hoverable={true}
-      size="small"
       title={
         <Space align="start" className="spaced-between">
           <div>
@@ -61,7 +60,7 @@ export default function PoolCard({ pool }: Props) {
         </div>,
       ]}
     >
-      <Space align="start" wrap={true}>
+      <Space align="start" className="RankedTokenWrapper">
         {pool.assets.map((token, index) => (
           <RankedToken key={token.symbol} rank={index + 1} token={token} />
         ))}

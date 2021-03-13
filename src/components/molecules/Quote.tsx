@@ -9,6 +9,7 @@ export interface Props extends HTMLProps<HTMLDivElement> {
   isNegative?: boolean;
   kind?: "small" | "normal";
   centered?: boolean;
+  inline?: boolean;
 }
 
 export default function Quote({
@@ -18,21 +19,49 @@ export default function Quote({
   netChangePercent,
   isNegative = false,
   centered = true,
+  inline = false,
 }: Props) {
-  return (
-    <div style={{ textAlign: centered ? "center" : "right", flex: 2 }}>
-      <Typography.Title level={2} className="no-margin">
-        {symbol}
-      </Typography.Title>
-      <Typography.Title level={3} className="no-margin">
+  const inner = (
+    <>
+      {symbol && (
+        <Typography.Title
+          level={2}
+          style={{
+            marginTop: 0,
+            marginRight: 12,
+            marginBottom: 0,
+          }}
+        >
+          {symbol}
+        </Typography.Title>
+      )}
+      <Typography.Title
+        level={3}
+        style={{
+          marginTop: 0,
+          marginRight: 12,
+          marginBottom: 0,
+        }}
+      >
         {price}
       </Typography.Title>
       <Typography.Paragraph
-        className="no-margin"
+        style={{
+          marginTop: 0,
+          marginBottom: 0,
+        }}
         type={isNegative ? "danger" : "success"}
       >
         {netChange} ({netChangePercent})
       </Typography.Paragraph>
+    </>
+  );
+
+  return inline ? (
+    <div className="flex-center">{inner}</div>
+  ) : (
+    <div style={{ textAlign: centered ? "center" : "right", flex: 2 }}>
+      {inner}
     </div>
   );
 }

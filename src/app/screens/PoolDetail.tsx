@@ -1,6 +1,4 @@
-import { Action, Performance, Recent, Subscreen } from "../subscreens";
 import { AppState, actions, selectors } from "features";
-import { CgArrowsExpandRight } from "react-icons/cg";
 import {
   ChartCard,
   PoolDropdown,
@@ -9,8 +7,9 @@ import {
   RankedToken,
   ScreenHeader,
 } from "components";
-import { Col, Row, Space } from "antd";
+import { Col, Divider, Row, Space } from "antd";
 import { Link, Redirect, useParams } from "react-router-dom";
+import { Performance, Recent, Subscreen } from "../subscreens";
 import { useBreakpoints } from "helpers";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useMemo } from "react";
@@ -24,36 +23,6 @@ export default function PoolDetail() {
   const id = useMemo(() => pool?.id ?? "", [pool]);
   const isConnected = useSelector(selectors.selectConnected);
   const breakpoints = useBreakpoints();
-  const chartActions = useMemo(
-    () =>
-      [
-        {
-          type: "default",
-          title: (
-            <Link to={`/pools/${poolName}/chart`}>
-              Expand <CgArrowsExpandRight />
-            </Link>
-          ),
-          onClick: () => {
-            /* */
-          },
-        },
-      ] as Action[],
-    [poolName]
-  );
-  const interactionActions = useMemo(
-    () =>
-      [
-        {
-          title: "Swap",
-          onClick: () => {
-            /* */
-          },
-          type: "primary",
-        },
-      ] as Action[],
-    []
-  );
 
   // Effect:
   // When the pool changes and not connected to the server, get the juicy details.
@@ -86,13 +55,13 @@ export default function PoolDetail() {
     // Subscreens
     const performance = <Performance pool={pool} />;
     const chart = (
-      <Subscreen title="Chart" padding={0} defaultActions={chartActions}>
+      <Subscreen title="Performance">
         {id ? <ChartCard poolId={id} /> : null}
       </Subscreen>
     );
     const assets = (
-      <Subscreen title="Assets" padding={0}>
-        <Space wrap={true} align="start">
+      <Subscreen title="Assets">
+        <Space wrap={true} align="start" className="RankedTokenWrapper">
           {pool.assets.map((token, index) => (
             <RankedToken key={token.symbol} rank={index + 1} token={token} />
           ))}
@@ -101,11 +70,7 @@ export default function PoolDetail() {
       </Subscreen>
     );
     const interactions = (
-      <Subscreen
-        title="Interact"
-        padding={0}
-        defaultActions={interactionActions}
-      >
+      <Subscreen title="Interactions">
         <ProviderRequirementDrawer includeSignerRequirement={true} />
         <PoolInteractions pool={pool} />
       </Subscreen>
@@ -114,9 +79,7 @@ export default function PoolDetail() {
 
     // Variants
     const mobileSized = (
-      <Row gutter={25}>
-        <Col span={24}>{performance}</Col>
-        <Col span={24}>{chart}</Col>
+      <Row>
         <Col span={24}>{interactions}</Col>
         <Col span={24}>{assets}</Col>
         <Col span={24}>{recents}</Col>
@@ -125,10 +88,6 @@ export default function PoolDetail() {
     const tabletSized = (
       <>
         <Row gutter={25}>
-          <Col span={12}>
-            {performance}
-            {chart}
-          </Col>
           <Col span={12}>
             {assets}
             {interactions}
@@ -139,22 +98,18 @@ export default function PoolDetail() {
         </Row>
       </>
     );
+
     const desktopSized = (
-      <Row gutter={20}>
-        <Col span={16}>
-          <Row gutter={25}>
-            <Col span={12}>
-              {performance}
-              {chart}
-            </Col>
-            <Col span={12}>{interactions}</Col>
-          </Row>
-          <Row gutter={25}>
-            <Col span={24}>{recents}</Col>
-          </Row>
-        </Col>
-        <Col span={8}>{assets}</Col>
-      </Row>
+      <>
+        <Row gutter={20}>
+          <Col span={12}>{chart}</Col>
+          <Col span={12}>{interactions}</Col>
+        </Row>
+        <Row gutter={20}>
+          <Col span={12}>{assets}</Col>
+          <Col span={12}>{recents}</Col>
+        </Row>
+      </>
     );
 
     return (
@@ -164,6 +119,8 @@ export default function PoolDetail() {
           overlay={<PoolDropdown />}
           activeBreadcrumb={<Link to="/pools">Index Pools</Link>}
         />
+        {performance}
+        <Divider style={{ marginTop: 0 }} />
         {(() => {
           switch (true) {
             case breakpoints.xxl:
