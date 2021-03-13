@@ -2,7 +2,11 @@ import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { userActions, userSelectors } from "../user";
 import type { AppState } from "features/store";
 
-import { Call, MultiCallTaskConfig, TaskHandlersByKind } from "ethereum/multicall";
+import {
+  Call,
+  MultiCallTaskConfig,
+  TaskHandlersByKind,
+} from "ethereum/multicall";
 
 interface BatcherState {
   blockNumber: number;
@@ -47,36 +51,35 @@ export const { actions } = slice;
 
 export const selectors = {
   selectBlockNumber: (state: AppState) => state.batcher.blockNumber,
-  selectTasks: (state: AppState) => state.batcher.batch.map((id) => state.batcher.listeners[id]),
+  selectTasks: (state: AppState) =>
+    state.batcher.batch.map((id) => state.batcher.listeners[id]),
   selectBatch: (state: AppState) => {
     const tasks = selectors.selectTasks(state);
     const account = userSelectors.selectUserAddress(state);
     const context = { state, account };
-  
+
     return tasks.reduce(
       (prev, next) => {
         const taskCalls = TaskHandlersByKind[next.kind].constructCalls(
-          context, next.args
+          context,
+          next.args
         );
-        const callCounts = { index: prev.calls.length, count: taskCalls.length };
+        const callCounts = {
+          index: prev.calls.length,
+          count: taskCalls.length,
+        };
         prev.calls.push(...taskCalls);
         prev.counts.push(callCounts);
-          
+
         return prev;
       },
       {
         calls: [] as Call[],
-        counts: [] as { index: number; count: number; }[],
-        tasks
+        counts: [] as { index: number; count: number }[],
+        tasks,
       }
     );
-  }
+  },
 };
 
 export default slice.reducer;
-
-// #region Helpers
-function createTaskId(...args: string[]) {
-  return args.join("-");
-}
-// #endregion

@@ -2,7 +2,6 @@ import { AppState, actions, selectors } from "features";
 import {
   ChartCard,
   PoolDropdown,
-  PoolInteractions,
   ProviderRequirementDrawer,
   RankedToken,
   ScreenHeader,
@@ -10,6 +9,7 @@ import {
 import { Col, Divider, Row, Space } from "antd";
 import { Link, Redirect, useParams } from "react-router-dom";
 import { Performance, Recent, Subscreen } from "../subscreens";
+import { PoolInteractions } from "../interactions";
 import { useBreakpoints } from "helpers";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useMemo } from "react";

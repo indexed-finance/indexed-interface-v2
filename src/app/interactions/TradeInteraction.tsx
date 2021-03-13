@@ -1,22 +1,14 @@
 import { AiOutlineArrowRight } from "react-icons/ai";
 import { AppState, FormattedIndexPool, selectors } from "features";
 import { COMMON_BASE_TOKENS } from "config";
-import { Flipper, Token } from "components";
+import { Flipper, Token, TokenSelector } from "components";
 import { Form, Typography } from "antd";
 import { TokenExchangeRate } from "components/molecules";
 import { Trade } from "@uniswap/sdk";
 import { convert } from "helpers";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSelector } from "react-redux";
-
 import { useUniswapTradingPairs } from "ethereum/helpers";
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
-import TokenSelector from "../TokenSelector";
 
 interface Props {
   pool: null | FormattedIndexPool;

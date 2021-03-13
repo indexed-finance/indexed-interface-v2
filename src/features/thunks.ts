@@ -1,9 +1,9 @@
 import * as topLevelActions from "./actions";
 import { AppThunk } from "./store";
 import { BigNumber } from "bignumber.js";
-import { Call, TaskHandlersByKind, multicall } from "ethereum/multicall";
 import { CoinGeckoService } from "services";
 import { SLIPPAGE_RATE, SUBGRAPH_URL_UNISWAP } from "config";
+import { TaskHandlersByKind, multicall } from "ethereum/multicall";
 import { batcherActions } from "./batcher";
 import { categoriesActions } from "./categories";
 import { convert } from "helpers";
@@ -195,8 +195,8 @@ const thunks = {
         kind: "PoolData",
         args: {
           pool: poolId,
-          tokens: tokens.map(t => t.token.id),
-        }
+          tokens: tokens.map((t) => t.token.id),
+        },
       })
     );
   },
@@ -213,8 +213,8 @@ const thunks = {
         kind: "TokenUserData",
         args: {
           pool: poolId,
-          tokens: tokens.map(t => t.token.id),
-        }
+          tokens: tokens.map((t) => t.token.id),
+        },
       })
     );
   },
@@ -319,7 +319,7 @@ const thunks = {
       const state = getState();
       const account = selectors.selectUserAddress(state);
       const context = { state, dispatch, account };
-  
+
       const { calls, counts, tasks } = selectors.selectBatch(state);
       const { blockNumber, results: allResults } = await multicall(
         provider,
@@ -329,11 +329,10 @@ const thunks = {
       for (const task of tasks) {
         const { index, count } = counts[resultIndex++];
         const results = allResults.slice(index, index + count);
-        TaskHandlersByKind[task.kind].handleResults(
-          context,
-          task.args,
-          { blockNumber, results }
-        )
+        TaskHandlersByKind[task.kind].handleResults(context, task.args, {
+          blockNumber,
+          results,
+        });
       }
     }
   },

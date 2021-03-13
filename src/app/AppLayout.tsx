@@ -52,7 +52,7 @@ export default function AppLayout() {
         </Sider>
       )}
 
-      <Content>
+      <Content style={{ position: "relative" }}>
         <div className="Page">
           <RouterSwitch>
             {routes.map((route, index) => (
@@ -63,6 +63,8 @@ export default function AppLayout() {
           </RouterSwitch>
           {activePage && <Drawer page={activePage} />}
         </div>
+
+        <div className="BackgroundEffect" />
       </Content>
     </Layout>
   );

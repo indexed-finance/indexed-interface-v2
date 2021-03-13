@@ -62,7 +62,12 @@ export default function PoolCard({ pool }: Props) {
     >
       <Space align="start" className="RankedTokenWrapper">
         {pool.assets.map((token, index) => (
-          <RankedToken key={token.symbol} rank={index + 1} token={token} />
+          <RankedToken
+            key={token.symbol}
+            rank={index + 1}
+            token={token}
+            fixedSize={true}
+          />
         ))}
       </Space>
     </Card>

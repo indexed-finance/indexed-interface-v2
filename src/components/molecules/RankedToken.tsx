@@ -7,14 +7,15 @@ import Quote from "./Quote";
 export interface Props {
   token: Asset;
   rank: number;
+  fixedSize?: boolean;
 }
 
-export default function RankedToken({ token, rank }: Props) {
+export default function RankedToken({ token, fixedSize = false }: Props) {
   return (
     <Card
       size="small"
       className="RankedToken"
-      style={{ width: "100%" }}
+      style={{ width: fixedSize ? 460 : "100%" }}
       actions={[
         <div key="1">
           <Typography.Text type="secondary">Balance (in USD)</Typography.Text>
