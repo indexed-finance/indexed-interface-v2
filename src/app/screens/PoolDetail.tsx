@@ -11,5 +11,5 @@ export default function PoolDetail() {
   );
   if (poolId === undefined) return <></>;
   if (!poolId) return <Redirect to="/pools" />;
-  return <Pool poolId={poolId} poolName={poolName} />;
+  return <Pool id={poolId} />;
 }

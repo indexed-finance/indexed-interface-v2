@@ -16,14 +16,11 @@ export interface Props {
 export default function ChartCard({ poolId, expanded = false }: Props) {
   const [key, setKey] = useState<SnapshotKey>("value");
   const [timeframe, setTimeframe] = useState<Timeframe>("Day");
-  const poolName = useSelector((state: AppState) =>
-    selectors.selectNameForPool(state, poolId)
-  );
   const data = useSelector((state: AppState) =>
     selectors.selectTimeSeriesSnapshotData(state, poolId, timeframe, key)
   );
   const formattedPool = useSelector((state: AppState) =>
-    selectors.selectFormattedIndexPool(state, poolName)
+    selectors.selectFormattedIndexPool(state, poolId)
   );
   const toggleTimeframe = useCallback(
     () =>

@@ -12,16 +12,17 @@ import { Performance, Recent, Subscreen } from "../subscreens";
 import { PoolInteractions } from "../interactions";
 import { useBreakpoints } from "helpers";
 import { useDispatch, useSelector } from "react-redux";
-import { useEffect, useMemo } from "react";
+import { useEffect } from "react";
 
-type Props = { poolId: string; poolName: string };
+interface Props {
+  id: string;
+}
 
-export default function Pool({ poolId }: Props) {
+export default function Pool({ id }: Props) {
   const dispatch = useDispatch();
   const pool = useSelector((state: AppState) =>
-    selectors.selectFormattedIndexPool(state, poolId)
+    selectors.selectFormattedIndexPool(state, id)
   );
-  const id = useMemo(() => pool?.id ?? "", [pool]);
   const isConnected = useSelector(selectors.selectConnected);
   const breakpoints = useBreakpoints();
 
@@ -99,7 +100,6 @@ export default function Pool({ poolId }: Props) {
         </Row>
       </>
     );
-
     const desktopSized = (
       <>
         <Row gutter={20}>

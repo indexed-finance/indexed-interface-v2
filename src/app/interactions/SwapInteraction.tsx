@@ -1,7 +1,7 @@
 import { AiOutlineArrowRight } from "react-icons/ai";
 import { AppState, FormattedIndexPool, selectors, signer } from "features";
+import { Button, Divider, Form, Space, Typography } from "antd";
 import { Flipper, Token } from "components/atoms";
-import { Form, Space } from "antd";
 import { TokenExchangeRate, TokenSelector } from "components";
 import { actions } from "features";
 import { convert } from "helpers";
@@ -319,37 +319,46 @@ export default function SwapInteraction({ pool }: Props) {
       }
     >
       <Space align="center" className="spaced-between">
+        <Typography.Title level={2} className="fancy no-margin-bottom">
+          Swap
+        </Typography.Title>
         {baseline && comparison && (
-          <div style={{ position: "relative", top: 0, right: 0 }}>
+          <Space>
             <Token name="Baseline" image={baseline} />
             <AiOutlineArrowRight
               style={{
-                position: "absolute",
+                position: "relative",
+                top: "4px",
                 fontSize: "32px",
               }}
             />
             <Token name="Comparison" image={comparison} />
-          </div>
+          </Space>
         )}
       </Space>
+      <Divider />
       <Item name="from" rules={[{ validator: checkAmount }]}>
         {pool && <TokenSelector label="From" assets={pool.assets} />}
       </Item>
-      <Flipper onFlip={handleFlip} />
+      <Divider>
+        <Flipper onFlip={handleFlip} />
+      </Divider>
       <Item name="to" rules={[{ validator: checkAmount }]}>
         {pool && <TokenSelector label="To" assets={pool.assets} />}
       </Item>
+      <Divider />
       {previousFormValues.current.from.token &&
         previousFormValues.current.to.token && (
-          <div>
-            <TokenExchangeRate
-              baseline={baseline}
-              comparison={comparison}
-              fee={formattedSwapFee}
-              rate={price.toString()}
-            />
-          </div>
+          <TokenExchangeRate
+            baseline={baseline}
+            comparison={comparison}
+            fee={formattedSwapFee}
+            rate={price.toString()}
+          />
         )}
+      <Button type="primary" style={{ width: "100%", marginTop: 20 }}>
+        Send
+      </Button>
     </Form>
   );
 }

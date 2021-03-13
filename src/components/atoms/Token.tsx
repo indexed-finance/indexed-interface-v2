@@ -4,17 +4,23 @@ interface Props {
   address?: string;
   name: string;
   image: string;
-  size?: "small" | "medium" | "large";
+  size?: "tiny" | "small" | "medium" | "large";
 }
 
 export default function Token({
   address = "",
   name,
-  size = "medium",
+  size = "small",
   image,
   ...rest
 }: Props) {
   let tokenImage = PLACEHOLDER_TOKEN_IMAGE;
+  const tokenImageSize = {
+    tiny: 16,
+    small: 32,
+    medium: 48,
+    large: 64,
+  }[size];
 
   try {
     // First, do we have it locally?
@@ -28,5 +34,16 @@ export default function Token({
     }
   }
 
-  return <img className="Token" alt={name} src={tokenImage} {...rest} />;
+  return (
+    <img
+      className="Token"
+      alt={name}
+      src={tokenImage}
+      {...rest}
+      style={{
+        width: tokenImageSize,
+        height: tokenImageSize,
+      }}
+    />
+  );
 }

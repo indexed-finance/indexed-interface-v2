@@ -1,6 +1,5 @@
 import { AppState, selectors } from "features";
 import { Button, InputNumber, List, Space, Typography } from "antd";
-import { CaretDownOutlined } from "@ant-design/icons";
 import { SelectableToken } from "components/molecules";
 import { Token } from "components/atoms";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -119,9 +118,8 @@ export default function TokenSelector({
 
   return (
     <div onClick={handleWrapperClick}>
-      <Space direction="horizontal">
-        <Typography.Text type="secondary">{label}</Typography.Text>
-        <div>
+      <Space direction="horizontal" className="spaced-between">
+        <Space direction="vertical">
           {value.token ? (
             <Typography.Text type="secondary">
               {parseInt(relevantBalance) ? (
@@ -133,17 +131,21 @@ export default function TokenSelector({
           ) : (
             "-"
           )}
-        </div>
-      </Space>
-      <Space direction="horizontal">
-        <InputNumber
-          ref={input}
-          min={0}
-          step="0.01"
-          value={value.amount ?? amount}
-          onChange={onAmountChange}
-        />
+          <InputNumber
+            ref={input}
+            min={0}
+            step="0.01"
+            value={value.amount ?? amount}
+            onChange={onAmountChange}
+            style={{ width: 200 }}
+          />
+        </Space>
         <div>
+          <div
+            style={{ paddingLeft: 10, paddingRight: 15, textAlign: "right" }}
+          >
+            <Typography.Text type="secondary">{label}</Typography.Text>
+          </div>
           {value.token && parseFloat(relevantBalance) > 0 && (
             <Button type="dashed" onClick={handleMaxOut}>
               MAX
@@ -170,18 +172,18 @@ export default function TokenSelector({
             }
           >
             {value.token ? (
-              <>
+              <Space>
                 <Token
                   name={value.token}
                   image={value.token}
+                  size="small"
                   address={tokenLookup[value.token]?.id ?? ""}
                 />
                 {value.token}
-              </>
+              </Space>
             ) : (
               "Select"
             )}
-            {selectable && <CaretDownOutlined />}
           </Button>
         </div>
       </Space>
