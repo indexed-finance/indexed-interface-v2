@@ -178,16 +178,11 @@ export function useUniswapPairs(
   baseTokens: string[]
 ): [Pair[], false] | [undefined, true] {
   const dispatch = useDispatch();
-  const tokenPairs = useMemo(() => buildCommonTokenPairs(baseTokens), [
-    baseTokens,
-  ]);
-  const pairAddresses = useMemo(
-    () =>
-      tokenPairs.map(([tokenA, tokenB]) =>
-        computeUniswapPairAddress(tokenA, tokenB)
-      ),
-    [tokenPairs]
-  );
+  const [tokenPairs, pairAddresses] = useMemo(() => {
+    const _tokenPairs = buildCommonTokenPairs(baseTokens);
+    const _pairAddresses = _tokenPairs.map(([tokenA, tokenB]) => computeUniswapPairAddress(tokenA, tokenB));
+    return [_tokenPairs, _pairAddresses];
+  }, [baseTokens]);
 
   useEffect(() => {
     const pairs = tokenPairs.map(([tokenA, tokenB]) => {
@@ -201,8 +196,8 @@ export function useUniswapPairs(
     ) as unknown) as string;
     return () => {
       dispatch(actions.listenerUnregistered(listenerId));
-    };
-  }, [dispatch, pairAddresses, tokenPairs]);
+    }
+  }, [dispatch, tokenPairs, pairAddresses]);
 
   const pairDatas = useSelector((state: AppState) =>
     selectors.selectFormattedPairsById(state, pairAddresses)

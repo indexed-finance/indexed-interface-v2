@@ -99,21 +99,40 @@ export const { actions } = slice;
 
 export const selectors = {
   ...adapter.getSelectors((state: AppState) => state.indexPools),
-  selectPool: (state: AppState, poolId: string) =>
-    selectors.selectById(state, poolId),
+  selectPool: (state: AppState, poolId: string) => selectors.selectById(state, poolId),
   selectNameForPool: (state: AppState, poolId: string) => {
     const pool = selectors.selectPool(state, poolId);
     return pool ? formatName(pool.name) : "";
   },
-  selectPoolByName: (state: AppState, name: string) => {
+  selectPoolLookUpByName: (state: AppState) => {
     const formatName = (from: string) => S(from).camelize().s.toLowerCase();
-    const formattedName = formatName(name);
-    const pools = selectors.selectAllPools(state).reduce((prev, next) => {
+    return selectors.selectAllPools(state).reduce((prev, next) => {
       prev[formatName(next.name)] = next;
       return prev;
     }, {} as Record<string, NormalizedPool>);
+  },
+  /**
+   * @returns undefined if no pools are loaded yet;
+   * pool ID if a pool is found for the provided name;
+   * empty string if no pool is found for the provided name
+   */
+  selectPoolIdByName: (state: AppState, name: string) => {
+    const poolsByName = selectors.selectPoolLookUpByName(state);
+    if (Object.keys(poolsByName).length === 0) {
+      return undefined;
+    }
+    const formattedName = formatName(name);
+    const pool = poolsByName[formattedName];
+    if (pool) {
+      return pool.id;
+    }
+    return "";
+  },
+  selectPoolByName: (state: AppState, name: string) => {
+    const poolsByName = selectors.selectPoolLookUpByName(state);
+    const formattedName = formatName(name);
 
-    return pools[formattedName] ?? null;
+    return poolsByName[formattedName] ?? null;
   },
   selectAllPools: (state: AppState) => selectors.selectAll(state),
   selectPoolLookup: (state: AppState) => selectors.selectEntities(state),

@@ -11,7 +11,7 @@ import { useSelector } from "react-redux";
 import { useUniswapTradingPairs } from "ethereum/helpers";
 
 interface Props {
-  pool: null | FormattedIndexPool;
+  pool: FormattedIndexPool;
 }
 
 type TradeValues = typeof INITIAL_STATE;
@@ -32,11 +32,7 @@ const { Item } = Form;
 export default function TradeInteraction({ pool }: Props) {
   const [form] = Form.useForm<TradeValues>();
   const [trade, setTrade] = useState<Trade | undefined>();
-
-  const previousFormValues = useRef<TradeValues>(INITIAL_STATE);
   const lastTouchedField = useRef<"input" | "output">("input");
-
-  const [, setRenderCount] = useState(0);
 
   const handleFlip = () => {
     const { from, to } = form.getFieldsValue();
@@ -46,23 +42,13 @@ export default function TradeInteraction({ pool }: Props) {
     };
 
     form.setFieldsValue(flippedValue);
-    previousFormValues.current = flippedValue;
-    triggerUpdate();
   };
-  const triggerUpdate = () => setRenderCount((prev) => prev + 1);
+  const tokenIds = useMemo(() => {
+    return [pool.id, ...COMMON_BASE_TOKENS.map(c => c.id)];
+  }, [pool.id]);
 
-  // const poolToken = useSelector((state: AppState) => selectors.selectTokenById(state, pool?.id ?? ""));
-  const tokenIds = useMemo(
-    () => [pool?.id ?? "", ...COMMON_BASE_TOKENS.map((c) => c.id)],
-    [pool]
-  );
-  const {
-    calculateBestTradeForExactInput,
-    calculateBestTradeForExactOutput,
-  } = useUniswapTradingPairs(tokenIds);
-  const assets = useSelector((state: AppState) =>
-    selectors.selectTokensById(state, tokenIds)
-  );
+  const { calculateBestTradeForExactInput, calculateBestTradeForExactOutput } = useUniswapTradingPairs(tokenIds);
+  const assets = useSelector((state: AppState) => selectors.selectTokensById(state, tokenIds));
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
 
   useEffect(() => {
@@ -80,67 +66,56 @@ export default function TradeInteraction({ pool }: Props) {
     }
   }, [form, pool]);
 
-  const calculateInputForExactOutput = useCallback(
-    (changedValues: TradeValues) => {
-      const { from } = form.getFieldsValue();
-      if (!changedValues.to.token || !from.token) return;
-      let amountIn: number;
-      if (!changedValues.to.amount) {
-        amountIn = 0;
-      } else {
-        const inputToken = tokenLookup[from.token.toLowerCase()];
-        const outputToken = tokenLookup[changedValues.to.token.toLowerCase()];
-        const amountOut = convert
-          .toToken(changedValues.to.amount.toString(), outputToken.decimals)
-          .toString(10);
-        const bestTrade = calculateBestTradeForExactOutput(
-          inputToken,
-          outputToken,
-          amountOut
-        );
-        setTrade(bestTrade);
-        amountIn = parseFloat(bestTrade?.inputAmount.toFixed(4) ?? "0");
-      }
-      form.setFieldsValue({
-        from: {
-          token: from.token,
-          amount: amountIn,
-        },
-      });
-    },
-    [calculateBestTradeForExactOutput, form, tokenLookup]
-  );
+  const calculateInputForExactOutput = useCallback((changedValues: TradeValues) => {
+    const { from } = form.getFieldsValue();
+    if (!changedValues.to.token || !from.token) return;
+    let amountIn: number;
+    if (!changedValues.to.amount) {
+      amountIn = 0;
+    } else {
+      const inputToken = tokenLookup[from.token.toLowerCase()];
+      const outputToken = tokenLookup[changedValues.to.token.toLowerCase()];
+      const amountOut = convert
+        .toToken(changedValues.to.amount.toString(), outputToken.decimals)
+        .toString(10);
+      const bestTrade = calculateBestTradeForExactOutput(
+        inputToken,
+        outputToken,
+        amountOut
+      );
+      setTrade(bestTrade);
+      amountIn = parseFloat(bestTrade?.inputAmount.toFixed(4) ?? "0");
+    }
 
-  const calculateOutputForExactInput = useCallback(
-    (changedValues: TradeValues) => {
-      const { to } = form.getFieldsValue();
-      if (!changedValues.from.token || !to.token) return;
-      let amountOut: number;
-      if (!changedValues.from.amount) {
-        amountOut = 0;
-      } else {
-        const inputToken = tokenLookup[changedValues.from.token.toLowerCase()];
-        const outputToken = tokenLookup[to.token.toLowerCase()];
-        const amountIn = convert
-          .toToken(changedValues.from.amount.toString(), inputToken.decimals)
-          .toString(10);
-        const bestTrade = calculateBestTradeForExactInput(
-          inputToken,
-          outputToken,
-          amountIn
-        );
-        setTrade(bestTrade);
-        amountOut = parseFloat(bestTrade?.outputAmount.toFixed(4) ?? "0");
+    form.setFieldsValue({
+      from: {
+        token: from.token,
+        amount: amountIn
       }
-      form.setFieldsValue({
-        to: {
-          token: to.token,
-          amount: amountOut,
-        },
-      });
-    },
-    [calculateBestTradeForExactInput, form, tokenLookup]
-  );
+    });
+  }, [calculateBestTradeForExactOutput, form, tokenLookup]);
+
+  const calculateOutputForExactInput = useCallback((changedValues: TradeValues) => {
+    const { from, to } = form.getFieldsValue();
+    if (!changedValues.from.token || !to.token) return;
+    let amountOut: number;
+    if (!changedValues.from.amount) {
+      amountOut = 0;
+    } else {
+      const inputToken = tokenLookup[changedValues.from.token.toLowerCase()];
+      const outputToken = tokenLookup[to.token.toLowerCase()];
+      const amountIn = convert.toToken(changedValues.from.amount.toString(), inputToken.decimals).toString(10);
+      const bestTrade = calculateBestTradeForExactInput(inputToken, outputToken, amountIn);
+      setTrade(bestTrade);
+      amountOut = parseFloat(bestTrade?.outputAmount.toFixed(4) ?? "0");
+    }
+    form.setFieldsValue({
+      to: {
+        token: to.token,
+        amount: amountOut
+      }
+    });
+  }, [calculateBestTradeForExactInput, form, tokenLookup]);
 
   const checkAmount = (_: any, value: { amount: number }) => {
     return value.amount > 0
