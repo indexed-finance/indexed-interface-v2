@@ -123,13 +123,13 @@ const selectors = {
   /**
    *
    * @param state -
-   * @param poolName -
+   * @param poolId -
    */
   selectFormattedIndexPool: (
     state: AppState,
-    poolName: string
+    poolId: string
   ): null | FormattedIndexPool => {
-    const pool = selectors.selectPoolByName(state, poolName);
+    const pool = selectors.selectPool(state, poolId);
     const tokenIds = pool?.tokens.ids ?? [];
 
     if (pool) {
@@ -276,7 +276,7 @@ const selectors = {
   selectAllFormattedIndexPools: (state: AppState) => {
     return selectors
       .selectAllPools(state)
-      .map((pool) => selectors.selectFormattedIndexPool(state, pool.name))
+      .map((pool) => selectors.selectFormattedIndexPool(state, pool.id))
       .filter(Boolean);
   },
 };
