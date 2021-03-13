@@ -18,6 +18,7 @@ export default function PoolInteractions({ pool, initial = "swap" }: Props) {
 
   return (
     <Tabs
+      size="large"
       centered={true}
       tabPosition="right"
       activeKey={interaction}

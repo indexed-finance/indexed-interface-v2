@@ -49,11 +49,11 @@ export default function ProviderRequirementDrawer({
   return (
     <div onClick={() => dispatch(actions.attachToProvider())}>
       <Drawer
-        className="requirement-drawer"
         placement={placement}
         closable={false}
         visible={!meetsRequirement}
         getContainer={false}
+        style={{ position: "absolute" }}
         {...placementProps[placement]}
       >
         <Result

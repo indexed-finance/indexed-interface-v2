@@ -1,5 +1,4 @@
-// This file should not contain any color information.
-@import "./variables.less";
+@import "~antd/dist/antd.less";
 
 // -- Fonts
 @font-face {
@@ -21,8 +20,6 @@
 }
 
 .ant-layout {
-  background-image: url("../assets/images/light-bg.png") !important;
-
   &-sider-children {
     &:extend(.effect8f);
 
@@ -38,6 +35,19 @@
 
     // COLOR
     border-right: 1px solid #f0f0f0;
+  }
+}
+
+.dark {
+  .ant-layout {
+    background: black;
+    background-image: url("../assets/images/dark-bg.png") !important;
+  }
+}
+.light {
+  .ant-layout {
+    background: white;
+    background-image: url("../assets/images/light-bg.png") !important;
   }
 }
 
@@ -183,11 +193,26 @@ body {
     min-height: 100vh;
     margin: 8rem auto 0 auto;
     padding: @spacing-small;
-    background: @page-background;
+
     z-index: 3;
 
     @media screen and (min-width: 480px) {
       padding: @spacing-large;
+    }
+  }
+}
+
+.dark {
+  .AppLayout {
+    .Page {
+      background: #161616 !important;
+    }
+  }
+}
+.light {
+  .AppLayout {
+    .Page {
+      background: #fafafa !important;
     }
   }
 }

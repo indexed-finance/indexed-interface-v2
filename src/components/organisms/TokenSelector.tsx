@@ -29,7 +29,6 @@ export default function TokenSelector({
   label = "",
   assets,
   value = {},
-  selectable = true,
   onChange,
 }: Props) {
   const [amount, setAmount] = useState(value?.amount ?? 0);
@@ -176,6 +175,22 @@ export default function TokenSelector({
         closable={true}
         onClose={handleCloseTokenSelection}
         visible={selectingToken}
+        width={300}
+        style={{
+          height: "calc(100% - 64px)",
+          top: 64,
+          overflow: "auto",
+          zIndex: 6,
+        }}
+        footer={
+          <Button
+            type="default"
+            onClick={handleCloseTokenSelection}
+            style={{ width: "100%" }}
+          >
+            Close
+          </Button>
+        }
       >
         <List>
           {assets.map((asset) => (
@@ -189,9 +204,6 @@ export default function TokenSelector({
             />
           ))}
         </List>
-        <Button type="default" onClick={handleCloseTokenSelection}>
-          Close
-        </Button>
       </Drawer>
     </div>
   );

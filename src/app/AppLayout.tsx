@@ -1,4 +1,5 @@
 import { FormattedIndexPool, selectors } from "features";
+import { Helmet } from "react-helmet";
 import { Layout } from "antd";
 import { QuoteCarousel } from "components";
 import { Route, Switch as RouterSwitch } from "react-router-dom";
@@ -22,6 +23,7 @@ export default function AppLayout() {
     () => setMobileMenuActive((prev) => !prev),
     []
   );
+  const theme = useSelector(selectors.selectTheme);
 
   // Effect
   // On initial load, open up a connection to the server.
@@ -38,31 +40,36 @@ export default function AppLayout() {
   }, [isConnectionEnabled]);
 
   return (
-    <Layout className="AppLayout">
-      <AppHeader
-        mobileMenuActive={mobileMenuActive}
-        onToggleMobileMenu={toggleMobileMenu}
-      />
+    <>
+      <Helmet>
+        <body className={theme} />
+      </Helmet>
+      <Layout className={`AppLayout`}>
+        <AppHeader
+          mobileMenuActive={mobileMenuActive}
+          onToggleMobileMenu={toggleMobileMenu}
+        />
 
-      {(mobileMenuActive || breakpoints.lg) && (
-        <Sider width={300}>
-          <QuoteCarousel pools={indexPools as FormattedIndexPool[]} />
-          <AppMenu onItemClick={closeMobileMenu} />
-        </Sider>
-      )}
+        {(mobileMenuActive || breakpoints.lg) && (
+          <Sider width={300}>
+            <QuoteCarousel pools={indexPools as FormattedIndexPool[]} />
+            <AppMenu onItemClick={closeMobileMenu} />
+          </Sider>
+        )}
 
-      <Content style={{ position: "relative" }}>
-        <div className="Page">
-          <RouterSwitch>
-            {routes.map((route, index) => (
-              <Route key={index} path={route.path} exact={route.exact}>
-                {route.screen}
-              </Route>
-            ))}
-          </RouterSwitch>
-        </div>
-        <div className="BackgroundEffect" />
-      </Content>
-    </Layout>
+        <Content style={{ position: "relative" }}>
+          <div className="Page">
+            <RouterSwitch>
+              {routes.map((route, index) => (
+                <Route key={index} path={route.path} exact={route.exact}>
+                  {route.screen}
+                </Route>
+              ))}
+            </RouterSwitch>
+          </div>
+          <div className="BackgroundEffect" />
+        </Content>
+      </Layout>
+    </>
   );
 }
