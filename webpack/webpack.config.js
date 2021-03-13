@@ -38,6 +38,10 @@ module.exports = {
         test: /\.d\.ts$/,
         loader: "ignore-loader",
       },
+      {
+        test: /\.less$/,
+        loader: "ignore-loader",
+      },
     ],
   },
 };

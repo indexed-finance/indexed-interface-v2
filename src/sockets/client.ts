@@ -4,12 +4,16 @@ import { message } from "antd";
 
 export let socket: null | WebSocket = null;
 
+const websocketUrl =
+  process.env.NODE_ENV === "development"
+    ? "ws://localhost:13337/"
+    : "ws://192.168.1.154:13337/";
 const timeInSeconds = [1, 1, 3, 5, 8, 13, 21, 99, 999];
 let retryAttempts = 0;
 
 export default class SocketClient {
   public static connect() {
-    socket = new WebSocket("ws://localhost:13337/");
+    socket = new WebSocket(websocketUrl);
 
     socket.onopen = () => {
       message.success("The connection to the server was established.");

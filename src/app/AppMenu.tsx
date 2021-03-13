@@ -8,14 +8,14 @@ import {
 import { Link, useHistory } from "react-router-dom";
 import { SOCIAL_MEDIA } from "config";
 import { selectors } from "features";
-import { useBreakpoints } from "helpers";
+import { useBreakpoints, useScrollPrevention } from "helpers";
 import { useSelector } from "react-redux";
 import noop from "lodash.noop";
 import routes from "./routes";
 
 interface Props {
-  onItemClick?(): void;
   className?: string;
+  onItemClick?(): void;
 }
 
 const { Item, SubMenu } = Menu;
@@ -25,12 +25,13 @@ export default function AppMenu({ onItemClick = noop, ...rest }: Props) {
   const categoryLookup = useSelector(selectors.selectCategoryLookup);
   const indexPoolsLookup = useSelector(selectors.selectCategoryImagesByPoolIds);
   const history = useHistory();
-  const breakpoints = useBreakpoints();
-  const isMobile = !breakpoints.md;
+  const { isMobile } = useBreakpoints();
+
+  useScrollPrevention(isMobile);
 
   return (
     <>
-      <Divider className="no-margin-bottom" />
+      {!isMobile && <Divider className="no-margin-bottom" />}
       <Menu
         className="AppMenu"
         mode="inline"

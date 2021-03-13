@@ -44,20 +44,25 @@ export default function AppLayout() {
       <Helmet>
         <body className={theme} />
       </Helmet>
-      <Layout className={`AppLayout`}>
+      <Layout className="AppLayout">
+        {mobileMenuActive && (
+          <div className="AppMenuWrapper">
+            <AppMenu onItemClick={closeMobileMenu} />
+          </div>
+        )}
         <AppHeader
           mobileMenuActive={mobileMenuActive}
           onToggleMobileMenu={toggleMobileMenu}
         />
-
-        {(mobileMenuActive || breakpoints.lg) && (
+        {breakpoints.lg && (
           <Sider width={300}>
-            <QuoteCarousel pools={indexPools as FormattedIndexPool[]} />
-            <AppMenu onItemClick={closeMobileMenu} />
+            {indexPools.length > 0 && (
+              <QuoteCarousel pools={indexPools as FormattedIndexPool[]} />
+            )}
+            <AppMenu />
           </Sider>
         )}
-
-        <Content style={{ position: "relative" }}>
+        <Content>
           <div className="Page">
             <RouterSwitch>
               {routes.map((route, index) => (
@@ -67,7 +72,6 @@ export default function AppLayout() {
               ))}
             </RouterSwitch>
           </div>
-          <div className="BackgroundEffect" />
         </Content>
       </Layout>
     </>
