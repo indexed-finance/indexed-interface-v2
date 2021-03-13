@@ -1,7 +1,6 @@
 import { DEFAULT_DECIMAL_COUNT } from "config";
 import { NormalizedPool, PoolTokenUpdate } from "ethereum";
 import { PoolUnderlyingToken } from "indexed-types";
-import { buildCommonTokenPairs } from "ethereum/utils/uniswap";
 import { categoriesSelectors } from "../categories";
 import { convert } from "helpers";
 import { createEntityAdapter, createSlice } from "@reduxjs/toolkit";
@@ -15,8 +14,6 @@ import {
 import { tokensSelectors } from "features/tokens";
 import S from "string";
 import type { AppState } from "features/store";
-
-const formatName = (from: string) => S(from).camelize().s.toLowerCase();
 
 const adapter = createEntityAdapter<NormalizedPool>();
 
@@ -103,6 +100,10 @@ export const { actions } = slice;
 export const selectors = {
   ...adapter.getSelectors((state: AppState) => state.indexPools),
   selectPool: (state: AppState, poolId: string) => selectors.selectById(state, poolId),
+  selectNameForPool: (state: AppState, poolId: string) => {
+    const pool = selectors.selectPool(state, poolId);
+    return pool ? formatName(pool.name) : "";
+  },
   selectPoolLookUpByName: (state: AppState) => {
     const formatName = (from: string) => S(from).camelize().s.toLowerCase();
     return selectors.selectAllPools(state).reduce((prev, next) => {
@@ -141,7 +142,7 @@ export const selectors = {
   },
   selectPoolTokenAddresses: (state: AppState, poolId: string) => {
     const pool = selectors.selectPool(state, poolId);
-    return pool?.tokens.ids.map(t => pool.tokens.entities[t].token.id) ?? [];
+    return pool?.tokens.ids.map((t) => pool.tokens.entities[t].token.id) ?? [];
   },
   selectPoolTokenSymbols: (state: AppState, poolId: string) => {
     const tokenIds = selectors.selectPoolTokenIds(state, poolId);
@@ -218,3 +219,9 @@ export const selectors = {
 };
 
 export default slice.reducer;
+
+// #region Helpers
+function formatName(from: string) {
+  return S(from).camelize().s.toLowerCase();
+}
+// #endregion

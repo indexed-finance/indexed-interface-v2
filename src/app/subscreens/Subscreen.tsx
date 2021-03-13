@@ -1,5 +1,5 @@
-import { Button, Collapse, CollapseProps } from "antd";
-import { ReactNode, createContext, useEffect, useState } from "react";
+import { Collapse, CollapseProps } from "antd";
+import { ReactNode, createContext } from "react";
 import noop from "lodash.noop";
 
 export type Action = {
@@ -18,8 +18,6 @@ interface SubscreenProps extends CollapseProps {
   title?: ReactNode;
   children: ReactNode;
   defaultActions?: null | Action[];
-  padding?: null | number | string;
-  margin?: null | number | string;
 }
 
 const { Panel } = Collapse;
@@ -28,42 +26,24 @@ export default function Subscreen({
   title = "",
   children,
   defaultActions = null,
-  padding = null,
   ...rest
 }: SubscreenProps) {
-  const [actions, setActions] = useState(defaultActions);
-
-  useEffect(() => {
-    setActions(defaultActions);
-  }, [defaultActions]);
-
   return (
-    <SubscreenContext.Provider value={{ setActions }}>
-      <Collapse defaultActiveKey={["1"]} {...rest}>
-        <Panel
-          header={
-            title ? (
-              <>
-                <span>{title}</span>
-              </>
-            ) : (
-              <span>_</span>
-            )
-          }
-          key="1"
-        >
-          {children}
-          {actions && (
+    <Collapse defaultActiveKey={["1"]} {...rest}>
+      <Panel
+        header={
+          title ? (
             <>
-              {actions.map(({ type, title, onClick }, index) => (
-                <Button type={type} key={index} onClick={onClick}>
-                  {title}
-                </Button>
-              ))}
+              <span>{title}</span>
             </>
-          )}
-        </Panel>
-      </Collapse>
-    </SubscreenContext.Provider>
+          ) : (
+            <span>_</span>
+          )
+        }
+        key="1"
+      >
+        {children}
+      </Panel>
+    </Collapse>
   );
 }

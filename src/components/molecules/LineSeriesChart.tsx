@@ -23,7 +23,7 @@ export default function LineSeriesChart({ data, expanded = false }: Props) {
     if (cardRef.current && !series) {
       const size = expanded
         ? { width: 1200, height: 500 }
-        : { width: 400, height: 300 };
+        : { width: 400, height: 200 };
 
       const chart_ = createChart(cardRef.current, size);
       setChart(chart_);
@@ -50,7 +50,7 @@ export default function LineSeriesChart({ data, expanded = false }: Props) {
 
   useEffect(() => {
     if (cardRef.current && chart) {
-      const [width, height] = expanded ? [1200, 500] : [400, 300];
+      const [width, height] = expanded ? [1200, 500] : [400, 200];
       const options = CHART_MODES[theme];
       chart.resize(width, height);
       chart.applyOptions(options);

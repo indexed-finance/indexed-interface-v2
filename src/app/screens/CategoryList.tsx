@@ -1,5 +1,6 @@
 import { CategoryCard, CategoryDropdown, ScreenHeader } from "components";
 import { Link } from "react-router-dom";
+import { Space } from "antd";
 import { selectors } from "features";
 import { useSelector } from "react-redux";
 
@@ -17,13 +18,13 @@ export default function CategoryList({ withBreadcrumb = true }: Props) {
     : {};
 
   return (
-    <div>
+    <div className="CategoryList">
       <ScreenHeader title="Categories" {...headerProps} />
-      <div>
+      <Space direction="vertical" size="large">
         {categories.map((category) => (
           <CategoryCard key={category!.id} {...category!} />
         ))}
-      </div>
+      </Space>
     </div>
   );
 }

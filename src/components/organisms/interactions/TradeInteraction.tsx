@@ -9,7 +9,13 @@ import { convert } from "helpers";
 import { useSelector } from "react-redux";
 
 import { useUniswapTradingPairs } from "ethereum/helpers";
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import TokenSelector from "../TokenSelector";
 
 interface Props {
@@ -60,13 +66,13 @@ export default function TradeInteraction({ pool }: Props) {
         const newFormValues = {
           to: {
             token: pool.symbol,
-            amount: 0
-          }
+            amount: 0,
+          },
         };
         form.setFieldsValue(newFormValues);
       }
     }
-  }, [form, pool])
+  }, [form, pool]);
 
   const calculateInputForExactOutput = useCallback((changedValues: TradeValues) => {
     const { from } = form.getFieldsValue();
@@ -77,17 +83,24 @@ export default function TradeInteraction({ pool }: Props) {
     } else {
       const inputToken = tokenLookup[from.token.toLowerCase()];
       const outputToken = tokenLookup[changedValues.to.token.toLowerCase()];
-      const amountOut = convert.toToken(changedValues.to.amount.toString(), outputToken.decimals).toString(10);
-      const bestTrade = calculateBestTradeForExactOutput(inputToken, outputToken, amountOut);
+      const amountOut = convert
+        .toToken(changedValues.to.amount.toString(), outputToken.decimals)
+        .toString(10);
+      const bestTrade = calculateBestTradeForExactOutput(
+        inputToken,
+        outputToken,
+        amountOut
+      );
       setTrade(bestTrade);
       amountIn = parseFloat(bestTrade?.inputAmount.toFixed(4) ?? "0");
     }
+
     form.setFieldsValue({
       from: {
         token: from.token,
         amount: amountIn
       }
-    })
+    });
   }, [calculateBestTradeForExactOutput, form, tokenLookup]);
 
   const calculateOutputForExactInput = useCallback((changedValues: TradeValues) => {
@@ -109,7 +122,7 @@ export default function TradeInteraction({ pool }: Props) {
         token: to.token,
         amount: amountOut
       }
-    })
+    });
   }, [calculateBestTradeForExactInput, form, tokenLookup]);
 
   const checkAmount = (_: any, value: { amount: number }) => {
@@ -129,20 +142,23 @@ export default function TradeInteraction({ pool }: Props) {
       return ["0", "0", baseline, comparison];
     }
     const price = trade.executionPrice.toFixed(4);
-    const fee = trade.outputAmount.multiply("3").divide("1000").toSignificant(5);
+    const fee = trade.outputAmount
+      .multiply("3")
+      .divide("1000")
+      .toSignificant(5);
     return [price, fee, baseline, comparison];
   }, [form, trade]);
 
   const fromOptions = useMemo(() => {
     const fields = form.getFieldsValue();
     if (!fields.to) return assets;
-    return assets.filter(a => fields.to.token !== a?.symbol);
+    return assets.filter((a) => fields.to.token !== a?.symbol);
   }, [assets, form]);
 
   const toOptions = useMemo(() => {
     const fields = form.getFieldsValue();
     if (!fields.from) return assets;
-    return assets.filter(a => fields.from.token !== a?.symbol);
+    return assets.filter((a) => fields.from.token !== a?.symbol);
   }, [assets, form]);
 
   return (
@@ -155,7 +171,7 @@ export default function TradeInteraction({ pool }: Props) {
           calculateOutputForExactInput(changedValues);
         } else if (changedValues.to) {
           lastTouchedField.current = "output";
-          calculateInputForExactOutput(changedValues)
+          calculateInputForExactOutput(changedValues);
         }
       }}
     >
@@ -177,9 +193,7 @@ export default function TradeInteraction({ pool }: Props) {
         {pool && <TokenSelector label="To" assets={toOptions as any} />}
       </Item>
       <Item>
-        <TokenExchangeRate
-          { ...{ baseline, comparison, fee, rate: price } }
-        />
+        <TokenExchangeRate {...{ baseline, comparison, fee, rate: price }} />
       </Item>
     </Form>
   );

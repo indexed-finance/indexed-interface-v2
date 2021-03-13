@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { PoolCard, PoolDropdown, ScreenHeader } from "components";
+import { Space } from "antd";
 import { selectors } from "features";
 import { useSelector } from "react-redux";
 
@@ -17,13 +18,13 @@ export default function PoolList({ withBreadcrumb = true }: Props) {
     : {};
 
   return (
-    <div>
+    <>
       <ScreenHeader title="Pools" {...headerProps} />
-      <div>
+      <Space direction="vertical" size="large" style={{ flex: 1 }}>
         {pools.map((pool) => (
           <PoolCard key={pool!.id} pool={pool!} />
         ))}
-      </div>
-    </div>
+      </Space>
+    </>
   );
 }
