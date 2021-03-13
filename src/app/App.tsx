@@ -1,6 +1,6 @@
 import "theme/index.less";
 import { BrowserRouter } from "react-router-dom";
-import { DEBUGScreenSize, DrawerProvider } from "components";
+import { DEBUGScreenSize } from "components";
 import { Provider } from "react-redux";
 import { notification } from "antd";
 import { store } from "features";
@@ -18,9 +18,7 @@ function Inner() {
   return (
     <>
       <BrowserRouter>
-        <DrawerProvider>
-          <AppLayout />
-        </DrawerProvider>
+        <AppLayout />
       </BrowserRouter>
       {flags.showScreenSize && <DEBUGScreenSize />}
     </>

@@ -43,7 +43,7 @@ export default function Portfolio() {
   ];
   const breakpoints = useBreakpoints();
   const ndx = (
-    <Subscreen title="NDX">
+    <Subscreen title="NDX" className="NDXSubscreen">
       <Space size="large" style={{ width: "100%" }} align="start">
         <Statistic title="Balance" value="2800.00 NDX" />
         <Statistic
@@ -55,54 +55,73 @@ export default function Portfolio() {
     </Subscreen>
   );
   const holdings = (
-    <Subscreen title="Holdings">
+    <Subscreen title="Holdings" className="HoldingsSubscreen">
       <Space wrap={true} size="large">
         {__data.map((datum) => {
           const card = (
             <Link to={datum.link}>
               <Card
                 key={datum.address}
+                style={{ width: 400 }}
                 hoverable={true}
-                cover={
-                  <div
-                    className="perfectly-centered"
-                    style={{
-                      paddingTop: "1.5rem",
-                    }}
-                  >
-                    <Progress
-                      type="dashboard"
-                      percent={parseFloat(datum.weight.replace(/%/g, ""))}
-                    />
-                  </div>
-                }
                 actions={[
-                  <Typography.Title type="success" level={2}>
-                    {datum.value}
-                  </Typography.Title>,
+                  <div key="1">
+                    <Typography.Text type="secondary">
+                      Balance (in tokens)
+                    </Typography.Text>
+                    <Typography.Title
+                      level={4}
+                      style={{
+                        margin: 0,
+                      }}
+                    >
+                      {datum.balance && `${datum.balance} ${datum.symbol}`}
+                    </Typography.Title>
+                  </div>,
+                  <div key="2">
+                    <Typography.Text type="secondary">
+                      Value (in USD)
+                    </Typography.Text>
+                    <Typography.Title
+                      level={4}
+                      type="success"
+                      style={{
+                        margin: 0,
+                      }}
+                    >
+                      {datum.value}
+                    </Typography.Title>
+                  </div>,
                 ]}
               >
-                <Meta
-                  avatar={
-                    <>
+                <Space className="spaced-between" style={{ paddingTop: 25 }}>
+                  <Meta
+                    avatar={
                       <Token
                         size="small"
                         address={datum.address}
                         name={datum.symbol}
                         image={datum.image}
                       />
-                      <div>{datum.balance}</div>
-                    </>
-                  }
-                  title={<>{datum.symbol}</>}
-                  description={datum.name}
-                />
+                    }
+                    title={<>{datum.symbol}</>}
+                    description={datum.name}
+                  />
+                  <Progress
+                    className="SmallProgress"
+                    type="dashboard"
+                    percent={parseFloat(datum.weight.replace(/%/g, ""))}
+                  />
+                </Space>
               </Card>
             </Link>
           );
 
           return datum.staking ? (
-            <Badge.Ribbon text={`Staking ${datum.staking}`} color="blue">
+            <Badge.Ribbon
+              text={`Staking ${datum.staking} ${datum.symbol}`}
+              color="blue"
+            >
               {card}
             </Badge.Ribbon>
           ) : (

@@ -1,9 +1,9 @@
-import { Drawer, DrawerContext, QuoteCarousel } from "components";
 import { FormattedIndexPool, selectors } from "features";
 import { Layout } from "antd";
+import { QuoteCarousel } from "components";
 import { Route, Switch as RouterSwitch } from "react-router-dom";
 import { useBreakpoints } from "helpers";
-import { useCallback, useContext, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import AppHeader from "./AppHeader";
 import AppMenu from "./AppMenu";
@@ -13,7 +13,6 @@ import routes from "./routes";
 const { Sider, Content } = Layout;
 
 export default function AppLayout() {
-  const { activePage } = useContext(DrawerContext);
   const isConnectionEnabled = useSelector(selectors.selectConnectionEnabled);
   const indexPools = useSelector(selectors.selectAllFormattedIndexPools);
   const breakpoints = useBreakpoints();
@@ -61,9 +60,7 @@ export default function AppLayout() {
               </Route>
             ))}
           </RouterSwitch>
-          {activePage && <Drawer page={activePage} />}
         </div>
-
         <div className="BackgroundEffect" />
       </Content>
     </Layout>

@@ -6,6 +6,7 @@ export { default as JazzIcon } from "./JazzIcon";
 export { default as LanguageSelector } from "./LanguageSelector";
 export { default as Logo } from "./Logo";
 export { default as ModeSwitch } from "./ModeSwitch";
+export { default as PlainLanguageTransaction } from "./PlainLanguageTransaction";
 export { default as PoolDropdown } from "./PoolDropdown";
 export * from "./ProviderRequirementDrawer";
 export { default as ProviderRequirementDrawer } from "./ProviderRequirementDrawer";

@@ -1,9 +1,9 @@
 import { AppState, selectors } from "features";
-import { Button, InputNumber, List, Space, Typography } from "antd";
+import { Button, Drawer, InputNumber, List, Space, Typography } from "antd";
+import { GrCaretDown } from "react-icons/gr";
 import { SelectableToken } from "components/molecules";
 import { Token } from "components/atoms";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useDrawer } from "./providers";
 import { useSelector } from "react-redux";
 
 export type TokenSelectorValue = {
@@ -34,26 +34,13 @@ export default function TokenSelector({
 }: Props) {
   const [amount, setAmount] = useState(value?.amount ?? 0);
   const [token, setToken] = useState(value?.token ?? "");
+  const [selectingToken, setSelectingToken] = useState(false);
   const balances = useSelector((state: AppState) =>
     selectors.selectTokenSymbolsToBalances(state)
   );
   const relevantBalance = useMemo(() => balances[token], [balances, token]);
   const input = useRef<null | HTMLInputElement>(null);
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
-  const { openDrawer, closeDrawer } = useDrawer({
-    name: "Select a token",
-    title: "",
-    mask: true,
-    width: 420,
-    actions: [
-      {
-        type: "default",
-        label: "Close",
-        onClick: () => closeDrawer(),
-      },
-    ],
-    closable: true,
-  });
   const triggerChange = useCallback(
     (changedValue: TokenSelectorValue) => {
       if (onChange) {
@@ -91,9 +78,8 @@ export default function TokenSelector({
       }
 
       triggerChange({ token: newToken });
-      closeDrawer();
     },
-    [closeDrawer, triggerChange, value]
+    [triggerChange, value]
   );
   const handleWrapperClick = useCallback(() => {
     if (input.current) {
@@ -103,6 +89,14 @@ export default function TokenSelector({
   const handleMaxOut = useCallback(() => {
     onAmountChange(relevantBalance);
   }, [onAmountChange, relevantBalance]);
+  const handleOpenTokenSelection = useCallback(
+    () => setSelectingToken(true),
+    []
+  );
+  const handleCloseTokenSelection = useCallback(
+    () => setSelectingToken(false),
+    []
+  );
 
   // Effect: Sync parent values with local values.
   // --
@@ -153,40 +147,52 @@ export default function TokenSelector({
           )}
           <Button
             type={value.token ? "text" : "primary"}
-            onClick={() =>
-              selectable &&
-              openDrawer(
-                <List size="small">
-                  <Typography.Title level={3}>Select one</Typography.Title>
-                  {assets.map((asset) => (
-                    <SelectableToken
-                      key={asset.name}
-                      asset={asset}
-                      onClick={(selectedAsset) => {
-                        onTokenChange(selectedAsset.symbol);
-                      }}
-                    />
-                  ))}
-                </List>
-              )
-            }
+            onClick={handleOpenTokenSelection}
           >
-            {value.token ? (
-              <Space>
-                <Token
-                  name={value.token}
-                  image={value.token}
-                  size="small"
-                  address={tokenLookup[value.token]?.id ?? ""}
-                />
-                {value.token}
-              </Space>
-            ) : (
-              "Select"
-            )}
+            <Space>
+              <div>
+                {value.token ? (
+                  <Space>
+                    <Token
+                      name={value.token}
+                      image={value.token}
+                      size="small"
+                      address={tokenLookup[value.token]?.id ?? ""}
+                    />
+                    {value.token}
+                  </Space>
+                ) : (
+                  "Pick Token"
+                )}
+              </div>
+              <GrCaretDown />
+            </Space>
           </Button>
         </div>
       </Space>
+      <Drawer
+        title={<Typography.Title level={3}>Select one</Typography.Title>}
+        placement="right"
+        closable={true}
+        onClose={handleCloseTokenSelection}
+        visible={selectingToken}
+      >
+        <List>
+          {assets.map((asset) => (
+            <SelectableToken
+              key={asset.name}
+              asset={asset}
+              onClick={(selectedAsset) => {
+                onTokenChange(selectedAsset.symbol);
+                handleCloseTokenSelection();
+              }}
+            />
+          ))}
+        </List>
+        <Button type="default" onClick={handleCloseTokenSelection}>
+          Close
+        </Button>
+      </Drawer>
     </div>
   );
 }

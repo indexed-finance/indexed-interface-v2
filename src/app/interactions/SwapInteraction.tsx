@@ -2,7 +2,11 @@ import { AiOutlineArrowRight } from "react-icons/ai";
 import { AppState, FormattedIndexPool, selectors, signer } from "features";
 import { Button, Divider, Form, Space, Typography } from "antd";
 import { Flipper, Token } from "components/atoms";
-import { TokenExchangeRate, TokenSelector } from "components";
+import {
+  PlainLanguageTransaction,
+  TokenExchangeRate,
+  TokenSelector,
+} from "components";
 import { actions } from "features";
 import { convert } from "helpers";
 import { helpers } from "ethereum";
@@ -347,15 +351,18 @@ export default function SwapInteraction({ pool }: Props) {
         {pool && <TokenSelector label="To" assets={pool.assets} />}
       </Item>
       <Divider />
-      {previousFormValues.current.from.token &&
-        previousFormValues.current.to.token && (
-          <TokenExchangeRate
-            baseline={baseline}
-            comparison={comparison}
-            fee={formattedSwapFee}
-            rate={price.toString()}
-          />
-        )}
+      <Space direction="vertical" style={{ width: "100%" }}>
+        {previousFormValues.current.from.token &&
+          previousFormValues.current.to.token && (
+            <TokenExchangeRate
+              baseline={baseline}
+              comparison={comparison}
+              fee={formattedSwapFee}
+              rate={price.toString()}
+            />
+          )}
+        <PlainLanguageTransaction />
+      </Space>
       <Button type="primary" style={{ width: "100%", marginTop: 20 }}>
         Send
       </Button>

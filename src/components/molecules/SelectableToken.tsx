@@ -15,7 +15,11 @@ const { Item } = List;
 
 export default function SelectableToken({ asset, onClick }: Props) {
   return (
-    <Item onClick={() => onClick(asset)}>
+    <Item
+      onClick={() => onClick(asset)}
+      className="SelectableToken"
+      style={{ padding: "1rem" }}
+    >
       <Item.Meta
         avatar={<Token name={asset.symbol} image={asset.symbol} />}
         title={asset.symbol}
