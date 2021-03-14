@@ -129,7 +129,6 @@ export default function EthereumAddressInput({
   return (
     <div>
       <Input
-        autoFocus={true}
         spellCheck={false}
         onChange={handleChange}
         type="text"

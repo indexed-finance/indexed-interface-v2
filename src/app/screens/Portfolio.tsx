@@ -152,10 +152,7 @@ export default function Portfolio() {
 
   return (
     <div>
-      <ProviderRequirementDrawer
-        includeSignerRequirement={true}
-        placement="right"
-      />
+      <ProviderRequirementDrawer includeSignerRequirement={true} />
       <ScreenHeader title="Portfolio" />
       {(() => {
         switch (true) {

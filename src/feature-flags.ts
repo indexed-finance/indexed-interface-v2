@@ -4,5 +4,6 @@ export default {
   useColorThief: false,
   useInternalDocs: false,
   saveStateAcrossSessions: true,
-  showScreenSize: process.env.NODE_ENV === "development",
+  // showScreenSize: process.env.NODE_ENV === "development",
+  showScreenSize: false,
 };

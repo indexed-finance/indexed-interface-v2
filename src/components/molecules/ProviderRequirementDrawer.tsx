@@ -47,7 +47,10 @@ export default function ProviderRequirementDrawer({
   };
 
   return (
-    <div onClick={() => dispatch(actions.attachToProvider())}>
+    <div
+      onClick={() => dispatch(actions.attachToProvider())}
+      style={{ cursor: "pointer" }}
+    >
       <Drawer
         placement={placement}
         closable={false}

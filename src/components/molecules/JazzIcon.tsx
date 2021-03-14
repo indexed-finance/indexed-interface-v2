@@ -41,10 +41,11 @@ export default function JazzIcon({ address }: Props) {
     if (_blockie) {
       const parsedAddress = parseInt(address.slice(2, 10), 16);
 
-      element = jazzicon(35, parsedAddress);
+      element = jazzicon(40, parsedAddress);
       element.style.border = "2px solid #ccccff";
+
       element.style.position = "relative";
-      element.style.top = "12px";
+      element.style.top = breakpoints.isMobile ? "4px" : "12px";
 
       _blockie.appendChild(element);
     }
@@ -58,33 +59,28 @@ export default function JazzIcon({ address }: Props) {
         ReactDOM.unmountComponentAtNode(_blockie);
       }
     };
-  }, [address, breakpoints.md]);
+  }, [address, breakpoints]);
 
   return (
-    <a
-      target="_blank"
-      rel="noopener noreferrer"
-      href={`https://etherscan.io/address/${address}`}
+    <Dropdown
+      arrow={true}
+      placement={breakpoints.isMobile ? "topRight" : "bottomLeft"}
+      overlay={
+        <Menu>
+          <Menu.Item>
+            <a
+              target="_blank"
+              rel="noopener noreferrer"
+              href={`https://etherscan.io/address/${address}`}
+            >
+              View on Etherscan
+            </a>
+          </Menu.Item>
+          <Menu.Item onClick={handleDisconnect}>Disconnect</Menu.Item>
+        </Menu>
+      }
     >
-      <Dropdown
-        arrow={true}
-        overlay={
-          <Menu>
-            <Menu.Item>
-              <a
-                target="_blank"
-                rel="noopener noreferrer"
-                href={`https://etherscan.io/address/${address}`}
-              >
-                View on Etherscan
-              </a>
-            </Menu.Item>
-            <Menu.Item onClick={handleDisconnect}>Disconnect</Menu.Item>
-          </Menu>
-        }
-      >
-        <span ref={blockie} />
-      </Dropdown>
-    </a>
+      <span ref={blockie} />
+    </Dropdown>
   );
 }

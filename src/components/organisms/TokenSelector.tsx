@@ -1,6 +1,15 @@
+import { AiOutlineCaretDown } from "react-icons/ai";
 import { AppState, selectors } from "features";
-import { Button, Drawer, InputNumber, List, Space, Typography } from "antd";
-import { GrCaretDown } from "react-icons/gr";
+import {
+  AutoComplete,
+  Button,
+  Drawer,
+  Input,
+  InputNumber,
+  List,
+  Space,
+  Typography,
+} from "antd";
 import { SelectableToken } from "components/molecules";
 import { Token } from "components/atoms";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -96,6 +105,17 @@ export default function TokenSelector({
     () => setSelectingToken(false),
     []
   );
+  const handleSelectToken = useCallback(
+    (selectedAsset) => {
+      onTokenChange(
+        typeof selectedAsset === "object" && selectedAsset.symbol
+          ? selectedAsset.symbol
+          : selectedAsset
+      );
+      handleCloseTokenSelection();
+    },
+    [handleCloseTokenSelection, onTokenChange]
+  );
 
   // Effect: Sync parent values with local values.
   // --
@@ -110,46 +130,46 @@ export default function TokenSelector({
   }, [value]);
 
   return (
-    <div onClick={handleWrapperClick}>
-      <Space direction="horizontal" className="spaced-between">
-        <Space direction="vertical">
-          {value.token ? (
-            <Typography.Text type="secondary">
-              {parseInt(relevantBalance) ? (
-                <>Balance: {relevantBalance}</>
-              ) : (
-                "No Balance"
-              )}
-            </Typography.Text>
-          ) : (
-            "-"
-          )}
-          <InputNumber
-            ref={input}
-            min={0}
-            step="0.01"
-            value={value.amount ?? amount}
-            onChange={onAmountChange}
-            style={{ width: 200 }}
-          />
-        </Space>
-        <div>
-          <div
-            style={{ paddingLeft: 10, paddingRight: 15, textAlign: "right" }}
-          >
-            <Typography.Text type="secondary">{label}</Typography.Text>
-          </div>
-          {value.token && parseFloat(relevantBalance) > 0 && (
-            <Button type="dashed" onClick={handleMaxOut}>
-              MAX
-            </Button>
-          )}
-          <Button
-            type={value.token ? "text" : "primary"}
-            onClick={handleOpenTokenSelection}
-          >
-            <Space>
-              <div>
+    <>
+      <div onClick={handleWrapperClick}>
+        <Space direction="horizontal" className="spaced-between">
+          <Space direction="vertical">
+            {value.token ? (
+              <Typography.Text type="secondary">
+                {parseInt(relevantBalance) ? (
+                  <>Balance: {relevantBalance}</>
+                ) : (
+                  "No Balance"
+                )}
+              </Typography.Text>
+            ) : (
+              "-"
+            )}
+            <InputNumber
+              ref={input}
+              min={0}
+              step="0.01"
+              value={value.amount ?? amount}
+              onChange={onAmountChange}
+              style={{ width: 200 }}
+            />
+          </Space>
+          <div>
+            <div
+              style={{ paddingLeft: 10, paddingRight: 15, textAlign: "right" }}
+            >
+              <Typography.Text type="secondary">{label}</Typography.Text>
+            </div>
+            {value.token && parseFloat(relevantBalance) > 0 && (
+              <Button type="dashed" onClick={handleMaxOut}>
+                MAX
+              </Button>
+            )}
+            <Button
+              type={value.token ? "text" : "primary"}
+              onClick={handleOpenTokenSelection}
+            >
+              <Space>
                 {value.token ? (
                   <Space>
                     <Token
@@ -161,16 +181,43 @@ export default function TokenSelector({
                     {value.token}
                   </Space>
                 ) : (
-                  "Pick Token"
+                  <div className="fancy" style={{ fontSize: 12 }}>
+                    Select one
+                  </div>
                 )}
-              </div>
-              <GrCaretDown />
-            </Space>
-          </Button>
-        </div>
-      </Space>
+                <AiOutlineCaretDown />
+              </Space>
+            </Button>
+          </div>
+        </Space>
+      </div>
       <Drawer
-        title={<Typography.Title level={3}>Select one</Typography.Title>}
+        title={
+          <>
+            <AutoComplete
+              style={{ width: "90%" }}
+              options={assets
+                .map(({ name: label, symbol: value }) => ({
+                  label,
+                  value,
+                }))
+                .sort((a, b) => a.label.localeCompare(b.label))}
+              filterOption={(inputValue, option) =>
+                option!.value
+                  .toUpperCase()
+                  .indexOf(inputValue.toUpperCase()) !== -1
+              }
+              onSelect={handleSelectToken}
+            >
+              <Input.Search
+                name="tokens"
+                size="large"
+                placeholder="Search tokens"
+                enterButton
+              />
+            </AutoComplete>
+          </>
+        }
         placement="right"
         closable={true}
         onClose={handleCloseTokenSelection}
@@ -197,14 +244,11 @@ export default function TokenSelector({
             <SelectableToken
               key={asset.name}
               asset={asset}
-              onClick={(selectedAsset) => {
-                onTokenChange(selectedAsset.symbol);
-                handleCloseTokenSelection();
-              }}
+              onClick={handleSelectToken}
             />
           ))}
         </List>
       </Drawer>
-    </div>
+    </>
   );
 }
