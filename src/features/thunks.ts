@@ -4,6 +4,7 @@ import { BigNumber } from "bignumber.js";
 import { CoinGeckoService } from "services";
 import { SLIPPAGE_RATE, SUBGRAPH_URL_UNISWAP } from "config";
 import { TaskHandlersByKind, multicall } from "ethereum/multicall";
+import { Trade } from "@uniswap/sdk";
 import { batcherActions } from "./batcher";
 import { categoriesActions } from "./categories";
 import { convert } from "helpers";
@@ -200,7 +201,7 @@ const thunks = {
       })
     );
   },
-  registerTokenUserDataListener: (poolId: string): AppThunk => (
+  registerPoolTokenUserDataListener: (poolId: string): AppThunk => (
     dispatch,
     getState
   ) => {
@@ -212,9 +213,23 @@ const thunks = {
         id: "",
         kind: "TokenUserData",
         args: {
-          pool: poolId,
-          tokens: tokens.map((t) => t.token.id),
-        },
+          spender: poolId,
+          tokens: tokens.map(t => t.token.id),
+        }
+      })
+    );
+  },
+  registerTokenUserDataListener: (spender: string, tokens: string[]): AppThunk => (
+    dispatch
+  ) => {
+    return dispatch(
+      actions.listenerRegistered({
+        id: "",
+        kind: "TokenUserData",
+        args: {
+          spender,
+          tokens,
+        }
       })
     );
   },
@@ -242,23 +257,28 @@ const thunks = {
     }
   },
   /**
-   *
+   * @param spender - Address of the spender to approve
+   * @param token - ERC20 token address
+   * @param amount - Exact amount of tokens to allow spender to use
    */
-  approvePool: (
-    poolAddress: string,
-    tokenSymbol: string,
+  approveSpender: (
+    spender: string,
+    token: string,
     amount: string
-  ): AppThunk => async (_, getState) => {
-    const state = getState();
-    const tokensBySymbol = selectors.selectTokenLookupBySymbol(state);
-    const tokenAddress = tokensBySymbol[tokenSymbol]?.id ?? "";
-
-    if (signer && tokenAddress) {
+  ): AppThunk => async () => {
+    if (signer && token) {
       try {
-        await helpers.approvePool(signer, poolAddress, tokenAddress, amount);
+        await helpers.approvePool(signer, spender, token, amount);
       } catch {
         // Handle failed approval.
       }
+    }
+  },
+  trade: (trade: Trade): AppThunk => async (_, getState) =>{
+    const state = getState();
+    if (signer) {
+      const userAddress = selectors.selectUserAddress(state);
+      await helpers.executeUniswapTrade(signer, userAddress, trade);
     }
   },
   /**
