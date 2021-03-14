@@ -9,16 +9,18 @@ interface Props {
 }
 
 export default function ScreenHeader(props: Props) {
-  const breakpoints = useBreakpoints();
+  const { isMobile } = useBreakpoints();
   const title = props.title ? props.title.replace(/ Tokens Index/g, "") : "";
 
   return (
     <>
-      <Space align="center" wrap={true} className="spaced-between">
-        <Typography.Title
-          level={breakpoints.md ? 1 : 3}
-          className="ScreenHeader"
-        >
+      <Space
+        align="center"
+        wrap={true}
+        className="spaced-between"
+        direction={isMobile ? "vertical" : "horizontal"}
+      >
+        <Typography.Title level={isMobile ? 1 : 2} className="ScreenHeader">
           {title}
         </Typography.Title>
         {(props.overlay || props.activeBreadcrumb) && (

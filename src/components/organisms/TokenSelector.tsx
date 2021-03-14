@@ -12,6 +12,7 @@ import {
 } from "antd";
 import { SelectableToken } from "components/molecules";
 import { Token } from "components/atoms";
+import { useBreakpoints } from "helpers";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 
@@ -31,6 +32,7 @@ export interface Props {
   value?: TokenSelectorValue;
   selectable?: boolean;
   balance?: string;
+  parent?: false | HTMLElement;
   onChange?: (value: TokenSelectorValue) => void;
 }
 
@@ -38,6 +40,7 @@ export default function TokenSelector({
   label = "",
   assets,
   value = {},
+  parent = false,
   onChange,
 }: Props) {
   const [amount, setAmount] = useState(value?.amount ?? 0);
@@ -116,6 +119,7 @@ export default function TokenSelector({
     },
     [handleCloseTokenSelection, onTokenChange]
   );
+  const { isMobile } = useBreakpoints();
 
   // Effect: Sync parent values with local values.
   // --
@@ -135,9 +139,20 @@ export default function TokenSelector({
         <Space direction="horizontal" className="spaced-between">
           <Space direction="vertical">
             {value.token ? (
-              <Typography.Text type="secondary">
+              <Typography.Text type="secondary" style={{ textAlign: "left" }}>
                 {parseInt(relevantBalance) ? (
-                  <>Balance: {relevantBalance}</>
+                  <>
+                    Balance: {relevantBalance}{" "}
+                    {value.token && parseFloat(relevantBalance) > 0 && (
+                      <Button
+                        type="text"
+                        onClick={handleMaxOut}
+                        style={{ fontSize: 12 }}
+                      >
+                        MAX
+                      </Button>
+                    )}
+                  </>
                 ) : (
                   "No Balance"
                 )}
@@ -151,35 +166,28 @@ export default function TokenSelector({
               step="0.01"
               value={value.amount ?? amount}
               onChange={onAmountChange}
-              style={{ width: 200 }}
+              style={{ width: isMobile ? 120 : 200 }}
             />
           </Space>
           <div>
-            <div
-              style={{ paddingLeft: 10, paddingRight: 15, textAlign: "right" }}
-            >
+            <div style={{ paddingRight: 15, textAlign: "right" }}>
               <Typography.Text type="secondary">{label}</Typography.Text>
             </div>
-            {value.token && parseFloat(relevantBalance) > 0 && (
-              <Button type="dashed" onClick={handleMaxOut}>
-                MAX
-              </Button>
-            )}
             <Button
               type={value.token ? "text" : "primary"}
               onClick={handleOpenTokenSelection}
             >
               <Space>
                 {value.token ? (
-                  <Space>
+                  <>
                     <Token
-                      name={value.token}
+                      name=""
                       image={value.token}
                       size="small"
                       address={tokenLookup[value.token]?.id ?? ""}
                     />
                     {value.token}
-                  </Space>
+                  </>
                 ) : (
                   <div className="fancy" style={{ fontSize: 12 }}>
                     Select one
@@ -191,11 +199,11 @@ export default function TokenSelector({
           </div>
         </Space>
       </div>
-      <Drawer
-        title={
-          <>
+      {selectingToken && (
+        <Drawer
+          title={
             <AutoComplete
-              style={{ width: "90%" }}
+              style={{ width: "100%" }}
               options={assets
                 .map(({ name: label, symbol: value }) => ({
                   label,
@@ -216,39 +224,36 @@ export default function TokenSelector({
                 enterButton
               />
             </AutoComplete>
-          </>
-        }
-        placement="right"
-        closable={true}
-        onClose={handleCloseTokenSelection}
-        visible={selectingToken}
-        width={300}
-        style={{
-          height: "calc(100% - 64px)",
-          top: 64,
-          overflow: "auto",
-          zIndex: 6,
-        }}
-        footer={
-          <Button
-            type="default"
-            onClick={handleCloseTokenSelection}
-            style={{ width: "100%" }}
-          >
-            Close
-          </Button>
-        }
-      >
-        <List>
-          {assets.map((asset) => (
-            <SelectableToken
-              key={asset.name}
-              asset={asset}
-              onClick={handleSelectToken}
-            />
-          ))}
-        </List>
-      </Drawer>
+          }
+          placement="right"
+          closable={false}
+          visible={selectingToken}
+          getContainer={parent}
+          width={300}
+          style={{
+            position: "absolute",
+          }}
+          footer={
+            <Button
+              type="default"
+              onClick={handleCloseTokenSelection}
+              style={{ width: "100%" }}
+            >
+              Close
+            </Button>
+          }
+        >
+          <List>
+            {assets.map((asset) => (
+              <SelectableToken
+                key={asset.name}
+                asset={asset}
+                onClick={handleSelectToken}
+              />
+            ))}
+          </List>
+        </Drawer>
+      )}
     </>
   );
 }

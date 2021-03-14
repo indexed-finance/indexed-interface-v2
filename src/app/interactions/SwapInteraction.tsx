@@ -261,6 +261,7 @@ export default function SwapInteraction({ pool }: Props) {
   const handleSendTransaction = useCallback((values) => handleSubmit(values), [
     handleSubmit,
   ]);
+  const formRef = useRef<null | HTMLDivElement>(null);
 
   useTokenRandomizer({
     pool,
@@ -294,78 +295,96 @@ export default function SwapInteraction({ pool }: Props) {
   useHistoryChangeCallback(() => form.resetFields());
 
   return (
-    <Form
-      form={form}
-      name="swap"
-      size="large"
-      labelAlign="left"
-      layout="vertical"
-      initialValues={INITIAL_STATE}
-      onValuesChange={(changedValues) => {
-        checkForDuplicates(changedValues);
+    <div ref={formRef}>
+      <Form
+        form={form}
+        name="swap"
+        size="large"
+        labelAlign="left"
+        layout="vertical"
+        initialValues={INITIAL_STATE}
+        onValuesChange={(changedValues) => {
+          checkForDuplicates(changedValues);
 
-        // Update previous values for future comparisons.
-        previousFormValues.current = form.getFieldsValue();
+          // Update previous values for future comparisons.
+          previousFormValues.current = form.getFieldsValue();
 
-        if (changedValues.from) {
-          lastTouchedField.current = "input";
-          calculateOutputFromInput(changedValues);
-        } else if (changedValues.to) {
-          lastTouchedField.current = "output";
-          calculateInputFromOutput(changedValues);
+          if (changedValues.from) {
+            lastTouchedField.current = "input";
+            calculateOutputFromInput(changedValues);
+          } else if (changedValues.to) {
+            lastTouchedField.current = "output";
+            calculateInputFromOutput(changedValues);
+          }
+
+          triggerUpdate();
+        }}
+        onFinish={(values: any) => handleSubmit(values)}
+        onFinishFailed={(error) =>
+          console.log("Submission failed. Error was: ", error)
         }
-
-        triggerUpdate();
-      }}
-      onFinish={(values: any) => handleSubmit(values)}
-      onFinishFailed={(error) =>
-        console.log("Submission failed. Error was: ", error)
-      }
-    >
-      <Space align="center" className="spaced-between">
-        <Typography.Title level={2} className="fancy no-margin-bottom">
-          Swap
-        </Typography.Title>
-        {baseline && comparison && (
-          <Space>
-            <Token name="Baseline" image={baseline} />
-            <AiOutlineArrowRight
-              style={{
-                position: "relative",
-                top: "4px",
-                fontSize: "32px",
-              }}
-            />
-            <Token name="Comparison" image={comparison} />
-          </Space>
-        )}
-      </Space>
-      <Divider />
-      <Item name="from" rules={[{ validator: checkAmount }]}>
-        {pool && <TokenSelector label="From" assets={pool.assets} />}
-      </Item>
-      <Divider>
-        <Flipper onFlip={handleFlip} />
-      </Divider>
-      <Item name="to" rules={[{ validator: checkAmount }]}>
-        {pool && <TokenSelector label="To" assets={pool.assets} />}
-      </Item>
-      <Divider />
-      <Space direction="vertical" style={{ width: "100%" }}>
-        {previousFormValues.current.from.token &&
-          previousFormValues.current.to.token && (
-            <TokenExchangeRate
-              baseline={baseline}
-              comparison={comparison}
-              fee={formattedSwapFee}
-              rate={price.toString()}
+      >
+        <Space align="center" className="spaced-between">
+          <Typography.Title
+            level={2}
+            className="fancy no-margin-bottom"
+            type="secondary"
+          >
+            Swap
+          </Typography.Title>
+          {baseline && comparison && (
+            <Space>
+              <Token name="Baseline" image={baseline} />
+              <AiOutlineArrowRight
+                style={{
+                  position: "relative",
+                  top: "4px",
+                  fontSize: "32px",
+                }}
+              />
+              <Token name="Comparison" image={comparison} />
+            </Space>
+          )}
+        </Space>
+        <Divider />
+        <Item name="from" rules={[{ validator: checkAmount }]}>
+          {pool && (
+            <TokenSelector
+              label="From"
+              assets={pool.assets}
+              parent={formRef.current ?? false}
             />
           )}
-        <PlainLanguageTransaction />
-      </Space>
-      <Button type="primary" style={{ width: "100%", marginTop: 20 }}>
-        Send
-      </Button>
-    </Form>
+        </Item>
+        <Divider>
+          <Flipper onFlip={handleFlip} />
+        </Divider>
+        <Item name="to" rules={[{ validator: checkAmount }]}>
+          {pool && (
+            <TokenSelector
+              label="To"
+              assets={pool.assets}
+              parent={formRef.current ?? false}
+            />
+          )}
+        </Item>
+        <Divider />
+        <Space direction="vertical" size="large" style={{ width: "100%" }}>
+          {previousFormValues.current.from.token &&
+            previousFormValues.current.to.token && (
+              <TokenExchangeRate
+                baseline={baseline}
+                comparison={comparison}
+                fee={formattedSwapFee}
+                rate={price.toString()}
+              />
+            )}
+          <PlainLanguageTransaction />
+          <Button type="primary" style={{ width: "100%" }}>
+            Send
+          </Button>
+        </Space>
+      </Form>
+    </div>
   );
 }

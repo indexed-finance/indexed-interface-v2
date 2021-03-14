@@ -54,10 +54,14 @@ export default function AppHeader({
             bottom: 50,
             left: 20,
             zIndex: 8,
-            opacity: 0.3,
+            background: "rgba(0,0,0,0.5)",
           }}
         >
-          (<Typography.Text>{icon}</Typography.Text>)
+          (
+          <Typography.Text style={{ color: "rgb(204, 204, 255)" }}>
+            {icon}
+          </Typography.Text>
+          )
         </div>
       )}
     </>

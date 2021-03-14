@@ -1,6 +1,7 @@
 import { AiOutlineSwap } from "react-icons/ai";
 import { FaCoins, FaFireAlt, FaHammer } from "react-icons/fa";
 import { Tabs } from "antd";
+import { useBreakpoints } from "helpers";
 import { useState } from "react";
 import SwapInteraction from "./SwapInteraction";
 import TradeInteraction from "./TradeInteraction";
@@ -15,12 +16,14 @@ interface Props {
 
 export default function PoolInteractions({ pool, initial = "swap" }: Props) {
   const [interaction, setInteraction] = useState<PoolInteraction>(initial);
+  const { isMobile } = useBreakpoints();
 
   return (
     <Tabs
+      type={isMobile ? "line" : "card"}
       size="large"
-      centered={true}
-      tabPosition="right"
+      centered={isMobile}
+      tabPosition={isMobile ? "top" : "right"}
       activeKey={interaction}
       onChange={(nextInteraction) => {
         const next = nextInteraction as PoolInteraction;
@@ -30,44 +33,48 @@ export default function PoolInteractions({ pool, initial = "swap" }: Props) {
       {pool && (
         <>
           <Tabs.TabPane
-            tab={
-              <div>
-                <FaCoins /> <span>Trade</span>
-              </div>
-            }
+            style={{ padding: 20 }}
             key="trade"
+            tab={
+              <>
+                <FaCoins /> {!isMobile && <span>Trade</span>}
+              </>
+            }
           >
             <TradeInteraction pool={pool} />
           </Tabs.TabPane>
           <Tabs.TabPane
+            style={{ padding: 20 }}
+            key="swap"
             tab={
-              <div>
-                <FaHammer /> <span>Mint</span>
-              </div>
+              <>
+                <AiOutlineSwap /> {!isMobile && <span>Swap</span>}
+              </>
             }
+          >
+            <SwapInteraction pool={pool} />
+          </Tabs.TabPane>
+          <Tabs.TabPane
+            style={{ padding: 20 }}
             key="mint"
+            tab={
+              <>
+                <FaHammer /> {!isMobile && <span>Mint</span>}
+              </>
+            }
           >
             {/* <MintForm pool={pool} /> */}
           </Tabs.TabPane>
           <Tabs.TabPane
+            style={{ padding: 20 }}
+            key="burn"
             tab={
               <div>
-                <FaFireAlt /> <span>Burn</span>
+                <FaFireAlt /> {!isMobile && <span>Burn</span>}
               </div>
             }
-            key="burn"
           >
             {/* <BurnForm /> */}
-          </Tabs.TabPane>
-          <Tabs.TabPane
-            tab={
-              <div>
-                <AiOutlineSwap /> <span>Swap</span>
-              </div>
-            }
-            key="swap"
-          >
-            <SwapInteraction pool={pool} />
           </Tabs.TabPane>
         </>
       )}

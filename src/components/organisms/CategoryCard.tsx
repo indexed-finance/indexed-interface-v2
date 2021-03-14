@@ -1,7 +1,7 @@
-import { Card, List, Typography } from "antd";
+import { Avatar, Card, List, Typography } from "antd";
 import { Link, useHistory } from "react-router-dom";
 import { Token } from "components/atoms";
-
+import { useBreakpoints } from "helpers";
 import type { Token as TokenType } from "indexed-types";
 
 export interface Props {
@@ -35,42 +35,47 @@ export default function CategoryCard({
   },
 }: Props) {
   const history = useHistory();
+  const breakpoints = useBreakpoints();
+  const tokenImages = [
+    <Avatar.Group
+      key="1"
+      maxCount={breakpoints.isMobile ? 6 : 20}
+      style={{ paddingLeft: "1rem", paddingRight: "1rem" }}
+    >
+      {Object.values(tokens.entities).map((token) => (
+        <Token
+          key={token.symbol}
+          address={token.id}
+          name={token.name}
+          image={token.symbol}
+          size={breakpoints.isMobile ? "small" : "medium"}
+        />
+      ))}
+    </Avatar.Group>,
+  ];
 
   return (
     <Card
       key={id}
       hoverable={true}
       title={<Typography.Title level={2}>{name}</Typography.Title>}
-      actions={[
-        <div key="1">
-          {Object.values(tokens.entities).map((token) => (
-            <Token
-              key={token.symbol}
-              address={token.id}
-              name={token.name}
-              image={token.symbol}
-            />
-          ))}
-        </div>,
-      ]}
+      actions={tokenImages}
     >
       <div onClick={() => history.push(`/categories/${slug}`)}>
-        <Card.Meta
-          description={
-            <>
-              {brief}
-              <List header="Index Pools">
-                {indexPools.map((indexPool) => (
-                  <List.Item key={indexPool.name}>
-                    <Link to={`/pools/${indexPool.slug}`}>
-                      {indexPool.name} [{indexPool.symbol}]
-                    </Link>
-                  </List.Item>
-                ))}
-              </List>
-            </>
+        {brief}
+        <List
+          header={
+            <Typography.Text type="secondary">Index Pools</Typography.Text>
           }
-        />
+        >
+          {indexPools.map((indexPool) => (
+            <List.Item key={indexPool.name}>
+              <Link to={`/pools/${indexPool.slug}`}>
+                {indexPool.name} [{indexPool.symbol}]
+              </Link>
+            </List.Item>
+          ))}
+        </List>
       </div>
     </Card>
   );

@@ -20,7 +20,7 @@ export default function PoolList({ withBreadcrumb = true }: Props) {
   return (
     <>
       <ScreenHeader title="Pools" {...headerProps} />
-      <Space direction="vertical" size="large" style={{ flex: 1 }}>
+      <Space direction="vertical" style={{ width: "100%" }}>
         {pools.map((pool) => (
           <PoolCard key={pool!.id} pool={pool!} />
         ))}

@@ -1,3 +1,4 @@
+import { Avatar } from "antd";
 import { PLACEHOLDER_TOKEN_IMAGE } from "config";
 
 interface Props {
@@ -35,7 +36,7 @@ export default function Token({
   }
 
   return (
-    <img
+    <Avatar
       className="Token"
       alt={name}
       src={tokenImage}

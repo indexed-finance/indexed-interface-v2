@@ -1,6 +1,6 @@
 import { AppState, selectors } from "features";
 import { CategoryDropdown, CategoryTable, ScreenHeader } from "components";
-import { Divider } from "antd";
+import { Divider, Typography } from "antd";
 import { Link } from "react-router-dom";
 import { Redirect, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
@@ -22,7 +22,9 @@ export default function CategoryDetail() {
       />
       <CategoryTable pools={category.indexPools} />
       <Divider />
-      <ReactMarkdown>{category.description}</ReactMarkdown>
+      <Typography.Text>
+        <ReactMarkdown>{category.description}</ReactMarkdown>
+      </Typography.Text>
     </>
   ) : (
     <Redirect to="/categories" />

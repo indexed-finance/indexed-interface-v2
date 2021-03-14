@@ -99,7 +99,8 @@ export const { actions } = slice;
 
 export const selectors = {
   ...adapter.getSelectors((state: AppState) => state.indexPools),
-  selectPool: (state: AppState, poolId: string) => selectors.selectById(state, poolId),
+  selectPool: (state: AppState, poolId: string) =>
+    selectors.selectById(state, poolId),
   selectNameForPool: (state: AppState, poolId: string) => {
     const pool = selectors.selectPool(state, poolId);
     return pool ? formatName(pool.name) : "";
@@ -154,6 +155,11 @@ export const selectors = {
   selectSwapFee: (state: AppState, poolId: string) => {
     const pool = selectors.selectPool(state, poolId);
     return pool ? convert.toBigNumber(pool.swapFee) : null;
+  },
+  selectFormattedSwapFee: (state: AppState, poolId: string) => {
+    const fee = selectors.selectSwapFee(state, poolId);
+
+    return fee ? convert.toPercent(parseFloat(convert.toBalance(fee))) : "";
   },
   selectPoolInitializerAddress: (state: AppState, poolId: string) => {
     const pool = selectors.selectPool(state, poolId);

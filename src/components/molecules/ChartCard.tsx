@@ -1,6 +1,7 @@
 import { AppState, selectors } from "features";
-import { Card, Divider, Menu, Radio, RadioChangeEvent } from "antd";
+import { Card, Menu, Select, Space, Typography } from "antd";
 import { SnapshotKey } from "features";
+import { useBreakpoints } from "helpers";
 import { useCallback, useState } from "react";
 import { useSelector } from "react-redux";
 import LineSeriesChart from "./LineSeriesChart";
@@ -29,10 +30,78 @@ export default function ChartCard({ poolId, expanded = false }: Props) {
       ),
     []
   );
-  const handleRadioGroupChange = useCallback(
-    (event: RadioChangeEvent) => setKey(event.target.value as SnapshotKey),
-    []
+  const { isMobile } = useBreakpoints();
+  const timeframeAction = (
+    <>
+      <Typography.Paragraph
+        type="secondary"
+        style={{
+          textAlign: "center",
+          paddingLeft: isMobile ? 0 : 20,
+          marginBottom: isMobile ? -10 : 0,
+        }}
+      >
+        Timeframe
+      </Typography.Paragraph>
+      <Menu
+        style={{ textAlign: "center", marginTop: 0 }}
+        mode="horizontal"
+        selectedKeys={[timeframe]}
+      >
+        {["Day", "Week"].map((_timeframe) => (
+          <Menu.Item
+            key={_timeframe}
+            active={_timeframe === timeframe}
+            onClick={toggleTimeframe}
+          >
+            {_timeframe}
+          </Menu.Item>
+        ))}
+      </Menu>
+    </>
   );
+  const criteriaAction = (
+    <>
+      <Typography.Paragraph
+        type="secondary"
+        style={{
+          textAlign: "center",
+          paddingRight: isMobile ? 0 : 30,
+          marginBottom: isMobile ? 0 : 15,
+        }}
+      >
+        Criteria
+      </Typography.Paragraph>
+      <Select
+        value={key}
+        style={{ width: isMobile ? "240px" : "80%" }}
+        onChange={setKey}
+      >
+        <Select.Option value="value">Value (in USD)</Select.Option>
+        <Select.Option value="totalSupply">Supply (in tokens)</Select.Option>
+        <Select.Option value="totalValueLockedUSD">
+          Total Value Locked (in USD)
+        </Select.Option>
+        <Select.Option value="totalSwapVolumeUSD">
+          Total Swap Volume (in USD)
+        </Select.Option>
+        <Select.Option value="feesTotalUSD">
+          Total Swap Fees (in USD)
+        </Select.Option>
+      </Select>
+    </>
+  );
+  const actions = isMobile
+    ? [
+        <Space direction="vertical" key="1">
+          {timeframeAction}
+          {criteriaAction}
+        </Space>,
+      ]
+    : [
+        <div key="1">{timeframeAction}</div>,
+        <div key="2">{criteriaAction}</div>,
+      ];
 
   return (
     <Card
@@ -44,50 +113,12 @@ export default function ChartCard({ poolId, expanded = false }: Props) {
             netChange={formattedPool.netChange}
             netChangePercent={formattedPool.netChangePercent}
             isNegative={formattedPool.isNegative}
-            inline={true}
+            inline={!isMobile}
           />
         )
       }
-      actions={[
-        <Radio.Group
-          key="1"
-          value={key}
-          onChange={handleRadioGroupChange}
-          style={{ width: "100%" }}
-        >
-          <div className="spaced-evenly">
-            <Radio.Button value={"value"} style={{ width: 125 }}>
-              Value
-            </Radio.Button>
-            <Radio.Button value={"totalSupply"} style={{ width: 125 }}>
-              Supply
-            </Radio.Button>
-          </div>
-          <Divider style={{ marginTop: 10, marginBottom: 10 }} />
-          <div className="spaced-evenly">
-            <Radio.Button value={"totalValueLockedUSD"}>
-              Total Value Locked
-            </Radio.Button>
-            <Radio.Button value={"totalSwapVolumeUSD"}>
-              Total Swap Volume
-            </Radio.Button>
-            <Radio.Button value={"feesTotalUSD"}>Total Swap Fees</Radio.Button>
-          </div>
-        </Radio.Group>,
-      ]}
-      extra={
-        <Menu mode="horizontal" selectedKeys={[timeframe]}>
-          {["Day", "Week"].map((_timeframe) => (
-            <Menu.Item
-              key={_timeframe}
-              active={_timeframe === timeframe}
-              onClick={toggleTimeframe}
-            >
-              {_timeframe}
-            </Menu.Item>
-          ))}
-        </Menu>
-      }
+      bodyStyle={{ padding: 0, height: 300 }}
+      actions={actions}
     >
       <LineSeriesChart data={data} expanded={expanded} />
     </Card>

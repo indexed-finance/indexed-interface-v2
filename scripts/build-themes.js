@@ -18,6 +18,7 @@ const options = {
   mainLessFile: path.join(__dirname, "../src/theme/index.less"),
   themeVariables: [
     "@primary-color",
+    "@secondary-color",
     "@heading-color",
     "@text-color",
     "@layout-header-background",

@@ -1,6 +1,7 @@
 
 .dark {
   @primary-color: #800180;
+@secondary-color: #2096f3;
 @heading-color: #fafafa;
 @text-color: #fafafa;
 @layout-header-background: #151515;
@@ -1414,7 +1415,7 @@ tr.ant-table-expanded-row:hover > td {background: #fbfbfb;}
 .ant-tag-blue-inverse {color: #fff;background: #1890ff;border-color: #1890ff;}
 .ant-tag-geekblue {color: #1d39c4;background: #f0f5ff;border-color: #adc6ff;}
 .ant-tag-geekblue-inverse {color: #fff;background: #2f54eb;border-color: #2f54eb;}
-.ant-tag-purple {color: #531dab;background: #f9f0ff;border-color: #d3adf7;}
+.ant-tag-purple {color: #531dab;background: color(~`colorPalette("@{layout-header-background}", 1)`);border-color: #d3adf7;}
 .ant-tag-purple-inverse {color: #fff;background: #722ed1;border-color: #722ed1;}
 .ant-tag-success {color: #52c41a;background: #f6ffed;border-color: #b7eb8f;}
 .ant-tag-processing {color: #1890ff;background: #e6f7ff;border-color: #91d5ff;}
@@ -3343,8 +3344,9 @@ a.ant-typography.ant-typography-disabled:hover, .ant-typography a.ant-typography
 .ant-upload-list-picture-card .ant-upload-list-item-uploading.ant-upload-list-item {background-color: rgba(255, 255, 255, 0.04);}
 .dark .ant-layout {background: black;}
 .light .ant-layout {background: white;}
-.circular, .Token {border-radius: 50%;}
-.dark .AppMenuWrapper {background: #000;}
+.circular {border-radius: 50%;}
+.AppHeader {border-bottom: 1px solid rgba(204, 204, 255, 0.2);}
+.dark .AppMenuWrapper {background: #101010;}
 .light .AppMenuWrapper {background: #fff;}
 .dark .AppLayout .Page {background: #161616 !important;}
 .light .AppLayout .Page {background: #fafafa !important;}

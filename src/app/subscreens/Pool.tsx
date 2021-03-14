@@ -63,7 +63,12 @@ export default function Pool({ id }: Props) {
     );
     const assets = (
       <Subscreen title="Assets">
-        <Space wrap={true} align="start" className="RankedTokenWrapper">
+        <Space
+          wrap={true}
+          align="start"
+          className="RankedTokenWrapper"
+          style={{ padding: 10 }}
+        >
           {pool.assets.map((token, index) => (
             <RankedToken key={token.symbol} rank={index + 1} token={token} />
           ))}
@@ -82,6 +87,7 @@ export default function Pool({ id }: Props) {
     // Variants
     const mobileSized = (
       <Row>
+        <Col span={24}>{chart}</Col>
         <Col span={24}>{interactions}</Col>
         <Col span={24}>{assets}</Col>
         <Col span={24}>{recents}</Col>

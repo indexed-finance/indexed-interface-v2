@@ -69,7 +69,7 @@ export default function AppLayout() {
             <AppMenu />
           </Sider>
         )}
-        <Content>
+        <Content style={{ paddingRight: 10, paddingLeft: 10 }}>
           <div className="Page">
             <RouterSwitch>
               {routes.map((route, index) => (

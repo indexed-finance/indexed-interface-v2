@@ -80,6 +80,10 @@ const selectors = {
           .filter(Boolean)
           .map((pool) => {
             const guaranteedPool = pool as NormalizedPool;
+            const swapFee = selectors.selectFormattedSwapFee(
+              state,
+              guaranteedPool.id
+            );
             const price = convert.toToken(
               convert
                 .toBigNumber(guaranteedPool.totalValueLockedUSD)
@@ -97,7 +101,7 @@ const selectors = {
                 parseFloat(convert.toBalance(guaranteedPool.totalSupply))
               ),
               marketCap: convert.toCurrency(guaranteedPool.totalValueLockedUSD),
-              swapFee: convert.toPercent(parseFloat(guaranteedPool.swapFee)),
+              swapFee,
               cumulativeFees: convert.toCurrency(guaranteedPool.feesTotalUSD),
               volume: convert.toCurrency(guaranteedPool.totalVolumeUSD),
             };

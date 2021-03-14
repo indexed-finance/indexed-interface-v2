@@ -57,11 +57,5 @@ export default function Quote({
     </>
   );
 
-  return inline ? (
-    <div className="flex-center">{inner}</div>
-  ) : (
-    <div style={{ textAlign: centered ? "center" : "right", flex: 2 }}>
-      {inner}
-    </div>
-  );
+  return inline ? <div className="flex-center">{inner}</div> : inner;
 }

@@ -18,13 +18,13 @@ export default function CategoryList({ withBreadcrumb = true }: Props) {
     : {};
 
   return (
-    <div className="CategoryList">
+    <>
       <ScreenHeader title="Categories" {...headerProps} />
-      <Space direction="vertical" size="large">
+      <Space direction="vertical" size="large" style={{ width: "100%" }}>
         {categories.map((category) => (
           <CategoryCard key={category!.id} {...category!} />
         ))}
       </Space>
-    </div>
+    </>
   );
 }

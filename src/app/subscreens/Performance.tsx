@@ -8,6 +8,7 @@ export default function Performance({ pool }: { pool: FormattedIndexPool }) {
   return (
     <Space
       className="Performance"
+      direction={isMobile ? "vertical" : "horizontal"}
       style={{
         flex: 1,
         flexWrap: "wrap",
@@ -19,22 +20,22 @@ export default function Performance({ pool }: { pool: FormattedIndexPool }) {
       <Statistic
         title="Total Value Locked"
         value={pool.totalValueLocked}
-        style={{ flex: 1, textAlign: isMobile ? "left" : "center" }}
+        style={{ flex: 1, textAlign: "center" }}
       />
       <Statistic
         title="Volume"
         value={pool.volume}
-        style={{ flex: 1, textAlign: isMobile ? "right" : "center" }}
+        style={{ flex: 1, textAlign: "center" }}
       />
       <Statistic
         title="Cumulative Fees"
         value={pool.cumulativeFee}
-        style={{ flex: 1, textAlign: isMobile ? "left" : "center" }}
+        style={{ flex: 1, textAlign: "center" }}
       />
       <Statistic
         title="Swap Fee"
         value={pool.swapFee}
-        style={{ flex: 1, textAlign: isMobile ? "right" : "center" }}
+        style={{ flex: 1, textAlign: "center" }}
       />
     </Space>
   );

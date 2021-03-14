@@ -1,6 +1,6 @@
 import { Alert, Space, Statistic } from "antd";
 import { Token } from "components";
-import { convert } from "helpers";
+import { convert, useBreakpoints } from "helpers";
 
 export interface Props {
   baseline: string;
@@ -15,6 +15,7 @@ export default function TokenExchangeRate({
   fee,
   rate,
 }: Props) {
+  const { isMobile } = useBreakpoints();
   const converted = convert.toComma(
     typeof rate === "number" ? rate : parseFloat(rate)
   );
@@ -22,11 +23,14 @@ export default function TokenExchangeRate({
   return (
     <Alert
       message={
-        <Space style={{ width: "100%" }} className="spaced-between">
+        <Space
+          style={{ width: "100%" }}
+          direction={isMobile ? "vertical" : "horizontal"}
+          className={isMobile ? "" : "spaced-between"}
+        >
           <Statistic
             title="Exchange Rate"
-            // value={`1 ${baseline} ≈  ${comparison}`}
-            valueStyle={{ fontSize: 14 }}
+            // style={{ textAlign: isMobile ? "left" : "right" }}
             valueRender={() => (
               <div className="spaced-between">
                 <Space style={{ marginRight: 8 }}>
@@ -46,6 +50,7 @@ export default function TokenExchangeRate({
                 </Space>
               </div>
             )}
+            valueStyle={{ fontSize: isMobile ? 12 : 14 }}
           />
           <Statistic
             title="Fee"
@@ -59,8 +64,8 @@ export default function TokenExchangeRate({
                 {comparison}
               </Space>
             )}
-            valueStyle={{ fontSize: 14 }}
-            style={{ flex: 1, textAlign: "right" }}
+            valueStyle={{ fontSize: isMobile ? 12 : 14 }}
+            style={{ flex: 1, textAlign: isMobile ? "left" : "right" }}
           />
         </Space>
       }
