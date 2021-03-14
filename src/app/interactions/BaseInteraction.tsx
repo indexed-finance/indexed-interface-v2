@@ -1,13 +1,13 @@
 import * as yup from "yup";
 import { AiOutlineArrowRight } from "react-icons/ai";
 import { Alert, Button, Divider, Space, Typography } from "antd";
-import { AppState, FormattedIndexPool, actions, selectors } from "features";
+import { AppState, FormattedIndexPool } from "features";
 import { Flipper, Token } from "components/atoms";
 import { Formik, FormikProps, useFormikContext } from "formik";
-import { ReactNode, useCallback, useEffect, useRef } from "react";
+import { ReactNode, useEffect, useRef } from "react";
 import { TokenSelector } from "components";
 import { convert } from "helpers";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { useTokenRandomizer } from "./common";
 
 interface Props {
@@ -15,6 +15,13 @@ interface Props {
   pool: FormattedIndexPool;
   extra?: ReactNode;
   onSubmit(values: typeof initialValues): void;
+  approvalSelector(
+    state: AppState,
+    poolId: string,
+    fromToken: string,
+    fromAmount: string
+  ): boolean;
+  handleApprove(poolId: string, fromToken: string, fromAmount: string): void;
 }
 
 const initialValues = {
@@ -36,6 +43,8 @@ export default function BaseInteraction({
   title,
   pool,
   extra = null,
+  approvalSelector,
+  handleApprove,
   onSubmit,
 }: Props) {
   const interactionRef = useRef<null | HTMLDivElement>(null);
@@ -69,7 +78,10 @@ export default function BaseInteraction({
               {...props}
               pool={pool}
               extra={extra}
-              parent={interactionParent}
+              parent={interactionParent ?? false}
+              approvalSelector={approvalSelector}
+              handleApprove={handleApprove}
+              onSubmit={onSubmit}
             />
           </>
         )}
@@ -78,11 +90,10 @@ export default function BaseInteraction({
   );
 }
 
-interface InnerProps extends FormikProps<InteractionValues> {
-  pool: Props["pool"];
-  extra: Props["extra"];
-  parent: false | HTMLDivElement;
-}
+type InnerProps = Omit<Props, "title"> &
+  FormikProps<InteractionValues> & {
+    parent: false | HTMLDivElement;
+  };
 
 function InteractionInner({
   pool,
@@ -92,30 +103,20 @@ function InteractionInner({
   isValid,
   setFieldValue,
   handleSubmit,
+  approvalSelector,
+  handleApprove,
 }: InnerProps) {
-  const dispatch = useDispatch();
   const lastTouched = useRef<null | "from" | "to">(null);
   const previousFrom = useRef("");
   const previousTo = useRef("");
   const needsApproval = useSelector((state: AppState) =>
-    selectors.selectApprovalStatus(
+    approvalSelector(
       state,
       pool.id,
       values.fromToken.toLowerCase(),
       convert.toToken(values.fromAmount.toString()).toString(10)
     )
   );
-  const handleApproval = useCallback(() => {
-    if (needsApproval) {
-      dispatch(
-        actions.approvePool(
-          pool.id,
-          values.fromToken.toLowerCase(),
-          values.fromAmount.toString()
-        )
-      );
-    }
-  }, [needsApproval, dispatch, pool.id, values]);
 
   // Effect:
   // Prevent duplicates.
@@ -134,6 +135,8 @@ function InteractionInner({
     previousTo.current = toToken ?? "";
   }, [values, setFieldValue]);
 
+  // Effect:
+  // On initial load, select two arbitrary tokens.
   useTokenRandomizer({
     pool,
     from: values.fromToken,
@@ -148,7 +151,7 @@ function InteractionInner({
       <TokenSelector
         label="From"
         assets={pool.assets}
-        parent={parent}
+        parent={parent ?? false}
         value={{
           token: values.fromToken,
           amount: values.fromAmount,
@@ -165,7 +168,7 @@ function InteractionInner({
       <TokenSelector
         label="To"
         assets={pool.assets}
-        parent={parent}
+        parent={parent ?? false}
         value={{
           token: values.toToken,
           amount: values.toAmount,
@@ -188,7 +191,13 @@ function InteractionInner({
           type="primary"
           style={{ width: "100%" }}
           disabled={!isValid}
-          onClick={handleApproval}
+          onClick={() =>
+            handleApprove(
+              pool.id,
+              values.fromToken,
+              values.fromAmount.toString()
+            )
+          }
         >
           Approve
         </Button>

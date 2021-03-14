@@ -1,42 +1,21 @@
 import { COMMON_BASE_TOKENS } from "config";
 import { NormalizedToken } from "ethereum";
 import {
-  PayloadAction,
-  createEntityAdapter,
-  createSlice,
-} from "@reduxjs/toolkit";
-import {
   coingeckoDataLoaded,
   coingeckoIdsLoaded,
   receivedInitialStateFromServer,
   receivedStatePatchFromServer,
   subgraphDataLoaded,
 } from "features/actions";
+import { createEntityAdapter, createSlice } from "@reduxjs/toolkit";
 import type { AppState } from "features/store";
 
 const adapter = createEntityAdapter<NormalizedToken>();
 
 const slice = createSlice({
   name: "tokens",
-  initialState: adapter.getInitialState<{
-    // Token ID -> [red, green, blue]
-    colorCache: Record<string, [number, number, number]>;
-  }>({
-    colorCache: {},
-  }),
-  reducers: {
-    tokenColorCached(
-      state,
-      action: PayloadAction<{
-        tokenId: string;
-        color: [number, number, number];
-      }>
-    ) {
-      const { tokenId, color } = action.payload;
-
-      state.colorCache[tokenId] = color;
-    },
-  },
+  initialState: adapter.getInitialState(),
+  reducers: {},
   extraReducers: (builder) =>
     builder
       .addCase(subgraphDataLoaded, (state, action) => {
@@ -97,13 +76,17 @@ export const { actions } = slice;
 export const selectors = {
   ...adapter.getSelectors((state: AppState) => state.tokens),
   selectTokens: (state: AppState) => state.tokens,
-  selectTokenById: (state: AppState, id: string) => selectors.selectById(state, id),
-  selectTokensById: (state: AppState, ids: string[]): (NormalizedToken | undefined)[] => {
+  selectTokenById: (state: AppState, id: string) =>
+    selectors.selectById(state, id),
+  selectTokensById: (
+    state: AppState,
+    ids: string[]
+  ): (NormalizedToken | undefined)[] => {
     const tokens = selectors.selectTokens(state);
-    return ids.reduce((prev, next) => ([
-      ...prev,
-      tokens.entities[next.toLowerCase()]
-    ]), [] as (NormalizedToken | undefined)[]);
+    return ids.reduce(
+      (prev, next) => [...prev, tokens.entities[next.toLowerCase()]],
+      [] as (NormalizedToken | undefined)[]
+    );
   },
   selectAllTokens: (state: AppState) => selectors.selectAll(state),
   selectTokenLookup: (state: AppState) => selectors.selectEntities(state),
@@ -116,7 +99,6 @@ export const selectors = {
     selectors.selectAll(state).map(({ symbol }) => symbol),
   selectTokenSymbol: (state: AppState, poolId: string) =>
     selectors.selectTokenLookup(state)[poolId]?.symbol ?? "",
-  selectColorCache: (state: AppState) => state.tokens.colorCache,
 };
 
 export default slice.reducer;

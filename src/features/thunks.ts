@@ -54,7 +54,7 @@ type InitialzeOptions = {
  */
 const BLOCK_HANDLER_DEBOUNCE_RATE = 250;
 
-const thunks = {
+export const thunks = {
   /**
    *
    */
@@ -193,24 +193,6 @@ const thunks = {
       actions.listenerRegistered({
         id: "",
         kind: "PoolData",
-        args: {
-          pool: poolId,
-          tokens: tokens.map((t) => t.token.id),
-        },
-      })
-    );
-  },
-  registerTokenUserDataListener: (poolId: string): AppThunk => (
-    dispatch,
-    getState
-  ) => {
-    const state = getState();
-    const tokens = selectors.selectPoolUnderlyingTokens(state, poolId);
-
-    return dispatch(
-      actions.listenerRegistered({
-        id: "",
-        kind: "TokenUserData",
         args: {
           pool: poolId,
           tokens: tokens.map((t) => t.token.id),

@@ -1,6 +1,10 @@
 import { Divider, Space } from "antd";
-import { FormattedIndexPool } from "features";
+import { FormattedIndexPool, selectors } from "features";
 import { PlainLanguageTransaction, TokenExchangeRate } from "components";
+import { actions } from "features";
+import { getSwapCost } from "./common";
+import { useCallback } from "react";
+import { useDispatch } from "react-redux";
 import { useFormikContext } from "formik";
 import BaseInteraction, { InteractionValues } from "./BaseInteraction";
 
@@ -9,19 +13,35 @@ interface Props {
 }
 
 export default function SwapInteraction({ pool }: Props) {
+  const dispatch = useDispatch();
+  const handleApprove = useCallback(
+    (poolId: string, fromToken: string, fromAmount: string) =>
+      dispatch(
+        actions.approvePool(
+          poolId,
+          fromToken.toLowerCase(),
+          fromAmount.toString()
+        )
+      ),
+    [dispatch]
+  );
+
   return (
     <BaseInteraction
       title="Swap"
       pool={pool}
       onSubmit={console.log}
-      extra={<SwapExtras />}
+      extra={<SwapExtras pool={pool} />}
+      approvalSelector={selectors.selectApprovalStatus}
+      handleApprove={handleApprove}
     />
   );
 }
 
-function SwapExtras() {
+function SwapExtras({ pool }: Props) {
   const { values } = useFormikContext<InteractionValues>();
-  const { fromToken, toToken } = values;
+  const { fromToken, toToken, toAmount } = values;
+  const swapCost = getSwapCost(toAmount, pool.swapFee);
 
   return fromToken && toToken ? (
     <>
@@ -30,7 +50,7 @@ function SwapExtras() {
           baseline={fromToken}
           comparison={toToken}
           rate=""
-          fee=""
+          fee={swapCost}
         />
         <PlainLanguageTransaction />
       </Space>

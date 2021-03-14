@@ -6,6 +6,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import noop from "lodash.noop";
 
+export function getSwapCost(outputAmount: number, swapFeePercent: string) {
+  return convert
+    .toBigNumber(outputAmount.toString(10))
+    .times(convert.toBigNumber((parseFloat(swapFeePercent) / 100).toString()))
+    .toString(10);
+}
+
 // Effect:
 // On initial token load, select two to swap.
 export function useTokenRandomizer(options: TokenRandomizerOptions) {

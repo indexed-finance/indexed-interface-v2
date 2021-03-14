@@ -4,6 +4,7 @@ import { ThunkAction } from "redux-thunk";
 import { batcherActions } from "./batcher";
 import { configureStore } from "@reduxjs/toolkit";
 import { disconnectFromProvider } from "./thunks";
+import { thunks } from "./thunks";
 import { userActions } from "./user";
 import { v4 as uuid } from "uuid";
 import flags from "feature-flags";
@@ -17,7 +18,7 @@ const store = configureStore({
       serializableCheck: false,
     })
       // The listener ID is returned for later use in unregistering.
-      .concat(function listenerIdMiddleware() {
+      .concat(function listenerIdMiddleware(storeAPI) {
         return (next) => (action) => {
           if (action.type === batcherActions.listenerRegistered.type) {
             const id = uuid();
@@ -29,6 +30,8 @@ const store = configureStore({
                 id,
               },
             });
+
+            storeAPI.dispatch(thunks.sendBatch() as any);
 
             return id;
           } else {
