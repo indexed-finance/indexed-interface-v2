@@ -30,7 +30,6 @@ export default function TokenExchangeRate({
         >
           <Statistic
             title="Exchange Rate"
-            // style={{ textAlign: isMobile ? "left" : "right" }}
             valueRender={() => (
               <div className="spaced-between">
                 <Space style={{ marginRight: 8 }}>

@@ -44,11 +44,16 @@ export default function TradeInteraction({ pool }: Props) {
     form.setFieldsValue(flippedValue);
   };
   const tokenIds = useMemo(() => {
-    return [pool.id, ...COMMON_BASE_TOKENS.map(c => c.id)];
+    return [pool.id, ...COMMON_BASE_TOKENS.map((c) => c.id)];
   }, [pool.id]);
 
-  const { calculateBestTradeForExactInput, calculateBestTradeForExactOutput } = useUniswapTradingPairs(tokenIds);
-  const assets = useSelector((state: AppState) => selectors.selectTokensById(state, tokenIds));
+  const {
+    calculateBestTradeForExactInput,
+    calculateBestTradeForExactOutput,
+  } = useUniswapTradingPairs(tokenIds);
+  const assets = useSelector((state: AppState) =>
+    selectors.selectTokensById(state, tokenIds)
+  );
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
 
   useEffect(() => {
@@ -66,56 +71,68 @@ export default function TradeInteraction({ pool }: Props) {
     }
   }, [form, pool]);
 
-  const calculateInputForExactOutput = useCallback((changedValues: TradeValues) => {
-    const { from } = form.getFieldsValue();
-    if (!changedValues.to.token || !from.token) return;
-    let amountIn: number;
-    if (!changedValues.to.amount) {
-      amountIn = 0;
-    } else {
-      const inputToken = tokenLookup[from.token.toLowerCase()];
-      const outputToken = tokenLookup[changedValues.to.token.toLowerCase()];
-      const amountOut = convert
-        .toToken(changedValues.to.amount.toString(), outputToken.decimals)
-        .toString(10);
-      const bestTrade = calculateBestTradeForExactOutput(
-        inputToken,
-        outputToken,
-        amountOut
-      );
-      setTrade(bestTrade);
-      amountIn = parseFloat(bestTrade?.inputAmount.toFixed(4) ?? "0");
-    }
-
-    form.setFieldsValue({
-      from: {
-        token: from.token,
-        amount: amountIn
+  const calculateInputForExactOutput = useCallback(
+    (changedValues: TradeValues) => {
+      const { from } = form.getFieldsValue();
+      if (!changedValues.to.token || !from.token) return;
+      let amountIn: number;
+      if (!changedValues.to.amount) {
+        amountIn = 0;
+      } else {
+        const inputToken = tokenLookup[from.token.toLowerCase()];
+        const outputToken = tokenLookup[changedValues.to.token.toLowerCase()];
+        const amountOut = convert
+          .toToken(changedValues.to.amount.toString(), outputToken.decimals)
+          .toString(10);
+        const bestTrade = calculateBestTradeForExactOutput(
+          inputToken,
+          outputToken,
+          amountOut
+        );
+        setTrade(bestTrade);
+        amountIn = parseFloat(bestTrade?.inputAmount.toFixed(4) ?? "0");
       }
-    });
-  }, [calculateBestTradeForExactOutput, form, tokenLookup]);
 
-  const calculateOutputForExactInput = useCallback((changedValues: TradeValues) => {
-    const { from, to } = form.getFieldsValue();
-    if (!changedValues.from.token || !to.token) return;
-    let amountOut: number;
-    if (!changedValues.from.amount) {
-      amountOut = 0;
-    } else {
-      const inputToken = tokenLookup[changedValues.from.token.toLowerCase()];
-      const outputToken = tokenLookup[to.token.toLowerCase()];
-      const amountIn = convert.toToken(changedValues.from.amount.toString(), inputToken.decimals).toString(10);
-      const bestTrade = calculateBestTradeForExactInput(inputToken, outputToken, amountIn);
-      setTrade(bestTrade);
-      amountOut = parseFloat(bestTrade?.outputAmount.toFixed(4) ?? "0");
-    }
-    form.setFieldsValue({
-      to: {
-        token: to.token,
-        amount: amountOut
+      form.setFieldsValue({
+        from: {
+          token: from.token,
+          amount: amountIn,
+        },
+      });
+    },
+    [calculateBestTradeForExactOutput, form, tokenLookup]
+  );
+
+  const calculateOutputForExactInput = useCallback(
+    (changedValues: TradeValues) => {
+      const { to } = form.getFieldsValue();
+      if (!changedValues.from.token || !to.token) return;
+      let amountOut: number;
+      if (!changedValues.from.amount) {
+        amountOut = 0;
+      } else {
+        const inputToken = tokenLookup[changedValues.from.token.toLowerCase()];
+        const outputToken = tokenLookup[to.token.toLowerCase()];
+        const amountIn = convert
+          .toToken(changedValues.from.amount.toString(), inputToken.decimals)
+          .toString(10);
+        const bestTrade = calculateBestTradeForExactInput(
+          inputToken,
+          outputToken,
+          amountIn
+        );
+        setTrade(bestTrade);
+        amountOut = parseFloat(bestTrade?.outputAmount.toFixed(4) ?? "0");
       }
-    });
-  }, [calculateBestTradeForExactInput, form, tokenLookup]);
+      form.setFieldsValue({
+        to: {
+          token: to.token,
+          amount: amountOut,
+        },
+      });
+    },
+    [calculateBestTradeForExactInput, form, tokenLookup]
+  );
 
   const checkAmount = (_: any, value: { amount: number }) => {
     return value.amount > 0

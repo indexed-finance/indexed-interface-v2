@@ -14,6 +14,7 @@ import { SelectableToken } from "components/molecules";
 import { Token } from "components/atoms";
 import { useBreakpoints } from "helpers";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useFormikContext } from "formik";
 import { useSelector } from "react-redux";
 
 export type TokenSelectorValue = {
@@ -43,6 +44,9 @@ export default function TokenSelector({
   parent = false,
   onChange,
 }: Props) {
+  const tokenField = `${label.toLowerCase()}Token`;
+  const amountField = `${label.toLowerCase()}Amount`;
+  const { setTouched } = useFormikContext<any>();
   const [amount, setAmount] = useState(value?.amount ?? 0);
   const [token, setToken] = useState(value?.token ?? "");
   const [selectingToken, setSelectingToken] = useState(false);
@@ -100,10 +104,12 @@ export default function TokenSelector({
   const handleMaxOut = useCallback(() => {
     onAmountChange(relevantBalance);
   }, [onAmountChange, relevantBalance]);
-  const handleOpenTokenSelection = useCallback(
-    () => setSelectingToken(true),
-    []
-  );
+  const handleOpenTokenSelection = useCallback(() => {
+    setSelectingToken(true);
+    setTouched({
+      [tokenField]: true,
+    });
+  }, [setTouched, tokenField]);
   const handleCloseTokenSelection = useCallback(
     () => setSelectingToken(false),
     []
@@ -165,6 +171,11 @@ export default function TokenSelector({
               min={0}
               step="0.01"
               value={value.amount ?? amount}
+              onFocus={() =>
+                setTouched({
+                  [amountField]: true,
+                })
+              }
               onChange={onAmountChange}
               style={{ width: isMobile ? 120 : 200 }}
             />

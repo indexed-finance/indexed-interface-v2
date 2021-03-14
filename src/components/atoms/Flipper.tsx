@@ -1,23 +1,16 @@
-import { Button } from "antd";
+import { Button, Divider } from "antd";
 import { MdSwapCalls } from "react-icons/md";
-import { ReactNode } from "react";
 
 interface Props {
-  left?: ReactNode;
   onFlip(): void;
-  right?: ReactNode;
 }
 
-export default function Flipper({ left, onFlip, right }: Props) {
+export default function Flipper({ onFlip }: Props) {
   return (
-    <div style={{ position: "relative" }}>
-      <div>
-        {left}
-        <Button type="primary" onClick={onFlip}>
-          <MdSwapCalls />
-        </Button>
-        {right}
-      </div>
-    </div>
+    <Divider style={{ marginBottom: 0 }}>
+      <Button type="primary" onClick={onFlip}>
+        <MdSwapCalls />
+      </Button>
+    </Divider>
   );
 }
