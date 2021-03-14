@@ -24,6 +24,19 @@ function parsePairReservesResults(
 
 const UniswapPairsDataTaskHandler: MultiCallTaskHandler<UniswapPairsDataTask> = {
   kind: "UniswapPairsData",
+  onlyUniqueTasks: (tasks) => {
+    const allPairs = tasks.reduce((prev, next) => {
+      return [
+        ...prev,
+        ...next.args
+      ];
+    }, [] as string[]);
+    return [{
+      id: tasks[0].id,
+      kind: "UniswapPairsData",
+      args: allPairs
+    }]
+  },
   constructCalls: (_, pairs) => {
     const _interface = Pair;
     return pairs.map(

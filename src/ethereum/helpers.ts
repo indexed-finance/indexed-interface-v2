@@ -28,7 +28,7 @@ type PoolTokenData = {
   usedBalance: string;
 };
 
-export async function calculateOutputFromInput(
+export function calculateOutputFromInput(
   inputData: PoolTokenData,
   outputData: PoolTokenData,
   inputAmount: string,
@@ -105,7 +105,7 @@ export async function calculateOutputFromInput(
   }
 }
 
-export async function calculateInputFromOutput(
+export function calculateInputFromOutput(
   inputData: PoolTokenData,
   outputData: PoolTokenUpdate,
   outputAmount: string,

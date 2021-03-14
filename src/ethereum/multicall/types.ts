@@ -34,16 +34,17 @@ type MultiCallContext = {
 export interface MultiCallTaskHandler<
   TaskType extends MultiCallTask = MultiCallTask
 > {
-  kind: TaskType["kind"],
-  constructCalls: (context: Omit<MultiCallContext, "dispatch">, taskArgs: TaskType["args"]) => Call[],
-  handleResults: (context: MultiCallContext, taskArgs: TaskType["args"], results: MultiCallResults) => void
+  kind: TaskType["kind"];
+  onlyUniqueTasks: (tasks: TaskType[]) => TaskType[];
+  constructCalls: (context: Omit<MultiCallContext, "dispatch">, taskArgs: TaskType["args"]) => Call[];
+  handleResults: (context: MultiCallContext, taskArgs: TaskType["args"], results: MultiCallResults) => void;
 }
 
 export interface UniswapPairsDataTask extends MultiCallTask<string[]> {
   kind: "UniswapPairsData";
 }
 
-export interface TokenUserDataTask extends MultiCallTask<{ pool: string; tokens: string[]; }> {
+export interface TokenUserDataTask extends MultiCallTask<{ spender: string; tokens: string[]; }> {
   kind: "TokenUserData";
 }
 

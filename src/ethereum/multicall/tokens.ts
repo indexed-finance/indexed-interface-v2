@@ -1,8 +1,8 @@
 import { Result as AbiCoderResult } from "ethers/lib/utils";
 import { IERC20 } from "ethereum/abi";
 import { MultiCallTaskHandler, TokenUserDataTask } from "./types";
-import { actions, selectors } from "features";
-import { convert } from "helpers";
+import { actions } from "features";
+import { convert, dedupe } from "helpers";
 import chunk from "lodash.chunk";
 import type { Call, MultiCallResults } from "./types";
 
@@ -36,11 +36,32 @@ function formatTokenUserDataResults(
 
 const TokenUserDataTaskHandler: MultiCallTaskHandler<TokenUserDataTask> = {
   kind: "TokenUserData",
+  onlyUniqueTasks: (tasks: TokenUserDataTask[]): TokenUserDataTask[] => {
+    const tasksBySpender = tasks.reduce((prev, next) => {
+      const { spender, tokens } = next.args;
+  
+      if (prev[spender]) {
+        const task = prev[spender];
+        task.args.tokens.push(...tokens);
+        task.args.tokens = dedupe(task.args.tokens);
+      } else {
+        prev[spender] = {
+          id: next.id,
+          kind: next.kind,
+          args: {
+            spender,
+            tokens: dedupe(tokens)
+          }
+        }
+      }
+      return prev;
+    }, {} as Record<string, TokenUserDataTask>);
+    return Object.values(tasksBySpender);
+  },
   constructCalls: (
-    { account, state }, { pool, tokens }
+    { account }, { spender, tokens }
   ): Call[] => {
-    const _pool = selectors.selectPool(state, pool);
-    if (!account || !_pool) return [];
+    if (!account) return [];
     const _interface = IERC20;
     return tokens.reduce((prev, next) => {
       prev.push(
@@ -48,7 +69,7 @@ const TokenUserDataTaskHandler: MultiCallTaskHandler<TokenUserDataTask> = {
           target: next,
           interface: _interface,
           function: "allowance",
-          args: [account, pool],
+          args: [account, spender],
         },
         {
           target: next,
@@ -61,13 +82,13 @@ const TokenUserDataTaskHandler: MultiCallTaskHandler<TokenUserDataTask> = {
     }, [] as Call[]);
   },
 
-  handleResults: ({ dispatch }, { pool, tokens }, results) => {
+  handleResults: ({ dispatch }, { spender, tokens }, results) => {
     if (!results.results.length) return;
     const { blockNumber, data: userData } = formatTokenUserDataResults(results, tokens);
     dispatch(
       actions.poolUserDataLoaded({
         blockNumber: +blockNumber,
-        poolId: pool,
+        poolId: spender,
         userData,
       })
     );
