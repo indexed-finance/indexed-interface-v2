@@ -5,6 +5,12 @@ import { tokensSelectors } from "features/tokens";
 import type { AppState } from "features/store";
 import type { NormalizedUser } from "ethereum/types";
 
+export enum ApprovalStatus {
+  UNKNOWN = "UNKNOWN",
+  APPROVAL_NEEDED = "APPROVAL_NEEDED",
+  APPROVED = "APPROVED"
+}
+
 const initialState: NormalizedUser & {
   recentPoolUpdates: Record<string, number>;
 } = {
@@ -31,7 +37,7 @@ const slice = createSlice({
 
       for (const tokenId of Object.keys(userData)) {
         const { allowance, balance } = userData[tokenId];
-        const combinedId = `${poolId}-${tokenId}`;
+        const combinedId = `${poolId}-${tokenId}`.toLowerCase();
 
         state.allowances[combinedId] = allowance;
         state.balances[tokenId] = balance;
@@ -48,7 +54,7 @@ export const selectors = {
     return state.user.address;
   },
   selectPoolAllowance(state: AppState, poolId: string, tokenId: string) {
-    return state.user.allowances[`${poolId}-${tokenId}`] ?? "0";
+    return state.user.allowances[`${poolId}-${tokenId}`.toLowerCase()];
   },
   selectTokenBalance(state: AppState, tokenId: string) {
     return state.user.balances[tokenId] ?? "0";
@@ -56,22 +62,23 @@ export const selectors = {
   selectApprovalStatus(
     state: AppState,
     poolId: string,
-    tokenSymbol: string,
+    tokenId: string,
     amount: string
   ) {
-    const tokenLookup = tokensSelectors.selectTokenLookupBySymbol(state);
-    const entry = tokenLookup[tokenSymbol];
+    const entry = tokensSelectors.selectTokenById(state, tokenId);
 
     if (entry) {
-      const { id: tokenId } = tokenLookup[tokenSymbol];
       const allowance = selectors.selectPoolAllowance(state, poolId, tokenId);
-      const needsApproval = convert
-        .toBigNumber(amount)
-        .isGreaterThanOrEqualTo(convert.toBigNumber(allowance));
-
-      return needsApproval;
+      if (allowance) {
+        const needsApproval = convert
+          .toBigNumber(amount)
+          .isGreaterThan(convert.toBigNumber(allowance));
+        return needsApproval ? ApprovalStatus.APPROVAL_NEEDED : ApprovalStatus.APPROVED;
+      } else {
+        return ApprovalStatus.UNKNOWN;
+      }
     } else {
-      return true;
+      return ApprovalStatus.UNKNOWN;
     }
   },
   selectTokenSymbolsToBalances(state: AppState) {
