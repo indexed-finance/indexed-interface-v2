@@ -1,6 +1,5 @@
 import * as balancerMath from "./utils/balancer-math";
 import { BigNumber } from "bignumber.js";
-import { PoolTokenUpdate } from "./types.d";
 import { convert } from "helpers";
 
 export * from "./utils";
@@ -17,148 +16,100 @@ type PoolTokenData = {
   usedBalance: string;
 };
 
-export function calculateOutputFromInput(
-  inputData: PoolTokenData,
-  outputData: PoolTokenData,
-  inputAmount: string,
+export function calculateSwapAmountIn(
+  inputToken: PoolTokenData,
+  outputToken: PoolTokenData,
+  amountOut: BigNumber,
   swapFee: BigNumber
-) {
-  const badResult = {
-    outputAmount: parseFloat(convert.toBalance(ZERO)),
-    price: ZERO,
-    spotPriceAfter: ZERO,
-    isGoodResult: false,
-  };
+): { error?: string; amountIn?: BigNumber; spotPriceAfter?: BigNumber } {
+  const [balanceIn, weightIn, balanceOut, weightOut] = [
+    inputToken.usedBalance,
+    inputToken.usedDenorm,
+    outputToken.usedBalance,
+    outputToken.usedDenorm,
+  ].map(convert.toBigNumber);
 
-  if (inputData && outputData) {
-    // --
-    const [balanceIn, weightIn, balanceOut, weightOut, amountIn] = [
-      convert.toBigNumber(inputData.usedBalance),
-      convert.toBigNumber(inputData.usedDenorm),
-      convert.toBigNumber(outputData.usedBalance),
-      convert.toBigNumber(outputData.usedDenorm),
-      convert.toToken(inputAmount),
-    ];
-    if (amountIn.isLessThanOrEqualTo(balanceIn.div(2))) {
-      const amountOut = balancerMath.calcOutGivenIn(
-        balanceIn,
-        weightIn,
-        balanceOut,
-        weightOut,
-        amountIn,
-        swapFee
-      );
-
-      const spotPriceAfter = balancerMath.calcSpotPrice(
-        balanceIn.plus(amountIn),
-        weightIn,
-        balanceOut.minus(amountOut),
-        weightOut,
-        swapFee
-      );
-
-      let price: BigNumber = ZERO;
-
-      // Next, compute the price.
-      if (amountIn.isEqualTo(0) || amountOut.isEqualTo(0)) {
-        const oneToken = BONE;
-        const preciseInput = balancerMath.calcOutGivenIn(
-          balanceIn,
-          weightIn,
-          balanceOut,
-          weightOut,
-          oneToken,
-          swapFee
-        );
-        const preciseOutput = preciseInput.dividedBy(BONE);
-
-        price = preciseOutput.dividedBy(ONE);
-      } else {
-        const preciseInput = amountIn.dividedBy(BONE);
-        const preciseOutput = amountOut.dividedBy(BONE);
-
-        price = preciseOutput.dividedBy(preciseInput);
-      }
-
-      return {
-        outputAmount: parseFloat(convert.toBalance(amountOut)),
-        price,
-        spotPriceAfter,
-        isGoodResult: true,
-      };
-    } else {
-      return badResult;
-    }
-  } else {
-    return badResult;
+  if (amountOut.isGreaterThan(balanceOut.div(3))) {
+    return { error: "Output can not be more than 1/3 of the pool's balance." };
   }
+  if (amountOut.eq(0)) {
+    return { error: "Input can not be zero." };
+  }
+
+  const amountIn = balancerMath.calcInGivenOut(
+    balanceIn,
+    weightIn,
+    balanceOut,
+    weightOut,
+    amountOut,
+    swapFee
+  );
+
+  if (amountIn.isGreaterThan(balanceIn.div(2))) {
+    return {
+      amountIn,
+      error: "Input must be less than 1/2 the pool's balance.",
+    };
+  }
+
+  const spotPriceAfter = balancerMath.calcSpotPrice(
+    balanceIn.plus(amountIn),
+    weightIn,
+    balanceOut.minus(amountOut),
+    weightOut,
+    swapFee
+  );
+
+  return {
+    amountIn,
+    spotPriceAfter,
+  };
 }
 
-export function calculateInputFromOutput(
-  inputData: PoolTokenData,
-  outputData: PoolTokenUpdate,
-  outputAmount: string,
+export function calculateSwapAmountOut(
+  inputToken: PoolTokenData,
+  outputToken: PoolTokenData,
+  amountIn: BigNumber,
   swapFee: BigNumber
-) {
-  const badResult = {
-    inputAmount: parseFloat(convert.toBalance(ZERO)),
-    price: ZERO,
-    spotPriceAfter: ZERO,
-    isGoodResult: false,
-  };
-
-  const {
-    usedBalance: inputUsedBalance,
-    usedDenorm: inputUsedDenorm,
-  } = inputData;
-  const {
-    balance: outputBalance,
-    usedBalance: outputUsedBalance,
-    denorm: outputDenorm,
-    usedDenorm: outputUsedDenorm,
-  } = outputData;
-
-  if (inputData && outputData) {
-    const [balanceIn, weightIn, balanceOut, weightOut, amountOut] = [
-      inputUsedBalance,
-      inputUsedDenorm,
-      outputBalance,
-      outputDenorm,
-      convert.toToken(outputAmount.toString()),
-    ]
-      .filter(Boolean)
-      .map((property) => convert.toBigNumber(property!));
-
-    if (
-      amountOut.isLessThanOrEqualTo(
-        convert.toBigNumber(outputUsedBalance).div(3)
-      )
-    ) {
-      const amountIn = balancerMath.calcInGivenOut(
-        balanceIn,
-        weightIn,
-        balanceOut,
-        weightOut,
-        amountOut,
-        swapFee
-      );
-      const spotPriceAfter = balancerMath.calcSpotPrice(
-        balanceIn.plus(amountIn),
-        weightIn,
-        convert.toBigNumber(outputUsedBalance).minus(amountOut),
-        convert.toBigNumber(outputUsedDenorm),
-        swapFee
-      );
-
-      return {
-        inputAmount: parseFloat(convert.toBalance(amountIn)),
-        spotPriceAfter,
-        isGoodResult: true,
-      };
-    } else {
-      return badResult;
-    }
-  } else {
-    return badResult;
+): { error?: string; amountOut?: BigNumber; spotPriceAfter?: BigNumber } {
+  const [balanceIn, weightIn, balanceOut, weightOut] = [
+    inputToken.usedBalance,
+    inputToken.usedDenorm,
+    outputToken.usedBalance,
+    outputToken.usedDenorm,
+  ].map(convert.toBigNumber);
+  if (amountIn.isGreaterThan(balanceIn.div(2))) {
+    return { error: "Input must be less than 1/2 the pool's balance." };
   }
+  if (amountIn.eq(0)) {
+    return { error: "Input can not be zero." };
+  }
+
+  const amountOut = balancerMath.calcOutGivenIn(
+    balanceIn,
+    weightIn,
+    balanceOut,
+    weightOut,
+    amountIn,
+    swapFee
+  );
+  if (amountOut.isGreaterThan(balanceOut.div(3))) {
+    return {
+      amountOut,
+      error: "Output can not be more than 1/3 of the pool's balance.",
+    };
+  }
+
+  const spotPriceAfter = balancerMath.calcSpotPrice(
+    balanceIn.plus(amountIn),
+    weightIn,
+    balanceOut.minus(amountOut),
+    weightOut,
+    swapFee
+  );
+
+  return {
+    amountOut,
+    spotPriceAfter,
+  };
 }

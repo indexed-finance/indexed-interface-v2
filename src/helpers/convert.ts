@@ -41,24 +41,23 @@ const convert = {
       ...options,
     }),
   toBigNumber: (amount: string | BigNumber) => toBN(amount),
-  toBalance: (amount: string | BigNumber) => {
-    const result = formatBalance(
-      convert.toBigNumber(amount),
-      DEFAULT_DECIMAL_COUNT,
-      4
-    );
-    return convert.toComma(parseFloat(result));
-  },
   // Address
   toChecksumAddress: (address: string) => getAddress(address),
   toAddressBuffer: (address: string) =>
     Buffer.from(address.slice(2).padStart(40, "0"), "hex"),
-  // Uniswap SDK
   toToken: (
     amount: string | BigNumber,
     decimals: number = DEFAULT_DECIMAL_COUNT
   ) => toTokenAmount(convert.toBigNumber(amount), decimals),
-
+  toBalance: (amount: string | BigNumber, decimals: number = DEFAULT_DECIMAL_COUNT) => {
+    const result = formatBalance(
+      convert.toBigNumber(amount),
+      decimals,
+      4
+    );
+    return convert.toComma(parseFloat(result));
+  },
+  // Uniswap SDK
   toUniswapSDKToken: (provider: ProviderLike, token: NormalizedToken) =>
     new Token(
       provider.network.chainId,

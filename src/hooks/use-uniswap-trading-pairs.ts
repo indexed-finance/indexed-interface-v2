@@ -1,5 +1,5 @@
 import { Pair, Token, TokenAmount, Trade } from "@uniswap/sdk";
-import { batcherHooks } from "./batcher";
+import { actions, provider, selectors } from "features";
 import {
   bestTradeExactIn,
   bestTradeExactOut,
@@ -8,21 +8,10 @@ import {
   sortTokens,
 } from "ethereum/utils/uniswap";
 import { convert } from "helpers";
-import { provider } from "./thunks";
 import { useCallback, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import actions from "./thunks";
-import selectors from "./selectors";
 import type { AppState, FormattedPair } from "features";
 import type { NormalizedToken } from "ethereum/types";
-
-const hooks = {
-  ...batcherHooks,
-  useUniswapPairs,
-  useUniswapTradingPairs,
-};
-
-export default hooks;
 
 function useUniswapPairs(
   baseTokens: string[]
@@ -74,7 +63,7 @@ function useUniswapPairs(
   }, [pairDatas]);
 }
 
-function useUniswapTradingPairs(baseTokens: string[]) {
+export default function useUniswapTradingPairs(baseTokens: string[]) {
   const [pairs, loading] = useUniswapPairs(baseTokens);
 
   const calculateBestTradeForExactInput = useCallback(

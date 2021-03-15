@@ -53,7 +53,7 @@ export default function TokenSelector({
   const balances = useSelector((state: AppState) =>
     selectors.selectTokenSymbolsToBalances(state)
   );
-  const relevantBalance = useMemo(() => balances[token], [balances, token]);
+  const relevantBalance = useMemo(() => balances[token.toLowerCase()], [balances, token]);
   const input = useRef<null | HTMLInputElement>(null);
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
   const triggerChange = useCallback(

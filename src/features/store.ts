@@ -18,6 +18,7 @@ const store = configureStore({
       serializableCheck: false,
     })
       // The listener ID is returned for later use in unregistering.
+      /** // Todo Replace this with an <Updater /> component that uses a debounce */
       .concat(function listenerIdMiddleware(storeAPI) {
         return (next) => (action) => {
           if (action.type === batcherActions.listenerRegistered.type) {

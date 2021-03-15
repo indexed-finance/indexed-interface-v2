@@ -58,8 +58,7 @@ const slice = createSlice({
           for (const token of tokens) {
             const { address, ...tokenUpdate } = token;
             const tokenInState = pool.tokens.entities[address];
-
-            tokenEntities[address] = {
+            tokenEntities[address.toLowerCase()] = {
               ...tokenInState,
               ...tokenUpdate,
             };

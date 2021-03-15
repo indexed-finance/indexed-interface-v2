@@ -6,7 +6,6 @@ import type { AppState } from "features/store";
 import type { NormalizedUser } from "ethereum/types";
 
 export type ApprovalStatus = "unknown" | "approval needed" | "approved";
-export type Foo = "unknown" | "approval needed" | "approved";
 
 const initialState: NormalizedUser & {
   recentPoolUpdates: Record<string, number>;

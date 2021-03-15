@@ -16,20 +16,20 @@ export function calculateGasMargin(value: string): string {
  * The amount parameter is unformatted (i.e. 1.50)
  *
  * @param signer - The user's signing client.
- * @param poolAddress - Which pool should be approved?
- * @param tokenAddress - Which token in the pool should be approved?
- * @param amount - How much should the approval be limited to? Must be exact amount.
+ * @param spenderAddress - Address of the spender to approve
+ * @param tokenAddress - ERC20 token address
+ * @param amount - Exact amount of tokens to allow spender to transfer
  */
-export function approvePool(
+export function approveSpender(
   signer: JsonRpcSigner,
-  poolAddress: string,
+  spenderAddress: string,
   tokenAddress: string,
   amount: string
 ) {
   const contract = new Contract(tokenAddress, IERC20, signer);
   const formattedAmount = convert.toHex(convert.toBigNumber(amount));
 
-  return contract.approve(poolAddress, formattedAmount);
+  return contract.approve(spenderAddress, formattedAmount);
 }
 
 export async function executeUniswapTrade(
@@ -48,8 +48,6 @@ export async function executeUniswapTrade(
     recipient: userAddress,
     deadline
   });
-  console.log(`Got Result For Uniswap Execution::`);
-  console.log({ args, value, methodName })
   const gas = await contract.estimateGas[methodName](...args, { value });
 
   return contract[methodName](...args, {

@@ -1,29 +1,37 @@
 import { MultiCallTaskConfig } from "ethereum";
 import { actions } from "./slice";
+import { isEqual } from "lodash";
 import { useDispatch } from "react-redux";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
-export function useDataListener(
-  kind: MultiCallTaskConfig["kind"],
-  spender: string,
-  tokens: string[]
+export function useDataListener<TaskConfig extends MultiCallTaskConfig = MultiCallTaskConfig>(
+  kind: TaskConfig["kind"],
+  args: TaskConfig["args"],
 ) {
   const dispatch = useDispatch();
+  // Jank solution to prevent obj identity from triggering effects
+  const argsRef = useRef(args);
+  if (!isEqual(argsRef.current, args)) {
+    argsRef.current = args;
+  }
 
   useEffect(() => {
     const listenerId = (dispatch(
       actions.listenerRegistered({
         id: "",
-        kind: kind as any, // ugh.
-        args: {
-          spender,
-          tokens,
-        },
-      })
+        kind,
+        args: argsRef.current,
+      } as any)
     ) as unknown) as string;
 
     return () => {
       dispatch(actions.listenerUnregistered(listenerId));
     };
-  }, [dispatch, kind, spender, tokens]);
+  }, [dispatch, kind, argsRef]);
 }
+
+export const useTokenUserDataListener = (spender: string, tokens: string[]) =>
+  useDataListener("TokenUserData", { spender, tokens });
+
+export const usePoolDataListener = (pool: string, tokens: string[]) =>
+  useDataListener("PoolData", { pool, tokens });
