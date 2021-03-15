@@ -8,7 +8,7 @@ import { convert } from "helpers";
 import { downwardSlippage, upwardSlippage } from "ethereum";
 import { useCallback } from "react";
 import { useSelector } from "react-redux";
-import { useSingleTokenMintCallbacks } from "hooks/useMintCallbacks";
+import { useSingleTokenMintCallbacks } from "hooks/use-mint-callbacks";
 import { useTokenUserDataListener } from "features/batcher/hooks";
 import BaseInteraction, { InteractionValues } from "./BaseInteraction";
 import BigNumber from "bignumber.js";
