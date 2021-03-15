@@ -8,6 +8,7 @@ import {
   sortTokens,
 } from "ethereum/utils/uniswap";
 import { convert } from "helpers";
+import { provider } from "./thunks";
 import { useCallback, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import actions from "./thunks";
@@ -58,14 +59,18 @@ function useUniswapPairs(
     const loading = pairDatas.some(
       (p) => !p || typeof p.exists === "undefined"
     );
-    if (loading) {
+    if (provider && !loading) {
+      const goodPairs = (pairDatas as FormattedPair[]).filter(
+        ({ exists }) => exists
+      );
+      const uniSdkPairs = goodPairs.map((entry) =>
+        convert.toUniswapSDKPair(provider!, entry)
+      ) as Pair[];
+
+      return [uniSdkPairs, false];
+    } else {
       return [undefined, true];
     }
-    const goodPairs = (pairDatas as FormattedPair[]).filter(
-      ({ exists }) => exists
-    );
-    const uniSdkPairs = goodPairs.map(convert.toUniswapSDKPair) as Pair[];
-    return [uniSdkPairs, false];
   }, [pairDatas]);
 }
 
@@ -78,14 +83,20 @@ function useUniswapTradingPairs(baseTokens: string[]) {
       tokenOut: NormalizedToken,
       amountIn: string // Should be formatted as a token amount in base 10 or hex
     ): Trade | undefined => {
-      if (loading) return undefined;
-      const bestTrade = bestTradeExactIn(
-        pairs as Pair[],
-        convert.toUniswapSDKTokenAmount(tokenIn, amountIn) as TokenAmount,
-        convert.toUniswapSDKToken(tokenOut) as Token,
-        { maxHops: 3, maxNumResults: 1 }
-      )[0];
-      return bestTrade;
+      if (provider && !loading) {
+        const [bestTrade] = bestTradeExactIn(
+          pairs as Pair[],
+          convert.toUniswapSDKTokenAmount(
+            provider,
+            tokenIn,
+            amountIn
+          ) as TokenAmount,
+          convert.toUniswapSDKToken(provider, tokenOut) as Token,
+          { maxHops: 3, maxNumResults: 1 }
+        );
+
+        return bestTrade;
+      }
     },
     [loading, pairs]
   );
@@ -96,14 +107,20 @@ function useUniswapTradingPairs(baseTokens: string[]) {
       tokenOut: NormalizedToken,
       amountOut: string // Should be formatted as a token amount
     ): Trade | undefined => {
-      if (loading) return undefined;
-      const bestTrade = bestTradeExactOut(
-        pairs as Pair[],
-        convert.toUniswapSDKToken(tokenIn) as Token,
-        convert.toUniswapSDKTokenAmount(tokenOut, amountOut) as TokenAmount,
-        { maxHops: 3, maxNumResults: 1 }
-      )[0];
-      return bestTrade;
+      if (provider && !loading) {
+        const [bestTrade] = bestTradeExactOut(
+          pairs as Pair[],
+          convert.toUniswapSDKToken(provider, tokenIn) as Token,
+          convert.toUniswapSDKTokenAmount(
+            provider,
+            tokenOut,
+            amountOut
+          ) as TokenAmount,
+          { maxHops: 3, maxNumResults: 1 }
+        );
+
+        return bestTrade;
+      }
     },
     [loading, pairs]
   );

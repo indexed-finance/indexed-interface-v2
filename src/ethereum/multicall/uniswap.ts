@@ -49,7 +49,10 @@ const UniswapPairsDataTaskHandler: MultiCallTaskHandler<UniswapPairsDataTask> = 
   },
   handleResults: ({ actions, dispatch }, pairs, results) => {
     const updates = parsePairReservesResults(results, pairs);
-    dispatch(actions.uniswapPairsUpdated(updates));
+
+    if (actions) {
+      dispatch(actions.uniswapPairsUpdated(updates));
+    }
   },
 };
 

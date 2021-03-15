@@ -80,18 +80,20 @@ const TokenUserDataTaskHandler: MultiCallTaskHandler<TokenUserDataTask> = {
   },
 
   handleResults: ({ actions, dispatch }, { spender, tokens }, results) => {
-    if (!results.results.length) return;
-    const { blockNumber, data: userData } = formatTokenUserDataResults(
-      results,
-      tokens
-    );
-    dispatch(
-      actions.poolUserDataLoaded({
-        blockNumber: +blockNumber,
-        poolId: spender,
-        userData,
-      })
-    );
+    if (actions && results.results.length > 0) {
+      const { blockNumber, data: userData } = formatTokenUserDataResults(
+        results,
+        tokens
+      );
+
+      dispatch(
+        actions.poolUserDataLoaded({
+          blockNumber: +blockNumber,
+          poolId: spender,
+          userData,
+        })
+      );
+    }
   },
 };
 

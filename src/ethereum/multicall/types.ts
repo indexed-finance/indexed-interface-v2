@@ -31,8 +31,8 @@ export type MultiCallResults = {
 type MultiCallContext = {
   state: AppState;
   dispatch: AppDispatch;
-  actions: ActionType;
-  selectors: SelectorType;
+  actions?: ActionType;
+  selectors?: SelectorType;
   account?: string;
 };
 

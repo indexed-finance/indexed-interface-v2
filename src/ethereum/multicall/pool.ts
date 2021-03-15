@@ -137,12 +137,15 @@ const PoolDataTaskHandler: MultiCallTaskHandler<PoolDataTask> = {
     { pool, tokens },
     results
   ) => {
-    const update = formatPoolUpdateResults(results, tokens);
-    const _pool = selectors.selectPool(state, pool) as NormalizedPool;
-    if (pool) {
-      dispatch(actions.poolUpdated({ pool: _pool, update }));
-      dispatch(actions.retrieveCoingeckoData(pool));
-      dispatch(actions.requestPoolTradesAndSwaps(pool));
+    if (actions && selectors) {
+      const update = formatPoolUpdateResults(results, tokens);
+      const _pool = selectors.selectPool(state, pool) as NormalizedPool;
+
+      if (pool) {
+        dispatch(actions.poolUpdated({ pool: _pool, update }));
+        dispatch(actions.retrieveCoingeckoData(pool));
+        dispatch(actions.requestPoolTradesAndSwaps(pool));
+      }
     }
   },
 };
