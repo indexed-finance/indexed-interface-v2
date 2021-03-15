@@ -1,5 +1,17 @@
 @import "~antd/dist/antd.less";
 
+@dark-first: #89dce3;
+@dark-second: #9d77ce;
+@dark-third: #ecc321;
+@dark-fourth: #fc79e1;
+@dark-text: #fafafa;
+
+@light-first: #89dce3;
+@light-second: #715596;
+@light-third: #d3ae1c;
+@light-fourth: #a74e95;
+@light-text: #111;
+
 // -- Fonts
 @font-face {
   font-family: "Main";
@@ -43,13 +55,35 @@ h5.ant-typography {
   .ant-layout {
     background: black;
     background-image: url("../assets/images/dark-bg.png") !important;
-  }
-}
 
-.light {
-  .ant-layout {
-    background: white;
-    background-image: url("../assets/images/light-bg.png") !important;
+    &-header {
+      border-bottom: 1px solid @dark-first !important;
+    }
+    &-sider {
+      &-children {
+        border-right: 1px solid @dark-first !important;
+      }
+    }
+  }
+
+  .ant-progress-circle-path {
+    stroke: @dark-second !important;
+  }
+
+  .ant-collapse {
+    border: 1px solid @dark-third !important;
+
+    &-header {
+      border-bottom: 1px solid @dark-third !important;
+    }
+  }
+
+  .ant-switch-inner {
+    color: @light-text !important;
+  }
+
+  .ant-divider {
+    border-top: 1px solid @dark-fourth !important;
   }
 }
 

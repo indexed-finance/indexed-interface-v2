@@ -121,6 +121,7 @@
     "generate:types": "graphql-codegen",
     "lint": "eslint . --fix --ignore-path .gitignore --ext .ts,.tsx,.js",
     "themes:build": "THEME=dark node ./scripts/build-themes && THEME=light node ./scripts/build-themes",
+    "themes:watch": "nodemon --watch ./src/theme --exec \"THEME=dark node ./scripts/build-themes && THEME=light node ./scripts/build-themes\" -e less",
     "storybook": "start-storybook -p 6006",
     "storybook:build": "build-storybook",
     "storybook:deploy": "storybook-to-ghpages",

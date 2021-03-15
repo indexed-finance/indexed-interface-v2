@@ -275,27 +275,20 @@ export const thunks = {
       const { id: outputAddress } = tokensBySymbol[outputTokenSymbol];
 
       if (inputAddress && outputAddress) {
-        if (specifiedSide === "input") {
-          await helpers.swapExactAmountIn(
-            signer,
-            poolAddress,
-            inputAddress,
-            outputAddress,
-            input,
-            output,
-            maximumPrice
-          );
-        } else {
-          await helpers.swapExactAmountOut(
-            signer,
-            poolAddress,
-            inputAddress,
-            outputAddress,
-            input,
-            output,
-            maximumPrice
-          );
-        }
+        const swapper =
+          specifiedSide === "input"
+            ? helpers.swapExactAmountIn
+            : helpers.swapExactAmountOut;
+
+        await swapper(
+          signer,
+          poolAddress,
+          inputAddress,
+          outputAddress,
+          input,
+          output,
+          maximumPrice
+        );
       } else {
         // --
       }
@@ -306,12 +299,12 @@ export const thunks = {
       const state = getState();
       const account = selectors.selectUserAddress(state);
       const context = { state, dispatch, actions, account };
-
       const { calls, counts, tasks } = selectors.selectBatch(state);
       const { blockNumber, results: allResults } = await multicall(
         provider,
         calls
       );
+
       let resultIndex = 0;
       for (const task of tasks) {
         const { index, count } = counts[resultIndex++];
