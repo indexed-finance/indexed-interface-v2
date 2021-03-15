@@ -1,5 +1,6 @@
 import { AiOutlineSwap } from "react-icons/ai";
 import { FaCoins, FaFireAlt, FaHammer } from "react-icons/fa";
+import { MintInteraction } from ".";
 import { Tabs } from "antd";
 import { useBreakpoints } from "helpers";
 import { useState } from "react";
@@ -14,7 +15,7 @@ interface Props {
   initial?: PoolInteraction;
 }
 
-export default function PoolInteractions({ pool, initial = "swap" }: Props) {
+export default function PoolInteractions({ pool, initial = "trade" }: Props) {
   const [interaction, setInteraction] = useState<PoolInteraction>(initial);
   const { isMobile } = useBreakpoints();
 
@@ -63,7 +64,7 @@ export default function PoolInteractions({ pool, initial = "swap" }: Props) {
               </>
             }
           >
-            {/* <MintForm pool={pool} /> */}
+            <MintInteraction pool={pool} />
           </Tabs.TabPane>
           <Tabs.TabPane
             style={{ padding: 20 }}
