@@ -224,20 +224,21 @@ export const thunks = {
     }
   },
   /**
-   * @param spender - Address of the spender to approve
-   * @param token - ERC20 token address
-   * @param amount - Exact amount of tokens to allow spender to use
+   * @param spenderAddress - Address of the spender to approve
+   * @param tokenAddress - ERC20 token address
+   * @param exactAmount - Exact amount of tokens to allow spender to transfer
    */
   approveSpender: (
-    spender: string,
-    token: string,
-    amount: string
+    spenderAddress: string,
+    tokenAddress: string,
+    exactAmount: string
   ): AppThunk => async () => {
-    if (signer && token) {
+    if (signer && tokenAddress) {
       try {
-        await helpers.approvePool(signer, spender, token, amount);
-      } catch {
+        await helpers.approvePool(signer, spenderAddress, tokenAddress, exactAmount);
+      } catch(err) {
         // Handle failed approval.
+        console.log(err);
       }
     }
   },
@@ -246,6 +247,48 @@ export const thunks = {
     if (signer) {
       const userAddress = selectors.selectUserAddress(state);
       await helpers.executeUniswapTrade(signer, userAddress, trade);
+    }
+  },
+  swapExactAmountIn: (
+    indexPool: string,
+    tokenIn: string,
+    amountIn: BigNumber,
+    tokenOut: string,
+    minAmountOut: BigNumber,
+    maximumPrice: BigNumber
+  ): AppThunk => async () => {
+    console.log('Got swapExactAmountIn')
+    if (signer) {
+      await helpers.swapExactAmountIn(
+        signer,
+        indexPool,
+        tokenIn,
+        tokenOut,
+        amountIn,
+        minAmountOut,
+        maximumPrice
+      );
+    }
+  },
+  swapExactAmountOut: (
+    indexPool: string,
+    tokenIn: string,
+    maxAmountIn: BigNumber,
+    tokenOut: string,
+    amountOut: BigNumber,
+    maximumPrice: BigNumber
+  ): AppThunk => async () => {
+    console.log('Got swapExactAmountOut')
+    if (signer) {
+      await helpers.swapExactAmountOut(
+        signer,
+        indexPool,
+        tokenIn,
+        tokenOut,
+        maxAmountIn,
+        amountOut,
+        maximumPrice
+      );
     }
   },
   /**
@@ -305,7 +348,7 @@ export const thunks = {
     if (provider) {
       const state = getState();
       const account = selectors.selectUserAddress(state);
-      const context = { state, dispatch, actions, account };
+      const context = { state, dispatch, actions, account, selectors };
 
       const { calls, counts, tasks } = selectors.selectBatch(state);
       const { blockNumber, results: allResults } = await multicall(
