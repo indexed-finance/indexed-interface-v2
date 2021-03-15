@@ -9,6 +9,7 @@ import { convert } from "helpers";
 import { ethers, providers } from "ethers";
 import { helpers } from "ethereum";
 import { indexPoolsActions } from "./indexPools";
+import { joinswapExternAmountIn, joinswapPoolAmountOut } from "ethereum/transactions";
 import { multicall, taskHandlersByKind } from "ethereum/multicall";
 import { settingsActions } from "./settings";
 import { tokensActions } from "./tokens";
@@ -247,6 +248,26 @@ export const thunks = {
     if (signer) {
       const userAddress = selectors.selectUserAddress(state);
       await helpers.executeUniswapTrade(signer, userAddress, trade);
+    }
+  },
+  joinswapExternAmountIn: (
+    indexPool: string,
+    tokenIn: string,
+    amountIn: BigNumber,
+    minPoolAmountOut: BigNumber
+  ): AppThunk => async () => {
+    if (signer) {
+      await joinswapExternAmountIn(signer, indexPool, tokenIn, amountIn, minPoolAmountOut);
+    }
+  },
+  joinswapPoolAmountOut: (
+    indexPool: string,
+    tokenIn: string,
+    poolAmountOut: BigNumber,
+    maxAmountIn: BigNumber
+  ): AppThunk => async () => {
+    if (signer) {
+      await joinswapPoolAmountOut(signer, indexPool, tokenIn, poolAmountOut, maxAmountIn);
     }
   },
   swapExactAmountIn: (
