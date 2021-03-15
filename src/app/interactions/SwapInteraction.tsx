@@ -15,10 +15,10 @@ interface Props {
 export default function SwapInteraction({ pool }: Props) {
   const dispatch = useDispatch();
   const handleApprove = useCallback(
-    (poolId: string, fromToken: string, fromAmount: string) =>
+    (spender: string, fromToken: string, fromAmount: string) =>
       dispatch(
-        actions.approvePool(
-          poolId,
+        actions.approveSpender(
+          spender,
           fromToken.toLowerCase(),
           fromAmount.toString()
         )

@@ -9,6 +9,7 @@ import { TokenSelector } from "components";
 import { convert } from "helpers";
 import { useSelector } from "react-redux";
 import { useTokenRandomizer } from "./common";
+import type { ApprovalStatus } from "features/user/slice";
 
 interface Props {
   title: string;
@@ -20,7 +21,7 @@ interface Props {
     poolId: string,
     fromToken: string,
     fromAmount: string
-  ): boolean;
+  ): ApprovalStatus;
   handleApprove(poolId: string, fromToken: string, fromAmount: string): void;
 }
 

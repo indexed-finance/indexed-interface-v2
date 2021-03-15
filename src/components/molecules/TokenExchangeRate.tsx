@@ -1,5 +1,5 @@
 import { Alert, Space, Statistic } from "antd";
-import { Token } from "components";
+import { Token } from "components/atoms";
 import { convert, useBreakpoints } from "helpers";
 
 export interface Props {

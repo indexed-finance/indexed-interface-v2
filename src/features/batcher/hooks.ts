@@ -1,7 +1,7 @@
+import { MultiCallTaskConfig } from "ethereum";
 import { actions } from "./slice";
 import { useDispatch } from "react-redux";
 import { useEffect } from "react";
-import { MultiCallTaskConfig } from "ethereum/types";
 
 export function useDataListener(
   kind: MultiCallTaskConfig["kind"],
@@ -14,7 +14,7 @@ export function useDataListener(
     const listenerId = (dispatch(
       actions.listenerRegistered({
         id: "",
-        kind,
+        kind: kind as any, // ugh.
         args: {
           spender,
           tokens,

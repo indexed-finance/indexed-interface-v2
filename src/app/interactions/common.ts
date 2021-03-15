@@ -1,10 +1,17 @@
-import { AppState, FormattedIndexPool, actions, selectors } from "features";
-import { SubscreenContext } from "app/subscreens/Subscreen";
+import {
+  AppState,
+  FormattedIndexPool,
+  actions,
+  hooks,
+  selectors,
+} from "features";
+import { Foo } from "features/user/slice";
 import { convert, getRandomEntries } from "helpers";
-import { useCallback, useContext, useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
-import noop from "lodash.noop";
+
+const { useDataListener } = hooks;
 
 export function getSwapCost(outputAmount: number, swapFeePercent: string) {
   return convert
@@ -49,72 +56,44 @@ export function useTokenRandomizer(options: TokenRandomizerOptions) {
   }, [options]);
 }
 
-// Effect:
-// Given a pool and token, provide properties and methods associated with token approval.
+interface TokenApprovalOptions {
+  spender: string;
+  token: string;
+  amount: string;
+}
+
+type TokenApprovalHook = {
+  status: Foo;
+  approve: () => void;
+};
+
 export function useTokenApproval({
-  pool,
-  from,
-  to,
-  onSendTransaction = noop,
-}: TokenApprovalOptions) {
+  spender,
+  token,
+  amount,
+}: TokenApprovalOptions): TokenApprovalHook {
   const dispatch = useDispatch();
-  const { setActions } = useContext(SubscreenContext);
-  const needsApproval = useSelector((state: AppState) => {
-    if (pool) {
-      const { token, amount } = from;
-      return selectors.selectApprovalStatus(
-        state,
-        pool.id,
-        token.toLowerCase(),
-        convert.toToken(amount.toString()).toString(10)
-      );
-    }
-  });
-  const handleApprovePool = useCallback(() => {
-    if (pool && needsApproval) {
-      const { token, amount } = from;
-
-      dispatch(
-        actions.approvePool(pool.id, token.toLowerCase(), amount.toString())
-      );
-    }
-  }, [dispatch, pool, needsApproval, from]);
-
-  // Effect:
-  // Start off with the "Approve" button. When the approval finishes, the callback will change to "Send Transaction."
-  useEffect(
-    () =>
-      setActions([
-        {
-          type: "primary",
-          title: "Approve",
-          onClick: handleApprovePool,
-        },
-      ]),
-    [setActions, handleApprovePool]
+  const status = useSelector((state: AppState) =>
+    selectors.selectApprovalStatus(
+      state,
+      spender.toLowerCase(),
+      token.toLowerCase(),
+      amount
+    )
   );
-
-  // Effect:
-  // When approved, call the optional callback.
-  useEffect(() => {
-    if (!needsApproval) {
-      setActions([
-        {
-          type: "primary",
-          title: "Send Transaction",
-          onClick: () =>
-            onSendTransaction({
-              from,
-              to,
-            }),
-        },
-      ]);
+  const approve = useCallback(() => {
+    if (spender && status === "approval needed") {
+      dispatch(
+        actions.approveSpender(spender, token.toLowerCase(), amount.toString())
+      );
     }
-  }, [needsApproval, setActions, onSendTransaction, from, to]);
+  }, [dispatch, status, token, spender, amount]);
+
+  useDataListener("TokenUserData", spender, [token]);
 
   return {
-    needsApproval,
-    handleApprovePool,
+    status,
+    approve,
   };
 }
 
@@ -140,14 +119,5 @@ type TokenRandomizerOptions = {
   changeFrom?(symbol: string): void;
   changeTo(symbol: string): void;
   callback?(): void;
-};
-
-type TokenSide = { token: string; amount: number };
-
-type TokenApprovalOptions = {
-  pool: null | FormattedIndexPool;
-  from: TokenSide;
-  to: TokenSide;
-  onSendTransaction?(values: { from: TokenSide; to: TokenSide }): void;
 };
 // #endregion

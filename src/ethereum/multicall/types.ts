@@ -1,9 +1,9 @@
 import {
   Result as AbiCoderResult,
   Interface,
-  JsonFragment
+  JsonFragment,
 } from "@ethersproject/abi";
-import { AppDispatch, AppState } from "features";
+import type { ActionType, AppDispatch, AppState, SelectorType } from "features";
 
 export type Call = {
   target: string;
@@ -12,7 +12,10 @@ export type Call = {
   args?: Array<any>;
 };
 
-export type MultiCallTaskKind = "PoolData" | "TokenUserData" | "UniswapPairsData";
+export type MultiCallTaskKind =
+  | "PoolData"
+  | "TokenUserData"
+  | "UniswapPairsData";
 
 interface MultiCallTask<Args = any> {
   id: string;
@@ -28,27 +31,42 @@ export type MultiCallResults = {
 type MultiCallContext = {
   state: AppState;
   dispatch: AppDispatch;
+  actions: ActionType;
+  selectors: SelectorType;
   account?: string;
-}
+};
 
 export interface MultiCallTaskHandler<
   TaskType extends MultiCallTask = MultiCallTask
 > {
-  kind: TaskType["kind"],
-  constructCalls: (context: Omit<MultiCallContext, "dispatch">, taskArgs: TaskType["args"]) => Call[],
-  handleResults: (context: MultiCallContext, taskArgs: TaskType["args"], results: MultiCallResults) => void
+  kind: TaskType["kind"];
+  onlyUniqueTasks: (tasks: TaskType[]) => TaskType[];
+  constructCalls: (
+    context: Omit<MultiCallContext, "dispatch">,
+    taskArgs: TaskType["args"]
+  ) => Call[];
+  handleResults: (
+    context: MultiCallContext,
+    taskArgs: TaskType["args"],
+    results: MultiCallResults
+  ) => void;
 }
 
 export interface UniswapPairsDataTask extends MultiCallTask<string[]> {
   kind: "UniswapPairsData";
 }
 
-export interface TokenUserDataTask extends MultiCallTask<{ pool: string; tokens: string[]; }> {
+export interface TokenUserDataTask
+  extends MultiCallTask<{ spender: string; tokens: string[] }> {
   kind: "TokenUserData";
 }
 
-export interface PoolDataTask extends MultiCallTask<{ pool: string; tokens: string[]; }> {
+export interface PoolDataTask
+  extends MultiCallTask<{ pool: string; tokens: string[] }> {
   kind: "PoolData";
 }
 
-export type MultiCallTaskConfig = UniswapPairsDataTask | TokenUserDataTask | PoolDataTask;
+export type MultiCallTaskConfig =
+  | UniswapPairsDataTask
+  | TokenUserDataTask
+  | PoolDataTask;

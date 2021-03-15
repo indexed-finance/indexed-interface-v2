@@ -6,7 +6,7 @@ import { default as UniswapPairsDataTaskHandler } from "./uniswap";
 export * from "./utils";
 export * from "./types";
 
-export const TaskHandlersByKind: { [key: string]: MultiCallTaskHandler } = [
+export const taskHandlersByKind: { [key: string]: MultiCallTaskHandler } = [
   UniswapPairsDataTaskHandler,
   TokenUserDataTaskHandler,
   PoolDataTaskHandler

@@ -1,4 +1,3 @@
-import { AppState } from "./store";
 import { NormalizedPool, NormalizedToken } from "ethereum";
 import { batcherSelectors } from "./batcher";
 import { categoriesSelectors } from "./categories";
@@ -11,6 +10,7 @@ import { settingsSelectors } from "./settings";
 import { tokensSelectors } from "./tokens";
 import { userSelectors } from "./user";
 import S from "string";
+import type { AppState } from "./store";
 
 const MILLISECONDS_PER_SECOND = 1000;
 
@@ -286,6 +286,8 @@ const selectors = {
 };
 
 export default selectors;
+
+export type SelectorType = typeof selectors;
 
 export interface FormattedCategory {
   id: string;

@@ -5,7 +5,7 @@ import type { AppState } from "features/store";
 import {
   Call,
   MultiCallTaskConfig,
-  TaskHandlersByKind,
+  taskHandlersByKind,
 } from "ethereum/multicall";
 
 interface BatcherState {
@@ -60,7 +60,7 @@ export const selectors = {
 
     return tasks.reduce(
       (prev, next) => {
-        const taskCalls = TaskHandlersByKind[next.kind].constructCalls(
+        const taskCalls = taskHandlersByKind[next.kind].constructCalls(
           context,
           next.args
         );

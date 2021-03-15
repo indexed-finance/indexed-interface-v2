@@ -1,21 +1,21 @@
 import * as topLevelActions from "./actions";
-import { AppThunk } from "./store";
 import { BigNumber } from "bignumber.js";
 import { CoinGeckoService } from "services";
 import { SLIPPAGE_RATE, SUBGRAPH_URL_UNISWAP } from "config";
-import { TaskHandlersByKind, multicall } from "ethereum/multicall";
+import { Trade } from "@uniswap/sdk";
 import { batcherActions } from "./batcher";
 import { categoriesActions } from "./categories";
 import { convert } from "helpers";
-import { ethers } from "ethers";
+import { ethers, providers } from "ethers";
 import { helpers } from "ethereum";
 import { indexPoolsActions } from "./indexPools";
-import { providers } from "ethers";
+import { multicall, taskHandlersByKind } from "ethereum/multicall";
 import { settingsActions } from "./settings";
 import { tokensActions } from "./tokens";
 import { userActions } from "./user";
 import debounce from "lodash.debounce";
 import selectors from "./selectors";
+import type { AppThunk } from "./store";
 
 // #region Provider
 /**
@@ -224,23 +224,28 @@ export const thunks = {
     }
   },
   /**
-   *
+   * @param spender - Address of the spender to approve
+   * @param token - ERC20 token address
+   * @param amount - Exact amount of tokens to allow spender to use
    */
-  approvePool: (
-    poolAddress: string,
-    tokenSymbol: string,
+  approveSpender: (
+    spender: string,
+    token: string,
     amount: string
-  ): AppThunk => async (_, getState) => {
-    const state = getState();
-    const tokensBySymbol = selectors.selectTokenLookupBySymbol(state);
-    const tokenAddress = tokensBySymbol[tokenSymbol]?.id ?? "";
-
-    if (signer && tokenAddress) {
+  ): AppThunk => async () => {
+    if (signer && token) {
       try {
-        await helpers.approvePool(signer, poolAddress, tokenAddress, amount);
+        await helpers.approvePool(signer, spender, token, amount);
       } catch {
         // Handle failed approval.
       }
+    }
+  },
+  trade: (trade: Trade): AppThunk => async (_, getState) => {
+    const state = getState();
+    if (signer) {
+      const userAddress = selectors.selectUserAddress(state);
+      await helpers.executeUniswapTrade(signer, userAddress, trade);
     }
   },
   /**
@@ -300,7 +305,7 @@ export const thunks = {
     if (provider) {
       const state = getState();
       const account = selectors.selectUserAddress(state);
-      const context = { state, dispatch, account };
+      const context = { state, dispatch, actions, account };
 
       const { calls, counts, tasks } = selectors.selectBatch(state);
       const { blockNumber, results: allResults } = await multicall(
@@ -311,7 +316,7 @@ export const thunks = {
       for (const task of tasks) {
         const { index, count } = counts[resultIndex++];
         const results = allResults.slice(index, index + count);
-        TaskHandlersByKind[task.kind].handleResults(context, task.args, {
+        taskHandlersByKind[task.kind].handleResults(context, task.args, {
           blockNumber,
           results,
         });
@@ -330,5 +335,7 @@ const actions = {
   ...topLevelActions,
   ...thunks,
 };
+
+export type ActionType = typeof actions;
 
 export default actions;

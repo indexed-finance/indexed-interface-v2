@@ -1,8 +1,7 @@
 import { Result as AbiCoderResult } from "ethers/lib/utils";
 import { IERC20 } from "ethereum/abi";
 import { MultiCallTaskHandler, TokenUserDataTask } from "./types";
-import { actions, selectors } from "features";
-import { convert } from "helpers";
+import { convert, dedupe } from "helpers";
 import chunk from "lodash.chunk";
 import type { Call, MultiCallResults } from "./types";
 
@@ -30,17 +29,36 @@ function formatTokenUserDataResults(
 
   return {
     blockNumber,
-    data: tokens
+    data: tokens,
   };
 }
 
 const TokenUserDataTaskHandler: MultiCallTaskHandler<TokenUserDataTask> = {
   kind: "TokenUserData",
-  constructCalls: (
-    { account, state }, { pool, tokens }
-  ): Call[] => {
-    const _pool = selectors.selectPool(state, pool);
-    if (!account || !_pool) return [];
+  onlyUniqueTasks: (tasks: TokenUserDataTask[]): TokenUserDataTask[] => {
+    const tasksBySpender = tasks.reduce((prev, next) => {
+      const { spender, tokens } = next.args;
+
+      if (prev[spender]) {
+        const task = prev[spender];
+        task.args.tokens.push(...tokens);
+        task.args.tokens = dedupe(task.args.tokens);
+      } else {
+        prev[spender] = {
+          id: next.id,
+          kind: next.kind,
+          args: {
+            spender,
+            tokens: dedupe(tokens),
+          },
+        };
+      }
+      return prev;
+    }, {} as Record<string, TokenUserDataTask>);
+    return Object.values(tasksBySpender);
+  },
+  constructCalls: ({ account }, { spender, tokens }): Call[] => {
+    if (!account) return [];
     const _interface = IERC20;
     return tokens.reduce((prev, next) => {
       prev.push(
@@ -48,7 +66,7 @@ const TokenUserDataTaskHandler: MultiCallTaskHandler<TokenUserDataTask> = {
           target: next,
           interface: _interface,
           function: "allowance",
-          args: [account, pool],
+          args: [account, spender],
         },
         {
           target: next,
@@ -61,17 +79,20 @@ const TokenUserDataTaskHandler: MultiCallTaskHandler<TokenUserDataTask> = {
     }, [] as Call[]);
   },
 
-  handleResults: ({ dispatch }, { pool, tokens }, results) => {
+  handleResults: ({ actions, dispatch }, { spender, tokens }, results) => {
     if (!results.results.length) return;
-    const { blockNumber, data: userData } = formatTokenUserDataResults(results, tokens);
+    const { blockNumber, data: userData } = formatTokenUserDataResults(
+      results,
+      tokens
+    );
     dispatch(
       actions.poolUserDataLoaded({
         blockNumber: +blockNumber,
-        poolId: pool,
+        poolId: spender,
         userData,
       })
     );
-  }
-}
+  },
+};
 
 export default TokenUserDataTaskHandler;
