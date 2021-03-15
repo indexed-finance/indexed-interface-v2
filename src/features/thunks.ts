@@ -235,7 +235,7 @@ export const thunks = {
   ): AppThunk => async () => {
     if (signer && tokenAddress) {
       try {
-        await helpers.approvePool(signer, spenderAddress, tokenAddress, exactAmount);
+        await helpers.approveSpender(signer, spenderAddress, tokenAddress, exactAmount);
       } catch(err) {
         // Handle failed approval.
         console.log(err);
