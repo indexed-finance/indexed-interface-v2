@@ -74,7 +74,7 @@ function useUniswapPairs(
   }, [pairDatas]);
 }
 
-function useUniswapTradingPairs(baseTokens: string[]) {
+export function useUniswapTradingPairs(baseTokens: string[]) {
   const [pairs, loading] = useUniswapPairs(baseTokens);
 
   const calculateBestTradeForExactInput = useCallback(
