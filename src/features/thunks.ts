@@ -257,7 +257,6 @@ export const thunks = {
     minAmountOut: BigNumber,
     maximumPrice: BigNumber
   ): AppThunk => async () => {
-    console.log('Got swapExactAmountIn')
     if (signer) {
       await helpers.swapExactAmountIn(
         signer,
@@ -278,7 +277,6 @@ export const thunks = {
     amountOut: BigNumber,
     maximumPrice: BigNumber
   ): AppThunk => async () => {
-    console.log('Got swapExactAmountOut')
     if (signer) {
       await helpers.swapExactAmountOut(
         signer,
