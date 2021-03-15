@@ -1,6 +1,6 @@
 import { MultiCallTaskConfig } from "ethereum";
 import { actions } from "./slice";
-import { isEqual } from "lodash"
+import { isEqual } from "lodash";
 import { useDispatch } from "react-redux";
 import { useEffect, useRef } from "react";
 
@@ -19,7 +19,7 @@ export function useDataListener<TaskConfig extends MultiCallTaskConfig = MultiCa
     const listenerId = (dispatch(
       actions.listenerRegistered({
         id: "",
-        kind: kind,
+        kind,
         args: argsRef.current,
       } as any)
     ) as unknown) as string;
