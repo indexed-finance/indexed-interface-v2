@@ -1,6 +1,7 @@
 import * as balancerMath from "./utils/balancer-math";
 import { BigNumber } from "bignumber.js";
-import { PoolTokenUpdate } from "./types.d";
+import { FormattedIndexPool } from "features";
+import { NormalizedPool, PoolTokenUpdate } from "./types.d";
 import { convert } from "helpers";
 
 export * from "./utils";
@@ -17,7 +18,7 @@ type PoolTokenData = {
   usedBalance: string;
 };
 
-export function calculateSwapAmountIn(
+export function calcSwapAmountIn(
   inputToken: PoolTokenData,
   outputToken: PoolTokenData,
   amountOut: BigNumber,
@@ -64,7 +65,7 @@ export function calculateSwapAmountIn(
   };
 }
 
-export function calculateSwapAmountOut(
+export function calcSwapAmountOut(
   inputToken: PoolTokenData,
   outputToken: PoolTokenData,
   amountIn: BigNumber,
@@ -76,11 +77,11 @@ export function calculateSwapAmountOut(
     outputToken.usedBalance,
     outputToken.usedDenorm,
   ].map(convert.toBigNumber);
-  if (amountIn.isGreaterThan(balanceIn.div(2))) {
-    return { error: "Input must be less than 1/2 the pool's balance." };
-  }
   if (amountIn.eq(0)) {
     return { error: "Input can not be zero." };
+  }
+  if (amountIn.isGreaterThan(balanceIn.div(2))) {
+    return { error: "Input must be less than 1/2 the pool's balance." };
   }
 
   const amountOut = balancerMath.calcOutGivenIn(
@@ -107,4 +108,66 @@ export function calculateSwapAmountOut(
     amountOut,
     spotPriceAfter
   };
+}
+
+export function calcPoolOutGivenSingleIn(
+  pool: NormalizedPool,
+  inputToken: PoolTokenData,
+  tokenAmountIn: BigNumber
+) {
+  const [balanceIn, weightIn, totalWeight, totalSupply, swapFee] = [
+    inputToken.usedBalance,
+    inputToken.usedDenorm,
+    pool.totalDenorm,
+    pool.totalSupply,
+    pool.swapFee
+  ].map(convert.toBigNumber);
+
+  if (tokenAmountIn.eq(0)) {
+    return { error: "Input can not be zero." };
+  }
+  if (tokenAmountIn.isGreaterThan(balanceIn.div(2))) {
+    return { error: "Input must be less than 1/2 the pool's balance." };
+  }
+
+  const poolAmountOut = balancerMath.calcPoolOutGivenSingleIn(
+    balanceIn,
+    weightIn,
+    totalSupply,
+    totalWeight,
+    tokenAmountIn,
+    swapFee
+  );
+  return { poolAmountOut };
+}
+
+export function calcSingleInGivenPoolOut(
+  pool: NormalizedPool,
+  inputToken: PoolTokenData,
+  poolAmountOut: BigNumber
+) {
+  const [balanceIn, weightIn, totalWeight, totalSupply, swapFee] = [
+    inputToken.usedBalance,
+    inputToken.usedDenorm,
+    pool.totalDenorm,
+    pool.totalSupply,
+    pool.swapFee
+  ].map(convert.toBigNumber);
+
+  if (poolAmountOut.eq(0)) {
+    return { error: "Input can not be zero." };
+  }
+
+  const tokenAmountIn = balancerMath.calcSingleInGivenPoolOut(
+    balanceIn,
+    weightIn,
+    totalSupply,
+    totalWeight,
+    poolAmountOut,
+    swapFee
+  );
+  if (tokenAmountIn.isGreaterThan(balanceIn.div(2))) {
+    return { error: "Input must be less than 1/2 the pool's balance.", tokenAmountIn };
+  }
+  return { tokenAmountIn };
 }
