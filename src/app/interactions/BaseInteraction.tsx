@@ -1,28 +1,27 @@
 import * as yup from "yup";
 import { AiOutlineArrowRight } from "react-icons/ai";
 import { Alert, Button, Divider, Space, Typography } from "antd";
-import { AppState, FormattedIndexPool } from "features";
 import { Flipper, Token } from "components/atoms";
 import { Formik, FormikProps, useFormikContext } from "formik";
-import { ReactNode, useEffect, useRef } from "react";
+import { ReactNode, useCallback, useMemo, useRef } from "react";
 import { TokenSelector } from "components";
 import { convert } from "helpers";
+import { selectors } from "features";
 import { useSelector } from "react-redux";
-import { useTokenRandomizer } from "./common";
-import type { ApprovalStatus } from "features/user/slice";
+import useTokenApproval from "hooks/useTokenApproval";
+import useTokenRandomizer from "hooks/useTokenRandomizer";
+
+type Asset = { name: string; symbol: string; id: string; };
 
 interface Props {
   title: string;
-  pool: FormattedIndexPool;
+  assets: Asset[];
+  spender: string;
   extra?: ReactNode;
-  onSubmit(values: typeof initialValues): void;
-  approvalSelector(
-    state: AppState,
-    poolId: string,
-    fromToken: string,
-    fromAmount: string
-  ): ApprovalStatus;
-  handleApprove(poolId: string, fromToken: string, fromAmount: string): void;
+  defaultInputSymbol?: string;
+  defaultOutputSymbol?: string;
+  onSubmit(values: InteractionValues): void;
+  onChange(values: InteractionValues): void | string;
 }
 
 const initialValues = {
@@ -30,11 +29,12 @@ const initialValues = {
   fromAmount: 0,
   toToken: "",
   toAmount: 0,
+  lastTouchedField: "from" as "from" | "to"
 };
 
 const interactionSchema = yup.object().shape({
-  fromToken: yup.string().min(1, "A token is required in the 'From' field."),
-  fromAmount: yup.number().positive("From balance must be greater than zero."),
+  fromToken: yup.string().min(0, "A token is required in the 'From' field."),
+  fromAmount: yup.number().min(0, "From balance must be greater than zero."),
   toToken: yup.string().min(1, "A token is required in the 'To' field."),
 });
 
@@ -42,11 +42,13 @@ export type InteractionValues = typeof initialValues;
 
 export default function BaseInteraction({
   title,
-  pool,
+  assets,
+  spender,
   extra = null,
-  approvalSelector,
-  handleApprove,
   onSubmit,
+  onChange,
+  defaultInputSymbol,
+  defaultOutputSymbol
 }: Props) {
   const interactionRef = useRef<null | HTMLDivElement>(null);
   const interactionParent = interactionRef.current ?? false;
@@ -77,12 +79,14 @@ export default function BaseInteraction({
             <Divider />
             <InteractionInner
               {...props}
-              pool={pool}
+              assets={assets}
+              spender={spender}
               extra={extra}
               parent={interactionParent ?? false}
-              approvalSelector={approvalSelector}
-              handleApprove={handleApprove}
               onSubmit={onSubmit}
+              onChange={onChange}
+              defaultInputSymbol={defaultInputSymbol}
+              defaultOutputSymbol={defaultOutputSymbol}
             />
           </>
         )}
@@ -97,49 +101,74 @@ type InnerProps = Omit<Props, "title"> &
   };
 
 function InteractionInner({
-  pool,
+  spender,
+  assets,
   extra,
   parent,
   values,
   isValid,
-  setFieldValue,
   handleSubmit,
-  approvalSelector,
-  handleApprove,
+  onChange,
+  setFieldValue,
+  setValues,
+  setFieldError,
+  defaultInputSymbol,
+  defaultOutputSymbol
 }: InnerProps) {
-  const lastTouched = useRef<null | "from" | "to">(null);
-  const previousFrom = useRef("");
-  const previousTo = useRef("");
-  const needsApproval = useSelector((state: AppState) =>
-    approvalSelector(
-      state,
-      pool.id,
-      values.fromToken.toLowerCase(),
-      convert.toToken(values.fromAmount.toString()).toString(10)
-    )
-  );
-
-  // Effect:
-  // Prevent duplicates.
-  useEffect(() => {
-    const { fromToken, toToken } = values;
-
-    if (fromToken === toToken) {
-      if (lastTouched.current === "from") {
-        setFieldValue("toToken", previousFrom.current);
-      } else {
-        setFieldValue("fromToken", previousTo.current);
+  const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
+  const [tokenId, exactAmountIn] = useMemo(() => {
+    if (values.fromToken && values.fromAmount) {
+      const tokenIn = tokenLookup[values.fromToken.toLowerCase()];
+      if (tokenIn) {
+        return [
+          tokenIn.id,
+          convert.toToken(values.fromAmount.toString(), tokenIn.decimals).toString(10)
+        ];
       }
     }
+    return ["", "0"];
+  }, [ values.fromAmount, values.fromToken, tokenLookup ]);
+  const { status, approve } = useTokenApproval({ spender, tokenId, amount: exactAmountIn })
 
-    previousFrom.current = fromToken ?? "";
-    previousTo.current = toToken ?? "";
-  }, [values, setFieldValue]);
+  const inputOptions = useMemo(() => {
+    return assets.filter((p) => p.symbol !== values.toToken);
+  }, [ assets, values.toToken ]);
+
+  const outputOptions = useMemo(() => {
+    return assets.filter((p) => p.symbol !== values.fromToken);
+  }, [ assets, values.fromToken ]);
+
+  const handleFlip = useCallback(() => {
+    const newValues = {
+      fromToken: values.toToken,
+      toToken: values.fromToken,
+      fromAmount: values.toAmount,
+      toAmount: values.fromAmount,
+      lastTouchedField: values.lastTouchedField
+    };
+    const error = onChange(newValues as InteractionValues);
+    if (error) {
+      const inputErr = error.includes("Input") || (
+        newValues.lastTouchedField === "from" &&
+        !error.includes("Output")
+      );
+      
+      if (inputErr) {
+        setFieldError("fromAmount", error);
+      } else {
+        setFieldError("toAmount", error);
+      }
+    }
+    setValues(newValues);
+    
+  }, [ values, setValues, onChange, setFieldError ]);
 
   // Effect:
   // On initial load, select two arbitrary tokens.
   useTokenRandomizer({
-    pool,
+    assets,
+    defaultInputSymbol,
+    defaultOutputSymbol,
     from: values.fromToken,
     to: values.toToken,
     changeFrom: (newFrom) => setFieldValue("fromToken", newFrom),
@@ -151,33 +180,47 @@ function InteractionInner({
       {/* // Fields */}
       <TokenSelector
         label="From"
-        assets={pool.assets}
+        assets={inputOptions}
         parent={parent ?? false}
         value={{
           token: values.fromToken,
           amount: values.fromAmount,
         }}
-        onChange={(value) => {
-          lastTouched.current = "from";
-          setFieldValue("fromToken", value.token);
-          setFieldValue("fromAmount", value.amount);
+        onChange={({ token, amount }) => {
+          const newValues = { ...values, fromToken: token || "", fromAmount: amount || 0, lastTouchedField: "from"} as InteractionValues;
+          const error = onChange(newValues);
+          if (error) {
+            if (error.includes("Output")) {
+              setFieldError("toAmount", error);
+            } else {
+              setFieldError("fromAmount", error);
+            }
+          }
+          setValues(newValues);
         }}
       />
 
-      <Flipper onFlip={console.log} />
+      <Flipper onFlip={handleFlip} />
 
       <TokenSelector
         label="To"
-        assets={pool.assets}
+        assets={outputOptions}
         parent={parent ?? false}
         value={{
           token: values.toToken,
           amount: values.toAmount,
         }}
-        onChange={(value) => {
-          lastTouched.current = "to";
-          setFieldValue("toToken", value.token);
-          setFieldValue("toAmount", value.amount);
+        onChange={({ token, amount }) => {
+          const newValues = { ...values, toToken: token || "", toAmount: amount || 0, lastTouchedField: "to" } as InteractionValues;
+          const error = onChange(newValues);
+          if (error) {
+            if (error.includes("Input")) {
+              setFieldError("fromAmount", error);
+            } else {
+              setFieldError("toAmount", error);
+            }
+          }
+          setValues(newValues);
         }}
       />
 
@@ -187,18 +230,12 @@ function InteractionInner({
 
       {extra}
 
-      {needsApproval ? (
+      {status === "approval needed" ? (
         <Button
           type="primary"
           style={{ width: "100%" }}
           disabled={!isValid}
-          onClick={() =>
-            handleApprove(
-              pool.id,
-              values.fromToken,
-              values.fromAmount.toString()
-            )
-          }
+          onClick={approve}
         >
           Approve
         </Button>
@@ -206,7 +243,7 @@ function InteractionInner({
         <Button
           type="primary"
           style={{ width: "100%" }}
-          disabled={!isValid}
+          disabled={!isValid || status === "unknown"}
           onClick={() => handleSubmit()}
         >
           Send
