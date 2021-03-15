@@ -6,6 +6,7 @@ interface Props {
   name: string;
   image: string;
   size?: "tiny" | "small" | "medium" | "large";
+  margin?: number;
 }
 
 export default function Token({
@@ -13,6 +14,7 @@ export default function Token({
   name,
   size = "small",
   image,
+  margin = 0,
   ...rest
 }: Props) {
   let tokenImage = PLACEHOLDER_TOKEN_IMAGE;
@@ -44,6 +46,7 @@ export default function Token({
       style={{
         width: tokenImageSize,
         height: tokenImageSize,
+        marginRight: margin,
       }}
     />
   );

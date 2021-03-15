@@ -5,13 +5,13 @@ import { PlainLanguageTransaction, TokenExchangeRate } from "components";
 import { SLIPPAGE_RATE } from "config";
 import { convert } from "helpers";
 import { downwardSlippage, upwardSlippage } from "ethereum";
+import { getSwapCost } from "ethereum/utils";
 import { useCallback, useMemo } from "react";
 import { useFormikContext } from "formik";
 import { useSelector } from "react-redux";
+import { useSwapCallbacks } from "hooks";
 import { useTokenUserDataListener } from "features/batcher/hooks";
 import BaseInteraction, { InteractionValues } from "./BaseInteraction";
-import getSwapCost from "ethereum/utils/getSwapCost";
-import useSwapCallbacks from "hooks/useSwapCallbacks";
 
 interface Props {
   pool: FormattedIndexPool;
@@ -21,81 +21,103 @@ export default function SwapInteraction({ pool }: Props) {
   const {
     calculateAmountIn,
     calculateAmountOut,
-    executeSwap
+    executeSwap,
   } = useSwapCallbacks(pool.id);
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
-  const tokenIds = useSelector((state: AppState) => selectors.selectPoolTokenIds(state, pool.id));
+  const tokenIds = useSelector((state: AppState) =>
+    selectors.selectPoolTokenIds(state, pool.id)
+  );
   useTokenUserDataListener(pool.id, tokenIds);
 
-  const handleChange = useCallback((values: InteractionValues) => {
-    const {
-      fromToken,
-      fromAmount,
-      toToken,
-      toAmount,
-      lastTouchedField
-    } = values;
-
-    if (!toToken || !fromToken) {
-      return;
-    }
-    if (lastTouchedField === "from") {
-      if (!fromAmount || isNaN(fromAmount) || fromAmount < 0) {
-        values.fromAmount = 0;
-        values.toAmount = 0;
-        return;
-      }
-      const output = calculateAmountOut(fromToken, toToken, fromAmount.toString());
-      if (output) {
-        if (output.error) {
-          return output.error;
-        } else {
-          const { decimals } = tokenLookup[toToken.toLowerCase()];
-          values.toAmount = parseFloat(convert.toBalance(
-            downwardSlippage(output.amountOut as BigNumber, SLIPPAGE_RATE), decimals
-          ));
-        }
-      }
-    } else {
-      if (!toAmount || isNaN(toAmount) || toAmount < 0) {
-        values.fromAmount = 0;
-        values.toAmount = 0;
-        return;
-      }
-      const input = calculateAmountIn(fromToken, toToken, toAmount.toString());
-      if (input) {
-        if (input.error) {
-          return input.error;
-        } else {
-          const { decimals } = tokenLookup[fromToken.toLowerCase()];
-          values.fromAmount = parseFloat(convert.toBalance(
-            upwardSlippage(input.amountIn as BigNumber, SLIPPAGE_RATE), decimals
-          ));
-        }
-      }
-    }
-  }, [calculateAmountIn, calculateAmountOut, tokenLookup]);
-
-  const handleSubmit = useCallback((values: InteractionValues) => {
-    const {
-      fromToken,
-      fromAmount,
-      toToken,
-      toAmount,
-      lastTouchedField
-    } = values;
-    if (
-      fromAmount > 0 && toAmount > 0 &&
-      fromToken && toToken
-    ) {
-      executeSwap(
+  const handleChange = useCallback(
+    (values: InteractionValues) => {
+      const {
         fromToken,
+        fromAmount,
         toToken,
+        toAmount,
         lastTouchedField,
-        lastTouchedField === "from" ? fromAmount.toString() : toAmount.toString()
-      );
-    }
-  }, [executeSwap])
+      } = values;
+
+      if (!toToken || !fromToken) {
+        return;
+      }
+      if (lastTouchedField === "from") {
+        if (!fromAmount || isNaN(fromAmount) || fromAmount < 0) {
+          values.fromAmount = 0;
+          values.toAmount = 0;
+          return;
+        }
+        const output = calculateAmountOut(
+          fromToken,
+          toToken,
+          fromAmount.toString()
+        );
+        if (output) {
+          if (output.error) {
+            return output.error;
+          } else {
+            const { decimals } = tokenLookup[toToken.toLowerCase()];
+
+            values.toAmount = parseFloat(
+              convert.toBalance(
+                downwardSlippage(output.amountOut as BigNumber, SLIPPAGE_RATE),
+                decimals
+              )
+            );
+          }
+        }
+      } else {
+        if (!toAmount || isNaN(toAmount) || toAmount < 0) {
+          values.fromAmount = 0;
+          values.toAmount = 0;
+          return;
+        }
+        const input = calculateAmountIn(
+          fromToken,
+          toToken,
+          toAmount.toString()
+        );
+        if (input) {
+          if (input.error) {
+            return input.error;
+          } else {
+            const { decimals } = tokenLookup[fromToken.toLowerCase()];
+            values.fromAmount = parseFloat(
+              convert.toBalance(
+                upwardSlippage(input.amountIn as BigNumber, SLIPPAGE_RATE),
+                decimals
+              )
+            );
+          }
+        }
+      }
+    },
+    [calculateAmountIn, calculateAmountOut, tokenLookup]
+  );
+
+  const handleSubmit = useCallback(
+    (values: InteractionValues) => {
+      const {
+        fromToken,
+        fromAmount,
+        toToken,
+        toAmount,
+        lastTouchedField,
+      } = values;
+      if (fromAmount > 0 && toAmount > 0 && fromToken && toToken) {
+        executeSwap(
+          fromToken,
+          toToken,
+          lastTouchedField,
+          lastTouchedField === "from"
+            ? fromAmount.toString()
+            : toAmount.toString()
+        );
+      }
+    },
+    [executeSwap]
+  );
 
   return (
     <BaseInteraction
@@ -118,7 +140,7 @@ function SwapExtras({ pool }: Props) {
       return (toAmount / fromAmount).toFixed(4);
     }
     return "";
-  }, [fromAmount, toAmount])
+  }, [fromAmount, toAmount]);
 
   return fromToken && toToken ? (
     <>

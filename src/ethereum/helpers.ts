@@ -23,7 +23,7 @@ export function calcSwapAmountIn(
   outputToken: PoolTokenData,
   amountOut: BigNumber,
   swapFee: BigNumber
-): { error?: string; amountIn?: BigNumber; spotPriceAfter?: BigNumber; } {
+): { error?: string; amountIn?: BigNumber; spotPriceAfter?: BigNumber } {
   const [balanceIn, weightIn, balanceOut, weightOut] = [
     inputToken.usedBalance,
     inputToken.usedDenorm,
@@ -48,7 +48,10 @@ export function calcSwapAmountIn(
   );
 
   if (amountIn.isGreaterThan(balanceIn.div(2))) {
-    return { amountIn, error: "Input must be less than 1/2 the pool's balance." };
+    return {
+      amountIn,
+      error: "Input must be less than 1/2 the pool's balance.",
+    };
   }
 
   const spotPriceAfter = balancerMath.calcSpotPrice(
@@ -61,7 +64,7 @@ export function calcSwapAmountIn(
 
   return {
     amountIn,
-    spotPriceAfter
+    spotPriceAfter,
   };
 }
 
@@ -70,7 +73,7 @@ export function calcSwapAmountOut(
   outputToken: PoolTokenData,
   amountIn: BigNumber,
   swapFee: BigNumber
-): { error?: string; amountOut?: BigNumber; spotPriceAfter?: BigNumber; } {
+): { error?: string; amountOut?: BigNumber; spotPriceAfter?: BigNumber } {
   const [balanceIn, weightIn, balanceOut, weightOut] = [
     inputToken.usedBalance,
     inputToken.usedDenorm,
@@ -93,7 +96,10 @@ export function calcSwapAmountOut(
     swapFee
   );
   if (amountOut.isGreaterThan(balanceOut.div(3))) {
-    return { amountOut, error: "Output can not be more than 1/3 of the pool's balance." };
+    return {
+      amountOut,
+      error: "Output can not be more than 1/3 of the pool's balance.",
+    };
   }
 
   const spotPriceAfter = balancerMath.calcSpotPrice(
@@ -106,7 +112,7 @@ export function calcSwapAmountOut(
 
   return {
     amountOut,
-    spotPriceAfter
+    spotPriceAfter,
   };
 }
 

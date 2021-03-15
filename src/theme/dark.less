@@ -1,0 +1,63 @@
+@dark-blue: #89dce3;
+@dark-pink: #fa79e0;
+@dark-green: #10be8a;
+@dark-red: #f7051b;
+@dark-text: #fafafa;
+@light-text: #fafafa;
+
+.dark {
+  .ant-layout {
+    background: black;
+    background-image: url("../assets/images/dark-bg.png") !important;
+
+    &-header {
+      border-bottom: 1px solid @dark-blue !important;
+    }
+    &-sider {
+      &-children {
+        border-right: 1px solid @dark-blue !important;
+      }
+    }
+  }
+
+  .ant-progress-circle-path {
+    stroke: @dark-pink !important;
+  }
+
+  .ant-switch-inner {
+    color: @light-text !important;
+  }
+
+  .ant-typography-success {
+    color: @dark-green !important;
+  }
+
+  .ant-tabs-tab-active {
+    > div {
+      color: @dark-blue !important;
+    }
+  }
+
+  .ant-divider-dashed {
+    border-color: @dark-blue !important;
+  }
+
+  .ant-btn-primary {
+    background: @dark-pink !important;
+  }
+
+  .ant-typography-danger {
+    color: @dark-red !important;
+  }
+
+  .ant-ribbon-color-purple {
+    background: @dark-pink !important;
+  }
+  .ant-ribbon-color-pink {
+    background: @dark-pink !important;
+  }
+
+  .ant-carousel {
+    background: #161617 !important;
+  }
+}

@@ -32,7 +32,7 @@ export default function ScreenHeader(props: Props) {
           </Breadcrumb>
         )}
       </Space>
-      <Divider className="screen-header-divider" />
+      <Divider dashed={true} />
     </>
   );
 }

@@ -8,10 +8,9 @@ import { TokenSelector } from "components";
 import { convert } from "helpers";
 import { selectors } from "features";
 import { useSelector } from "react-redux";
-import useTokenApproval from "hooks/useTokenApproval";
-import useTokenRandomizer from "hooks/useTokenRandomizer";
+import { useTokenApproval, useTokenRandomizer } from "hooks";
 
-type Asset = { name: string; symbol: string; id: string; };
+type Asset = { name: string; symbol: string; id: string };
 
 interface Props {
   title: string;
@@ -29,7 +28,7 @@ const initialValues = {
   fromAmount: 0,
   toToken: "",
   toAmount: 0,
-  lastTouchedField: "from" as "from" | "to"
+  lastTouchedField: "from" as "from" | "to",
 };
 
 const interactionSchema = yup.object().shape({
@@ -48,7 +47,7 @@ export default function BaseInteraction({
   onSubmit,
   onChange,
   defaultInputSymbol,
-  defaultOutputSymbol
+  defaultOutputSymbol,
 }: Props) {
   const interactionRef = useRef<null | HTMLDivElement>(null);
   const interactionParent = interactionRef.current ?? false;
@@ -113,7 +112,7 @@ function InteractionInner({
   setValues,
   setFieldError,
   defaultInputSymbol,
-  defaultOutputSymbol
+  defaultOutputSymbol,
 }: InnerProps) {
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
   const [tokenId, exactAmountIn] = useMemo(() => {
@@ -122,21 +121,27 @@ function InteractionInner({
       if (tokenIn) {
         return [
           tokenIn.id,
-          convert.toToken(values.fromAmount.toString(), tokenIn.decimals).toString(10)
+          convert
+            .toToken(values.fromAmount.toString(), tokenIn.decimals)
+            .toString(10),
         ];
       }
     }
     return ["", "0"];
-  }, [ values.fromAmount, values.fromToken, tokenLookup ]);
-  const { status, approve } = useTokenApproval({ spender, tokenId, amount: exactAmountIn })
+  }, [values.fromAmount, values.fromToken, tokenLookup]);
+  const { status, approve } = useTokenApproval({
+    spender,
+    tokenId,
+    amount: exactAmountIn,
+  });
 
   const inputOptions = useMemo(() => {
     return assets.filter((p) => p.symbol !== values.toToken);
-  }, [ assets, values.toToken ]);
+  }, [assets, values.toToken]);
 
   const outputOptions = useMemo(() => {
     return assets.filter((p) => p.symbol !== values.fromToken);
-  }, [ assets, values.fromToken ]);
+  }, [assets, values.fromToken]);
 
   const handleFlip = useCallback(() => {
     const newValues = {
@@ -144,15 +149,14 @@ function InteractionInner({
       toToken: values.fromToken,
       fromAmount: values.toAmount,
       toAmount: values.fromAmount,
-      lastTouchedField: values.lastTouchedField
+      lastTouchedField: values.lastTouchedField,
     };
     const error = onChange(newValues as InteractionValues);
     if (error) {
-      const inputErr = error.includes("Input") || (
-        newValues.lastTouchedField === "from" &&
-        !error.includes("Output")
-      );
-      
+      const inputErr =
+        error.includes("Input") ||
+        (newValues.lastTouchedField === "from" && !error.includes("Output"));
+
       if (inputErr) {
         setFieldError("fromAmount", error);
       } else {
@@ -160,8 +164,7 @@ function InteractionInner({
       }
     }
     setValues(newValues);
-    
-  }, [ values, setValues, onChange, setFieldError ]);
+  }, [values, setValues, onChange, setFieldError]);
 
   // Effect:
   // On initial load, select two arbitrary tokens.
@@ -187,7 +190,12 @@ function InteractionInner({
           amount: values.fromAmount,
         }}
         onChange={({ token, amount }) => {
-          const newValues = { ...values, fromToken: token || "", fromAmount: amount || 0, lastTouchedField: "from"} as InteractionValues;
+          const newValues = {
+            ...values,
+            fromToken: token || "",
+            fromAmount: amount || 0,
+            lastTouchedField: "from",
+          } as InteractionValues;
           const error = onChange(newValues);
           if (error) {
             if (error.includes("Output")) {
@@ -211,7 +219,12 @@ function InteractionInner({
           amount: values.toAmount,
         }}
         onChange={({ token, amount }) => {
-          const newValues = { ...values, toToken: token || "", toAmount: amount || 0, lastTouchedField: "to" } as InteractionValues;
+          const newValues = {
+            ...values,
+            toToken: token || "",
+            toAmount: amount || 0,
+            lastTouchedField: "to",
+          } as InteractionValues;
           const error = onChange(newValues);
           if (error) {
             if (error.includes("Input")) {

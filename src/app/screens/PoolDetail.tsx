@@ -6,7 +6,7 @@ import {
   RankedToken,
   ScreenHeader,
 } from "components";
-import { Col, Divider, Row, Space } from "antd";
+import { Col, Row, Space } from "antd";
 import { Link } from "react-router-dom";
 import { Performance, Recent, Subscreen } from "app/subscreens";
 import { PoolInteractions } from "app/interactions";
@@ -110,7 +110,7 @@ function Pool({ id }: { id: string }) {
           activeBreadcrumb={<Link to="/pools">Index Pools</Link>}
         />
         {performance}
-        <Divider style={{ marginTop: 0 }} />
+
         {(() => {
           switch (true) {
             case breakpoints.xxl:

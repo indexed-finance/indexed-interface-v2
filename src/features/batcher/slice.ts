@@ -68,6 +68,7 @@ export const selectors = {
           index: prev.calls.length,
           count: taskCalls.length,
         };
+
         prev.calls.push(...taskCalls);
         prev.counts.push(callCounts);
 

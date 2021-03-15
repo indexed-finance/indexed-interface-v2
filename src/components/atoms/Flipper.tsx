@@ -8,7 +8,7 @@ interface Props {
 export default function Flipper({ onFlip }: Props) {
   return (
     <Divider style={{ marginBottom: 0 }}>
-      <Button type="primary" onClick={onFlip}>
+      <Button type="default" onClick={onFlip}>
         <MdSwapCalls />
       </Button>
     </Divider>

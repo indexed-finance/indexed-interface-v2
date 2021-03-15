@@ -1,4 +1,6 @@
 @import "~antd/dist/antd.less";
+@import "./dark.less";
+@import "./light.less";
 
 // -- Fonts
 @font-face {
@@ -28,28 +30,14 @@ h5.ant-typography {
     &:extend(.effect8f);
 
     position: fixed;
-    top: @header-height;
+    top: 63px;
     width: 300px;
     height: calc(100% - @header-height);
-    z-index: 3;
+    z-index: 5;
 
     @media screen and (max-width: 480px) {
       width: 100%;
     }
-  }
-}
-
-.dark {
-  .ant-layout {
-    background: black;
-    background-image: url("../assets/images/dark-bg.png") !important;
-  }
-}
-
-.light {
-  .ant-layout {
-    background: white;
-    background-image: url("../assets/images/light-bg.png") !important;
   }
 }
 
@@ -210,12 +198,11 @@ body {
   .Page {
     &:extend(.effect8);
 
+    position: relative;
     max-width: 1240px;
     min-height: 100vh;
     margin: 8rem auto 0 auto;
     padding: @spacing-small;
-
-    // z-index: 3;
 
     @media screen and (min-width: 480px) {
       padding: @spacing-large;
@@ -226,7 +213,7 @@ body {
 .dark {
   .AppLayout {
     .Page {
-      background: #161616 !important;
+      background: #0f0f0f !important;
     }
   }
 }

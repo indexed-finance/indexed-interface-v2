@@ -239,11 +239,7 @@ export default function TokenSelector({
           placement="right"
           closable={false}
           visible={selectingToken}
-          getContainer={parent}
           width={300}
-          style={{
-            position: "absolute",
-          }}
           footer={
             <Button
               type="default"

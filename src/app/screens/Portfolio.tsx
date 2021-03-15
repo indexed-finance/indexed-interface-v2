@@ -43,12 +43,16 @@ export default function Portfolio() {
     <div>
       <ProviderRequirementDrawer includeSignerRequirement={true} />
       <ScreenHeader title="Portfolio" />
-      <Space wrap={true} size="large" style={{ width: "100%" }}>
+      <Space
+        wrap={true}
+        size="large"
+        style={{ width: "100%", alignItems: "stretch" }}
+      >
         {__data.map((datum) => {
           const card = (
             <Card
               key={datum.address}
-              // style={{ width: 500 }}
+              bodyStyle={{ minWidth: 300, height: 193 }}
               hoverable={true}
               actions={[
                 <div key="1">

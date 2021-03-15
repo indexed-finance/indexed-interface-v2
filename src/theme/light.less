@@ -1,0 +1,64 @@
+@light-blue: #89dce3;
+@light-pink: #9d77ce;
+@light-green: #10be8a;
+@light-red: #f7051b;
+@light-text: #fafafa;
+
+.light {
+  .ant-layout {
+    background: black;
+    background-image: url("../assets/images/light-bg.png") !important;
+
+    &-header {
+      border-bottom: 1px solid @light-blue !important;
+    }
+    &-sider {
+      &-children {
+        border-right: 1px solid @light-blue !important;
+      }
+    }
+  }
+
+  .ant-progress-circle-path {
+    stroke: @light-blue !important;
+  }
+
+  .ant-switch-inner {
+    color: @light-text !important;
+  }
+
+  .ant-typography-success {
+    color: @light-green !important;
+  }
+
+  .ant-tabs-tab-active {
+    > div {
+      color: @light-blue !important;
+    }
+  }
+
+  .ant-divider-dashed {
+    border-color: @light-pink !important;
+  }
+
+  .ant-card-head-title {
+    h2 {
+      color: @light-pink !important;
+    }
+  }
+
+  .ant-btn-primary {
+    background: @light-pink !important;
+  }
+
+  .ant-typography-danger {
+    color: @light-red !important;
+  }
+
+  .ant-ribbon-color-purple {
+    background: @light-pink !important;
+  }
+  .ant-ribbon-color-pink {
+    background: @light-pink !important;
+  }
+}
