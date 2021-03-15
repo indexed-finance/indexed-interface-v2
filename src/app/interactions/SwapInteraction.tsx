@@ -1,47 +1,124 @@
+import { AppState, FormattedIndexPool, selectors } from "features";
+import { BigNumber } from "ethereum/utils/balancer-math";
 import { Divider, Space } from "antd";
-import { FormattedIndexPool, selectors } from "features";
 import { PlainLanguageTransaction, TokenExchangeRate } from "components";
-import { actions } from "features";
-import { getSwapCost } from "./common";
-import { useCallback } from "react";
-import { useDispatch } from "react-redux";
+import { SLIPPAGE_RATE } from "config";
+import { convert } from "helpers";
+import { downwardSlippage, upwardSlippage } from "ethereum";
+import { useCallback, useMemo } from "react";
 import { useFormikContext } from "formik";
+import { useSelector } from "react-redux";
+import { useTokenUserDataListener } from "features/batcher/hooks";
 import BaseInteraction, { InteractionValues } from "./BaseInteraction";
+import getSwapCost from "ethereum/utils/getSwapCost";
+import useSwapCallbacks from "hooks/useSwapCallbacks";
 
 interface Props {
   pool: FormattedIndexPool;
 }
 
 export default function SwapInteraction({ pool }: Props) {
-  const dispatch = useDispatch();
-  const handleApprove = useCallback(
-    (spender: string, fromToken: string, fromAmount: string) =>
-      dispatch(
-        actions.approveSpender(
-          spender,
-          fromToken.toLowerCase(),
-          fromAmount.toString()
-        )
-      ),
-    [dispatch]
-  );
+  const {
+    calculateAmountIn,
+    calculateAmountOut,
+    executeSwap
+  } = useSwapCallbacks(pool.id);
+  const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
+  const tokenIds = useSelector((state: AppState) => selectors.selectPoolTokenIds(state, pool.id));
+  useTokenUserDataListener(pool.id, tokenIds);
+
+  const handleChange = useCallback((values: InteractionValues) => {
+    const {
+      fromToken,
+      fromAmount,
+      toToken,
+      toAmount,
+      lastTouchedField
+    } = values;
+
+    if (!toToken || !fromToken) {
+      return;
+    }
+    if (lastTouchedField === "from") {
+      if (!fromAmount || isNaN(fromAmount) || fromAmount < 0) {
+        values.fromAmount = 0;
+        values.toAmount = 0;
+        return;
+      }
+      const output = calculateAmountOut(fromToken, toToken, fromAmount.toString());
+      if (output) {
+        if (output.error) {
+          return output.error;
+        } else {
+          const { decimals } = tokenLookup[toToken.toLowerCase()];
+          values.toAmount = parseFloat(convert.toBalance(
+            downwardSlippage(output.amountOut as BigNumber, SLIPPAGE_RATE), decimals
+          ));
+        }
+      }
+    } else {
+      if (!toAmount || isNaN(toAmount) || toAmount < 0) {
+        values.fromAmount = 0;
+        values.toAmount = 0;
+        return;
+      }
+      const input = calculateAmountIn(fromToken, toToken, toAmount.toString());
+      if (input) {
+        if (input.error) {
+          return input.error;
+        } else {
+          const { decimals } = tokenLookup[fromToken.toLowerCase()];
+          values.fromAmount = parseFloat(convert.toBalance(
+            upwardSlippage(input.amountIn as BigNumber, SLIPPAGE_RATE), decimals
+          ));
+        }
+      }
+    }
+  }, [calculateAmountIn, calculateAmountOut, tokenLookup]);
+
+  const handleSubmit = useCallback((values: InteractionValues) => {
+    const {
+      fromToken,
+      fromAmount,
+      toToken,
+      toAmount,
+      lastTouchedField
+    } = values;
+    if (
+      fromAmount > 0 && toAmount > 0 &&
+      fromToken && toToken
+    ) {
+      executeSwap(
+        fromToken,
+        toToken,
+        lastTouchedField,
+        lastTouchedField === "from" ? fromAmount.toString() : toAmount.toString()
+      );
+    }
+  }, [executeSwap])
 
   return (
     <BaseInteraction
       title="Swap"
-      pool={pool}
-      onSubmit={console.log}
+      assets={pool.assets}
+      spender={pool.id}
+      onSubmit={handleSubmit}
+      onChange={handleChange}
       extra={<SwapExtras pool={pool} />}
-      approvalSelector={selectors.selectApprovalStatus}
-      handleApprove={handleApprove}
     />
   );
 }
 
 function SwapExtras({ pool }: Props) {
   const { values } = useFormikContext<InteractionValues>();
-  const { fromToken, toToken, toAmount } = values;
+  const { fromToken, fromAmount, toToken, toAmount } = values;
   const swapCost = getSwapCost(toAmount, pool.swapFee);
+  const rate = useMemo(() => {
+    if (fromAmount && toAmount) {
+      return (toAmount / fromAmount).toFixed(4);
+    }
+    return "";
+  }, [fromAmount, toAmount])
 
   return fromToken && toToken ? (
     <>
@@ -49,7 +126,7 @@ function SwapExtras({ pool }: Props) {
         <TokenExchangeRate
           baseline={fromToken}
           comparison={toToken}
-          rate=""
+          rate={rate}
           fee={swapCost}
         />
         <PlainLanguageTransaction />
