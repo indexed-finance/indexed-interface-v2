@@ -1,4 +1,4 @@
-import { AppState, hooks, selectors } from "features";
+import { AppState, selectors } from "features";
 import {
   ChartCard,
   PoolDropdown,
@@ -12,9 +12,8 @@ import { Performance, Recent, Subscreen } from "app/subscreens";
 import { PoolInteractions } from "app/interactions";
 import { Redirect, useParams } from "react-router-dom";
 import { useBreakpoints } from "helpers";
+import { usePoolDataListener } from "features/batcher/hooks";
 import { useSelector } from "react-redux";
-
-const { useDataListener } = hooks;
 
 export default function PoolDetail() {
   const { poolName } = useParams<{ poolName: string }>();
@@ -35,7 +34,7 @@ function Pool({ id }: { id: string }) {
   );
   const breakpoints = useBreakpoints();
 
-  useDataListener("TokenUserData", id, tokenIds);
+  usePoolDataListener(id, tokenIds);
 
   if (pool) {
     // Subscreens
