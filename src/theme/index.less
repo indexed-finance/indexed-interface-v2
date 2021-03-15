@@ -1,16 +1,6 @@
 @import "~antd/dist/antd.less";
-
-@dark-first: #89dce3;
-@dark-second: #9d77ce;
-@dark-third: #ecc321;
-@dark-fourth: #fc79e1;
-@dark-text: #fafafa;
-
-@light-first: #89dce3;
-@light-second: #715596;
-@light-third: #d3ae1c;
-@light-fourth: #a74e95;
-@light-text: #111;
+@import "./dark.less";
+@import "./light.less";
 
 // -- Fonts
 @font-face {
@@ -40,50 +30,14 @@ h5.ant-typography {
     &:extend(.effect8f);
 
     position: fixed;
-    top: @header-height;
+    top: 63px;
     width: 300px;
     height: calc(100% - @header-height);
-    z-index: 3;
+    z-index: 5;
 
     @media screen and (max-width: 480px) {
       width: 100%;
     }
-  }
-}
-
-.dark {
-  .ant-layout {
-    background: black;
-    background-image: url("../assets/images/dark-bg.png") !important;
-
-    &-header {
-      border-bottom: 1px solid @dark-first !important;
-    }
-    &-sider {
-      &-children {
-        border-right: 1px solid @dark-first !important;
-      }
-    }
-  }
-
-  .ant-progress-circle-path {
-    stroke: @dark-second !important;
-  }
-
-  .ant-collapse {
-    border: 1px solid @dark-third !important;
-
-    &-header {
-      border-bottom: 1px solid @dark-third !important;
-    }
-  }
-
-  .ant-switch-inner {
-    color: @light-text !important;
-  }
-
-  .ant-divider {
-    border-top: 1px solid @dark-fourth !important;
   }
 }
 
@@ -244,12 +198,11 @@ body {
   .Page {
     &:extend(.effect8);
 
+    position: relative;
     max-width: 1240px;
     min-height: 100vh;
     margin: 8rem auto 0 auto;
     padding: @spacing-small;
-
-    // z-index: 3;
 
     @media screen and (min-width: 480px) {
       padding: @spacing-large;
@@ -260,7 +213,7 @@ body {
 .dark {
   .AppLayout {
     .Page {
-      background: #161616 !important;
+      background: #0f0f0f !important;
     }
   }
 }

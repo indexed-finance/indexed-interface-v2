@@ -92,6 +92,7 @@ export default function AppMenu({ onItemClick = noop, ...rest }: Props) {
                             name={model.name}
                             image={image}
                             address={model.id}
+                            margin={10}
                           />
                           {model.name}
                         </div>

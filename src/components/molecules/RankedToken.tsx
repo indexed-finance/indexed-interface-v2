@@ -117,7 +117,7 @@ export default function RankedToken({ token, fixedSize = false }: Props) {
           percent={parseFloat(token.weightPercentage.replace(/%/g, ""))}
         />
       </Card>
-      <Divider />
+      {isMobile && <Divider />}
     </>
   );
 }
