@@ -113,3 +113,47 @@ export async function swapExactAmountOut(
     gasLimit,
   });
 }
+
+export async function joinswapExternAmountIn(
+  signer: JsonRpcSigner,
+  poolAddress: string,
+  inputTokenAddress: string,
+  tokenAmountIn: BigNumber,
+  minPoolAmountOut: BigNumber
+) {
+  const contract = new Contract(poolAddress, IPool, signer);
+  const gasPrice = await contract.signer.getGasPrice();
+  const args = [
+    inputTokenAddress,
+    convert.toHex(tokenAmountIn),
+    convert.toHex(minPoolAmountOut),
+  ];
+  const gasLimit = await contract.estimateGas.joinswapExternAmountIn(...args);
+
+  return contract.joinswapExternAmountIn(...args, {
+    gasPrice,
+    gasLimit,
+  });
+}
+
+export async function joinswapPoolAmountOut(
+  signer: JsonRpcSigner,
+  poolAddress: string,
+  inputTokenAddress: string,
+  poolAmountOut: BigNumber,
+  maxAmountIn: BigNumber
+) {
+  const contract = new Contract(poolAddress, IPool, signer);
+  const gasPrice = await contract.signer.getGasPrice();
+  const args = [
+    inputTokenAddress,
+    convert.toHex(poolAmountOut),
+    convert.toHex(maxAmountIn),
+  ];
+  const gasLimit = await contract.estimateGas.joinswapPoolAmountOut(...args);
+
+  return contract.joinswapPoolAmountOut(...args, {
+    gasPrice,
+    gasLimit,
+  });
+}

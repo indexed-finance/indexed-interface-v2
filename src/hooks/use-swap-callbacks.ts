@@ -28,7 +28,7 @@ export default function useSwapCallbacks(poolId: string) {
             tokenIn: inputToken.token.id,
             tokenOut: outputToken.token.id,
             amountOut,
-            ...helpers.calculateSwapAmountIn(
+            ...helpers.calcSwapAmountIn(
               inputToken,
               outputToken,
               amountOut,
@@ -56,7 +56,7 @@ export default function useSwapCallbacks(poolId: string) {
             tokenIn: inputToken.token.id,
             tokenOut: outputToken.token.id,
             amountIn,
-            ...helpers.calculateSwapAmountOut(
+            ...helpers.calcSwapAmountOut(
               inputToken,
               outputToken,
               amountIn,
