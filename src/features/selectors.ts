@@ -368,4 +368,8 @@ export interface FormattedPair {
 
 export type Swap = FormattedIndexPool["recent"]["swaps"][0];
 export type Trade = FormattedIndexPool["recent"]["trades"][0];
+export type Transaction = Swap & {
+  kind: Trade["kind"] | "swap";
+  amount?: Trade["amount"];
+};
 export type Asset = FormattedIndexPool["assets"][0];

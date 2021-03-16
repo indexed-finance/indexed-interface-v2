@@ -19,15 +19,19 @@ export default function QuoteCarousel({ pools }: Props) {
           parseFloat(filteredPool.netChangePercent.replace(/%/g, "")) < 0;
 
         return (
-          <Quote
+          <div
             key={filteredPool.symbol}
+            style={{ cursor: "pointer" }}
             onClick={() => history.push(`/pools/${filteredPool.slug}`)}
-            symbol={filteredPool.symbol}
-            price={filteredPool.priceUsd}
-            netChange={filteredPool.netChange}
-            netChangePercent={filteredPool.netChangePercent}
-            isNegative={isNegative}
-          />
+          >
+            <Quote
+              symbol={filteredPool.symbol}
+              price={filteredPool.priceUsd}
+              netChange={filteredPool.netChange}
+              netChangePercent={filteredPool.netChangePercent}
+              isNegative={isNegative}
+            />
+          </div>
         );
       })}
     </Carousel>

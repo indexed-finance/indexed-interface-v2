@@ -1,70 +1,8 @@
-import { AiOutlineClockCircle } from "react-icons/ai";
-import { Button, Card, Skeleton, Space, Tabs, Tag, Typography } from "antd";
-import { ImArrowRight2 } from "react-icons/im";
-import { ReactNode, useState } from "react";
+import { Skeleton, Tabs } from "antd";
+import { TransactionCard } from "components";
+import { useState } from "react";
 import Subscreen from "./Subscreen";
-import type { FormattedIndexPool, Swap, Trade } from "features";
-
-function BaseCard({
-  when,
-  from,
-  to,
-  transactionHash,
-  title = null,
-  extra = null,
-}: Swap & { title?: ReactNode; extra?: ReactNode }) {
-  return (
-    <Card
-      size="small"
-      title={title}
-      extra={
-        <div>
-          <AiOutlineClockCircle /> {when}
-        </div>
-      }
-      actions={[
-        <Button
-          key="tx"
-          type="link"
-          target="_blank"
-          rel="noopener noreferer"
-          href={`https://etherscan.com/tx/${transactionHash}`}
-        >
-          View Transaction
-        </Button>,
-      ]}
-    >
-      <Space align="center">
-        <div>{from}</div>
-        <ImArrowRight2 />
-        <div>{to}</div>
-      </Space>
-      {extra}
-    </Card>
-  );
-}
-
-function TradeCard(props: Trade) {
-  const { amount, kind, ...rest } = props;
-
-  return (
-    <BaseCard
-      title={<Tag color={kind === "buy" ? "green" : "red"}>{kind}</Tag>}
-      extra={
-        <div>
-          <Typography.Text type={kind === "sell" ? "danger" : "success"}>
-            {amount}
-          </Typography.Text>
-        </div>
-      }
-      {...rest}
-    />
-  );
-}
-
-function SwapCard(props: Swap) {
-  return <BaseCard {...props} />;
-}
+import type { FormattedIndexPool } from "features";
 
 const { TabPane } = Tabs;
 
@@ -79,24 +17,47 @@ export default function Recent({ pool }: { pool: FormattedIndexPool }) {
   return (
     <Subscreen title="Recent">
       <Tabs
+        className="Recent"
         size="large"
         centered={true}
         activeKey={mode}
         onChange={(next) => setMode(next)}
       >
         <TabPane tab="Trades" key="Trades">
-          {tradesEmpty
-            ? placeholders
-            : pool.recent.trades.map((trade, index) => (
-                <TradeCard key={index} {...trade} />
-              ))}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexWrap: "wrap",
+            }}
+          >
+            {tradesEmpty
+              ? placeholders
+              : pool.recent.trades.map((trade, index) => (
+                  <div key={index} style={{ flex: "1 1 0", padding: 15 }}>
+                    <TransactionCard {...trade} />
+                  </div>
+                ))}
+          </div>
         </TabPane>
         <TabPane tab="Swaps" key="Swaps">
-          {swapsEmpty
-            ? placeholders
-            : pool.recent.swaps.map((swap, index) => (
-                <SwapCard key={index} {...swap} />
-              ))}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexWrap: "wrap",
+            }}
+          >
+            {swapsEmpty
+              ? placeholders
+              : pool.recent.swaps.map((swap, index) => (
+                  <div key={index} style={{ flex: "1 1 0", padding: 15 }}>
+                    <TransactionCard key={index} {...swap} kind="swap" />
+                  </div>
+                ))}
+          </div>
         </TabPane>
       </Tabs>
     </Subscreen>

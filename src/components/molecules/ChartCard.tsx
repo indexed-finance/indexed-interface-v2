@@ -124,7 +124,7 @@ export default function ChartCard({ poolId, expanded = false }: Props) {
       }
       headStyle={{
         background: theme === "dark" ? "#0a0a0a" : "#fff",
-        paddingLeft: isMobile ? 10 : 0,
+        paddingLeft: 10,
       }}
       bodyStyle={{ padding: 0, height: 300 }}
       actions={actions}

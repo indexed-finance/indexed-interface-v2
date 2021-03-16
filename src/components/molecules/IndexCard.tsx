@@ -83,12 +83,13 @@ export default function IndexCard({
 
   return (
     <Card
+      className="IndexCard"
       onClick={onClick}
       hoverable={onClick !== noop}
       title={
         <Space
           direction={direction}
-          className="spaced-between"
+          className={titleExtra ? "spaced-between" : "perfectly-centered"}
           style={{ width: "100%", textAlign: "center" }}
         >
           <div>
@@ -114,7 +115,7 @@ export default function IndexCard({
               {title}
             </Typography.Title>
           </div>
-          <div>{titleExtra}</div>
+          {titleExtra && <div>{titleExtra}</div>}
         </Space>
       }
       actions={formattedActions}

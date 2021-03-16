@@ -56,7 +56,6 @@ function Pool({ id }: { id: string }) {
             <RankedToken key={token.symbol} rank={index + 1} token={token} />
           ))}
         </Space>
-        {/* */}
       </Subscreen>
     );
     const interactions = (

@@ -180,7 +180,7 @@ export default function TokenSelector({
                 })
               }
               onChange={onAmountChange}
-              style={{ width: isMobile ? 120 : 200 }}
+              style={{ width: isMobile ? 120 : 200, fontSize: 22 }}
             />
           </Space>
           <div>

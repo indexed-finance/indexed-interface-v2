@@ -39,7 +39,7 @@ export default function ProviderRequirementDrawer({
 
   const placementProps: any = {
     bottom: {
-      height: "55%",
+      height: "75%",
     },
     right: {
       width: "30%",
