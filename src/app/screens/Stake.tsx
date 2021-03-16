@@ -1,20 +1,7 @@
-import {
-  Avatar,
-  Button,
-  Col,
-  Divider,
-  List,
-  Row,
-  Space,
-  Statistic,
-  Typography,
-} from "antd";
-import { FaTractor } from "react-icons/fa";
+import { Button, Space, Statistic, Typography } from "antd";
+import { IndexCard, ScreenHeader } from "components";
 import { Link } from "react-router-dom";
-import { ScreenHeader } from "components";
-import { Subscreen } from "../subscreens";
 import { useBreakpoints } from "helpers";
-import React from "react";
 
 export default function Stake() {
   const stakeable = {
@@ -30,82 +17,82 @@ export default function Stake() {
   };
   const __data = [stakeable, stakeable, stakeable];
   const breakpoints = useBreakpoints();
-  const area = (
+
+  return (
     <>
+      <ScreenHeader title="Stake" />
       <Typography.Title>Liquidity mining</Typography.Title>
       <Typography.Paragraph>
         Stake index tokens or their associated Uniswap liquidity tokens to earn
         NDX, the governance token for Indexed Finance.
       </Typography.Paragraph>
-    </>
-  );
-  const pools = (
-    <Subscreen title="Available Pools">
-      <List>
-        {__data.map((datum) => (
-          <React.Fragment key={datum.id}>
-            <List.Item
-              extra={
-                <Space split={<Divider />}>
-                  <Statistic title="APY" value={datum.apy} />
-                  <Space direction="vertical">
-                    <Statistic title="Staked" value={datum.staked} />
-                    <Button type="primary" icon={<FaTractor />}>
-                      Stake pool
-                    </Button>
-                  </Space>
-                </Space>
-              }
+      <Space
+        wrap={true}
+        size="large"
+        style={{
+          marginTop: 15,
+          width: "100%",
+          justifyContent: breakpoints.isMobile ? "center" : "flex-start",
+        }}
+      >
+        {__data.map((datum) => {
+          const commonActions = [
+            {
+              title: "Rate",
+              value: datum.rate,
+            },
+            {
+              title: "Total",
+              value: datum.total,
+            },
+          ];
+          const actions = breakpoints.isMobile
+            ? [
+                {
+                  title: "APY",
+                  value: datum.apy,
+                },
+                {
+                  title: "Staked",
+                  value: datum.staked,
+                },
+                ...commonActions,
+              ]
+            : commonActions;
+
+          return (
+            <IndexCard
+              style={{
+                marginBottom: 15,
+                width: "100%",
+              }}
+              direction={breakpoints.isMobile ? "vertical" : "horizontal"}
+              title={<Link to={`/pools/${datum.slug}`}>{datum.name}</Link>}
+              subtitle={datum.symbol}
+              actions={actions}
+              centered={false}
             >
-              <List.Item.Meta
-                title={
-                  <Link to={`/pools/${datum.slug}`}>
-                    <Avatar src={datum.image} />
-                    {datum.name} [{datum.symbol}]
-                  </Link>
-                }
-                description={
-                  <Typography.Text type="secondary">
-                    Rate: {datum.rate} <br /> Total: {datum.total}
-                  </Typography.Text>
-                }
-              />
-            </List.Item>
-          </React.Fragment>
-        ))}
-      </List>
-    </Subscreen>
-  );
-
-  // Variants
-  const mobileSized = (
-    <Row gutter={5}>
-      <Col span={24}>{area}</Col>
-      <Col span={24}>{pools}</Col>
-    </Row>
-  );
-  const desktopSized = (
-    <>
-      <Row gutter={20}>
-        <Col span={12}>{area}</Col>
-      </Row>
-      <Row gutter={20}>
-        <Col span={12}>{pools}</Col>
-      </Row>
-    </>
-  );
-
-  return (
-    <>
-      <ScreenHeader title="Stake" />
-      {(() => {
-        switch (true) {
-          case breakpoints.sm:
-            return desktopSized;
-          case breakpoints.xs:
-            return mobileSized;
-        }
-      })()}
+              <Space
+                direction="vertical"
+                style={{ textAlign: "center", justifyContent: "center" }}
+              >
+                {!breakpoints.isMobile && (
+                  <Space style={{ width: "100%" }}>
+                    <Statistic title="APY" value={datum.apy} />
+                    <Statistic title="Staked" value={datum.staked} />
+                  </Space>
+                )}
+                <Button
+                  type="primary"
+                  style={{ minWidth: 200, justifySelf: "center" }}
+                >
+                  Stake pool
+                </Button>
+              </Space>
+            </IndexCard>
+          );
+        })}
+      </Space>
     </>
   );
 }

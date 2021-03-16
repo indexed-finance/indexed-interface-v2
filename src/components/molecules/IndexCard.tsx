@@ -14,6 +14,7 @@ interface Props extends CardProps {
   titleExtra?: ReactNode;
   actions?: IndexCardAction[];
   direction?: "horizontal" | "vertical";
+  centered?: boolean;
   onClick?(): void;
 }
 
@@ -25,6 +26,7 @@ export default function IndexCard({
   onClick = noop,
   direction = "horizontal",
   children,
+  centered = true,
   ...rest
 }: Props) {
   const { isMobile } = useBreakpoints();
@@ -85,7 +87,6 @@ export default function IndexCard({
       hoverable={onClick !== noop}
       title={
         <Space
-          align="start"
           direction={direction}
           className="spaced-between"
           style={{ width: "100%", textAlign: "center" }}
@@ -119,7 +120,7 @@ export default function IndexCard({
       actions={formattedActions}
       {...rest}
     >
-      <div className="perfectly-centered">{children}</div>
+      <div className={centered ? "perfectly-centered" : ""}>{children}</div>
     </Card>
   );
 }

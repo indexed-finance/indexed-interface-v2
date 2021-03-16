@@ -1,3 +1,4 @@
+import { CSSTransition } from "react-transition-group";
 import { FormattedIndexPool, selectors } from "features";
 import { Helmet } from "react-helmet";
 import { Layout } from "antd";
@@ -43,7 +44,7 @@ export default function AppLayout() {
     <>
       <Helmet>
         <body className={theme} />
-        {breakpoints.isMobile && (
+        {/* {breakpoints.isMobile && (
           <>
             <meta
               name="viewport"
@@ -51,15 +52,21 @@ export default function AppLayout() {
         user-scalable=0"
             />
           </>
-        )}
+        )} */}
       </Helmet>
 
       <Layout className="AppLayout">
-        {mobileMenuActive && (
+        <CSSTransition
+          in={mobileMenuActive}
+          timeout={200}
+          classNames="AppMenuAnimation"
+          unmountOnExit={true}
+        >
           <div className="AppMenuWrapper">
             <AppMenu onItemClick={closeMobileMenu} />
           </div>
-        )}
+        </CSSTransition>
+
         <AppHeader
           mobileMenuActive={mobileMenuActive}
           onToggleMobileMenu={toggleMobileMenu}

@@ -255,6 +255,29 @@ body {
   }
 }
 
+.AppMenuAnimation-enter {
+  top: -500px;
+  left: -300px;
+  z-index: 1000;
+}
+.AppMenuAnimation-enter-active {
+  top: 0;
+  left: 0;
+  transition: left 200ms ease-in-out, top 200ms ease-in-out;
+  z-index: 1000;
+}
+.AppMenuAnimation-exit {
+  top: 0;
+  left: 0;
+  z-index: 1000;
+}
+.AppMenuAnimation-exit-active {
+  top: -500px;
+  left: -300px;
+  transition: left 200ms ease-in-out, top 200ms ease-in-out;
+  z-index: 1000;
+}
+
 // -- Components
 .Carousel {
   &:extend(.perfectly-centered);
