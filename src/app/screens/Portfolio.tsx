@@ -1,10 +1,10 @@
-import { Badge, Card, Divider, Progress, Space, Typography } from "antd";
+import { Badge, Divider, Progress, Space, Typography } from "antd";
+import { IndexCard, ProviderRequirementDrawer, ScreenHeader } from "components";
 import { Link } from "react-router-dom";
-import { ProviderRequirementDrawer, ScreenHeader, Token } from "components";
-
-const { Meta } = Card;
+import { useBreakpoints } from "helpers";
 
 export default function Portfolio() {
+  const { isMobile } = useBreakpoints();
   const __data = [
     {
       address: "0x17ac188e09a7890a1844e5e65471fe8b0ccfadf3",
@@ -50,68 +50,38 @@ export default function Portfolio() {
       >
         {__data.map((datum) => {
           const card = (
-            <Card
+            <IndexCard
+              style={{ width: isMobile ? 300 : 500 }}
+              direction={isMobile ? "vertical" : "horizontal"}
               key={datum.address}
-              bodyStyle={{ minWidth: 300, height: 193 }}
-              hoverable={true}
+              title={datum.name}
+              subtitle={datum.symbol}
               actions={[
-                <div key="1">
-                  <Typography.Text type="secondary">
-                    Balance (in tokens)
-                  </Typography.Text>
-                  <Typography.Title
-                    level={4}
-                    style={{
-                      margin: 0,
-                    }}
-                  >
-                    {datum.balance && `${datum.balance} ${datum.symbol}`}
-                  </Typography.Title>
-                </div>,
-                <div key="2">
-                  <Typography.Text type="secondary">
-                    Value (in USD)
-                  </Typography.Text>
-                  <Typography.Title
-                    level={4}
-                    type="success"
-                    style={{
-                      margin: 0,
-                    }}
-                  >
-                    {datum.value}
-                  </Typography.Title>
-                </div>,
+                {
+                  title: "Balance (in tokens)",
+                  value: datum.balance && `${datum.balance} ${datum.symbol}`,
+                },
+                {
+                  title: "Value (in USD)",
+                  value: (
+                    <Typography.Text type="success">
+                      {datum.value}
+                    </Typography.Text>
+                  ),
+                },
               ]}
             >
-              <Space
-                // className="spaced-between"
-                style={{ paddingTop: 25 }}
-                wrap={true}
-              >
-                <Meta
-                  avatar={
-                    <Token
-                      size="small"
-                      address={datum.address}
-                      name={datum.symbol}
-                      image={datum.image}
-                    />
-                  }
-                  title={<>{datum.symbol}</>}
-                  description={datum.name}
-                />
+              <Space style={{ paddingTop: 25 }} wrap={true}>
                 {datum.weight && (
                   <Progress
-                    className="SmallProgress"
                     type="dashboard"
+                    style={{ marginLeft: 20 }}
                     percent={parseFloat(datum.weight.replace(/%/g, ""))}
                   />
                 )}
               </Space>
-            </Card>
+            </IndexCard>
           );
-
           const cardWithLink = datum.link ? (
             <Link to={datum.link}>{card}</Link>
           ) : (
@@ -120,7 +90,8 @@ export default function Portfolio() {
 
           return (
             <Badge.Ribbon
-              color={datum.staking ? "purple" : "magenta"}
+              color="magenta"
+              style={{ top: isMobile ? 80 : 0 }}
               text={
                 datum.staking
                   ? `Staking ${datum.staking} ${datum.symbol}`

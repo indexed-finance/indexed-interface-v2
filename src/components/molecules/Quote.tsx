@@ -18,7 +18,6 @@ export default function Quote({
   netChange,
   netChangePercent,
   isNegative = false,
-  centered = true,
   inline = false,
 }: Props) {
   const inner = (
@@ -38,6 +37,7 @@ export default function Quote({
       <Typography.Title
         level={3}
         style={{
+          opacity: 0.75,
           marginTop: 0,
           marginRight: 12,
           marginBottom: 0,

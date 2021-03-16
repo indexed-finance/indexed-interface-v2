@@ -1,21 +1,97 @@
 @dark-blue: #89dce3;
+@dark-blue-transparent: rgba(137, 220, 227, 0.66);
 @dark-pink: #fa79e0;
+@dark-pink-transparent: rgba(250, 121, 224, 0.66);
 @dark-green: #10be8a;
+@dark-yellow: #ecc321;
 @dark-red: #f7051b;
 @dark-text: #fafafa;
+@dark-background: rgba(10, 10, 10, 0.8);
 @light-text: #fafafa;
+
+@keyframes flash {
+  0% {
+    background: @dark-pink-transparent;
+  }
+  33% {
+    background: @dark-pink-transparent;
+  }
+  50% {
+    background: @light-text;
+  }
+  66% {
+    background: @dark-blue-transparent;
+  }
+  100% {
+    background: @dark-blue-transparent;
+  }
+}
+
+.top-left-corner {
+  position: fixed;
+  width: 0;
+  height: 0;
+  border-top: 75px solid transparent;
+  border-right: 75px solid transparent;
+  border-bottom: 75px solid @dark-background;
+  border-left: 75px solid transparent;
+  z-index: 99999;
+  top: -13px;
+  left: 224px;
+  transform: rotate(-45deg);
+  pointer-events: none;
+
+  @media screen and (max-width: 480px) {
+    top: -13px;
+    left: -118px;
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    bottom: -77px;
+    left: -78px;
+    width: 152px;
+    height: 1px;
+    z-index: 100000;
+    animation: flash 6s infinite alternate-reverse;
+  }
+}
+
+body {
+  background: url("../assets/images/dark-bg.jpg") no-repeat center center fixed;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
 
 .dark {
   .ant-layout {
-    background: black;
-    background-image: url("../assets/images/dark-bg.png") !important;
+    background: transparent !important;
 
     &-header {
-      border-bottom: 1px solid @dark-blue !important;
+      background: @dark-background !important;
+      border-bottom: none !important;
+      position: relative;
+
+      &::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 63px;
+        height: 1px;
+        width: calc(100% - 63px);
+        animation: flash 6s infinite alternate-reverse;
+        z-index: 10000;
+      }
     }
     &-sider {
+      background: transparent !important;
+
       &-children {
-        border-right: 1px solid @dark-blue !important;
+        top: 62px;
+        background: @dark-background !important;
       }
     }
   }
@@ -38,10 +114,6 @@
     }
   }
 
-  .ant-divider-dashed {
-    border-color: @dark-blue !important;
-  }
-
   .ant-btn-primary {
     background: @dark-pink !important;
   }
@@ -53,11 +125,16 @@
   .ant-ribbon-color-purple {
     background: @dark-pink !important;
   }
+
   .ant-ribbon-color-pink {
     background: @dark-pink !important;
   }
 
   .ant-carousel {
-    background: #161617 !important;
+    background: transparent !important;
+  }
+
+  .ant-menu-item-selected {
+    color: @dark-blue !important;
   }
 }

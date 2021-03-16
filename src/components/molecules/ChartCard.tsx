@@ -2,7 +2,7 @@ import { AppState, selectors } from "features";
 import { Card, Menu, Select, Space, Typography } from "antd";
 import { SnapshotKey } from "features";
 import { useBreakpoints } from "helpers";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import LineSeriesChart from "./LineSeriesChart";
 import Quote from "./Quote";
@@ -15,8 +15,13 @@ export interface Props {
 }
 
 export default function ChartCard({ poolId, expanded = false }: Props) {
-  const [key, setKey] = useState<SnapshotKey>("value");
+  const theme = useSelector(selectors.selectTheme);
   const [timeframe, setTimeframe] = useState<Timeframe>("Day");
+  const [key, setKey] = useState<SnapshotKey>("value");
+  const settings = useMemo<[Timeframe, SnapshotKey]>(() => [timeframe, key], [
+    timeframe,
+    key,
+  ]);
   const data = useSelector((state: AppState) =>
     selectors.selectTimeSeriesSnapshotData(state, poolId, timeframe, key)
   );
@@ -113,14 +118,18 @@ export default function ChartCard({ poolId, expanded = false }: Props) {
             netChange={formattedPool.netChange}
             netChangePercent={formattedPool.netChangePercent}
             isNegative={formattedPool.isNegative}
-            inline={!isMobile}
+            inline={true}
           />
         )
       }
+      headStyle={{
+        background: theme === "dark" ? "#0a0a0a" : "#fff",
+        paddingLeft: isMobile ? 10 : 0,
+      }}
       bodyStyle={{ padding: 0, height: 300 }}
       actions={actions}
     >
-      <LineSeriesChart data={data} expanded={expanded} />
+      <LineSeriesChart data={data} expanded={expanded} settings={settings} />
     </Card>
   );
 }

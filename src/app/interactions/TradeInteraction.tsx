@@ -15,9 +15,10 @@ interface Props {
 export default function TradeInteraction({ pool }: Props) {
   const dispatch = useDispatch();
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
-  const tokenIds = useMemo(() => {
-    return [pool.id, ...COMMON_BASE_TOKENS.map(({ id }) => id)];
-  }, [pool.id]);
+  const tokenIds = useMemo(
+    () => [pool.id, ...COMMON_BASE_TOKENS.map(({ id }) => id)],
+    [pool.id]
+  );
   const assets = useSelector((state: AppState) =>
     selectors.selectTokensById(state, tokenIds)
   );

@@ -25,7 +25,6 @@ const options = {
     "@secondary-color",
     "@heading-color",
     "@text-color",
-    "@layout-header-background",
     "@processing-color",
   ],
   indexFileName: "index.html",

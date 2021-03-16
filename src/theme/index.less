@@ -33,7 +33,7 @@ h5.ant-typography {
     top: 63px;
     width: 300px;
     height: calc(100% - @header-height);
-    z-index: 5;
+    z-index: 1005;
 
     @media screen and (max-width: 480px) {
       width: 100%;
@@ -140,7 +140,7 @@ body {
   top: 0;
   left: 0;
   width: 100vw;
-  z-index: 4;
+  z-index: 1004;
   border-bottom: 1px solid rgba(204, 204, 255, 0.2);
   padding-left: 12px !important;
   padding-right: 12px !important;
@@ -161,12 +161,12 @@ body {
   left: 0;
   width: 100vw;
   height: calc(100vh - @header-height);
-  z-index: 5;
+  z-index: 1005;
 }
 
 .dark {
   .AppMenuWrapper {
-    background: #101010;
+    background: rgba(10, 10, 10, 0.85);
   }
 }
 
@@ -213,7 +213,7 @@ body {
 .dark {
   .AppLayout {
     .Page {
-      background: #0f0f0f !important;
+      background: rgba(15, 15, 15, 0.95) !important;
     }
   }
 }
@@ -255,7 +255,18 @@ body {
   &:extend(.perfectly-centered);
 
   text-align: center;
-  padding: @spacing-medium @spacing-medium 0 @spacing-medium;
+  padding-bottom: @spacing-small;
+
+  &::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 1px;
+    width: 100%;
+    animation: flash 6s infinite alternate-reverse;
+    z-index: 10000;
+  }
 }
 
 .Token {
@@ -274,7 +285,7 @@ body {
   padding: 1rem;
   border: 1px solid white;
   background: rgba(0, 0, 0, 0.5);
-  z-index: 2;
+  z-index: 9999;
 }
 
 .WalletConnector,
@@ -332,18 +343,6 @@ body {
     width: 100%;
   }
 
-  .ant-progress-inner {
-    width: 90px !important;
-    height: 90px !important;
-    font-size: 18px !important;
-
-    @media screen and (max-width: 480px) {
-      width: 75px !important;
-      height: 75px !important;
-      font-size: 15px !important;
-    }
-  }
-
   .RankedToken {
     .ant-card-body {
       &:extend(.spaced-between);
@@ -380,6 +379,7 @@ body {
     cursor: pointer;
   }
 }
+
 // -- External
 .effect6 {
   position: fixed;

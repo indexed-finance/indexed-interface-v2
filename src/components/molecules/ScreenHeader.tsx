@@ -19,12 +19,13 @@ export default function ScreenHeader(props: Props) {
         wrap={true}
         className="spaced-between"
         direction={isMobile ? "vertical" : "horizontal"}
+        style={{ padding: 0 }}
       >
-        <Typography.Title level={isMobile ? 1 : 2} className="ScreenHeader">
+        <Typography.Title level={2} className="ScreenHeader">
           {title}
         </Typography.Title>
         {(props.overlay || props.activeBreadcrumb) && (
-          <Breadcrumb style={{ fontSize: 18 }}>
+          <Breadcrumb style={{ fontSize: isMobile ? 14 : 16 }}>
             <Breadcrumb.Item overlay={props.overlay}>
               {props.activeBreadcrumb}
             </Breadcrumb.Item>

@@ -43,14 +43,17 @@ export default function AppLayout() {
     <>
       <Helmet>
         <body className={theme} />
-        {breakpoints.isMobile && (
-          <meta
-            name="viewport"
-            content="width=device-width, initial-scale=1.0, maximum-scale=1.0,
+        {/* {breakpoints.isMobile && (
+          <>
+            <meta
+              name="viewport"
+              content="width=device-width, initial-scale=1.0, maximum-scale=1.0,
         user-scalable=0"
-          />
-        )}
+            />
+          </>
+        )} */}
       </Helmet>
+
       <Layout className="AppLayout">
         {mobileMenuActive && (
           <div className="AppMenuWrapper">
@@ -61,6 +64,9 @@ export default function AppLayout() {
           mobileMenuActive={mobileMenuActive}
           onToggleMobileMenu={toggleMobileMenu}
         />
+
+        <div className="top-left-corner" />
+
         {breakpoints.lg && (
           <Sider width={300}>
             {indexPools.length > 0 && (
@@ -69,6 +75,7 @@ export default function AppLayout() {
             <AppMenu />
           </Sider>
         )}
+
         <Content style={{ paddingRight: 10, paddingLeft: 10 }}>
           <div className="Page">
             <RouterSwitch>

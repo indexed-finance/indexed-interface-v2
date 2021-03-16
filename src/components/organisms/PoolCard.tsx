@@ -1,9 +1,10 @@
 import { Avatar, Card, Space, Typography } from "antd";
 import { FormattedIndexPool } from "features";
-import { Quote, RankedToken } from "components/molecules";
+import { Quote } from "components/molecules";
 import { Token } from "components/atoms";
 import { useBreakpoints } from "helpers";
 import { useHistory } from "react-router-dom";
+import RankedToken from "./RankedToken";
 
 export interface Props {
   pool: FormattedIndexPool;
@@ -23,7 +24,8 @@ export default function PoolCard({ pool }: Props) {
         <Space
           align="start"
           className="spaced-between"
-          style={{ width: "100%" }}
+          direction={isMobile ? "vertical" : "horizontal"}
+          style={{ width: "100%", textAlign: isMobile ? "center" : "left" }}
         >
           <div>
             <Typography.Title
@@ -50,6 +52,7 @@ export default function PoolCard({ pool }: Props) {
             netChangePercent={pool.netChangePercent}
             isNegative={false}
             centered={false}
+            inline={isMobile}
           />
         </Space>
       }
@@ -70,14 +73,10 @@ export default function PoolCard({ pool }: Props) {
         </Avatar.Group>,
       ]}
     >
+      <Typography.Title level={3}>{pool.symbol} assets</Typography.Title>
       <Space align="start" className="RankedTokenWrapper">
         {pool.assets.map((token, index) => (
-          <RankedToken
-            key={token.symbol}
-            rank={index + 1}
-            token={token}
-            fixedSize={true}
-          />
+          <RankedToken key={token.symbol} rank={index + 1} token={token} />
         ))}
       </Space>
     </Card>

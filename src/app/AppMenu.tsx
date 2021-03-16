@@ -31,7 +31,9 @@ export default function AppMenu({ onItemClick = noop, ...rest }: Props) {
 
   return (
     <>
-      {!isMobile && <Divider className="no-margin-bottom" />}
+      {!isMobile && (
+        <Divider style={{ marginTop: 0, marginBottom: 0 }} dashed={true} />
+      )}
       <Menu
         className="AppMenu"
         mode="inline"

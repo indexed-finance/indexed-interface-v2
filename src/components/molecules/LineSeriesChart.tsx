@@ -2,6 +2,7 @@ import { IChartApi, ISeriesApi, createChart } from "lightweight-charts";
 import { selectors } from "features";
 import { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
+import S from "string";
 
 export interface SeriesDataItem {
   time: number;
@@ -11,13 +12,30 @@ export interface SeriesDataItem {
 export interface Props {
   data: SeriesDataItem[];
   expanded?: boolean;
+  settings: [string, string];
 }
 
-export default function LineSeriesChart({ data, expanded = false }: Props) {
+export default function LineSeriesChart({
+  data,
+  expanded = false,
+  settings,
+}: Props) {
   const theme = useSelector(selectors.selectTheme);
   const cardRef = useRef<null | HTMLDivElement>(null);
   const [chart, setChart] = useState<IChartApi | null>(null);
   const [series, setSeries] = useState<ISeriesApi<"Line"> | null>(null);
+
+  useEffect(() => {
+    const [timeframe, key] = settings;
+
+    chart?.applyOptions({
+      watermark: {
+        text: `Showing ${S(key).humanize().s} (last ${
+          timeframe === "Day" ? "24h" : "week"
+        })`.toUpperCase(),
+      },
+    });
+  }, [chart, settings]);
 
   useEffect(() => {
     if (cardRef.current && !series) {
@@ -28,8 +46,20 @@ export default function LineSeriesChart({ data, expanded = false }: Props) {
       const chart_ = createChart(cardRef.current, size);
       setChart(chart_);
       const options = CHART_MODES[theme];
-      const lineSeries = chart_.addLineSeries();
-      chart_.applyOptions(options);
+      const lineSeries = chart_.addLineSeries({
+        color: "#ECC321",
+      });
+      chart_.applyOptions({
+        ...options,
+        watermark: {
+          color: "#ECC321",
+          visible: true,
+          text: ``,
+          fontSize: 18,
+          horzAlign: "left",
+          vertAlign: "top",
+        },
+      });
       setSeries(lineSeries);
       setTimeout(() => {
         if (cardRef.current) {
@@ -76,15 +106,26 @@ const CHART_MODES = {
   dark: {
     layout: {
       ...COMMON_LAYOUT_OPTIONS,
-      backgroundColor: "black",
-      textColor: "purple",
+      backgroundColor: "#0A0A0A",
+      textColor: "#89dce3",
+    },
+    priceScale: {
+      borderColor: "#ECC321",
+    },
+    crosshair: {
+      vertLine: {
+        color: "#ECC321",
+      },
+      horzLine: {
+        color: "#ECC321",
+      },
     },
     grid: {
       vertLines: {
-        color: "purple",
+        color: "#fa79e0",
       },
       horzLines: {
-        color: "purple",
+        color: "#fa79e0",
       },
     },
   },
