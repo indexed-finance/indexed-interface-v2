@@ -14,7 +14,7 @@ interface Props {
 export default function Logo({
   link = "/",
   withTitle = true,
-  title = "Indexed",
+  title = "INDEXED",
 }: Props) {
   const history = useHistory();
   const theme = useSelector(selectors.selectTheme);

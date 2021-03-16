@@ -1,12 +1,12 @@
+import { Button, Layout } from "antd";
 import { CSSTransition } from "react-transition-group";
-import { FormattedIndexPool, selectors } from "features";
+import { FormattedIndexPool, actions, selectors } from "features";
 import { Helmet } from "react-helmet";
-import { Layout } from "antd";
 import { QuoteCarousel } from "components";
 import { Route, Switch as RouterSwitch } from "react-router-dom";
 import { useBreakpoints } from "helpers";
 import { useCallback, useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import AppHeader from "./AppHeader";
 import AppMenu from "./AppMenu";
 import SocketClient from "sockets/client";
@@ -15,6 +15,7 @@ import routes from "./routes";
 const { Sider, Content } = Layout;
 
 export default function AppLayout() {
+  const dispatch = useDispatch();
   const isConnectionEnabled = useSelector(selectors.selectConnectionEnabled);
   const indexPools = useSelector(selectors.selectAllFormattedIndexPools);
   const breakpoints = useBreakpoints();
@@ -44,15 +45,6 @@ export default function AppLayout() {
     <>
       <Helmet>
         <body className={theme} />
-        {/* {breakpoints.isMobile && (
-          <>
-            <meta
-              name="viewport"
-              content="width=device-width, initial-scale=1.0, maximum-scale=1.0,
-        user-scalable=0"
-            />
-          </>
-        )} */}
       </Helmet>
 
       <Layout className="AppLayout">
@@ -79,7 +71,14 @@ export default function AppLayout() {
             {indexPools.length > 0 ? (
               <QuoteCarousel pools={indexPools as FormattedIndexPool[]} />
             ) : (
-              <div className="QuotePlaceholder" />
+              <div className="QuotePlaceholder perfectly-centered">
+                <Button
+                  type="primary"
+                  onClick={() => dispatch(actions.attachToProvider())}
+                >
+                  Connect wallet
+                </Button>
+              </div>
             )}
             <AppMenu />
           </Sider>

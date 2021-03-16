@@ -73,7 +73,6 @@ export default function PoolCard({ pool }: Props) {
         </Avatar.Group>,
       ]}
     >
-      <Typography.Title level={3}>{pool.symbol} assets</Typography.Title>
       <Space align="start" className="RankedTokenWrapper">
         {pool.assets.map((token, index) => (
           <RankedToken key={token.symbol} rank={index + 1} token={token} />

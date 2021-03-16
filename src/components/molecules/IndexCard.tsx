@@ -104,16 +104,18 @@ export default function IndexCard({
                 {subtitle}
               </Typography.Title>
             )}
-            <Typography.Title
-              className="no-margin-bottom"
-              level={isMobile ? 5 : 2}
-              style={{
-                marginTop: 0,
-                marginBottom: 0,
-              }}
-            >
-              {title}
-            </Typography.Title>
+            {title && (
+              <Typography.Title
+                className="no-margin-bottom"
+                level={isMobile ? 5 : 2}
+                style={{
+                  marginTop: 0,
+                  marginBottom: 0,
+                }}
+              >
+                {title}
+              </Typography.Title>
+            )}
           </div>
           {titleExtra && <div>{titleExtra}</div>}
         </Space>
@@ -121,7 +123,9 @@ export default function IndexCard({
       actions={formattedActions}
       {...rest}
     >
-      <div className={centered ? "perfectly-centered" : ""}>{children}</div>
+      {children && (
+        <div className={centered ? "perfectly-centered" : ""}>{children}</div>
+      )}
     </Card>
   );
 }

@@ -1,6 +1,6 @@
 import { Asset } from "features";
-import { Divider, Progress, Space, Typography } from "antd";
 import { IndexCard, Quote } from "components/molecules";
+import { Progress, Space, Typography } from "antd";
 import { Token } from "components/atoms";
 import { convert, useBreakpoints } from "helpers";
 
@@ -63,7 +63,6 @@ export default function RankedToken({ token }: Props) {
           percent={parseFloat(token.weightPercentage.replace(/%/g, ""))}
         />
       </IndexCard>
-      {isMobile && <Divider />}
     </>
   );
 }

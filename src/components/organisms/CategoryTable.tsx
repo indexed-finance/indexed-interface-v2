@@ -1,18 +1,38 @@
+import { FormattedCategory } from "features";
+import { IndexCard } from "components";
 import { Table } from "antd";
+import { useBreakpoints } from "helpers";
 import { useHistory } from "react-router-dom";
-
-import type { FormattedCategory } from "features";
+import S from "string";
 
 export type Props = {
   pools: FormattedCategory["indexPools"];
 };
 
-export default function CategoryTable(props: Props) {
+export default function CategoryTable({ pools }: Props) {
   const history = useHistory();
+  const { isMobile } = useBreakpoints();
 
-  return (
+  return isMobile ? (
+    <>
+      {pools.map((pool) => (
+        <IndexCard
+          key={pool.name}
+          direction="vertical"
+          actions={Object.entries(pool)
+            .filter(([key]) => !["name", "slug", "id"].includes(key))
+            .map(([key, value]) => ({
+              title: S(key).humanize().s,
+              value,
+            }))}
+        >
+          <span style={{ fontSize: 16 }}>{pool.name}</span>
+        </IndexCard>
+      ))}
+    </>
+  ) : (
     <Table
-      dataSource={props.pools}
+      dataSource={pools}
       columns={columns}
       pagination={false}
       onRow={(record: any) => ({

@@ -3,10 +3,12 @@ import { PLACEHOLDER_TOKEN_IMAGE } from "config";
 
 interface Props {
   address?: string;
+  asAvatar?: boolean;
   name: string;
   image: string;
   size?: "tiny" | "small" | "medium" | "large";
   margin?: number;
+  style?: any;
 }
 
 export default function Token({
@@ -15,6 +17,7 @@ export default function Token({
   size = "small",
   image,
   margin = 0,
+  asAvatar = true,
   ...rest
 }: Props) {
   let tokenImage = PLACEHOLDER_TOKEN_IMAGE;
@@ -37,8 +40,10 @@ export default function Token({
     }
   }
 
+  const Component = asAvatar ? Avatar : "img";
+
   return (
-    <Avatar
+    <Component
       className="Token"
       alt={name}
       src={tokenImage}
@@ -47,6 +52,7 @@ export default function Token({
         width: tokenImageSize,
         height: tokenImageSize,
         marginRight: margin,
+        ...rest.style,
       }}
     />
   );

@@ -23,7 +23,11 @@ export default function TransactionCard({
     >
       <IndexCard
         centered={false}
-        title={kind}
+        title={
+          <Typography.Text type="secondary" className="fancy">
+            {kind}
+          </Typography.Text>
+        }
         headStyle={{
           textAlign: "center",
         }}

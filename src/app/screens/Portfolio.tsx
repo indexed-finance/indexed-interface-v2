@@ -1,9 +1,17 @@
 import { Badge, Divider, Progress, Space, Typography } from "antd";
-import { IndexCard, ProviderRequirementDrawer, ScreenHeader } from "components";
+import {
+  IndexCard,
+  ProviderRequirementDrawer,
+  ScreenHeader,
+  Token,
+} from "components";
 import { Link } from "react-router-dom";
+import { selectors } from "features";
 import { useBreakpoints } from "helpers";
+import { useSelector } from "react-redux";
 
 export default function Portfolio() {
+  const theme = useSelector(selectors.selectTheme);
   const { isMobile } = useBreakpoints();
   const __data = [
     {
@@ -79,6 +87,19 @@ export default function Portfolio() {
                     percent={parseFloat(datum.weight.replace(/%/g, ""))}
                   />
                 )}
+                {datum.earned && (
+                  <Typography.Title level={2} className="no-margin-bottom">
+                    Earned {datum.earned}{" "}
+                    <Token
+                      asAvatar={false}
+                      name="NDX"
+                      size="small"
+                      image={`indexed-${theme}`}
+                      style={{ position: "relative", top: -6, marginRight: 10 }}
+                    />
+                    NDX
+                  </Typography.Title>
+                )}
               </Space>
             </IndexCard>
           );
@@ -88,7 +109,7 @@ export default function Portfolio() {
             card
           );
 
-          return (
+          return datum.staking ? (
             <Badge.Ribbon
               color="magenta"
               style={{ top: isMobile ? 80 : 0 }}
@@ -100,6 +121,8 @@ export default function Portfolio() {
             >
               {cardWithLink}
             </Badge.Ribbon>
+          ) : (
+            cardWithLink
           );
         })}
       </Space>
