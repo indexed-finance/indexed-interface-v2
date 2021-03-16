@@ -67,6 +67,42 @@ body {
 }
 
 .dark {
+  .TokenSelectorDrawer {
+    .ant-drawer-header {
+      background: rgba(10, 10, 10, 0.95) !important;
+    }
+
+    .ant-drawer-content {
+      background: rgba(10, 10, 10, 0.95) !important;
+
+      &::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 1px;
+        width: 100%;
+        animation: flash 6s infinite alternate-reverse;
+        z-index: 10000;
+      }
+      &::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        height: 100%;
+        width: 1px;
+        animation: flash 6s infinite alternate-reverse;
+        z-index: 10000;
+      }
+
+      @media screen and (max-width: 480px) {
+        top: 100px !important;
+        height: calc(100% - 100px) !important;
+      }
+    }
+  }
+
   .ant-layout {
     background: transparent !important;
 

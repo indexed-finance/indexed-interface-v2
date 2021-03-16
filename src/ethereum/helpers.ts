@@ -1,7 +1,6 @@
 import * as balancerMath from "./utils/balancer-math";
 import { BigNumber } from "bignumber.js";
-import { FormattedIndexPool } from "features";
-import { NormalizedPool, PoolTokenUpdate } from "./types.d";
+import { NormalizedPool } from "./types.d";
 import { convert } from "helpers";
 
 export * from "./utils";
@@ -126,7 +125,7 @@ export function calcPoolOutGivenSingleIn(
     inputToken.usedDenorm,
     pool.totalDenorm,
     pool.totalSupply,
-    pool.swapFee
+    pool.swapFee,
   ].map(convert.toBigNumber);
 
   if (tokenAmountIn.eq(0)) {
@@ -157,7 +156,7 @@ export function calcSingleInGivenPoolOut(
     inputToken.usedDenorm,
     pool.totalDenorm,
     pool.totalSupply,
-    pool.swapFee
+    pool.swapFee,
   ].map(convert.toBigNumber);
 
   if (poolAmountOut.eq(0)) {
@@ -173,7 +172,10 @@ export function calcSingleInGivenPoolOut(
     swapFee
   );
   if (tokenAmountIn.isGreaterThan(balanceIn.div(2))) {
-    return { error: "Input must be less than 1/2 the pool's balance.", tokenAmountIn };
+    return {
+      error: "Input must be less than 1/2 the pool's balance.",
+      tokenAmountIn,
+    };
   }
   return { tokenAmountIn };
 }

@@ -35,7 +35,8 @@ export default function RankedToken({ token }: Props) {
             netChangePercent={token.netChangePercent}
             isNegative={token.isNegative}
             kind="small"
-            inline={false}
+            inline={isMobile}
+            centered={isMobile}
           />
         }
         actions={[

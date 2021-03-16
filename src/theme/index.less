@@ -70,6 +70,7 @@ h5.ant-typography {
 body {
   * {
     font-family: "Main", sans-serif;
+    -webkit-overflow-scrolling: smooth;
   }
 }
 
@@ -162,6 +163,10 @@ body {
   width: 100vw;
   height: calc(100vh - @header-height);
   z-index: 1005;
+
+  @media screen and (min-width: 480px) {
+    padding-bottom: 192px !important;
+  }
 }
 
 .dark {

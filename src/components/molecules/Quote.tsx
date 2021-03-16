@@ -1,5 +1,6 @@
 import { HTMLProps } from "react";
 import { Typography } from "antd";
+import { useBreakpoints } from "helpers";
 
 export interface Props extends HTMLProps<HTMLDivElement> {
   symbol?: string;
@@ -19,28 +20,32 @@ export default function Quote({
   netChangePercent,
   isNegative = false,
   inline = false,
+  centered = false,
 }: Props) {
+  const { isMobile } = useBreakpoints();
   const inner = (
     <>
       {symbol && (
         <Typography.Title
-          level={2}
+          level={isMobile ? 4 : 2}
           style={{
             marginTop: 0,
             marginRight: 12,
             marginBottom: 0,
+            justifyContent: centered ? "center" : "left",
           }}
         >
           {symbol}
         </Typography.Title>
       )}
       <Typography.Title
-        level={3}
+        level={isMobile ? 5 : 3}
         style={{
           opacity: 0.75,
           marginTop: 0,
           marginRight: 12,
           marginBottom: 0,
+          justifyContent: centered ? "center" : "left",
         }}
       >
         {price}
@@ -57,5 +62,11 @@ export default function Quote({
     </>
   );
 
-  return inline ? <div className="flex-center">{inner}</div> : inner;
+  return inline || centered ? (
+    <div className={centered ? "perfectly-centered" : "flex-center"}>
+      {inner}
+    </div>
+  ) : (
+    inner
+  );
 }

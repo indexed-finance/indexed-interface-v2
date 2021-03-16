@@ -3,7 +3,7 @@ export default {
   showFaqLink: false,
   useColorThief: false,
   useInternalDocs: false,
-  saveStateAcrossSessions: true,
+  saveStateAcrossSessions: false,
   // showScreenSize: process.env.NODE_ENV === "development",
   showScreenSize: false,
 };
