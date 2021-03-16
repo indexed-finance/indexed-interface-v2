@@ -43,7 +43,7 @@ export default function AppLayout() {
     <>
       <Helmet>
         <body className={theme} />
-        {/* {breakpoints.isMobile && (
+        {breakpoints.isMobile && (
           <>
             <meta
               name="viewport"
@@ -51,7 +51,7 @@ export default function AppLayout() {
         user-scalable=0"
             />
           </>
-        )} */}
+        )}
       </Helmet>
 
       <Layout className="AppLayout">
@@ -69,8 +69,10 @@ export default function AppLayout() {
 
         {breakpoints.lg && (
           <Sider width={300}>
-            {indexPools.length > 0 && (
+            {indexPools.length > 0 ? (
               <QuoteCarousel pools={indexPools as FormattedIndexPool[]} />
+            ) : (
+              <div className="QuotePlaceholder" />
             )}
             <AppMenu />
           </Sider>
