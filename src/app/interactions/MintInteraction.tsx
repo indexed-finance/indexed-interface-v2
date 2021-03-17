@@ -41,7 +41,7 @@ function SingleTokenMintInteraction({ pool }: Props) {
     executeMint,
   } = useSingleTokenMintCallbacks(pool.id);
 
-  useTokenUserDataListener(UNISWAP_ROUTER_ADDRESS, tokenIds);
+  useTokenUserDataListener(pool.id, tokenIds);
 
   const handleChange = useCallback(
     (values: InteractionValues) => {
@@ -223,6 +223,7 @@ function UniswapMintInteraction({ pool }: Props) {
       spender={MINT_ROUTER_ADDRESS}
       onSubmit={handleSubmit}
       onChange={handleChange}
+      defaultInputSymbol={assets[0].symbol}
       defaultOutputSymbol={pool.symbol}
       disableOutputSelect
     />
