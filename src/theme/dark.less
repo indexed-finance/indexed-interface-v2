@@ -1,4 +1,4 @@
-@dark-blue: #89dce3;
+@dark-blue: #14fdf9;
 @dark-blue-transparent: rgba(137, 220, 227, 0.66);
 @dark-pink: #fa79e0;
 @dark-pink-transparent: rgba(250, 121, 224, 0.66);
@@ -25,6 +25,47 @@
   100% {
     background: @dark-blue-transparent;
   }
+}
+
+@keyframes flash-color {
+  0% {
+    color: @dark-pink;
+  }
+  33% {
+    color: @dark-pink-transparent;
+  }
+  50% {
+    color: @light-text;
+  }
+  66% {
+    color: @dark-blue-transparent;
+  }
+  100% {
+    color: @dark-blue;
+  }
+}
+
+@keyframes jumping {
+  0% {
+    font-size: 36px;
+  }
+  50% {
+    font-size: 36px;
+  }
+  100% {
+    font-size: 38px;
+  }
+}
+
+.ScrollableArrow {
+  animation: flash-color 2s ease-in-out infinite alternate-reverse,
+    jumping 0.66s linear infinite;
+  z-index: 9999;
+  opacity: 0.5;
+}
+
+.WalletConnector {
+  animation: flash-color 4s ease-in-out infinite alternate-reverse;
 }
 
 .QuotePlaceholder {
@@ -83,6 +124,12 @@ body {
 }
 
 .dark {
+  .ant-steps-item.ant-steps-item-active {
+    &::before {
+      background: @dark-blue !important;
+    }
+  }
+
   .TokenSelectorDrawer {
     .ant-drawer-header {
       background: rgba(10, 10, 10, 0.95) !important;
@@ -185,6 +232,10 @@ body {
   }
 
   .ant-menu-item-selected {
+    color: @dark-blue !important;
+  }
+
+  .ant-breadcrumb-link {
     color: @dark-blue !important;
   }
 }

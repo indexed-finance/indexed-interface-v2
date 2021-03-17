@@ -21,7 +21,12 @@ export default function ScreenHeader(props: Props) {
         direction={isMobile ? "vertical" : "horizontal"}
         style={{ padding: 0 }}
       >
-        <Typography.Title className="ScreenHeader">{title}</Typography.Title>
+        <Typography.Title
+          className="ScreenHeader fancy"
+          level={isMobile ? 3 : 1}
+        >
+          {title}
+        </Typography.Title>
         {(props.overlay || props.activeBreadcrumb) && (
           <Breadcrumb style={{ fontSize: isMobile ? 14 : 16 }}>
             <Breadcrumb.Item overlay={props.overlay}>

@@ -7,6 +7,7 @@ import { formatDistance } from "date-fns";
 import { indexPoolsSelectors } from "./indexPools";
 import { pairsSelectors } from "./pairs";
 import { settingsSelectors } from "./settings";
+import { toFormattedAsset } from "ethereum/utils";
 import { tokensSelectors } from "./tokens";
 import { userSelectors } from "./user";
 import S from "string";
@@ -208,46 +209,7 @@ const selectors = {
             const token = tokens[poolTokenId];
 
             if (category && token) {
-              const categoryToken = category.tokens.entities[token.id];
-              const coingeckoData = token.priceData || {};
-              const { balance } = pool.tokens.entities[token.id];
-              const parsedBalance = parseFloat(balance.replace(/,/g, ""));
-              const balanceUsd = coingeckoData.price
-                ? convert.toBalance(
-                    (coingeckoData.price * parsedBalance).toString()
-                  )
-                : null;
-              const tokenWeight = tokenWeights[token.id];
-              const weightPercentage = tokenWeight
-                ? convert.toPercent(parseFloat(convert.toBalance(tokenWeight)))
-                : "-";
-
-              return {
-                id: token.id,
-                symbol: token.symbol,
-                name: categoryToken?.name ?? "",
-                balance: convert.toBalance(balance),
-                balanceUsd,
-                price: coingeckoData.price
-                  ? convert.toCurrency(coingeckoData.price)
-                  : "-",
-                netChange: coingeckoData.change24Hours
-                  ? convert.toCurrency(
-                      coingeckoData.change24Hours,
-                      withDisplayedSigns
-                    )
-                  : "-",
-                netChangePercent: coingeckoData.percentChange24Hours
-                  ? convert.toPercent(
-                      coingeckoData.percentChange24Hours / 100,
-                      withDisplayedSigns
-                    )
-                  : "-",
-                isNegative: Boolean(
-                  coingeckoData.change24Hours && coingeckoData.change24Hours < 0
-                ),
-                weightPercentage,
-              };
+              return toFormattedAsset(category, token, pool, tokenWeights);
             } else {
               return {
                 id: "",

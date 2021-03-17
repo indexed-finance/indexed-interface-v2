@@ -8,7 +8,7 @@ import flags from "feature-flags";
 
 const { Step } = Steps;
 const STEP_COUNT = 3;
-const STEP_PROGRESSION_DURATION = 2500;
+const STEP_PROGRESSION_DURATION = 7500;
 
 export default function Splash() {
   const { isMobile } = useBreakpoints();

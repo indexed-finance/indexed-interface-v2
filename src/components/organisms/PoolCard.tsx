@@ -1,9 +1,9 @@
-import { Avatar, Card, Space, Typography } from "antd";
 import { FormattedIndexPool } from "features";
 import { Quote } from "components/molecules";
-import { Token } from "components/atoms";
+import { Space } from "antd";
 import { useBreakpoints } from "helpers";
 import { useHistory } from "react-router-dom";
+import ListCard from "./ListCard";
 import RankedToken from "./RankedToken";
 
 export interface Props {
@@ -11,73 +11,32 @@ export interface Props {
 }
 
 export default function PoolCard({ pool }: Props) {
-  const { assets, name, id, slug } = pool;
+  const { assets, category, name, slug } = pool;
   const history = useHistory();
   const { isMobile } = useBreakpoints();
 
   return (
-    <Card
+    <ListCard
       onClick={() => history.push(`/pools/${slug}`)}
-      key={id}
-      hoverable={true}
-      title={
-        <Space
-          align="start"
-          className="spaced-between"
-          direction={isMobile ? "vertical" : "horizontal"}
-          style={{ width: "100%", textAlign: isMobile ? "center" : "left" }}
-        >
-          <div>
-            <Typography.Title
-              type="secondary"
-              level={isMobile ? 5 : 3}
-              style={{
-                marginBottom: 0,
-              }}
-            >
-              {pool.category}
-            </Typography.Title>
-            <Typography.Title
-              level={isMobile ? 5 : 2}
-              style={{
-                marginTop: 0,
-              }}
-            >
-              {name}
-            </Typography.Title>
-          </div>
-          <Quote
-            price={pool.priceUsd}
-            netChange={pool.netChange}
-            netChangePercent={pool.netChangePercent}
-            isNegative={false}
-            centered={false}
-            inline={isMobile}
-          />
-        </Space>
+      assets={assets}
+      title={name}
+      subtitle={category}
+      extra={
+        <Quote
+          price={pool.priceUsd}
+          netChange={pool.netChange}
+          netChangePercent={pool.netChangePercent}
+          isNegative={false}
+          centered={false}
+          inline={isMobile}
+        />
       }
-      actions={[
-        <Avatar.Group
-          maxCount={isMobile ? 6 : 20}
-          style={{ paddingLeft: "1rem", paddingRight: "1rem" }}
-        >
-          {assets.map((token, index) => [
-            <Token
-              key={index}
-              address={token.id}
-              name={token.symbol}
-              image={token.symbol}
-              size={isMobile ? "small" : "medium"}
-            />,
-          ])}
-        </Avatar.Group>,
-      ]}
     >
       <Space align="start" className="RankedTokenWrapper">
         {pool.assets.map((token, index) => (
           <RankedToken key={token.symbol} rank={index + 1} token={token} />
         ))}
       </Space>
-    </Card>
+    </ListCard>
   );
 }

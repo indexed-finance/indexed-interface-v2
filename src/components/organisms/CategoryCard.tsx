@@ -1,7 +1,9 @@
-import { Avatar, Card, List, Typography } from "antd";
+import { AppState, selectors } from "features";
 import { Link, useHistory } from "react-router-dom";
-import { Token } from "components/atoms";
-import { useBreakpoints } from "helpers";
+import { List, Typography } from "antd";
+import { toFormattedAsset } from "ethereum";
+import { useSelector } from "react-redux";
+import ListCard from "./ListCard";
 import type { Token as TokenType } from "indexed-types";
 
 export interface Props {
@@ -34,49 +36,38 @@ export default function CategoryCard({
     entities: {},
   },
 }: Props) {
+  const category = useSelector((state: AppState) =>
+    selectors.selectCategory(state, id)
+  );
+  const tokenLookup = useSelector(selectors.selectTokenLookup);
   const history = useHistory();
-  const breakpoints = useBreakpoints();
-  const tokenImages = [
-    <Avatar.Group
-      key="1"
-      maxCount={breakpoints.isMobile ? 6 : 20}
-      style={{ paddingLeft: "1rem", paddingRight: "1rem" }}
-    >
-      {Object.values(tokens.entities).map((token) => (
-        <Token
-          key={token.symbol}
-          address={token.id}
-          name={token.name}
-          image={token.symbol}
-          size={breakpoints.isMobile ? "small" : "medium"}
-        />
-      ))}
-    </Avatar.Group>,
-  ];
 
   return (
-    <Card
-      key={id}
-      hoverable={true}
-      title={<Typography.Title level={2}>{name}</Typography.Title>}
-      actions={tokenImages}
+    <ListCard
+      onClick={() => history.push(`/categories/${slug}`)}
+      assets={
+        category
+          ? tokens.ids
+              .map((id) => tokenLookup[id])
+              .filter(Boolean)
+              .map((token) => toFormattedAsset(category, token!))
+          : []
+      }
+      title={name}
+      subtitle={symbol}
     >
-      <div onClick={() => history.push(`/categories/${slug}`)}>
-        {brief}
-        <List
-          header={
-            <Typography.Text type="secondary">Index Pools</Typography.Text>
-          }
-        >
-          {indexPools.map((indexPool) => (
-            <List.Item key={indexPool.name}>
-              <Link to={`/pools/${indexPool.slug}`}>
-                {indexPool.name} [{indexPool.symbol}]
-              </Link>
-            </List.Item>
-          ))}
-        </List>
-      </div>
-    </Card>
+      {brief}
+      <List
+        header={<Typography.Text type="secondary">Index Pools</Typography.Text>}
+      >
+        {indexPools.map((indexPool) => (
+          <List.Item key={indexPool.name}>
+            <Link to={`/pools/${indexPool.slug}`}>
+              {indexPool.name} [{indexPool.symbol}]
+            </Link>
+          </List.Item>
+        ))}
+      </List>
+    </ListCard>
   );
 }

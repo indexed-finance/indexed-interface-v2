@@ -1,13 +1,14 @@
+import { FormattedIndexPool } from "features";
 import { MIN_WEIGHT } from "./balancer-math";
-import { dedupe } from "helpers";
-
 import {
+  NormalizedCategory,
   NormalizedEntity,
   NormalizedInitialData,
+  NormalizedPool,
   NormalizedToken,
   PoolTokenUpdate,
 } from "ethereum/types.d";
-
+import { convert, dedupe } from "helpers";
 import type { Category, PoolUnderlyingToken, Token } from "indexed-types";
 
 export function normalizeInitialData(categories: Category[]) {
@@ -107,8 +108,8 @@ export function normalizeInitialData(categories: Category[]) {
             name: indexPool.name,
             symbol: indexPool.symbol,
             decimals: 18,
-            coingeckoId: ""
-          }
+            coingeckoId: "",
+          };
         }
       }
 
@@ -141,4 +142,63 @@ export function normalizeInitialData(categories: Category[]) {
       },
     } as NormalizedInitialData
   );
+}
+
+export function toFormattedAsset(
+  category: NormalizedCategory,
+  token: NormalizedToken,
+  pool?: NormalizedPool,
+  poolTokenWeights?: Record<string, string>
+): FormattedIndexPool["assets"][0] {
+  const categoryToken = category.tokens.entities[token.id];
+  const coingeckoData = token.priceData || {};
+  const withDisplayedSigns = { signDisplay: "always" };
+
+  let balance = "";
+  let balanceUsd = "";
+  let weightPercentage = "-";
+
+  if (pool) {
+    balance = pool.tokens.entities[token.id].balance;
+    const parsedBalance = parseFloat(balance.replace(/,/g, ""));
+    balance = convert.toBalance(balance);
+
+    if (coingeckoData.price) {
+      balanceUsd = convert.toBalance(
+        (coingeckoData.price * parsedBalance).toString()
+      );
+    }
+
+    if (poolTokenWeights) {
+      const tokenWeight = poolTokenWeights[token.id];
+
+      if (tokenWeight) {
+        weightPercentage = convert.toPercent(
+          parseFloat(convert.toBalance(tokenWeight))
+        );
+      }
+    }
+  }
+
+  return {
+    id: token.id,
+    symbol: token.symbol,
+    name: categoryToken?.name ?? "",
+    balance,
+    balanceUsd,
+    price: coingeckoData.price ? convert.toCurrency(coingeckoData.price) : "-",
+    netChange: coingeckoData.change24Hours
+      ? convert.toCurrency(coingeckoData.change24Hours, withDisplayedSigns)
+      : "-",
+    netChangePercent: coingeckoData.percentChange24Hours
+      ? convert.toPercent(
+          coingeckoData.percentChange24Hours / 100,
+          withDisplayedSigns
+        )
+      : "-",
+    isNegative: Boolean(
+      coingeckoData.change24Hours && coingeckoData.change24Hours < 0
+    ),
+    weightPercentage,
+  };
 }
