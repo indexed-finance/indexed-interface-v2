@@ -21,6 +21,7 @@ interface Props {
   disableOutputSelect?: boolean;
   defaultInputSymbol?: string;
   defaultOutputSymbol?: string;
+  requiresApproval?: boolean;
   onSubmit(values: InteractionValues): void;
   onChange(values: InteractionValues): void | string;
 }
@@ -51,7 +52,8 @@ export default function BaseInteraction({
   defaultInputSymbol,
   defaultOutputSymbol,
   disableInputSelect,
-  disableOutputSelect
+  disableOutputSelect,
+  requiresApproval = true
 }: Props) {
   const interactionRef = useRef<null | HTMLDivElement>(null);
   const interactionParent = interactionRef.current ?? false;
@@ -92,6 +94,7 @@ export default function BaseInteraction({
               defaultOutputSymbol={defaultOutputSymbol}
               disableInputSelect={disableInputSelect}
               disableOutputSelect={disableOutputSelect}
+              requiresApproval={requiresApproval}
             />
           </>
         )}
@@ -120,7 +123,8 @@ function InteractionInner({
   defaultInputSymbol,
   defaultOutputSymbol,
   disableInputSelect,
-  disableOutputSelect
+  disableOutputSelect,
+  requiresApproval
 }: InnerProps) {
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
   const [tokenId, exactAmountIn] = useMemo(() => {
@@ -257,7 +261,7 @@ function InteractionInner({
 
       {extra}
 
-      {status === "approval needed" ? (
+      {(requiresApproval && status === "approval needed") ? (
         <Button
           type="primary"
           style={{ width: "100%" }}
@@ -270,7 +274,7 @@ function InteractionInner({
         <Button
           type="primary"
           style={{ width: "100%" }}
-          disabled={!isValid || status === "unknown"}
+          disabled={!isValid || (requiresApproval && status === "unknown")}
           onClick={() => handleSubmit()}
         >
           Send
