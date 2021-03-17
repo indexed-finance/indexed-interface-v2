@@ -7,9 +7,9 @@ import { batcherActions } from "./batcher";
 import { categoriesActions } from "./categories";
 import { convert } from "helpers";
 import { ethers, providers } from "ethers";
+import { exitswapExternAmountOut, exitswapPoolAmountIn, joinswapExternAmountIn, joinswapPoolAmountOut } from "ethereum/transactions";
 import { helpers } from "ethereum";
 import { indexPoolsActions } from "./indexPools";
-import { joinswapExternAmountIn, joinswapPoolAmountOut } from "ethereum/transactions";
 import { multicall, taskHandlersByKind } from "ethereum/multicall";
 import { settingsActions } from "./settings";
 import { tokensActions } from "./tokens";
@@ -273,6 +273,26 @@ export const thunks = {
   ): AppThunk => async () => {
     if (signer) {
       await joinswapPoolAmountOut(signer, indexPool, tokenIn, poolAmountOut, maxAmountIn);
+    }
+  },
+  exitswapPoolAmountIn: (
+    indexPool: string,
+    tokenOut: string,
+    poolAmountIn: BigNumber,
+    minAmountOut: BigNumber
+  ): AppThunk => async () => {
+    if (signer) {
+      await exitswapPoolAmountIn(signer, indexPool, tokenOut, poolAmountIn, minAmountOut);
+    }
+  },
+  exitswapExternAmountOut: (
+    indexPool: string,
+    tokenOut: string,
+    tokenAmountOut: BigNumber,
+    maxPoolAmountIn: BigNumber
+  ): AppThunk => async () => {
+    if (signer) {
+      await exitswapExternAmountOut(signer, indexPool, tokenOut, tokenAmountOut, maxPoolAmountIn);
     }
   },
   swapExactAmountIn: (
