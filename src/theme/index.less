@@ -138,7 +138,7 @@ body {
   top: 0;
   left: 0;
   width: 100vw;
-  z-index: 1004;
+  z-index: 10010;
   border-bottom: 1px solid rgba(204, 204, 255, 0.2);
   padding-left: 12px !important;
   padding-right: 12px !important;
@@ -155,7 +155,7 @@ body {
 
 .AppMenuWrapper {
   position: fixed;
-  top: @header-height;
+  top: 100px;
   left: 0;
   width: 100vw;
   height: calc(100vh - @header-height);
@@ -203,7 +203,7 @@ body {
     position: relative;
     max-width: 1240px;
     min-height: 100vh;
-    margin: 8rem auto 0 auto;
+    margin: 8rem auto 0 10rem;
     padding: @spacing-small;
 
     @media screen and (min-width: 480px) {
@@ -280,6 +280,7 @@ body {
   &:extend(.perfectly-centered);
 
   text-align: center;
+  padding-top: @spacing-small;
   padding-bottom: @spacing-small;
 
   &::after {

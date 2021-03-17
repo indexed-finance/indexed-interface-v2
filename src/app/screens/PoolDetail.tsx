@@ -109,7 +109,6 @@ function Pool({ id }: { id: string }) {
           activeBreadcrumb={<Link to="/pools">Index Pools</Link>}
         />
         {performance}
-
         {(() => {
           switch (true) {
             case breakpoints.xxl:

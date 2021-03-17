@@ -45,21 +45,8 @@
   }
 }
 
-@keyframes jumping {
-  0% {
-    font-size: 36px;
-  }
-  50% {
-    font-size: 36px;
-  }
-  100% {
-    font-size: 38px;
-  }
-}
-
 .ScrollableArrow {
-  animation: flash-color 2s ease-in-out infinite alternate-reverse,
-    jumping 0.66s linear infinite;
+  animation: flash-color 2s ease-in-out infinite alternate-reverse;
   z-index: 9999;
   opacity: 0.5;
 }
@@ -92,9 +79,9 @@
   border-right: 75px solid transparent;
   border-bottom: 75px solid @dark-background;
   border-left: 75px solid transparent;
-  z-index: 99999;
-  top: -13px;
-  left: 224px;
+  z-index: 2000;
+  top: -11px;
+  left: 225px;
   transform: rotate(-45deg);
   pointer-events: none;
 
@@ -105,11 +92,34 @@
 
   &::after {
     content: "";
-    position: absolute;
+    position: fixed;
     bottom: -77px;
     left: -78px;
     width: 152px;
     height: 1px;
+    z-index: 100000;
+    animation: flash 6s infinite alternate-reverse;
+  }
+}
+
+.left-building-wall {
+  position: fixed;
+  top: 110px;
+  width: 126px;
+  height: 100%;
+  z-index: 10000;
+  background: @dark-background;
+  left: 300px;
+  transform: skewX(0deg) skewY(-45deg) perspective(314px) translateX(2px);
+  pointer-events: none;
+
+  &::after {
+    content: "";
+    position: absolute;
+    top: 22px;
+    right: 0;
+    width: 1px;
+    height: 100%;
     z-index: 100000;
     animation: flash 6s infinite alternate-reverse;
   }
@@ -164,6 +174,16 @@ body {
     }
   }
 
+  .ant-switch-handle {
+    &::before {
+      background: darken(@dark-pink, 50) !important;
+    }
+  }
+
+  .ant-notification-notice {
+    background: @dark-background !important;
+  }
+
   .ant-layout {
     background: transparent !important;
 
@@ -176,15 +196,11 @@ body {
         content: "";
         position: absolute;
         bottom: 0;
-        left: 63px;
+        left: 0;
         height: 1px;
-        width: calc(100% - 63px);
+        width: 100%;
         animation: flash 6s infinite alternate-reverse;
-        z-index: 10000;
-
-        @media screen and (min-width: 480px) {
-          left: 405px;
-        }
+        z-index: 20000;
       }
     }
     &-sider {
@@ -194,15 +210,30 @@ body {
         top: 62px;
         background: @dark-background !important;
       }
+
+      &::after {
+        content: "";
+        position: fixed;
+        top: 170px;
+        left: 300px;
+        height: 100%;
+        width: 1px;
+        animation: flash 6s infinite alternate-reverse;
+        z-index: 10000;
+      }
     }
   }
 
-  .ant-progress-circle-path {
-    stroke: @dark-yellow !important;
+  .ant-tabs-tabpane-active {
+    background: @dark-background;
+  }
+
+  .ant-card-body {
+    background: @dark-background;
   }
 
   .ant-switch-inner {
-    color: darken(@dark-blue, 50) !important;
+    color: darken(@dark-pink, 60) !important;
   }
 
   .ant-typography-success {
@@ -231,11 +262,19 @@ body {
     background: transparent !important;
   }
 
-  .ant-menu-item-selected {
+  .ant-menu-item {
     color: @dark-blue !important;
   }
 
   .ant-breadcrumb-link {
     color: @dark-blue !important;
+  }
+
+  .ant-btn-primary:enabled {
+    color: darken(@dark-pink, 90) !important;
+  }
+
+  .ant-input-number-input-wrap {
+    background: @dark-background !important;
   }
 }

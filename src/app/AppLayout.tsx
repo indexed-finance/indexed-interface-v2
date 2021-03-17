@@ -65,6 +65,7 @@ export default function AppLayout() {
         />
 
         <div className="top-left-corner" />
+        <div className="left-building-wall" />
 
         {breakpoints.lg && (
           <Sider width={300}>

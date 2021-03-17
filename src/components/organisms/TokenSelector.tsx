@@ -170,6 +170,7 @@ export default function TokenSelector({
               "-"
             )}
             <InputNumber
+              bordered={false}
               ref={input}
               min={0}
               step="0.01"
@@ -241,7 +242,8 @@ export default function TokenSelector({
           }
           className="TokenSelectorDrawer"
           placement="right"
-          closable={false}
+          closable={true}
+          maskClosable={true}
           visible={selectingToken}
           width={300}
           footer={
