@@ -220,7 +220,7 @@ function UniswapMintInteraction({ pool }: Props) {
     <BaseInteraction
       title="Mint with Uniswap"
       assets={assets.filter(_ => _) as { name: string; symbol: string; id: string }[]}
-      spender={pool.id}
+      spender={MINT_ROUTER_ADDRESS}
       onSubmit={handleSubmit}
       onChange={handleChange}
       defaultOutputSymbol={pool.symbol}
