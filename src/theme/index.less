@@ -205,6 +205,7 @@ body {
     min-height: 100vh;
     margin: 8rem auto 0 10rem;
     padding: @spacing-small;
+    animation: flash-border-sides 6s ease-in-out infinite alternate-reverse;
 
     @media screen and (min-width: 480px) {
       padding: @spacing-large;
@@ -280,8 +281,9 @@ body {
   &:extend(.perfectly-centered);
 
   text-align: center;
-  padding-top: @spacing-small;
-  padding-bottom: @spacing-small;
+  padding-top: 32px;
+  padding-bottom: 32px;
+  padding-left: 16px;
 
   &::after {
     content: "";

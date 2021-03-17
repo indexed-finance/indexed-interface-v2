@@ -30,6 +30,7 @@ export default function QuoteCarousel({ pools }: Props) {
               netChange={filteredPool.netChange}
               netChangePercent={filteredPool.netChangePercent}
               isNegative={isNegative}
+              inline={true}
             />
           </div>
         );
