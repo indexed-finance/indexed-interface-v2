@@ -83,7 +83,7 @@ export const selectors = {
 
     return Object.entries(tokenLookup).reduce((prev, [key, value]) => {
       if (value) {
-        prev[value.symbol] = convert.toBalance(
+        prev[value.symbol.toLowerCase()] = convert.toBalance(
           selectors.selectTokenBalance(state, key)
         );
       }
