@@ -1,9 +1,10 @@
 import { AiOutlineSwap } from "react-icons/ai";
 import { FaCoins, FaFireAlt, FaHammer } from "react-icons/fa";
-import { MintInteraction } from ".";
 import { Tabs } from "antd";
 import { useBreakpoints } from "helpers";
 import { useState } from "react";
+import BurnInteraction from "./BurnInteraction";
+import MintInteraction from "./MintInteraction";
 import SwapInteraction from "./SwapInteraction";
 import TradeInteraction from "./TradeInteraction";
 import type { FormattedIndexPool } from "features";
@@ -75,7 +76,7 @@ export default function PoolInteractions({ pool, initial = "trade" }: Props) {
               </div>
             }
           >
-            {/* <BurnForm /> */}
+            <BurnInteraction pool={pool} />
           </Tabs.TabPane>
         </>
       )}
