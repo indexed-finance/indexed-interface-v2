@@ -49,6 +49,7 @@
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.3",
     "react-transition-group": "^4.4.1",
+    "reselect": "^4.0.0",
     "string": "^3.3.3",
     "use-query-params": "^1.1.9",
     "uuid": "^8.3.2",

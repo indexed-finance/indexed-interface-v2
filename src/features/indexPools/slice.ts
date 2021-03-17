@@ -4,6 +4,7 @@ import { PoolUnderlyingToken } from "indexed-types";
 import { categoriesSelectors } from "../categories";
 import { convert } from "helpers";
 import { createEntityAdapter, createSlice } from "@reduxjs/toolkit";
+import { createSelector } from "reselect";
 import {
   poolTradesAndSwapsLoaded,
   poolUpdated,
@@ -91,7 +92,8 @@ const slice = createSlice({
         const { indexPools } = action.payload;
 
         return indexPools;
-      }),
+  }),
+  
 });
 
 export const { actions } = slice;
@@ -104,13 +106,7 @@ export const selectors = {
     const pool = selectors.selectPool(state, poolId);
     return pool ? formatName(pool.name) : "";
   },
-  selectPoolLookUpByName: (state: AppState) => {
-    const formatName = (from: string) => S(from).camelize().s.toLowerCase();
-    return selectors.selectAllPools(state).reduce((prev, next) => {
-      prev[formatName(next.name)] = next;
-      return prev;
-    }, {} as Record<string, NormalizedPool>);
-  },
+  selectPoolLookUpByName: (state: AppState): Record<string, NormalizedPool> => ({}),
   /**
    * @returns undefined if no pools are loaded yet;
    * pool ID if a pool is found for the provided name;
@@ -139,10 +135,6 @@ export const selectors = {
   selectPoolTokenIds: (state: AppState, poolId: string) => {
     const pool = selectors.selectPool(state, poolId);
     return pool?.tokens.ids ?? [];
-  },
-  selectPoolTokenAddresses: (state: AppState, poolId: string) => {
-    const pool = selectors.selectPool(state, poolId);
-    return pool?.tokens.ids.map((t) => pool.tokens.entities[t].token.id) ?? [];
   },
   selectPoolTokenSymbols: (state: AppState, poolId: string) => {
     const tokenIds = selectors.selectPoolTokenIds(state, poolId);
@@ -188,11 +180,8 @@ export const selectors = {
         prev[next.id] = next.image;
         return prev;
       }, {} as Record<string, string>),
-  selectPoolUnderlyingTokens: (state: AppState, poolId: string) => {
-    return Object.values(
-      state.indexPools.entities[poolId]?.tokens.entities ?? {}
-    );
-  },
+  selectPoolUnderlyingTokens: (state: AppState, poolId: string): (PoolTokenUpdate & PoolUnderlyingToken)[] => [],
+  selectPoolTokenAddresses: (state: AppState, poolId: string) => state.indexPools.entities[poolId.toString()]?.tokens.ids ?? [],
   selectTokenWeights: (state: AppState, poolId: string, tokenIds: string[]) => {
     const pool = selectors.selectPool(state, poolId);
     const weights = tokenIds.reduce((prev, next) => {
@@ -222,6 +211,24 @@ export const selectors = {
     return weights;
   },
 };
+
+selectors.selectPoolLookUpByName = createSelector(
+  [selectors.selectAllPools],
+  (pools) => {
+    const formatName = (from: string) => S(from).camelize().s.toLowerCase();
+    return pools.reduce((prev, next) => {
+      prev[formatName(next.name)] = next;
+      return prev;
+    }, {} as Record<string, NormalizedPool>);
+  }
+);
+
+const selectPoolTokenEntities = (state: AppState, poolId: string) => state.indexPools.entities[poolId.toLowerCase()]?.tokens.entities;
+
+selectors.selectPoolUnderlyingTokens = createSelector(
+  [selectPoolTokenEntities],
+  (tokens) => tokens ? Object.values(tokens) : []
+);
 
 export default slice.reducer;
 

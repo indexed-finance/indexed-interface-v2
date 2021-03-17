@@ -2,7 +2,7 @@ import { BigNumber } from "ethereum/utils/balancer-math";
 import { COMMON_BASE_TOKENS } from "config";
 import { Trade } from "@uniswap/sdk";
 import { convert } from "helpers";
-import { useCallback, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { usePoolTokenAddresses, usePoolUnderlyingTokens } from "features/indexPools/hooks";
 import { useSingleTokenMintCallbacks } from "./use-mint-callbacks";
 import { useTokenLookupBySymbol } from "features/tokens/hooks";
@@ -11,15 +11,12 @@ import useUniswapTradingPairs from "./use-uniswap-trading-pairs";
 export default function useMintRouterCallbacks(poolId: string) {
   const poolTokens = usePoolUnderlyingTokens(poolId);
   const poolTokenIds = usePoolTokenAddresses(poolId);
-  const idsRef = useRef(poolTokenIds);
-  if (JSON.stringify(poolTokenIds) !== JSON.stringify(idsRef.current)) {
-    idsRef.current = poolTokenIds;
-  }
+
   const tokenLookupBySymbol = useTokenLookupBySymbol();
   const tokenIds = useMemo(() => ([
-    ...idsRef.current,
+    ...poolTokenIds,
     ...COMMON_BASE_TOKENS.map(t => t.id)
-  ]), [idsRef]);
+  ]), [poolTokenIds]);
 
   const { calculateAmountIn, calculateAmountOut } = useSingleTokenMintCallbacks(poolId);
   const {
