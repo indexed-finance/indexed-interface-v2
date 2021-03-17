@@ -17,6 +17,8 @@ interface Props {
   assets: Asset[];
   spender: string;
   extra?: ReactNode;
+  disableInputSelect?: boolean;
+  disableOutputSelect?: boolean;
   defaultInputSymbol?: string;
   defaultOutputSymbol?: string;
   onSubmit(values: InteractionValues): void;
@@ -48,6 +50,8 @@ export default function BaseInteraction({
   onChange,
   defaultInputSymbol,
   defaultOutputSymbol,
+  disableInputSelect,
+  disableOutputSelect
 }: Props) {
   const interactionRef = useRef<null | HTMLDivElement>(null);
   const interactionParent = interactionRef.current ?? false;
@@ -86,6 +90,8 @@ export default function BaseInteraction({
               onChange={onChange}
               defaultInputSymbol={defaultInputSymbol}
               defaultOutputSymbol={defaultOutputSymbol}
+              disableInputSelect={disableInputSelect}
+              disableOutputSelect={disableOutputSelect}
             />
           </>
         )}
@@ -113,6 +119,8 @@ function InteractionInner({
   setFieldError,
   defaultInputSymbol,
   defaultOutputSymbol,
+  disableInputSelect,
+  disableOutputSelect
 }: InnerProps) {
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
   const [tokenId, exactAmountIn] = useMemo(() => {
@@ -143,28 +151,32 @@ function InteractionInner({
     return assets.filter((p) => p.symbol !== values.fromToken);
   }, [assets, values.fromToken]);
 
-  const handleFlip = useCallback(() => {
-    const newValues = {
-      fromToken: values.toToken,
-      toToken: values.fromToken,
-      fromAmount: values.toAmount,
-      toAmount: values.fromAmount,
-      lastTouchedField: values.lastTouchedField,
-    };
-    const error = onChange(newValues as InteractionValues);
-    if (error) {
-      const inputErr =
-        error.includes("Input") ||
-        (newValues.lastTouchedField === "from" && !error.includes("Output"));
+  const disableFlip = disableInputSelect || disableOutputSelect;
 
-      if (inputErr) {
-        setFieldError("fromAmount", error);
-      } else {
-        setFieldError("toAmount", error);
+  const handleFlip = useCallback(() => {
+    if (!disableFlip) {
+      const newValues = {
+        fromToken: values.toToken,
+        toToken: values.fromToken,
+        fromAmount: values.toAmount,
+        toAmount: values.fromAmount,
+        lastTouchedField: values.lastTouchedField,
+      };
+      const error = onChange(newValues as InteractionValues);
+      if (error) {
+        const inputErr =
+          error.includes("Input") ||
+          (newValues.lastTouchedField === "from" && !error.includes("Output"));
+  
+        if (inputErr) {
+          setFieldError("fromAmount", error);
+        } else {
+          setFieldError("toAmount", error);
+        }
       }
+      setValues(newValues);
     }
-    setValues(newValues);
-  }, [values, setValues, onChange, setFieldError]);
+  }, [disableFlip, values, setValues, onChange, setFieldError]);
 
   // Effect:
   // On initial load, select two arbitrary tokens.
@@ -189,6 +201,7 @@ function InteractionInner({
           token: values.fromToken,
           amount: values.fromAmount,
         }}
+        selectable={!disableInputSelect}
         onChange={({ token, amount }) => {
           const newValues = {
             ...values,
@@ -208,7 +221,7 @@ function InteractionInner({
         }}
       />
 
-      <Flipper onFlip={handleFlip} />
+      <Flipper disabled={disableFlip} onFlip={handleFlip} />
 
       <TokenSelector
         label="To"
@@ -218,6 +231,7 @@ function InteractionInner({
           token: values.toToken,
           amount: values.toAmount,
         }}
+        selectable={!disableOutputSelect}
         onChange={({ token, amount }) => {
           const newValues = {
             ...values,

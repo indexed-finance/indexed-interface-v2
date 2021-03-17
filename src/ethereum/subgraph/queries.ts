@@ -112,6 +112,7 @@ export const initial = `
           id
           token {
             id
+            symbol
           }
           ready
           balance

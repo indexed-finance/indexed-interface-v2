@@ -1,4 +1,4 @@
-import { Pair, Token, TokenAmount, Trade } from "@uniswap/sdk";
+import { BestTradeOptions, Pair, Token, TokenAmount, Trade } from "@uniswap/sdk";
 import { actions, provider, selectors } from "features";
 import {
   bestTradeExactIn,
@@ -70,7 +70,8 @@ export default function useUniswapTradingPairs(baseTokens: string[]) {
     (
       tokenIn: NormalizedToken,
       tokenOut: NormalizedToken,
-      amountIn: string // Should be formatted as a token amount in base 10 or hex
+      amountIn: string, // Should be formatted as a token amount in base 10 or hex
+      opts?: BestTradeOptions
     ): Trade | undefined => {
       if (provider && !loading) {
         const [bestTrade] = bestTradeExactIn(
@@ -81,7 +82,7 @@ export default function useUniswapTradingPairs(baseTokens: string[]) {
             amountIn
           ) as TokenAmount,
           convert.toUniswapSDKToken(provider, tokenOut) as Token,
-          { maxHops: 3, maxNumResults: 1 }
+          opts ?? { maxHops: 3, maxNumResults: 1 }
         );
 
         return bestTrade;
@@ -94,7 +95,8 @@ export default function useUniswapTradingPairs(baseTokens: string[]) {
     (
       tokenIn: NormalizedToken,
       tokenOut: NormalizedToken,
-      amountOut: string // Should be formatted as a token amount
+      amountOut: string, // Should be formatted as a token amount
+      opts?: BestTradeOptions
     ): Trade | undefined => {
       if (provider && !loading) {
         const [bestTrade] = bestTradeExactOut(
@@ -105,7 +107,7 @@ export default function useUniswapTradingPairs(baseTokens: string[]) {
             tokenOut,
             amountOut
           ) as TokenAmount,
-          { maxHops: 3, maxNumResults: 1 }
+          opts ?? { maxHops: 3, maxNumResults: 1 }
         );
 
         return bestTrade;

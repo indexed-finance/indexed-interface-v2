@@ -42,6 +42,7 @@ export default function TokenSelector({
   assets,
   value = {},
   parent = false,
+  selectable = true,
   onChange,
 }: Props) {
   const tokenField = `${label.toLowerCase()}Token`;
@@ -108,11 +109,13 @@ export default function TokenSelector({
     onAmountChange(relevantBalance);
   }, [onAmountChange, relevantBalance]);
   const handleOpenTokenSelection = useCallback(() => {
-    setSelectingToken(true);
-    setTouched({
-      [tokenField]: true,
-    });
-  }, [setTouched, tokenField]);
+    if (selectable) {
+      setSelectingToken(true);
+      setTouched({
+        [tokenField]: true,
+      });
+    }
+  }, [selectable, setTouched, tokenField]);
   const handleCloseTokenSelection = useCallback(
     () => setSelectingToken(false),
     []
@@ -188,6 +191,7 @@ export default function TokenSelector({
             <div style={{ paddingRight: 15, textAlign: "right" }}>
               <Typography.Text type="secondary">{label}</Typography.Text>
             </div>
+            {}
             <Button
               type={value.token ? "text" : "primary"}
               onClick={handleOpenTokenSelection}
@@ -208,7 +212,7 @@ export default function TokenSelector({
                     Select one
                   </div>
                 )}
-                <AiOutlineCaretDown />
+                {selectable && <AiOutlineCaretDown />}
               </Space>
             </Button>
           </div>
