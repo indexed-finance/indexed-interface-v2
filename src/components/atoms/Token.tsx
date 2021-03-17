@@ -52,6 +52,7 @@ export default function Token({
         width: tokenImageSize,
         height: tokenImageSize,
         marginRight: margin,
+        background: "white",
         ...rest.style,
       }}
     />

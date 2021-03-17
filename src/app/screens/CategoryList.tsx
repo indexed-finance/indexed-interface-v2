@@ -20,9 +20,11 @@ export default function CategoryList({ withBreadcrumb = true }: Props) {
   return (
     <>
       <ScreenHeader title="Categories" {...headerProps} />
-      <Space direction="vertical" size="large" style={{ width: "100%" }}>
+      <Space size="large" style={{ width: "100%" }} wrap={true}>
         {categories.map((category) => (
-          <CategoryCard key={category!.id} {...category!} />
+          <div style={{ flex: "1 1 50%" }}>
+            <CategoryCard key={category!.id} {...category!} />
+          </div>
         ))}
       </Space>
     </>

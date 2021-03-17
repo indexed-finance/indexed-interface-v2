@@ -28,7 +28,7 @@ function Inner() {
   }, [isMobile]);
 
   return (
-    <Parallax bgImage={background} bgImageAlt="background" strength={400}>
+    <Parallax bgImage={background} bgImageAlt="background" strength={200}>
       <BrowserRouter>
         <AppLayout />
       </BrowserRouter>

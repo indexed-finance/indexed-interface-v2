@@ -208,8 +208,8 @@ const selectors = {
           .map((poolTokenId) => {
             const token = tokens[poolTokenId];
 
-            if (category && token) {
-              return toFormattedAsset(category, token, pool, tokenWeights);
+            if (token) {
+              return toFormattedAsset(category!, token, pool, tokenWeights);
             } else {
               return {
                 id: "",

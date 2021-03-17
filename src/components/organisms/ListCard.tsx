@@ -89,6 +89,7 @@ export default function ListCard({
           className="spaced-between"
           direction={isMobile ? "vertical" : "horizontal"}
           style={{ width: "100%", textAlign: isMobile ? "center" : "left" }}
+          wrap={true}
         >
           <div>
             {subtitle && (
@@ -114,24 +115,6 @@ export default function ListCard({
             )}
           </div>
           {extra}
-          <ImArrowLeft
-            className="ScrollableArrow"
-            style={{
-              position: "absolute",
-              left: 30,
-              bottom: 15,
-              visibility: scrollableDirections.left ? "visible" : "hidden",
-            }}
-          />
-          <ImArrowRight
-            className="ScrollableArrow"
-            style={{
-              position: "absolute",
-              right: 30,
-              bottom: 15,
-              visibility: scrollableDirections.right ? "visible" : "hidden",
-            }}
-          />
         </Space>
       }
       actions={[
@@ -154,6 +137,24 @@ export default function ListCard({
         </Avatar.Group>,
       ]}
     >
+      <ImArrowLeft
+        className="ScrollableArrow"
+        style={{
+          position: "absolute",
+          left: 30,
+          bottom: 15,
+          visibility: scrollableDirections.left ? "visible" : "hidden",
+        }}
+      />
+      <ImArrowRight
+        className="ScrollableArrow"
+        style={{
+          position: "absolute",
+          right: 30,
+          bottom: 15,
+          visibility: scrollableDirections.right ? "visible" : "hidden",
+        }}
+      />
       <div ref={tokenWrapper}>{children}</div>
     </Card>
   );
