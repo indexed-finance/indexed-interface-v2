@@ -1,6 +1,6 @@
 import { AppState, FormattedIndexPool, selectors } from "features";
+import { COMMON_BASE_TOKENS, MINT_ROUTER_ADDRESS, SLIPPAGE_RATE, UNISWAP_ROUTER_ADDRESS } from "config";
 import { Fragment, useCallback, useState } from "react";
-import { MINT_ROUTER_ADDRESS, SLIPPAGE_RATE, UNISWAP_ROUTER_ADDRESS } from "config";
 import { Radio } from "antd";
 import { convert } from "helpers";
 import { downwardSlippage, upwardSlippage } from "ethereum";
@@ -149,7 +149,7 @@ function UniswapMintInteraction({ pool }: Props) {
     getBestMintRouteForAmountOut
   } = useMintRouterCallbacks(pool.id);
 
-  const assets = useTokens(tokenIds);
+  const assets = [...COMMON_BASE_TOKENS];
   useTokenUserDataListener(MINT_ROUTER_ADDRESS, tokenIds);
 
   const handleChange = useCallback(
