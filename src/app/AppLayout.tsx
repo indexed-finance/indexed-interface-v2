@@ -87,6 +87,9 @@ export default function AppLayout() {
 
         <Content style={{ paddingRight: 10, paddingLeft: 10 }}>
           <div className="Page">
+            <div className="page-top-wall" />
+            <div className="page-side-wall" />
+
             <RouterSwitch>
               {routes.map((route, index) => (
                 <Route key={index} path={route.path} exact={route.exact}>
