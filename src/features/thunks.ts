@@ -188,7 +188,7 @@ export const thunks = {
     getState
   ) => {
     const state = getState();
-    const tokens = selectors.selectPoolUnderlyingTokens(state, poolId);
+    const tokens = selectors.selectPoolTokenAddresses(state, poolId);
 
     return dispatch(
       actions.listenerRegistered({
@@ -196,7 +196,7 @@ export const thunks = {
         kind: "PoolData",
         args: {
           pool: poolId,
-          tokens: tokens.map((t) => t.token.id),
+          tokens,
         },
       })
     );
