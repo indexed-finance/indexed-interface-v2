@@ -179,3 +179,65 @@ export function calcSingleInGivenPoolOut(
   }
   return { tokenAmountIn };
 }
+
+export function calcPoolInGivenSingleOut(
+  pool: NormalizedPool,
+  outputToken: PoolTokenData,
+  tokenAmountOut: BigNumber
+) {
+  const [balanceOut, weightOut, totalWeight, totalSupply, swapFee] = [
+    outputToken.usedBalance,
+    outputToken.usedDenorm,
+    pool.totalDenorm,
+    pool.totalSupply,
+    pool.swapFee,
+  ].map(convert.toBigNumber);
+
+  if (tokenAmountOut.eq(0)) {
+    return { error: "Output can not be zero." };
+  }
+  if (tokenAmountOut.isGreaterThan(balanceOut.div(3))) {
+    return { tokenAmountOut, error: "Output must be less than 1/3 the pool's balance." };
+  }
+
+  const poolAmountIn = balancerMath.calcPoolInGivenSingleOut(
+    balanceOut,
+    weightOut,
+    totalSupply,
+    totalWeight,
+    tokenAmountOut,
+    swapFee
+  );
+  return { poolAmountIn };
+}
+
+export function calcSingleOutGivenPoolIn(
+  pool: NormalizedPool,
+  outputToken: PoolTokenData,
+  poolAmountIn: BigNumber
+) {
+  const [balanceOut, weightOut, totalWeight, totalSupply, swapFee] = [
+    outputToken.usedBalance,
+    outputToken.usedDenorm,
+    pool.totalDenorm,
+    pool.totalSupply,
+    pool.swapFee,
+  ].map(convert.toBigNumber);
+
+  if (poolAmountIn.eq(0)) {
+    return { error: "Input can not be zero." };
+  }
+
+  const tokenAmountOut = balancerMath.calcSingleOutGivenPoolIn(
+    balanceOut,
+    weightOut,
+    totalSupply,
+    totalWeight,
+    poolAmountIn,
+    swapFee
+  );
+  if (tokenAmountOut.isGreaterThan(balanceOut.div(3))) {
+    return { tokenAmountOut, error: "Output must be less than 1/3 the pool's balance." };
+  }
+  return { tokenAmountOut };
+}

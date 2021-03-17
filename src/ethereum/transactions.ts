@@ -48,17 +48,10 @@ export async function executeUniswapTrade(
     recipient: userAddress,
     deadline
   });
-  const gas = await contract.estimateGas[methodName](...args, { value });
 
-  return contract[methodName](...args, {
-    value,
-    gasLimit: calculateGasMargin(gas.toString())
-  });
+  return contract[methodName](...args, { value });
 }
 
-/**
- *
- */
 export async function swapExactAmountIn(
   signer: JsonRpcSigner,
   poolAddress: string,
@@ -69,7 +62,6 @@ export async function swapExactAmountIn(
   maximumPrice: BigNumber
 ) {
   const contract = new Contract(poolAddress, IPool, signer);
-  const gasPrice = await contract.signer.getGasPrice();
   const args = [
     inputTokenAddress,
     convert.toHex(amountIn),
@@ -77,17 +69,9 @@ export async function swapExactAmountIn(
     convert.toHex(minimumAmountOut),
     convert.toHex(maximumPrice),
   ];
-  const gasLimit = await contract.estimateGas.swapExactAmountIn(...args);
-
-  return contract.swapExactAmountIn(...args, {
-    gasPrice,
-    gasLimit,
-  });
+  return contract.swapExactAmountIn(...args);
 }
 
-/**
- *
- */
 export async function swapExactAmountOut(
   signer: JsonRpcSigner,
   poolAddress: string,
@@ -98,7 +82,6 @@ export async function swapExactAmountOut(
   maximumPrice: BigNumber
 ) {
   const contract = new Contract(poolAddress, IPool, signer);
-  const gasPrice = await contract.signer.getGasPrice();
   const args = [
     inputTokenAddress,
     convert.toHex(maxAmountIn),
@@ -106,12 +89,8 @@ export async function swapExactAmountOut(
     convert.toHex(amountOut),
     convert.toHex(maximumPrice),
   ];
-  const gasLimit = await contract.estimateGas.swapExactAmountOut(...args);
 
-  return contract.swapExactAmountOut(...args, {
-    gasPrice,
-    gasLimit,
-  });
+  return contract.swapExactAmountOut(...args);
 }
 
 export async function joinswapExternAmountIn(
@@ -122,18 +101,12 @@ export async function joinswapExternAmountIn(
   minPoolAmountOut: BigNumber
 ) {
   const contract = new Contract(poolAddress, IPool, signer);
-  const gasPrice = await contract.signer.getGasPrice();
   const args = [
     inputTokenAddress,
     convert.toHex(tokenAmountIn),
     convert.toHex(minPoolAmountOut),
   ];
-  const gasLimit = await contract.estimateGas.joinswapExternAmountIn(...args);
-
-  return contract.joinswapExternAmountIn(...args, {
-    gasPrice,
-    gasLimit,
-  });
+  return contract.joinswapExternAmountIn(...args);
 }
 
 export async function joinswapPoolAmountOut(
@@ -144,16 +117,42 @@ export async function joinswapPoolAmountOut(
   maxAmountIn: BigNumber
 ) {
   const contract = new Contract(poolAddress, IPool, signer);
-  const gasPrice = await contract.signer.getGasPrice();
   const args = [
     inputTokenAddress,
     convert.toHex(poolAmountOut),
     convert.toHex(maxAmountIn),
   ];
-  const gasLimit = await contract.estimateGas.joinswapPoolAmountOut(...args);
+  return contract.joinswapPoolAmountOut(...args);
+}
 
-  return contract.joinswapPoolAmountOut(...args, {
-    gasPrice,
-    gasLimit,
-  });
+export async function exitswapPoolAmountIn(
+  signer: JsonRpcSigner,
+  poolAddress: string,
+  outputTokenAddress: string,
+  poolAmountIn: BigNumber,
+  minAmountOut: BigNumber
+) {
+  const contract = new Contract(poolAddress, IPool, signer);
+  const args = [
+    outputTokenAddress,
+    convert.toHex(poolAmountIn),
+    convert.toHex(minAmountOut),
+  ];
+  return contract.exitswapPoolAmountIn(...args);
+}
+
+export async function exitswapExternAmountOut(
+  signer: JsonRpcSigner,
+  poolAddress: string,
+  outputTokenAddress: string,
+  tokenAmountOut: BigNumber,
+  maxPoolAmountIn: BigNumber
+) {
+  const contract = new Contract(poolAddress, IPool, signer);
+  const args = [
+    outputTokenAddress,
+    convert.toHex(tokenAmountOut),
+    convert.toHex(maxPoolAmountIn),
+  ];
+  return contract.exitswapExternAmountOut(...args);
 }
