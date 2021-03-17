@@ -72,28 +72,19 @@ export default function useMintRouterCallbacks(poolId: string) {
   const getBestMintRouteForAmountIn = useCallback((tokenInSymbol: string, typedTokenAmountIn: string) => {
     const normalizedInput = tokenLookupBySymbol[tokenInSymbol.toLowerCase()];
     const exactAmountIn = convert.toToken(typedTokenAmountIn, normalizedInput.decimals).toString(10);
-    console.log(`Comparing tokens...`);
-    const timesUni: number[] = [];
-    const timesPool: number[] = [];
 
     const allResults = poolTokens.map((token) => {
       const normalizedOutput = tokenLookupBySymbol[token.token.symbol.toLowerCase()];
       if (!normalizedOutput) return null;
-      const start = Date.now();
       const uniswapResult = calculateBestTradeForExactInput(
         normalizedInput,
         normalizedOutput,
         exactAmountIn,
         { maxHops: 2, maxNumResults: 1 }
       );
-      const end = Date.now();
-      timesUni.push(end - start);
 
       if (uniswapResult) {
-        const start2 = Date.now();
         const poolResult = calculateAmountOut(normalizedOutput.symbol, uniswapResult.outputAmount.toExact());
-        const end2 = Date.now();
-        timesPool.push(end2 - start2);
         if (poolResult) {
           if (poolResult.error) {
             return { poolResult };
@@ -116,15 +107,9 @@ export default function useMintRouterCallbacks(poolId: string) {
       };
       uniswapResult: Trade;
     }>;
-
-    console.log(`Compared tokens!`);
     allResults.sort((a, b) =>
       b.poolResult.poolAmountOut.gt(a.poolResult.poolAmountOut) ? 1 : -1
     );
-    const avgUni = timesUni.reduce((a, b) => a+b, 0) / timesUni.length;
-    const avgPool = timesPool.reduce((a, b) => a+b, 0) / timesPool.length;
-    console.log(`Average UNI time: ${avgUni}`)
-    console.log(`Average Pool time: ${avgPool}`)
     const bestResult = allResults[0];
     return bestResult;
   }, [tokenLookupBySymbol, poolTokens, calculateAmountOut, calculateBestTradeForExactInput]);
