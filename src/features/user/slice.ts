@@ -49,7 +49,7 @@ export const selectors = {
   selectUserAddress(state: AppState) {
     return state.user.address;
   },
-  selectPoolAllowance(state: AppState, poolId: string, tokenId: string) {
+  selectTokenAllowance(state: AppState, poolId: string, tokenId: string) {
     return state.user.allowances[`${poolId}-${tokenId}`.toLowerCase()];
   },
   selectTokenBalance(state: AppState, tokenId: string) {
@@ -64,7 +64,7 @@ export const selectors = {
     const entry = tokensSelectors.selectTokenById(state, tokenId);
 
     if (entry) {
-      const allowance = selectors.selectPoolAllowance(state, spender, tokenId);
+      const allowance = selectors.selectTokenAllowance(state, spender, tokenId);
       if (allowance) {
         const needsApproval = convert
           .toBigNumber(amount)
