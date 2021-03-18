@@ -1,8 +1,8 @@
+import { BuildingWall, QuoteCarousel } from "components";
 import { Button, Layout } from "antd";
 import { CSSTransition } from "react-transition-group";
 import { FormattedIndexPool, actions, selectors } from "features";
 import { Helmet } from "react-helmet";
-import { QuoteCarousel } from "components";
 import { Route, Switch as RouterSwitch } from "react-router-dom";
 import { useBreakpoints } from "helpers";
 import { useCallback, useEffect, useState } from "react";
@@ -65,7 +65,10 @@ export default function AppLayout() {
         />
 
         <div className="top-left-corner" />
-        <div className="left-building-wall" />
+
+        <BuildingWall top={0} left={300} windows={false} zIndex={0} />
+        <BuildingWall top={284} left={300} zIndex={0} />
+        <BuildingWall top={0} right={-220} zIndex={2} />
 
         {breakpoints.lg && (
           <Sider width={300}>
@@ -87,8 +90,12 @@ export default function AppLayout() {
 
         <Content style={{ paddingRight: 10, paddingLeft: 10 }}>
           <div className="Page">
-            <div className="page-top-wall" />
-            <div className="page-side-wall" />
+            {!breakpoints.isMobile && (
+              <>
+                <div className="page-top-wall" />
+                <div className="page-side-wall" />
+              </>
+            )}
 
             <RouterSwitch>
               {routes.map((route, index) => (

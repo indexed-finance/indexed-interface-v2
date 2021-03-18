@@ -148,7 +148,7 @@
   top: 110px;
   width: 126px;
   height: 100%;
-  z-index: 10000;
+  z-index: 1;
   background: @dark-background;
   left: 300px;
   transform: skewX(0deg) skewY(-45deg) perspective(314px) translateX(2px);
@@ -324,7 +324,20 @@ body {
   }
 
   .ant-carousel {
+    position: relative;
     background: transparent !important;
+    height: 110px;
+
+    &::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 1px;
+      z-index: 100001;
+      animation: flash 6s infinite alternate-reverse;
+    }
   }
 
   .ant-menu-item {
@@ -341,5 +354,27 @@ body {
 
   .ant-input-number-input-wrap {
     background: @dark-background !important;
+  }
+}
+
+.BuildingWall {
+  position: absolute;
+  width: 300px;
+  height: 100%;
+  background: @dark-background;
+  animation: flash-border-sides 6s linear infinite alternate-reverse;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-evenly;
+  flex-wrap: wrap;
+  transform: skewY(-45deg);
+  z-index: 2;
+
+  .Window {
+    width: 25%;
+    height: 50px;
+    perspective: 300px;
+    margin: 5px 0;
+    animation: flash 6s infinite alternate-reverse;
   }
 }

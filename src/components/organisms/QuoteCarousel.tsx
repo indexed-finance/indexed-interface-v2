@@ -12,8 +12,13 @@ export default function QuoteCarousel({ pools }: Props) {
   const history = useHistory();
 
   return (
-    <Carousel effect="fade" autoplay={true} dots={false} className="Carousel">
-      {pools.map((pool) => {
+    <Carousel
+      effect="fade"
+      autoplay={true}
+      dots={false}
+      className="Carousel BuildingQuote"
+    >
+      {[pools[0]].map((pool) => {
         const filteredPool = pool as FormattedIndexPool;
         const isNegative =
           parseFloat(filteredPool.netChangePercent.replace(/%/g, "")) < 0;
@@ -30,7 +35,6 @@ export default function QuoteCarousel({ pools }: Props) {
               netChange={filteredPool.netChange}
               netChangePercent={filteredPool.netChangePercent}
               isNegative={isNegative}
-              inline={true}
             />
           </div>
         );

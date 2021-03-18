@@ -1,3 +1,4 @@
+export { default as BuildingWall } from "./BuildingWall";
 export { default as CategoryCard } from "./CategoryCard";
 export { default as CategoryTable } from "./CategoryTable";
 export { default as ListCard } from "./ListCard";

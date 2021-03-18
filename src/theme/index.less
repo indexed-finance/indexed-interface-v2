@@ -47,7 +47,6 @@ h1.ant-typography {
   }
   &-content-box {
     position: relative;
-    max-height: 800px;
     overflow: auto;
     padding: 0 !important;
   }
@@ -131,6 +130,16 @@ body {
 }
 
 // -- Layout
+.BuildingQuote {
+  position: fixed;
+  top: 100px;
+  width: 120px;
+  left: 300px;
+  z-index: -1;
+  transform: skewX(0deg) skewY(-45deg) scale(1.33) translateX(23px)
+    translateY(23px);
+}
+
 .AppHeader {
   &:extend(.spaced-between, .effect6);
 
@@ -155,7 +164,7 @@ body {
 
 .AppMenuWrapper {
   position: fixed;
-  top: 100px;
+  top: 64px;
   left: 0;
   width: 100vw;
   height: calc(100vh - @header-height);
@@ -163,6 +172,7 @@ body {
 
   @media screen and (min-width: 480px) {
     padding-bottom: 192px !important;
+    top: 100px;
   }
 }
 
@@ -179,6 +189,17 @@ body {
 }
 
 .AppMenu {
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 1px;
+    width: 100%;
+    animation: flash 6s infinite alternate-reverse;
+    z-index: 10000;
+  }
+
   .ant-menu-item,
   .ant-menu-submenu-title {
     &:extend(.fancy);
@@ -205,10 +226,14 @@ body {
     min-height: 100vh;
     margin: 8rem auto 0 10rem;
     padding: @spacing-small;
-    animation: flash-border-sides 6s ease-in-out infinite alternate-reverse;
 
     @media screen and (min-width: 480px) {
       padding: @spacing-large;
+      animation: flash-border-sides 6s ease-in-out infinite alternate-reverse;
+    }
+    @media screen and (max-width: 480px) {
+      margin: unset;
+      margin-top: 8rem;
     }
   }
 }
@@ -281,20 +306,20 @@ body {
   &:extend(.perfectly-centered);
 
   text-align: center;
-  padding-top: 32px;
-  padding-bottom: 32px;
-  padding-left: 16px;
+  // padding-top: 32px;
+  // padding-bottom: 32px;
+  // padding-left: 16px;
 
-  &::after {
-    content: "";
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    height: 1px;
-    width: 100%;
-    animation: flash 6s infinite alternate-reverse;
-    z-index: 10000;
-  }
+  // &::after {
+  //   content: "";
+  //   position: absolute;
+  //   bottom: 0;
+  //   left: 0;
+  //   height: 1px;
+  //   width: 100%;
+  //   animation: flash 6s infinite alternate-reverse;
+  //   z-index: 10000;
+  // }
 }
 
 .Token {
