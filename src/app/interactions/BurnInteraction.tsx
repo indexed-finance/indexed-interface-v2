@@ -1,4 +1,4 @@
-import { AppState, FormattedIndexPool, selectors } from "features";
+import { FormattedIndexPool, selectors } from "features";
 import { Fragment, useCallback, useMemo, useState } from "react";
 import { Radio } from "antd";
 import { SLIPPAGE_RATE } from "config";
@@ -15,29 +15,38 @@ interface Props {
 }
 
 export default function BurnInteraction({ pool }: Props) {
-  const [burnType, setBurnType] = useState<"single" | "uniswap" | "multi">("single");
-  return <Fragment>
-    <Radio.Group value={burnType} onChange={({ target: { value } }) => {setBurnType(value)}}>
-      <Radio.Button value="single">Single Output</Radio.Button>
-      <Radio.Button value="multi">Multi Output</Radio.Button>
-      <Radio.Button value="uniswap">Uniswap</Radio.Button>
-    </Radio.Group>
-    { burnType === "single" && <SingleTokenBurnInteraction pool={pool} /> }
-    {/* { mintType === "uniswap" && <UniswapMintInteraction pool={pool} /> } */}
-  </Fragment>
+  const [burnType, setBurnType] = useState<"single" | "uniswap" | "multi">(
+    "single"
+  );
+  return (
+    <Fragment>
+      <Radio.Group
+        value={burnType}
+        onChange={({ target: { value } }) => {
+          setBurnType(value);
+        }}
+      >
+        <Radio.Button value="single">Single Output</Radio.Button>
+        <Radio.Button value="multi">Multi Output</Radio.Button>
+        <Radio.Button value="uniswap">Uniswap</Radio.Button>
+      </Radio.Group>
+      {burnType === "single" && <SingleTokenBurnInteraction pool={pool} />}
+      {/* { mintType === "uniswap" && <UniswapMintInteraction pool={pool} /> } */}
+    </Fragment>
+  );
 }
 
 function SingleTokenBurnInteraction({ pool }: Props) {
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
   const poolTokenIds = usePoolTokenAddresses(pool.id);
-  const tokenIds = useMemo(() => [
-    ...poolTokenIds,
+  const tokenIds = useMemo(() => [...poolTokenIds, pool.id], [
+    poolTokenIds,
     pool.id,
-  ], [poolTokenIds, pool.id]);
+  ]);
   const {
     calculateAmountIn,
     calculateAmountOut,
-    executeBurn
+    executeBurn,
   } = useSingleTokenBurnCallbacks(pool.id);
 
   useTokenUserDataListener(pool.id, tokenIds);

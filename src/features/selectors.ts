@@ -7,6 +7,7 @@ import { formatDistance } from "date-fns";
 import { indexPoolsSelectors } from "./indexPools";
 import { pairsSelectors } from "./pairs";
 import { settingsSelectors } from "./settings";
+import { stakingSelectors } from "./staking";
 import { toFormattedAsset } from "ethereum/utils";
 import { tokensSelectors } from "./tokens";
 import { userSelectors } from "./user";
@@ -23,6 +24,7 @@ const selectors = {
   ...dailySnapshotsSelectors,
   ...indexPoolsSelectors,
   ...settingsSelectors,
+  ...stakingSelectors,
   ...tokensSelectors,
   ...userSelectors,
   ...pairsSelectors,

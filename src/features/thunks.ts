@@ -7,11 +7,17 @@ import { batcherActions } from "./batcher";
 import { categoriesActions } from "./categories";
 import { convert } from "helpers";
 import { ethers, providers } from "ethers";
-import { exitswapExternAmountOut, exitswapPoolAmountIn, joinswapExternAmountIn, joinswapPoolAmountOut } from "ethereum/transactions";
+import {
+  exitswapExternAmountOut,
+  exitswapPoolAmountIn,
+  joinswapExternAmountIn,
+  joinswapPoolAmountOut,
+} from "ethereum/transactions";
 import { helpers } from "ethereum";
 import { indexPoolsActions } from "./indexPools";
 import { multicall, taskHandlersByKind } from "ethereum/multicall";
 import { settingsActions } from "./settings";
+import { stakingActions } from "./staking";
 import { tokensActions } from "./tokens";
 import { userActions } from "./user";
 import debounce from "lodash.debounce";
@@ -224,6 +230,15 @@ export const thunks = {
       dispatch(actions.poolTradesAndSwapsLoaded({ poolId, trades, swaps }));
     }
   },
+  requestStakingData: (): AppThunk => async (dispatch) => {
+    if (provider) {
+      const { chainId } = provider.network;
+      const url = helpers.getUrl(chainId);
+      const staking = await helpers.queryStaking(url);
+
+      dispatch(actions.stakingDataLoaded(staking));
+    }
+  },
   /**
    * @param spenderAddress - Address of the spender to approve
    * @param tokenAddress - ERC20 token address
@@ -262,7 +277,13 @@ export const thunks = {
     minPoolAmountOut: BigNumber
   ): AppThunk => async () => {
     if (signer) {
-      await joinswapExternAmountIn(signer, indexPool, tokenIn, amountIn, minPoolAmountOut);
+      await joinswapExternAmountIn(
+        signer,
+        indexPool,
+        tokenIn,
+        amountIn,
+        minPoolAmountOut
+      );
     }
   },
   joinswapPoolAmountOut: (
@@ -272,7 +293,13 @@ export const thunks = {
     maxAmountIn: BigNumber
   ): AppThunk => async () => {
     if (signer) {
-      await joinswapPoolAmountOut(signer, indexPool, tokenIn, poolAmountOut, maxAmountIn);
+      await joinswapPoolAmountOut(
+        signer,
+        indexPool,
+        tokenIn,
+        poolAmountOut,
+        maxAmountIn
+      );
     }
   },
   exitswapPoolAmountIn: (
@@ -282,7 +309,13 @@ export const thunks = {
     minAmountOut: BigNumber
   ): AppThunk => async () => {
     if (signer) {
-      await exitswapPoolAmountIn(signer, indexPool, tokenOut, poolAmountIn, minAmountOut);
+      await exitswapPoolAmountIn(
+        signer,
+        indexPool,
+        tokenOut,
+        poolAmountIn,
+        minAmountOut
+      );
     }
   },
   exitswapExternAmountOut: (
@@ -292,7 +325,13 @@ export const thunks = {
     maxPoolAmountIn: BigNumber
   ): AppThunk => async () => {
     if (signer) {
-      await exitswapExternAmountOut(signer, indexPool, tokenOut, tokenAmountOut, maxPoolAmountIn);
+      await exitswapExternAmountOut(
+        signer,
+        indexPool,
+        tokenOut,
+        tokenAmountOut,
+        maxPoolAmountIn
+      );
     }
   },
   swapExactAmountIn: (
@@ -411,6 +450,7 @@ const actions = {
   ...categoriesActions,
   ...indexPoolsActions,
   ...settingsActions,
+  ...stakingActions,
   ...tokensActions,
   ...userActions,
   ...topLevelActions,

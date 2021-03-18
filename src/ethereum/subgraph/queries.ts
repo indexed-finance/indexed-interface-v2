@@ -215,3 +215,23 @@ export const swap = (address: string) => `
       }
   }
 `;
+
+export const staking = `
+{
+  ndxStakingPools(first: 20) {
+    id
+    isWethPair
+    startsAt
+		isReady
+    indexPool
+    stakingToken
+    totalSupply
+    periodFinish
+    lastUpdateTime
+    totalRewards
+    claimedRewards
+    rewardRate
+    rewardPerTokenStored
+  }
+}
+`;

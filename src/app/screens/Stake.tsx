@@ -1,9 +1,13 @@
 import { Button, Space, Statistic, Typography } from "antd";
 import { IndexCard, ScreenHeader } from "components";
 import { Link } from "react-router-dom";
+import { actions } from "features";
 import { useBreakpoints } from "helpers";
+import { useDispatch } from "react-redux";
+import { useEffect, useRef } from "react";
 
 export default function Stake() {
+  const dispatch = useDispatch();
   const stakeable = {
     image: require("assets/images/cc-dark-circular.png").default,
     id: "0x17ac188e09a7890a1844e5e65471fe8b0ccfadf3",
@@ -17,6 +21,17 @@ export default function Stake() {
   };
   const __data = [stakeable, stakeable, stakeable];
   const breakpoints = useBreakpoints();
+  const hasLoadedStakingData = useRef(false);
+
+  // Effect:
+  // It may be the case the provider isn't available on load,
+  // so we will continue to listen to updates until we have it.
+  useEffect(() => {
+    if (!hasLoadedStakingData.current) {
+      dispatch(actions.requestStakingData());
+      hasLoadedStakingData.current = true;
+    }
+  });
 
   return (
     <>

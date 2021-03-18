@@ -1,7 +1,7 @@
 import * as config from "config";
 import * as queries from "./queries";
 import axios from "axios";
-import type { Category, IndexPool, Swap } from "indexed-types";
+import type { Category, IndexPool, NdxStakingPool, Swap } from "indexed-types";
 import type { Swap as Trade } from "uniswap-types";
 
 export function getUrl(chainId: number) {
@@ -61,4 +61,9 @@ export async function querySwaps(
 ): Promise<Swap[]> {
   const { swaps } = await sendQuery(queries.swap(poolAddress), url);
   return swaps;
+}
+
+export async function queryStaking(url: string): Promise<NdxStakingPool[]> {
+  const { ndxStakingPools: staking } = await sendQuery(queries.staking, url);
+  return staking;
 }

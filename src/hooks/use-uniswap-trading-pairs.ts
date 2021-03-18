@@ -1,4 +1,10 @@
-import { BestTradeOptions, Pair, Token, TokenAmount, Trade } from "@uniswap/sdk";
+import {
+  BestTradeOptions,
+  Pair,
+  Token,
+  TokenAmount,
+  Trade,
+} from "@uniswap/sdk";
 import { actions, provider, selectors } from "features";
 import {
   bestTradeExactIn,
@@ -13,7 +19,7 @@ import { useDispatch, useSelector } from "react-redux";
 import type { AppState, FormattedPair } from "features";
 import type { NormalizedToken } from "ethereum/types";
 
-function useUniswapPairs(
+export function useUniswapPairs(
   baseTokens: string[]
 ): [Pair[], false] | [undefined, true] {
   const dispatch = useDispatch();

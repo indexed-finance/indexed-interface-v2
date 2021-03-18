@@ -5,6 +5,7 @@ import { dailySnapshotsReducer } from "./dailySnapshots";
 import { indexPoolsReducer } from "./indexPools";
 import { pairsReducer } from "./pairs";
 import { settingsReducer } from "./settings";
+import { stakingReducer } from "./staking";
 import { tokensReducer } from "./tokens";
 import { userReducer } from "./user";
 
@@ -14,6 +15,7 @@ export default combineReducers({
   dailySnapshots: dailySnapshotsReducer,
   indexPools: indexPoolsReducer,
   settings: settingsReducer,
+  staking: stakingReducer,
   tokens: tokensReducer,
   user: userReducer,
   pairs: pairsReducer,
