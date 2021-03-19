@@ -2,6 +2,7 @@ import { BigNumber } from "@ethersproject/bignumber";
 import { MultiCallTaskHandler, UniswapPairsDataTask } from "./types";
 import { Pair } from "ethereum/abi";
 import { PairReservesUpdate } from "ethereum/types";
+import { dedupe } from "helpers";
 import type { Call, MultiCallResults } from "./types";
 
 function parsePairReservesResults(
@@ -24,9 +25,10 @@ function parsePairReservesResults(
 const UniswapPairsDataTaskHandler: MultiCallTaskHandler<UniswapPairsDataTask> = {
   kind: "UniswapPairsData",
   onlyUniqueTasks: (tasks) => {
-    const allPairs = tasks.reduce((prev, next) => {
+    const allPairs = dedupe(tasks.reduce((prev, next) => {
       return [...prev, ...next.args];
-    }, [] as string[]);
+    }, [] as string[]));
+    if (allPairs.length === 0) return [];
     return [
       {
         id: tasks[0].id,
