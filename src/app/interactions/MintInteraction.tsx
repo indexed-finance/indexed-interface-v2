@@ -139,13 +139,13 @@ function SingleTokenMintInteraction({ pool }: Props) {
   );
 }
 
-
 function UniswapMintInteraction({ pool }: Props) {
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
   const {
     tokenIds,
     getBestMintRouteForAmountIn,
-    getBestMintRouteForAmountOut
+    getBestMintRouteForAmountOut,
+    executeRoutedMint
   } = useMintRouterCallbacks(pool.id);
 
   const assets = [...COMMON_BASE_TOKENS];
@@ -199,7 +199,16 @@ function UniswapMintInteraction({ pool }: Props) {
           if (result.poolResult?.error) {
             return result.poolResult.error;
           } else {
-            values.fromAmount = parseFloat(result.uniswapResult.outputAmount.toFixed(4));
+            const { decimals } = tokenLookup[fromToken.toLowerCase()];
+            values.fromAmount = parseFloat(
+              convert.toBalance(
+                upwardSlippage(
+                  convert.toBigNumber(result.uniswapResult.inputAmount.raw.toString(10)),
+                  SLIPPAGE_RATE
+                ),
+                decimals
+              )
+            );
           }
         }
       }
@@ -209,10 +218,24 @@ function UniswapMintInteraction({ pool }: Props) {
 
   const handleSubmit = useCallback(
     (values: InteractionValues) => {
-      console.log(values)
-
+      const {
+        fromToken,
+        fromAmount,
+        toToken,
+        toAmount,
+        lastTouchedField,
+      } = values;
+      if (fromAmount > 0 && toAmount > 0 && fromToken && toToken) {
+        executeRoutedMint(
+          fromToken,
+          lastTouchedField,
+          lastTouchedField === "from"
+            ? fromAmount.toString()
+            : toAmount.toString()
+        );
+      }
     },
-    []
+    [executeRoutedMint]
   );
 
   return (
