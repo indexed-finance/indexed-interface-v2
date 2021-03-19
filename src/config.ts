@@ -130,6 +130,7 @@ export const UNISWAP_ROUTER_ADDRESS =
 export const WETH_CONTRACT_ADDRESS =
   "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2";
 export const MINT_ROUTER_ADDRESS = "0xfb6ac20d38a1f0c4f90747ca0745e140bc17e4c3";
+export const BURN_ROUTER_ADDRESS = "0x348ab9b021fff6016d3eb07d3171bdef0022cfa8";
 
 export const COMMON_BASE_TOKENS = [
   {
