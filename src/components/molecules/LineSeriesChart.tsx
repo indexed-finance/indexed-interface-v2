@@ -13,17 +13,20 @@ export interface Props {
   data: SeriesDataItem[];
   expanded?: boolean;
   settings: [string, string];
+  onChangeTheme(): void;
 }
 
 export default function LineSeriesChart({
   data,
   expanded = false,
   settings,
+  onChangeTheme,
 }: Props) {
   const theme = useSelector(selectors.selectTheme);
   const cardRef = useRef<null | HTMLDivElement>(null);
   const [chart, setChart] = useState<IChartApi | null>(null);
   const [series, setSeries] = useState<ISeriesApi<"Line"> | null>(null);
+  const lastTheme = useRef<string>(theme);
 
   useEffect(() => {
     const [timeframe, key] = settings;
@@ -45,21 +48,14 @@ export default function LineSeriesChart({
 
       const chart_ = createChart(cardRef.current, size);
       setChart(chart_);
+
       const options = CHART_MODES[theme];
       const lineSeries = chart_.addLineSeries({
-        color: "#ECC321",
+        color: theme === "outrun" ? "#ECC321" : "#187DDC",
       });
-      chart_.applyOptions({
-        ...options,
-        watermark: {
-          color: "#ECC321",
-          visible: true,
-          text: ``,
-          fontSize: 18,
-          horzAlign: "left",
-          vertAlign: "top",
-        },
-      });
+
+      chart_.applyOptions(options as any);
+
       setSeries(lineSeries);
       setTimeout(() => {
         if (cardRef.current) {
@@ -68,7 +64,7 @@ export default function LineSeriesChart({
             cardRef.current.clientHeight
           );
         }
-      }, 250);
+      }, 0);
     }
   }, [expanded, theme, series]);
 
@@ -82,8 +78,10 @@ export default function LineSeriesChart({
     if (cardRef.current && chart) {
       const [width, height] = expanded ? [1200, 500] : [400, 300];
       const options = CHART_MODES[theme];
+
       chart.resize(width, height);
-      chart.applyOptions(options);
+      chart.applyOptions(options as any);
+
       setTimeout(() => {
         if (cardRef.current) {
           chart.resize(
@@ -91,9 +89,15 @@ export default function LineSeriesChart({
             cardRef.current.clientHeight
           );
         }
-      }, 250);
+      }, 0);
     }
   }, [expanded, theme, chart]);
+
+  useEffect(() => {
+    if (theme !== lastTheme.current) {
+      onChangeTheme();
+    }
+  }, [theme, onChangeTheme]);
 
   return <div ref={cardRef} />;
 }
@@ -102,46 +106,31 @@ const COMMON_LAYOUT_OPTIONS = {
   fontFamily: "sans-serif",
   fontSize: 16,
 };
+
+const COMMON_WATERMARK_OPTIONS = {
+  visible: true,
+  fontSize: 18,
+  horzAlign: "left",
+  vertAlign: "top",
+};
+
 const CHART_MODES = {
   dark: {
     layout: {
       ...COMMON_LAYOUT_OPTIONS,
       backgroundColor: "#0A0A0A",
-      textColor: "#89dce3",
+      textColor: "#fafafa",
     },
-    priceScale: {
-      borderColor: "#ECC321",
-    },
-    crosshair: {
-      vertLine: {
-        color: "#ECC321",
-      },
-      horzLine: {
-        color: "#ECC321",
-      },
-    },
-    grid: {
-      vertLines: {
-        color: "#fa79e0",
-      },
-      horzLines: {
-        color: "#fa79e0",
-      },
+    watermark: {
+      ...COMMON_WATERMARK_OPTIONS,
     },
   },
   light: {
     layout: {
       ...COMMON_LAYOUT_OPTIONS,
-      backgroundColor: "white",
-      textColor: "black",
     },
-    grid: {
-      vertLines: {
-        color: "purple",
-      },
-      horzLines: {
-        color: "purple",
-      },
+    watermark: {
+      ...COMMON_WATERMARK_OPTIONS,
     },
   },
   outrun: {
@@ -168,6 +157,10 @@ const CHART_MODES = {
       horzLines: {
         color: "#fa79e0",
       },
+    },
+    watermark: {
+      ...COMMON_WATERMARK_OPTIONS,
+      color: "#ECC321",
     },
   },
 };

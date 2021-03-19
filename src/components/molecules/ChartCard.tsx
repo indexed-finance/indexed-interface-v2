@@ -36,6 +36,11 @@ export default function ChartCard({ poolId, expanded = false }: Props) {
     []
   );
   const { isMobile } = useBreakpoints();
+  const [rerendering, setRerendering] = useState(false);
+  const handleRerenderChart = useCallback(() => {
+    setRerendering(true);
+    setTimeout(() => setRerendering(false), 0);
+  }, []);
   const timeframeAction = (
     <>
       <Typography.Paragraph
@@ -129,7 +134,14 @@ export default function ChartCard({ poolId, expanded = false }: Props) {
       bodyStyle={{ padding: 0, height: 300 }}
       actions={actions}
     >
-      <LineSeriesChart data={data} expanded={expanded} settings={settings} />
+      {!rerendering && (
+        <LineSeriesChart
+          data={data}
+          expanded={expanded}
+          settings={settings}
+          onChangeTheme={handleRerenderChart}
+        />
+      )}
     </Card>
   );
 }

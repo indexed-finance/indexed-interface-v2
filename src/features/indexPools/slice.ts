@@ -1,10 +1,6 @@
-import { DEFAULT_DECIMAL_COUNT } from "config";
 import { NormalizedPool, PoolTokenUpdate } from "ethereum";
 import { PoolUnderlyingToken } from "indexed-types";
-import { categoriesSelectors } from "../categories";
-import { convert } from "helpers";
 import { createEntityAdapter, createSlice } from "@reduxjs/toolkit";
-import { createSelector } from "reselect";
 import {
   poolTradesAndSwapsLoaded,
   poolUpdated,
@@ -12,9 +8,7 @@ import {
   receivedStatePatchFromServer,
   subgraphDataLoaded,
 } from "features/actions";
-import { tokensSelectors } from "features/tokens";
 import S from "string";
-import type { AppState } from "features/store";
 
 export const adapter = createEntityAdapter<NormalizedPool>();
 
