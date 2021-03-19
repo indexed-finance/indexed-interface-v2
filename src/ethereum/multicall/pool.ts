@@ -143,8 +143,6 @@ const PoolDataTaskHandler: MultiCallTaskHandler<PoolDataTask> = {
 
       if (pool) {
         dispatch(actions.poolUpdated({ pool: _pool, update }));
-        dispatch(actions.retrieveCoingeckoData(pool));
-        dispatch(actions.requestPoolTradesAndSwaps(pool));
       }
     }
   },
