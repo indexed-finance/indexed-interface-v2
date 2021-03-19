@@ -27,6 +27,7 @@ export default function PoolInteractions({ pool, initial = "trade" }: Props) {
       centered={isMobile}
       tabPosition={isMobile ? "top" : "right"}
       activeKey={interaction}
+      destroyInactiveTabPane
       onChange={(nextInteraction) => {
         const next = nextInteraction as PoolInteraction;
         setInteraction(next);
