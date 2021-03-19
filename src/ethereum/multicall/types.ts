@@ -74,4 +74,5 @@ export interface TotalSuppliesTask extends MultiCallTask<string[]> {
 export type MultiCallTaskConfig =
   | UniswapPairsDataTask
   | TokenUserDataTask
-  | PoolDataTask;
+  | PoolDataTask
+  | TotalSuppliesTask;
