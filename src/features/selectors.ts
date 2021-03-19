@@ -143,7 +143,7 @@ const selectors = {
         const withDisplayedSigns = { signDisplay: "always" };
   
         return {
-          category: "",
+          category: pool.category.id,
           canStake: false,
           id: pool.id,
           symbol: pool.symbol,
