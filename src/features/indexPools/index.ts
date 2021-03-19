@@ -1,5 +1,5 @@
 export {
   actions as indexPoolsActions,
-  selectors as indexPoolsSelectors,
   default as indexPoolsReducer,
 } from "./slice";
+export { default as indexPoolsSelectors } from "./selectors";

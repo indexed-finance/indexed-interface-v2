@@ -1,6 +1,6 @@
 import { AppState } from "features/store";
-import { selectors } from "./slice";
 import { useSelector } from "react-redux";
+import selectors from "./selectors";
 
 export const usePool = (poolId: string) => useSelector(
   (state: AppState) => selectors.selectPool(state, poolId)
