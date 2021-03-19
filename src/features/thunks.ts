@@ -374,6 +374,70 @@ export const thunks = {
       );
     }
   },
+  swapTokensForTokensAndMintExact: (
+    indexPool: string,
+    maxAmountIn: BigNumber,
+    path: string[],
+    poolAmountOut: BigNumber
+  ): AppThunk => async () => {
+    if (signer) {
+      await helpers.swapTokensForTokensAndMintExact(
+        signer,
+        indexPool,
+        maxAmountIn,
+        path,
+        poolAmountOut
+      );
+    }
+  },
+  swapExactTokensForTokensAndMint: (
+    indexPool: string,
+    amountIn: BigNumber,
+    path: string[],
+    minPoolAmountOut: BigNumber
+  ): AppThunk => async () => {
+    if (signer) {
+      await helpers.swapExactTokensForTokensAndMint(
+        signer,
+        indexPool,
+        amountIn,
+        path,
+        minPoolAmountOut
+      );
+    }
+  },
+  burnExactAndSwapForTokens: (
+    indexPool: string,
+    poolAmountIn: BigNumber,
+    path: string[],
+    minAmountOut: BigNumber
+  ): AppThunk => async () => {
+    if (signer) {
+      await helpers.burnExactAndSwapForTokens(
+        signer,
+        indexPool,
+        poolAmountIn,
+        path,
+        minAmountOut
+      );
+    }
+  },
+  burnAndSwapForExactTokens: (
+    indexPool: string,
+    poolAmountInMax: BigNumber,
+    path: string[],
+    tokenAmountOut: BigNumber
+  ): AppThunk => async () => {
+    if (signer) {
+      await helpers.burnAndSwapForExactTokens(
+        signer,
+        indexPool,
+        poolAmountInMax,
+        path,
+        tokenAmountOut
+      );
+    }
+  },
   /**
    *
    */

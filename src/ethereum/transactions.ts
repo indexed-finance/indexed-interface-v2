@@ -1,9 +1,9 @@
+import { BURN_ROUTER_ADDRESS, MINT_ROUTER_ADDRESS, UNISWAP_ROUTER_ADDRESS } from "config";
 import { BigNumber } from "./utils/balancer-math";
 import { Contract } from "ethers";
-import { IERC20, IPool, UniswapV2Router } from "./abi";
+import { IERC20, IPool, IndexedUniswapRouterBurner, IndexedUniswapRouterMinter, UniswapV2Router } from "./abi";
 import { JSBI, Percent, Router, Trade } from "@uniswap/sdk";
 import { JsonRpcSigner } from "@ethersproject/providers";
-import { UNISWAP_ROUTER_ADDRESS } from "config";
 import { convert } from "helpers";
 
 export function calculateGasMargin(value: string): string {
@@ -155,4 +155,72 @@ export async function exitswapExternAmountOut(
     convert.toHex(maxPoolAmountIn),
   ];
   return contract.exitswapExternAmountOut(...args);
+}
+
+export async function swapTokensForTokensAndMintExact(
+  signer: JsonRpcSigner,
+  indexPool: string,
+  maxAmountIn: BigNumber,
+  path: string[],
+  poolAmountOut: BigNumber
+) {
+  const contract = new Contract(MINT_ROUTER_ADDRESS, IndexedUniswapRouterMinter, signer);
+  const args = [
+    convert.toHex(maxAmountIn),
+    path,
+    indexPool,
+    convert.toHex(poolAmountOut)
+  ];
+  return contract.swapTokensForTokensAndMintExact(...args);
+}
+
+export async function swapExactTokensForTokensAndMint(
+  signer: JsonRpcSigner,
+  indexPool: string,
+  amountIn: BigNumber,
+  path: string[],
+  minPoolAmountOut: BigNumber
+) {
+  const contract = new Contract(MINT_ROUTER_ADDRESS, IndexedUniswapRouterMinter, signer);
+  const args = [
+    convert.toHex(amountIn),
+    path,
+    indexPool,
+    convert.toHex(minPoolAmountOut)
+  ];
+  return contract.swapExactTokensForTokensAndMint(...args);
+}
+
+export async function burnExactAndSwapForTokens(
+  signer: JsonRpcSigner,
+  indexPool: string,
+  poolAmountIn: BigNumber,
+  path: string[],
+  minAmountOut: BigNumber
+) {
+  const contract = new Contract(BURN_ROUTER_ADDRESS, IndexedUniswapRouterBurner, signer);
+  const args = [
+    indexPool,
+    convert.toHex(poolAmountIn),
+    path,
+    convert.toHex(minAmountOut)
+  ];
+  return contract.burnExactAndSwapForTokens(...args);
+}
+
+export async function burnAndSwapForExactTokens(
+  signer: JsonRpcSigner,
+  indexPool: string,
+  poolAmountInMax: BigNumber,
+  path: string[],
+  tokenAmountOut: BigNumber
+) {
+  const contract = new Contract(BURN_ROUTER_ADDRESS, IndexedUniswapRouterBurner, signer);
+  const args = [
+    indexPool,
+    convert.toHex(poolAmountInMax),
+    path,
+    convert.toHex(tokenAmountOut)
+  ];
+  return contract.burnAndSwapForExactTokens(...args);
 }
