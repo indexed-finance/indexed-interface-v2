@@ -50,7 +50,7 @@ export default function CategoryCard({
           ? tokens.ids
               .map((id) => tokenLookup[id])
               .filter(Boolean)
-              .map((token) => toFormattedAsset(category, token!))
+              .map((token) => toFormattedAsset(token!))
           : []
       }
       title={name}

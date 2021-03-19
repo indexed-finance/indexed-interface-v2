@@ -145,12 +145,9 @@ export function normalizeInitialData(categories: Category[]) {
 }
 
 export function toFormattedAsset(
-  category: NormalizedCategory,
   token: NormalizedToken,
-  pool?: NormalizedPool,
-  poolTokenWeights?: Record<string, string>
+  pool?: NormalizedPool
 ): FormattedIndexPool["assets"][0] {
-  const categoryToken = category.tokens.entities[token.id];
   const coingeckoData = token.priceData || {};
   const withDisplayedSigns = { signDisplay: "always" };
 
@@ -159,31 +156,21 @@ export function toFormattedAsset(
   let weightPercentage = "-";
 
   if (pool) {
-    balance = pool.tokens.entities[token.id].balance;
-    const parsedBalance = parseFloat(balance.replace(/,/g, ""));
-    balance = convert.toBalance(balance);
+    const { balance: exactBalance, denorm } = pool.tokens.entities[token.id];
+
+    const weight = convert.toBigNumber(denorm).div(pool.totalDenorm)
+    weightPercentage = convert.toPercent(weight.toNumber());
+    balance = convert.toBalance(exactBalance, token.decimals);
 
     if (coingeckoData.price) {
-      balanceUsd = convert.toBalance(
-        (coingeckoData.price * parsedBalance).toString()
-      );
-    }
-
-    if (poolTokenWeights) {
-      const tokenWeight = poolTokenWeights[token.id];
-
-      if (tokenWeight) {
-        weightPercentage = convert.toPercent(
-          parseFloat(convert.toBalance(tokenWeight))
-        );
-      }
+      balanceUsd = (coingeckoData.price * parseFloat(balance)).toString();
     }
   }
 
   return {
     id: token.id,
     symbol: token.symbol,
-    name: categoryToken?.name ?? "",
+    name: token.name ?? "",
     balance,
     balanceUsd,
     price: coingeckoData.price ? convert.toCurrency(coingeckoData.price) : "-",
