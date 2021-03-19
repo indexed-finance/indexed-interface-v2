@@ -58,7 +58,20 @@ export const selectors = {
     const account = userSelectors.selectUserAddress(state);
     const context = { state, account };
 
-    return tasks.reduce(
+    const uniqueTasks = Object.entries(
+      tasks.reduce((prev, next) => ({
+        ...prev,
+        [next.kind]: [
+          ...(prev[next.kind] ?? []),
+          next
+        ]
+      }), {} as Record<string, MultiCallTaskConfig[]>) as Record<string, MultiCallTaskConfig[]>
+    ).reduce((prev, [kind, tasksOfKind]) => {
+      const uniqueTasksOfKind = taskHandlersByKind[kind].onlyUniqueTasks(tasksOfKind)
+      return [...prev, ...uniqueTasksOfKind];
+    }, [] as MultiCallTaskConfig[]);
+
+    return uniqueTasks.reduce(
       (prev, next) => {
         const taskCalls = taskHandlersByKind[next.kind].constructCalls(
           context,
@@ -77,7 +90,7 @@ export const selectors = {
       {
         calls: [] as Call[],
         counts: [] as { index: number; count: number }[],
-        tasks,
+        tasks: uniqueTasks,
       }
     );
   },
