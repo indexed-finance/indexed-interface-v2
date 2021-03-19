@@ -1,7 +1,6 @@
 import { FormattedIndexPool } from "features";
 import { MIN_WEIGHT } from "./balancer-math";
 import {
-  NormalizedCategory,
   NormalizedEntity,
   NormalizedInitialData,
   NormalizedPool,
@@ -153,12 +152,12 @@ export function toFormattedAsset(
 
   let balance = "";
   let balanceUsd = "";
-  let weightPercentage = "-";
+  let weightPercentage = "";
 
   if (pool) {
     const { balance: exactBalance, denorm } = pool.tokens.entities[token.id];
 
-    const weight = convert.toBigNumber(denorm).div(pool.totalDenorm)
+    const weight = convert.toBigNumber(denorm).div(pool.totalDenorm);
     weightPercentage = convert.toPercent(weight.toNumber());
     balance = convert.toBalance(exactBalance, token.decimals);
 
@@ -173,16 +172,16 @@ export function toFormattedAsset(
     name: token.name ?? "",
     balance,
     balanceUsd,
-    price: coingeckoData.price ? convert.toCurrency(coingeckoData.price) : "-",
+    price: coingeckoData.price ? convert.toCurrency(coingeckoData.price) : "",
     netChange: coingeckoData.change24Hours
       ? convert.toCurrency(coingeckoData.change24Hours, withDisplayedSigns)
-      : "-",
+      : "",
     netChangePercent: coingeckoData.percentChange24Hours
       ? convert.toPercent(
           coingeckoData.percentChange24Hours / 100,
           withDisplayedSigns
         )
-      : "-",
+      : "",
     isNegative: Boolean(
       coingeckoData.change24Hours && coingeckoData.change24Hours < 0
     ),

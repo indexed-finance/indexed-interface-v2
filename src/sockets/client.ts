@@ -53,7 +53,7 @@ export default class SocketClient {
         await sleep(seconds * 1000);
 
         SocketClient.disconnect();
-        SocketClient.connect();
+        // SocketClient.connect();
       } else {
         const isConnected = selectors.selectConnected(store.getState());
 
@@ -64,7 +64,7 @@ export default class SocketClient {
         }
 
         SocketClient.disconnect();
-        SocketClient.connect();
+        // SocketClient.connect();
       }
 
       retryAttempts++;

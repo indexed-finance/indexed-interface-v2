@@ -1,7 +1,7 @@
 import { Asset } from "features";
 import { IndexCard, Quote } from "components/molecules";
 import { Progress, Token } from "components/atoms";
-import { Space, Typography } from "antd";
+import { Space, Spin, Typography } from "antd";
 import { convert, useBreakpoints } from "helpers";
 
 export interface Props {
@@ -48,10 +48,13 @@ export default function RankedToken({ token }: Props) {
             title: "Balance (in USD)",
             value: (
               <Typography.Text type="success">
-                {token.balanceUsd &&
+                {token.balanceUsd ? (
                   convert.toCurrency(
                     parseFloat(token.balanceUsd.replace(/,/g, ""))
-                  )}
+                  )
+                ) : (
+                  <Spin />
+                )}
               </Typography.Text>
             ),
           },

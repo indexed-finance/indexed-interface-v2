@@ -189,24 +189,6 @@ export const thunks = {
 
     dispatch(actions.coingeckoDataLoaded(coingeckoData));
   },
-  registerPoolUpdateListener: (poolId: string): AppThunk => (
-    dispatch,
-    getState
-  ) => {
-    const state = getState();
-    const tokens = selectors.selectPoolTokenAddresses(state, poolId);
-
-    return dispatch(
-      actions.listenerRegistered({
-        id: "",
-        kind: "PoolData",
-        args: {
-          pool: poolId,
-          tokens,
-        },
-      })
-    );
-  },
   registerPairReservesDataListener: (pairs: string[]): AppThunk => (
     dispatch
   ) => {

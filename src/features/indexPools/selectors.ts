@@ -1,6 +1,5 @@
 import { DEFAULT_DECIMAL_COUNT } from "config";
-import { NormalizedPool, PoolTokenUpdate } from "ethereum";
-import { PoolUnderlyingToken } from "indexed-types";
+import { NormalizedPool } from "ethereum";
 import { adapter } from "./slice";
 import { categoriesSelectors } from "../categories";
 import { convert } from "helpers";
@@ -13,11 +12,14 @@ function formatName(from: string) {
   return S(from).camelize().s.toLowerCase();
 }
 
-const baseSelectors = { ...adapter.getSelectors((state: AppState) => state.indexPools) };
+const baseSelectors = {
+  ...adapter.getSelectors((state: AppState) => state.indexPools),
+};
 
 const selectAllPools = (state: AppState) => baseSelectors.selectAll(state);
 
-const selectPool = (state: AppState, poolId: string) => baseSelectors.selectById(state, poolId);
+const selectPool = (state: AppState, poolId: string) =>
+  baseSelectors.selectById(state, poolId);
 
 const selectAllPoolIds = (state: AppState) => baseSelectors.selectIds(state);
 
@@ -26,16 +28,13 @@ const selectNameForPool = (state: AppState, poolId: string) => {
   return pool ? formatName(pool.name) : "";
 };
 
-const selectPoolLookUpByName = createSelector(
-  [selectAllPools],
-  (pools) => {
-    const formatName = (from: string) => S(from).camelize().s.toLowerCase();
-    return pools.reduce((prev, next) => {
-      prev[formatName(next.name)] = next;
-      return prev;
-    }, {} as Record<string, NormalizedPool>);
-  }
-);
+const selectPoolLookUpByName = createSelector([selectAllPools], (pools) => {
+  const formatName = (from: string) => S(from).camelize().s.toLowerCase();
+  return pools.reduce((prev, next) => {
+    prev[formatName(next.name)] = next;
+    return prev;
+  }, {} as Record<string, NormalizedPool>);
+});
 
 /**
  * @returns undefined if no pools are loaded yet;
@@ -62,7 +61,8 @@ const selectPoolByName = (state: AppState, name: string) => {
   return poolsByName[formattedName] ?? null;
 };
 
-const selectPoolLookup = (state: AppState) => baseSelectors.selectEntities(state);
+const selectPoolLookup = (state: AppState) =>
+  baseSelectors.selectEntities(state);
 
 const selectPoolTokenIds = (state: AppState, poolId: string) => {
   const pool = selectPool(state, poolId);
@@ -118,7 +118,7 @@ const selectCategoryImagesByPoolIds = (state: AppState) =>
       return prev;
     }, {} as Record<string, string>);
 
-// const 
+// const
 
 const selectPoolTokenEntities = (state: AppState, poolId: string) =>
   state.indexPools.entities[poolId.toLowerCase()]?.tokens.entities;
@@ -131,10 +131,14 @@ const selectPoolUnderlyingTokens = createSelector(
 const selectPoolTokenAddresses = (state: AppState, poolId: string) =>
   state.indexPools.entities[poolId.toString()]?.tokens.ids ?? [];
 
-const selectTokenWeights = (state: AppState, poolId: string, tokenIds: string[]) => {
+const selectTokenWeights = (
+  state: AppState,
+  poolId: string,
+  tokenIds: string[]
+) => {
   const pool = selectPool(state, poolId);
   const weights = tokenIds.reduce((prev, next) => {
-    prev[next] = "-";
+    prev[next] = "";
     return prev;
   }, {} as Record<string, string>);
 

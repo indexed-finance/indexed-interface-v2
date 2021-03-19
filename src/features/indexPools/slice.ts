@@ -8,7 +8,6 @@ import {
   receivedStatePatchFromServer,
   subgraphDataLoaded,
 } from "features/actions";
-import S from "string";
 
 export const adapter = createEntityAdapter<NormalizedPool>();
 
@@ -92,9 +91,3 @@ const slice = createSlice({
 export const { actions } = slice;
 
 export default slice.reducer;
-
-// #region Helpers
-function formatName(from: string) {
-  return S(from).camelize().s.toLowerCase();
-}
-// #endregion

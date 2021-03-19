@@ -27,7 +27,7 @@ export default function Portfolio() {
       weight: "50%",
     },
     {
-      address: "0x17ac188e09a7890a1844e5e65471fe8b0ccfadf3",
+      address: "0x17ac188e09a7890a1844e5e65471fe8b0ccfadf4",
       image: "defi-dark-circular",
       link: "/pools/defi-top-5-tokens-index",
       symbol: "DEFI5",
@@ -38,7 +38,7 @@ export default function Portfolio() {
       weight: "50%",
     },
     {
-      address: "0x17ac188e09a7890a1844e5e65471fe8b0ccfadf3",
+      address: "0x17ac188e09a7890a1844e5e65471fe8b0ccfadf5",
       image: "indexed-dark",
       symbol: "NDX",
       name: "Indexed",

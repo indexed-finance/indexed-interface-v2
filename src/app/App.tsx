@@ -2,9 +2,9 @@ import "theme/index.less";
 import { BrowserRouter } from "react-router-dom";
 import { DEBUGScreenSize } from "components";
 import { Parallax } from "react-parallax";
-import { Provider } from "react-redux";
+import { Provider, useSelector } from "react-redux";
 import { message, notification } from "antd";
-import { store } from "features";
+import { selectors, store } from "features";
 import { useBreakpoints } from "helpers";
 import { useEffect } from "react";
 import AppLayout from "./AppLayout";
@@ -13,6 +13,15 @@ import flags from "feature-flags";
 
 function Inner() {
   const { isMobile } = useBreakpoints();
+  const theme = useSelector(selectors.selectTheme);
+  const inner = (
+    <>
+      <BrowserRouter>
+        <AppLayout />
+      </BrowserRouter>
+      {flags.showScreenSize && <DEBUGScreenSize />}
+    </>
+  );
 
   useEffect(() => {
     message.config({
@@ -27,13 +36,12 @@ function Inner() {
     });
   }, [isMobile]);
 
-  return (
+  return theme === "outrun" ? (
     <Parallax bgImage={background} bgImageAlt="background" strength={200}>
-      <BrowserRouter>
-        <AppLayout />
-      </BrowserRouter>
-      {flags.showScreenSize && <DEBUGScreenSize />}
+      {inner}
     </Parallax>
+  ) : (
+    inner
   );
 }
 

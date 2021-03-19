@@ -66,10 +66,19 @@ export default function AppLayout() {
 
         {theme === "outrun" && (
           <>
-            <div className="top-left-corner" />
-            <BuildingWall top={0} left={300} windows={false} zIndex={0} />
-            <BuildingWall top={284} left={300} zIndex={0} />
-            <BuildingWall top={0} right={-220} zIndex={2} />
+            <BuildingWall
+              top={0}
+              right={breakpoints.isMobile ? -295 : -220}
+              zIndex={2}
+            />
+
+            {!breakpoints.isMobile && (
+              <>
+                <div className="top-left-corner" />
+                <BuildingWall top={0} left={300} windows={false} zIndex={0} />
+                <BuildingWall top={284} left={300} zIndex={0} />
+              </>
+            )}
           </>
         )}
 
@@ -93,10 +102,10 @@ export default function AppLayout() {
 
         <Content style={{ paddingRight: 10, paddingLeft: 10 }}>
           <div className="Page">
-            {theme === "outrun" && !breakpoints.isMobile && (
+            {theme === "outrun" && (
               <>
                 <div className="page-top-wall" />
-                <div className="page-side-wall" />
+                {!breakpoints.isMobile && <div className="page-side-wall" />}
               </>
             )}
 

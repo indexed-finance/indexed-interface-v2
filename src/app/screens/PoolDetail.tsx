@@ -20,9 +20,17 @@ export default function PoolDetail() {
   const poolId = useSelector((state: AppState) =>
     selectors.selectPoolIdByName(state, poolName)
   );
-  if (poolId === undefined) return <></>;
-  if (!poolId) return <Redirect to="/pools" />;
-  return <Pool id={poolId} />;
+  if (poolId === undefined) {
+    return (
+      <div style={{ padding: 20 }}>
+        <ProviderRequirementDrawer />
+      </div>
+    );
+  } else if (!poolId) {
+    return <Redirect to="/pools" />;
+  } else {
+    return <Pool id={poolId} />;
+  }
 }
 
 function Pool({ id }: { id: string }) {
@@ -102,7 +110,7 @@ function Pool({ id }: { id: string }) {
     );
 
     return (
-      <>
+      <div style={{ position: "relative" }}>
         <ScreenHeader
           title={pool.name}
           overlay={<PoolDropdown />}
@@ -125,7 +133,7 @@ function Pool({ id }: { id: string }) {
               return mobileSized;
           }
         })()}
-      </>
+      </div>
     );
   } else {
     return <Redirect to="/pools" />;

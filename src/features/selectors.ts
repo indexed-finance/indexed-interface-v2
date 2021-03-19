@@ -135,13 +135,17 @@ const selectors = {
    * @param poolId -
    */
   selectFormattedIndexPool: createSelector(
-    [indexPoolsSelectors.selectPool, tokensSelectors.selectTokenLookup, dailySnapshotsSelectors.selectPoolStats],
+    [
+      indexPoolsSelectors.selectPool,
+      tokensSelectors.selectTokenLookup,
+      dailySnapshotsSelectors.selectPoolStats,
+    ],
     (pool, tokens, stats) => {
       const tokenIds = pool?.tokens.ids ?? [];
-  
+
       if (pool) {
         const withDisplayedSigns = { signDisplay: "always" };
-  
+
         return {
           category: pool.category.id,
           canStake: false,
@@ -164,14 +168,16 @@ const selectors = {
           totalValueLockedPercent: convert.toPercent(
             stats.deltas.totalValueLockedUSD.day.percent
           ),
-          swapFee: convert.toPercent(parseFloat(convert.toBalance(pool.swapFee))),
+          swapFee: convert.toPercent(
+            parseFloat(convert.toBalance(pool.swapFee))
+          ),
           cumulativeFee: convert.toCurrency(pool.feesTotalUSD),
           recent: {
             swaps: (pool.swaps ?? []).map((swap) => {
               const from = tokens[swap.tokenIn.toLowerCase()]?.symbol;
               const to = tokens[swap.tokenOut.toLowerCase()]?.symbol;
               const [transactionHash] = swap.id.split("-");
-  
+
               return {
                 when: formatDistance(
                   new Date(swap.timestamp * MILLISECONDS_PER_SECOND),
@@ -201,7 +207,7 @@ const selectors = {
           assets: tokenIds
             .map((poolTokenId) => {
               const token = tokens[poolTokenId];
-  
+
               if (token) {
                 return toFormattedAsset(token, pool);
               } else {
@@ -211,9 +217,9 @@ const selectors = {
                   name: "",
                   balance: "",
                   balanceUsd: "",
-                  price: "-",
-                  netChange: "-",
-                  netChangePercent: "-",
+                  price: "",
+                  netChange: "",
+                  netChangePercent: "",
                   isNegative: false,
                   weightPercentage: "",
                 };
@@ -262,7 +268,7 @@ const selectors = {
       if (next.isWethPair) {
         const entry = lookup[next.stakingToken.toLowerCase()];
 
-        if (entry) {
+        if (entry?.token0?.id && entry?.token1?.id) {
           const indexPoolSideReserve =
             entry.token0.id.toLowerCase() === poolAddress.toLowerCase()
               ? entry.reserve0

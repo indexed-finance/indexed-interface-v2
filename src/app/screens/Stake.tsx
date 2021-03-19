@@ -1,12 +1,10 @@
-import { AppState, actions, selectors } from "features";
 import { Button, Space, Statistic, Typography } from "antd";
 import { IndexCard, ScreenHeader } from "components";
 import { Link } from "react-router-dom";
-import { Pair } from "uniswap-types";
+import { actions } from "features";
 import { useBreakpoints } from "helpers";
-import { useDispatch, useSelector } from "react-redux";
-import { useEffect, useMemo, useRef } from "react";
-import { useUniswapPairs } from "hooks";
+import { useDispatch } from "react-redux";
+import { useEffect, useRef } from "react";
 
 export default function Stake() {
   const dispatch = useDispatch();
@@ -24,15 +22,15 @@ export default function Stake() {
   const __data = [stakeable, stakeable, stakeable];
   const breakpoints = useBreakpoints();
   const hasLoadedStakingData = useRef(false);
-  const poolIds = useSelector(selectors.selectAllPoolIds);
-  const relevantIds = useMemo(() => [...poolIds], [poolIds]);
-  const [pairs, loading] = useUniswapPairs(relevantIds as string[]);
-  const stakingPoolPrices = useSelector((state: AppState) =>
-    selectors.selectStakingTokenPrices(
-      state,
-      pairs ? ((pairs as unknown) as Pair[]) : []
-    )
-  );
+  // const poolIds = useSelector(selectors.selectAllPoolIds);
+  // const relevantIds = useMemo(() => [...poolIds], [poolIds]);
+  // const [pairs] = useUniswapPairs(relevantIds as string[]);
+  // const stakingPoolPrices = useSelector((state: AppState) =>
+  //   selectors.selectStakingTokenPrices(
+  //     state,
+  //     pairs ? ((pairs as unknown) as Pair[]) : []
+  //   )
+  // );
 
   // Effect:
   // It may be the case the provider isn't available on load,

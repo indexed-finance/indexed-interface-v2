@@ -1,5 +1,5 @@
 import { HTMLProps } from "react";
-import { Typography } from "antd";
+import { Skeleton, Spin, Typography } from "antd";
 import { useBreakpoints } from "helpers";
 
 export interface Props extends HTMLProps<HTMLDivElement> {
@@ -38,27 +38,33 @@ export default function Quote({
           {symbol}
         </Typography.Title>
       )}
-      <Typography.Title
-        level={isMobile ? 5 : 3}
-        style={{
-          opacity: 0.75,
-          marginTop: 0,
-          marginRight: 12,
-          marginBottom: 0,
-          justifyContent: centered ? "center" : "left",
-        }}
-      >
-        {price}
-      </Typography.Title>
-      <Typography.Paragraph
-        style={{
-          marginTop: 0,
-          marginBottom: 0,
-        }}
-        type={isNegative ? "danger" : "success"}
-      >
-        {netChange} ({netChangePercent})
-      </Typography.Paragraph>
+      {price && netChange && netChangePercent ? (
+        <>
+          <Typography.Title
+            level={isMobile ? 5 : 3}
+            style={{
+              opacity: 0.75,
+              marginTop: 0,
+              marginRight: 12,
+              marginBottom: 0,
+              justifyContent: centered ? "center" : "left",
+            }}
+          >
+            {price ?? <Skeleton paragraph={{ rows: 1 }} />}
+          </Typography.Title>
+          <Typography.Paragraph
+            style={{
+              marginTop: 0,
+              marginBottom: 0,
+            }}
+            type={isNegative ? "danger" : "success"}
+          >
+            {netChange} ({netChangePercent}
+          </Typography.Paragraph>
+        </>
+      ) : (
+        <Spin size="large" />
+      )}
     </>
   );
 
