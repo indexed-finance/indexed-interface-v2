@@ -35,3 +35,6 @@ export const useTokenUserDataListener = (spender: string, tokens: string[]) =>
 
 export const usePoolDataListener = (pool: string, tokens: string[]) =>
   useDataListener("PoolData", { pool, tokens });
+
+export const useTotalSuppliesListener = (tokens: string[]) =>
+  useDataListener("TotalSupplies", tokens);
