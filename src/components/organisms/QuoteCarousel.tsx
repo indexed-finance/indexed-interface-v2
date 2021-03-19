@@ -1,8 +1,8 @@
 import { Carousel } from "antd";
+import { FormattedIndexPool, selectors } from "features";
 import { Quote } from "components/molecules";
 import { useHistory } from "react-router-dom";
-
-import type { FormattedIndexPool } from "features";
+import { useSelector } from "react-redux";
 
 export interface Props {
   pools: FormattedIndexPool[];
@@ -10,15 +10,16 @@ export interface Props {
 
 export default function QuoteCarousel({ pools }: Props) {
   const history = useHistory();
+  const theme = useSelector(selectors.selectTheme);
 
   return (
     <Carousel
       effect="fade"
       autoplay={true}
       dots={false}
-      className="Carousel BuildingQuote"
+      className={`Carousel ${theme === "outrun" && "BuildingQuote"}`}
     >
-      {[pools[0]].map((pool) => {
+      {pools.map((pool) => {
         const filteredPool = pool as FormattedIndexPool;
         const isNegative =
           parseFloat(filteredPool.netChangePercent.replace(/%/g, "")) < 0;

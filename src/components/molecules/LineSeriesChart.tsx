@@ -144,4 +144,30 @@ const CHART_MODES = {
       },
     },
   },
+  outrun: {
+    layout: {
+      ...COMMON_LAYOUT_OPTIONS,
+      backgroundColor: "#0A0A0A",
+      textColor: "#89dce3",
+    },
+    priceScale: {
+      borderColor: "#ECC321",
+    },
+    crosshair: {
+      vertLine: {
+        color: "#ECC321",
+      },
+      horzLine: {
+        color: "#ECC321",
+      },
+    },
+    grid: {
+      vertLines: {
+        color: "#fa79e0",
+      },
+      horzLines: {
+        color: "#fa79e0",
+      },
+    },
+  },
 };

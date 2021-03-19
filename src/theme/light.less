@@ -1,64 +1,85 @@
-@light-blue: #89dce3;
-@light-pink: #9d77ce;
-@light-green: #10be8a;
-@light-red: #f7051b;
-@light-text: #fafafa;
+@light-background: #fafafa;
 
 .light {
-  .ant-layout {
-    background: black;
-    background-image: url("../assets/images/light-bg.png") !important;
+  .ant-layout-sider-children {
+    .effect8;
 
-    &-header {
-      border-bottom: 1px solid @light-blue !important;
-    }
-    &-sider {
-      &-children {
-        border-right: 1px solid @light-blue !important;
-      }
-    }
+    position: fixed !important;
   }
 
-  .ant-progress-circle-path {
-    stroke: @light-blue !important;
+  .AppHeader {
+    .effect6;
   }
 
-  .ant-switch-inner {
-    color: @light-text !important;
+  .Page {
+    .effect8;
+
+    background: @light-background;
   }
 
-  .ant-typography-success {
-    color: @light-green !important;
+  .effect6 {
+    position: fixed;
+    -webkit-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3),
+      0 0 40px rgba(0, 0, 0, 0.1) inset;
+    -moz-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3),
+      0 0 40px rgba(0, 0, 0, 0.1) inset;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.1) inset;
+  }
+  .effect6:before,
+  .effect6:after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    -webkit-box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+    -moz-box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+    top: 50%;
+    bottom: 0;
+    left: 10px;
+    right: 10px;
+    -moz-border-radius: 100px / 10px;
+    border-radius: 100px / 10px;
+  }
+  .effect6:after {
+    right: 10px;
+    left: auto;
+    -webkit-transform: skew(8deg) rotate(3deg);
+    -moz-transform: skew(8deg) rotate(3deg);
+    -ms-transform: skew(8deg) rotate(3deg);
+    -o-transform: skew(8deg) rotate(3deg);
+    transform: skew(8deg) rotate(3deg);
   }
 
-  .ant-tabs-tab-active {
-    > div {
-      color: @light-blue !important;
-    }
+  .effect8 {
+    position: relative;
+    -webkit-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3),
+      0 0 40px rgba(0, 0, 0, 0.1) inset;
+    -moz-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3),
+      0 0 40px rgba(0, 0, 0, 0.1) inset;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.1) inset;
   }
-
-  .ant-divider-dashed {
-    border-color: @light-pink !important;
+  .effect8:before,
+  .effect8:after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    -webkit-box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+    -moz-box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+    top: 10px;
+    bottom: 10px;
+    left: 0;
+    right: 0;
+    -moz-border-radius: 100px / 10px;
+    border-radius: 100px / 10px;
   }
-
-  .ant-card-head-title {
-    h2 {
-      color: @light-pink !important;
-    }
-  }
-
-  .ant-btn-primary {
-    background: @light-pink !important;
-  }
-
-  .ant-typography-danger {
-    color: @light-red !important;
-  }
-
-  .ant-ribbon-color-purple {
-    background: @light-pink !important;
-  }
-  .ant-ribbon-color-pink {
-    background: @light-pink !important;
+  .effect8:after {
+    right: 10px;
+    left: auto;
+    -webkit-transform: skew(8deg) rotate(3deg);
+    -moz-transform: skew(8deg) rotate(3deg);
+    -ms-transform: skew(8deg) rotate(3deg);
+    -o-transform: skew(8deg) rotate(3deg);
+    transform: skew(8deg) rotate(3deg);
   }
 }

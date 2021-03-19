@@ -2,7 +2,7 @@ import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import type { AppState } from "../store";
 import type { SupportedLanguageCode } from "../../i18n";
 
-type Theme = "dark" | "light";
+type Theme = "dark" | "light" | "outrun";
 
 interface SettingsState {
   languageCode: SupportedLanguageCode;
@@ -27,7 +27,18 @@ const slice = createSlice({
       state.theme = action.payload;
     },
     themeToggled: (state) => {
-      state.theme = state.theme === "dark" ? "light" : "dark";
+      const themeOrder = ["light", "dark", "outrun"] as Theme[];
+      const currentIndex = themeOrder.findIndex(
+        (value) => value === state.theme
+      );
+
+      let nextIndex = currentIndex + 1;
+
+      if (!themeOrder[nextIndex]) {
+        nextIndex = 0;
+      }
+
+      state.theme = themeOrder[nextIndex];
     },
     connectionEstablished: (state) => {
       state.connected = true;
@@ -52,7 +63,7 @@ export const { actions } = slice;
 
 export const selectors = {
   selectSettings: (state: AppState) => state.settings,
-  selectTheme: (state: AppState) => state.settings.theme,
+  selectTheme: (state: AppState) => selectors.selectSettings(state).theme,
   selectConnected: (state: AppState) => state.settings.connected,
   selectConnectionEnabled: (state: AppState) =>
     state.settings.connectionEnabled,

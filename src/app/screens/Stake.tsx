@@ -99,6 +99,7 @@ export default function Stake() {
               subtitle={datum.symbol}
               actions={actions}
               centered={false}
+              key={datum.id}
             >
               <Space
                 direction="vertical"

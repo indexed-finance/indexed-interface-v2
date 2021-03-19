@@ -123,7 +123,7 @@ export default function ChartCard({ poolId, expanded = false }: Props) {
         )
       }
       headStyle={{
-        background: theme === "dark" ? "#0a0a0a" : "#fff",
+        background: ["dark", "outrun"].includes(theme) ? "#0a0a0a" : "#fff",
         paddingLeft: 10,
       }}
       bodyStyle={{ padding: 0, height: 300 }}

@@ -124,7 +124,7 @@
     "deploy": "git push && npm run storybook:deploy",
     "generate:types": "graphql-codegen",
     "lint": "eslint . --fix --ignore-path .gitignore --ext .ts,.tsx,.js",
-    "themes:build": "THEME=dark node ./scripts/build-themes && THEME=light node ./scripts/build-themes",
+    "themes:build": "THEME=dark node ./scripts/build-themes && THEME=light node ./scripts/build-themes && THEME=outrun node ./scripts/build-themes",
     "themes:watch": "nodemon --watch ./src/theme --exec \"THEME=dark node ./scripts/build-themes && THEME=light node ./scripts/build-themes\" -e less",
     "storybook": "start-storybook -p 6006",
     "storybook:build": "build-storybook",

@@ -4,7 +4,7 @@ const { generateTheme } = require("antd-theme-generator");
 
 const theme = process.env.THEME;
 
-if (!["dark", "light"].includes(theme)) {
+if (!["dark", "light", "outrun"].includes(theme)) {
   console.error(
     "The build-themes script requires an environment variable of either >dark< or >light<."
   );
@@ -30,6 +30,7 @@ const options = {
     "@danger-color",
     "@error-color",
     "@warning-color",
+    "@layout-header-background",
   ],
   indexFileName: "index.html",
   outputFilePath: path.join(__dirname, `../public/${theme}.less`),
