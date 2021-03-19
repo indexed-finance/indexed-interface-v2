@@ -11,7 +11,7 @@ export const useTokens = (tokenIds: string[]) => useSelector(
 );
 
 export const useTokenLookupBySymbol = () => useSelector(
-  (state: AppState) => selectors.selectTokenLookupBySymbol(state)
+  selectors.selectTokenLookupBySymbol
 );
 
 export const useTokenLookup = () => useSelector(

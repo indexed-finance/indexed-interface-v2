@@ -9,7 +9,7 @@ import {
   totalSuppliesUpdated,
   uniswapPairsRegistered,
 } from "features/actions";
-import { createEntityAdapter, createSlice } from "@reduxjs/toolkit";
+import { createEntityAdapter, createSelector, createSlice } from "@reduxjs/toolkit";
 import type { AppState } from "features/store";
 
 const adapter = createEntityAdapter<NormalizedToken>();
@@ -113,15 +113,25 @@ export const selectors = {
   },
   selectAllTokens: (state: AppState) => selectors.selectAll(state),
   selectTokenLookup: (state: AppState) => selectors.selectEntities(state),
-  selectTokenLookupBySymbol: (state: AppState) =>
-    selectors.selectAllTokens(state).reduce((prev, next) => {
-      prev[next.symbol.toLowerCase()] = next;
-      return prev;
-    }, {} as Record<string, NormalizedToken>),
+  selectTokenLookupBySymbol: (state: AppState): Record<string, NormalizedToken> => ({}),
   selectTokenSymbols: (state: AppState) =>
     selectors.selectAll(state).map(({ symbol }) => symbol),
   selectTokenSymbol: (state: AppState, poolId: string) =>
     selectors.selectTokenLookup(state)[poolId]?.symbol ?? "",
 };
+
+
+export const selectTokenSupplies = createSelector(
+  selectors.selectTokensById,
+  tokens => tokens.map((t: NormalizedToken | undefined) => t?.totalSupply)
+);
+
+selectors.selectTokenLookupBySymbol = createSelector(
+  selectors.selectAllTokens,
+  (tokens) => tokens.reduce((prev, next) => {
+    prev[next.symbol.toLowerCase()] = next;
+    return prev;
+  }, {} as Record<string, NormalizedToken>)
+);
 
 export default slice.reducer;
