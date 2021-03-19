@@ -15,7 +15,8 @@ export type Call = {
 export type MultiCallTaskKind =
   | "PoolData"
   | "TokenUserData"
-  | "UniswapPairsData";
+  | "UniswapPairsData"
+  | "TotalSupplies";
 
 interface MultiCallTask<Args = any> {
   id: string;
@@ -64,6 +65,10 @@ export interface TokenUserDataTask
 export interface PoolDataTask
   extends MultiCallTask<{ pool: string; tokens: string[] }> {
   kind: "PoolData";
+}
+
+export interface TotalSuppliesTask extends MultiCallTask<string[]> {
+  kind: "TotalSupplies";
 }
 
 export type MultiCallTaskConfig =

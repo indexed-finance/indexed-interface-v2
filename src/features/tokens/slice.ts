@@ -6,6 +6,8 @@ import {
   receivedInitialStateFromServer,
   receivedStatePatchFromServer,
   subgraphDataLoaded,
+  totalSuppliesUpdated,
+  uniswapPairsRegistered,
 } from "features/actions";
 import { createEntityAdapter, createSlice } from "@reduxjs/toolkit";
 import type { AppState } from "features/store";
@@ -68,7 +70,28 @@ const slice = createSlice({
         const { tokens } = action.payload;
 
         return tokens;
-      }),
+      })
+      .addCase(totalSuppliesUpdated, (state, action) => {
+        for (const { token, totalSupply } of action.payload) {
+          const entity = state.entities[token.toLowerCase()];
+          if (entity) {
+            entity.totalSupply = totalSupply;
+          }
+        }
+      })
+      .addCase(uniswapPairsRegistered, (state, action) => {
+        for (const pair of action.payload) {
+          if (!state.entities[pair.id.toLowerCase()]) {
+            state.entities[pair.id.toLowerCase()] = {
+              id: pair.id.toLowerCase(),
+              symbol: "UniV2",
+              name: `UniswapV2 LP Token`,
+              decimals: 18,
+              coingeckoId: ""
+            };
+          }
+        }
+      })
 });
 
 export const { actions } = slice;

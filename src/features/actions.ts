@@ -72,3 +72,7 @@ export const uniswapPairsUpdated = createAction<PairReservesUpdate[]>(
 export const uniswapPairsRegistered = createAction<NormalizedPair[]>(
   "uniswapPairsRegistered"
 );
+
+export const totalSuppliesUpdated = createAction<{ token: string; totalSupply: string; }[]>(
+  "totalSuppliesUpdated"
+)
