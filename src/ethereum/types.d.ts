@@ -86,6 +86,7 @@ export interface NormalizedToken {
   name?: string;
   symbol: string;
   coingeckoId: string;
+  totalSupply?: string;
   priceData?: {
     price?: number;
     change24Hours?: number;
