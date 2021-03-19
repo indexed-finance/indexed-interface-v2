@@ -78,8 +78,8 @@ export function useSingleTokenMintCallbacks(poolId: string) {
       );
     } else {
       const result = calculateAmountIn(tokenInSymbol, typedAmount);
-      if (!result) throw Error(`Caught error calculating mint output.`);
-      if (result.error) throw Error(`Caught error calculating mint output: ${result.error}`);
+      if (!result) throw Error(`Caught error calculating mint input.`);
+      if (result.error) throw Error(`Caught error calculating mint input: ${result.error}`);
       const maxAmountIn = upwardSlippage(result.tokenAmountIn as BigNumber, SLIPPAGE_RATE);
       dispatch(
         thunks.joinswapPoolAmountOut(
