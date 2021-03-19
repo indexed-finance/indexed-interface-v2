@@ -3,6 +3,7 @@ import { Pair } from "uniswap-types";
 import { batcherSelectors } from "./batcher";
 import { categoriesSelectors } from "./categories";
 import { convert } from "helpers";
+import { createSelector } from "reselect";
 import { dailySnapshotsSelectors } from "./dailySnapshots";
 import { formatDistance } from "date-fns";
 import { indexPoolsSelectors } from "./indexPools";
@@ -133,110 +134,105 @@ const selectors = {
    * @param state -
    * @param poolId -
    */
-  selectFormattedIndexPool: (
-    state: AppState,
-    poolId: string
-  ): null | FormattedIndexPool => {
-    const pool = selectors.selectPool(state, poolId);
-    const tokenIds = pool?.tokens.ids ?? [];
-
-    if (pool) {
-      const tokens = selectors.selectTokenLookup(state);
-      const tokenWeights = selectors.selectTokenWeights(
-        state,
-        pool.id,
-        tokenIds
-      );
-      const category = selectors.selectCategory(state, pool.category.id);
-      const stats = selectors.selectPoolStats(state, pool.id);
-      const withDisplayedSigns = { signDisplay: "always" };
-
-      return {
-        category: category?.name ?? "",
-        canStake: false,
-        id: pool.id,
-        symbol: pool.symbol,
-        priceUsd: convert.toCurrency(stats.price),
-        netChange: convert.toCurrency(
-          stats.deltas.price.day.value,
-          withDisplayedSigns
-        ),
-        netChangePercent: convert.toPercent(
-          stats.deltas.price.day.percent,
-          withDisplayedSigns
-        ),
-        isNegative: stats.deltas.price.day.value < 0,
-        name: pool.name.replace(/Tokens Index/g, ""),
-        slug: S(pool.name).slugify().s,
-        volume: convert.toCurrency(stats.deltas.volume.day),
-        totalValueLocked: convert.toCurrency(pool.totalValueLockedUSD),
-        totalValueLockedPercent: convert.toPercent(
-          stats.deltas.totalValueLockedUSD.day.percent
-        ),
-        swapFee: convert.toPercent(parseFloat(convert.toBalance(pool.swapFee))),
-        cumulativeFee: convert.toCurrency(pool.feesTotalUSD),
-        recent: {
-          swaps: (pool.swaps ?? []).map((swap) => {
-            const from = selectors.selectTokenSymbol(state, swap.tokenIn);
-            const to = selectors.selectTokenSymbol(state, swap.tokenOut);
-            const [transactionHash] = swap.id.split("-");
-
-            return {
+  selectFormattedIndexPool: createSelector(
+    [indexPoolsSelectors.selectPool, tokensSelectors.selectTokenLookup, dailySnapshotsSelectors.selectPoolStats],
+    (pool, tokens, stats) => {
+      const tokenIds = pool?.tokens.ids ?? [];
+  
+      if (pool) {
+        const withDisplayedSigns = { signDisplay: "always" };
+  
+        return {
+          category: "",
+          canStake: false,
+          id: pool.id,
+          symbol: pool.symbol,
+          priceUsd: convert.toCurrency(stats.price),
+          netChange: convert.toCurrency(
+            stats.deltas.price.day.value,
+            withDisplayedSigns
+          ),
+          netChangePercent: convert.toPercent(
+            stats.deltas.price.day.percent,
+            withDisplayedSigns
+          ),
+          isNegative: stats.deltas.price.day.value < 0,
+          name: pool.name.replace(/Tokens Index/g, ""),
+          slug: S(pool.name).slugify().s,
+          volume: convert.toCurrency(stats.deltas.volume.day),
+          totalValueLocked: convert.toCurrency(pool.totalValueLockedUSD),
+          totalValueLockedPercent: convert.toPercent(
+            stats.deltas.totalValueLockedUSD.day.percent
+          ),
+          swapFee: convert.toPercent(parseFloat(convert.toBalance(pool.swapFee))),
+          cumulativeFee: convert.toCurrency(pool.feesTotalUSD),
+          recent: {
+            swaps: (pool.swaps ?? []).map((swap) => {
+              const from = tokens[swap.tokenIn.toLowerCase()]?.symbol;
+              const to = tokens[swap.tokenOut.toLowerCase()]?.symbol;
+              const [transactionHash] = swap.id.split("-");
+  
+              return {
+                when: formatDistance(
+                  new Date(swap.timestamp * MILLISECONDS_PER_SECOND),
+                  new Date()
+                ),
+                from,
+                to,
+                transactionHash,
+              };
+            }),
+            trades: (pool.trades ?? []).map((trade) => ({
               when: formatDistance(
-                new Date(swap.timestamp * MILLISECONDS_PER_SECOND),
+                new Date(parseInt(trade.timestamp) * MILLISECONDS_PER_SECOND),
                 new Date()
               ),
-              from,
-              to,
-              transactionHash,
-            };
-          }),
-          trades: (pool.trades ?? []).map((trade) => ({
-            when: formatDistance(
-              new Date(parseInt(trade.timestamp) * MILLISECONDS_PER_SECOND),
-              new Date()
+              from: trade.pair.token0.symbol,
+              to: trade.pair.token1.symbol,
+              amount: convert.toCurrency(parseFloat(trade.amountUSD)),
+              kind:
+                trade.pair.token0.symbol.toLowerCase() ===
+                pool.symbol.toLowerCase()
+                  ? "sell"
+                  : "buy",
+              transactionHash: trade.transaction.id,
+            })),
+          },
+          assets: tokenIds
+            .map((poolTokenId) => {
+              const token = tokens[poolTokenId];
+  
+              if (token) {
+                return toFormattedAsset(token, pool);
+              } else {
+                return {
+                  id: "",
+                  symbol: "",
+                  name: "",
+                  balance: "",
+                  balanceUsd: "",
+                  price: "-",
+                  netChange: "-",
+                  netChangePercent: "-",
+                  isNegative: false,
+                  weightPercentage: "",
+                };
+              }
+            })
+            .sort(
+              (left, right) =>
+                parseFloat(right.weightPercentage) -
+                parseFloat(left.weightPercentage)
             ),
-            from: trade.pair.token0.symbol,
-            to: trade.pair.token1.symbol,
-            amount: convert.toCurrency(parseFloat(trade.amountUSD)),
-            kind:
-              trade.pair.token0.symbol.toLowerCase() ===
-              pool.symbol.toLowerCase()
-                ? "sell"
-                : "buy",
-            transactionHash: trade.transaction.id,
-          })),
-        },
-        assets: tokenIds
-          .map((poolTokenId) => {
-            const token = tokens[poolTokenId];
-
-            if (token) {
-              return toFormattedAsset(category!, token, pool, tokenWeights);
-            } else {
-              return {
-                id: "",
-                symbol: "",
-                name: "",
-                balance: "",
-                balanceUsd: "",
-                price: "-",
-                netChange: "-",
-                netChangePercent: "-",
-                isNegative: false,
-                weightPercentage: "",
-              };
-            }
-          })
-          .sort(
-            (left, right) =>
-              parseFloat(right.weightPercentage) -
-              parseFloat(left.weightPercentage)
-          ),
-      };
-    } else {
-      return null;
+        } as FormattedIndexPool;
+      } else {
+        return null;
+      }
     }
+  ),
+  selectNormalizedUnderlyingPoolTokens: (state: AppState, poolId: string) => {
+    const tokenIds = selectors.selectPoolTokenAddresses(state, poolId);
+    return selectors.selectTokensById(state, tokenIds);
   },
   /**
    *
