@@ -1,8 +1,11 @@
 import { BigNumber } from "ethereum/utils/balancer-math";
-import { COMMON_BASE_TOKENS } from "config";
+import { COMMON_BASE_TOKENS, SLIPPAGE_RATE } from "config";
 import { Trade } from "@uniswap/sdk";
 import { convert } from "helpers";
+import { downwardSlippage, upwardSlippage } from "ethereum";
+import { thunks } from "features";
 import { useCallback, useMemo } from "react";
+import { useDispatch } from "react-redux";
 import {
   usePoolTokenAddresses,
   usePoolUnderlyingTokens,
@@ -12,6 +15,7 @@ import { useTokenLookupBySymbol } from "features/tokens/hooks";
 import useUniswapTradingPairs from "./use-uniswap-trading-pairs";
 
 export default function useMintRouterCallbacks(poolId: string) {
+  const dispatch = useDispatch();
   const poolTokens = usePoolUnderlyingTokens(poolId);
   const poolTokenIds = usePoolTokenAddresses(poolId);
 
@@ -148,9 +152,38 @@ export default function useMintRouterCallbacks(poolId: string) {
     ]
   );
 
+  const executeRoutedMint = useCallback((
+    tokenInSymbol: string,
+    specifiedField: "from" | "to",
+    typedAmount: string
+  ) => {
+    if (specifiedField === "from") {
+      const result = getBestMintRouteForAmountIn(tokenInSymbol, typedAmount);
+      if (!result) throw Error('Caught error calculating routed mint output.');
+      if (result.poolResult.error) throw Error(`Caught error calculating routed mint output: ${result.poolResult.error}`);
+      dispatch(thunks.swapExactTokensForTokensAndMint(
+        poolId,
+        convert.toBigNumber(result.uniswapResult.inputAmount.raw.toString(10)),
+        result.uniswapResult.route.path.map(p => p.address),
+        downwardSlippage(result.poolResult.poolAmountOut, SLIPPAGE_RATE)
+      ));
+    } else {
+      const result = getBestMintRouteForAmountOut(tokenInSymbol, typedAmount);
+      if (!result) throw Error('Caught error calculating routed mint input.');
+      if (result.poolResult.error) throw Error(`Caught error calculating routed mint input: ${result.poolResult.error}`);
+      dispatch(thunks.swapTokensForTokensAndMintExact(
+        poolId,
+        upwardSlippage(convert.toBigNumber(result.uniswapResult.inputAmount.raw.toString(10)), SLIPPAGE_RATE),
+        result.uniswapResult.route.path.map(p => p.address),
+        result.poolResult.amountOut
+      ))
+    }
+  }, [dispatch, getBestMintRouteForAmountOut, getBestMintRouteForAmountIn, poolId])
+
   return {
     tokenIds,
     getBestMintRouteForAmountIn,
     getBestMintRouteForAmountOut,
+    executeRoutedMint
   };
 }
