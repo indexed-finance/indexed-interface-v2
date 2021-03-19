@@ -291,9 +291,9 @@ export const thunks = {
     tokenIn: string,
     poolAmountOut: BigNumber,
     maxAmountIn: BigNumber
-  ): AppThunk => async () => {
+  ): AppThunk => () => {
     if (signer) {
-      await joinswapPoolAmountOut(
+      joinswapPoolAmountOut(
         signer,
         indexPool,
         tokenIn,

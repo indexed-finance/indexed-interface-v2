@@ -92,8 +92,7 @@ const slice = createSlice({
         const { indexPools } = action.payload;
 
         return indexPools;
-  }),
-  
+      }),
 });
 
 export const { actions } = slice;
@@ -102,11 +101,14 @@ export const selectors = {
   ...adapter.getSelectors((state: AppState) => state.indexPools),
   selectPool: (state: AppState, poolId: string) =>
     selectors.selectById(state, poolId),
+  selectAllPoolIds: (state: AppState) => selectors.selectIds(state),
   selectNameForPool: (state: AppState, poolId: string) => {
     const pool = selectors.selectPool(state, poolId);
     return pool ? formatName(pool.name) : "";
   },
-  selectPoolLookUpByName: (state: AppState): Record<string, NormalizedPool> => ({}),
+  selectPoolLookUpByName: (
+    state: AppState
+  ): Record<string, NormalizedPool> => ({}),
   /**
    * @returns undefined if no pools are loaded yet;
    * pool ID if a pool is found for the provided name;
@@ -180,8 +182,12 @@ export const selectors = {
         prev[next.id] = next.image;
         return prev;
       }, {} as Record<string, string>),
-  selectPoolUnderlyingTokens: (state: AppState, poolId: string): (PoolTokenUpdate & PoolUnderlyingToken)[] => [],
-  selectPoolTokenAddresses: (state: AppState, poolId: string) => state.indexPools.entities[poolId.toString()]?.tokens.ids ?? [],
+  selectPoolUnderlyingTokens: (
+    state: AppState,
+    poolId: string
+  ): (PoolTokenUpdate & PoolUnderlyingToken)[] => [],
+  selectPoolTokenAddresses: (state: AppState, poolId: string) =>
+    state.indexPools.entities[poolId.toString()]?.tokens.ids ?? [],
   selectTokenWeights: (state: AppState, poolId: string, tokenIds: string[]) => {
     const pool = selectors.selectPool(state, poolId);
     const weights = tokenIds.reduce((prev, next) => {
@@ -223,11 +229,12 @@ selectors.selectPoolLookUpByName = createSelector(
   }
 );
 
-const selectPoolTokenEntities = (state: AppState, poolId: string) => state.indexPools.entities[poolId.toLowerCase()]?.tokens.entities;
+const selectPoolTokenEntities = (state: AppState, poolId: string) =>
+  state.indexPools.entities[poolId.toLowerCase()]?.tokens.entities;
 
 selectors.selectPoolUnderlyingTokens = createSelector(
   [selectPoolTokenEntities],
-  (tokens) => tokens ? Object.values(tokens) : []
+  (tokens) => (tokens ? Object.values(tokens) : [])
 );
 
 export default slice.reducer;

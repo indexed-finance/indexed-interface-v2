@@ -3,6 +3,7 @@ import {
   createEntityAdapter,
   createSlice,
 } from "@reduxjs/toolkit";
+import type { AppState } from "features/store";
 import type { NdxStakingPool } from "indexed-types";
 
 const adapter = createEntityAdapter<NdxStakingPool>();
@@ -19,6 +20,11 @@ const slice = createSlice({
 
 export const { actions } = slice;
 
-export const selectors = {};
+export const selectors = {
+  ...adapter.getSelectors((state: AppState) => state.staking),
+  selectAllStakingPools(state: AppState) {
+    return selectors.selectAll(state);
+  },
+};
 
 export default slice.reducer;

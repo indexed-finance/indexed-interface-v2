@@ -1,4 +1,5 @@
 import { NormalizedPool, NormalizedToken } from "ethereum";
+import { Pair } from "uniswap-types";
 import { batcherSelectors } from "./batcher";
 import { categoriesSelectors } from "./categories";
 import { convert } from "helpers";
@@ -246,6 +247,48 @@ const selectors = {
       .selectAllPools(state)
       .map((pool) => selectors.selectFormattedIndexPool(state, pool.id))
       .filter(Boolean);
+  },
+  selectStakingTokenPrices(state: AppState, pairs: Pair[]) {
+    const pools = selectors.selectAllStakingPools(state);
+    const lookup = pairs.reduce((prev, next) => {
+      prev[(next as any).liquidityToken.address.toLowerCase()] = next;
+      return prev;
+    }, {} as Record<string, Pair>);
+
+    return pools.reduce((prev, next) => {
+      const { indexPool: poolAddress } = next;
+      const mostRecentSnapshot = selectors.selectMostRecentSnapshotOfPool(
+        state,
+        poolAddress
+      );
+      const mostRecentValue = mostRecentSnapshot?.value ?? 0;
+
+      if (next.isWethPair) {
+        const entry = lookup[next.stakingToken.toLowerCase()];
+
+        if (entry) {
+          const indexPoolSideReserve =
+            entry.token0.id.toLowerCase() === poolAddress.toLowerCase()
+              ? entry.reserve0
+              : entry.reserve1;
+          const price = convert
+            .toBigNumber(indexPoolSideReserve)
+            .multipliedBy(2)
+            // .dividedBy(/* TODO: Get total supply of pair. */)
+            .dividedBy(1)
+            .multipliedBy(mostRecentValue)
+            .toString();
+
+          prev[next.stakingToken] = price;
+        } else {
+          prev[next.stakingToken] = "0";
+        }
+      } else {
+        prev[next.stakingToken] = mostRecentValue;
+      }
+
+      return prev;
+    }, {} as Record<string, string>);
   },
 };
 
