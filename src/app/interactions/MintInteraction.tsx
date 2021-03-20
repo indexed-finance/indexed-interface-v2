@@ -2,6 +2,7 @@ import { AppState, FormattedIndexPool, selectors } from "features";
 import { COMMON_BASE_TOKENS, MINT_ROUTER_ADDRESS, SLIPPAGE_RATE } from "config";
 import { Fragment, useCallback, useState } from "react";
 import { Radio } from "antd";
+import { Route } from "react-router-dom";
 import { convert } from "helpers";
 import { downwardSlippage, upwardSlippage } from "ethereum";
 import { useSelector } from "react-redux";
@@ -16,16 +17,33 @@ interface Props {
 }
 
 export default function MintInteraction({ pool }: Props) {
-  const [mintType, setMintType] = useState<"single" | "uniswap" | "multi">("single");
-  return <Fragment>
-    <Radio.Group value={mintType} onChange={({ target: { value } }) => {setMintType(value)}}>
-      <Radio.Button value="single">Single Input</Radio.Button>
-      <Radio.Button value="multi">Multi Input</Radio.Button>
-      <Radio.Button value="uniswap">Uniswap</Radio.Button>
-    </Radio.Group>
-    { mintType === "single" && <SingleTokenMintInteraction pool={pool} /> }
-    { mintType === "uniswap" && <UniswapMintInteraction pool={pool} /> }
-  </Fragment>
+  const [mintType, setMintType] = useState<"single" | "uniswap" | "multi">(
+    "single"
+  );
+  return (
+    <Fragment>
+      <Radio.Group
+        value={mintType}
+        onChange={({ target: { value } }) => {
+          setMintType(value);
+        }}
+      >
+        <Radio.Button value="single">Single Input</Radio.Button>
+        <Radio.Button value="multi">Multi Input</Radio.Button>
+        <Radio.Button value="uniswap">Uniswap</Radio.Button>
+      </Radio.Group>
+
+      <Route path="/single">
+        <SingleTokenMintInteraction pool={pool} />
+      </Route>
+      <Route path="/multi">
+        <MultiTokenMintInteraction pool={pool} />
+      </Route>
+      <Route path="/uniswap">
+        <UniswapMintInteraction pool={pool} />
+      </Route>
+    </Fragment>
+  );
 }
 
 function SingleTokenMintInteraction({ pool }: Props) {
@@ -139,13 +157,17 @@ function SingleTokenMintInteraction({ pool }: Props) {
   );
 }
 
+function MultiTokenMintInteraction({ pool }: Props) {
+  return <div>Multi</div>;
+}
+
 function UniswapMintInteraction({ pool }: Props) {
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
   const {
     tokenIds,
     getBestMintRouteForAmountIn,
     getBestMintRouteForAmountOut,
-    executeRoutedMint
+    executeRoutedMint,
   } = useMintRouterCallbacks(pool.id);
 
   const assets = [...COMMON_BASE_TOKENS];
@@ -170,7 +192,10 @@ function UniswapMintInteraction({ pool }: Props) {
           values.toAmount = 0;
           return;
         }
-        const result = getBestMintRouteForAmountIn(fromToken, fromAmount.toString());
+        const result = getBestMintRouteForAmountIn(
+          fromToken,
+          fromAmount.toString()
+        );
         if (result) {
           if (result.poolResult?.error) {
             return result.poolResult.error;
@@ -194,7 +219,10 @@ function UniswapMintInteraction({ pool }: Props) {
           return;
         }
 
-        const result = getBestMintRouteForAmountOut(fromToken, toAmount.toString());
+        const result = getBestMintRouteForAmountOut(
+          fromToken,
+          toAmount.toString()
+        );
         if (result) {
           if (result.poolResult?.error) {
             return result.poolResult.error;
@@ -203,7 +231,9 @@ function UniswapMintInteraction({ pool }: Props) {
             values.fromAmount = parseFloat(
               convert.toBalance(
                 upwardSlippage(
-                  convert.toBigNumber(result.uniswapResult.inputAmount.raw.toString(10)),
+                  convert.toBigNumber(
+                    result.uniswapResult.inputAmount.raw.toString(10)
+                  ),
                   SLIPPAGE_RATE
                 ),
                 decimals
@@ -240,8 +270,18 @@ function UniswapMintInteraction({ pool }: Props) {
 
   return (
     <BaseInteraction
-      title="Mint with Uniswap"
-      assets={assets.filter(_ => _) as { name: string; symbol: string; id: string }[]}
+      title={
+        <>
+          Mint <br /> w/ Uniswap
+        </>
+      }
+      assets={
+        assets.filter((_) => _) as {
+          name: string;
+          symbol: string;
+          id: string;
+        }[]
+      }
       spender={MINT_ROUTER_ADDRESS}
       onSubmit={handleSubmit}
       onChange={handleChange}

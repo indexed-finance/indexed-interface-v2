@@ -13,7 +13,7 @@ import { useTokenApproval, useTokenRandomizer } from "hooks";
 type Asset = { name: string; symbol: string; id: string };
 
 interface Props {
-  title: string;
+  title: ReactNode;
   assets: Asset[];
   spender: string;
   extra?: ReactNode;
@@ -53,7 +53,7 @@ export default function BaseInteraction({
   defaultOutputSymbol,
   disableInputSelect,
   disableOutputSelect,
-  requiresApproval = true
+  requiresApproval = true,
 }: Props) {
   const interactionRef = useRef<null | HTMLDivElement>(null);
   const interactionParent = interactionRef.current ?? false;
@@ -124,7 +124,7 @@ function InteractionInner({
   defaultOutputSymbol,
   disableInputSelect,
   disableOutputSelect,
-  requiresApproval
+  requiresApproval,
 }: InnerProps) {
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
   const [tokenId, exactAmountIn] = useMemo(() => {
@@ -171,7 +171,7 @@ function InteractionInner({
         const inputErr =
           error.includes("Input") ||
           (newValues.lastTouchedField === "from" && !error.includes("Output"));
-  
+
         if (inputErr) {
           setFieldError("fromAmount", error);
         } else {
@@ -261,7 +261,7 @@ function InteractionInner({
 
       {extra}
 
-      {(requiresApproval && status === "approval needed") ? (
+      {requiresApproval && status === "approval needed" ? (
         <Button
           type="primary"
           style={{ width: "100%" }}

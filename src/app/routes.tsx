@@ -55,8 +55,8 @@ const routes: Route[] = [
     screen: <CategoryDetail />,
   },
   {
-    path: "/pools/:poolName",
-    exact: true,
+    path: "/pools/:poolName/:interaction?",
+    exact: false,
     screen: <PoolDetail />,
   },
   {
