@@ -12,7 +12,10 @@ import { Performance, Recent, Subscreen } from "app/subscreens";
 import { PoolInteractions } from "app/interactions";
 import { Redirect, useParams } from "react-router-dom";
 import { useBreakpoints } from "helpers";
-import { usePoolDataListener } from "features/batcher/hooks";
+import {
+  usePoolDataListener,
+  usePoolDetailRegistrar,
+} from "features/batcher/hooks";
 import { useSelector } from "react-redux";
 
 export default function PoolDetail() {
@@ -43,6 +46,8 @@ function Pool({ id }: { id: string }) {
   const breakpoints = useBreakpoints();
 
   usePoolDataListener(id, tokenIds);
+
+  usePoolDetailRegistrar(id, tokenIds);
 
   if (pool) {
     // Subscreens

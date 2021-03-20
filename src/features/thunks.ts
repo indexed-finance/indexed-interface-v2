@@ -189,6 +189,11 @@ export const thunks = {
 
     dispatch(actions.coingeckoDataLoaded(coingeckoData));
   },
+  /**
+   *
+   * @param pairs -
+   * @returns
+   */
   registerPairReservesDataListener: (pairs: string[]): AppThunk => (
     dispatch
   ) => {
@@ -200,6 +205,11 @@ export const thunks = {
       })
     );
   },
+  /**
+   *
+   * @param poolId -
+   * @returns
+   */
   requestPoolTradesAndSwaps: (poolId: string): AppThunk => async (dispatch) => {
     if (provider) {
       const { chainId } = await provider.getNetwork();
@@ -212,6 +222,10 @@ export const thunks = {
       dispatch(actions.poolTradesAndSwapsLoaded({ poolId, trades, swaps }));
     }
   },
+  /**
+   *
+   * @returns
+   */
   requestStakingData: (): AppThunk => async (dispatch) => {
     if (provider) {
       const { chainId } = provider.network;
@@ -482,6 +496,7 @@ export const thunks = {
       for (const task of tasks) {
         const { index, count } = counts[resultIndex++];
         const results = allResults.slice(index, index + count);
+
         taskHandlersByKind[task.kind].handleResults(context, task.args, {
           blockNumber,
           results,

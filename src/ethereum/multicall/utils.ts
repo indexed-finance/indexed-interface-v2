@@ -21,31 +21,31 @@ interface CondensedCall {
   interface: Interface;
 }
 
+// Ensure we don't surpass the 25kb limit.
+const CHUNK_CALL_COUNT = 30;
+
 const toInterface = (_interface: Interface | JsonFragment[]) =>
   Array.isArray(_interface) ? new Interface(_interface) : _interface;
 
 function condenseCalls(
   _calls: Call[],
-  _interface?: Interface,
+  _interface?: Interface
 ): CondensedCall[] {
-  return _calls.reduce(
-    (prev, next) => {
-      const {
-        target,
-        function: callFunction,
-        args,
-        interface: callInterface,
-      } = next;
-      const interface_ = callInterface ? toInterface(callInterface) : _interface;
-      if (!interface_) {
-        throw new Error(`Interface not provided for call`);
-      }
-      const callData = interface_.encodeFunctionData(callFunction, args);
-      prev.push({ callData, interface: interface_, target });
-      return prev;
-    },
-    [] as CondensedCall[]
-  );
+  return _calls.reduce((prev, next) => {
+    const {
+      target,
+      function: callFunction,
+      args,
+      interface: callInterface,
+    } = next;
+    const interface_ = callInterface ? toInterface(callInterface) : _interface;
+    if (!interface_) {
+      throw new Error(`Interface not provided for call`);
+    }
+    const callData = interface_.encodeFunctionData(callFunction, args);
+    prev.push({ callData, interface: interface_, target });
+    return prev;
+  }, [] as CondensedCall[]);
 }
 
 const hasNumber = (str: string) => /\d/.test(str);
@@ -84,11 +84,11 @@ function getDefaultResultForFunction(fn: FunctionFragment): any[] {
 async function executeChunk(
   _provider: Provider,
   _calls: CondensedCall[],
-  _strict?: boolean,
+  _strict?: boolean
 ) {
   const inputData = defaultAbiCoder.encode(
     ["address[]", "bytes[]"],
-    [_calls.map(c => c.target), _calls.map(c => c.callData)]
+    [_calls.map((c) => c.target), _calls.map((c) => c.callData)]
   );
   const bytecodeToUse = _strict ? bytecodeStrict : bytecode;
   const without0x = inputData.slice(2);
@@ -105,13 +105,18 @@ export async function multicall(
   _provider: Provider,
   _calls: Call[],
   _interface?: Interface,
-  _strict?: boolean,
+  _strict?: boolean
 ): Promise<MultiCallResults> {
   const calls = condenseCalls(_calls, _interface);
-  const chunks = chunk(calls, 30);
-  const allResults = await Promise.all(chunks.map(chunk => executeChunk(_provider, chunk, _strict)));
-  const blockNumber = allResults.map(r => r.blockNumber).sort()[0];
-  const decodedResult = allResults.reduce((prev, next) => ([...prev, ...next.decodedResult]), [] as string[]);
+  const chunks = chunk(calls, CHUNK_CALL_COUNT);
+  const allResults = await Promise.all(
+    chunks.map((chunk) => executeChunk(_provider, chunk, _strict))
+  );
+  const blockNumber = allResults.map((r) => r.blockNumber).sort()[0];
+  const decodedResult = allResults.reduce(
+    (prev, next) => [...prev, ...next.decodedResult],
+    [] as string[]
+  );
   const formattedResults = (decodedResult as string[]).map((result, index) => {
     return result === "0x"
       ? getDefaultResultForFunction(
