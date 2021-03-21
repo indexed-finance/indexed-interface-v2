@@ -111,3 +111,45 @@ export interface NormalizedUser {
   >;
   balances: Record<string /* <tokenId> */, string /* Token Balance */>;
 }
+
+/* id: stakingPool,
+    rewardsDuration: +(rewardsDuration),
+    periodFinish: +(periodFinish),
+    rewardRate,
+    rewardPerToken,
+    totalSupply,
+    poolBalanceStakingToken,
+    userData: {
+      userAddress,
+      userStakedBalance,
+      userRewardsEarned
+    } */
+
+export interface StakingPoolUpdate {
+  id: string; // Staking pool address
+  rewardsDuration: number;
+  periodFinish: number;
+  rewardRate: string;
+  rewardPerToken: string;
+  totalSupply: string; // Total amount of tokens staked
+  userData: {
+    userAddress,
+    userStakedBalance,
+    userRewardsEarned
+  }
+}
+
+export interface NormalizedStakingPool {
+  id: string; // Staking pool address
+  stakingToken: string; // Address of token being staked
+  rewardsDuration?: number;
+  periodFinish: number;
+  indexPool: string; // Address of related index pool
+  isWethPair: boolean; // Whether the pool is for a UNI LP pair
+  /** Unix timestamp for when staking pool begins */
+  startsAt: number;
+  rewardPerTokenStored: string;
+  totalRewards: string;
+  remainingRewards: string;
+  rewardRate: string;
+}

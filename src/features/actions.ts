@@ -1,4 +1,4 @@
-import { NormalizedInitialData, NormalizedPair, NormalizedPool, PairReservesUpdate, PoolUpdate } from "ethereum";
+import { NormalizedInitialData, NormalizedPair, NormalizedPool, PairReservesUpdate, PoolUpdate, StakingPoolUpdate } from "ethereum";
 import { Swap } from "indexed-types";
 import { Swap as Trade } from "uniswap-types";
 import { createAction } from "@reduxjs/toolkit";
@@ -75,4 +75,8 @@ export const uniswapPairsRegistered = createAction<NormalizedPair[]>(
 
 export const totalSuppliesUpdated = createAction<{ token: string; totalSupply: string; }[]>(
   "totalSuppliesUpdated"
+);
+
+export const stakingPoolUpdated = createAction<StakingPoolUpdate>(
+  "stakingPoolUpdated"
 )

@@ -220,13 +220,12 @@ export const staking = `
 {
   ndxStakingPools(first: 20) {
     id
-    isWethPair
-    startsAt
-		isReady
     indexPool
     stakingToken
-    totalSupply
+    isWethPair
+    startsAt
     periodFinish
+    totalSupply
     lastUpdateTime
     totalRewards
     claimedRewards

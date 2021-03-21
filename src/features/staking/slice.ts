@@ -3,6 +3,7 @@ import {
   createEntityAdapter,
   createSlice,
 } from "@reduxjs/toolkit";
+import { stakingPoolUpdated } from "features/actions";
 import type { AppState } from "features/store";
 import type { NdxStakingPool } from "indexed-types";
 
@@ -16,6 +17,8 @@ const slice = createSlice({
       adapter.addMany(state, action.payload);
     },
   },
+  extraReducers: (builder) =>
+    builder.addCase(stakingPoolUpdated, (state, action) => { return })
 });
 
 export const { actions } = slice;
