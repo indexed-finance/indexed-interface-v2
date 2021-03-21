@@ -9,5 +9,7 @@ export * from "./selectors";
 export * from "./dailySnapshots";
 export type { RegisteredCall } from "./batcher/slice";
 export * from "./indexPools/hooks";
+export * from "./pairs/hooks";
 export * from "./tokens/hooks";
 export * from "./user/hooks";
+export * from "./batcher/slice";

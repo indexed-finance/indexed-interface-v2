@@ -23,20 +23,28 @@ export function usePoolDetailRegistrar(
   poolAddress: string,
   tokenIds: string[]
 ) {
+  const caller = "Pool Detail";
   const target = poolAddress;
+  const interfaceKind = "IPool_ABI";
   const tokenCalls = tokenIds.reduce((prev, next) => {
     prev.push(
       {
+        caller,
+        interfaceKind,
         target,
         function: "getBalance",
         args: [next],
       },
       {
+        caller,
+        interfaceKind,
         target,
         function: "getMinimumBalance",
         args: [next],
       },
       {
+        caller,
+        interfaceKind,
         target,
         function: "getDenormalizedWeight",
         args: [next],
@@ -45,16 +53,22 @@ export function usePoolDetailRegistrar(
 
     return prev;
   }, [] as RegisteredCall[]);
-  const poolCalls = [
+  const poolCalls: RegisteredCall[] = [
     {
+      caller,
+      interfaceKind,
       target,
       function: "getTotalDenormalizedWeight",
     },
     {
+      caller,
+      interfaceKind,
       target,
       function: "totalSupply",
     },
     {
+      caller,
+      interfaceKind,
       target,
       function: "getSwapFee",
     },

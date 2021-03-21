@@ -1,11 +1,13 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
+import { abiLookup } from "ethereum/abi";
 import { userActions } from "../user";
 import type { AppState } from "features/store";
+import type { Call } from "ethereum";
+import type { InterfaceKind } from "ethereum/abi";
 
-// When a registrant un-registers,
-// - for each of the registrants calls, check to see which exist in other registrants.
-// - if a call doesn't exist for another registrant, schedule the call to be purged based on its priority?
 export type RegisteredCall = {
+  caller: string;
+  interfaceKind: InterfaceKind;
   target: string;
   function: string;
   args?: string[];
@@ -16,8 +18,6 @@ interface BatcherState {
   calls: string[];
   listenerCounts: Record<string, number>;
 }
-
-// Call ID format: TARGET/FUNCTION(/ARGS)
 
 const slice = createSlice({
   name: "batcher",
@@ -34,7 +34,7 @@ const slice = createSlice({
       const calls = action.payload;
 
       for (const call of calls) {
-        const callId = formatCallId(call);
+        const callId = serializeCallId(call);
 
         state.calls.push(callId);
         state.listenerCounts[callId] = (state.listenerCounts[callId] ?? 0) + 1;
@@ -44,7 +44,7 @@ const slice = createSlice({
       const calls = action.payload;
 
       for (const call of calls) {
-        const callId = formatCallId(call);
+        const callId = serializeCallId(call);
 
         state.listenerCounts[callId]--;
       }
@@ -61,6 +61,40 @@ export const { actions } = slice;
 
 export const selectors = {
   selectBlockNumber: (state: AppState) => state.batcher.blockNumber,
+  selectBatch: (state: AppState) =>
+    state.batcher.calls.reduce(
+      (prev, next) => {
+        const [from] = next.split(": ");
+
+        if (!prev.registrars.includes(from)) {
+          prev.registrars.push(from);
+          prev.callsByRegistrant[from] = [];
+        }
+
+        if (!prev.callsByRegistrant[from].includes(next)) {
+          const deserialized = deserializeCallId(next);
+
+          if (deserialized) {
+            prev.callsByRegistrant[from].push(next);
+            prev.deserializedCalls.push(deserialized);
+          }
+        }
+
+        prev.callsByRegistrant[from].push();
+
+        return prev;
+      },
+      {
+        registrars: [],
+        callsByRegistrant: {},
+        deserializedCalls: [],
+      } as {
+        registrars: string[];
+        callsByRegistrant: Record<string, string[]>;
+        deserializedCalls: Call[];
+      }
+    ),
+
   // selectBatch: (state: AppState) => {
   //   const tasks = selectors.selectTasks(state);
   //   const account = userSelectors.selectUserAddress(state);
@@ -109,9 +143,34 @@ export const selectors = {
 export default slice.reducer;
 
 // #region Helpers
-function formatCallId(call: RegisteredCall): string {
-  const callId = `${call.target}/${call.function}`;
+export function serializeCallId(call: RegisteredCall): string {
+  return `(${call.caller}): ${call.interfaceKind}/${call.target}/${
+    call.function
+  }/${(call.args ?? []).join("_")}`;
+}
 
-  return call.args ? `${callId}/${call.args.join("_")}` : callId;
+export function deserializeCallId(callId: string): null | Call {
+  try {
+    const [, callData] = callId.split(": ");
+    const [interfaceKind, target, fn, args] = callData.split("/");
+    const abi = abiLookup[interfaceKind as InterfaceKind];
+    const common = {
+      target,
+      interface: abi,
+      function: fn,
+    };
+
+    if (args) {
+      return {
+        ...common,
+        args: args.split("_"),
+      };
+    } else {
+      return common;
+    }
+  } catch (error) {
+    console.error("Bad call ID", callId, error);
+    return null;
+  }
 }
 // #endregion

@@ -13,7 +13,7 @@ import {
   joinswapExternAmountIn,
   joinswapPoolAmountOut,
 } from "ethereum/transactions";
-import { helpers } from "ethereum";
+import { helpers, multicall } from "ethereum";
 import { indexPoolsActions } from "./indexPools";
 import { settingsActions } from "./settings";
 import { stakingActions } from "./staking";
@@ -479,26 +479,51 @@ export const thunks = {
       }
     }
   },
-  sendBatch: (): AppThunk => async (_dispatch, _getState) => {
-    // if (provider) {
-    //   const state = getState();
-    //   const account = selectors.selectUserAddress(state);
-    //   const context = { state, dispatch, actions, account, selectors };
-    //   const { calls, counts, tasks } = selectors.selectBatch(state);
-    //   const { blockNumber, results: allResults } = await multicall(
-    //     provider,
-    //     calls
-    //   );
-    //   let resultIndex = 0;
-    //   for (const task of tasks) {
-    //     const { index, count } = counts[resultIndex++];
-    //     const results = allResults.slice(index, index + count);
-    //     taskHandlersByKind[task.kind].handleResults(context, task.args, {
-    //       blockNumber,
-    //       results,
-    //     });
-    //   }
-    // }
+  sendBatch: (): AppThunk => async (dispatch, getState) => {
+    if (provider) {
+      const state = getState();
+      const batch = selectors.selectBatch(state);
+
+      console.log({ batch });
+
+      const { blockNumber, results } = await multicall(
+        provider,
+        batch.deserializedCalls
+      );
+
+      const resultsByRegistrant = batch.registrars.reduce((prev, next) => {
+        prev[next] = [];
+        return prev;
+      }, {} as Record<string, Array<{ call: string; result: string[] }>>);
+
+      let previousCutoff = 0;
+      for (const registrar of batch.registrars) {
+        const callCount = batch.callsByRegistrant[registrar].length;
+        const relevantResults = results.slice(
+          previousCutoff,
+          previousCutoff + callCount
+        );
+
+        let index = 0;
+        for (const callResult of relevantResults) {
+          resultsByRegistrant[registrar].push({
+            call: batch.callsByRegistrant[registrar][index],
+            result: callResult.map((bn) => bn.toString()),
+          });
+
+          index++;
+        }
+
+        previousCutoff += callCount;
+      }
+
+      dispatch(
+        actions.multicallDataReceived({
+          blockNumber,
+          resultsByRegistrant,
+        })
+      );
+    }
   },
 };
 

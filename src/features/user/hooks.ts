@@ -26,15 +26,21 @@ export const useTokenAllowance = (tokenId: string, spender: string) =>
 export const useUserAddress = () => useSelector(selectors.selectUserAddress);
 
 export function useUserDataRegistrar(spender: string, tokenIds: string[]) {
+  const caller = "User Data";
   const userAddress = useUserAddress();
+  const interfaceKind = "IERC20_ABI";
   const userDataCalls = tokenIds.reduce((prev, next) => {
     prev.push(
       {
+        caller,
+        interfaceKind,
         target: next,
         function: "allowance",
         args: [userAddress, spender],
       },
       {
+        caller,
+        interfaceKind,
         target: next,
         function: "balanceOf",
         args: [userAddress],

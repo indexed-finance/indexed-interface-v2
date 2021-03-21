@@ -31,9 +31,6 @@ export default function SwapInteraction({ pool }: Props) {
   const tokenIds = useSelector((state: AppState) =>
     selectors.selectPoolTokenIds(state, pool.id)
   );
-
-  useUserDataRegistrar(pool.id, tokenIds);
-
   const handleChange = useCallback(
     (values: InteractionValues) => {
       const {
@@ -100,7 +97,6 @@ export default function SwapInteraction({ pool }: Props) {
     },
     [calculateAmountIn, calculateAmountOut, tokenLookup]
   );
-
   const handleSubmit = useCallback(
     (values: InteractionValues) => {
       const {
@@ -123,6 +119,8 @@ export default function SwapInteraction({ pool }: Props) {
     },
     [executeSwap]
   );
+
+  useUserDataRegistrar(pool.id, tokenIds);
 
   return (
     <BaseInteraction

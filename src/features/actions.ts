@@ -1,4 +1,11 @@
-import { NormalizedInitialData, NormalizedPair, NormalizedPool, PairReservesUpdate, PoolUpdate, StakingPoolUpdate } from "ethereum";
+import {
+  NormalizedInitialData,
+  NormalizedPair,
+  NormalizedPool,
+  PairReservesUpdate,
+  PoolUpdate,
+  StakingPoolUpdate,
+} from "ethereum";
 import { Swap } from "indexed-types";
 import { Swap as Trade } from "uniswap-types";
 import { createAction } from "@reduxjs/toolkit";
@@ -73,10 +80,21 @@ export const uniswapPairsRegistered = createAction<NormalizedPair[]>(
   "uniswapPairsRegistered"
 );
 
-export const totalSuppliesUpdated = createAction<{ token: string; totalSupply: string; }[]>(
-  "totalSuppliesUpdated"
-);
+export const totalSuppliesUpdated = createAction<
+  { token: string; totalSupply: string }[]
+>("totalSuppliesUpdated");
 
 export const stakingPoolUpdated = createAction<StakingPoolUpdate>(
   "stakingPoolUpdated"
-)
+);
+
+export const multicallDataReceived = createAction<{
+  blockNumber: number;
+  resultsByRegistrant: Record<
+    string,
+    Array<{
+      call: string;
+      result: string[];
+    }>
+  >;
+}>("multicallDataReceived");

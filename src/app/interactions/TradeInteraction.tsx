@@ -89,7 +89,6 @@ export default function TradeInteraction({ pool }: Props) {
       calculateBestTradeForExactOutput,
     ]
   );
-
   const handleSubmit = useCallback(
     ({
       fromToken,

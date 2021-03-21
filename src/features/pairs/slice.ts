@@ -19,6 +19,7 @@ const slice = createSlice({
           const id = pair.id.toLowerCase();
           const pairInState = state.entities[id] as NormalizedPair;
           const { exists, reserves0, reserves1 } = pair;
+
           state.entities[id] = {
             ...pairInState,
             exists,
@@ -60,11 +61,14 @@ export const selectors = {
     const allPairs = selectors.selectPairsById(state, ids);
     const allTokens = tokensSelectors.selectEntities(state);
     const formattedPairs: (FormattedPair | undefined)[] = [];
+
     for (const pair of allPairs) {
       let formattedPair: FormattedPair | undefined;
+
       if (pair && pair.exists !== undefined && pair.token0 && pair.token1) {
         const token0 = allTokens[pair.token0.toLowerCase()] as NormalizedToken;
         const token1 = allTokens[pair.token1.toLowerCase()] as NormalizedToken;
+
         formattedPair = {
           id: pair.id,
           exists: pair.exists,
@@ -74,14 +78,14 @@ export const selectors = {
           reserves1: pair.reserves1 as string,
         };
       }
+
       formattedPairs.push(formattedPair);
     }
+
     return formattedPairs;
   },
-  selectAllUpdatedPairs: (state: AppState) => {
-    const allPairs = selectors.selectAll(state);
-    return allPairs.filter((pair) => pair.exists !== undefined);
-  },
+  selectAllUpdatedPairs: (state: AppState) =>
+    selectors.selectAll(state).filter((pair) => pair.exists !== undefined),
   selectTokenPair: (state: AppState, tokenA: string, tokenB: string) => {
     const pairAddress = computeUniswapPairAddress(tokenA, tokenB);
     return selectors.selectById(state, pairAddress.toLowerCase());

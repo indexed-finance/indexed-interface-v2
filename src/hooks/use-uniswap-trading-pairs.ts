@@ -5,7 +5,7 @@ import {
   TokenAmount,
   Trade,
 } from "@uniswap/sdk";
-import { actions, provider, selectors } from "features";
+import { actions, provider, selectors, usePairDataRegistrar } from "features";
 import {
   bestTradeExactIn,
   bestTradeExactOut,
@@ -30,25 +30,24 @@ export function useUniswapPairs(
     );
     return [_tokenPairs, _pairAddresses];
   }, [baseTokens]);
-
-  // useEffect(() => {
-  //   const pairs = tokenPairs.map(([tokenA, tokenB]) => {
-  //     const [token0, token1] = sortTokens(tokenA, tokenB);
-  //     const pair = computeUniswapPairAddress(token0, token1);
-  //     return { id: pair, exists: undefined, token0, token1 };
-  //   });
-  //   dispatch(actions.uniswapPairsRegistered(pairs));
-  //   const listenerId = (dispatch(
-  //     actions.registerPairReservesDataListener(pairAddresses)
-  //   ) as unknown) as string;
-  //   return () => {
-  //     dispatch(actions.listenerUnregistered(listenerId));
-  //   };
-  // }, [dispatch, tokenPairs, pairAddresses]);
-
+  const pairs = useMemo(
+    () =>
+      tokenPairs.map(([tokenA, tokenB]) => {
+        const [token0, token1] = sortTokens(tokenA, tokenB);
+        const pair = computeUniswapPairAddress(token0, token1);
+        return { id: pair, exists: undefined, token0, token1 };
+      }),
+    [tokenPairs]
+  );
   const pairDatas = useSelector((state: AppState) =>
     selectors.selectFormattedPairsById(state, pairAddresses)
   );
+
+  useEffect(() => {
+    dispatch(actions.uniswapPairsRegistered(pairs));
+  }, [dispatch, pairs]);
+
+  usePairDataRegistrar(pairs);
 
   return useMemo(() => {
     const loading = pairDatas.some(
@@ -71,7 +70,6 @@ export function useUniswapPairs(
 
 export default function useUniswapTradingPairs(baseTokens: string[]) {
   const [pairs, loading] = useUniswapPairs(baseTokens);
-
   const calculateBestTradeForExactInput = useCallback(
     (
       tokenIn: NormalizedToken,
@@ -96,7 +94,6 @@ export default function useUniswapTradingPairs(baseTokens: string[]) {
     },
     [loading, pairs]
   );
-
   const calculateBestTradeForExactOutput = useCallback(
     (
       tokenIn: NormalizedToken,

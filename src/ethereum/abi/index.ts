@@ -17,8 +17,12 @@ export const Pair = new Interface(Pair_ABI);
 export const StakingRewards = new Interface(StakingRewards_ABI);
 export const StakingRewardsFactory = new Interface(StakingRewardsFactory_ABI);
 export const UniswapV2Router = new Interface(UniswapV2Router_ABI);
-export const IndexedUniswapRouterBurner = new Interface(IndexedUniswapRouterBurner_ABI);
-export const IndexedUniswapRouterMinter = new Interface(IndexedUniswapRouterMinter_ABI);
+export const IndexedUniswapRouterBurner = new Interface(
+  IndexedUniswapRouterBurner_ABI
+);
+export const IndexedUniswapRouterMinter = new Interface(
+  IndexedUniswapRouterMinter_ABI
+);
 
 export {
   IPool_ABI,
@@ -29,5 +33,19 @@ export {
   StakingRewardsFactory_ABI,
   UniswapV2Router_ABI,
   IndexedUniswapRouterBurner_ABI,
-  IndexedUniswapRouterMinter_ABI
+  IndexedUniswapRouterMinter_ABI,
 };
+
+export const abiLookup = {
+  IPool_ABI,
+  IERC20_ABI,
+  IPoolInitializer_ABI,
+  Pair_ABI,
+  StakingRewards_ABI,
+  StakingRewardsFactory_ABI,
+  UniswapV2Router_ABI,
+  IndexedUniswapRouterBurner_ABI,
+  IndexedUniswapRouterMinter_ABI,
+};
+
+export type InterfaceKind = keyof typeof abiLookup;
