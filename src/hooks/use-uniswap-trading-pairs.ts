@@ -31,20 +31,20 @@ export function useUniswapPairs(
     return [_tokenPairs, _pairAddresses];
   }, [baseTokens]);
 
-  useEffect(() => {
-    const pairs = tokenPairs.map(([tokenA, tokenB]) => {
-      const [token0, token1] = sortTokens(tokenA, tokenB);
-      const pair = computeUniswapPairAddress(token0, token1);
-      return { id: pair, exists: undefined, token0, token1 };
-    });
-    dispatch(actions.uniswapPairsRegistered(pairs));
-    const listenerId = (dispatch(
-      actions.registerPairReservesDataListener(pairAddresses)
-    ) as unknown) as string;
-    return () => {
-      dispatch(actions.listenerUnregistered(listenerId));
-    };
-  }, [dispatch, tokenPairs, pairAddresses]);
+  // useEffect(() => {
+  //   const pairs = tokenPairs.map(([tokenA, tokenB]) => {
+  //     const [token0, token1] = sortTokens(tokenA, tokenB);
+  //     const pair = computeUniswapPairAddress(token0, token1);
+  //     return { id: pair, exists: undefined, token0, token1 };
+  //   });
+  //   dispatch(actions.uniswapPairsRegistered(pairs));
+  //   const listenerId = (dispatch(
+  //     actions.registerPairReservesDataListener(pairAddresses)
+  //   ) as unknown) as string;
+  //   return () => {
+  //     dispatch(actions.listenerUnregistered(listenerId));
+  //   };
+  // }, [dispatch, tokenPairs, pairAddresses]);
 
   const pairDatas = useSelector((state: AppState) =>
     selectors.selectFormattedPairsById(state, pairAddresses)

@@ -1,5 +1,5 @@
 import { BURN_ROUTER_ADDRESS, COMMON_BASE_TOKENS, SLIPPAGE_RATE } from "config";
-import { FormattedIndexPool, selectors } from "features";
+import { FormattedIndexPool, selectors, useUserDataRegistrar } from "features";
 import { Fragment, useCallback, useMemo, useState } from "react";
 import { Radio } from "antd";
 import { convert } from "helpers";
@@ -7,7 +7,6 @@ import { downwardSlippage, upwardSlippage } from "ethereum";
 import { usePoolTokenAddresses } from "features/indexPools/hooks";
 import { useSelector } from "react-redux";
 import { useSingleTokenBurnCallbacks } from "hooks/use-burn-callbacks";
-import { useTokenUserDataListener } from "features/batcher/hooks";
 import BaseInteraction, { InteractionValues } from "./BaseInteraction";
 import BigNumber from "bignumber.js";
 import useBurnRouterCallbacks from "hooks/use-burn-router-callbacks";
@@ -20,6 +19,12 @@ export default function BurnInteraction({ pool }: Props) {
   const [burnType, setBurnType] = useState<"single" | "uniswap" | "multi">(
     "single"
   );
+  const tokenIds = useMemo(() => pool.assets.map(({ id }) => id), [
+    pool.assets,
+  ]);
+
+  useUserDataRegistrar(pool.id, tokenIds);
+
   return (
     <Fragment>
       <Radio.Group
@@ -32,8 +37,8 @@ export default function BurnInteraction({ pool }: Props) {
         <Radio.Button value="multi">Multi Output</Radio.Button>
         <Radio.Button value="uniswap">Uniswap</Radio.Button>
       </Radio.Group>
-      { burnType === "single" && <SingleTokenBurnInteraction pool={pool} /> }
-      { burnType === "uniswap" && <UniswapBurnInteraction pool={pool} /> }
+      {burnType === "single" && <SingleTokenBurnInteraction pool={pool} />}
+      {burnType === "uniswap" && <UniswapBurnInteraction pool={pool} />}
     </Fragment>
   );
 }
@@ -42,18 +47,17 @@ function SingleTokenBurnInteraction({ pool }: Props) {
   const poolId = pool.id;
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
   const poolTokenIds = usePoolTokenAddresses(poolId);
-  const tokenIds = useMemo(() => [
-    ...poolTokenIds,
-    poolId
-  ], [poolId, poolTokenIds])
-
+  const tokenIds = useMemo(() => [...poolTokenIds, poolId], [
+    poolId,
+    poolTokenIds,
+  ]);
   const {
     calculateAmountIn,
     calculateAmountOut,
     executeBurn,
   } = useSingleTokenBurnCallbacks(poolId);
 
-  useTokenUserDataListener(poolId, tokenIds);
+  useUserDataRegistrar(pool.id, tokenIds);
 
   const handleChange = useCallback(
     (values: InteractionValues) => {
@@ -153,18 +157,19 @@ function SingleTokenBurnInteraction({ pool }: Props) {
   );
 }
 
-
 function UniswapBurnInteraction({ pool }: Props) {
   const poolId = pool.id;
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
   const {
+    tokenIds,
     getBestBurnRouteForAmountIn,
     getBestBurnRouteForAmountOut,
-    executeRoutedBurn
+    executeRoutedBurn,
   } = useBurnRouterCallbacks(poolId);
 
   const assets = [...COMMON_BASE_TOKENS];
-  useTokenUserDataListener(BURN_ROUTER_ADDRESS, [poolId]);
+
+  useUserDataRegistrar(pool.id, tokenIds);
 
   const handleChange = useCallback(
     (values: InteractionValues) => {
@@ -185,19 +190,26 @@ function UniswapBurnInteraction({ pool }: Props) {
           values.toAmount = 0;
           return;
         }
-        const result = getBestBurnRouteForAmountIn(toToken, fromAmount.toString());
+        const result = getBestBurnRouteForAmountIn(
+          toToken,
+          fromAmount.toString()
+        );
         if (result) {
           if (result.poolResult?.error) {
             return result.poolResult.error;
           } else {
             const { decimals } = tokenLookup[toToken.toLowerCase()];
-            values.toAmount = parseFloat(convert.toBalance(
-              downwardSlippage(
-                convert.toBigNumber(result.uniswapResult.outputAmount.raw.toString(10)),
-                SLIPPAGE_RATE
-              ),
-              decimals
-            ));
+            values.toAmount = parseFloat(
+              convert.toBalance(
+                downwardSlippage(
+                  convert.toBigNumber(
+                    result.uniswapResult.outputAmount.raw.toString(10)
+                  ),
+                  SLIPPAGE_RATE
+                ),
+                decimals
+              )
+            );
           }
         }
       } else {
@@ -207,17 +219,17 @@ function UniswapBurnInteraction({ pool }: Props) {
           return;
         }
 
-        const result = getBestBurnRouteForAmountOut(toToken, toAmount.toString());
+        const result = getBestBurnRouteForAmountOut(
+          toToken,
+          toAmount.toString()
+        );
         if (result) {
           if (result.poolResult?.error) {
             return result.poolResult.error;
           } else {
             values.fromAmount = parseFloat(
               convert.toBalance(
-                upwardSlippage(
-                  result.poolResult.poolAmountIn,
-                  SLIPPAGE_RATE
-                ),
+                upwardSlippage(result.poolResult.poolAmountIn, SLIPPAGE_RATE),
                 18
               )
             );
@@ -253,7 +265,13 @@ function UniswapBurnInteraction({ pool }: Props) {
   return (
     <BaseInteraction
       title="Burn with Uniswap"
-      assets={assets.filter(_ => _) as { name: string; symbol: string; id: string }[]}
+      assets={
+        assets.filter((_) => _) as {
+          name: string;
+          symbol: string;
+          id: string;
+        }[]
+      }
       spender={BURN_ROUTER_ADDRESS}
       onSubmit={handleSubmit}
       onChange={handleChange}

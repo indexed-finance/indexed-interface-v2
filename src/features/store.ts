@@ -1,12 +1,9 @@
 import { AnyAction } from "redux";
 import { LOCALSTORAGE_KEY } from "config";
 import { ThunkAction } from "redux-thunk";
-import { batcherActions } from "./batcher";
 import { configureStore } from "@reduxjs/toolkit";
 import { disconnectFromProvider } from "./thunks";
-import { thunks } from "./thunks";
 import { userActions } from "./user";
-import { v4 as uuid } from "uuid";
 import flags from "feature-flags";
 import reducer from "./reducer";
 
@@ -17,29 +14,6 @@ const store = configureStore({
       immutableCheck: false,
       serializableCheck: false,
     })
-      // The listener ID is returned for later use in unregistering.
-      /** // Todo Replace this with an <Updater /> component that uses a debounce */
-      .concat(function listenerIdMiddleware(storeAPI) {
-        return (next) => (action) => {
-          if (action.type === batcherActions.listenerRegistered.type) {
-            const id = uuid();
-
-            next({
-              ...action,
-              payload: {
-                ...action.payload,
-                id,
-              },
-            });
-
-            storeAPI.dispatch(thunks.sendBatch() as any);
-
-            return id;
-          } else {
-            return next(action);
-          }
-        };
-      })
       // When the user disconnects, remove the global provider and signer.
       .concat(function userDisconnectionMiddleware() {
         return (next) => (action) => {

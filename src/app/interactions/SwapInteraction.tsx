@@ -1,4 +1,9 @@
-import { AppState, FormattedIndexPool, selectors } from "features";
+import {
+  AppState,
+  FormattedIndexPool,
+  selectors,
+  useUserDataRegistrar,
+} from "features";
 import { BigNumber } from "ethereum/utils/balancer-math";
 import { Divider, Space } from "antd";
 import { PlainLanguageTransaction, TokenExchangeRate } from "components";
@@ -10,7 +15,6 @@ import { useCallback, useMemo } from "react";
 import { useFormikContext } from "formik";
 import { useSelector } from "react-redux";
 import { useSwapCallbacks } from "hooks";
-import { useTokenUserDataListener } from "features/batcher/hooks";
 import BaseInteraction, { InteractionValues } from "./BaseInteraction";
 
 interface Props {
@@ -27,7 +31,8 @@ export default function SwapInteraction({ pool }: Props) {
   const tokenIds = useSelector((state: AppState) =>
     selectors.selectPoolTokenIds(state, pool.id)
   );
-  useTokenUserDataListener(pool.id, tokenIds);
+
+  useUserDataRegistrar(pool.id, tokenIds);
 
   const handleChange = useCallback(
     (values: InteractionValues) => {

@@ -15,7 +15,6 @@ import {
 } from "ethereum/transactions";
 import { helpers } from "ethereum";
 import { indexPoolsActions } from "./indexPools";
-import { multicall, taskHandlersByKind } from "ethereum/multicall";
 import { settingsActions } from "./settings";
 import { stakingActions } from "./staking";
 import { tokensActions } from "./tokens";
@@ -194,17 +193,17 @@ export const thunks = {
    * @param pairs -
    * @returns
    */
-  registerPairReservesDataListener: (pairs: string[]): AppThunk => (
-    dispatch
-  ) => {
-    return dispatch(
-      actions.listenerRegistered({
-        id: "",
-        kind: "UniswapPairsData",
-        args: pairs,
-      })
-    );
-  },
+  // registerPairReservesDataListener: (pairs: string[]): AppThunk => (
+  //   dispatch
+  // ) => {
+  //   return dispatch(
+  //     actions.listenerRegistered({
+  //       id: "",
+  //       kind: "UniswapPairsData",
+  //       args: pairs,
+  //     })
+  //   );
+  // },
   /**
    *
    * @param poolId -
@@ -480,29 +479,26 @@ export const thunks = {
       }
     }
   },
-  sendBatch: (): AppThunk => async (dispatch, getState) => {
-    if (provider) {
-      const state = getState();
-      const account = selectors.selectUserAddress(state);
-      const context = { state, dispatch, actions, account, selectors };
-
-      const { calls, counts, tasks } = selectors.selectBatch(state);
-      const { blockNumber, results: allResults } = await multicall(
-        provider,
-        calls
-      );
-
-      let resultIndex = 0;
-      for (const task of tasks) {
-        const { index, count } = counts[resultIndex++];
-        const results = allResults.slice(index, index + count);
-
-        taskHandlersByKind[task.kind].handleResults(context, task.args, {
-          blockNumber,
-          results,
-        });
-      }
-    }
+  sendBatch: (): AppThunk => async (_dispatch, _getState) => {
+    // if (provider) {
+    //   const state = getState();
+    //   const account = selectors.selectUserAddress(state);
+    //   const context = { state, dispatch, actions, account, selectors };
+    //   const { calls, counts, tasks } = selectors.selectBatch(state);
+    //   const { blockNumber, results: allResults } = await multicall(
+    //     provider,
+    //     calls
+    //   );
+    //   let resultIndex = 0;
+    //   for (const task of tasks) {
+    //     const { index, count } = counts[resultIndex++];
+    //     const results = allResults.slice(index, index + count);
+    //     taskHandlersByKind[task.kind].handleResults(context, task.args, {
+    //       blockNumber,
+    //       results,
+    //     });
+    //   }
+    // }
   },
 };
 

@@ -146,3 +146,5 @@ export const COMMON_BASE_TOKENS = [
     decimals: 18,
   },
 ];
+
+export const EXTERNAL_IP = "143.198.78.205";

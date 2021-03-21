@@ -1,13 +1,13 @@
-import { AppState, selectors } from "features";
-import { FormattedIndexPool } from "features";
+import {
+  AppState,
+  FormattedIndexPool,
+  selectors,
+  usePoolDetailRegistrar,
+} from "features";
 import { Quote } from "components/molecules";
 import { Space } from "antd";
 import { useBreakpoints } from "helpers";
 import { useHistory } from "react-router-dom";
-import {
-  usePoolDataListener,
-  usePoolDetailRegistrar,
-} from "features/batcher/hooks";
 import { useSelector } from "react-redux";
 import ListCard from "./ListCard";
 import RankedToken from "./RankedToken";
@@ -24,7 +24,6 @@ export default function PoolCard({ pool }: Props) {
     selectors.selectPoolTokenIds(state, pool.id)
   );
 
-  usePoolDataListener(pool.id, tokenIds);
   usePoolDetailRegistrar(pool.id, tokenIds);
 
   return (

@@ -1,10 +1,16 @@
-import { AppState, FormattedIndexPool, actions, selectors } from "features";
+import {
+  AppState,
+  FormattedIndexPool,
+  actions,
+  selectors,
+  useUserDataRegistrar,
+} from "features";
 import { COMMON_BASE_TOKENS, UNISWAP_ROUTER_ADDRESS } from "config";
 import { Trade } from "@uniswap/sdk";
 import { convert } from "helpers";
 import { useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useTokenUserDataListener } from "features/batcher/hooks";
+// import { useTokenUserDataListener } from "features/batcher/hooks";
 import { useUniswapTradingPairs } from "hooks";
 import BaseInteraction, { InteractionValues } from "./BaseInteraction";
 
@@ -128,7 +134,7 @@ export default function TradeInteraction({ pool }: Props) {
     ]
   );
 
-  useTokenUserDataListener(UNISWAP_ROUTER_ADDRESS, tokenIds);
+  useUserDataRegistrar(pool.id, tokenIds);
 
   return (
     <BaseInteraction

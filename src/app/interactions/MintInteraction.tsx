@@ -1,13 +1,12 @@
-import { AppState, FormattedIndexPool, selectors } from "features";
 import { COMMON_BASE_TOKENS, MINT_ROUTER_ADDRESS, SLIPPAGE_RATE } from "config";
-import { Fragment, useCallback, useState } from "react";
+import { FormattedIndexPool, selectors, useUserDataRegistrar } from "features";
+import { Fragment, useCallback, useMemo, useState } from "react";
 import { Radio } from "antd";
 import { Route } from "react-router-dom";
 import { convert } from "helpers";
 import { downwardSlippage, upwardSlippage } from "ethereum";
 import { useSelector } from "react-redux";
 import { useSingleTokenMintCallbacks } from "hooks/use-mint-callbacks";
-import { useTokenUserDataListener } from "features/batcher/hooks";
 import BaseInteraction, { InteractionValues } from "./BaseInteraction";
 import BigNumber from "bignumber.js";
 import useMintRouterCallbacks from "hooks/use-mint-router-callbacks";
@@ -20,6 +19,7 @@ export default function MintInteraction({ pool }: Props) {
   const [mintType, setMintType] = useState<"single" | "uniswap" | "multi">(
     "single"
   );
+
   return (
     <Fragment>
       <Radio.Group
@@ -48,17 +48,16 @@ export default function MintInteraction({ pool }: Props) {
 
 function SingleTokenMintInteraction({ pool }: Props) {
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
-  const tokenIds = useSelector((state: AppState) => [
-    ...selectors.selectPoolTokenIds(state, pool.id),
-    pool.id,
-  ]);
   const {
     calculateAmountIn,
     calculateAmountOut,
     executeMint,
   } = useSingleTokenMintCallbacks(pool.id);
+  const tokenIds = useMemo(() => pool.assets.map(({ id }) => id), [
+    pool.assets,
+  ]);
 
-  useTokenUserDataListener(pool.id, tokenIds);
+  useUserDataRegistrar(pool.id, tokenIds);
 
   const handleChange = useCallback(
     (values: InteractionValues) => {
@@ -169,9 +168,9 @@ function UniswapMintInteraction({ pool }: Props) {
     getBestMintRouteForAmountOut,
     executeRoutedMint,
   } = useMintRouterCallbacks(pool.id);
-
   const assets = [...COMMON_BASE_TOKENS];
-  useTokenUserDataListener(MINT_ROUTER_ADDRESS, tokenIds);
+
+  useUserDataRegistrar(MINT_ROUTER_ADDRESS, tokenIds);
 
   const handleChange = useCallback(
     (values: InteractionValues) => {
