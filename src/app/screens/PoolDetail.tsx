@@ -1,4 +1,4 @@
-import { AppState, selectors } from "features";
+import { AppState, actions, selectors } from "features";
 import {
   ChartCard,
   PoolDropdown,
@@ -12,8 +12,9 @@ import { Performance, Recent, Subscreen } from "app/subscreens";
 import { PoolInteractions } from "app/interactions";
 import { Redirect, useParams } from "react-router-dom";
 import { useBreakpoints } from "helpers";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect } from "react";
 import { usePoolDetailRegistrar } from "features";
-import { useSelector } from "react-redux";
 
 export default function PoolDetail() {
   const { poolName } = useParams<{ poolName: string }>();
@@ -34,6 +35,8 @@ export default function PoolDetail() {
 }
 
 function Pool({ id }: { id: string }) {
+  const dispatch = useDispatch();
+  const blockNumber = useSelector(selectors.selectBlockNumber);
   const pool = useSelector((state: AppState) =>
     selectors.selectFormattedIndexPool(state, id)
   );
@@ -43,6 +46,13 @@ function Pool({ id }: { id: string }) {
   const breakpoints = useBreakpoints();
 
   usePoolDetailRegistrar(id, tokenIds);
+
+  useEffect(() => {
+    if (blockNumber > 0) {
+      dispatch(actions.retrieveCoingeckoData(id));
+      dispatch(actions.requestPoolTradesAndSwaps(id));
+    }
+  }, [dispatch, id, blockNumber]);
 
   if (pool) {
     // Subscreens
