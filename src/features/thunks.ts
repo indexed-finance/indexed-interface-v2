@@ -483,14 +483,10 @@ export const thunks = {
     if (provider) {
       const state = getState();
       const batch = selectors.selectBatch(state);
-
-      console.log({ batch });
-
       const { blockNumber, results } = await multicall(
         provider,
         batch.deserializedCalls
       );
-
       const resultsByRegistrant = batch.registrars.reduce((prev, next) => {
         prev[next] = [];
         return prev;

@@ -88,7 +88,7 @@ export const stakingPoolUpdated = createAction<StakingPoolUpdate>(
   "stakingPoolUpdated"
 );
 
-export const multicallDataReceived = createAction<{
+export type MulticallData = {
   blockNumber: number;
   resultsByRegistrant: Record<
     string,
@@ -97,4 +97,8 @@ export const multicallDataReceived = createAction<{
       result: string[];
     }>
   >;
-}>("multicallDataReceived");
+};
+
+export const multicallDataReceived = createAction<MulticallData>(
+  "multicallDataReceived"
+);
