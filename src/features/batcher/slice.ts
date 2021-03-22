@@ -13,6 +13,11 @@ export type RegisteredCall = {
   args?: string[];
 };
 
+export type CallWithResult = Omit<Call, "interface" | "args"> & {
+  result: string[];
+  args?: string[];
+};
+
 interface BatcherState {
   blockNumber: number;
   calls: string[];

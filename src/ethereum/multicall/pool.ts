@@ -76,7 +76,6 @@ function formatPoolUpdateResults(
     prev[tokenAddresses[index]] = next;
     return prev;
   }, {} as Record<string, AbiCoderResult[]>);
-
   const tokens = tokenAddresses
     .map((address) => responseDataByTokenAddress[address])
     .map((response, index) => {

@@ -1,5 +1,5 @@
 import * as balancerMath from "ethereum/utils/balancer-math";
-import { Call, NormalizedPool, PoolTokenUpdate } from "ethereum";
+import { CallWithResult, deserializeCallId } from "../batcher/slice";
 import {
   MulticallData,
   multicallDataReceived,
@@ -9,10 +9,10 @@ import {
   receivedStatePatchFromServer,
   subgraphDataLoaded,
 } from "features/actions";
+import { NormalizedPool, PoolTokenUpdate } from "ethereum";
 import { PoolUnderlyingToken } from "indexed-types";
 import { convert } from "helpers";
 import { createEntityAdapter, createSlice } from "@reduxjs/toolkit";
-import { deserializeCallId } from "../batcher/slice";
 
 export const adapter = createEntityAdapter<NormalizedPool>();
 
@@ -25,11 +25,6 @@ const EMPTY_TOKEN = {
   denorm: "",
   usedDenorm: "",
   usedWeight: "",
-};
-
-type CallWithResult = Omit<Call, "interface" | "args"> & {
-  result: string[];
-  args?: string[];
 };
 
 const slice = createSlice({
@@ -63,7 +58,30 @@ const slice = createSlice({
           action.payload
         );
 
-        console.log({ relevantMulticallData });
+        if (relevantMulticallData) {
+          for (const [poolAddress, results] of Object.entries(
+            relevantMulticallData
+          )) {
+            const entry = state.entities[poolAddress];
+
+            if (entry) {
+              entry.swapFee = results.swapFee;
+              entry.totalDenorm = results.totalDenorm;
+              entry.totalSupply = results.totalSupply;
+
+              for (const token of results.tokens) {
+                const tokenEntry = entry.tokens.entities[token.address];
+
+                tokenEntry.balance = token.balance;
+                tokenEntry.denorm = token.denorm;
+                tokenEntry.minimumBalance = token.minimumBalance;
+                tokenEntry.usedBalance = token.usedBalance;
+                tokenEntry.usedDenorm = token.usedDenorm;
+                tokenEntry.usedWeight = token.usedWeight;
+              }
+            }
+          }
+        }
 
         return state;
       })
@@ -248,9 +266,9 @@ function createFormattedPoolDetail(calls: Record<string, CallWithResult[]>) {
 function handleTokenResults(
   fieldName: keyof FormattedPoolDetail["tokens"][0],
   poolEntry: FormattedPoolDetail,
-  kalls: Array<{ args: string[]; values: any[] }>
+  calls: Array<{ args: string[]; values: any[] }>
 ) {
-  for (const { args, values: flattenedValues } of kalls) {
+  for (const { args, values: flattenedValues } of calls) {
     const [address] = args;
     const relevantFieldValue = flattenedValues[0].toString();
     const intermediary = {
