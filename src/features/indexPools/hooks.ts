@@ -1,7 +1,7 @@
+import { AppState, RegisteredCall, actions, selectors } from "features";
 import { useCallRegistrar } from "hooks";
-import { useSelector } from "react-redux";
-import selectors from "./selectors";
-import type { AppState, RegisteredCall } from "features";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect } from "react";
 
 export const usePool = (poolId: string) =>
   useSelector((state: AppState) => selectors.selectPool(state, poolId));
@@ -23,6 +23,8 @@ export function usePoolDetailRegistrar(
   poolAddress: string,
   tokenIds: string[]
 ) {
+  const dispatch = useDispatch();
+  const blockNumber = useSelector(selectors.selectBlockNumber);
   const caller = "Pool Detail";
   const target = poolAddress;
   const interfaceKind = "IPool_ABI";
@@ -74,6 +76,15 @@ export function usePoolDetailRegistrar(
     },
     ...tokenCalls,
   ];
+
+  // Effect:
+  // Whenever a new block comes in, reload coingecko data and trades/swaps.
+  useEffect(() => {
+    if (blockNumber > 0) {
+      dispatch(actions.retrieveCoingeckoData(poolAddress));
+      dispatch(actions.requestPoolTradesAndSwaps(poolAddress));
+    }
+  }, [dispatch, poolAddress, blockNumber]);
 
   useCallRegistrar({
     calls: poolCalls,
