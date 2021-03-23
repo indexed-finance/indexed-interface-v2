@@ -12,7 +12,8 @@ export function usePairDataRegistrar(pairs: RegisteredPair[]) {
   const caller = "Pair Data";
 
   useCallRegistrar({
-    calls: pairs.map(
+    caller,
+    onChainCalls: pairs.map(
       (pair) => ({
         caller,
         interfaceKind: "Pair_ABI",

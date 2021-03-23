@@ -3,7 +3,13 @@ import { BigNumber } from "bignumber.js";
 import { CoinGeckoService } from "services";
 import { SLIPPAGE_RATE, SUBGRAPH_URL_UNISWAP } from "config";
 import { Trade } from "@uniswap/sdk";
-import { batcherActions } from "./batcher";
+import {
+  batcherActions,
+  createOnChainBatch,
+  deserializeOffChainCall,
+  serializeOffChainCall,
+  serializeOnChainCall,
+} from "./batcher";
 import { categoriesActions } from "./categories";
 import { convert } from "helpers";
 import { ethers, providers } from "ethers";
@@ -22,6 +28,7 @@ import { userActions } from "./user";
 import debounce from "lodash.debounce";
 import selectors from "./selectors";
 import type { AppThunk } from "./store";
+import type { RegisteredCall } from "./batcher/slice";
 
 // #region Provider
 /**
@@ -59,6 +66,13 @@ type InitialzeOptions = {
  * we need to batch the calls to avoid unnecessary updates.
  */
 const BLOCK_HANDLER_DEBOUNCE_RATE = 250;
+
+const offChainThunkToTopLevelActions = {
+  retrieveCoingeckoData: (value: any) => actions.coingeckoDataLoaded(value),
+  requestPoolTradesAndSwaps: (value: any) =>
+    actions.poolTradesAndSwapsLoaded(value),
+  requestStakingData: (value: any) => actions.stakingDataLoaded(value),
+};
 
 export const thunks = {
   /**
@@ -130,9 +144,17 @@ export const thunks = {
   /**
    *
    */
-  changeBlockNumber: (blockNumber: number): AppThunk => async (dispatch) => {
+  changeBlockNumber: (blockNumber: number): AppThunk => async (
+    dispatch,
+    getState
+  ) => {
+    const state = getState();
+    const onChainBatch = selectors.selectOnChainBatch(state);
+    const offChainBatch = selectors.selectOffChainBatch(state);
+
     dispatch(actions.blockNumberChanged(blockNumber));
-    dispatch(thunks.sendBatch());
+    dispatch(thunks.sendOnChainBatch(onChainBatch));
+    dispatch(thunks.sendOffChainBatch(offChainBatch));
   },
   /**
    *
@@ -188,22 +210,6 @@ export const thunks = {
 
     dispatch(actions.coingeckoDataLoaded(coingeckoData));
   },
-  /**
-   *
-   * @param pairs -
-   * @returns
-   */
-  // registerPairReservesDataListener: (pairs: string[]): AppThunk => (
-  //   dispatch
-  // ) => {
-  //   return dispatch(
-  //     actions.listenerRegistered({
-  //       id: "",
-  //       kind: "UniswapPairsData",
-  //       args: pairs,
-  //     })
-  //   );
-  // },
   /**
    *
    * @param poolId -
@@ -479,47 +485,128 @@ export const thunks = {
       }
     }
   },
-  sendBatch: (): AppThunk => async (dispatch, getState) => {
+  independentlyQuery: ({
+    onChainCalls = [],
+    offChainCalls = [],
+  }: DataReceiverConfig): AppThunk => async (dispatch, getState) => {
+    const state = getState();
+    const serializedOnChainCalls = onChainCalls.map(serializeOnChainCall);
+    const splitOnChainCalls = serializedOnChainCalls.reduce(
+      (prev, next) => {
+        const cacheEntry = selectors.selectCacheEntry(state, next);
+
+        if (cacheEntry) {
+          prev.cached.calls.push(next);
+          prev.cached.results.push(cacheEntry);
+        } else {
+          prev.notCached.push(next);
+        }
+
+        return prev;
+      },
+      {
+        cached: { calls: [], results: [] },
+        notCached: [],
+      } as {
+        cached: {
+          calls: string[];
+          results: string[][];
+        };
+        notCached: string[];
+      }
+    );
+    const serializedOffChainCalls = offChainCalls.map(serializeOffChainCall);
+    const splitOffChainCalls = serializedOffChainCalls.reduce(
+      (prev, next) => {
+        const cacheEntry = selectors.selectCacheEntry(state, next);
+
+        if (cacheEntry) {
+          prev.cached.calls.push(next);
+          prev.cached.results.push(cacheEntry);
+        } else {
+          prev.notCached.push(next);
+        }
+
+        return prev;
+      },
+      {
+        cached: { calls: [], results: [] },
+        notCached: [],
+      } as {
+        cached: {
+          calls: string[];
+          results: string[][];
+        };
+        notCached: string[];
+      }
+    );
+
+    if (splitOnChainCalls.cached.calls.length > 0) {
+      const toImmediatelyUpdate = createOnChainBatch(
+        splitOnChainCalls.cached.calls
+      );
+      const formattedMulticallData = formatMulticallData(
+        toImmediatelyUpdate,
+        0,
+        splitOnChainCalls.cached.results
+      );
+
+      dispatch(actions.multicallDataReceived(formattedMulticallData));
+    }
+
     if (provider) {
-      const state = getState();
-      const batch = selectors.selectBatch(state);
+      const toMulticall = createOnChainBatch(splitOnChainCalls.notCached);
+
+      dispatch(actions.sendOnChainBatch(toMulticall));
+    }
+
+    if (splitOffChainCalls.cached.calls.length > 0) {
+      let index = 0;
+      for (const call of splitOffChainCalls.cached.calls) {
+        const [thunkName] = call.split("/");
+        const relevantActionCreator = (offChainThunkToTopLevelActions as any)[
+          thunkName
+        ];
+
+        if (relevantActionCreator) {
+          const relevantResult = splitOffChainCalls.cached.results[index];
+
+          relevantActionCreator(relevantResult);
+        }
+
+        index++;
+      }
+    }
+
+    for (const call of splitOffChainCalls.notCached) {
+      const action = deserializeOffChainCall(call, thunks);
+
+      if (action) {
+        dispatch(action());
+      }
+    }
+  },
+  sendOnChainBatch: (
+    batch: ReturnType<typeof selectors.selectOnChainBatch>
+  ): AppThunk => async (dispatch) => {
+    if (provider) {
       const { blockNumber, results } = await multicall(
         provider,
         batch.deserializedCalls
       );
-      const resultsByRegistrant = batch.registrars.reduce((prev, next) => {
-        prev[next] = [];
-        return prev;
-      }, {} as Record<string, Array<{ call: string; result: string[] }>>);
-
-      let previousCutoff = 0;
-      for (const registrar of batch.registrars) {
-        const callCount = batch.callsByRegistrant[registrar].length;
-        const relevantResults = results.slice(
-          previousCutoff,
-          previousCutoff + callCount
-        );
-
-        let index = 0;
-        for (const callResult of relevantResults) {
-          resultsByRegistrant[registrar].push({
-            call: batch.callsByRegistrant[registrar][index],
-            result: callResult.map((bn) => bn.toString()),
-          });
-
-          index++;
-        }
-
-        previousCutoff += callCount;
-      }
-
-      dispatch(
-        actions.multicallDataReceived({
-          blockNumber,
-          resultsByRegistrant,
-        })
+      const formattedMulticallData = formatMulticallData(
+        batch,
+        blockNumber,
+        results
       );
+
+      dispatch(actions.multicallDataReceived(formattedMulticallData));
     }
+  },
+  sendOffChainBatch: (
+    batch: ReturnType<typeof selectors.selectOffChainBatch>
+  ): AppThunk => async (dispatch) => {
+    console.log({ batch });
   },
 };
 
@@ -537,4 +624,49 @@ const actions = {
 
 export type ActionType = typeof actions;
 
+export type DataReceiverConfig = {
+  caller: string;
+  onChainCalls?: RegisteredCall[];
+  offChainCalls?: any[];
+};
+
 export default actions;
+
+// #region Helpers
+export function formatMulticallData(
+  batch: ReturnType<typeof selectors.selectOnChainBatch>,
+  blockNumber: number,
+  results: ethers.utils.Result[]
+) {
+  const resultsByRegistrant = batch.registrars.reduce((prev, next) => {
+    prev[next] = [];
+    return prev;
+  }, {} as Record<string, Array<{ call: string; result: string[] }>>);
+
+  let previousCutoff = 0;
+  for (const registrar of batch.registrars) {
+    const callCount = batch.callsByRegistrant[registrar].length;
+    const relevantResults = results.slice(
+      previousCutoff,
+      previousCutoff + callCount
+    );
+
+    let index = 0;
+    for (const callResult of relevantResults) {
+      resultsByRegistrant[registrar].push({
+        call: batch.callsByRegistrant[registrar][index],
+        result: callResult.map((bn) => bn.toString()),
+      });
+
+      index++;
+    }
+
+    previousCutoff += callCount;
+  }
+
+  return {
+    blockNumber,
+    resultsByRegistrant,
+  };
+}
+// #endregion

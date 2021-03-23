@@ -1,4 +1,4 @@
-import { CallWithResult, deserializeCallId } from "../batcher/slice";
+import { CallWithResult, deserializeOnChainCall } from "../batcher/slice";
 import {
   MulticallData,
   multicallDataReceived,
@@ -128,7 +128,7 @@ function createMulticallDataParser(prefix: string, formatter: any) {
       // ===  so we group them by pool prior to iteration.
       const callsByPool = relevantResults
         .map(({ call, result }) => {
-          const deserialized = deserializeCallId(call);
+          const deserialized = deserializeOnChainCall(call);
 
           return deserialized
             ? ({

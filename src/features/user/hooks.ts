@@ -32,14 +32,12 @@ export function useUserDataRegistrar(spender: string, tokenIds: string[]) {
   const userDataCalls = tokenIds.reduce((prev, next) => {
     prev.push(
       {
-        caller,
         interfaceKind,
         target: next,
         function: "allowance",
         args: [userAddress, spender],
       },
       {
-        caller,
         interfaceKind,
         target: next,
         function: "balanceOf",
@@ -51,6 +49,7 @@ export function useUserDataRegistrar(spender: string, tokenIds: string[]) {
   }, [] as RegisteredCall[]);
 
   useCallRegistrar({
-    calls: userDataCalls,
+    caller,
+    onChainCalls: userDataCalls,
   });
 }
