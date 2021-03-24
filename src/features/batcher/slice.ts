@@ -3,6 +3,7 @@ import { abiLookup } from "ethereum/abi";
 import {
   coingeckoDataLoaded,
   multicallDataReceived,
+  multicallDataRequested,
   poolTradesAndSwapsLoaded,
 } from "features/actions";
 import { stakingActions } from "../staking";
@@ -36,6 +37,7 @@ interface BatcherState {
     }
   >;
   listenerCounts: Record<string, number>;
+  status: "idle" | "loading";
 }
 
 const MAX_AGE_IN_BLOCKS = 4; // How old can data be in the cache?
@@ -48,6 +50,7 @@ const slice = createSlice({
     offChainCalls: [],
     cache: {},
     listenerCounts: {},
+    status: "idle",
   } as BatcherState,
   reducers: {
     blockNumberChanged: (state, action: PayloadAction<number>) => {
@@ -134,9 +137,21 @@ const slice = createSlice({
           return state;
         }
       )
+      .addCase(multicallDataRequested, (state, action) => {
+        state.status = "loading";
+      })
       .addCase(multicallDataReceived, (state, action) => {
         const { blockNumber, cache, listenerCounts } = state;
-        const { resultsByRegistrant } = action.payload;
+        const {
+          data: { resultsByRegistrant },
+          isLegitimate,
+        } = action.payload;
+
+        if (isLegitimate) {
+          // It's a silly name, but "legitimacy" in this context means "a standard batch" vs. an independent query.
+          // Only go back to "idle" when a standard batch concludes.
+          state.status = "idle";
+        }
 
         for (const callsWithResults of Object.values(resultsByRegistrant)) {
           for (const { call, result } of callsWithResults) {
@@ -190,6 +205,16 @@ export const selectors = {
     return entry && blockNumber - entry.fromBlockNumber <= MAX_AGE_IN_BLOCKS
       ? entry.result
       : null;
+  },
+  selectBatcherStatus(state: AppState) {
+    const { status, onChainCalls, offChainCalls, cache } = state.batcher;
+
+    return {
+      cache: Object.entries(cache).length,
+      status,
+      onChainCalls: onChainCalls.length,
+      offChainCalls: offChainCalls.length,
+    };
   },
 };
 

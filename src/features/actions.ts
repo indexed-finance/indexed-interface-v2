@@ -100,6 +100,9 @@ export type MulticallData = {
   >;
 };
 
-export const multicallDataReceived = createAction<MulticallData>(
-  "multicallDataReceived"
-);
+export const multicallDataReceived = createAction<{
+  data: MulticallData;
+  isLegitimate: boolean;
+}>("multicallDataReceived");
+
+export const multicallDataRequested = createAction("multicallDataRequested");

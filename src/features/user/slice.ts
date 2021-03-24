@@ -50,7 +50,7 @@ const slice = createSlice({
         state.recentPoolUpdates[poolId] = blockNumber;
       })
       .addCase(multicallDataReceived, (state, action) => {
-        const parsed = multicallDataParser(action.payload) as ReturnType<
+        const parsed = multicallDataParser(action.payload.data) as ReturnType<
           typeof createFormattedUserDetail
         >;
 

@@ -153,7 +153,7 @@ export const thunks = {
     const offChainBatch = selectors.selectOffChainBatch(state);
 
     dispatch(actions.blockNumberChanged(blockNumber));
-    dispatch(thunks.sendOnChainBatch(onChainBatch));
+    dispatch(thunks.sendOnChainBatch(onChainBatch, true));
     dispatch(thunks.sendOffChainBatch(offChainBatch));
   },
   /**
@@ -556,13 +556,18 @@ export const thunks = {
         splitOnChainCalls.cached.results
       );
 
-      dispatch(actions.multicallDataReceived(formattedMulticallData));
+      dispatch(
+        actions.multicallDataReceived({
+          data: formattedMulticallData,
+          isLegitimate: false,
+        })
+      );
     }
 
     if (provider) {
       const toMulticall = createOnChainBatch(splitOnChainCalls.notCached);
 
-      dispatch(actions.sendOnChainBatch(toMulticall));
+      dispatch(actions.sendOnChainBatch(toMulticall, false));
     }
 
     if (splitOffChainCalls.cached.calls.length > 0) {
@@ -592,9 +597,12 @@ export const thunks = {
     }
   },
   sendOnChainBatch: (
-    batch: ReturnType<typeof selectors.selectOnChainBatch>
+    batch: ReturnType<typeof selectors.selectOnChainBatch>,
+    isLegitimate: boolean
   ): AppThunk => async (dispatch) => {
     if (provider) {
+      dispatch(actions.multicallDataRequested());
+
       const { blockNumber, results } = await multicall(
         provider,
         batch.deserializedCalls
@@ -605,7 +613,12 @@ export const thunks = {
         results
       );
 
-      dispatch(actions.multicallDataReceived(formattedMulticallData));
+      dispatch(
+        actions.multicallDataReceived({
+          data: formattedMulticallData,
+          isLegitimate,
+        })
+      );
     }
   },
   sendOffChainBatch: (

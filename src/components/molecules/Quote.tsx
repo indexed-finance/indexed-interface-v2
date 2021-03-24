@@ -59,7 +59,7 @@ export default function Quote({
             }}
             type={isNegative ? "danger" : "success"}
           >
-            {netChange} ({netChangePercent}
+            {netChange} ({netChangePercent})
           </Typography.Paragraph>
         </>
       ) : (
