@@ -9,7 +9,11 @@ import {
   totalSuppliesUpdated,
   uniswapPairsRegistered,
 } from "features/actions";
-import { createEntityAdapter, createSelector, createSlice } from "@reduxjs/toolkit";
+import {
+  createEntityAdapter,
+  createSelector,
+  createSlice,
+} from "@reduxjs/toolkit";
 import type { AppState } from "features/store";
 
 const adapter = createEntityAdapter<NormalizedToken>();
@@ -49,7 +53,7 @@ const slice = createSlice({
         for (const [
           address,
           { price, change24Hours, percentChange24Hours },
-        ] of Object.entries(action.payload)) {
+        ] of Object.entries(action.payload.tokens)) {
           const entry = state.entities[address.toLowerCase()];
 
           if (entry) {
@@ -87,11 +91,11 @@ const slice = createSlice({
               symbol: "UniV2",
               name: `UniswapV2 LP Token`,
               decimals: 18,
-              coingeckoId: ""
+              coingeckoId: "",
             };
           }
         }
-      })
+      }),
 });
 
 export const { actions } = slice;
@@ -113,25 +117,27 @@ export const selectors = {
   },
   selectAllTokens: (state: AppState) => selectors.selectAll(state),
   selectTokenLookup: (state: AppState) => selectors.selectEntities(state),
-  selectTokenLookupBySymbol: (state: AppState): Record<string, NormalizedToken> => ({}),
+  selectTokenLookupBySymbol: (
+    state: AppState
+  ): Record<string, NormalizedToken> => ({}),
   selectTokenSymbols: (state: AppState) =>
     selectors.selectAll(state).map(({ symbol }) => symbol),
   selectTokenSymbol: (state: AppState, poolId: string) =>
     selectors.selectTokenLookup(state)[poolId]?.symbol ?? "",
 };
 
-
 export const selectTokenSupplies = createSelector(
   selectors.selectTokensById,
-  tokens => tokens.map((t: NormalizedToken | undefined) => t?.totalSupply)
+  (tokens) => tokens.map((t: NormalizedToken | undefined) => t?.totalSupply)
 );
 
 selectors.selectTokenLookupBySymbol = createSelector(
   selectors.selectAllTokens,
-  (tokens) => tokens.reduce((prev, next) => {
-    prev[next.symbol.toLowerCase()] = next;
-    return prev;
-  }, {} as Record<string, NormalizedToken>)
+  (tokens) =>
+    tokens.reduce((prev, next) => {
+      prev[next.symbol.toLowerCase()] = next;
+      return prev;
+    }, {} as Record<string, NormalizedToken>)
 );
 
 export default slice.reducer;

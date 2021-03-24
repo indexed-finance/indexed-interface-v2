@@ -67,7 +67,7 @@ type InitialzeOptions = {
  */
 const BLOCK_HANDLER_DEBOUNCE_RATE = 250;
 
-const offChainThunkToTopLevelActions = {
+const offChainActionPayloads = {
   retrieveCoingeckoData: (value: any) => actions.coingeckoDataLoaded(value),
   requestPoolTradesAndSwaps: (value: any) =>
     actions.poolTradesAndSwapsLoaded(value),
@@ -208,7 +208,12 @@ export const thunks = {
       relevantTokenAddresses
     );
 
-    dispatch(actions.coingeckoDataLoaded(coingeckoData));
+    dispatch(
+      actions.coingeckoDataLoaded({
+        pool: poolId,
+        tokens: coingeckoData,
+      })
+    );
   },
   /**
    *
@@ -564,14 +569,14 @@ export const thunks = {
       let index = 0;
       for (const call of splitOffChainCalls.cached.calls) {
         const [thunkName] = call.split("/");
-        const relevantActionCreator = (offChainThunkToTopLevelActions as any)[
+        const relevantActionCreator = (offChainActionPayloads as any)[
           thunkName
         ];
 
         if (relevantActionCreator) {
           const relevantResult = splitOffChainCalls.cached.results[index];
 
-          relevantActionCreator(relevantResult);
+          dispatch(relevantActionCreator(relevantResult));
         }
 
         index++;
@@ -606,7 +611,7 @@ export const thunks = {
   sendOffChainBatch: (
     batch: ReturnType<typeof selectors.selectOffChainBatch>
   ): AppThunk => async (dispatch) => {
-    console.log({ batch });
+    // console.log({ batch });
   },
 };
 

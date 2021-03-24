@@ -103,18 +103,16 @@ const slice = createSlice({
   extraReducers: (builder) =>
     builder
       .addCase(coingeckoDataLoaded, (state, action) => {
-        for (const [address, result] of Object.entries(action.payload)) {
-          const formattedCall = `retrieveCoingeckoData/${address}`;
+        const formattedCall = `retrieveCoingeckoData/${action.payload.pool}`;
 
-          state.cache[formattedCall] = {
-            result: result as any,
-            fromBlockNumber: state.blockNumber,
-          };
-        }
+        state.cache[formattedCall] = {
+          result: action.payload as any,
+          fromBlockNumber: state.blockNumber,
+        };
       })
       .addCase(poolTradesAndSwapsLoaded, (state, action) => {
         const { poolId } = action.payload;
-        const formattedCall = `poolTradesAndSwapsLoaded/${poolId}`;
+        const formattedCall = `requestPoolTradesAndSwaps/${poolId}`;
 
         state.cache[formattedCall] = {
           result: action.payload as any,
@@ -124,7 +122,7 @@ const slice = createSlice({
         return state;
       })
       .addCase(
-        stakingActions.stakingDataLoaded.type,
+        stakingActions.stakingDataLoaded,
         (state, action: PayloadAction<NdxStakingPool[]>) => {
           const formattedCall = "requestStakingData";
 

@@ -25,8 +25,9 @@ export const coingeckoIdsLoaded = createAction<
 /**
  *
  */
-export const coingeckoDataLoaded = createAction<
-  Record<
+export const coingeckoDataLoaded = createAction<{
+  pool: string;
+  tokens: Record<
     string,
     {
       price: number;
@@ -34,8 +35,8 @@ export const coingeckoDataLoaded = createAction<
       percentChange24Hours: number;
       updatedAt: number;
     }
-  >
->("coingeckoDataLoaded");
+  >;
+}>("coingeckoDataLoaded");
 /**
  *
  */

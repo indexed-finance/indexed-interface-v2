@@ -181,7 +181,12 @@ function handleExrateResponse(data: ExchangeResponse) {
         updatedAt: new Date().getTime(),
       };
 
-      store.dispatch(actions.coingeckoDataLoaded(symbolToPriceDataLookup));
+      store.dispatch(
+        actions.coingeckoDataLoaded({
+          pool: "",
+          tokens: symbolToPriceDataLookup,
+        })
+      );
     }
   } finally {
     coinapiUsage.responseCounts.exrate++;
