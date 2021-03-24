@@ -1,5 +1,11 @@
-import { INFURA_ID, SERVER_POLL_RATE } from "config";
-import { actions, selectors, store } from "features";
+import { INFURA_ID } from "config";
+import {
+  RegisteredCall,
+  actions,
+  createPoolDetailCalls,
+  selectors,
+  store,
+} from "features";
 import { log } from "./helpers";
 import { providers } from "ethers";
 import setupCoinapiConnection from "./coinapi-connection";
@@ -43,25 +49,37 @@ const unsubscribeFromWaitingForSymbols = subscribe(() => {
 
     unsubscribeFromWaitingForSymbols();
     setupCoinapiConnection(relevantSymbols);
-    continuouslyRetrievePoolDetails();
+    setupRegistrants();
   }
 });
 
-/**
- * Every so often, re-fetch thegraph and pool data.
- */
-function continuouslyRetrievePoolDetails() {
-  setTimeout(() => {
-    const state = getState();
-    const pools = selectors.selectAllPools(state);
+function setupRegistrants() {
+  const state = getState();
+  const pools = selectors.selectAllPools(state);
+  const allCalls = pools.reduce(
+    (prev, next) => {
+      const { id } = next;
+      const tokenIds = selectors.selectPoolTokenIds(state, id);
+      const { onChainCalls, offChainCalls } = createPoolDetailCalls(
+        id,
+        tokenIds
+      );
 
-    dispatch(actions.retrieveInitialData());
+      prev.onChainCalls.push(...onChainCalls);
+      prev.offChainCalls.push(...(offChainCalls as RegisteredCall[]));
 
-    for (const pool of pools) {
-      dispatch(actions.retrieveCoingeckoData(pool.id));
-      dispatch(actions.requestPoolTradesAndSwaps(pool.id));
+      return prev;
+    },
+    {
+      caller: "Socket Server",
+      onChainCalls: [],
+      offChainCalls: [],
+    } as {
+      caller: string;
+      onChainCalls: RegisteredCall[];
+      offChainCalls: RegisteredCall[];
     }
+  );
 
-    continuouslyRetrievePoolDetails();
-  }, SERVER_POLL_RATE);
+  dispatch(actions.registrantRegistered(allCalls));
 }

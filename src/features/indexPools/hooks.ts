@@ -18,11 +18,7 @@ export const usePoolUnderlyingTokens = (poolId: string) =>
     selectors.selectPoolUnderlyingTokens(state, poolId)
   );
 
-export function usePoolDetailRegistrar(
-  poolAddress: string,
-  tokenIds: string[]
-) {
-  const caller = "Pool Detail";
+export function createPoolDetailCalls(poolAddress: string, tokenIds: string[]) {
   const target = poolAddress;
   const interfaceKind = "IPool_ABI";
   const tokenCalls = tokenIds.reduce((prev, next) => {
@@ -68,8 +64,7 @@ export function usePoolDetailRegistrar(
     ...tokenCalls,
   ];
 
-  useCallRegistrar({
-    caller,
+  return {
     onChainCalls: poolCalls,
     offChainCalls: [
       {
@@ -81,5 +76,22 @@ export function usePoolDetailRegistrar(
         args: [poolAddress],
       },
     ],
+  };
+}
+
+export function usePoolDetailRegistrar(
+  poolAddress: string,
+  tokenIds: string[]
+) {
+  const caller = "Pool Detail";
+  const { onChainCalls, offChainCalls } = createPoolDetailCalls(
+    poolAddress,
+    tokenIds
+  );
+
+  useCallRegistrar({
+    caller,
+    onChainCalls,
+    offChainCalls,
   });
 }

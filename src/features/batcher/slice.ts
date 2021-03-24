@@ -1,11 +1,13 @@
-import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import { abiLookup } from "ethereum/abi";
 import {
+  MulticallData,
+  cachedMulticallDataReceived,
   coingeckoDataLoaded,
   multicallDataReceived,
   multicallDataRequested,
   poolTradesAndSwapsLoaded,
 } from "features/actions";
+import { PayloadAction, createSlice } from "@reduxjs/toolkit";
+import { abiLookup } from "ethereum/abi";
 import { stakingActions } from "../staking";
 import { userActions } from "../user";
 import type { AppState, AppThunk } from "features/store";
@@ -140,50 +142,53 @@ const slice = createSlice({
       .addCase(multicallDataRequested, (state, action) => {
         state.status = "loading";
       })
-      .addCase(multicallDataReceived, (state, action) => {
-        const { blockNumber, cache, listenerCounts } = state;
-        const {
-          data: { resultsByRegistrant },
-          isLegitimate,
-        } = action.payload;
-
-        if (isLegitimate) {
-          // It's a silly name, but "legitimacy" in this context means "a standard batch" vs. an independent query.
-          // Only go back to "idle" when a standard batch concludes.
-          state.status = "idle";
-        }
-
-        for (const callsWithResults of Object.values(resultsByRegistrant)) {
-          for (const { call, result } of callsWithResults) {
-            cache[call] = {
-              result,
-              fromBlockNumber: blockNumber,
-            };
-          }
-        }
-
-        const oldCalls: Record<string, true> = {};
-        for (const [call, value] of Object.entries(listenerCounts)) {
-          if (value === 0) {
-            oldCalls[call] = true;
-            delete listenerCounts[call];
-          }
-        }
-
-        state.onChainCalls = state.onChainCalls.filter(
-          (call) => !oldCalls[call]
-        );
-        state.offChainCalls = state.offChainCalls.filter(
-          (call) => !oldCalls[call]
-        );
-
-        return state;
-      })
       .addCase(userActions.userDisconnected.type, (state) => {
         state.onChainCalls = [];
         state.offChainCalls = [];
         state.listenerCounts = {};
-      }),
+      })
+      .addMatcher(
+        (action) =>
+          [
+            multicallDataReceived.type,
+            cachedMulticallDataReceived.type,
+          ].includes(action.type),
+        (state, action: PayloadAction<MulticallData>) => {
+          const { blockNumber, cache, listenerCounts } = state;
+
+          if (action.type === multicallDataReceived.type) {
+            state.status = "idle";
+          }
+
+          for (const callsWithResults of Object.values(
+            action.payload.resultsByRegistrant
+          )) {
+            for (const { call, result } of callsWithResults) {
+              cache[call] = {
+                result,
+                fromBlockNumber: blockNumber,
+              };
+            }
+          }
+
+          const oldCalls: Record<string, true> = {};
+          for (const [call, value] of Object.entries(listenerCounts)) {
+            if (value === 0) {
+              oldCalls[call] = true;
+              delete listenerCounts[call];
+            }
+          }
+
+          state.onChainCalls = state.onChainCalls.filter(
+            (call) => !oldCalls[call]
+          );
+          state.offChainCalls = state.offChainCalls.filter(
+            (call) => !oldCalls[call]
+          );
+
+          return state;
+        }
+      ),
 });
 
 export const { actions } = slice;

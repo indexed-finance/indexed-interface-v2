@@ -55,7 +55,7 @@ const slice = createSlice({
       })
       .addCase(multicallDataReceived, (state, action) => {
         const relevantMulticallData = parseRelevantMulticallData(
-          action.payload.data
+          action.payload
         );
 
         if (relevantMulticallData) {

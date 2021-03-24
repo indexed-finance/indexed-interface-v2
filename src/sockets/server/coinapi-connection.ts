@@ -37,6 +37,7 @@ export let lastSymbols: string[];
 export let coinapiClient: WebSocket;
 export let symbolToPriceDataLookup: Record<string, PriceData>;
 export let prices24HoursAgo: Record<string, null | number>;
+export let updatingCoinData: NodeJS.Timer;
 export let reportingCoinapiUsage: NodeJS.Timer;
 export let checkingNeedToRestart: NodeJS.Timer;
 
@@ -69,6 +70,7 @@ export default async function setupCoinapiConnection(symbols: string[]) {
   coinapiClient.on("close", handleClose);
   coinapiClient.on("error", handleError);
 
+  continuouslyUpdateCoinData();
   continuouslyReportCoinapiUsage();
   continuouslyCheckNeedToRestart();
 }
@@ -174,19 +176,12 @@ function handleExrateResponse(data: ExchangeResponse) {
       const change24Hours = rate - price24HoursAgo!;
       const percentChange24Hours = change24Hours / rate;
 
-      symbolToPriceDataLookup[from] = {
+      Reflect.set(symbolToPriceDataLookup, from, {
         price: rate,
         change24Hours,
         percentChange24Hours,
         updatedAt: new Date().getTime(),
-      };
-
-      store.dispatch(
-        actions.coingeckoDataLoaded({
-          pool: "",
-          tokens: symbolToPriceDataLookup,
-        })
-      );
+      });
     }
   } finally {
     coinapiUsage.responseCounts.exrate++;
@@ -237,6 +232,23 @@ function handleReconnect() {
 function handleUnexpectedResponse(data: { type: string }) {
   log("Unexpected response; no handler present for ", data.type);
   coinapiUsage.responseCounts.unexpected++;
+}
+/**
+ *
+ */
+function continuouslyUpdateCoinData() {
+  clearTimeout(updatingCoinData);
+  updatingCoinData = setTimeout(() => {
+    log("Sending up-to-date coin data.");
+
+    store.dispatch(
+      actions.coingeckoDataLoaded({
+        pool: "",
+        tokens: symbolToPriceDataLookup,
+      })
+    );
+    continuouslyUpdateCoinData();
+  }, 10000);
 }
 /**
  *

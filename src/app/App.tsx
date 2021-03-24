@@ -19,7 +19,7 @@ function Inner() {
       <BrowserRouter>
         <AppLayout />
       </BrowserRouter>
-      {flags.showScreenSize && <DEBUG />}
+      {flags.useDEBUG && <DEBUG />}
     </>
   );
 

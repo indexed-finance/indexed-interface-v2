@@ -34,12 +34,19 @@ export default class SocketClient {
 
       switch (kind) {
         case "INITIAL_STATE":
-          return store.dispatch(actions.receivedInitialStateFromServer(data));
+          const { batcher: _, ...others } = data;
+
+          return store.dispatch(actions.receivedInitialStateFromServer(others));
         case "STATE_PATCH":
           const state = deepClone(store.getState()) as AppState;
           const patch = data as Operation[];
+          const nonBatchPatch = patch.filter(
+            (operation) => !operation.path.includes("batcher")
+          );
 
-          patch.reduce(applyReducer, state);
+          delete (state as any).batcher;
+
+          nonBatchPatch.reduce(applyReducer, state);
 
           return store.dispatch(actions.receivedStatePatchFromServer(state));
       }

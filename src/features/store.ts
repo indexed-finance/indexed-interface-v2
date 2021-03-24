@@ -7,6 +7,8 @@ import { userActions } from "./user";
 import flags from "feature-flags";
 import reducer from "./reducer";
 
+export const actionHistory: any = [];
+
 const store = configureStore({
   reducer,
   middleware: (getDefaultMiddleware) =>
@@ -20,6 +22,13 @@ const store = configureStore({
           if (action.type === userActions.userDisconnected.type) {
             disconnectFromProvider();
           }
+
+          return next(action);
+        };
+      })
+      .concat(function trackActionMiddleware() {
+        return (next) => (action) => {
+          actionHistory.push(action.type);
 
           return next(action);
         };

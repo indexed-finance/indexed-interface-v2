@@ -1,11 +1,12 @@
-import { DataReceiverConfig, actions } from "features";
+import { DataReceiverConfig, actions, selectors } from "features";
 import { isEqual } from "lodash";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useRef } from "react";
 
 export default function useCallRegistrar(calls: DataReceiverConfig) {
   const dispatch = useDispatch();
   const cachedCalls = useRef(calls);
+  const isConnected = useSelector(selectors.selectConnected);
 
   // Effect:
   // Handle updates "gracefully" in a McJanky way.
@@ -17,23 +18,26 @@ export default function useCallRegistrar(calls: DataReceiverConfig) {
 
   // Effect:
   // Register a multicall listener that queries certain functions every update.
+  // Note: if the user is connected, defer all updates to the server.
   useEffect(() => {
-    const _cachedCalls = cachedCalls.current;
+    if (!isConnected) {
+      const _cachedCalls = cachedCalls.current;
 
-    if (_cachedCalls) {
-      const allCalls = {
-        caller: _cachedCalls.caller,
-        onChainCalls: _cachedCalls.onChainCalls ?? [],
-        offChainCalls: _cachedCalls.offChainCalls ?? [],
-      };
+      if (_cachedCalls) {
+        const allCalls = {
+          caller: _cachedCalls.caller,
+          onChainCalls: _cachedCalls.onChainCalls ?? [],
+          offChainCalls: _cachedCalls.offChainCalls ?? [],
+        };
 
-      dispatch(actions.registrantRegistered(allCalls));
+        dispatch(actions.registrantRegistered(allCalls));
 
-      return () => {
-        dispatch(actions.registrantUnregistered(allCalls));
-      };
+        return () => {
+          dispatch(actions.registrantUnregistered(allCalls));
+        };
+      }
     }
-  }, [dispatch]);
+  }, [dispatch, isConnected]);
 
   // Effect:
   // When a call is first registered,

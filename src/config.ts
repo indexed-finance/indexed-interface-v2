@@ -20,7 +20,7 @@ export const TRADE_PRICE_OUTPUT_MODIFIER = 1.02;
 export const GATEWAY_URL = "https://gateway.temporal.cloud/ipfs/";
 export const SOCKET_PORT = 13337;
 export const WEBSOCKET_SERVER_PING_RATE = 2000;
-export const WEBSOCKET_SERVER_UPDATE_RATE = 1000;
+export const WEBSOCKET_SERVER_UPDATE_RATE = 10000;
 export const WEBSOCKET_SERVER_PORT = 13337;
 export const QUIKNODE_WEBSOCKET_PROVIDER =
   "wss://bold-old-pond.quiknode.pro/7876affe5a6bb6688c659b452fe9d81d4125d21f/";

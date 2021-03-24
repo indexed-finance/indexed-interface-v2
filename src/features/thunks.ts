@@ -153,7 +153,7 @@ export const thunks = {
     const offChainBatch = selectors.selectOffChainBatch(state);
 
     dispatch(actions.blockNumberChanged(blockNumber));
-    dispatch(thunks.sendOnChainBatch(onChainBatch, true));
+    dispatch(thunks.sendOnChainBatch(onChainBatch));
     dispatch(thunks.sendOffChainBatch(offChainBatch));
   },
   /**
@@ -196,12 +196,12 @@ export const thunks = {
   /**
    *
    */
-  retrieveCoingeckoData: (poolId: string): AppThunk => async (
+  retrieveCoingeckoData: (poolAddress: string): AppThunk => async (
     dispatch,
     getState
   ) => {
     const state = getState();
-    const tokenIds = selectors.selectPoolTokenIds(state, poolId);
+    const tokenIds = selectors.selectPoolTokenIds(state, poolAddress);
     const tokenLookup = selectors.selectTokenLookup(state);
     const relevantTokenAddresses = tokenIds.filter((id) => tokenLookup[id]);
     const coingeckoData = await CoinGeckoService.getStatsForTokens(
@@ -210,26 +210,30 @@ export const thunks = {
 
     dispatch(
       actions.coingeckoDataLoaded({
-        pool: poolId,
+        pool: poolAddress,
         tokens: coingeckoData,
       })
     );
   },
   /**
    *
-   * @param poolId -
+   * @param poolAddress -
    * @returns
    */
-  requestPoolTradesAndSwaps: (poolId: string): AppThunk => async (dispatch) => {
+  requestPoolTradesAndSwaps: (poolAddress: string): AppThunk => async (
+    dispatch
+  ) => {
     if (provider) {
       const { chainId } = await provider.getNetwork();
       const url = helpers.getUrl(chainId);
       const [trades, swaps] = await Promise.all([
-        helpers.queryTrades(SUBGRAPH_URL_UNISWAP, poolId),
-        helpers.querySwaps(url, poolId),
+        helpers.queryTrades(SUBGRAPH_URL_UNISWAP, poolAddress),
+        helpers.querySwaps(url, poolAddress),
       ]);
 
-      dispatch(actions.poolTradesAndSwapsLoaded({ poolId, trades, swaps }));
+      dispatch(
+        actions.poolTradesAndSwapsLoaded({ poolId: poolAddress, trades, swaps })
+      );
     }
   },
   /**
@@ -556,18 +560,13 @@ export const thunks = {
         splitOnChainCalls.cached.results
       );
 
-      dispatch(
-        actions.multicallDataReceived({
-          data: formattedMulticallData,
-          isLegitimate: false,
-        })
-      );
+      dispatch(actions.cachedMulticallDataReceived(formattedMulticallData));
     }
 
     if (provider) {
       const toMulticall = createOnChainBatch(splitOnChainCalls.notCached);
 
-      dispatch(actions.sendOnChainBatch(toMulticall, false));
+      dispatch(actions.sendOnChainBatch(toMulticall));
     }
 
     if (splitOffChainCalls.cached.calls.length > 0) {
@@ -597,8 +596,7 @@ export const thunks = {
     }
   },
   sendOnChainBatch: (
-    batch: ReturnType<typeof selectors.selectOnChainBatch>,
-    isLegitimate: boolean
+    batch: ReturnType<typeof selectors.selectOnChainBatch>
   ): AppThunk => async (dispatch) => {
     if (provider) {
       dispatch(actions.multicallDataRequested());
@@ -613,18 +611,19 @@ export const thunks = {
         results
       );
 
-      dispatch(
-        actions.multicallDataReceived({
-          data: formattedMulticallData,
-          isLegitimate,
-        })
-      );
+      dispatch(actions.multicallDataReceived(formattedMulticallData));
     }
   },
   sendOffChainBatch: (
     batch: ReturnType<typeof selectors.selectOffChainBatch>
   ): AppThunk => async (dispatch) => {
-    // console.log({ batch });
+    for (const call of batch) {
+      const action = deserializeOffChainCall(call, thunks);
+
+      if (action) {
+        dispatch(action());
+      }
+    }
   },
 };
 
