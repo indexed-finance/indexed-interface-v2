@@ -614,8 +614,8 @@ export const thunks = {
   },
   sendOnChainBatch: (
     batchConfig: ReturnType<typeof selectors.selectOnChainBatch>
-  ): AppThunk => async (dispatch, getState) => {
-    if (provider) {
+  ): AppThunk => async (dispatch) => {
+    if (provider && batchConfig.batch.deserializedCalls.length > 0) {
       dispatch(actions.multicallDataRequested());
 
       const { blockNumber, results } = await multicall(

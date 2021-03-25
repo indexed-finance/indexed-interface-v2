@@ -8,6 +8,7 @@ import {
 } from "features/actions";
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { abiLookup } from "ethereum/abi";
+import { settingsActions } from "../settings";
 import { stakingActions } from "../staking";
 import { userActions } from "../user";
 import type { AppState, AppThunk } from "features/store";
@@ -23,7 +24,7 @@ export type RegisteredCall = {
 };
 
 export type CallWithResult = Omit<Call, "interface" | "args"> & {
-  result: string[];
+  result?: string[];
   args?: string[];
 };
 
@@ -46,7 +47,7 @@ interface BatcherState {
     }
   >;
   listenerCounts: Record<string, number>;
-  status: "idle" | "loading";
+  status: "idle" | "loading" | "deferring to server";
 }
 
 const MAX_AGE_IN_BLOCKS = 4; // How old can data be in the cache?
@@ -164,11 +165,37 @@ const slice = createSlice({
       .addCase(multicallDataRequested, (state) => {
         state.status = "loading";
       })
-      .addCase(userActions.userDisconnected.type, (state) => {
-        state.onChainCalls = [];
-        state.offChainCalls = [];
-        state.listenerCounts = {};
+      .addCase(settingsActions.connectionEstablished, (state) => {
+        state.status = "deferring to server";
       })
+      .addMatcher(
+        (action) =>
+          [
+            settingsActions.connectionLost.type,
+            settingsActions.connectionToggled.type,
+          ].includes(action.type),
+        (state, action) => {
+          if (
+            action.type === settingsActions.connectionLost.type ||
+            (action.type === settingsActions.connectionToggled.type &&
+              state.status === "deferring to server")
+          ) {
+            state.status = "idle";
+          }
+        }
+      )
+      .addMatcher(
+        (action) =>
+          [
+            userActions.userDisconnected.type,
+            settingsActions.connectionEstablished.type,
+          ].includes(action.type),
+        (state) => {
+          state.onChainCalls = [];
+          state.offChainCalls = [];
+          state.listenerCounts = {};
+        }
+      )
       .addMatcher(
         (action) =>
           [
@@ -180,6 +207,8 @@ const slice = createSlice({
 
           if (action.type === multicallDataReceived.type) {
             state.status = "idle";
+
+            state.blockNumber = parseInt(action.payload.blockNumber.toString());
           }
 
           for (const [call, result] of Object.entries(

@@ -61,7 +61,7 @@ const slice = createSlice({
           )) {
             const entry = state.entities[poolAddress];
 
-            if (entry) {
+            if (entry && Object.entries(results).length > 0) {
               entry.swapFee = results.swapFee;
               entry.totalDenorm = results.totalDenorm;
               entry.totalSupply = results.totalSupply;
@@ -138,7 +138,6 @@ export const { actions } = slice;
 export default slice.reducer;
 
 // #region Helpers
-
 const poolMulticallDataParser = createMulticallDataParser(
   POOL_PREFIX,
   (calls) => {
@@ -150,29 +149,32 @@ const poolMulticallDataParser = createMulticallDataParser(
           const [fn, results] = next;
           const flattened = results.map((item: CallWithResult) => ({
             args: item.args ?? [],
-            values: item.result.map(convert.toBigNumber),
+            values: (item.result ?? []).map(convert.toBigNumber),
           }));
-          const poolLevelValue = flattened[0].values[0].toString(); // --
-          const handlers: Record<string, () => void> = {
-            getBalance: () =>
-              handleTokenResults("balance", poolEntry, flattened),
-            getDenormalizedWeight: () =>
-              handleTokenResults("denorm", poolEntry, flattened),
-            getMinimumBalance: () =>
-              handleTokenResults("minimumBalance", poolEntry, flattened),
-            getSwapFee: () => {
-              poolEntry.swapFee = poolLevelValue;
-            },
-            getTotalDenormalizedWeight: () => {
-              poolEntry.totalDenorm = poolLevelValue;
-            },
-            totalSupply: () => {
-              poolEntry.totalSupply = poolLevelValue;
-            },
-          };
-          const handler = handlers[fn];
 
-          handler();
+          if (flattened[0].values.length > 0) {
+            const poolLevelValue = flattened[0].values[0].toString(); // --
+            const handlers: Record<string, () => void> = {
+              getBalance: () =>
+                handleTokenResults("balance", poolEntry, flattened),
+              getDenormalizedWeight: () =>
+                handleTokenResults("denorm", poolEntry, flattened),
+              getMinimumBalance: () =>
+                handleTokenResults("minimumBalance", poolEntry, flattened),
+              getSwapFee: () => {
+                poolEntry.swapFee = poolLevelValue;
+              },
+              getTotalDenormalizedWeight: () => {
+                poolEntry.totalDenorm = poolLevelValue;
+              },
+              totalSupply: () => {
+                poolEntry.totalSupply = poolLevelValue;
+              },
+            };
+            const handler = handlers[fn];
+
+            handler();
+          }
 
           return poolEntry;
         },
@@ -193,7 +195,7 @@ const poolMulticallDataParser = createMulticallDataParser(
         }
       );
 
-      for (const token of formattedPoolDetail.tokens) {
+      for (const token of formattedPoolDetail.tokens ?? []) {
         const { balance, minimumBalance, denorm } = token;
         const [usedBalance, usedDenorm] = convert.toBigNumber(denorm).eq(0)
           ? [minimumBalance, balancerMath.MIN_WEIGHT]

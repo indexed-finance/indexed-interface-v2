@@ -34,11 +34,23 @@ export default class SocketClient {
 
       switch (kind) {
         case "INITIAL_STATE":
-          const { batcher: _, ...others } = data;
-
-          return store.dispatch(actions.receivedInitialStateFromServer(others));
+          return store.dispatch(
+            actions.receivedInitialStateFromServer({
+              ...data,
+              batcher: {
+                blockNumber: data.batcher.blockNumber,
+                onChainCalls: [],
+                offChainCalls: [],
+                callers: {},
+                cache: {},
+                listenerCounts: {},
+                status: "deferring to server",
+              },
+            })
+          );
         case "STATE_PATCH":
           const state = deepClone(store.getState()) as AppState;
+          const blockNumber = state.batcher.blockNumber;
           const patch = data as Operation[];
           const nonBatchPatch = patch.filter(
             (operation) => !operation.path.includes("batcher")
@@ -47,6 +59,16 @@ export default class SocketClient {
           delete (state as any).batcher;
 
           nonBatchPatch.reduce(applyReducer, state);
+
+          (state as any).batcher = {
+            blockNumber,
+            onChainCalls: [],
+            offChainCalls: [],
+            callers: {},
+            cache: {},
+            listenerCounts: {},
+            status: "deferring to server",
+          };
 
           return store.dispatch(actions.receivedStatePatchFromServer(state));
       }

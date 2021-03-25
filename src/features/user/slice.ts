@@ -7,7 +7,7 @@ import type { NormalizedUser } from "ethereum/types";
 
 export type ApprovalStatus = "unknown" | "approval needed" | "approved";
 
-const USER_PREFIX = "(User Data)";
+const USER_PREFIX = "User Data";
 
 const initialState: NormalizedUser & {
   recentPoolUpdates: Record<string, number>;
@@ -38,8 +38,13 @@ const slice = createSlice({
           const { allowance, balance } = userData[tokenId];
           const combinedId = `${poolId}-${tokenId}`.toLowerCase();
 
-          state.allowances[combinedId] = allowance;
-          state.balances[tokenId] = balance;
+          if (allowance) {
+            state.allowances[combinedId] = allowance;
+          }
+
+          if (balance) {
+            state.balances[tokenId] = balance;
+          }
         }
 
         state.recentPoolUpdates[poolId] = blockNumber;
@@ -122,12 +127,17 @@ const userMulticallDataParser = createMulticallDataParser(
         const [_balanceOfCall] = balanceOfCall;
         const tokenAddress = _allowanceCall.target;
         const [, poolAddress] = _allowanceCall.args!;
-        const [allowance] = _allowanceCall.result;
-        const [balanceOf] = _balanceOfCall.result;
+        const [allowance] = _allowanceCall.result ?? [];
+        const [balanceOf] = _balanceOfCall.result ?? [];
         const combinedId = `${poolAddress}-${tokenAddress}`;
 
-        prev.allowances[combinedId] = allowance.toString();
-        prev.balances[combinedId] = balanceOf.toString();
+        if (allowance) {
+          prev.allowances[combinedId] = allowance.toString();
+        }
+
+        if (balanceOf) {
+          prev.balances[combinedId] = balanceOf.toString();
+        }
 
         return prev;
       },

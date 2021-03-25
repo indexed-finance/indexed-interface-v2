@@ -44,6 +44,8 @@ export default function useCallRegistrar(calls: DataReceiverConfig) {
   //  a) check the cache, or
   // b) independently query for results separate from the common batch.
   useEffect(() => {
-    dispatch(actions.independentlyQuery(cachedCalls.current));
-  }, [dispatch, calls.caller]);
+    if (!isConnected) {
+      dispatch(actions.independentlyQuery(cachedCalls.current));
+    }
+  }, [dispatch, calls.caller, isConnected]);
 }
