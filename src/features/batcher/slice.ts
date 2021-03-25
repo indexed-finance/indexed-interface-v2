@@ -31,6 +31,13 @@ interface BatcherState {
   blockNumber: number;
   onChainCalls: string[];
   offChainCalls: string[];
+  callers: Record<
+    string,
+    {
+      onChainCalls: string[];
+      offChainCalls: string[];
+    }
+  >;
   cache: Record<
     string,
     {
@@ -50,13 +57,18 @@ const slice = createSlice({
     blockNumber: 0,
     onChainCalls: [],
     offChainCalls: [],
+    callers: {},
     cache: {},
     listenerCounts: {},
     status: "idle",
   } as BatcherState,
   reducers: {
     blockNumberChanged: (state, action: PayloadAction<number>) => {
-      state.blockNumber = action.payload;
+      const blockNumber = action.payload;
+
+      if (blockNumber > 0) {
+        state.blockNumber = blockNumber;
+      }
     },
     registrantRegistered(
       state,
@@ -66,10 +78,16 @@ const slice = createSlice({
         offChainCalls: RegisteredCall[];
       }>
     ) {
-      const { onChainCalls, offChainCalls } = action.payload;
+      const { caller, onChainCalls, offChainCalls } = action.payload;
+      const callerEntry = {
+        onChainCalls: [] as string[],
+        offChainCalls: [] as string[],
+      };
 
       for (const call of onChainCalls) {
         const callId = serializeOnChainCall(call);
+
+        callerEntry.onChainCalls.push(callId);
 
         state.onChainCalls.push(callId);
         state.listenerCounts[callId] = (state.listenerCounts[callId] ?? 0) + 1;
@@ -78,9 +96,13 @@ const slice = createSlice({
       for (const call of offChainCalls) {
         const callId = serializeOffChainCall(call);
 
+        callerEntry.offChainCalls.push(callId);
+
         state.offChainCalls.push(callId);
         state.listenerCounts[callId] = (state.listenerCounts[callId] ?? 0) + 1;
       }
+
+      state.callers[caller] = callerEntry;
     },
     registrantUnregistered(
       state,
@@ -139,7 +161,7 @@ const slice = createSlice({
           return state;
         }
       )
-      .addCase(multicallDataRequested, (state, action) => {
+      .addCase(multicallDataRequested, (state) => {
         state.status = "loading";
       })
       .addCase(userActions.userDisconnected.type, (state) => {
@@ -160,15 +182,13 @@ const slice = createSlice({
             state.status = "idle";
           }
 
-          for (const callsWithResults of Object.values(
-            action.payload.resultsByRegistrant
+          for (const [call, result] of Object.entries(
+            action.payload.callsToResults
           )) {
-            for (const { call, result } of callsWithResults) {
-              cache[call] = {
-                result,
-                fromBlockNumber: blockNumber,
-              };
-            }
+            cache[call] = {
+              result,
+              fromBlockNumber: blockNumber,
+            };
           }
 
           const oldCalls: Record<string, true> = {};
@@ -198,7 +218,10 @@ export const selectors = {
     return state.batcher.blockNumber;
   },
   selectOnChainBatch(state: AppState) {
-    return createOnChainBatch(state.batcher.onChainCalls);
+    return {
+      callers: state.batcher.callers,
+      batch: createOnChainBatch(state.batcher.onChainCalls),
+    };
   },
   selectOffChainBatch(state: AppState) {
     return state.batcher.offChainCalls;

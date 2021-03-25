@@ -91,13 +91,14 @@ export const stakingPoolUpdated = createAction<StakingPoolUpdate>(
 
 export type MulticallData = {
   blockNumber: number;
-  resultsByRegistrant: Record<
+  callers: Record<
     string,
-    Array<{
-      call: string;
-      result: string[];
-    }>
+    {
+      onChainCalls: string[];
+      offChainCalls: string[];
+    }
   >;
+  callsToResults: Record<string, string[]>;
 };
 
 export const multicallDataReceived = createAction<MulticallData>(

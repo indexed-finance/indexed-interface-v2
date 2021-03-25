@@ -118,8 +118,6 @@ const selectCategoryImagesByPoolIds = (state: AppState) =>
       return prev;
     }, {} as Record<string, string>);
 
-// const
-
 const selectPoolTokenEntities = (state: AppState, poolId: string) =>
   state.indexPools.entities[poolId.toLowerCase()]?.tokens.entities;
 

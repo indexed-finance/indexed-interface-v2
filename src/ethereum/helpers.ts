@@ -129,7 +129,7 @@ export function calcPoolOutGivenSingleIn(
   ].map(convert.toBigNumber);
 
   if (tokenAmountIn.eq(0)) {
-    return { error: "Input can not be zero." };
+    return { error: "Input cannot be zero." };
   }
   if (tokenAmountIn.isGreaterThan(balanceIn.div(2))) {
     return { error: "Input must be less than 1/2 the pool's balance." };
@@ -143,6 +143,7 @@ export function calcPoolOutGivenSingleIn(
     tokenAmountIn,
     swapFee
   );
+
   return { poolAmountOut };
 }
 
@@ -160,7 +161,7 @@ export function calcSingleInGivenPoolOut(
   ].map(convert.toBigNumber);
 
   if (poolAmountOut.eq(0)) {
-    return { error: "Input can not be zero." };
+    return { error: "Input cannot be zero." };
   }
 
   const tokenAmountIn = balancerMath.calcSingleInGivenPoolOut(
@@ -194,10 +195,13 @@ export function calcPoolInGivenSingleOut(
   ].map(convert.toBigNumber);
 
   if (tokenAmountOut.eq(0)) {
-    return { error: "Output can not be zero." };
+    return { error: "Output cannot be zero." };
   }
   if (tokenAmountOut.isGreaterThan(balanceOut.div(3))) {
-    return { tokenAmountOut, error: "Output must be less than 1/3 the pool's balance." };
+    return {
+      tokenAmountOut,
+      error: "Output must be less than 1/3 the pool's balance.",
+    };
   }
 
   const poolAmountIn = balancerMath.calcPoolInGivenSingleOut(
@@ -225,7 +229,7 @@ export function calcSingleOutGivenPoolIn(
   ].map(convert.toBigNumber);
 
   if (poolAmountIn.eq(0)) {
-    return { error: "Input can not be zero." };
+    return { error: "Input cannot be zero." };
   }
 
   const tokenAmountOut = balancerMath.calcSingleOutGivenPoolIn(
@@ -237,7 +241,10 @@ export function calcSingleOutGivenPoolIn(
     swapFee
   );
   if (tokenAmountOut.isGreaterThan(balanceOut.div(3))) {
-    return { tokenAmountOut, error: "Output must be less than 1/3 the pool's balance." };
+    return {
+      tokenAmountOut,
+      error: "Output must be less than 1/3 the pool's balance.",
+    };
   }
   return { tokenAmountOut };
 }

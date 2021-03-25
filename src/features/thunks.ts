@@ -495,6 +495,7 @@ export const thunks = {
     }
   },
   independentlyQuery: ({
+    caller,
     onChainCalls = [],
     offChainCalls = [],
   }: DataReceiverConfig): AppThunk => async (dispatch, getState) => {
@@ -551,9 +552,15 @@ export const thunks = {
     );
 
     if (splitOnChainCalls.cached.calls.length > 0) {
-      const toImmediatelyUpdate = createOnChainBatch(
-        splitOnChainCalls.cached.calls
-      );
+      const toImmediatelyUpdate = {
+        callers: {
+          [caller]: {
+            onChainCalls: serializedOnChainCalls,
+            offChainCalls: serializedOffChainCalls,
+          },
+        },
+        batch: createOnChainBatch(splitOnChainCalls.cached.calls),
+      };
       const formattedMulticallData = formatMulticallData(
         toImmediatelyUpdate,
         0,
@@ -566,7 +573,17 @@ export const thunks = {
     if (provider) {
       const toMulticall = createOnChainBatch(splitOnChainCalls.notCached);
 
-      dispatch(actions.sendOnChainBatch(toMulticall));
+      dispatch(
+        actions.sendOnChainBatch({
+          callers: {
+            [caller]: {
+              onChainCalls: serializedOnChainCalls,
+              offChainCalls: serializedOffChainCalls,
+            },
+          },
+          batch: toMulticall,
+        })
+      );
     }
 
     if (splitOffChainCalls.cached.calls.length > 0) {
@@ -596,17 +613,17 @@ export const thunks = {
     }
   },
   sendOnChainBatch: (
-    batch: ReturnType<typeof selectors.selectOnChainBatch>
-  ): AppThunk => async (dispatch) => {
+    batchConfig: ReturnType<typeof selectors.selectOnChainBatch>
+  ): AppThunk => async (dispatch, getState) => {
     if (provider) {
       dispatch(actions.multicallDataRequested());
 
       const { blockNumber, results } = await multicall(
         provider,
-        batch.deserializedCalls
+        batchConfig.batch.deserializedCalls
       );
       const formattedMulticallData = formatMulticallData(
-        batch,
+        batchConfig,
         blockNumber,
         results
       );
@@ -651,14 +668,15 @@ export default actions;
 
 // #region Helpers
 export function formatMulticallData(
-  batch: ReturnType<typeof selectors.selectOnChainBatch>,
+  batchConfig: ReturnType<typeof selectors.selectOnChainBatch>,
   blockNumber: number,
   results: ethers.utils.Result[]
 ) {
-  const resultsByRegistrant = batch.registrars.reduce((prev, next) => {
+  const { callers, batch } = batchConfig;
+  const callsToResults = batch.registrars.reduce((prev, next) => {
     prev[next] = [];
     return prev;
-  }, {} as Record<string, Array<{ call: string; result: string[] }>>);
+  }, {} as Record<string, string[]>);
 
   let previousCutoff = 0;
   for (const registrar of batch.registrars) {
@@ -670,10 +688,12 @@ export function formatMulticallData(
 
     let index = 0;
     for (const callResult of relevantResults) {
-      resultsByRegistrant[registrar].push({
-        call: batch.callsByRegistrant[registrar][index],
-        result: callResult.map((bn) => bn.toString()),
-      });
+      const call = batch.callsByRegistrant[registrar][index];
+      const formattedResults = callResult.map((bn) =>
+        bn.toString()
+      ) as string[];
+
+      callsToResults[call].push(...formattedResults);
 
       index++;
     }
@@ -683,7 +703,8 @@ export function formatMulticallData(
 
   return {
     blockNumber,
-    resultsByRegistrant,
+    callers,
+    callsToResults,
   };
 }
 // #endregion
