@@ -14,13 +14,18 @@ import { userActions } from "../user";
 import type { AppState, AppThunk } from "features/store";
 import type { Call } from "ethereum";
 import type { InterfaceKind } from "ethereum/abi";
-import type { NdxStakingPool } from "indexed-types";
 
 export type RegisteredCall = {
   interfaceKind?: InterfaceKind;
   target: string;
   function: string;
   args?: string[];
+};
+
+export type RegisteredCaller = {
+  caller: string;
+  onChainCalls: RegisteredCall[];
+  offChainCalls: RegisteredCall[];
 };
 
 export type CallWithResult = Omit<Call, "interface" | "args"> & {
@@ -149,19 +154,16 @@ const slice = createSlice({
 
         return state;
       })
-      .addCase(
-        stakingActions.stakingDataLoaded,
-        (state, action: PayloadAction<NdxStakingPool[]>) => {
-          const formattedCall = "requestStakingData";
+      .addCase(stakingActions.stakingDataLoaded, (state, action) => {
+        const formattedCall = "requestStakingData";
 
-          state.cache[formattedCall] = {
-            result: action.payload as any,
-            fromBlockNumber: state.blockNumber,
-          };
+        state.cache[formattedCall] = {
+          result: action.payload as any,
+          fromBlockNumber: state.blockNumber,
+        };
 
-          return state;
-        }
-      )
+        return state;
+      })
       .addCase(multicallDataRequested, (state) => {
         state.status = "loading";
       })

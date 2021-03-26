@@ -72,9 +72,6 @@ export function loadPersistedState() {
     if (persistedState) {
       const state = JSON.parse(persistedState);
 
-      delete state.batcher;
-      delete state.user;
-
       return state;
     }
   } catch (error) {

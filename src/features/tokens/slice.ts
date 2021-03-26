@@ -3,6 +3,7 @@ import { NormalizedToken } from "ethereum";
 import {
   coingeckoDataLoaded,
   coingeckoIdsLoaded,
+  multicallDataReceived,
   receivedInitialStateFromServer,
   receivedStatePatchFromServer,
   subgraphDataLoaded,
@@ -14,6 +15,8 @@ import {
   createSelector,
   createSlice,
 } from "@reduxjs/toolkit";
+import { createMulticallDataParser } from "helpers";
+import { totalSuppliesCaller } from "./hooks";
 import type { AppState } from "features/store";
 
 const adapter = createEntityAdapter<NormalizedToken>();
@@ -24,9 +27,29 @@ const slice = createSlice({
   reducers: {},
   extraReducers: (builder) =>
     builder
+      .addCase(multicallDataReceived, (state, action) => {
+        const relevantMulticallData = totalSuppliesMulticallDataParser(
+          action.payload
+        );
+
+        if (relevantMulticallData) {
+          for (const [tokenAddress, result] of Object.entries(
+            relevantMulticallData
+          )) {
+            const entry = state.entities[tokenAddress];
+
+            if (entry) {
+              entry.totalSupply = result;
+            }
+          }
+        }
+
+        return state;
+      })
       .addCase(subgraphDataLoaded, (state, action) => {
         const { tokens } = action.payload;
         const fullTokens = tokens.ids.map((id) => tokens.entities[id]);
+
         for (const commonToken of COMMON_BASE_TOKENS) {
           if (!tokens.entities[commonToken.id]) {
             fullTokens.push({ ...commonToken, coingeckoId: "" });
@@ -141,3 +164,26 @@ selectors.selectTokenLookupBySymbol = createSelector(
 );
 
 export default slice.reducer;
+
+// #region Helpers
+const totalSuppliesMulticallDataParser = createMulticallDataParser(
+  totalSuppliesCaller,
+  (calls) => {
+    const formattedTotalSupplies = calls.reduce((prev, next) => {
+      const [tokenAddress, functions] = next;
+      const totalSupplies = functions.totalSupply;
+
+      for (const totalSupply of totalSupplies) {
+        if (totalSupply.result) {
+          prev[tokenAddress] = totalSupply.result[0];
+        }
+      }
+
+      return prev;
+    }, {} as Record<string, string>);
+
+    return formattedTotalSupplies;
+  }
+);
+
+// #endregion

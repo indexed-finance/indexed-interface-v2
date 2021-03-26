@@ -245,8 +245,9 @@ export const thunks = {
       const { chainId } = provider.network;
       const url = helpers.getUrl(chainId);
       const staking = await helpers.queryStaking(url);
+      const formatted = helpers.normalizeStakingData(staking);
 
-      dispatch(actions.stakingDataLoaded(staking));
+      dispatch(actions.stakingDataLoaded(formatted));
     }
   },
   /**

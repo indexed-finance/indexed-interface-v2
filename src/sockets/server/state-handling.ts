@@ -1,11 +1,16 @@
 import { INFURA_ID } from "config";
 import {
   RegisteredCall,
+  RegisteredCaller,
   actions,
+  createPairDataCalls,
   createPoolDetailCalls,
+  createStakingCalls,
+  createTotalSuppliesCalls,
   selectors,
   store,
 } from "features";
+import { buildUniswapPairs } from "hooks";
 import { log } from "./helpers";
 import { providers } from "ethers";
 import setupCoinapiConnection from "./coinapi-connection";
@@ -30,6 +35,8 @@ export default async function setupStateHandling() {
       withSigner: false,
     })
   );
+
+  dispatch(actions.requestStakingData());
 }
 
 /**
@@ -40,9 +47,10 @@ let relevantSymbols: string[] = [];
 const unsubscribeFromWaitingForSymbols = subscribe(() => {
   const state = getState();
   const pools = selectors.selectAllPools(state);
+  const stakingPools = selectors.selectAllStakingPools(state);
   const symbols = selectors.selectTokenSymbols(state);
 
-  if (pools.length > 0 && symbols.length > 0) {
+  if (pools.length > 0 && stakingPools.length > 0 && symbols.length > 0) {
     log("Pools and tokens have loaded.");
 
     relevantSymbols = symbols;
@@ -56,30 +64,68 @@ const unsubscribeFromWaitingForSymbols = subscribe(() => {
 function setupRegistrants() {
   const state = getState();
   const pools = selectors.selectAllPools(state);
-  const allCalls = pools.reduce(
+  const stakingPools = selectors.selectAllStakingPools(state);
+  const { pairDataCalls, poolDetailCalls, totalSuppliesCalls } = pools.reduce(
     (prev, next) => {
       const { id } = next;
       const tokenIds = selectors.selectPoolTokenIds(state, id);
-      const { onChainCalls, offChainCalls } = createPoolDetailCalls(
-        id,
-        tokenIds
-      );
+      const pairs = buildUniswapPairs(tokenIds);
+      const pairDataCalls = createPairDataCalls(pairs);
+      const poolDetailCalls = createPoolDetailCalls(id, tokenIds);
+      const totalSuppliesCalls = createTotalSuppliesCalls(tokenIds);
 
-      prev.onChainCalls.push(...onChainCalls);
-      prev.offChainCalls.push(...(offChainCalls as RegisteredCall[]));
+      prev.pairDataCalls.onChainCalls = pairDataCalls;
+      prev.poolDetailCalls.onChainCalls = poolDetailCalls.onChainCalls;
+      prev.poolDetailCalls.offChainCalls = poolDetailCalls.offChainCalls as RegisteredCall[];
+      prev.totalSuppliesCalls.onChainCalls = totalSuppliesCalls;
 
       return prev;
     },
     {
-      caller: "Socket Server",
-      onChainCalls: [],
-      offChainCalls: [],
+      pairDataCalls: {
+        caller: "Pair Data",
+        onChainCalls: [],
+        offChainCalls: [],
+      },
+      poolDetailCalls: {
+        caller: "Pool Data",
+        onChainCalls: [],
+        offChainCalls: [],
+      },
+      totalSuppliesCalls: {
+        caller: "Total Supplies",
+        onChainCalls: [],
+        offChainCalls: [],
+      },
     } as {
-      caller: string;
-      onChainCalls: RegisteredCall[];
-      offChainCalls: RegisteredCall[];
+      pairDataCalls: RegisteredCaller;
+      poolDetailCalls: RegisteredCaller;
+      totalSuppliesCalls: RegisteredCaller;
     }
   );
 
-  dispatch(actions.registrantRegistered(allCalls));
+  dispatch(actions.registrantRegistered(pairDataCalls));
+  dispatch(actions.registrantRegistered(poolDetailCalls));
+  dispatch(actions.registrantRegistered(totalSuppliesCalls));
+
+  const stakingCalls = stakingPools.reduce(
+    (prev, next) => {
+      const { id, stakingToken } = next;
+      const stakingCalls = createStakingCalls(id, stakingToken);
+
+      prev.onChainCalls.push(...stakingCalls.onChainCalls);
+      prev.offChainCalls.push(
+        ...(stakingCalls.offChainCalls as RegisteredCall[])
+      );
+
+      return prev;
+    },
+    {
+      caller: "Staking",
+      onChainCalls: [],
+      offChainCalls: [],
+    } as RegisteredCaller
+  );
+
+  dispatch(actions.registrantRegistered(stakingCalls));
 }

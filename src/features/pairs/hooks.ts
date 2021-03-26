@@ -8,19 +8,20 @@ export type RegisteredPair = {
   exists?: boolean;
 };
 
-export function usePairDataRegistrar(pairs: RegisteredPair[]) {
-  const caller = "Pair Data";
+export const pairDataCaller = "Pair Data";
 
+export function createPairDataCalls(pairs: RegisteredPair[]): RegisteredCall[] {
+  return pairs.map((pair) => ({
+    caller: pairDataCaller,
+    interfaceKind: "Pair_ABI",
+    target: pair.id,
+    function: "getReserves",
+  }));
+}
+
+export function usePairDataRegistrar(pairs: RegisteredPair[]) {
   useCallRegistrar({
-    caller,
-    onChainCalls: pairs.map(
-      (pair) => ({
-        caller,
-        interfaceKind: "Pair_ABI",
-        target: pair.id,
-        function: "getReserves",
-      }),
-      [] as RegisteredCall[]
-    ),
+    caller: pairDataCaller,
+    onChainCalls: createPairDataCalls(pairs),
   });
 }

@@ -3,3 +3,4 @@ export {
   selectors as stakingSelectors,
   default as stakingReducer,
 } from "./slice";
+export * from "./hooks";

@@ -19,26 +19,30 @@ import { useDispatch, useSelector } from "react-redux";
 import type { AppState, FormattedPair } from "features";
 import type { NormalizedToken } from "ethereum/types";
 
+export function buildUniswapPairs(baseTokens: string[]) {
+  const tokenPairs = buildCommonTokenPairs(baseTokens);
+  const pairs = tokenPairs.map(([tokenA, tokenB]) => {
+    const [token0, token1] = sortTokens(tokenA, tokenB);
+    const pair = computeUniswapPairAddress(token0, token1);
+
+    return { id: pair, exists: undefined, token0, token1 };
+  });
+
+  return pairs;
+}
+
 export function useUniswapPairs(
   baseTokens: string[]
 ): [Pair[], false] | [undefined, true] {
   const dispatch = useDispatch();
-  const [tokenPairs, pairAddresses] = useMemo(() => {
+  const [, pairAddresses] = useMemo(() => {
     const _tokenPairs = buildCommonTokenPairs(baseTokens);
     const _pairAddresses = _tokenPairs.map(([tokenA, tokenB]) =>
       computeUniswapPairAddress(tokenA, tokenB)
     );
     return [_tokenPairs, _pairAddresses];
   }, [baseTokens]);
-  const pairs = useMemo(
-    () =>
-      tokenPairs.map(([tokenA, tokenB]) => {
-        const [token0, token1] = sortTokens(tokenA, tokenB);
-        const pair = computeUniswapPairAddress(token0, token1);
-        return { id: pair, exists: undefined, token0, token1 };
-      }),
-    [tokenPairs]
-  );
+  const pairs = useMemo(() => buildUniswapPairs(baseTokens), [baseTokens]);
   const pairDatas = useSelector((state: AppState) =>
     selectors.selectFormattedPairsById(state, pairAddresses)
   );

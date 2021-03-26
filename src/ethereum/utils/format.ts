@@ -4,11 +4,17 @@ import {
   NormalizedEntity,
   NormalizedInitialData,
   NormalizedPool,
+  NormalizedStakingPool,
   NormalizedToken,
   PoolTokenUpdate,
 } from "ethereum/types.d";
 import { convert, dedupe } from "helpers";
-import type { Category, PoolUnderlyingToken, Token } from "indexed-types";
+import type {
+  Category,
+  NdxStakingPool,
+  PoolUnderlyingToken,
+  Token,
+} from "indexed-types";
 
 export function normalizeInitialData(categories: Category[]) {
   return categories.reduce(
@@ -187,4 +193,24 @@ export function toFormattedAsset(
     ),
     weightPercentage,
   };
+}
+
+export function normalizeStakingData(
+  data: NdxStakingPool[]
+): NormalizedStakingPool[] {
+  return data.map((pool) => {
+    return {
+      id: pool.id,
+      rewardsDuration: 0,
+      periodFinish: pool.periodFinish,
+      rewardRate: pool.rewardRate,
+      rewardPerTokenStored: pool.rewardPerTokenStored,
+      totalSupply: pool.totalSupply,
+      stakingToken: pool.stakingToken,
+      indexPool: pool.indexPool,
+      isWethPair: pool.isWethPair,
+      startsAt: pool.startsAt,
+      totalRewards: pool.totalRewards,
+    };
+  });
 }

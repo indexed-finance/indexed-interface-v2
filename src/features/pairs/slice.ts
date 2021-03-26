@@ -1,7 +1,13 @@
 import { computeUniswapPairAddress } from "ethereum/utils/uniswap";
+import { convert, createMulticallDataParser } from "helpers";
 import { createEntityAdapter, createSlice } from "@reduxjs/toolkit";
+import {
+  multicallDataReceived,
+  uniswapPairsRegistered,
+  uniswapPairsUpdated,
+} from "features/actions";
+import { pairDataCaller } from "./hooks";
 import { tokensSelectors } from "features/tokens";
-import { uniswapPairsRegistered, uniswapPairsUpdated } from "features/actions";
 import type { AppState } from "features/store";
 import type { FormattedPair } from "features/selectors";
 import type { NormalizedPair, NormalizedToken } from "ethereum/types";
@@ -14,6 +20,24 @@ const slice = createSlice({
   reducers: {},
   extraReducers: (builder) =>
     builder
+      .addCase(multicallDataReceived, (state, action) => {
+        const relevantMulticallData = pairMulticallDataParser(action.payload);
+
+        if (relevantMulticallData) {
+          for (const [
+            pairAddress,
+            { exists, reserves0, reserves1 },
+          ] of Object.entries(relevantMulticallData)) {
+            const id = pairAddress.toLowerCase();
+            const pairInState = state.entities[id] as NormalizedPair;
+
+            if (exists) {
+              pairInState.reserves0 = reserves0;
+              pairInState.reserves1 = reserves1;
+            }
+          }
+        }
+      })
       .addCase(uniswapPairsUpdated, (state, action) => {
         for (const pair of action.payload) {
           const id = pair.id.toLowerCase();
@@ -93,3 +117,44 @@ export const selectors = {
 };
 
 export default slice.reducer;
+
+// #region Helpers
+const pairMulticallDataParser = createMulticallDataParser(
+  pairDataCaller,
+  (calls) => {
+    const formattedPairData = calls.reduce(
+      (prev, next) => {
+        const [pairAddress, functions] = next;
+        const pairs = functions.getReserves;
+
+        for (const pair of pairs) {
+          if (pair.result) {
+            const [reserves0, reserves1] = pair.result;
+            const exists = [reserves0, reserves1].every((value) =>
+              convert.toBigNumber(value).isPositive()
+            );
+
+            prev[pairAddress] = {
+              exists,
+              reserves0,
+              reserves1,
+            };
+          }
+        }
+
+        return prev;
+      },
+      {} as Record<
+        string,
+        {
+          exists: boolean;
+          reserves0: string;
+          reserves1: string;
+        }
+      >
+    );
+
+    return formattedPairData;
+  }
+);
+// #endregion
