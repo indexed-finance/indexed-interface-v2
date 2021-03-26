@@ -1,6 +1,7 @@
 import { AppState, selectors } from "features";
 import {
   ChartCard,
+  Performance,
   PoolDropdown,
   ProviderRequirementDrawer,
   RankedToken,
@@ -8,8 +9,8 @@ import {
 } from "components";
 import { Col, Row, Space } from "antd";
 import { Link } from "react-router-dom";
-import { Performance, Recent, Subscreen } from "app/subscreens";
 import { PoolInteractions } from "app/interactions";
+import { Recent, Subscreen } from "app/subscreens";
 import { Redirect, useParams } from "react-router-dom";
 import { useBreakpoints } from "helpers";
 import { usePoolDetailRegistrar } from "features";
@@ -45,7 +46,6 @@ function Pool({ id }: { id: string }) {
   usePoolDetailRegistrar(id, tokenIds);
 
   if (pool) {
-    // Subscreens
     const performance = <Performance pool={pool} />;
     const chart = (
       <Subscreen title="Performance">

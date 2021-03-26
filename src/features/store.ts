@@ -77,7 +77,11 @@ export function loadPersistedState() {
     const persistedState = window.localStorage.getItem(LOCALSTORAGE_KEY);
 
     if (persistedState) {
-      return JSON.parse(persistedState);
+      const state = JSON.parse(persistedState);
+
+      state.cache.blockNumber = 0;
+
+      return state;
     }
   }
 }

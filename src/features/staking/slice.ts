@@ -36,6 +36,10 @@ const slice = createSlice({
             entry.rewardRate = update.rewardRate;
             entry.rewardPerTokenStored = update.rewardPerTokenStored;
             entry.totalSupply = update.totalSupply;
+
+            if (update.userData) {
+              entry.userData = update.userData;
+            }
           }
         }
       }
@@ -65,7 +69,7 @@ const stakingMulticallDataParser = createMulticallDataParser(
         (prev, next) => {
           const stakingPoolEntry = prev;
           const [fn, results] = next;
-          const [{ values }] = results.map((item: CallWithResult) => ({
+          const [{ args, values }] = results.map((item: CallWithResult) => ({
             args: item.args ?? [],
             values: (item.result ?? []).map(convert.toBigNumber),
           }));
@@ -73,20 +77,54 @@ const stakingMulticallDataParser = createMulticallDataParser(
 
           if (result) {
             const handlers: Record<string, () => void> = {
-              rewardsDuration: () => {
+              rewardsDuration() {
                 stakingPoolEntry.rewardsDuration = result.toNumber();
               },
-              periodFinish: () => {
+              periodFinish() {
                 stakingPoolEntry.periodFinish = result.toNumber();
               },
-              rewardRate: () => {
+              rewardRate() {
                 stakingPoolEntry.rewardRate = result.toString();
               },
-              rewardPerToken: () => {
+              rewardPerToken() {
                 stakingPoolEntry.rewardPerTokenStored = result.toString();
               },
-              totalSupply: () => {
+              totalSupply() {
                 stakingPoolEntry.totalSupply = result.toString();
+              },
+              balanceOf() {
+                const [userAddress] = args;
+
+                if (!stakingPoolEntry.userData) {
+                  stakingPoolEntry.userData = {
+                    userAddress,
+                    userRewardsEarned: "",
+                    userStakedBalance: "",
+                  };
+                }
+
+                stakingPoolEntry.userData = {
+                  ...stakingPoolEntry.userData,
+                  userAddress,
+                  userStakedBalance: result.toString(),
+                };
+              },
+              earned() {
+                const [userAddress] = args;
+
+                if (!stakingPoolEntry.userData) {
+                  stakingPoolEntry.userData = {
+                    userAddress,
+                    userRewardsEarned: "",
+                    userStakedBalance: "",
+                  };
+                }
+
+                stakingPoolEntry.userData = {
+                  ...stakingPoolEntry.userData,
+                  userAddress,
+                  userRewardsEarned: result.toString(),
+                };
               },
             };
             const handler = handlers[fn];

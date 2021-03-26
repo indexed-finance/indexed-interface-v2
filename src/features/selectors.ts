@@ -294,6 +294,55 @@ const selectors = {
       return prev;
     }, {} as Record<string, string>);
   },
+  selectFormattedStaking(state: AppState): FormattedStakingDetail {
+    const pools = selectors.selectAllStakingPools(state);
+    const formattedStaking = pools
+      .map((stakingPool) => {
+        const indexPool = selectors.selectPool(state, stakingPool.indexPool);
+
+        if (!indexPool) {
+          return null;
+        }
+
+        const { id, name, symbol } = indexPool;
+        const userData = stakingPool.userData ?? {
+          userStakedBalance: "0",
+          userRewardsEarned: "0",
+        };
+        const staked = convert.toBalance(userData.userStakedBalance);
+        const earned = convert.toBalance(userData.userRewardsEarned);
+
+        return {
+          id,
+          isWethPair: stakingPool.isWethPair,
+          slug: S(indexPool.name).slugify().s,
+          name,
+          symbol,
+          staked: `${staked} ${symbol}`,
+          stakingToken: stakingPool.stakingToken,
+          earned: `${earned} NDX`,
+          apy: "0.00%",
+          rate: `0 NDX/Day`,
+        };
+      })
+      .filter((each): each is FormattedStakingData => Boolean(each));
+
+    return formattedStaking.reduce(
+      (prev, next) => {
+        const collection = next.isWethPair
+          ? prev.liquidityTokens
+          : prev.indexTokens;
+
+        collection.push(next);
+
+        return prev;
+      },
+      {
+        indexTokens: [],
+        liquidityTokens: [],
+      } as FormattedStakingDetail
+    );
+  },
 };
 
 export default selectors;
@@ -384,3 +433,21 @@ export type Transaction = Swap & {
   amount?: Trade["amount"];
 };
 export type Asset = FormattedIndexPool["assets"][0];
+
+export interface FormattedStakingData {
+  id: string;
+  slug: string;
+  name: string;
+  symbol: string;
+  staked: string;
+  stakingToken: string;
+  earned: string;
+  apy: string;
+  rate: string;
+  isWethPair: boolean;
+}
+
+export interface FormattedStakingDetail {
+  indexTokens: FormattedStakingData[];
+  liquidityTokens: FormattedStakingData[];
+}

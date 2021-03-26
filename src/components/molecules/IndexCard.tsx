@@ -10,6 +10,7 @@ type IndexCardAction = {
 
 interface Props extends CardProps {
   title?: ReactNode;
+  titleStyle?: any;
   subtitle?: ReactNode;
   titleExtra?: ReactNode;
   actions?: IndexCardAction[];
@@ -20,6 +21,7 @@ interface Props extends CardProps {
 
 export default function IndexCard({
   title,
+  titleStyle = {},
   subtitle,
   titleExtra,
   actions = [],
@@ -111,6 +113,7 @@ export default function IndexCard({
                 style={{
                   marginTop: 0,
                   marginBottom: 0,
+                  ...titleStyle,
                 }}
               >
                 {title}
