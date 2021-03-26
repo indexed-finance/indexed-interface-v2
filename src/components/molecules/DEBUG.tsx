@@ -17,6 +17,7 @@ export default function DEBUG() {
   const successOrDanger = (factor: boolean) => (factor ? "success" : "danger");
   const blockNumber = useSelector(selectors.selectBlockNumber);
   const batcherStatus = useSelector(selectors.selectBatcherStatus);
+  const cacheSize = useSelector(selectors.selectCacheSize);
   const initialBlockNumber = useRef(blockNumber);
 
   // Effect:
@@ -72,12 +73,15 @@ export default function DEBUG() {
         <div>{blockNumber}</div>
       </div>
       <div>
+        <legend>Cache Size</legend>
+        <p>{cacheSize}</p>
+      </div>
+      <div>
         <legend>Batcher Status</legend>
         <ul>
           <li>Status: {batcherStatus.status}</li>
           <li>On-Chain Calls: {batcherStatus.onChainCalls}</li>
           <li>Off-Chain Calls: {batcherStatus.offChainCalls}</li>
-          <li>Cache Size: {batcherStatus.cache}</li>
         </ul>
       </div>
     </Space>

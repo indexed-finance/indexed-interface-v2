@@ -50,7 +50,7 @@ export default class SocketClient {
           );
         case "STATE_PATCH":
           const state = deepClone(store.getState()) as AppState;
-          const blockNumber = state.batcher.blockNumber;
+          const blockNumber = state.cache.blockNumber;
           const patch = data as Operation[];
           const nonBatchPatch = patch.filter(
             (operation) => !operation.path.includes("batcher")

@@ -1,6 +1,7 @@
 import { NormalizedPool, NormalizedToken } from "ethereum";
 import { Pair } from "uniswap-types";
 import { batcherSelectors } from "./batcher";
+import { cacheSelectors } from "./cache";
 import { categoriesSelectors } from "./categories";
 import { convert } from "helpers";
 import { createSelector } from "reselect";
@@ -22,6 +23,7 @@ type ModelKeys = "categories" | "indexPools";
 
 const selectors = {
   ...batcherSelectors,
+  ...cacheSelectors,
   ...categoriesSelectors,
   ...dailySnapshotsSelectors,
   ...indexPoolsSelectors,

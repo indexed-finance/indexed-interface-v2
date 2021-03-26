@@ -10,6 +10,7 @@ import {
   serializeOffChainCall,
   serializeOnChainCall,
 } from "./batcher";
+import { cacheActions } from "./cache";
 import { categoriesActions } from "./categories";
 import { convert } from "helpers";
 import { ethers, providers } from "ethers";
@@ -86,6 +87,11 @@ export const thunks = {
         method: "eth_requestAccounts",
       });
       const provider = new ethers.providers.Web3Provider(ethereum, 1);
+
+      if (provider.blockNumber) {
+        dispatch(actions.blockNumberChanged(provider.blockNumber));
+        dispatch(actions.cachePurged());
+      }
 
       dispatch(
         actions.initialize({
@@ -647,6 +653,7 @@ export const thunks = {
 
 const actions = {
   ...batcherActions,
+  ...cacheActions,
   ...categoriesActions,
   ...indexPoolsActions,
   ...settingsActions,

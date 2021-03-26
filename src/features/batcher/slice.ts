@@ -1,15 +1,12 @@
 import {
   MulticallData,
   cachedMulticallDataReceived,
-  coingeckoDataLoaded,
   multicallDataReceived,
   multicallDataRequested,
-  poolTradesAndSwapsLoaded,
 } from "features/actions";
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { abiLookup } from "ethereum/abi";
 import { settingsActions } from "../settings";
-import { stakingActions } from "../staking";
 import { userActions } from "../user";
 import type { AppState, AppThunk } from "features/store";
 import type { InterfaceKind } from "ethereum/abi";
@@ -33,7 +30,6 @@ export type CallWithResult = Omit<RegisteredCall, "interface" | "args"> & {
 };
 
 interface BatcherState {
-  blockNumber: number;
   onChainCalls: string[];
   offChainCalls: string[];
   callers: Record<
@@ -43,38 +39,20 @@ interface BatcherState {
       offChainCalls: string[];
     }
   >;
-  cache: Record<
-    string,
-    {
-      result: string[];
-      fromBlockNumber: number;
-    }
-  >;
   listenerCounts: Record<string, number>;
   status: "idle" | "loading" | "deferring to server";
 }
 
-const MAX_AGE_IN_BLOCKS = 4; // How old can data be in the cache?
-
 const slice = createSlice({
   name: "batcher",
   initialState: {
-    blockNumber: 0,
     onChainCalls: [],
     offChainCalls: [],
     callers: {},
-    cache: {},
     listenerCounts: {},
     status: "idle",
   } as BatcherState,
   reducers: {
-    blockNumberChanged: (state, action: PayloadAction<number>) => {
-      const blockNumber = action.payload;
-
-      if (blockNumber > 0) {
-        state.blockNumber = blockNumber;
-      }
-    },
     registrantRegistered(
       state,
       action: PayloadAction<{
@@ -134,35 +112,6 @@ const slice = createSlice({
   },
   extraReducers: (builder) =>
     builder
-      .addCase(coingeckoDataLoaded, (state, action) => {
-        const formattedCall = `retrieveCoingeckoData/${action.payload.pool}`;
-
-        state.cache[formattedCall] = {
-          result: action.payload as any,
-          fromBlockNumber: state.blockNumber,
-        };
-      })
-      .addCase(poolTradesAndSwapsLoaded, (state, action) => {
-        const { poolId } = action.payload;
-        const formattedCall = `requestPoolTradesAndSwaps/${poolId}`;
-
-        state.cache[formattedCall] = {
-          result: action.payload as any,
-          fromBlockNumber: state.blockNumber,
-        };
-
-        return state;
-      })
-      .addCase(stakingActions.stakingDataLoaded, (state, action) => {
-        const formattedCall = "requestStakingData";
-
-        state.cache[formattedCall] = {
-          result: action.payload as any,
-          fromBlockNumber: state.blockNumber,
-        };
-
-        return state;
-      })
       .addCase(multicallDataRequested, (state) => {
         state.status = "loading";
       })
@@ -204,21 +153,10 @@ const slice = createSlice({
             cachedMulticallDataReceived.type,
           ].includes(action.type),
         (state, action: PayloadAction<MulticallData>) => {
-          const { blockNumber, cache, listenerCounts } = state;
+          const { listenerCounts } = state;
 
           if (action.type === multicallDataReceived.type) {
             state.status = "idle";
-
-            state.blockNumber = parseInt(action.payload.blockNumber.toString());
-          }
-
-          for (const [call, result] of Object.entries(
-            action.payload.callsToResults
-          )) {
-            cache[call] = {
-              result,
-              fromBlockNumber: blockNumber,
-            };
           }
 
           const oldCalls: Record<string, true> = {};
@@ -244,9 +182,6 @@ const slice = createSlice({
 export const { actions } = slice;
 
 export const selectors = {
-  selectBlockNumber(state: AppState) {
-    return state.batcher.blockNumber;
-  },
   selectOnChainBatch(state: AppState) {
     return {
       callers: state.batcher.callers,
@@ -256,19 +191,10 @@ export const selectors = {
   selectOffChainBatch(state: AppState) {
     return state.batcher.offChainCalls;
   },
-  selectCacheEntry(state: AppState, callId: string) {
-    const { blockNumber, cache } = state.batcher;
-    const entry = cache[callId];
-
-    return entry && blockNumber - entry.fromBlockNumber <= MAX_AGE_IN_BLOCKS
-      ? entry.result
-      : null;
-  },
   selectBatcherStatus(state: AppState) {
-    const { status, onChainCalls, offChainCalls, cache } = state.batcher;
+    const { status, onChainCalls, offChainCalls } = state.batcher;
 
     return {
-      cache: Object.entries(cache).length,
       status,
       onChainCalls: onChainCalls.length,
       offChainCalls: offChainCalls.length,
