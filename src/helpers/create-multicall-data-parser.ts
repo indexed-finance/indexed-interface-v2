@@ -1,5 +1,8 @@
-import { Call } from "ethereum";
-import { CallWithResult, deserializeOnChainCall } from "features/batcher/slice";
+import {
+  CallWithResult,
+  RegisteredCall,
+  deserializeOnChainCall,
+} from "features/batcher/slice";
 import { MulticallData } from "features/actions";
 
 export type RelevantCall = [
@@ -18,7 +21,7 @@ export default function createMulticallDataParser<T>(
     if (relevantCaller) {
       const onChainCalls = relevantCaller.onChainCalls
         .map(deserializeOnChainCall)
-        .filter((entry): entry is Call => Boolean(entry))
+        .filter((entry): entry is RegisteredCall => Boolean(entry))
         .reduce((prev, next, index) => {
           const serialized = relevantCaller.onChainCalls[index];
 

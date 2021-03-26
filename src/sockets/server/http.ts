@@ -5,7 +5,6 @@ export default function setupHttpHandling() {
   const app = express();
 
   app.get("/", (_, res) => {
-    const state = store.getState();
     const actionsHtml = `
         <div>
             <h1>Action History</h1>

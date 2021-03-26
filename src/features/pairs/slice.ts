@@ -4,7 +4,6 @@ import { createEntityAdapter, createSlice } from "@reduxjs/toolkit";
 import {
   multicallDataReceived,
   uniswapPairsRegistered,
-  uniswapPairsUpdated,
 } from "features/actions";
 import { pairDataCaller } from "./hooks";
 import { tokensSelectors } from "features/tokens";
@@ -31,35 +30,15 @@ const slice = createSlice({
             const id = pairAddress.toLowerCase();
             const pairInState = state.entities[id] as NormalizedPair;
 
-            if (exists) {
+            if (pairInState && exists) {
               pairInState.reserves0 = reserves0;
               pairInState.reserves1 = reserves1;
             }
           }
         }
       })
-      .addCase(uniswapPairsUpdated, (state, action) => {
-        for (const pair of action.payload) {
-          const id = pair.id.toLowerCase();
-          const pairInState = state.entities[id] as NormalizedPair;
-          const { exists, reserves0, reserves1 } = pair;
-
-          state.entities[id] = {
-            ...pairInState,
-            exists,
-            reserves0,
-            reserves1,
-          };
-        }
-      })
       .addCase(uniswapPairsRegistered, (state, action) => {
-        for (const pair of action.payload) {
-          const id = pair.id.toLowerCase();
-          if (!state.ids.includes(id)) {
-            state.ids.push(id);
-            state.entities[id] = { ...pair };
-          }
-        }
+        adapter.addMany(state, action.payload);
       }),
 });
 

@@ -2,7 +2,6 @@ import {
   NormalizedInitialData,
   NormalizedPair,
   NormalizedPool,
-  PairReservesUpdate,
   PoolUpdate,
   StakingPoolUpdate,
 } from "ethereum";
@@ -71,10 +70,6 @@ export const receivedInitialStateFromServer = createAction<any>(
  */
 export const receivedStatePatchFromServer = createAction<any>(
   "receivedStatePatchFromServer"
-);
-
-export const uniswapPairsUpdated = createAction<PairReservesUpdate[]>(
-  "uniswapPairsUpdated"
 );
 
 export const uniswapPairsRegistered = createAction<NormalizedPair[]>(

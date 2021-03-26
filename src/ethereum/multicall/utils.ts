@@ -7,13 +7,12 @@ import {
   defaultAbiCoder,
 } from "@ethersproject/abi";
 import { Provider } from "@ethersproject/providers";
-import { chunk } from "lodash";
-import type { Call, MultiCallResults } from "./types";
-
 import {
   MultiCall as bytecode,
   MultiCallStrict as bytecodeStrict,
 } from "./bytecode.json";
+import { chunk } from "lodash";
+import type { Call, MulticallResults } from "./types";
 
 interface CondensedCall {
   target: string;
@@ -106,7 +105,7 @@ export async function multicall(
   _calls: Call[],
   _interface?: Interface,
   _strict?: boolean
-): Promise<MultiCallResults> {
+): Promise<MulticallResults> {
   const calls = condenseCalls(_calls, _interface);
   const chunks = chunk(calls, CHUNK_CALL_COUNT);
   const allResults = await Promise.all(

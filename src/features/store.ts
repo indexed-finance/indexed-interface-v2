@@ -4,6 +4,7 @@ import { ThunkAction } from "redux-thunk";
 import { configureStore } from "@reduxjs/toolkit";
 import { disconnectFromProvider } from "./thunks";
 import { userActions } from "./user";
+import cloneDeep from "lodash.clonedeep";
 import flags from "feature-flags";
 import reducer from "./reducer";
 
@@ -40,10 +41,13 @@ const store = configureStore({
 
 store.subscribe(() => {
   try {
-    const state = JSON.stringify(store.getState(), null, 2);
+    const { batcher, ...rest } = store.getState();
+    const cache = cloneDeep(batcher.cache);
+    const toSave = JSON.stringify({ cache, ...rest }, null, 2);
 
-    window.localStorage.setItem(LOCALSTORAGE_KEY, state);
-  } catch {
+    window.localStorage.setItem(LOCALSTORAGE_KEY, toSave);
+  } catch (error) {
+    console.error("huh?", error);
     // Persistence not available.
   }
 });
@@ -66,16 +70,31 @@ export interface TokenField {
 
 // #region Helpers
 export function loadPersistedState() {
-  try {
+  if (typeof window === "undefined") {
+    // We're on the server.
+    const { loadState } = require("../sockets/server/persistence");
+    const state = loadState();
+
+    return state;
+  } else {
+    // We're on the browser.
     const persistedState = window.localStorage.getItem(LOCALSTORAGE_KEY);
 
     if (persistedState) {
-      const state = JSON.parse(persistedState);
+      const { cache, ...statePartial } = JSON.parse(persistedState);
 
-      return state;
+      statePartial.batcher = {
+        blockNumber: 0,
+        onChainCalls: [],
+        offChainCalls: [],
+        callers: {},
+        cache,
+        listenerCounts: {},
+        status: "idle",
+      };
+
+      return statePartial;
     }
-  } catch (error) {
-    return undefined;
   }
 }
 // #endregion

@@ -12,7 +12,6 @@ import { settingsActions } from "../settings";
 import { stakingActions } from "../staking";
 import { userActions } from "../user";
 import type { AppState, AppThunk } from "features/store";
-import type { Call } from "ethereum";
 import type { InterfaceKind } from "ethereum/abi";
 
 export type RegisteredCall = {
@@ -28,7 +27,7 @@ export type RegisteredCaller = {
   offChainCalls: RegisteredCall[];
 };
 
-export type CallWithResult = Omit<Call, "interface" | "args"> & {
+export type CallWithResult = Omit<RegisteredCall, "interface" | "args"> & {
   result?: string[];
   args?: string[];
 };
@@ -310,7 +309,7 @@ export function createOnChainBatch(fromCalls: string[]) {
     } as {
       registrars: string[];
       callsByRegistrant: Record<string, string[]>;
-      deserializedCalls: Call[];
+      deserializedCalls: RegisteredCall[];
     }
   );
 }
@@ -321,7 +320,7 @@ export function serializeOnChainCall(call: RegisteredCall): string {
   ).join("_")}`;
 }
 
-export function deserializeOnChainCall(callId: string): null | Call {
+export function deserializeOnChainCall(callId: string): null | RegisteredCall {
   try {
     const [interfaceKind, target, fn, args] = callId.split("/");
     const abi = abiLookup[interfaceKind as InterfaceKind];

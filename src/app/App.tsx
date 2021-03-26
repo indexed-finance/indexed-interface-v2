@@ -2,18 +2,22 @@ import "theme/index.less";
 import { BrowserRouter } from "react-router-dom";
 import { DEBUG } from "components";
 import { Parallax } from "react-parallax";
-import { Provider, useSelector } from "react-redux";
+import { Provider, useDispatch, useSelector } from "react-redux";
+import { actions, selectors, store } from "features";
 import { message, notification } from "antd";
-import { selectors, store } from "features";
 import { useBreakpoints } from "helpers";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import AppLayout from "./AppLayout";
 import background from "assets/images/dark-bg.jpg";
 import flags from "feature-flags";
 
 function Inner() {
+  const dispatch = useDispatch();
   const { isMobile } = useBreakpoints();
   const theme = useSelector(selectors.selectTheme);
+  const userAddress = useSelector(selectors.selectUserAddress);
+  const initiallyLoadedUser = useRef(false);
+
   const inner = (
     <>
       <BrowserRouter>
@@ -35,6 +39,13 @@ function Inner() {
       duration: 4.2,
     });
   }, [isMobile]);
+
+  useEffect(() => {
+    if (!initiallyLoadedUser.current && userAddress) {
+      initiallyLoadedUser.current = true;
+      dispatch(actions.attachToProvider());
+    }
+  }, [dispatch, userAddress]);
 
   return theme === "outrun" ? (
     <Parallax bgImage={background} bgImageAlt="background" strength={200}>
