@@ -13,8 +13,8 @@ export default function setupProxy() {
     );
   }
   const credentials = {
-    key: fs.readFileSync(API_CERT_PATH, "utf8"),
-    cert: fs.readFileSync(API_KEY_PATH, "utf8"),
+    key: fs.readFileSync(API_KEY_PATH, "utf8"),
+    cert: fs.readFileSync(API_CERT_PATH, "utf8"),
   };
   const proxy = httpProxy.createProxyServer({
     ssl: credentials,

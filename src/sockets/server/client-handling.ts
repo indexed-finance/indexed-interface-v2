@@ -43,8 +43,8 @@ export default function setupClientHandling() {
     );
   }
 
-  const key = fs.readFileSync(API_CERT_PATH, "utf8");
-  const cert = fs.readFileSync(API_KEY_PATH, "utf8");
+  const key = fs.readFileSync(API_KEY_PATH, "utf8");
+  const cert = fs.readFileSync(API_CERT_PATH, "utf8");
   const credentials = { key, cert };
   const server = createServer(credentials);
   const socketServer = new WebSocket.Server(

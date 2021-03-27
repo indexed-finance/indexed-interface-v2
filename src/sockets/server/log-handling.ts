@@ -13,8 +13,8 @@ export default function setupLog() {
     );
   }
 
-  const key = fs.readFileSync(LOG_CERT_PATH, "utf8");
-  const cert = fs.readFileSync(LOG_KEY_PATH, "utf8");
+  const key = fs.readFileSync(LOG_KEY_PATH, "utf8");
+  const cert = fs.readFileSync(LOG_CERT_PATH, "utf8");
   const credentials = { key, cert };
   const app = express();
 
