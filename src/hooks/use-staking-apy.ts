@@ -18,7 +18,6 @@ export function useStakingTokenPrice(stakingPoolAddress: string) {
       return [[], []];
     }
     const [token0, token1] = sortTokens(stakingPool.indexPool, WETH_CONTRACT_ADDRESS);
-    console.log('Right Pair Address ? ', computeUniswapPairAddress(token0, token1).toLowerCase() === stakingPool.stakingToken.toLowerCase())
     return [
       [stakingPool.stakingToken.toLowerCase()],
       [{
@@ -33,13 +32,10 @@ export function useStakingTokenPrice(stakingPoolAddress: string) {
   const [pairs, pairsLoading] = useUniswapPairs(_pairs);
   const [tokenPrice, tokenPriceLoading] = useTokenPrice(stakingPool?.isWethPair ? stakingPool.indexPool : stakingPool?.stakingToken ?? "");
 
-  // console.log(`Got Token Price?: ${tokenPrice}`);
-
   return useMemo(() => {
     if (!stakingPool || tokenPriceLoading) return null;
     if (stakingPool.isWethPair) {
-      console.log(`Is WETH Pair :D || ${pairsLoading} | ${suppliesLoading}`);
-      console.log(`Pairs: ${JSON.stringify(_pairs)}`)
+      console.log(`Is WETH Pair || Loading Pairs ${pairsLoading} | Loading Supplies ${suppliesLoading}`);
       if (pairsLoading || suppliesLoading) {
         return null;
       }
