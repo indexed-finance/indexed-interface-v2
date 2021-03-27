@@ -1,4 +1,4 @@
-import { selectors, totalSuppliesCaller } from "./slice";
+import { pricesCaller, selectors, totalSuppliesCaller } from "./slice";
 import { useSelector } from "react-redux";
 import useCallRegistrar from "hooks/use-call-registrar";
 import type { AppState } from "features";
@@ -38,4 +38,26 @@ export function useTotalSuppliesRegistrar(
     actions,
     selectors
   );
+}
+
+export function usePricesRegistrar(
+  tokenIds: string[],
+  actions: Record<string, any>,
+  selectors: Record<string, any>
+) {
+  useCallRegistrar(
+    {
+      caller: pricesCaller,
+      onChainCalls: [],
+      offChainCalls: [
+        {
+          function: "retrieveCoingeckoDataForTokens",
+          args: tokenIds,
+        }
+      ],
+    },
+    actions,
+    selectors
+  );
+
 }

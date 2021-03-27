@@ -19,6 +19,7 @@ import { createMulticallDataParser } from "helpers";
 import type { AppState } from "features/store";
 
 export const totalSuppliesCaller = "Total Supplies";
+export const pricesCaller = "Token Prices";
 
 const adapter = createEntityAdapter<NormalizedToken>();
 
@@ -148,6 +149,7 @@ export const selectors = {
     selectors.selectAll(state).map(({ symbol }) => symbol),
   selectTokenSymbol: (state: AppState, poolId: string) =>
     selectors.selectTokenLookup(state)[poolId]?.symbol ?? "",
+  selectTokenPrice: (state: AppState, tokenId: string) => selectors.selectTokenById(state, tokenId)?.priceData?.price
 };
 
 export const selectTokenSupplies = createSelector(
