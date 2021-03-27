@@ -53,7 +53,7 @@ const slice = createSlice({
   extraReducers: (builder) =>
     builder
       .addCase(coingeckoDataLoaded, (state, action) => {
-        const formattedCall = `retrieveCoingeckoData/${action.payload.pool}`;
+        const formattedCall = `retrieveCoingeckoData/${action.payload.pool || Object.keys(action.payload.tokens).join('_')}`;
 
         state.entries[formattedCall] = {
           result: action.payload as any,
