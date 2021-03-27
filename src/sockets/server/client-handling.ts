@@ -5,11 +5,7 @@ import {
 } from "config";
 import { IncomingMessage } from "http";
 import { createServer } from "https";
-import {
-  formatInitialStateResponse,
-  formatStatePatchResponse,
-  log,
-} from "./helpers";
+import { formatMirrorStateResponse, log } from "./helpers";
 import { store } from "features";
 import WebSocket from "isomorphic-ws";
 import fs from "fs";
@@ -101,7 +97,7 @@ function handleConnection(client: WebSocket, incoming: IncomingMessage) {
 
     connections.push(client);
 
-    client.send(formatInitialStateResponse(store.getState()));
+    client.send(formatMirrorStateResponse(store.getState()));
   }
 }
 
@@ -150,7 +146,7 @@ function continuouslySendUpdates() {
       log(`Updating clients with ${differences.length} patches.`);
 
       for (const client of connections) {
-        client.send(formatStatePatchResponse(differences));
+        client.send(formatMirrorStateResponse(currentState));
       }
 
       clientStatistics.totalStatePatchesSent += differences.length;

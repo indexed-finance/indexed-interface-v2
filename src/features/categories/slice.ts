@@ -1,10 +1,6 @@
 import { NormalizedCategory } from "ethereum";
 import { createEntityAdapter, createSlice } from "@reduxjs/toolkit";
-import {
-  receivedInitialStateFromServer,
-  receivedStatePatchFromServer,
-  subgraphDataLoaded,
-} from "features/actions";
+import { mirroredServerState, subgraphDataLoaded } from "features/actions";
 import S from "string";
 import SigmaTenExOne from "./local-data/sigma-v10x1.json";
 import ZeroExOne from "./local-data/0x1.json";
@@ -46,12 +42,7 @@ const slice = createSlice({
 
         adapter.upsertMany(state, mapped);
       })
-      .addCase(receivedInitialStateFromServer, (_, action) => {
-        const { categories } = action.payload;
-
-        return categories;
-      })
-      .addCase(receivedStatePatchFromServer, (_, action) => {
+      .addCase(mirroredServerState, (_, action) => {
         const { categories } = action.payload;
 
         return categories;

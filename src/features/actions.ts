@@ -41,15 +41,7 @@ export const poolTradesAndSwapsLoaded = createAction<{
 /**
  *
  */
-export const receivedInitialStateFromServer = createAction<any>(
-  "receivedInitialStateFromServer"
-);
-/**
- *
- */
-export const receivedStatePatchFromServer = createAction<any>(
-  "receivedStatePatchFromServer"
-);
+export const mirroredServerState = createAction<any>("mirroredServerState");
 
 export const uniswapPairsRegistered = createAction<NormalizedPair[]>(
   "uniswapPairsRegistered"

@@ -3,9 +3,8 @@ import { NormalizedToken } from "ethereum";
 import {
   coingeckoDataLoaded,
   coingeckoIdsLoaded,
+  mirroredServerState,
   multicallDataReceived,
-  receivedInitialStateFromServer,
-  receivedStatePatchFromServer,
   subgraphDataLoaded,
   totalSuppliesUpdated,
   uniswapPairsRegistered,
@@ -90,12 +89,7 @@ const slice = createSlice({
           }
         }
       })
-      .addCase(receivedInitialStateFromServer, (_, action) => {
-        const { tokens } = action.payload;
-
-        return tokens;
-      })
-      .addCase(receivedStatePatchFromServer, (_, action) => {
+      .addCase(mirroredServerState, (_, action) => {
         const { tokens } = action.payload;
 
         return tokens;

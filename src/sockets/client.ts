@@ -1,5 +1,4 @@
 import { AppState, actions, selectors, store } from "features";
-import { Operation, applyReducer, deepClone } from "fast-json-patch";
 import { message } from "antd";
 
 export let socket: null | WebSocket = null;
@@ -21,51 +20,9 @@ export default class SocketClient {
     };
 
     socket.onmessage = (message) => {
-      const {
-        kind,
-        data,
-      }: {
-        kind: "INITIAL_STATE" | "STATE_PATCH";
-        data: any;
-      } = JSON.parse(message.data);
+      const serverState = JSON.parse(message.data) as AppState;
 
-      switch (kind) {
-        case "INITIAL_STATE":
-          return store.dispatch(
-            actions.receivedInitialStateFromServer({
-              ...data,
-              batcher: {
-                blockNumber: data.batcher.blockNumber,
-                onChainCalls: [],
-                offChainCalls: [],
-                callers: {},
-                cache: {},
-                listenerCounts: {},
-                status: "deferring to server",
-              },
-            })
-          );
-        case "STATE_PATCH":
-          const state = deepClone(store.getState()) as AppState;
-          const patch = data as Operation[];
-          const nonBatchPatch = patch.filter(
-            (operation) => !operation.path.includes("batcher")
-          );
-
-          delete (state as any).batcher;
-
-          nonBatchPatch.reduce(applyReducer, state);
-
-          (state as any).batcher = {
-            onChainCalls: [],
-            offChainCalls: [],
-            callers: {},
-            listenerCounts: {},
-            status: "deferring to server",
-          };
-
-          return store.dispatch(actions.receivedStatePatchFromServer(state));
-      }
+      return store.dispatch(actions.mirroredServerState(serverState));
     };
 
     socket.onerror = async () => {

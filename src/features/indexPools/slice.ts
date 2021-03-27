@@ -3,10 +3,9 @@ import { NormalizedPool } from "ethereum";
 import { convert, createMulticallDataParser } from "helpers";
 import { createEntityAdapter, createSlice } from "@reduxjs/toolkit";
 import {
+  mirroredServerState,
   multicallDataReceived,
   poolTradesAndSwapsLoaded,
-  receivedInitialStateFromServer,
-  receivedStatePatchFromServer,
   subgraphDataLoaded,
 } from "features/actions";
 import type { CallWithResult } from "helpers";
@@ -90,11 +89,12 @@ const slice = createSlice({
           poolInState.swaps = swaps ?? poolInState.swaps;
         }
       })
-      .addCase(receivedInitialStateFromServer, (_, action) => {
+      .addCase(mirroredServerState, (_, action) => {
         const { indexPools } = action.payload;
+
         return indexPools;
       })
-      .addCase(receivedStatePatchFromServer, (_, action) => {
+      .addCase(mirroredServerState, (_, action) => {
         const { indexPools } = action.payload;
 
         return indexPools;

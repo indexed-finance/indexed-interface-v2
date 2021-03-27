@@ -201,10 +201,9 @@ export const thunks = {
 
     dispatch(actions.coingeckoIdsLoaded(supportedCoinIds));
   },
-  retrieveCoingeckoDataForTokens: (...tokenAddresses: string[]): AppThunk => async (
-    dispatch,
-    getState
-  ) => {
+  retrieveCoingeckoDataForTokens: (
+    ...tokenAddresses: string[]
+  ): AppThunk => async (dispatch, getState) => {
     const coingeckoData = await CoinGeckoService.getStatsForTokens(
       tokenAddresses
     );
@@ -215,10 +214,9 @@ export const thunks = {
       })
     );
   },
-  retrieveCoingeckoData: (poolOrTokenIds: string | string[]): AppThunk => async (
-    dispatch,
-    getState
-  ) => {
+  retrieveCoingeckoData: (
+    poolOrTokenIds: string | string[]
+  ): AppThunk => async (dispatch, getState) => {
     const state = getState();
     let pool: string | undefined;
     let tokenAddresses: string[];
