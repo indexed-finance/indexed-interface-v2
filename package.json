@@ -138,7 +138,8 @@
     "server:build": "node ./scripts/build-server",
     "server:start": "CONNECTION=false node ./webpack/server/server",
     "server:develop": "npm run server:build && npm run server:start",
-    "server:run": "CONNECTION=false SSL_CERT_PATH=/etc/letsencrypt/live/api.indexed.finance/fullchain.pem SSL_KEY_PATH=/etc/letsencrypt/live/api.indexed.finance/privkey.pem node ./webpack/server/server",
+    "server:upstream:build": "CONNECTION=false SSL_CERT_PATH=/etc/letsencrypt/live/api.indexed.finance/fullchain.pem SSL_KEY_PATH=/etc/letsencrypt/live/api.indexed.finance/privkey.pem node ./scripts/build-server",
+    "server:upstream:start": "CONNECTION=false SSL_CERT_PATH=/etc/letsencrypt/live/api.indexed.finance/fullchain.pem SSL_KEY_PATH=/etc/letsencrypt/live/api.indexed.finance/privkey.pem node ./webpack/server/server",
     "data:build": "node ./scripts/build-data",
     "data:watch": "nodemon --watch ./data --exec \"node ./scripts/build-data.js\" -e js,md"
   },
