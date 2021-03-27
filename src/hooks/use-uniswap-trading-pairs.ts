@@ -31,7 +31,7 @@ export function buildUniswapPairs(baseTokens: string[]) {
   return pairs;
 }
 
-export function useUniswapPairs(
+export function useCommonUniswapPairs(
   baseTokens: string[]
 ): [Pair[], false] | [undefined, true] {
   const dispatch = useDispatch();
@@ -73,7 +73,7 @@ export function useUniswapPairs(
 }
 
 export default function useUniswapTradingPairs(baseTokens: string[]) {
-  const [pairs, loading] = useUniswapPairs(baseTokens);
+  const [pairs, loading] = useCommonUniswapPairs(baseTokens);
   const calculateBestTradeForExactInput = useCallback(
     (
       tokenIn: NormalizedToken,
