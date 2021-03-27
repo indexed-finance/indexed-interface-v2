@@ -1,4 +1,4 @@
-import { AppState } from "features";
+import { AppState, actions, selectors, useTotalSuppliesRegistrar } from "features";
 import { selectTokenSupplies } from "features/tokens/slice";
 import { useSelector } from "react-redux";
 // import { useTotalSuppliesListener } from "features/batcher/hooks";
@@ -6,7 +6,7 @@ import { useSelector } from "react-redux";
 export function useTotalSuppliesWithLoadingIndicator(
   tokens: string[]
 ): [string[], false] | [undefined, true] {
-  // useTotalSuppliesListener(tokens);
+  useTotalSuppliesRegistrar(tokens, actions, selectors);
 
   const supplies = useSelector((state: AppState) =>
     selectTokenSupplies(state, tokens)
