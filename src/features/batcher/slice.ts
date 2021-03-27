@@ -56,16 +56,19 @@ const slice = createSlice({
       for (const call of onChainCalls) {
         const callId = serializeOnChainCall(call);
 
-        callerEntry.onChainCalls.push(callId);
+        if (!state.onChainCalls.includes(callId)) {
+          callerEntry.onChainCalls.push(callId);
+        }
 
-        state.onChainCalls.push(callId);
         state.listenerCounts[callId] = (state.listenerCounts[callId] ?? 0) + 1;
       }
 
       for (const call of offChainCalls) {
         const callId = serializeOffChainCall(call);
 
-        callerEntry.offChainCalls.push(callId);
+        if (!state.offChainCalls.includes(callId)) {
+          callerEntry.offChainCalls.push(callId);
+        }
 
         state.offChainCalls.push(callId);
         state.listenerCounts[callId] = (state.listenerCounts[callId] ?? 0) + 1;
