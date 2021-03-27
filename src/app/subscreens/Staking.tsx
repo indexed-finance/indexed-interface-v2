@@ -32,7 +32,7 @@ function StakingCard(props: FormattedStakingData) {
       value: rate,
     },
     {
-      title: "Total",
+      title: "Earned",
       value: earned,
     },
   ];

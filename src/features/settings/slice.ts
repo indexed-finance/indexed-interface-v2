@@ -17,7 +17,7 @@ const slice = createSlice({
     languageCode: "en-us",
     theme: "dark",
     connected: false,
-    connectionEnabled: true,
+    connectionEnabled: process.env.NODE_ENV === "development",
   } as SettingsState,
   reducers: {
     languageChanged: (state, action: PayloadAction<SupportedLanguageCode>) => {
