@@ -5,6 +5,7 @@ import { selectors } from "features";
 import { useBreakpoints } from "helpers";
 import { useEthPrice } from "hooks";
 import { useSelector } from "react-redux";
+import { useStakingApy } from "hooks/use-staking-apy";
 import Subscreen from "./Subscreen";
 import type { AppState, FormattedStakingData } from "features";
 
@@ -21,10 +22,7 @@ function StakingCard(props: FormattedStakingData) {
     name,
   } = props;
   const { isMobile } = useBreakpoints();
-  const ethPrice = useEthPrice();
-  const apy = useSelector((state: AppState) =>
-    selectors.selectStakingApy(state, id, ethPrice)
-  );
+  const apy = useStakingApy(id);
 
   const commonActions = [
     {
