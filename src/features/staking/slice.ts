@@ -62,6 +62,9 @@ export const selectors = {
   selectStakingPool(state: AppState, id: string) {
     return selectors.selectById(state, id);
   },
+  selectStakingPoolByStakingToken(state: AppState, id: string) {
+    return selectors.selectAllStakingPools(state).find(p => p.stakingToken.toLowerCase() === id.toLowerCase())
+  },
 };
 
 export default slice.reducer;
