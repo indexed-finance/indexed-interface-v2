@@ -22,7 +22,7 @@ export default function setupProxy() {
   });
   const app = express();
 
-  app.get("*", (req, res) => {
+  app.get("/", (req, res) => {
     const [subdomain] = req.subdomains;
 
     switch (subdomain) {
