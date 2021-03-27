@@ -1,4 +1,5 @@
 import { MIN_WEIGHT } from "./balancer-math";
+import { NDX_ADDRESS, WETH_CONTRACT_ADDRESS } from "config";
 import {
   NormalizedEntity,
   NormalizedInitialData,
@@ -142,8 +143,26 @@ export function normalizeInitialData(categories: Category[]) {
         entities: {},
       },
       tokens: {
-        ids: [],
-        entities: {},
+        ids: [
+          WETH_CONTRACT_ADDRESS.toLowerCase(),
+          NDX_ADDRESS.toLowerCase()
+        ],
+        entities: {
+          [WETH_CONTRACT_ADDRESS.toLowerCase()]: {
+            id: WETH_CONTRACT_ADDRESS.toLowerCase(),
+            coingeckoId: "",
+            name: 'Wrapped Ether',
+            symbol: 'WETH',
+            decimals: 18,
+          },
+          [NDX_ADDRESS.toLowerCase()]: {
+            id: NDX_ADDRESS.toLowerCase(),
+            coingeckoId: "indexed-finance",
+            name: 'Indexed',
+            symbol: 'NDX',
+            decimals: 18
+          }
+        },
       },
     } as NormalizedInitialData
   );
