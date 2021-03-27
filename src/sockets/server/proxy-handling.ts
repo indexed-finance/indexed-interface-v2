@@ -2,7 +2,6 @@ import { createServer } from "https";
 import express from "express";
 import fs from "fs";
 import httpProxy from "http-proxy";
-import path from "path";
 
 export default function setupProxy() {
   const API_CERT_PATH = process.env.API_CERT_PATH;
@@ -14,8 +13,8 @@ export default function setupProxy() {
     );
   }
   const credentials = {
-    key: fs.readFileSync(path.resolve(API_CERT_PATH), "utf8"),
-    cert: fs.readFileSync(path.resolve(API_KEY_PATH), "utf8"),
+    key: fs.readFileSync(API_CERT_PATH, "utf8"),
+    cert: fs.readFileSync(API_KEY_PATH, "utf8"),
   };
   const proxy = httpProxy.createProxyServer({
     ssl: credentials,

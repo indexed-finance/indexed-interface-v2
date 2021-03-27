@@ -2,7 +2,6 @@ import { actionHistory, store } from "features";
 import { createServer } from "https";
 import express from "express";
 import fs from "fs";
-import path from "path";
 
 export default function setupLog() {
   const LOG_CERT_PATH = process.env.LOG_CERT_PATH;
@@ -14,8 +13,8 @@ export default function setupLog() {
     );
   }
 
-  const key = fs.readFileSync(path.resolve(LOG_CERT_PATH), "utf8");
-  const cert = fs.readFileSync(path.resolve(LOG_KEY_PATH), "utf8");
+  const key = fs.readFileSync(LOG_CERT_PATH, "utf8");
+  const cert = fs.readFileSync(LOG_KEY_PATH, "utf8");
   const credentials = { key, cert };
   const app = express();
 

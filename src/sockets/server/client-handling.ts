@@ -15,7 +15,6 @@ import { store } from "features";
 import WebSocket from "isomorphic-ws";
 import fs from "fs";
 import jsonpatch from "fast-json-patch";
-import path from "path";
 
 // Track usage via reporting statistics.
 export const clientStatistics = {
@@ -44,8 +43,8 @@ export default function setupClientHandling() {
     );
   }
 
-  const key = fs.readFileSync(path.resolve(API_CERT_PATH), "utf8");
-  const cert = fs.readFileSync(path.resolve(API_KEY_PATH), "utf8");
+  const key = fs.readFileSync(API_CERT_PATH, "utf8");
+  const cert = fs.readFileSync(API_KEY_PATH, "utf8");
   const credentials = { key, cert };
   const server = createServer(credentials);
   const socketServer = new WebSocket.Server(
