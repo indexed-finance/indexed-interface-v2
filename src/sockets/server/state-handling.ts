@@ -1,7 +1,5 @@
 import { INFURA_ID } from "config";
 import {
-  RegisteredCall,
-  RegisteredCaller,
   actions,
   createPairDataCalls,
   createPoolDetailCalls,
@@ -14,6 +12,7 @@ import { buildUniswapPairs } from "hooks";
 import { log } from "./helpers";
 import { providers } from "ethers";
 import setupCoinapiConnection from "./coinapi-connection";
+import type { RegisteredCall, RegisteredCaller } from "helpers";
 
 // The same provider is used for the lifetime of the server.
 const { dispatch, getState, subscribe } = store;
@@ -35,8 +34,6 @@ export default async function setupStateHandling() {
       withSigner: false,
     })
   );
-
-  dispatch(actions.requestStakingData());
 }
 
 /**

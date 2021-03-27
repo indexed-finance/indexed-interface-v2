@@ -5,11 +5,12 @@ import {
   multicallDataReceived,
   uniswapPairsRegistered,
 } from "features/actions";
-import { pairDataCaller } from "./hooks";
 import { tokensSelectors } from "features/tokens";
 import type { AppState } from "features/store";
 import type { FormattedPair } from "features/selectors";
 import type { NormalizedPair, NormalizedToken } from "ethereum/types";
+
+export const pairDataCaller = "Pair Data";
 
 const adapter = createEntityAdapter<NormalizedPair>();
 

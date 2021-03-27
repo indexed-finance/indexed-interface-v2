@@ -51,7 +51,7 @@ export function useUniswapPairs(
     dispatch(actions.uniswapPairsRegistered(pairs));
   }, [dispatch, pairs]);
 
-  usePairDataRegistrar(pairs);
+  usePairDataRegistrar(pairs, actions, selectors);
 
   return useMemo(() => {
     const loading = pairDatas.some(

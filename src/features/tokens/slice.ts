@@ -16,8 +16,9 @@ import {
   createSlice,
 } from "@reduxjs/toolkit";
 import { createMulticallDataParser } from "helpers";
-import { totalSuppliesCaller } from "./hooks";
 import type { AppState } from "features/store";
+
+export const totalSuppliesCaller = "Total Supplies";
 
 const adapter = createEntityAdapter<NormalizedToken>();
 

@@ -5,10 +5,11 @@ import {
 } from "@reduxjs/toolkit";
 import { convert, createMulticallDataParser } from "helpers";
 import { multicallDataReceived } from "features/actions";
-import { stakingCaller } from "./hooks";
 import type { AppState } from "features/store";
-import type { CallWithResult } from "features/batcher/slice";
+import type { CallWithResult } from "helpers";
 import type { NormalizedStakingPool, StakingPoolUpdate } from "ethereum/types";
+
+export const stakingCaller = "Staking";
 
 const adapter = createEntityAdapter<NormalizedStakingPool>();
 
@@ -52,8 +53,14 @@ export const { actions } = slice;
 
 export const selectors = {
   ...adapter.getSelectors((state: AppState) => state.staking),
+  selectAllStakingPoolIds(state: AppState) {
+    return selectors.selectAll(state).map((entry) => entry.indexPool);
+  },
   selectAllStakingPools(state: AppState) {
     return selectors.selectAll(state);
+  },
+  selectStakingPool(state: AppState, id: string) {
+    return selectors.selectById(state, id);
   },
 };
 

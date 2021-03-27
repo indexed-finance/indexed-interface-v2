@@ -88,7 +88,7 @@ export const NETWORKS = {
 };
 
 export const PLACEHOLDER_TOKEN_IMAGE = "https://via.placeholder.com/32";
-
+export const NDX_ADDRESS = "0x86772b1409b61c639EaAc9Ba0AcfBb6E238e5F83";
 export const SOCIAL_MEDIA = [
   {
     name: "Snapshot",

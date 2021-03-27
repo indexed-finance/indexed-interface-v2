@@ -1,5 +1,4 @@
 import * as balancerMath from "ethereum/utils/balancer-math";
-import { CallWithResult } from "../batcher/slice";
 import { NormalizedPool, PoolTokenUpdate } from "ethereum";
 import { PoolUnderlyingToken } from "indexed-types";
 import { convert, createMulticallDataParser } from "helpers";
@@ -12,10 +11,11 @@ import {
   receivedStatePatchFromServer,
   subgraphDataLoaded,
 } from "features/actions";
+import type { CallWithResult } from "helpers";
 
 export const adapter = createEntityAdapter<NormalizedPool>();
 
-const POOL_PREFIX = "Pool Detail";
+const poolCaller = "Pool Detail";
 const EMPTY_TOKEN = {
   address: "",
   balance: "",
@@ -61,25 +61,21 @@ const slice = createSlice({
           )) {
             const entry = state.entities[poolAddress];
 
-            try {
-              if (entry && results && Object.entries(results).length > 0) {
-                entry.swapFee = results.swapFee;
-                entry.totalDenorm = results.totalDenorm;
-                entry.totalSupply = results.totalSupply;
+            if (entry && results && Object.entries(results).length > 0) {
+              entry.swapFee = results.swapFee;
+              entry.totalDenorm = results.totalDenorm;
+              entry.totalSupply = results.totalSupply;
 
-                for (const token of results.tokens) {
-                  const tokenEntry = entry.tokens.entities[token.address];
+              for (const token of results.tokens) {
+                const tokenEntry = entry.tokens.entities[token.address];
 
-                  tokenEntry.balance = token.balance;
-                  tokenEntry.denorm = token.denorm;
-                  tokenEntry.minimumBalance = token.minimumBalance;
-                  tokenEntry.usedBalance = token.usedBalance;
-                  tokenEntry.usedDenorm = token.usedDenorm;
-                  tokenEntry.usedWeight = token.usedWeight;
-                }
+                tokenEntry.balance = token.balance;
+                tokenEntry.denorm = token.denorm;
+                tokenEntry.minimumBalance = token.minimumBalance;
+                tokenEntry.usedBalance = token.usedBalance;
+                tokenEntry.usedDenorm = token.usedDenorm;
+                tokenEntry.usedWeight = token.usedWeight;
               }
-            } catch (error) {
-              console.log("wow", error);
             }
           }
         }
@@ -142,8 +138,9 @@ export const { actions } = slice;
 export default slice.reducer;
 
 // #region Helpers
+
 const poolMulticallDataParser = createMulticallDataParser(
-  POOL_PREFIX,
+  poolCaller,
   (calls) => {
     const formattedPoolDetails = calls.reduce((prev, next) => {
       const [poolAddress, functions] = next;

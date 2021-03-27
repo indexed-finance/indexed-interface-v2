@@ -6,7 +6,7 @@ import {
   poolTradesAndSwapsLoaded,
 } from "features/actions";
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import { stakingActions } from "../staking";
+import { actions as stakingActions } from "../staking/slice";
 import type { AppState } from "features/store";
 
 interface CacheState {

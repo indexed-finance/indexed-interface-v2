@@ -10,7 +10,6 @@ import { Trade } from "@uniswap/sdk";
 import { convert } from "helpers";
 import { useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-// import { useTokenUserDataListener } from "features/batcher/hooks";
 import { useUniswapTradingPairs } from "hooks";
 import BaseInteraction, { InteractionValues } from "./BaseInteraction";
 
@@ -133,7 +132,7 @@ export default function TradeInteraction({ pool }: Props) {
     ]
   );
 
-  useUserDataRegistrar(pool.id, tokenIds);
+  useUserDataRegistrar(pool.id, tokenIds, actions, selectors);
 
   return (
     <BaseInteraction

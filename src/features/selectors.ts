@@ -1,8 +1,10 @@
+import { NDX_ADDRESS, WETH_CONTRACT_ADDRESS } from "config";
 import { NormalizedPool, NormalizedToken } from "ethereum";
 import { Pair } from "uniswap-types";
 import { batcherSelectors } from "./batcher";
 import { cacheSelectors } from "./cache";
 import { categoriesSelectors } from "./categories";
+import { computeUniswapPairAddress, toFormattedAsset } from "ethereum/utils";
 import { convert } from "helpers";
 import { createSelector } from "reselect";
 import { dailySnapshotsSelectors } from "./dailySnapshots";
@@ -11,7 +13,6 @@ import { indexPoolsSelectors } from "./indexPools";
 import { pairsSelectors } from "./pairs";
 import { settingsSelectors } from "./settings";
 import { stakingSelectors } from "./staking";
-import { toFormattedAsset } from "ethereum/utils";
 import { tokensSelectors } from "./tokens";
 import { userSelectors } from "./user";
 import S from "string";
@@ -278,8 +279,7 @@ const selectors = {
           const price = convert
             .toBigNumber(indexPoolSideReserve)
             .multipliedBy(2)
-            // .dividedBy(/* TODO: Get total supply of pair. */)
-            .dividedBy(1)
+            .dividedBy(convert.toBigNumber(entry.totalSupply))
             .multipliedBy(mostRecentValue)
             .toString();
 
@@ -293,6 +293,61 @@ const selectors = {
 
       return prev;
     }, {} as Record<string, string>);
+  },
+  selectNdxPrice(state: AppState, ethPrice: number) {
+    const wethNdxPair = computeUniswapPairAddress(
+      WETH_CONTRACT_ADDRESS,
+      NDX_ADDRESS
+    );
+    const [pairData] = selectors.selectPairsById(state, [wethNdxPair]);
+
+    if (pairData) {
+      const firstIsNdx =
+        NDX_ADDRESS.toLowerCase() === pairData.token0.toLowerCase();
+      const [firstValue, secondValue] = firstIsNdx
+        ? [pairData.reserves1, pairData.reserves0]
+        : [pairData.reserves0, pairData.reserves1];
+
+      if (firstValue && secondValue) {
+        const numberOfEth = convert
+          .toBigNumber(firstValue)
+          .dividedBy(convert.toBigNumber(secondValue))
+          .toNumber();
+
+        return numberOfEth * ethPrice;
+      }
+    }
+
+    return null;
+  },
+  selectStakingApy(state: AppState, from: string, ethPrice: null | number) {
+    if (!ethPrice) {
+      return "";
+    }
+
+    const stakingPool = selectors.selectStakingPool(state, from);
+    const prices = selectors.selectStakingTokenPrices(state, []);
+    const tokenPrice = stakingPool ? prices[stakingPool.stakingToken] : "";
+    const ndxPrice = selectors.selectNdxPrice(state, ethPrice);
+
+    if (tokenPrice && ndxPrice) {
+      const ndxMinedPerDay = parseFloat(
+        convert.toBalance(
+          convert.toBigNumber(stakingPool?.rewardRate ?? "0").times(86400),
+          18
+        )
+      );
+      const valueNdxPerYear = ndxMinedPerDay * 365 * ndxPrice;
+      const totalStakedValue = convert
+        .toBigNumber(tokenPrice)
+        .times(convert.toBigNumber("1")) // Todo: displayPrice
+        .toNumber();
+      const formatted = (valueNdxPerYear / totalStakedValue) * 100;
+
+      return convert.toPercent(formatted);
+    } else {
+      return null;
+    }
   },
   selectFormattedStaking(state: AppState): FormattedStakingDetail {
     const pools = selectors.selectAllStakingPools(state);
@@ -311,6 +366,10 @@ const selectors = {
         };
         const staked = convert.toBalance(userData.userStakedBalance);
         const earned = convert.toBalance(userData.userRewardsEarned);
+        const rate = convert.toBalance(
+          convert.toBigNumber(stakingPool.rewardRate).times(86400),
+          18
+        );
 
         return {
           id,
@@ -321,8 +380,7 @@ const selectors = {
           staked: `${staked} ${symbol}`,
           stakingToken: stakingPool.stakingToken,
           earned: `${earned} NDX`,
-          apy: "0.00%",
-          rate: `0 NDX/Day`,
+          rate: `${rate} NDX/Day`,
         };
       })
       .filter((each): each is FormattedStakingData => Boolean(each));
@@ -442,7 +500,6 @@ export interface FormattedStakingData {
   staked: string;
   stakingToken: string;
   earned: string;
-  apy: string;
   rate: string;
   isWethPair: boolean;
 }

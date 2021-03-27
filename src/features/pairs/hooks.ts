@@ -1,5 +1,6 @@
-import { RegisteredCall } from "features";
-import { useCallRegistrar } from "hooks";
+import { pairDataCaller } from "./slice";
+import useCallRegistrar from "hooks/use-call-registrar";
+import type { RegisteredCall } from "helpers";
 
 export type RegisteredPair = {
   id: string;
@@ -7,8 +8,6 @@ export type RegisteredPair = {
   token1: string;
   exists?: boolean;
 };
-
-export const pairDataCaller = "Pair Data";
 
 export function createPairDataCalls(pairs: RegisteredPair[]): RegisteredCall[] {
   return pairs.map((pair) => ({
@@ -19,9 +18,17 @@ export function createPairDataCalls(pairs: RegisteredPair[]): RegisteredCall[] {
   }));
 }
 
-export function usePairDataRegistrar(pairs: RegisteredPair[]) {
-  useCallRegistrar({
-    caller: pairDataCaller,
-    onChainCalls: createPairDataCalls(pairs),
-  });
+export function usePairDataRegistrar(
+  pairs: RegisteredPair[],
+  actions: Record<string, any>,
+  selectors: Record<string, any>
+) {
+  useCallRegistrar(
+    {
+      caller: pairDataCaller,
+      onChainCalls: createPairDataCalls(pairs),
+    },
+    actions,
+    selectors
+  );
 }

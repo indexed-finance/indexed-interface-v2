@@ -1,8 +1,8 @@
 import { AppState } from "features/store";
 import { selectors } from "./slice";
-import { useCallRegistrar } from "hooks";
 import { useSelector } from "react-redux";
-import type { RegisteredCall } from "features";
+import useCallRegistrar from "hooks/use-call-registrar";
+import type { RegisteredCall } from "helpers";
 
 export const useApprovalStatus = (
   tokenId: string,
@@ -25,7 +25,12 @@ export const useTokenAllowance = (tokenId: string, spender: string) =>
 
 export const useUserAddress = () => useSelector(selectors.selectUserAddress);
 
-export function useUserDataRegistrar(spender: string, tokenIds: string[]) {
+export function useUserDataRegistrar(
+  spender: string,
+  tokenIds: string[],
+  actions: Record<string, any>,
+  selectors: Record<string, any>
+) {
   const caller = "User Data";
   const userAddress = useUserAddress();
   const interfaceKind = "IERC20_ABI";
@@ -48,8 +53,12 @@ export function useUserDataRegistrar(spender: string, tokenIds: string[]) {
     return prev;
   }, [] as RegisteredCall[]);
 
-  useCallRegistrar({
-    caller,
-    onChainCalls: userDataCalls,
-  });
+  useCallRegistrar(
+    {
+      caller,
+      onChainCalls: userDataCalls,
+    },
+    actions,
+    selectors
+  );
 }

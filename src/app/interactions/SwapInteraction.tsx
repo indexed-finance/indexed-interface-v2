@@ -1,6 +1,7 @@
 import {
   AppState,
   FormattedIndexPool,
+  actions,
   selectors,
   useUserDataRegistrar,
 } from "features";
@@ -120,7 +121,7 @@ export default function SwapInteraction({ pool }: Props) {
     [executeSwap]
   );
 
-  useUserDataRegistrar(pool.id, tokenIds);
+  useUserDataRegistrar(pool.id, tokenIds, actions, selectors);
 
   return (
     <BaseInteraction

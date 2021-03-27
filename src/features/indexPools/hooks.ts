@@ -1,6 +1,8 @@
-import { AppState, RegisteredCall, selectors } from "features";
-import { useCallRegistrar } from "hooks";
 import { useSelector } from "react-redux";
+import selectors from "./selectors";
+import useCallRegistrar from "hooks/use-call-registrar";
+import type { AppState } from "features";
+import type { RegisteredCall } from "helpers";
 
 export const usePool = (poolId: string) =>
   useSelector((state: AppState) => selectors.selectPool(state, poolId));
@@ -81,7 +83,9 @@ export function createPoolDetailCalls(poolAddress: string, tokenIds: string[]) {
 
 export function usePoolDetailRegistrar(
   poolAddress: string,
-  tokenIds: string[]
+  tokenIds: string[],
+  actions: Record<string, any>,
+  selectors: Record<string, any>
 ) {
   const caller = "Pool Detail";
   const { onChainCalls, offChainCalls } = createPoolDetailCalls(
@@ -89,9 +93,13 @@ export function usePoolDetailRegistrar(
     tokenIds
   );
 
-  useCallRegistrar({
-    caller,
-    onChainCalls,
-    offChainCalls,
-  });
+  useCallRegistrar(
+    {
+      caller,
+      onChainCalls,
+      offChainCalls,
+    },
+    actions,
+    selectors
+  );
 }

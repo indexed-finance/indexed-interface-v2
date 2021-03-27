@@ -1,4 +1,3 @@
-import { FormattedIndexPool } from "features";
 import { MIN_WEIGHT } from "./balancer-math";
 import {
   NormalizedEntity,
@@ -15,6 +14,7 @@ import type {
   PoolUnderlyingToken,
   Token,
 } from "indexed-types";
+import type { FormattedIndexPool } from "features";
 
 export function normalizeInitialData(categories: Category[]) {
   return categories.reduce(

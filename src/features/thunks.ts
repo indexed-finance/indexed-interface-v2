@@ -1,18 +1,19 @@
 import * as topLevelActions from "./actions";
 import { BigNumber } from "bignumber.js";
 import { CoinGeckoService } from "services";
-import { SLIPPAGE_RATE, SUBGRAPH_URL_UNISWAP } from "config";
-import { Trade } from "@uniswap/sdk";
 import {
-  batcherActions,
+  RegisteredCall,
+  convert,
   createOnChainBatch,
   deserializeOffChainCall,
   serializeOffChainCall,
   serializeOnChainCall,
-} from "./batcher";
+} from "helpers";
+import { SLIPPAGE_RATE, SUBGRAPH_URL_UNISWAP } from "config";
+import { Trade } from "@uniswap/sdk";
+import { batcherActions } from "./batcher";
 import { cacheActions } from "./cache";
 import { categoriesActions } from "./categories";
-import { convert } from "helpers";
 import { ethers, providers } from "ethers";
 import {
   exitswapExternAmountOut,
@@ -29,7 +30,6 @@ import { userActions } from "./user";
 import debounce from "lodash.debounce";
 import selectors from "./selectors";
 import type { AppThunk } from "./store";
-import type { RegisteredCall } from "./batcher/slice";
 
 // #region Provider
 /**
@@ -174,6 +174,8 @@ export const thunks = {
 
       dispatch(actions.subgraphDataLoaded(formatted));
     }
+
+    dispatch(actions.requestStakingData());
   },
   /**
    *

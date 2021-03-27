@@ -1,9 +1,13 @@
-import { DataReceiverConfig, actions, selectors } from "features";
 import { isEqual } from "lodash";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useRef } from "react";
+import type { DataReceiverConfig } from "features";
 
-export default function useCallRegistrar(calls: DataReceiverConfig) {
+export default function useCallRegistrar(
+  calls: DataReceiverConfig,
+  actions: Record<string, any>,
+  selectors: Record<string, any>
+) {
   const dispatch = useDispatch();
   const cachedCalls = useRef(calls);
   const isConnected = useSelector(selectors.selectConnected);
@@ -37,7 +41,7 @@ export default function useCallRegistrar(calls: DataReceiverConfig) {
         };
       }
     }
-  }, [dispatch, isConnected]);
+  }, [dispatch, actions, isConnected]);
 
   // Effect:
   // When a call is first registered,
@@ -47,5 +51,5 @@ export default function useCallRegistrar(calls: DataReceiverConfig) {
     if (!isConnected) {
       dispatch(actions.independentlyQuery(cachedCalls.current));
     }
-  }, [dispatch, calls.caller, isConnected]);
+  }, [dispatch, actions, calls.caller, isConnected]);
 }

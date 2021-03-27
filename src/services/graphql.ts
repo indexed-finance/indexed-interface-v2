@@ -1,4 +1,5 @@
 import { ETHEREUM_PRICE_URL, SUBGRAPH_URL_INDEXED } from "config";
+import { convert } from "helpers";
 import IpfsService from "./ipfs";
 import axios from "axios";
 
@@ -38,9 +39,12 @@ export default class GraphqlService {
     const {
       data: { pairs },
     } = await GraphqlService.executeRequest(priceQuery, ETHEREUM_PRICE_URL);
-    const [{ token0Price: price }] = pairs;
 
-    return price;
+    if (pairs) {
+      const [{ token0Price: price }] = pairs;
+
+      return convert.toBigNumber(price).toNumber();
+    }
   };
 }
 

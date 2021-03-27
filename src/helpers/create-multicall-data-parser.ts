@@ -2,8 +2,8 @@ import {
   CallWithResult,
   RegisteredCall,
   deserializeOnChainCall,
-} from "features/batcher/slice";
-import { MulticallData } from "features/actions";
+} from "./serialize";
+import type { MulticallData } from "features/actions";
 
 export type RelevantCall = [
   string /* poolAddress */,
@@ -15,6 +15,7 @@ export default function createMulticallDataParser<T>(
   formatter: (calls: [string, Record<string, CallWithResult[]>][]) => T
 ) {
   return ({
+    callers,
     callers: { [prefix]: relevantCaller },
     callsToResults,
   }: MulticallData) => {

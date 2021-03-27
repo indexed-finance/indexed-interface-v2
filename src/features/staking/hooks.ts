@@ -1,9 +1,8 @@
-import { selectors } from "features";
-import { useCallRegistrar } from "hooks";
+import { stakingCaller } from "./slice";
 import { useSelector } from "react-redux";
-import type { RegisteredCall } from "features/batcher/slice";
-
-export const stakingCaller = "Staking";
+import useCallRegistrar from "hooks/use-call-registrar";
+import type { NormalizedStakingPool } from "ethereum";
+import type { RegisteredCall } from "helpers";
 
 export function createStakingCalls(
   stakingPool: string,
@@ -63,8 +62,14 @@ export function createStakingCalls(
   };
 }
 
-export function useStakingRegistrar(userAddress?: string) {
-  const stakingPools = useSelector(selectors.selectAllStakingPools);
+export function useStakingRegistrar(
+  userAddress: string,
+  actions: Record<string, any>,
+  selectors: Record<string, any>
+) {
+  const stakingPools: NormalizedStakingPool[] = useSelector(
+    selectors.selectAllStakingPools
+  );
   const { onChainCalls, offChainCalls } = stakingPools.reduce(
     (prev, next) => {
       const poolCalls = createStakingCalls(next.id, userAddress);
@@ -83,9 +88,13 @@ export function useStakingRegistrar(userAddress?: string) {
     }
   );
 
-  useCallRegistrar({
-    caller: stakingCaller,
-    onChainCalls,
-    offChainCalls,
-  });
+  useCallRegistrar(
+    {
+      caller: stakingCaller,
+      onChainCalls,
+      offChainCalls,
+    },
+    actions,
+    selectors
+  );
 }

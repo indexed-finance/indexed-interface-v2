@@ -1,6 +1,7 @@
 import {
   AppState,
   FormattedIndexPool,
+  actions,
   selectors,
   usePoolDetailRegistrar,
 } from "features";
@@ -24,7 +25,7 @@ export default function PoolCard({ pool }: Props) {
     selectors.selectPoolTokenIds(state, pool.id)
   );
 
-  usePoolDetailRegistrar(pool.id, tokenIds);
+  usePoolDetailRegistrar(pool.id, tokenIds, actions, selectors);
 
   return (
     <ListCard

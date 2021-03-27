@@ -1,9 +1,8 @@
-import { RegisteredCall, selectors } from "features";
-import { useCallRegistrar } from "hooks";
+import { selectors, totalSuppliesCaller } from "./slice";
 import { useSelector } from "react-redux";
+import useCallRegistrar from "hooks/use-call-registrar";
 import type { AppState } from "features";
-
-export const totalSuppliesCaller = "Total Supplies";
+import type { RegisteredCall } from "helpers";
 
 export const useToken = (tokenId: string) =>
   useSelector((state: AppState) => selectors.selectTokenById(state, tokenId));
@@ -26,9 +25,17 @@ export function createTotalSuppliesCalls(tokenIds: string[]): RegisteredCall[] {
   }));
 }
 
-export function useTotalSuppliesRegistrar(tokenIds: string[]) {
-  useCallRegistrar({
-    caller: totalSuppliesCaller,
-    onChainCalls: createTotalSuppliesCalls(tokenIds),
-  });
+export function useTotalSuppliesRegistrar(
+  tokenIds: string[],
+  actions: Record<string, any>,
+  selectors: Record<string, any>
+) {
+  useCallRegistrar(
+    {
+      caller: totalSuppliesCaller,
+      onChainCalls: createTotalSuppliesCalls(tokenIds),
+    },
+    actions,
+    selectors
+  );
 }

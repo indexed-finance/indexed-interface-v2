@@ -1,5 +1,5 @@
 import { FormattedCategory } from "features";
-import { IndexCard } from "components";
+import { IndexCard } from "components/molecules";
 import { Table } from "antd";
 import { useBreakpoints } from "helpers";
 import { useHistory } from "react-router-dom";

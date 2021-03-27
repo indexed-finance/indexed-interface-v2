@@ -1,4 +1,4 @@
-import { AppState, selectors } from "features";
+import { AppState, actions, selectors } from "features";
 import {
   ChartCard,
   Performance,
@@ -43,7 +43,7 @@ function Pool({ id }: { id: string }) {
   );
   const breakpoints = useBreakpoints();
 
-  usePoolDetailRegistrar(id, tokenIds);
+  usePoolDetailRegistrar(id, tokenIds, actions, selectors);
 
   if (pool) {
     const performance = <Performance pool={pool} />;
