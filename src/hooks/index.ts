@@ -3,7 +3,7 @@ export { default as useSwapCallbacks } from "./use-swap-callbacks";
 export { default as useTokenApproval } from "./use-token-approval";
 export { default as useTokenRandomizer } from "./use-token-randomizer";
 export {
-  useUniswapPairs,
+  useCommonUniswapPairs,
   buildUniswapPairs,
   default as useUniswapTradingPairs,
 } from "./use-uniswap-trading-pairs";
@@ -12,4 +12,4 @@ export { useSingleTokenBurnCallbacks } from "./use-burn-callbacks";
 export { useSingleTokenMintCallbacks } from "./use-mint-callbacks";
 export * from "./use-call-registrar";
 export { default as useCallRegistrar } from "./use-call-registrar";
-export { default as useEthPrice } from "./use-eth-price";
+export { useEthPrice, useTokenPrice } from "./use-token-price";

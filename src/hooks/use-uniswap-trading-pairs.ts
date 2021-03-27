@@ -19,6 +19,8 @@ import { useDispatch, useSelector } from "react-redux";
 import type { AppState, FormattedPair } from "features";
 import type { NormalizedToken } from "ethereum/types";
 
+type PairToken = { id: string; exists: boolean | undefined; token0: string; token1: string; };
+
 export function buildUniswapPairs(baseTokens: string[]) {
   const tokenPairs = buildCommonTokenPairs(baseTokens);
   const pairs = tokenPairs.map(([tokenA, tokenB]) => {
@@ -31,20 +33,11 @@ export function buildUniswapPairs(baseTokens: string[]) {
   return pairs;
 }
 
-export function useUniswapPairs(
-  baseTokens: string[]
-): [Pair[], false] | [undefined, true] {
+export function useUniswapPairs(pairs: PairToken[]): [Pair[], false] | [undefined, true] {
   const dispatch = useDispatch();
-  const [, pairAddresses] = useMemo(() => {
-    const _tokenPairs = buildCommonTokenPairs(baseTokens);
-    const _pairAddresses = _tokenPairs.map(([tokenA, tokenB]) =>
-      computeUniswapPairAddress(tokenA, tokenB)
-    );
-    return [_tokenPairs, _pairAddresses];
-  }, [baseTokens]);
-  const pairs = useMemo(() => buildUniswapPairs(baseTokens), [baseTokens]);
+
   const pairDatas = useSelector((state: AppState) =>
-    selectors.selectFormattedPairsById(state, pairAddresses)
+    selectors.selectFormattedPairsById(state, pairs.map(p => p.id))
   );
 
   useEffect(() => {
@@ -72,8 +65,15 @@ export function useUniswapPairs(
   }, [pairDatas]);
 }
 
+export function useCommonUniswapPairs(
+  baseTokens: string[]
+): [Pair[], false] | [undefined, true] {
+  const pairs = useMemo(() => buildUniswapPairs(baseTokens), [baseTokens]);
+  return useUniswapPairs(pairs);
+}
+
 export default function useUniswapTradingPairs(baseTokens: string[]) {
-  const [pairs, loading] = useUniswapPairs(baseTokens);
+  const [pairs, loading] = useCommonUniswapPairs(baseTokens);
   const calculateBestTradeForExactInput = useCallback(
     (
       tokenIn: NormalizedToken,

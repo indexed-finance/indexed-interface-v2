@@ -320,35 +320,6 @@ const selectors = {
 
     return null;
   },
-  selectStakingApy(state: AppState, from: string, ethPrice: null | number) {
-    if (!ethPrice) {
-      return "";
-    }
-
-    const stakingPool = selectors.selectStakingPool(state, from);
-    const prices = selectors.selectStakingTokenPrices(state, []);
-    const tokenPrice = stakingPool ? prices[stakingPool.stakingToken] : "";
-    const ndxPrice = selectors.selectNdxPrice(state, ethPrice);
-
-    if (tokenPrice && ndxPrice) {
-      const ndxMinedPerDay = parseFloat(
-        convert.toBalance(
-          convert.toBigNumber(stakingPool?.rewardRate ?? "0").times(86400),
-          18
-        )
-      );
-      const valueNdxPerYear = ndxMinedPerDay * 365 * ndxPrice;
-      const totalStakedValue = convert
-        .toBigNumber(tokenPrice)
-        .times(convert.toBigNumber("1")) // Todo: wtf is display price in dapp
-        .toNumber();
-      const formatted = (valueNdxPerYear / totalStakedValue) * 100;
-
-      return convert.toPercent(formatted);
-    } else {
-      return null;
-    }
-  },
   selectFormattedStaking(state: AppState): FormattedStakingDetail {
     const pools = selectors.selectAllStakingPools(state);
     const formattedStaking = pools
@@ -359,7 +330,7 @@ const selectors = {
           return null;
         }
 
-        const { id, name, symbol } = indexPool;
+        const { name, symbol } = indexPool;
         const userData = stakingPool.userData ?? {
           userStakedBalance: "0",
           userRewardsEarned: "0",
@@ -372,7 +343,7 @@ const selectors = {
         );
 
         return {
-          id,
+          id: stakingPool.id,
           isWethPair: stakingPool.isWethPair,
           slug: S(indexPool.name).slugify().s,
           name,

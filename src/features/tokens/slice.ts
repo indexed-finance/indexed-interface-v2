@@ -18,7 +18,8 @@ import {
 import { createMulticallDataParser } from "helpers";
 import type { AppState } from "features/store";
 
-export const TOTAL_SUPPLIES_CALLER = "Total Supplies";
+export const totalSuppliesCaller = "Total Supplies";
+export const pricesCaller = "Token Prices";
 
 const adapter = createEntityAdapter<NormalizedToken>();
 
@@ -148,6 +149,8 @@ export const selectors = {
     selectors.selectAll(state).map(({ symbol }) => symbol),
   selectTokenSymbol: (state: AppState, poolId: string) =>
     selectors.selectTokenLookup(state)[poolId]?.symbol ?? "",
+  selectTokenPrice: (state: AppState, tokenId: string) =>
+    selectors.selectTokenById(state, tokenId)?.priceData?.price,
 };
 
 export const selectTokenSupplies = createSelector(
@@ -168,7 +171,7 @@ export default slice.reducer;
 
 // #region Helpers
 const totalSuppliesMulticallDataParser = createMulticallDataParser(
-  TOTAL_SUPPLIES_CALLER,
+  totalSuppliesCaller,
   (calls) => {
     const formattedTotalSupplies = calls.reduce((prev, next) => {
       const [tokenAddress, functions] = next;
