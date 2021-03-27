@@ -10,7 +10,7 @@ import type { AppState } from "features/store";
 import type { FormattedPair } from "features/selectors";
 import type { NormalizedPair, NormalizedToken } from "ethereum/types";
 
-export const pairDataCaller = "Pair Data";
+export const PAIR_DATA_CALLER = "Pair Data";
 
 const adapter = createEntityAdapter<NormalizedPair>();
 
@@ -100,7 +100,7 @@ export default slice.reducer;
 
 // #region Helpers
 const pairMulticallDataParser = createMulticallDataParser(
-  pairDataCaller,
+  PAIR_DATA_CALLER,
   (calls) => {
     const formattedPairData = calls.reduce(
       (prev, next) => {

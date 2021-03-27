@@ -110,6 +110,7 @@ export interface NormalizedUser {
     string /* Token Balance */
   >;
   balances: Record<string /* <tokenId> */, string /* Token Balance */>;
+  ndx: null | string;
 }
 
 export interface StakingPoolUpdate {

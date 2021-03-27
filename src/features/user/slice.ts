@@ -1,21 +1,19 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { convert, createMulticallDataParser } from "helpers";
-import { multicallDataReceived, poolUserDataLoaded } from "features/actions";
+import { multicallDataReceived } from "features/actions";
 import { tokensSelectors } from "features/tokens";
 import type { AppState } from "features/store";
 import type { NormalizedUser } from "ethereum/types";
 
 export type ApprovalStatus = "unknown" | "approval needed" | "approved";
 
-const USER_PREFIX = "User Data";
+export const USER_CALLER = "User Data";
 
-const initialState: NormalizedUser & {
-  recentPoolUpdates: Record<string, number>;
-} = {
+const initialState: NormalizedUser = {
   address: "",
   allowances: {},
   balances: {},
-  recentPoolUpdates: {},
+  ndx: null,
 };
 
 const slice = createSlice({
@@ -30,37 +28,19 @@ const slice = createSlice({
     },
   },
   extraReducers: (builder) =>
-    builder
-      .addCase(poolUserDataLoaded, (state, action) => {
-        const { blockNumber, poolId, userData } = action.payload;
+    builder.addCase(multicallDataReceived, (state, action) => {
+      const parsed = userMulticallDataParser(action.payload);
 
-        for (const tokenId of Object.keys(userData)) {
-          const { allowance, balance } = userData[tokenId];
-          const combinedId = `${poolId}-${tokenId}`.toLowerCase();
+      if (parsed) {
+        const { allowances, balances, ndx } = parsed;
 
-          if (allowance) {
-            state.allowances[combinedId] = allowance;
-          }
+        state.allowances = allowances;
+        state.balances = balances;
+        state.ndx = ndx;
+      }
 
-          if (balance) {
-            state.balances[tokenId] = balance;
-          }
-        }
-
-        state.recentPoolUpdates[poolId] = blockNumber;
-      })
-      .addCase(multicallDataReceived, (state, action) => {
-        const parsed = userMulticallDataParser(action.payload);
-
-        if (parsed) {
-          const { allowances, balances } = parsed;
-
-          state.allowances = allowances;
-          state.balances = balances;
-        }
-
-        return state;
-      }),
+      return state;
+    }),
 });
 
 export const { actions } = slice;
@@ -69,11 +49,14 @@ export const selectors = {
   selectUserAddress(state: AppState) {
     return state.user.address;
   },
+  selectNdxBalance(state: AppState) {
+    return state.user.ndx ? convert.toBalance(state.user.ndx) : 0;
+  },
   selectTokenAllowance(state: AppState, poolId: string, tokenId: string) {
     return state.user.allowances[`${poolId}-${tokenId}`.toLowerCase()];
   },
   selectTokenBalance(state: AppState, tokenId: string) {
-    return state.user.balances[tokenId] ?? "0";
+    return state.user.balances[tokenId.toLowerCase()] ?? "0";
   },
   selectApprovalStatus(
     state: AppState,
@@ -117,26 +100,35 @@ export default slice.reducer;
 
 // #region Helpers
 const userMulticallDataParser = createMulticallDataParser(
-  USER_PREFIX,
+  USER_CALLER,
   (calls) => {
     const formattedUserDetails = calls.reduce(
       (prev, next) => {
         const [, details] = next;
         const { allowance: allowanceCall, balanceOf: balanceOfCall } = details;
-        const [_allowanceCall] = allowanceCall;
-        const [_balanceOfCall] = balanceOfCall;
-        const tokenAddress = _allowanceCall.target;
-        const [, poolAddress] = _allowanceCall.args!;
-        const [allowance] = _allowanceCall.result ?? [];
-        const [balanceOf] = _balanceOfCall.result ?? [];
-        const combinedId = `${poolAddress}-${tokenAddress}`;
 
-        if (allowance) {
-          prev.allowances[combinedId] = allowance.toString();
-        }
+        if (allowanceCall && balanceOfCall) {
+          const [_allowanceCall] = allowanceCall;
+          const [_balanceOfCall] = balanceOfCall;
+          const tokenAddress = _allowanceCall.target;
+          const [, poolAddress] = _allowanceCall.args!;
+          const [allowance] = _allowanceCall.result ?? [];
+          const [balanceOf] = _balanceOfCall.result ?? [];
+          const combinedId = `${poolAddress}-${tokenAddress}`;
 
-        if (balanceOf) {
-          prev.balances[combinedId] = balanceOf.toString();
+          if (allowance) {
+            prev.allowances[combinedId] = allowance.toString();
+          }
+
+          if (balanceOf) {
+            prev.balances[combinedId] = balanceOf.toString();
+          }
+        } else if (balanceOfCall) {
+          // NDX token has no allowance.
+          const [_balanceOfCall] = balanceOfCall;
+          const [balanceOf] = _balanceOfCall.result ?? [];
+
+          prev.ndx = balanceOf.toString();
         }
 
         return prev;
@@ -144,9 +136,11 @@ const userMulticallDataParser = createMulticallDataParser(
       {
         allowances: {},
         balances: {},
+        ndx: null,
       } as {
         allowances: Record<string, string>;
         balances: Record<string, string>;
+        ndx: null | string;
       }
     );
 

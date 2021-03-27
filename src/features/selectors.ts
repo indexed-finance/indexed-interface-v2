@@ -340,7 +340,7 @@ const selectors = {
       const valueNdxPerYear = ndxMinedPerDay * 365 * ndxPrice;
       const totalStakedValue = convert
         .toBigNumber(tokenPrice)
-        .times(convert.toBigNumber("1")) // Todo: displayPrice
+        .times(convert.toBigNumber("1")) // Todo: wtf is display price in dapp
         .toNumber();
       const formatted = (valueNdxPerYear / totalStakedValue) * 100;
 

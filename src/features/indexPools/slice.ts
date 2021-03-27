@@ -1,12 +1,10 @@
 import * as balancerMath from "ethereum/utils/balancer-math";
-import { NormalizedPool, PoolTokenUpdate } from "ethereum";
-import { PoolUnderlyingToken } from "indexed-types";
+import { NormalizedPool } from "ethereum";
 import { convert, createMulticallDataParser } from "helpers";
 import { createEntityAdapter, createSlice } from "@reduxjs/toolkit";
 import {
   multicallDataReceived,
   poolTradesAndSwapsLoaded,
-  poolUpdated,
   receivedInitialStateFromServer,
   receivedStatePatchFromServer,
   subgraphDataLoaded,
@@ -15,8 +13,9 @@ import type { CallWithResult } from "helpers";
 
 export const adapter = createEntityAdapter<NormalizedPool>();
 
-const poolCaller = "Pool Detail";
-const EMPTY_TOKEN = {
+export const POOL_CALLER = "Pool Detail";
+
+export const EMPTY_TOKEN = {
   address: "",
   balance: "",
   minimumBalance: "",
@@ -32,26 +31,6 @@ const slice = createSlice({
   reducers: {},
   extraReducers: (builder) =>
     builder
-      .addCase(subgraphDataLoaded, (state, action) => {
-        const { pools } = action.payload;
-        const fullPools = pools.ids.map((id) => pools.entities[id]);
-
-        for (const { tokens } of fullPools) {
-          for (const tokenId of tokens.ids) {
-            const token = tokens.entities[tokenId];
-
-            if (token.ready) {
-              token.usedDenorm = token.denorm;
-              token.usedBalance = token.balance;
-            } else {
-              token.usedDenorm = token.desiredDenorm;
-              token.usedBalance = token.minimumBalance;
-            }
-          }
-        }
-
-        adapter.addMany(state, fullPools);
-      })
       .addCase(multicallDataReceived, (state, action) => {
         const relevantMulticallData = poolMulticallDataParser(action.payload);
 
@@ -82,36 +61,25 @@ const slice = createSlice({
 
         return state;
       })
-      .addCase(poolUpdated, (state, action) => {
-        const { pool, update } = action.payload;
+      .addCase(subgraphDataLoaded, (state, action) => {
+        const { pools } = action.payload;
+        const fullPools = pools.ids.map((id) => pools.entities[id]);
 
-        const poolInState = state.entities[pool.id];
+        for (const { tokens } of fullPools) {
+          for (const tokenId of tokens.ids) {
+            const token = tokens.entities[tokenId];
 
-        if (poolInState) {
-          const { $blockNumber: _, tokens, ...rest } = update;
-          const tokenEntities: Record<
-            string,
-            PoolTokenUpdate & PoolUnderlyingToken
-          > = {};
-
-          for (const token of tokens) {
-            const { address, ...tokenUpdate } = token;
-            const tokenInState = pool.tokens.entities[address];
-            tokenEntities[address.toLowerCase()] = {
-              ...tokenInState,
-              ...tokenUpdate,
-            };
+            if (token.ready) {
+              token.usedDenorm = token.denorm;
+              token.usedBalance = token.balance;
+            } else {
+              token.usedDenorm = token.desiredDenorm;
+              token.usedBalance = token.minimumBalance;
+            }
           }
-
-          state.entities[pool.id] = {
-            ...poolInState,
-            ...rest,
-            tokens: {
-              ids: poolInState.tokens.ids,
-              entities: tokenEntities,
-            },
-          };
         }
+
+        adapter.addMany(state, fullPools);
       })
       .addCase(poolTradesAndSwapsLoaded, (state, action) => {
         const { poolId, trades, swaps } = action.payload;
@@ -138,9 +106,8 @@ export const { actions } = slice;
 export default slice.reducer;
 
 // #region Helpers
-
 const poolMulticallDataParser = createMulticallDataParser(
-  poolCaller,
+  POOL_CALLER,
   (calls) => {
     const formattedPoolDetails = calls.reduce((prev, next) => {
       const [poolAddress, functions] = next;

@@ -35,7 +35,7 @@ export default function Stake() {
   return (
     <>
       <ScreenHeader title="Stake" />
-      <Typography.Title>Liquidity mining</Typography.Title>
+      <Typography.Title level={2}>Liquidity mining</Typography.Title>
       <Typography.Paragraph>
         Stake index tokens or their associated Uniswap liquidity tokens to earn
         NDX, the governance token for Indexed Finance.

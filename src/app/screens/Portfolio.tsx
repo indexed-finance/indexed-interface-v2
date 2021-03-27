@@ -7,11 +7,12 @@ import {
 } from "components";
 import { Link } from "react-router-dom";
 import { Progress } from "components";
-import { selectors } from "features";
+import { selectors, useNdxBalance } from "features";
 import { useBreakpoints } from "helpers";
 import { useSelector } from "react-redux";
 
 export default function Portfolio() {
+  const ndxBalance = useNdxBalance();
   const theme = useSelector(selectors.selectTheme);
   const { isMobile } = useBreakpoints();
   const __data = [
@@ -42,7 +43,7 @@ export default function Portfolio() {
       image: "indexed-dark",
       symbol: "NDX",
       name: "Indexed",
-      balance: "20.00",
+      balance: ndxBalance,
       value: "$200.00",
       earned: "2.00",
     },
@@ -113,6 +114,7 @@ export default function Portfolio() {
 
           return datum.staking ? (
             <Badge.Ribbon
+              key={datum.address}
               color="magenta"
               style={{ top: isMobile ? 80 : 0 }}
               text={

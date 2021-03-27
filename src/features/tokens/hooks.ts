@@ -1,4 +1,4 @@
-import { selectors, totalSuppliesCaller } from "./slice";
+import { TOTAL_SUPPLIES_CALLER, selectors } from "./slice";
 import { useSelector } from "react-redux";
 import useCallRegistrar from "hooks/use-call-registrar";
 import type { AppState } from "features";
@@ -18,7 +18,7 @@ export const useTokenLookup = () =>
 
 export function createTotalSuppliesCalls(tokenIds: string[]): RegisteredCall[] {
   return tokenIds.map((id) => ({
-    caller: totalSuppliesCaller,
+    caller: TOTAL_SUPPLIES_CALLER,
     interfaceKind: "IERC20_ABI",
     target: id,
     function: "totalSupply",
@@ -32,7 +32,7 @@ export function useTotalSuppliesRegistrar(
 ) {
   useCallRegistrar(
     {
-      caller: totalSuppliesCaller,
+      caller: TOTAL_SUPPLIES_CALLER,
       onChainCalls: createTotalSuppliesCalls(tokenIds),
     },
     actions,

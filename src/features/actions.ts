@@ -1,10 +1,4 @@
-import {
-  NormalizedInitialData,
-  NormalizedPair,
-  NormalizedPool,
-  PoolUpdate,
-  StakingPoolUpdate,
-} from "ethereum";
+import { NormalizedInitialData, NormalizedPair } from "ethereum";
 import { Swap } from "indexed-types";
 import { Swap as Trade } from "uniswap-types";
 import { createAction } from "@reduxjs/toolkit";
@@ -39,26 +33,11 @@ export const coingeckoDataLoaded = createAction<{
 /**
  *
  */
-export const poolUpdated = createAction<{
-  pool: NormalizedPool;
-  update: PoolUpdate;
-}>("poolUpdated");
-/**
- *
- */
 export const poolTradesAndSwapsLoaded = createAction<{
   poolId: string;
   trades: Trade[];
   swaps: Swap[];
 }>("poolTradesAndSwapsLoaded");
-/**
- *
- */
-export const poolUserDataLoaded = createAction<{
-  blockNumber: number;
-  poolId: string;
-  userData: Record<string, { allowance: string; balance: string }>;
-}>("poolUserDataLoaded");
 /**
  *
  */
@@ -79,10 +58,6 @@ export const uniswapPairsRegistered = createAction<NormalizedPair[]>(
 export const totalSuppliesUpdated = createAction<
   { token: string; totalSupply: string }[]
 >("totalSuppliesUpdated");
-
-export const stakingPoolUpdated = createAction<StakingPoolUpdate>(
-  "stakingPoolUpdated"
-);
 
 export type MulticallData = {
   blockNumber: number;

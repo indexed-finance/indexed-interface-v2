@@ -1,8 +1,9 @@
 import { AppState } from "features/store";
-import { selectors } from "./slice";
+import { NDX_ADDRESS } from "config";
+import { RegisteredCall } from "helpers";
+import { USER_CALLER, selectors } from "./slice";
 import { useSelector } from "react-redux";
 import useCallRegistrar from "hooks/use-call-registrar";
-import type { RegisteredCall } from "helpers";
 
 export const useApprovalStatus = (
   tokenId: string,
@@ -24,6 +25,7 @@ export const useTokenAllowance = (tokenId: string, spender: string) =>
   );
 
 export const useUserAddress = () => useSelector(selectors.selectUserAddress);
+export const useNdxBalance = () => useSelector(selectors.selectNdxBalance);
 
 export function useUserDataRegistrar(
   spender: string,
@@ -31,7 +33,6 @@ export function useUserDataRegistrar(
   actions: Record<string, any>,
   selectors: Record<string, any>
 ) {
-  const caller = "User Data";
   const userAddress = useUserAddress();
   const interfaceKind = "IERC20_ABI";
   const userDataCalls = tokenIds.reduce((prev, next) => {
@@ -53,9 +54,16 @@ export function useUserDataRegistrar(
     return prev;
   }, [] as RegisteredCall[]);
 
+  userDataCalls.push({
+    interfaceKind,
+    target: NDX_ADDRESS,
+    function: "balanceOf",
+    args: [userAddress],
+  });
+
   useCallRegistrar(
     {
-      caller,
+      caller: USER_CALLER,
       onChainCalls: userDataCalls,
     },
     actions,

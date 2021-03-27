@@ -1,4 +1,4 @@
-import { pairDataCaller } from "./slice";
+import { PAIR_DATA_CALLER } from "./slice";
 import useCallRegistrar from "hooks/use-call-registrar";
 import type { RegisteredCall } from "helpers";
 
@@ -11,7 +11,7 @@ export type RegisteredPair = {
 
 export function createPairDataCalls(pairs: RegisteredPair[]): RegisteredCall[] {
   return pairs.map((pair) => ({
-    caller: pairDataCaller,
+    caller: PAIR_DATA_CALLER,
     interfaceKind: "Pair_ABI",
     target: pair.id,
     function: "getReserves",
@@ -25,7 +25,7 @@ export function usePairDataRegistrar(
 ) {
   useCallRegistrar(
     {
-      caller: pairDataCaller,
+      caller: PAIR_DATA_CALLER,
       onChainCalls: createPairDataCalls(pairs),
     },
     actions,

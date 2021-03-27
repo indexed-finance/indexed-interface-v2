@@ -18,7 +18,7 @@ import {
 import { createMulticallDataParser } from "helpers";
 import type { AppState } from "features/store";
 
-export const totalSuppliesCaller = "Total Supplies";
+export const TOTAL_SUPPLIES_CALLER = "Total Supplies";
 
 const adapter = createEntityAdapter<NormalizedToken>();
 
@@ -168,7 +168,7 @@ export default slice.reducer;
 
 // #region Helpers
 const totalSuppliesMulticallDataParser = createMulticallDataParser(
-  totalSuppliesCaller,
+  TOTAL_SUPPLIES_CALLER,
   (calls) => {
     const formattedTotalSupplies = calls.reduce((prev, next) => {
       const [tokenAddress, functions] = next;
