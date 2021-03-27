@@ -12,4 +12,4 @@ export { useSingleTokenBurnCallbacks } from "./use-burn-callbacks";
 export { useSingleTokenMintCallbacks } from "./use-mint-callbacks";
 export * from "./use-call-registrar";
 export { default as useCallRegistrar } from "./use-call-registrar";
-export { default as useEthPrice } from "./use-eth-price";
+export { useEthPrice, useTokenPrice } from "./use-token-price";
