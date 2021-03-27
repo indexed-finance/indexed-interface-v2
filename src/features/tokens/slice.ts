@@ -75,18 +75,18 @@ const slice = createSlice({
         }
       })
       .addCase(coingeckoDataLoaded, (state, action) => {
-        for (const [
-          address,
-          { price, change24Hours, percentChange24Hours },
-        ] of Object.entries(action.payload.tokens)) {
-          const entry = state.entities[address.toLowerCase()];
+        for (const [address, value] of Object.entries(action.payload.tokens)) {
+          if (value) {
+            const { price, change24Hours, percentChange24Hours } = value;
+            const entry = state.entities[address.toLowerCase()];
 
-          if (entry) {
-            entry.priceData = {
-              price,
-              change24Hours,
-              percentChange24Hours,
-            };
+            if (entry) {
+              entry.priceData = {
+                price,
+                change24Hours,
+                percentChange24Hours,
+              };
+            }
           }
         }
       })

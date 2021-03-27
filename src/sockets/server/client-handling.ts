@@ -5,6 +5,7 @@ import {
   WEBSOCKET_SERVER_UPDATE_RATE,
 } from "config";
 import { IncomingMessage } from "http";
+import { createServer } from "https";
 import {
   formatInitialStateResponse,
   formatStatePatchResponse,
@@ -12,7 +13,9 @@ import {
 } from "./helpers";
 import { store } from "features";
 import WebSocket from "isomorphic-ws";
+import fs from "fs";
 import jsonpatch from "fast-json-patch";
+import path from "path";
 
 // Track usage via reporting statistics.
 export const clientStatistics = {
@@ -32,35 +35,47 @@ export let previousState = store.getState();
  * Creates a WebSocket server that provides quick updates to connected clients.
  */
 export default function setupClientHandling() {
-  const clientServer: WebSocket.Server = new WebSocket.Server(
-    {
-      port: WEBSOCKET_SERVER_PORT,
-      perMessageDeflate: {
-        zlibDeflateOptions: {
-          // See zlib defaults.
-          chunkSize: 1024,
-          memLevel: 7,
-          level: 3,
-        },
-        zlibInflateOptions: {
-          chunkSize: 10 * 1024,
-        },
-        // Other options settable:
-        clientNoContextTakeover: true, // Defaults to negotiated value.
-        serverNoContextTakeover: true, // Defaults to negotiated value.
-        serverMaxWindowBits: 10, // Defaults to negotiated value.
-        // Below options specified as default values.
-        concurrencyLimit: 10, // Limits zlib concurrency for perf.
-        threshold: 1024, // Size (in bytes) below which messages
-        // should not be compressed.
+  const SSL_CERT_PATH = process.env.SSL_CERT_PATH;
+  const SSL_KEY_PATH = process.env.SSL_KEY_PATH;
+  const isSecure = SSL_CERT_PATH && SSL_CERT_PATH;
+  const config: WebSocket.ServerOptions = {
+    perMessageDeflate: {
+      zlibDeflateOptions: {
+        // See zlib defaults.
+        chunkSize: 1024,
+        memLevel: 7,
+        level: 3,
       },
+      zlibInflateOptions: {
+        chunkSize: 10 * 1024,
+      },
+      // Other options settable:
+      clientNoContextTakeover: true, // Defaults to negotiated value.
+      serverNoContextTakeover: true, // Defaults to negotiated value.
+      serverMaxWindowBits: 10, // Defaults to negotiated value.
+      // Below options specified as default values.
+      concurrencyLimit: 10, // Limits zlib concurrency for perf.
+      threshold: 1024, // Size (in bytes) below which messages
+      // should not be compressed.
     },
-    () => log("Listening...")
-  );
+  };
 
-  clientServer.on("connection", handleConnection);
-  clientServer.on("close", handleClose);
-  clientServer.on("error", handleError);
+  if (isSecure) {
+    const httpsServer = createServer({
+      cert: fs.readFileSync(path.resolve(SSL_CERT_PATH!)),
+      key: fs.readFileSync(path.resolve(SSL_KEY_PATH!)),
+    });
+
+    config.server = httpsServer;
+  } else {
+    config.port = WEBSOCKET_SERVER_PORT;
+  }
+
+  const socketServer = new WebSocket.Server(config, () => log("Listening..."));
+
+  socketServer.on("connection", handleConnection);
+  socketServer.on("close", handleClose);
+  socketServer.on("error", handleError);
 
   continuouslyCheckForInactivity();
   continuouslySendUpdates();

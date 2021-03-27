@@ -136,8 +136,9 @@
     "check:circulars": "madge --circular --warning --extensions ts,tsx --ts-config=tsconfig.json ./src",
     "check:types": "ttsc --noEmit",
     "server:build": "node ./scripts/build-server",
-    "server:start": "node ./webpack/server/server",
+    "server:start": "CONNECTION=false node ./webpack/server/server",
     "server:develop": "npm run server:build && npm run server:start",
+    "server:run": "CONNECTION=false SSL_CERT_PATH=/etc/letsencrypt/live/api.indexed.finance/fullchain.pem SSL_KEY_PATH=/etc/letsencrypt/live/api.indexed.finance/privkey.pem node ./webpack/server/server",
     "data:build": "node ./scripts/build-data",
     "data:watch": "nodemon --watch ./data --exec \"node ./scripts/build-data.js\" -e js,md"
   },

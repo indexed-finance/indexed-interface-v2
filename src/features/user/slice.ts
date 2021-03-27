@@ -128,7 +128,7 @@ const userMulticallDataParser = createMulticallDataParser(
           const [_balanceOfCall] = balanceOfCall;
           const [balanceOf] = _balanceOfCall.result ?? [];
 
-          prev.ndx = balanceOf.toString();
+          prev.ndx = (balanceOf ?? "").toString();
         }
 
         return prev;

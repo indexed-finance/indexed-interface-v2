@@ -11,13 +11,18 @@ interface SettingsState {
   connectionEnabled: boolean;
 }
 
+const isConnectionEnabled = () => {
+  const setting = process.env.CONNECTION;
+  return typeof setting === "undefined" || setting === "true";
+};
+
 const slice = createSlice({
   name: "settings",
   initialState: {
     languageCode: "en-us",
     theme: "dark",
     connected: false,
-    connectionEnabled: process.env.NODE_ENV === "development",
+    connectionEnabled: isConnectionEnabled(),
   } as SettingsState,
   reducers: {
     languageChanged: (state, action: PayloadAction<SupportedLanguageCode>) => {

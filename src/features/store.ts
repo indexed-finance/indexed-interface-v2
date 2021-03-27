@@ -66,7 +66,7 @@ export interface TokenField {
 
 // #region Helpers
 export function loadPersistedState() {
-  if (typeof window === "undefined") {
+  if (!window?.localStorage) {
     // We're on the server.
     const { loadState } = require("../sockets/server/persistence");
     const state = loadState();
