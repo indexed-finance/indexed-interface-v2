@@ -1,8 +1,23 @@
 import { actionHistory, store } from "features";
+import { createServer } from "https";
 import express from "express";
+import fs from "fs";
+import path from "path";
 
-export default function setupHttpHandling() {
+export default function setupHttpsHandling() {
+  const SSL_CERT_PATH = process.env.SSL_CERT_PATH;
+  const SSL_KEY_PATH = process.env.SSL_KEY_PATH;
+
+  if (!(SSL_CERT_PATH && SSL_KEY_PATH)) {
+    throw new Error(
+      "Https server requires environment variables SSL_CERT_PATH and SSL_KEY_PATH"
+    );
+  }
+
   const app = express();
+  const key = fs.readFileSync(path.resolve(SSL_KEY_PATH), "utf8");
+  const cert = fs.readFileSync(path.resolve(SSL_CERT_PATH), "utf8");
+  const credentials = { key, cert };
 
   app.get("/", (_, res) => {
     const actionsHtml = `
@@ -36,5 +51,7 @@ export default function setupHttpHandling() {
     });
   });
 
-  app.listen(411, () => console.info("Socket HTTP server listening."));
+  const httpsServer = createServer(credentials, app);
+
+  httpsServer.listen(443, () => console.info("Socket HTTPS server listening."));
 }
