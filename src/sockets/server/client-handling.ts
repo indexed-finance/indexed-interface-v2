@@ -1,7 +1,6 @@
 import {
   CLIENT_STATISTICS_REPORTING_RATE,
   WEBSOCKET_SERVER_PING_RATE,
-  WEBSOCKET_SERVER_PORT,
   WEBSOCKET_SERVER_UPDATE_RATE,
 } from "config";
 import { IncomingMessage } from "http";
@@ -73,7 +72,7 @@ export default function setupClientHandling() {
   socketServer.on("close", handleClose);
   socketServer.on("error", handleError);
 
-  server.listen(WEBSOCKET_SERVER_PORT, () => "Server listening...");
+  server.listen(443, () => "Server listening...");
 
   continuouslyCheckForInactivity();
   continuouslySendUpdates();

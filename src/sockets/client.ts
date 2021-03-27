@@ -4,10 +4,7 @@ import { message } from "antd";
 
 export let socket: null | WebSocket = null;
 
-const websocketUrl =
-  process.env.NODE_ENV === "development"
-    ? "ws://localhost:13337/"
-    : "ws://192.168.1.154:13337/";
+const websocketUrl = "wss://api.indexed.finance/";
 const timeInSeconds = [1, 1, 3, 5, 8, 13, 21, 99, 999];
 let retryAttempts = 0;
 

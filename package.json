@@ -28,6 +28,7 @@
     "fortmatic": "^2.2.1",
     "http-proxy": "^1.18.1",
     "isomorphic-ws": "^4.0.1",
+    "less-loader": "^7.3.0",
     "lightweight-charts": "^3.3.0",
     "lodash.chunk": "^4.2.0",
     "lodash.clonedeep": "^4.5.0",
