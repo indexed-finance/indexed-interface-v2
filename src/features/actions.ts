@@ -25,7 +25,7 @@ export const coingeckoIdsLoaded = createAction<
  *
  */
 export const coingeckoDataLoaded = createAction<{
-  pool: string;
+  pool?: string;
   tokens: Record<
     string,
     {
