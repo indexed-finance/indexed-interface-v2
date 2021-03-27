@@ -4,20 +4,20 @@ import express from "express";
 import fs from "fs";
 import path from "path";
 
-export default function setupHttpsHandling() {
-  const SSL_CERT_PATH = process.env.SSL_CERT_PATH;
-  const SSL_KEY_PATH = process.env.SSL_KEY_PATH;
+export default function setupLog() {
+  const LOG_CERT_PATH = process.env.LOG_CERT_PATH;
+  const LOG_KEY_PATH = process.env.LOG_KEY_PATH;
 
-  if (!(SSL_CERT_PATH && SSL_KEY_PATH)) {
+  if (!(LOG_CERT_PATH && LOG_KEY_PATH)) {
     throw new Error(
-      "Https server requires environment variables SSL_CERT_PATH and SSL_KEY_PATH"
+      "Logging server requires environment variables LOG_CERT_PATH and LOG_KEY_PATH"
     );
   }
 
-  const app = express();
-  const key = fs.readFileSync(path.resolve(SSL_KEY_PATH), "utf8");
-  const cert = fs.readFileSync(path.resolve(SSL_CERT_PATH), "utf8");
+  const key = fs.readFileSync(path.resolve(LOG_CERT_PATH), "utf8");
+  const cert = fs.readFileSync(path.resolve(LOG_KEY_PATH), "utf8");
   const credentials = { key, cert };
+  const app = express();
 
   app.get("/", (_, res) => {
     const actionsHtml = `
@@ -53,5 +53,5 @@ export default function setupHttpsHandling() {
 
   const httpsServer = createServer(credentials, app);
 
-  httpsServer.listen(443, () => console.info("Socket HTTPS server listening."));
+  httpsServer.listen(411, () => console.info("Logger listening."));
 }

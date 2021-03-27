@@ -35,47 +35,46 @@ export let previousState = store.getState();
  * Creates a WebSocket server that provides quick updates to connected clients.
  */
 export default function setupClientHandling() {
-  const SSL_CERT_PATH = process.env.SSL_CERT_PATH;
-  const SSL_KEY_PATH = process.env.SSL_KEY_PATH;
-  const isSecure = SSL_CERT_PATH && SSL_CERT_PATH;
-  const config: WebSocket.ServerOptions = {
-    perMessageDeflate: {
-      zlibDeflateOptions: {
-        // See zlib defaults.
-        chunkSize: 1024,
-        memLevel: 7,
-        level: 3,
-      },
-      zlibInflateOptions: {
-        chunkSize: 10 * 1024,
-      },
-      // Other options settable:
-      clientNoContextTakeover: true, // Defaults to negotiated value.
-      serverNoContextTakeover: true, // Defaults to negotiated value.
-      serverMaxWindowBits: 10, // Defaults to negotiated value.
-      // Below options specified as default values.
-      concurrencyLimit: 10, // Limits zlib concurrency for perf.
-      threshold: 1024, // Size (in bytes) below which messages
-      // should not be compressed.
-    },
-  };
+  const API_CERT_PATH = process.env.API_CERT_PATH;
+  const API_KEY_PATH = process.env.API_KEY_PATH;
 
-  if (isSecure) {
-    const httpsServer = createServer({
-      cert: fs.readFileSync(path.resolve(SSL_CERT_PATH!)),
-      key: fs.readFileSync(path.resolve(SSL_KEY_PATH!)),
-    });
-
-    config.server = httpsServer;
-  } else {
-    config.port = WEBSOCKET_SERVER_PORT;
+  if (!(API_CERT_PATH && API_KEY_PATH)) {
+    throw new Error(
+      "Server requires environment variables API_CERT_PATH and API_KEY_PATH"
+    );
   }
 
-  const socketServer = new WebSocket.Server(config, () => log("Listening..."));
+  const key = fs.readFileSync(path.resolve(API_CERT_PATH), "utf8");
+  const cert = fs.readFileSync(path.resolve(API_KEY_PATH), "utf8");
+  const credentials = { key, cert };
+  const server = createServer(credentials);
+  const socketServer = new WebSocket.Server(
+    {
+      server,
+      perMessageDeflate: {
+        zlibDeflateOptions: {
+          chunkSize: 1024,
+          memLevel: 7,
+          level: 3,
+        },
+        zlibInflateOptions: {
+          chunkSize: 10 * 1024,
+        },
+        clientNoContextTakeover: true,
+        serverNoContextTakeover: true,
+        serverMaxWindowBits: 10,
+        concurrencyLimit: 10,
+        threshold: 1024,
+      },
+    },
+    () => log("Socket server listening...")
+  );
 
   socketServer.on("connection", handleConnection);
   socketServer.on("close", handleClose);
   socketServer.on("error", handleError);
+
+  server.listen(WEBSOCKET_SERVER_PORT, () => "Server listening...");
 
   continuouslyCheckForInactivity();
   continuouslySendUpdates();
