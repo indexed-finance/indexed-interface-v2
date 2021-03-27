@@ -30,7 +30,7 @@ export function useStakingTokenPrice(stakingPoolAddress: string) {
   }, [ stakingPool?.isWethPair, stakingPool?.stakingToken, stakingPool?.indexPool ]);
   const [supplies, suppliesLoading] = useTotalSuppliesWithLoadingIndicator(supplyTokens);
   const [pairs, pairsLoading] = useUniswapPairs(_pairs);
-  const [tokenPrice, tokenPriceLoading] = useTokenPrice(stakingPool?.isWethPair ? stakingPool.indexPool : stakingPool?.stakingToken ?? "");
+  const [tokenPrice, tokenPriceLoading] = useTokenPrice(stakingPool?.indexPool ?? "");
 
   return useMemo(() => {
     if (!stakingPool || tokenPriceLoading) return null;
