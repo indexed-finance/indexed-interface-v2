@@ -1,14 +1,16 @@
-import { BigNumber } from "ethereum/utils/balancer-math";
-import { Divider, Space } from "antd";
 import {
+  AppState,
   FormattedIndexPool,
   actions,
   selectors,
   usePoolToTokens,
   useUserDataRegistrar,
 } from "features";
+import { BigNumber } from "ethereum/utils/balancer-math";
+import { Divider, Space } from "antd";
 import { PlainLanguageTransaction, TokenExchangeRate } from "components";
 import { SLIPPAGE_RATE } from "config";
+import { calcSwapAmountOut } from "ethereum/helpers";
 import { convert } from "helpers";
 import { downwardSlippage, upwardSlippage } from "ethereum";
 import { getSwapCost } from "ethereum/utils";
@@ -138,12 +140,22 @@ function SwapExtras({ pool }: Props) {
   const { values } = useFormikContext<InteractionValues>();
   const { fromToken, fromAmount, toToken, toAmount } = values;
   const swapCost = getSwapCost(toAmount, pool.swapFee);
+  const defaultFromToken = useDefaultToken(pool, fromToken);
+  const defaultToToken = useDefaultToken(pool, toToken);
   const rate = useMemo(() => {
     if (fromAmount && toAmount) {
       return (toAmount / fromAmount).toFixed(4);
+    } else {
+      const { spotPriceAfter = "" } = calcSwapAmountOut(
+        defaultFromToken,
+        defaultToToken,
+        convert.toBigNumber("1"),
+        convert.toBigNumber(swapCost)
+      );
+
+      return convert.toBalance(spotPriceAfter!);
     }
-    return "";
-  }, [fromAmount, toAmount]);
+  }, [fromAmount, toAmount, defaultFromToken, defaultToToken, swapCost]);
 
   return fromToken && toToken ? (
     <>
@@ -160,3 +172,29 @@ function SwapExtras({ pool }: Props) {
     </>
   ) : null;
 }
+
+// #region Helpers
+function useDefaultToken(pool: FormattedIndexPool, token: string) {
+  const poolInState = useSelector((state: AppState) =>
+    selectors.selectPool(state, pool.id)
+  );
+  const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
+
+  return useMemo(() => {
+    if (poolInState && token) {
+      const { id } = tokenLookup[token.toLowerCase()];
+      const entry = poolInState!.tokens.entities[id];
+
+      return {
+        usedDenorm: entry.usedDenorm,
+        usedBalance: entry.usedBalance,
+      };
+    } else {
+      return {
+        usedDenorm: "0",
+        usedBalance: "0",
+      };
+    }
+  }, [poolInState, token, tokenLookup]);
+}
+// #endregion
