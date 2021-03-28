@@ -17,7 +17,9 @@ const LOCAL_DATA_LOOKUP: Record<string, typeof ZeroExOne> = {
   "sigma-v10x1": SigmaTenExOne,
 };
 
-const adapter = createEntityAdapter<NormalizedCategory>();
+const adapter = createEntityAdapter<NormalizedCategory>({
+  selectId: (entry) => entry.id.toLowerCase(),
+});
 const initialState = adapter.getInitialState();
 const withLocalData = adapter.addMany(
   initialState,

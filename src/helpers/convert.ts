@@ -49,13 +49,19 @@ const convert = {
     amount: string | BigNumber,
     decimals: number = DEFAULT_DECIMAL_COUNT
   ) => toTokenAmount(convert.toBigNumber(amount), decimals),
-  toBalance: (amount: string | BigNumber, decimals: number = DEFAULT_DECIMAL_COUNT) => {
-    const result = formatBalance(
-      convert.toBigNumber(amount),
-      decimals,
-      4
-    );
-    return convert.toComma(parseFloat(result));
+  toBalanceNumber: (
+    amount: string | BigNumber,
+    decimals: number = DEFAULT_DECIMAL_COUNT
+  ) => {
+    return parseFloat(formatBalance(convert.toBigNumber(amount), decimals, 4));
+  },
+  toBalance: (
+    amount: string | BigNumber,
+    decimals: number = DEFAULT_DECIMAL_COUNT
+  ) => {
+    const result = convert.toBalanceNumber(amount, decimals);
+
+    return convert.toComma(result);
   },
   // Uniswap SDK
   toUniswapSDKToken: (provider: ProviderLike, token: NormalizedToken) =>

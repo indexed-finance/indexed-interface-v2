@@ -11,7 +11,9 @@ import type { NormalizedStakingPool, StakingPoolUpdate } from "ethereum/types";
 
 export const stakingCaller = "Staking";
 
-const adapter = createEntityAdapter<NormalizedStakingPool>();
+const adapter = createEntityAdapter<NormalizedStakingPool>({
+  selectId: (entry) => entry.id.toLowerCase(),
+});
 
 const slice = createSlice({
   name: "staking",

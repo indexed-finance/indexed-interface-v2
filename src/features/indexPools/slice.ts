@@ -10,7 +10,9 @@ import {
 } from "features/actions";
 import type { CallWithResult } from "helpers";
 
-export const adapter = createEntityAdapter<NormalizedPool>();
+export const adapter = createEntityAdapter<NormalizedPool>({
+  selectId: (entry) => entry.id.toLowerCase(),
+});
 
 export const POOL_CALLER = "Pool Detail";
 

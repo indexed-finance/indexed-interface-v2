@@ -8,7 +8,9 @@ export type SnapshotKey = keyof Omit<DailyPoolSnapshot, "date">;
 const SECONDS_PER_DAY = 24 * 60 * 60;
 const SECONDS_PER_WEEK = SECONDS_PER_DAY * 7;
 
-const adapter = createEntityAdapter<DailyPoolSnapshot>();
+const adapter = createEntityAdapter<DailyPoolSnapshot>({
+  selectId: (entry) => entry.id.toLowerCase(),
+});
 
 const slice = createSlice({
   name: "dailySnapshots",

@@ -20,7 +20,9 @@ import type { AppState } from "features/store";
 export const totalSuppliesCaller = "Total Supplies";
 export const pricesCaller = "Token Prices";
 
-const adapter = createEntityAdapter<NormalizedToken>();
+const adapter = createEntityAdapter<NormalizedToken>({
+  selectId: (entry) => entry.id.toLowerCase(),
+});
 
 const slice = createSlice({
   name: "tokens",
@@ -105,6 +107,7 @@ const slice = createSlice({
       .addCase(uniswapPairsRegistered, (state, action) => {
         for (const pair of action.payload) {
           if (!state.entities[pair.id.toLowerCase()]) {
+            state.ids.push(pair.id.toLowerCase());
             state.entities[pair.id.toLowerCase()] = {
               id: pair.id.toLowerCase(),
               symbol: "UniV2",

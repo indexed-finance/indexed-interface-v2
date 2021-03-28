@@ -201,41 +201,21 @@ export const thunks = {
 
     dispatch(actions.coingeckoIdsLoaded(supportedCoinIds));
   },
-  retrieveCoingeckoDataForTokens: (
-    ...tokenAddresses: string[]
-  ): AppThunk => async (dispatch, getState) => {
-    const coingeckoData = await CoinGeckoService.getStatsForTokens(
-      tokenAddresses
-    );
-
-    dispatch(
-      actions.coingeckoDataLoaded({
-        tokens: coingeckoData,
-      })
-    );
-  },
   retrieveCoingeckoData: (
     poolOrTokenIds: string | string[]
   ): AppThunk => async (dispatch, getState) => {
     const state = getState();
-    let pool: string | undefined;
-    let tokenAddresses: string[];
-    if (!Array.isArray(poolOrTokenIds)) {
-      pool = poolOrTokenIds;
-      const tokenIds = selectors.selectPoolTokenIds(state, poolOrTokenIds);
-      const tokenLookup = selectors.selectTokenLookup(state);
-      tokenAddresses = tokenIds.filter((id) => tokenLookup[id]);
-    } else {
-      tokenAddresses = poolOrTokenIds;
-    }
-    const coingeckoData = await CoinGeckoService.getStatsForTokens(
-      tokenAddresses
-    );
+    const isPool = typeof poolOrTokenIds === "string";
+    const pool = isPool ? (poolOrTokenIds as string) : null;
+    const tokenIds = pool
+      ? [...selectors.selectPoolTokenIds(state, pool), pool]
+      : (poolOrTokenIds as string[]);
+    const tokens = await CoinGeckoService.getStatsForTokens(tokenIds);
 
     dispatch(
       actions.coingeckoDataLoaded({
         pool,
-        tokens: coingeckoData,
+        tokens,
       })
     );
   },

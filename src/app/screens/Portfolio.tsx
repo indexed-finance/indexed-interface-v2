@@ -1,3 +1,12 @@
+import {
+  AppState,
+  actions,
+  selectors,
+  useNdxBalance,
+  usePairDataRegistrar,
+  useStakingRegistrar,
+  useUserDataRegistrar,
+} from "features";
 import { Badge, Divider, Space, Typography } from "antd";
 import {
   IndexCard,
@@ -7,17 +16,14 @@ import {
   Token,
 } from "components";
 import { Link } from "react-router-dom";
-import {
-  actions,
-  selectors,
-  useNdxBalance,
-  useStakingRegistrar,
-  useUserDataRegistrar,
-} from "features";
+import { NDX_ADDRESS, WETH_CONTRACT_ADDRESS } from "config";
+import { buildUniswapPairs, useEthPrice } from "hooks";
 import { useBreakpoints } from "helpers";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect, useMemo } from "react";
 
 export default function Portfolio() {
+  const dispatch = useDispatch();
   const ndxBalance = useNdxBalance();
   const theme = useSelector(selectors.selectTheme);
   const { isMobile } = useBreakpoints();
@@ -60,12 +66,32 @@ export default function Portfolio() {
 
     return prev;
   }, {} as Record<string, string[]>);
-  const formattedPortfolio = useSelector(selectors.selectFormattedPortfolio);
+  const [ethPrice, ethPriceLoading] = useEthPrice();
+  const formattedPortfolio = useSelector((state: AppState) =>
+    ethPriceLoading
+      ? null
+      : selectors.selectFormattedPortfolio(state, ethPrice!)
+  );
+
+  const uniswapPairs = useMemo(
+    () => buildUniswapPairs([NDX_ADDRESS, WETH_CONTRACT_ADDRESS]),
+    []
+  );
 
   useUserDataRegistrar(poolsToTokens, actions, selectors);
   useStakingRegistrar(actions, selectors);
+  usePairDataRegistrar(uniswapPairs, actions, selectors);
 
-  console.log({ formattedPortfolio });
+  console.log({
+    formattedPortfolio,
+    ethPrice,
+  });
+
+  // Effect:
+  // On portfolio load, register the NDX address.
+  useEffect(() => {
+    dispatch(actions.uniswapPairsRegistered(uniswapPairs));
+  }, [dispatch, uniswapPairs]);
 
   return (
     <div>

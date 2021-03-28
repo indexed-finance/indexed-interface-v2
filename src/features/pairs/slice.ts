@@ -13,7 +13,9 @@ import type { NormalizedPair, NormalizedToken } from "ethereum/types";
 
 export const PAIR_DATA_CALLER = "Pair Data";
 
-const adapter = createEntityAdapter<NormalizedPair>();
+const adapter = createEntityAdapter<NormalizedPair>({
+  selectId: (entry) => entry.id.toLowerCase(),
+});
 
 const slice = createSlice({
   name: "pairs",
@@ -32,6 +34,7 @@ const slice = createSlice({
             const id = pairAddress.toLowerCase();
 
             if (!state.entities[id]) {
+              state.ids.push(id);
               state.entities[id] = { id };
             }
 
@@ -44,7 +47,16 @@ const slice = createSlice({
         }
       })
       .addCase(uniswapPairsRegistered, (state, action) => {
-        adapter.addMany(state, action.payload);
+        const formatted = action.payload.map(
+          ({ id, token0 = "", token1 = "", ...rest }) => ({
+            ...rest,
+            id: id.toLowerCase(),
+            token0: token0.toLowerCase(),
+            token1: token0.toLowerCase(),
+          })
+        );
+
+        adapter.upsertMany(state, formatted);
       })
       .addCase(mirroredServerState, (_, action) => {
         const { pairs } = action.payload;

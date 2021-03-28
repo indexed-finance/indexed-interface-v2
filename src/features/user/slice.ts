@@ -69,7 +69,7 @@ export const selectors = {
     return state.user.address;
   },
   selectNdxBalance(state: AppState) {
-    return state.user.ndx ? convert.toBalance(state.user.ndx) : 0;
+    return state.user.ndx ? convert.toBalanceNumber(state.user.ndx) : 0;
   },
   selectTokenAllowance(state: AppState, poolId: string, tokenId: string) {
     return state.user.allowances[`${poolId}-${tokenId}`.toLowerCase()];

@@ -321,7 +321,7 @@ const selectors = {
       }
     }
 
-    return null;
+    return 0;
   },
   selectFormattedStaking(state: AppState): FormattedStakingDetail {
     const pools = selectors.selectAllStakingPools(state);
@@ -375,9 +375,13 @@ const selectors = {
       } as FormattedStakingDetail
     );
   },
-  selectFormattedPortfolio(state: AppState): FormattedPortfolioData {
+  selectFormattedPortfolio(
+    state: AppState,
+    ethPrice: number
+  ): FormattedPortfolioData {
     const theme = selectors.selectTheme(state);
     const poolLookup = selectors.selectPoolLookup(state);
+    const tokenLookup = selectors.selectTokenLookup(state);
     const tokenBalanceLookup = selectors.selectTokenSymbolsToBalances(state);
     const { staking } = selectors.selectUser(state);
     const ndxBalance = selectors.selectNdxBalance(state);
@@ -387,44 +391,57 @@ const selectors = {
 
       return prev + parsed;
     }, 0);
+    const ndxPrice = selectors.selectNdxPrice(state, ethPrice);
+    const ndxValue = ndxBalance * ndxPrice;
 
-    const formattedPortfolio = selectors.selectAllPoolIds(state).reduce(
-      (prev, next) => {
-        const pool = poolLookup[next];
+    let accumulatedValue = ndxValue;
+    const accumulatedTokenValues: number[] = [];
+    const processedTokens = selectors.selectAllPoolIds(state).map((poolId) => {
+      const pool = poolLookup[poolId]!;
 
-        if (pool) {
-          const balance = convert.toBalance(
-            tokenBalanceLookup[pool.symbol.toLowerCase()]
-          );
+      const balanceAsNumber = convert.toBigNumber(
+        tokenBalanceLookup[pool.symbol.toLowerCase()]
+      );
+      const displayedBalance = convert.toBalance(balanceAsNumber);
+      const poolToken = tokenLookup[pool.id];
+      const poolTokenPrice = poolToken?.priceData?.price ?? 0;
+      const value = balanceAsNumber.times(poolTokenPrice).toNumber();
+      const displayedValue = convert.toCurrency(value);
 
-          prev.tokens.push({
-            address: pool.id,
-            image: pool.id,
-            link: `/pools/${S(pool.name).slugify().s}`,
-            symbol: pool.symbol,
-            name: pool.name,
-            balance,
-            staking: staking[pool.id]?.balance ?? "",
-            value: "",
-            weight: convert.toPercent(0),
-          });
-        }
+      accumulatedTokenValues.push(value);
+      accumulatedValue += value;
 
-        return prev;
+      return {
+        address: pool.id,
+        link: `/pools/${S(pool.name).slugify().s}`,
+        symbol: pool.symbol,
+        name: pool.name,
+        balance: displayedBalance,
+        staking: staking[pool.id]?.balance ?? "",
+        value: displayedValue,
+        weight: "0.00%", // Calculate weight after.
+      };
+    });
+
+    const tokens = processedTokens.map((token, index) => ({
+      ...token,
+      weight: convert.toPercent(
+        accumulatedTokenValues[index] / accumulatedValue
+      ),
+    }));
+    const formattedPortfolio = {
+      tokens,
+      ndx: {
+        address: NDX_ADDRESS,
+        image: `indexed-${theme}`,
+        symbol: "NDX",
+        name: "Indexed",
+        balance: `${ndxBalance.toFixed(2)} NDX`,
+        value: convert.toCurrency(ndxValue),
+        earned: `${ndxEarned} NDX`,
+        weight: convert.toPercent(ndxValue / accumulatedValue),
       },
-      {
-        tokens: [] as FormattedPortfolioData["tokens"],
-        ndx: {
-          address: NDX_ADDRESS,
-          image: `indexed-${theme}`,
-          symbol: "NDX",
-          name: "Indexed",
-          balance: ndxBalance,
-          value: "",
-          earned: `${ndxEarned} NDX`,
-        },
-      } as FormattedPortfolioData
-    );
+    };
 
     return formattedPortfolio;
   },
@@ -521,17 +538,15 @@ export type Asset = FormattedIndexPool["assets"][0];
 
 export type FormattedPortfolioDatum = {
   address: string;
-  image: string;
   symbol: string;
   name: string;
   balance: string;
   value: string;
+  weight: string;
 };
 
 export interface FormattedPortfolioData {
-  tokens: Array<
-    FormattedPortfolioDatum & { link: string; staking: string; weight: string }
-  >;
+  tokens: Array<FormattedPortfolioDatum & { link: string; staking: string }>;
   ndx: FormattedPortfolioDatum & { earned: string };
 }
 
