@@ -20,7 +20,6 @@ export default function StakingCard(props: FormattedStakingData) {
   const { isMobile } = useBreakpoints();
   const apy = useStakingApy(id);
   const isExpired = apy === "Expired";
-
   const commonActions = [
     {
       title: "Rate",

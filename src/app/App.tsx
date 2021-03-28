@@ -7,6 +7,7 @@ import { actions, selectors, store } from "features";
 import { message, notification } from "antd";
 import { useBreakpoints } from "helpers";
 import { useEffect, useRef } from "react";
+import AppErrorBoundary from "./AppErrorBoundary";
 import AppLayout from "./AppLayout";
 import background from "assets/images/dark-bg.jpg";
 import flags from "feature-flags";
@@ -59,7 +60,9 @@ function Inner() {
 export default function App() {
   return (
     <Provider store={store}>
-      <Inner />
+      <AppErrorBoundary>
+        <Inner />
+      </AppErrorBoundary>
     </Provider>
   );
 }

@@ -17,6 +17,7 @@ import { useFormikContext } from "formik";
 import { useSelector } from "react-redux";
 import { useSwapCallbacks } from "hooks";
 import BaseInteraction, { InteractionValues } from "./BaseInteraction";
+import flags from "feature-flags";
 
 interface Props {
   pool: FormattedIndexPool;
@@ -153,7 +154,7 @@ function SwapExtras({ pool }: Props) {
           rate={rate}
           fee={swapCost}
         />
-        <PlainLanguageTransaction />
+        {flags.usePlainLanguageTransaction && <PlainLanguageTransaction />}
       </Space>
       <Divider />
     </>

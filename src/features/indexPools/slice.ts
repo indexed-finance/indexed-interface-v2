@@ -6,6 +6,7 @@ import {
   mirroredServerState,
   multicallDataReceived,
   poolTradesAndSwapsLoaded,
+  restartedDueToError,
   subgraphDataLoaded,
 } from "features/actions";
 import type { CallWithResult } from "helpers";
@@ -13,6 +14,8 @@ import type { CallWithResult } from "helpers";
 export const adapter = createEntityAdapter<NormalizedPool>({
   selectId: (entry) => entry.id.toLowerCase(),
 });
+
+const initialState = adapter.getInitialState();
 
 export const POOL_CALLER = "Pool Detail";
 
@@ -28,7 +31,7 @@ export const EMPTY_TOKEN = {
 
 const slice = createSlice({
   name: "indexPools",
-  initialState: adapter.getInitialState(),
+  initialState,
   reducers: {},
   extraReducers: (builder) =>
     builder
@@ -95,7 +98,8 @@ const slice = createSlice({
         const { indexPools } = action.payload;
 
         return indexPools;
-      }),
+      })
+      .addCase(restartedDueToError, () => initialState),
 });
 
 export const { actions } = slice;

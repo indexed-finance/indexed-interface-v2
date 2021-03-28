@@ -4,6 +4,7 @@ import {
   coingeckoDataLoaded,
   multicallDataReceived,
   poolTradesAndSwapsLoaded,
+  restartedDueToError,
 } from "features/actions";
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { actions as stakingActions } from "../staking/slice";
@@ -20,14 +21,16 @@ interface CacheState {
   >;
 }
 
+const initialState: CacheState = {
+  blockNumber: 0,
+  entries: {},
+};
+
 const MAX_AGE_IN_BLOCKS = 4; // How old can data be in the cache?
 
 const slice = createSlice({
   name: "cache",
-  initialState: {
-    blockNumber: 0,
-    entries: {},
-  } as CacheState,
+  initialState,
   reducers: {
     blockNumberChanged(state, action: PayloadAction<number>) {
       const blockNumber = action.payload;
@@ -83,6 +86,7 @@ const slice = createSlice({
 
         return state;
       })
+      .addCase(restartedDueToError, () => initialState)
       .addMatcher(
         (action) =>
           [

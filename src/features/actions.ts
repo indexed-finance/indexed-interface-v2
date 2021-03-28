@@ -72,3 +72,5 @@ export const cachedMulticallDataReceived = createAction<MulticallData>(
 );
 
 export const multicallDataRequested = createAction("multicallDataRequested");
+
+export const restartedDueToError = createAction("restartedDueToError");

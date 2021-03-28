@@ -5,6 +5,7 @@ import {
   coingeckoIdsLoaded,
   mirroredServerState,
   multicallDataReceived,
+  restartedDueToError,
   subgraphDataLoaded,
   totalSuppliesUpdated,
   uniswapPairsRegistered,
@@ -24,9 +25,11 @@ const adapter = createEntityAdapter<NormalizedToken>({
   selectId: (entry) => entry.id.toLowerCase(),
 });
 
+const initialState = adapter.getInitialState();
+
 const slice = createSlice({
   name: "tokens",
-  initialState: adapter.getInitialState(),
+  initialState,
   reducers: {},
   extraReducers: (builder) =>
     builder
@@ -96,6 +99,7 @@ const slice = createSlice({
 
         return tokens;
       })
+      .addCase(restartedDueToError, () => initialState)
       .addCase(totalSuppliesUpdated, (state, action) => {
         for (const { token, totalSupply } of action.payload) {
           const entity = state.entities[token.toLowerCase()];

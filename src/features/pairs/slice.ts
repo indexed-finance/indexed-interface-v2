@@ -4,6 +4,7 @@ import { createEntityAdapter, createSlice } from "@reduxjs/toolkit";
 import {
   mirroredServerState,
   multicallDataReceived,
+  restartedDueToError,
   uniswapPairsRegistered,
 } from "features/actions";
 import { tokensSelectors } from "features/tokens";
@@ -17,9 +18,11 @@ const adapter = createEntityAdapter<NormalizedPair>({
   selectId: (entry) => entry.id.toLowerCase(),
 });
 
+const initialState = adapter.getInitialState();
+
 const slice = createSlice({
   name: "pairs",
-  initialState: adapter.getInitialState(),
+  initialState,
   reducers: {},
   extraReducers: (builder) =>
     builder
@@ -52,7 +55,7 @@ const slice = createSlice({
             ...rest,
             id: id.toLowerCase(),
             token0: token0.toLowerCase(),
-            token1: token0.toLowerCase(),
+            token1: token1.toLowerCase(),
           })
         );
 
@@ -62,7 +65,8 @@ const slice = createSlice({
         const { pairs } = action.payload;
 
         return pairs;
-      }),
+      })
+      .addCase(restartedDueToError, () => initialState),
 });
 
 export const { actions } = slice;

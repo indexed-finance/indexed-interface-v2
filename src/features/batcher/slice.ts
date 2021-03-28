@@ -3,6 +3,7 @@ import {
   cachedMulticallDataReceived,
   multicallDataReceived,
   multicallDataRequested,
+  restartedDueToError,
 } from "features/actions";
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import {
@@ -29,15 +30,17 @@ interface BatcherState {
   status: "idle" | "loading" | "deferring to server";
 }
 
+const initialState: BatcherState = {
+  onChainCalls: [],
+  offChainCalls: [],
+  callers: {},
+  listenerCounts: {},
+  status: "idle",
+} as BatcherState;
+
 const slice = createSlice({
   name: "batcher",
-  initialState: {
-    onChainCalls: [],
-    offChainCalls: [],
-    callers: {},
-    listenerCounts: {},
-    status: "idle",
-  } as BatcherState,
+  initialState,
   reducers: {
     registrantRegistered(
       state,
@@ -110,6 +113,7 @@ const slice = createSlice({
       .addCase(settingsActions.connectionEstablished, (state) => {
         state.status = "deferring to server";
       })
+      .addCase(restartedDueToError, () => initialState)
       .addMatcher(
         (action) =>
           [

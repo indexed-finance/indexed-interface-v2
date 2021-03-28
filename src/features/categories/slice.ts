@@ -1,6 +1,10 @@
 import { NormalizedCategory } from "ethereum";
 import { createEntityAdapter, createSlice } from "@reduxjs/toolkit";
-import { mirroredServerState, subgraphDataLoaded } from "features/actions";
+import {
+  mirroredServerState,
+  restartedDueToError,
+  subgraphDataLoaded,
+} from "features/actions";
 import S from "string";
 import SigmaTenExOne from "./local-data/sigma-v10x1.json";
 import ZeroExOne from "./local-data/0x1.json";
@@ -48,7 +52,8 @@ const slice = createSlice({
         const { categories } = action.payload;
 
         return categories;
-      }),
+      })
+      .addCase(restartedDueToError, () => withLocalData),
 });
 
 export const { actions } = slice;

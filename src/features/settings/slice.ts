@@ -16,14 +16,16 @@ const isConnectionEnabled = () => {
   return typeof setting === "undefined" || setting === "true";
 };
 
+const initialState: SettingsState = {
+  languageCode: "en-us",
+  theme: "dark",
+  connected: false,
+  connectionEnabled: isConnectionEnabled(),
+};
+
 const slice = createSlice({
   name: "settings",
-  initialState: {
-    languageCode: "en-us",
-    theme: "dark",
-    connected: false,
-    connectionEnabled: isConnectionEnabled(),
-  } as SettingsState,
+  initialState,
   reducers: {
     languageChanged: (state, action: PayloadAction<SupportedLanguageCode>) => {
       state.languageCode = action.payload;

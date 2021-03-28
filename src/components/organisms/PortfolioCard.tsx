@@ -19,7 +19,7 @@ export default function PortfolioCard({
 
   let ribbonText = "";
 
-  if (earned) {
+  if (earned && earned !== "0.00") {
     ribbonText = `Earned ${earned} NDX`;
   } else if (staking) {
     ribbonText = `Staking ${staking} ${symbol}`;

@@ -4,7 +4,11 @@ import {
   createSlice,
 } from "@reduxjs/toolkit";
 import { convert, createMulticallDataParser } from "helpers";
-import { mirroredServerState, multicallDataReceived } from "features/actions";
+import {
+  mirroredServerState,
+  multicallDataReceived,
+  restartedDueToError,
+} from "features/actions";
 import type { AppState } from "features/store";
 import type { CallWithResult } from "helpers";
 import type { NormalizedStakingPool, StakingPoolUpdate } from "ethereum/types";
@@ -15,9 +19,11 @@ const adapter = createEntityAdapter<NormalizedStakingPool>({
   selectId: (entry) => entry.id.toLowerCase(),
 });
 
+const initialState = adapter.getInitialState();
+
 const slice = createSlice({
   name: "staking",
-  initialState: adapter.getInitialState(),
+  initialState,
   reducers: {
     stakingDataLoaded(state, action: PayloadAction<NormalizedStakingPool[]>) {
       adapter.addMany(state, action.payload);
@@ -56,7 +62,8 @@ const slice = createSlice({
         const { staking } = action.payload;
 
         return staking;
-      }),
+      })
+      .addCase(restartedDueToError, () => initialState),
 });
 
 export const { actions } = slice;

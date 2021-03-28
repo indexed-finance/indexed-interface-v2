@@ -12,8 +12,6 @@ export default function QuoteCarousel({ pools }: Props) {
   const history = useHistory();
   const theme = useSelector(selectors.selectTheme);
 
-  return null;
-
   return (
     <Carousel
       effect="fade"

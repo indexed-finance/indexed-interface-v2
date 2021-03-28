@@ -46,70 +46,72 @@ export function useStakingTokenPrice(stakingPoolAddress: string) {
   const [tokenPrice, tokenPriceLoading] = useTokenPrice(
     stakingPool?.indexPool ?? ""
   );
+  const hasLoaded = useMemo(() => {
+    const [_pair] = pairs ?? [];
+    const [_supply] = supplies ?? [];
+    const wasLoadingIndicated = !(
+      pairsLoading ||
+      suppliesLoading ||
+      tokenPriceLoading
+    );
+
+    return stakingPool && !wasLoadingIndicated && Boolean(_pair && _supply);
+  }, [
+    stakingPool,
+    pairs,
+    supplies,
+    pairsLoading,
+    suppliesLoading,
+    tokenPriceLoading,
+  ]);
 
   return useMemo(() => {
-    if (stakingPool && !tokenPriceLoading) {
-      if (stakingPool.isWethPair) {
-        const hasLoaded = !(
-          pairsLoading ||
-          suppliesLoading ||
-          tokenPriceLoading
-        );
+    if (hasLoaded) {
+      if (stakingPool!.isWethPair) {
+        const [pair] = pairs!;
+        const [supply] = supplies!;
+        const firstTokenIsStakingPool =
+          pair.token0.address.toLowerCase() ===
+          stakingPool!.indexPool.toLowerCase();
+        const tokenReserve = firstTokenIsStakingPool
+          ? pair.reserve0
+          : pair.reserve1;
+        const valueOfSupplyInToken = parseFloat(tokenReserve.toExact()) * 2;
+        const tokensPerLpToken =
+          valueOfSupplyInToken / parseFloat(convert.toBalance(supply, 18));
 
-        if (hasLoaded) {
-          const [pair] = pairs!;
-          const [supply] = supplies!;
-          const firstTokenIsStakingPool =
-            pair.token0.address.toLowerCase() ===
-            stakingPool.indexPool.toLowerCase();
-          const tokenReserve = firstTokenIsStakingPool
-            ? pair.reserve0
-            : pair.reserve1;
-          const valueOfSupplyInToken = parseFloat(tokenReserve.toExact()) * 2;
-          const tokensPerLpToken =
-            valueOfSupplyInToken / parseFloat(convert.toBalance(supply, 18));
-
-          return tokensPerLpToken * tokenPrice!;
-        } else {
-          return null;
-        }
+        return tokensPerLpToken * tokenPrice!;
       } else {
         return tokenPrice;
       }
     } else {
       return null;
     }
-  }, [
-    supplies,
-    suppliesLoading,
-    pairs,
-    pairsLoading,
-    stakingPool,
-    tokenPrice,
-    tokenPriceLoading,
-  ]);
+  }, [hasLoaded, pairs, stakingPool, supplies, tokenPrice]);
 }
 
 export function useStakingApy(stakingPoolAddress: string) {
   const stakingPool = useStakingPool(stakingPoolAddress);
   const [ndxPrice] = useTokenPrice(NDX_ADDRESS);
   const tokenPrice = useStakingTokenPrice(stakingPoolAddress);
+  const hasLoaded = ndxPrice && tokenPrice && stakingPool;
+  const isWethAddress = stakingPoolAddress === WETH_CONTRACT_ADDRESS;
 
-  if (ndxPrice && tokenPrice && stakingPool) {
-    const isExpired = stakingPool.periodFinish < Date.now() / 1000;
+  if (!isWethAddress && hasLoaded) {
+    const isExpired = stakingPool!.periodFinish < Date.now() / 1000;
 
     if (isExpired) {
       return "Expired";
     } else {
       const ndxMinedPerDay = parseFloat(
         convert.toBalance(
-          convert.toBigNumber(stakingPool.rewardRate ?? "0").times(86400),
+          convert.toBigNumber(stakingPool!.rewardRate ?? "0").times(86400),
           18
         )
       );
-      const valueNdxPerYear = ndxMinedPerDay * 365 * ndxPrice;
+      const valueNdxPerYear = ndxMinedPerDay * 365 * ndxPrice!;
       const totalStakedValue = convert
-        .toBigNumber(tokenPrice.toString())
+        .toBigNumber(tokenPrice!.toString())
         .toNumber();
       const formatted = (valueNdxPerYear / totalStakedValue) * 100;
 

@@ -146,17 +146,15 @@ function InteractionInner({
     tokenId,
     amount: exactAmountIn,
   });
-
-  const inputOptions = useMemo(() => {
-    return assets.filter((p) => p.symbol !== values.toToken);
-  }, [assets, values.toToken]);
-
-  const outputOptions = useMemo(() => {
-    return assets.filter((p) => p.symbol !== values.fromToken);
-  }, [assets, values.fromToken]);
-
+  const inputOptions = useMemo(
+    () => assets.filter(({ symbol }) => symbol !== values.toToken),
+    [assets, values.toToken]
+  );
+  const outputOptions = useMemo(
+    () => assets.filter(({ symbol }) => symbol !== values.fromToken),
+    [assets, values.fromToken]
+  );
   const disableFlip = disableInputSelect || disableOutputSelect;
-
   const handleFlip = useCallback(() => {
     if (!disableFlip) {
       const newValues = {
