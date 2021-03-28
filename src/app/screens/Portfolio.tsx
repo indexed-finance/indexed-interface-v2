@@ -40,7 +40,7 @@ export default function Portfolio() {
     },
     {
       address: "0x17ac188e09a7890a1844e5e65471fe8b0ccfadf5",
-      image: "indexed-dark",
+      image: `indexed-${theme}`,
       symbol: "NDX",
       name: "Indexed",
       balance: ndxBalance,
@@ -97,7 +97,7 @@ export default function Portfolio() {
                       asAvatar={false}
                       name="NDX"
                       size="small"
-                      image={`indexed-${theme}`}
+                      image={datum.image}
                       style={{ position: "relative", top: -6, marginRight: 10 }}
                     />
                     NDX

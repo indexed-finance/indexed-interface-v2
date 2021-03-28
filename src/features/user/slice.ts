@@ -62,6 +62,9 @@ const slice = createSlice({
 export const { actions } = slice;
 
 export const selectors = {
+  selectUser(state: AppState) {
+    return state.user;
+  },
   selectUserAddress(state: AppState) {
     return state.user.address;
   },
@@ -137,7 +140,7 @@ const userMulticallDataParser = createMulticallDataParser(
           }
 
           if (balanceOf) {
-            prev.balances[combinedId] = balanceOf.toString();
+            prev.balances[tokenAddress] = balanceOf.toString();
           }
         } else if (balanceOfCall) {
           // NDX token has no allowance.

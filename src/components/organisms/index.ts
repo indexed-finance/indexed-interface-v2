@@ -5,5 +5,6 @@ export { default as ListCard } from "./ListCard";
 export { default as PoolCard } from "./PoolCard";
 export { default as QuoteCarousel } from "./QuoteCarousel";
 export { default as RankedToken } from "./RankedToken";
+export { default as StakingCard } from "./StakingCard";
 export { default as TokenSelector } from "./TokenSelector";
 export { default as TransactionCard } from "./TransactionCard";

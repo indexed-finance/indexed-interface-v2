@@ -375,6 +375,53 @@ const selectors = {
       } as FormattedStakingDetail
     );
   },
+  selectFormattedPortfolio(state: AppState): FormattedPortfolioData {
+    const theme = selectors.selectTheme(state);
+    const poolLookup = selectors.selectPoolLookup(state);
+    const { balances, staking } = selectors.selectUser(state);
+    const ndxBalance = selectors.selectNdxBalance(state);
+    const ndxEarned = Object.values(staking).reduce((prev, next) => {
+      const { earned } = next;
+      const parsed = convert.toBigNumber(earned).toNumber();
+
+      return prev + parsed;
+    }, 0);
+    const formattedPortfolio = selectors.selectAllPoolIds(state).reduce(
+      (prev, next) => {
+        const pool = poolLookup[next];
+
+        if (pool) {
+          prev.tokens.push({
+            address: pool.id,
+            image: pool.id,
+            link: `/pools/${S(pool.name).slugify().s}`,
+            symbol: pool.symbol,
+            name: pool.name,
+            balance: balances[pool.id],
+            staking: staking[pool.id]?.balance ?? "",
+            value: "",
+            weight: convert.toPercent(0),
+          });
+        }
+
+        return prev;
+      },
+      {
+        tokens: [] as FormattedPortfolioData["tokens"],
+        ndx: {
+          address: NDX_ADDRESS,
+          image: `indexed-${theme}`,
+          symbol: "NDX",
+          name: "Indexed",
+          balance: ndxBalance,
+          value: "",
+          earned: `${ndxEarned} NDX`,
+        },
+      } as FormattedPortfolioData
+    );
+
+    return formattedPortfolio;
+  },
 };
 
 export default selectors;
@@ -465,6 +512,22 @@ export type Transaction = Swap & {
   amount?: Trade["amount"];
 };
 export type Asset = FormattedIndexPool["assets"][0];
+
+export type FormattedPortfolioDatum = {
+  address: string;
+  image: string;
+  symbol: string;
+  name: string;
+  balance: string;
+  value: string;
+};
+
+export interface FormattedPortfolioData {
+  tokens: Array<
+    FormattedPortfolioDatum & { link: string; staking: string; weight: string }
+  >;
+  ndx: FormattedPortfolioDatum & { earned: string };
+}
 
 export interface FormattedStakingData {
   id: string;
