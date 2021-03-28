@@ -422,7 +422,6 @@ const selectors = {
         weight: "0.00%", // Calculate weight after.
       };
     });
-
     const tokens = processedTokens.map((token, index) => ({
       ...token,
       weight: convert.toPercent(
@@ -430,17 +429,18 @@ const selectors = {
       ),
     }));
     const formattedPortfolio = {
-      tokens,
       ndx: {
         address: NDX_ADDRESS,
         image: `indexed-${theme}`,
         symbol: "NDX",
         name: "Indexed",
-        balance: `${ndxBalance.toFixed(2)} NDX`,
+        balance: `${ndxBalance.toFixed(2)}`,
         value: convert.toCurrency(ndxValue),
-        earned: `${ndxEarned} NDX`,
+        earned: ndxEarned.toFixed(2),
         weight: convert.toPercent(ndxValue / accumulatedValue),
       },
+      tokens,
+      totalValue: convert.toCurrency(accumulatedValue),
     };
 
     return formattedPortfolio;
@@ -543,11 +543,15 @@ export type FormattedPortfolioDatum = {
   balance: string;
   value: string;
   weight: string;
+  link?: string;
+  staking?: string;
+  earned?: string;
 };
 
 export interface FormattedPortfolioData {
-  tokens: Array<FormattedPortfolioDatum & { link: string; staking: string }>;
-  ndx: FormattedPortfolioDatum & { earned: string };
+  tokens: FormattedPortfolioDatum[];
+  ndx: FormattedPortfolioDatum;
+  totalValue: string;
 }
 
 export interface FormattedStakingData {
