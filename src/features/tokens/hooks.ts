@@ -1,5 +1,6 @@
-import { pricesCaller, selectors, totalSuppliesCaller } from "./slice";
+import { pricesCaller, totalSuppliesCaller } from "./slice";
 import { useSelector } from "react-redux";
+import selectors from "./selectors";
 import useCallRegistrar from "hooks/use-call-registrar";
 import type { AppState } from "features";
 import type { RegisteredCall } from "helpers";

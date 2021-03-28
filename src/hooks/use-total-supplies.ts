@@ -1,7 +1,10 @@
-import { AppState, actions, selectors, useTotalSuppliesRegistrar } from "features";
-import { selectTokenSupplies } from "features/tokens/slice";
+import {
+  AppState,
+  actions,
+  selectors,
+  useTotalSuppliesRegistrar,
+} from "features";
 import { useSelector } from "react-redux";
-// import { useTotalSuppliesListener } from "features/batcher/hooks";
 
 export function useTotalSuppliesWithLoadingIndicator(
   tokens: string[]
@@ -9,7 +12,7 @@ export function useTotalSuppliesWithLoadingIndicator(
   useTotalSuppliesRegistrar(tokens, actions, selectors);
 
   const supplies = useSelector((state: AppState) =>
-    selectTokenSupplies(state, tokens)
+    selectors.selectTokenSupplies(state, tokens)
   );
 
   if (supplies.some((s) => !s)) {

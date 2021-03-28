@@ -1,5 +1,5 @@
 import { Button, Space, Statistic } from "antd";
-import { IndexCard } from "components";
+import { IndexCard } from "components/molecules";
 import { Link } from "react-router-dom";
 import { useBreakpoints } from "helpers";
 import { useStakingApy } from "hooks/use-staking-apy";

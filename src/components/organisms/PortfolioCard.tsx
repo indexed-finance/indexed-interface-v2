@@ -1,7 +1,8 @@
 import { Badge, Space, Typography } from "antd";
 import { FormattedPortfolioDatum } from "features";
-import { IndexCard, Progress } from "components";
+import { IndexCard } from "components/molecules";
 import { Link } from "react-router-dom";
+import { Progress } from "components/atoms";
 import { useBreakpoints } from "helpers";
 
 export default function PortfolioCard({

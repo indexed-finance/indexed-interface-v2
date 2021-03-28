@@ -1,5 +1,2 @@
-export {
-  actions as tokensActions,
-  selectors as tokensSelectors,
-  default as tokensReducer,
-} from "./slice";
+export { actions as tokensActions, default as tokensReducer } from "./slice";
+export { default as tokensSelectors } from "./selectors";

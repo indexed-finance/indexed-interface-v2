@@ -1,5 +1,4 @@
 import { COMMON_BASE_TOKENS } from "config";
-import { NormalizedToken } from "ethereum";
 import {
   coingeckoDataLoaded,
   coingeckoIdsLoaded,
@@ -10,18 +9,14 @@ import {
   totalSuppliesUpdated,
   uniswapPairsRegistered,
 } from "features/actions";
-import {
-  createEntityAdapter,
-  createSelector,
-  createSlice,
-} from "@reduxjs/toolkit";
+import { createEntityAdapter, createSlice } from "@reduxjs/toolkit";
 import { createMulticallDataParser } from "helpers";
-import type { AppState } from "features/store";
+import type { NormalizedToken } from "ethereum";
 
 export const totalSuppliesCaller = "Total Supplies";
 export const pricesCaller = "Token Prices";
 
-const adapter = createEntityAdapter<NormalizedToken>({
+export const adapter = createEntityAdapter<NormalizedToken>({
   selectId: (entry) => entry.id.toLowerCase(),
 });
 
@@ -125,48 +120,6 @@ const slice = createSlice({
 });
 
 export const { actions } = slice;
-
-export const selectors = {
-  ...adapter.getSelectors((state: AppState) => state.tokens),
-  selectTokens: (state: AppState) => state.tokens,
-  selectTokenById: (state: AppState, id: string) =>
-    selectors.selectById(state, id),
-  selectTokensById: (
-    state: AppState,
-    ids: string[]
-  ): (NormalizedToken | undefined)[] => {
-    const tokens = selectors.selectTokens(state);
-    return ids.reduce(
-      (prev, next) => [...prev, tokens.entities[next.toLowerCase()]],
-      [] as (NormalizedToken | undefined)[]
-    );
-  },
-  selectAllTokens: (state: AppState) => selectors.selectAll(state),
-  selectTokenLookup: (state: AppState) => selectors.selectEntities(state),
-  selectTokenLookupBySymbol: (
-    state: AppState
-  ): Record<string, NormalizedToken> => ({}),
-  selectTokenSymbols: (state: AppState) =>
-    selectors.selectAll(state).map(({ symbol }) => symbol),
-  selectTokenSymbol: (state: AppState, poolId: string) =>
-    selectors.selectTokenLookup(state)[poolId]?.symbol ?? "",
-  selectTokenPrice: (state: AppState, tokenId: string) =>
-    selectors.selectTokenById(state, tokenId)?.priceData?.price,
-};
-
-export const selectTokenSupplies = createSelector(
-  selectors.selectTokensById,
-  (tokens) => tokens.map((t: NormalizedToken | undefined) => t?.totalSupply)
-);
-
-selectors.selectTokenLookupBySymbol = createSelector(
-  selectors.selectAllTokens,
-  (tokens) =>
-    tokens.reduce((prev, next) => {
-      prev[next.symbol.toLowerCase()] = next;
-      return prev;
-    }, {} as Record<string, NormalizedToken>)
-);
 
 export default slice.reducer;
 

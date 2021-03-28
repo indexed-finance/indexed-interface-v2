@@ -1,9 +1,9 @@
-import { AppState } from "features/store";
 import { NDX_ADDRESS } from "config";
 import { RegisteredCall } from "helpers";
 import { USER_CALLER, selectors } from "./slice";
 import { useSelector } from "react-redux";
 import useCallRegistrar from "hooks/use-call-registrar";
+import type { AppState } from "features/store";
 
 export const useApprovalStatus = (
   tokenId: string,
