@@ -1,13 +1,19 @@
 import { Badge, Divider, Space, Typography } from "antd";
 import {
   IndexCard,
+  Progress,
   ProviderRequirementDrawer,
   ScreenHeader,
   Token,
 } from "components";
 import { Link } from "react-router-dom";
-import { Progress } from "components";
-import { selectors, useNdxBalance } from "features";
+import {
+  actions,
+  selectors,
+  useNdxBalance,
+  useStakingRegistrar,
+  useUserDataRegistrar,
+} from "features";
 import { useBreakpoints } from "helpers";
 import { useSelector } from "react-redux";
 
@@ -48,6 +54,18 @@ export default function Portfolio() {
       earned: "2.00",
     },
   ];
+  const pools = useSelector(selectors.selectAllPools);
+  const poolsToTokens = pools.reduce((prev, next) => {
+    prev[next.id] = next.tokens.ids;
+
+    return prev;
+  }, {} as Record<string, string[]>);
+  const formattedPortfolio = useSelector(selectors.selectFormattedPortfolio);
+
+  useUserDataRegistrar(poolsToTokens, actions, selectors);
+  useStakingRegistrar(actions, selectors);
+
+  console.log({ formattedPortfolio });
 
   return (
     <div>

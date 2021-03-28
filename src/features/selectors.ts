@@ -378,7 +378,8 @@ const selectors = {
   selectFormattedPortfolio(state: AppState): FormattedPortfolioData {
     const theme = selectors.selectTheme(state);
     const poolLookup = selectors.selectPoolLookup(state);
-    const { balances, staking } = selectors.selectUser(state);
+    const tokenBalanceLookup = selectors.selectTokenSymbolsToBalances(state);
+    const { staking } = selectors.selectUser(state);
     const ndxBalance = selectors.selectNdxBalance(state);
     const ndxEarned = Object.values(staking).reduce((prev, next) => {
       const { earned } = next;
@@ -386,18 +387,23 @@ const selectors = {
 
       return prev + parsed;
     }, 0);
+
     const formattedPortfolio = selectors.selectAllPoolIds(state).reduce(
       (prev, next) => {
         const pool = poolLookup[next];
 
         if (pool) {
+          const balance = convert.toBalance(
+            tokenBalanceLookup[pool.symbol.toLowerCase()]
+          );
+
           prev.tokens.push({
             address: pool.id,
             image: pool.id,
             link: `/pools/${S(pool.name).slugify().s}`,
             symbol: pool.symbol,
             name: pool.name,
-            balance: balances[pool.id],
+            balance,
             staking: staking[pool.id]?.balance ?? "",
             value: "",
             weight: convert.toPercent(0),

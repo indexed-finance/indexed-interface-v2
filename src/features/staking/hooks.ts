@@ -1,5 +1,6 @@
 import { stakingCaller } from "./slice";
 import { useSelector } from "react-redux";
+import { useUserAddress } from "features/user/hooks";
 import useCallRegistrar from "hooks/use-call-registrar";
 import type { NormalizedStakingPool } from "ethereum";
 import type { RegisteredCall } from "helpers";
@@ -63,10 +64,10 @@ export function createStakingCalls(
 }
 
 export function useStakingRegistrar(
-  userAddress: string,
   actions: Record<string, any>,
   selectors: Record<string, any>
 ) {
+  const userAddress = useUserAddress();
   const stakingPools: NormalizedStakingPool[] = useSelector(
     selectors.selectAllStakingPools
   );

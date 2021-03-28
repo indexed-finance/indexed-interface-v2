@@ -6,7 +6,6 @@ import { useBreakpoints } from "helpers";
 import { useSelector } from "react-redux";
 
 export default function Stake() {
-  const userAddress = useSelector(selectors.selectUserAddress);
   const staking = useSelector(selectors.selectFormattedStaking);
   const indexTokens = (
     <Staking title="Index Tokens" data={staking.indexTokens} />
@@ -16,7 +15,7 @@ export default function Stake() {
   );
   const breakpoints = useBreakpoints();
 
-  useStakingRegistrar(userAddress, actions, selectors);
+  useStakingRegistrar(actions, selectors);
 
   // Variants
   const mobileSized = (

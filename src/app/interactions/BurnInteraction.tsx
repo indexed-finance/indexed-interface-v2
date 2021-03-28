@@ -3,13 +3,13 @@ import {
   FormattedIndexPool,
   actions,
   selectors,
+  usePoolToTokens,
   useUserDataRegistrar,
 } from "features";
-import { Fragment, useCallback, useMemo, useState } from "react";
+import { Fragment, useCallback, useState } from "react";
 import { Radio } from "antd";
 import { convert } from "helpers";
 import { downwardSlippage, upwardSlippage } from "ethereum";
-import { usePoolTokenAddresses } from "features/indexPools/hooks";
 import { useSelector } from "react-redux";
 import { useSingleTokenBurnCallbacks } from "hooks/use-burn-callbacks";
 import BaseInteraction, { InteractionValues } from "./BaseInteraction";
@@ -24,11 +24,9 @@ export default function BurnInteraction({ pool }: Props) {
   const [burnType, setBurnType] = useState<"single" | "uniswap" | "multi">(
     "single"
   );
-  const tokenIds = useMemo(() => pool.assets.map(({ id }) => id), [
-    pool.assets,
-  ]);
+  const poolsToTokens = usePoolToTokens(pool);
 
-  useUserDataRegistrar(pool.id, tokenIds, actions, selectors);
+  useUserDataRegistrar(poolsToTokens, actions, selectors);
 
   return (
     <Fragment>
@@ -51,18 +49,14 @@ export default function BurnInteraction({ pool }: Props) {
 function SingleTokenBurnInteraction({ pool }: Props) {
   const poolId = pool.id;
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
-  const poolTokenIds = usePoolTokenAddresses(poolId);
-  const tokenIds = useMemo(() => [...poolTokenIds, poolId], [
-    poolId,
-    poolTokenIds,
-  ]);
+  const poolsToTokens = usePoolToTokens(pool);
   const {
     calculateAmountIn,
     calculateAmountOut,
     executeBurn,
   } = useSingleTokenBurnCallbacks(poolId);
 
-  useUserDataRegistrar(pool.id, tokenIds, actions, selectors);
+  useUserDataRegistrar(poolsToTokens, actions, selectors);
 
   const handleChange = useCallback(
     (values: InteractionValues) => {
@@ -165,8 +159,8 @@ function SingleTokenBurnInteraction({ pool }: Props) {
 function UniswapBurnInteraction({ pool }: Props) {
   const poolId = pool.id;
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
+  const poolsToTokens = usePoolToTokens(pool);
   const {
-    tokenIds,
     getBestBurnRouteForAmountIn,
     getBestBurnRouteForAmountOut,
     executeRoutedBurn,
@@ -174,7 +168,7 @@ function UniswapBurnInteraction({ pool }: Props) {
 
   const assets = [...COMMON_BASE_TOKENS];
 
-  useUserDataRegistrar(pool.id, tokenIds, actions, selectors);
+  useUserDataRegistrar(poolsToTokens, actions, selectors);
 
   const handleChange = useCallback(
     (values: InteractionValues) => {

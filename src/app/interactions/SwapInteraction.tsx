@@ -1,12 +1,12 @@
+import { BigNumber } from "ethereum/utils/balancer-math";
+import { Divider, Space } from "antd";
 import {
-  AppState,
   FormattedIndexPool,
   actions,
   selectors,
+  usePoolToTokens,
   useUserDataRegistrar,
 } from "features";
-import { BigNumber } from "ethereum/utils/balancer-math";
-import { Divider, Space } from "antd";
 import { PlainLanguageTransaction, TokenExchangeRate } from "components";
 import { SLIPPAGE_RATE } from "config";
 import { convert } from "helpers";
@@ -29,9 +29,7 @@ export default function SwapInteraction({ pool }: Props) {
     executeSwap,
   } = useSwapCallbacks(pool.id);
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
-  const tokenIds = useSelector((state: AppState) =>
-    selectors.selectPoolTokenIds(state, pool.id)
-  );
+  const poolToTokens = usePoolToTokens(pool);
   const handleChange = useCallback(
     (values: InteractionValues) => {
       const {
@@ -121,7 +119,7 @@ export default function SwapInteraction({ pool }: Props) {
     [executeSwap]
   );
 
-  useUserDataRegistrar(pool.id, tokenIds, actions, selectors);
+  useUserDataRegistrar(poolToTokens, actions, selectors);
 
   return (
     <BaseInteraction

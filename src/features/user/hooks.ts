@@ -28,31 +28,30 @@ export const useUserAddress = () => useSelector(selectors.selectUserAddress);
 export const useNdxBalance = () => useSelector(selectors.selectNdxBalance);
 
 export function useUserDataRegistrar(
-  spender: string,
-  tokenIds: string[],
+  poolTokens: Record<string, string[]>,
   actions: Record<string, any>,
   selectors: Record<string, any>
 ) {
   const userAddress = useUserAddress();
   const interfaceKind = "IERC20_ABI";
-  const userDataCalls = tokenIds.reduce((prev, next) => {
-    prev.push(
-      {
-        interfaceKind,
-        target: next,
-        function: "allowance",
-        args: [userAddress, spender],
-      },
-      {
-        interfaceKind,
-        target: next,
-        function: "balanceOf",
-        args: [userAddress],
-      }
-    );
-
-    return prev;
-  }, [] as RegisteredCall[]);
+  const userDataCalls: RegisteredCall[] = Object.entries(poolTokens).flatMap(
+    ([pool, tokens]) => {
+      return tokens.flatMap((token) => [
+        {
+          interfaceKind,
+          target: token,
+          function: "allowance",
+          args: [userAddress, pool],
+        },
+        {
+          interfaceKind,
+          target: token,
+          function: "balanceOf",
+          args: [userAddress],
+        },
+      ]);
+    }
+  );
 
   userDataCalls.push({
     interfaceKind,

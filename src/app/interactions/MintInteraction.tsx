@@ -3,6 +3,7 @@ import {
   FormattedIndexPool,
   actions,
   selectors,
+  usePoolToTokens,
   useUserDataRegistrar,
 } from "features";
 import { Fragment, useCallback, useMemo, useState } from "react";
@@ -58,11 +59,9 @@ function SingleTokenMintInteraction({ pool }: Props) {
     calculateAmountOut,
     executeMint,
   } = useSingleTokenMintCallbacks(pool.id);
-  const tokenIds = useMemo(() => pool.assets.map(({ id }) => id), [
-    pool.assets,
-  ]);
+  const poolToTokens = usePoolToTokens(pool);
 
-  useUserDataRegistrar(pool.id, tokenIds, actions, selectors);
+  useUserDataRegistrar(poolToTokens, actions, selectors);
 
   const handleChange = useCallback(
     (values: InteractionValues) => {
@@ -174,8 +173,11 @@ function UniswapMintInteraction({ pool }: Props) {
     executeRoutedMint,
   } = useMintRouterCallbacks(pool.id);
   const assets = [...COMMON_BASE_TOKENS];
+  const poolToTokens = useMemo(() => ({ [MINT_ROUTER_ADDRESS]: tokenIds }), [
+    tokenIds,
+  ]);
 
-  useUserDataRegistrar(MINT_ROUTER_ADDRESS, tokenIds, actions, selectors);
+  useUserDataRegistrar(poolToTokens, actions, selectors);
 
   const handleChange = useCallback(
     (values: InteractionValues) => {

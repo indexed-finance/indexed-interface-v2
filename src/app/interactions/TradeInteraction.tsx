@@ -3,6 +3,7 @@ import {
   FormattedIndexPool,
   actions,
   selectors,
+  usePoolToTokens,
   useUserDataRegistrar,
 } from "features";
 import { COMMON_BASE_TOKENS, UNISWAP_ROUTER_ADDRESS } from "config";
@@ -27,6 +28,7 @@ export default function TradeInteraction({ pool }: Props) {
   const assets = useSelector((state: AppState) =>
     selectors.selectTokensById(state, tokenIds)
   );
+  const poolToTokens = usePoolToTokens(pool);
   const {
     calculateBestTradeForExactInput,
     calculateBestTradeForExactOutput,
@@ -132,7 +134,7 @@ export default function TradeInteraction({ pool }: Props) {
     ]
   );
 
-  useUserDataRegistrar(pool.id, tokenIds, actions, selectors);
+  useUserDataRegistrar(poolToTokens, actions, selectors);
 
   return (
     <BaseInteraction
