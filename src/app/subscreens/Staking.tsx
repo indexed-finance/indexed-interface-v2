@@ -75,7 +75,13 @@ function StakingCard(props: FormattedStakingData) {
     >
       {!isMobile && (
         <Space style={{ width: "100%", justifyContent: "space-evenly" }}>
-          <Statistic title="APY" value={apy ?? ""} />
+          <Statistic
+            title="APY"
+            valueStyle={{
+              color: apy === "Expired" ? "grey" : "",
+            }}
+            value={apy ?? ""}
+          />
           <Statistic title="Staked" value={staked} />
           <Button
             type="primary"

@@ -1,6 +1,7 @@
 import {
   CLIENT_STATISTICS_REPORTING_RATE,
   WEBSOCKET_SERVER_PING_RATE,
+  WEBSOCKET_SERVER_PORT,
   WEBSOCKET_SERVER_UPDATE_RATE,
 } from "config";
 import { IncomingMessage } from "http";
@@ -10,6 +11,22 @@ import { store } from "features";
 import WebSocket from "isomorphic-ws";
 import fs from "fs";
 import jsonpatch from "fast-json-patch";
+
+const DEFLATION_OPTIONS = {
+  zlibDeflateOptions: {
+    chunkSize: 1024,
+    memLevel: 7,
+    level: 3,
+  },
+  zlibInflateOptions: {
+    chunkSize: 10 * 1024,
+  },
+  clientNoContextTakeover: true,
+  serverNoContextTakeover: true,
+  serverMaxWindowBits: 10,
+  concurrencyLimit: 10,
+  threshold: 1024,
+};
 
 // Track usage via reporting statistics.
 export const clientStatistics = {
@@ -29,46 +46,46 @@ export let previousState = store.getState();
  * Creates a WebSocket server that provides quick updates to connected clients.
  */
 export default function setupClientHandling() {
-  const API_CERT_PATH = process.env.API_CERT_PATH;
-  const API_KEY_PATH = process.env.API_KEY_PATH;
-
-  if (!(API_CERT_PATH && API_KEY_PATH)) {
-    throw new Error(
-      "Server requires environment variables API_CERT_PATH and API_KEY_PATH"
-    );
-  }
-
-  const key = fs.readFileSync(API_KEY_PATH, "utf8");
-  const cert = fs.readFileSync(API_CERT_PATH, "utf8");
-  const credentials = { key, cert };
-  const server = createServer(credentials);
-  const socketServer = new WebSocket.Server(
-    {
-      server,
-      perMessageDeflate: {
-        zlibDeflateOptions: {
-          chunkSize: 1024,
-          memLevel: 7,
-          level: 3,
-        },
-        zlibInflateOptions: {
-          chunkSize: 10 * 1024,
-        },
-        clientNoContextTakeover: true,
-        serverNoContextTakeover: true,
-        serverMaxWindowBits: 10,
-        concurrencyLimit: 10,
-        threshold: 1024,
+  if (process.env.NODE_ENV === "development") {
+    const socketServer = new WebSocket.Server(
+      {
+        port: WEBSOCKET_SERVER_PORT,
+        perMessageDeflate: DEFLATION_OPTIONS,
       },
-    },
-    () => log("Socket server listening...")
-  );
+      () => log("Local socket server listening...")
+    );
 
-  socketServer.on("connection", handleConnection);
-  socketServer.on("close", handleClose);
-  socketServer.on("error", handleError);
+    socketServer.on("connection", handleConnection);
+    socketServer.on("close", handleClose);
+    socketServer.on("error", handleError);
+  } else {
+    const API_CERT_PATH = process.env.API_CERT_PATH;
+    const API_KEY_PATH = process.env.API_KEY_PATH;
 
-  server.listen(443, () => "Server listening...");
+    if (!(API_CERT_PATH && API_KEY_PATH)) {
+      throw new Error(
+        "Server requires environment variables API_CERT_PATH and API_KEY_PATH"
+      );
+    }
+
+    const key = fs.readFileSync(API_KEY_PATH, "utf8");
+    const cert = fs.readFileSync(API_CERT_PATH, "utf8");
+    const credentials = { key, cert };
+    const server = createServer(credentials);
+    const socketServer = new WebSocket.Server(
+      {
+        server,
+        perMessageDeflate: DEFLATION_OPTIONS,
+      },
+      () => log("Production socket server listening...")
+    );
+
+    socketServer.on("connection", handleConnection);
+    socketServer.on("close", handleClose);
+    socketServer.on("error", handleError);
+
+    server.listen(443, () => "Server listening...");
+  }
 
   continuouslyCheckForInactivity();
   continuouslySendUpdates();

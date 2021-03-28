@@ -4,7 +4,7 @@ import {
   createSlice,
 } from "@reduxjs/toolkit";
 import { convert, createMulticallDataParser } from "helpers";
-import { multicallDataReceived } from "features/actions";
+import { mirroredServerState, multicallDataReceived } from "features/actions";
 import type { AppState } from "features/store";
 import type { CallWithResult } from "helpers";
 import type { NormalizedStakingPool, StakingPoolUpdate } from "ethereum/types";
@@ -22,31 +22,39 @@ const slice = createSlice({
     },
   },
   extraReducers: (builder) =>
-    builder.addCase(multicallDataReceived, (state, action) => {
-      const relevantMulticallData = stakingMulticallDataParser(action.payload);
+    builder
+      .addCase(multicallDataReceived, (state, action) => {
+        const relevantMulticallData = stakingMulticallDataParser(
+          action.payload
+        );
 
-      if (relevantMulticallData) {
-        for (const [stakingPoolAddress, update] of Object.entries(
-          relevantMulticallData
-        )) {
-          const entry = state.entities[stakingPoolAddress];
+        if (relevantMulticallData) {
+          for (const [stakingPoolAddress, update] of Object.entries(
+            relevantMulticallData
+          )) {
+            const entry = state.entities[stakingPoolAddress];
 
-          if (entry) {
-            entry.rewardsDuration = update.rewardsDuration;
-            entry.periodFinish = update.periodFinish;
-            entry.rewardRate = update.rewardRate;
-            entry.rewardPerTokenStored = update.rewardPerTokenStored;
-            entry.totalSupply = update.totalSupply;
+            if (entry) {
+              entry.rewardsDuration = update.rewardsDuration;
+              entry.periodFinish = update.periodFinish;
+              entry.rewardRate = update.rewardRate;
+              entry.rewardPerTokenStored = update.rewardPerTokenStored;
+              entry.totalSupply = update.totalSupply;
 
-            if (update.userData) {
-              entry.userData = update.userData;
+              if (update.userData) {
+                entry.userData = update.userData;
+              }
             }
           }
         }
-      }
 
-      return state;
-    }),
+        return state;
+      })
+      .addCase(mirroredServerState, (_, action) => {
+        const { staking } = action.payload;
+
+        return staking;
+      }),
 });
 
 export const { actions } = slice;
@@ -63,14 +71,16 @@ export const selectors = {
     return selectors.selectById(state, id);
   },
   selectStakingPoolByStakingToken(state: AppState, id: string) {
-    return selectors.selectAllStakingPools(state).find(p => p.stakingToken.toLowerCase() === id.toLowerCase())
+    return selectors
+      .selectAllStakingPools(state)
+      .find((p) => p.stakingToken.toLowerCase() === id.toLowerCase());
   },
 };
 
 export default slice.reducer;
 
 // #region Helpers
-const stakingMulticallDataParser = createMulticallDataParser(
+export const stakingMulticallDataParser = createMulticallDataParser(
   stakingCaller,
   (calls) => {
     const formattingStakingData = calls.reduce((prev, next) => {

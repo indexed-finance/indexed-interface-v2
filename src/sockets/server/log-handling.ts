@@ -4,18 +4,6 @@ import express from "express";
 import fs from "fs";
 
 export default function setupLog() {
-  const LOG_CERT_PATH = process.env.LOG_CERT_PATH;
-  const LOG_KEY_PATH = process.env.LOG_KEY_PATH;
-
-  if (!(LOG_CERT_PATH && LOG_KEY_PATH)) {
-    throw new Error(
-      "Logging server requires environment variables LOG_CERT_PATH and LOG_KEY_PATH"
-    );
-  }
-
-  const key = fs.readFileSync(LOG_KEY_PATH, "utf8");
-  const cert = fs.readFileSync(LOG_CERT_PATH, "utf8");
-  const credentials = { key, cert };
   const app = express();
 
   app.get("/", (_, res) => {
@@ -50,7 +38,25 @@ export default function setupLog() {
     });
   });
 
-  const httpsServer = createServer(credentials, app);
+  if (process.env.NODE_ENV === "development") {
+    app.listen(411, () => console.info("Local logger listening..."));
+  } else {
+    const LOG_CERT_PATH = process.env.LOG_CERT_PATH;
+    const LOG_KEY_PATH = process.env.LOG_KEY_PATH;
 
-  httpsServer.listen(411, () => console.info("Logger listening."));
+    if (!(LOG_CERT_PATH && LOG_KEY_PATH)) {
+      throw new Error(
+        "Logging server requires environment variables LOG_CERT_PATH and LOG_KEY_PATH"
+      );
+    }
+
+    const key = fs.readFileSync(LOG_KEY_PATH, "utf8");
+    const cert = fs.readFileSync(LOG_CERT_PATH, "utf8");
+    const credentials = { key, cert };
+    const httpsServer = createServer(credentials, app);
+
+    httpsServer.listen(411, () =>
+      console.info("Production logger listening...")
+    );
+  }
 }

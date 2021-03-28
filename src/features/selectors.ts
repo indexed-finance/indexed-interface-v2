@@ -302,19 +302,22 @@ const selectors = {
     const [pairData] = selectors.selectPairsById(state, [wethNdxPair]);
 
     if (pairData) {
-      const firstIsNdx =
-        NDX_ADDRESS.toLowerCase() === pairData.token0.toLowerCase();
-      const [firstValue, secondValue] = firstIsNdx
-        ? [pairData.reserves1, pairData.reserves0]
-        : [pairData.reserves0, pairData.reserves1];
+      const { token0, reserves0, reserves1 } = pairData;
 
-      if (firstValue && secondValue) {
-        const numberOfEth = convert
-          .toBigNumber(firstValue)
-          .dividedBy(convert.toBigNumber(secondValue))
-          .toNumber();
+      if (token0 && reserves0 && reserves1) {
+        const firstIsNdx = NDX_ADDRESS.toLowerCase() === token0.toLowerCase();
+        const [firstValue, secondValue] = firstIsNdx
+          ? [reserves1, reserves0]
+          : [reserves0, reserves1];
 
-        return numberOfEth * ethPrice;
+        if (firstValue && secondValue) {
+          const numberOfEth = convert
+            .toBigNumber(firstValue)
+            .dividedBy(convert.toBigNumber(secondValue))
+            .toNumber();
+
+          return numberOfEth * ethPrice;
+        }
       }
     }
 

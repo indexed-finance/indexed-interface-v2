@@ -73,9 +73,9 @@ export interface PairReservesUpdate {
 
 export interface NormalizedPair {
   id: string; // Uniswap pair address
-  exists: boolean | undefined;
-  token0: string;
-  token1: string;
+  exists?: boolean;
+  token0?: string;
+  token1?: string;
   reserves0?: string;
   reserves1?: string;
 }
@@ -103,6 +103,11 @@ export type NormalizedInitialData = {
   tokens: NormalizedEntity<NormalizedToken>;
 };
 
+export interface NormalizedUserStakingData {
+  balance: string;
+  earned: string;
+}
+
 export interface NormalizedUser {
   address: string;
   allowances: Record<
@@ -110,6 +115,7 @@ export interface NormalizedUser {
     string /* Token Balance */
   >;
   balances: Record<string /* <tokenId> */, string /* Token Balance */>;
+  staking: Record<string /* <stakingPoolId> */, NormalizedUserStakingData>;
   ndx: null | string;
 }
 

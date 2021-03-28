@@ -1,6 +1,7 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { convert, createMulticallDataParser } from "helpers";
 import { multicallDataReceived } from "features/actions";
+import { stakingMulticallDataParser } from "../staking/slice";
 import { tokensSelectors } from "features/tokens";
 import type { AppState } from "features/store";
 import type { NormalizedUser } from "ethereum/types";
@@ -13,6 +14,7 @@ const initialState: NormalizedUser = {
   address: "",
   allowances: {},
   balances: {},
+  staking: {},
   ndx: null,
 };
 
@@ -29,14 +31,28 @@ const slice = createSlice({
   },
   extraReducers: (builder) =>
     builder.addCase(multicallDataReceived, (state, action) => {
-      const parsed = userMulticallDataParser(action.payload);
+      const userData = userMulticallDataParser(action.payload);
+      const stakingData = stakingMulticallDataParser(action.payload);
 
-      if (parsed) {
-        const { allowances, balances, ndx } = parsed;
+      if (userData) {
+        const { allowances, balances, ndx } = userData;
 
         state.allowances = allowances;
         state.balances = balances;
         state.ndx = ndx;
+      }
+
+      if (stakingData) {
+        for (const [stakingPoolAddress, update] of Object.entries(
+          stakingData
+        )) {
+          if (update.userData) {
+            state.staking[stakingPoolAddress] = {
+              balance: update.userData.userStakedBalance,
+              earned: update.userData.userRewardsEarned,
+            };
+          }
+        }
       }
 
       return state;

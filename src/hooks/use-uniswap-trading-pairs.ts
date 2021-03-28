@@ -19,7 +19,12 @@ import { useDispatch, useSelector } from "react-redux";
 import type { AppState, FormattedPair } from "features";
 import type { NormalizedToken } from "ethereum/types";
 
-type PairToken = { id: string; exists: boolean | undefined; token0: string; token1: string; };
+type PairToken = {
+  id: string;
+  exists: boolean | undefined;
+  token0: string;
+  token1: string;
+};
 
 export function buildUniswapPairs(baseTokens: string[]) {
   const tokenPairs = buildCommonTokenPairs(baseTokens);
@@ -33,11 +38,15 @@ export function buildUniswapPairs(baseTokens: string[]) {
   return pairs;
 }
 
-export function useUniswapPairs(pairs: PairToken[]): [Pair[], false] | [undefined, true] {
+export function useUniswapPairs(
+  pairs: PairToken[]
+): [Pair[], false] | [undefined, true] {
   const dispatch = useDispatch();
-
   const pairDatas = useSelector((state: AppState) =>
-    selectors.selectFormattedPairsById(state, pairs.map(p => p.id))
+    selectors.selectFormattedPairsById(
+      state,
+      pairs.map((p) => p.id)
+    )
   );
 
   useEffect(() => {

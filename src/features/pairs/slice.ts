@@ -2,6 +2,7 @@ import { computeUniswapPairAddress } from "ethereum/utils/uniswap";
 import { convert, createMulticallDataParser } from "helpers";
 import { createEntityAdapter, createSlice } from "@reduxjs/toolkit";
 import {
+  mirroredServerState,
   multicallDataReceived,
   uniswapPairsRegistered,
 } from "features/actions";
@@ -29,17 +30,26 @@ const slice = createSlice({
             { exists, reserves0, reserves1 },
           ] of Object.entries(relevantMulticallData)) {
             const id = pairAddress.toLowerCase();
-            const pairInState = state.entities[id] as NormalizedPair;
 
-            if (pairInState && exists) {
-              pairInState.reserves0 = reserves0;
-              pairInState.reserves1 = reserves1;
+            if (!state.entities[id]) {
+              state.entities[id] = { id };
             }
+
+            const entity = state.entities[id]!;
+
+            entity.exists = exists;
+            entity.reserves0 = reserves0;
+            entity.reserves1 = reserves1;
           }
         }
       })
       .addCase(uniswapPairsRegistered, (state, action) => {
         adapter.addMany(state, action.payload);
+      })
+      .addCase(mirroredServerState, (_, action) => {
+        const { pairs } = action.payload;
+
+        return pairs;
       }),
 });
 
