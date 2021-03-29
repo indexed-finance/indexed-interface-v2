@@ -12,16 +12,14 @@ export default function CategoryDetail() {
   const category = useSelector((state: AppState) =>
     selectors.selectFormattedCategory(state, categoryName)
   );
-  const translate = useTranslation();
+  const tx = useTranslation();
 
   return category ? (
     <>
       <ScreenHeader
         title={category.name}
         overlay={<CategoryDropdown />}
-        activeBreadcrumb={
-          <Link to="/categories">{translate("CATEGORIES")}</Link>
-        }
+        activeBreadcrumb={<Link to="/categories">{tx("CATEGORIES")}</Link>}
       />
       <CategoryTable pools={category.indexPools} />
       <Divider />

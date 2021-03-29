@@ -4,7 +4,7 @@ import { useBreakpoints } from "helpers";
 import { useTranslation } from "i18n";
 
 export default function Performance({ pool }: { pool: FormattedIndexPool }) {
-  const translate = useTranslation();
+  const tx = useTranslation();
   const { isMobile } = useBreakpoints();
 
   return (
@@ -20,22 +20,22 @@ export default function Performance({ pool }: { pool: FormattedIndexPool }) {
       }}
     >
       <Statistic
-        title={translate("TOTAL_VALUE_LOCKED")}
+        title={tx("TOTAL_VALUE_LOCKED")}
         value={pool.totalValueLocked}
         style={{ flex: 1, textAlign: "center" }}
       />
       <Statistic
-        title={translate("VOLUME")}
+        title={tx("VOLUME")}
         value={pool.volume}
         style={{ flex: 1, textAlign: "center" }}
       />
       <Statistic
-        title={translate("CUMULATIVE_FEES")}
+        title={tx("CUMULATIVE_FEES")}
         value={pool.cumulativeFee}
         style={{ flex: 1, textAlign: "center" }}
       />
       <Statistic
-        title={translate("SWAP_FEE")}
+        title={tx("SWAP_FEE")}
         value={pool.swapFee}
         style={{ flex: 1, textAlign: "center" }}
       />

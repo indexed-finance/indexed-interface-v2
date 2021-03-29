@@ -37,7 +37,7 @@ export default function CategoryCard({
     entities: {},
   },
 }: Props) {
-  const translate = useTranslation();
+  const tx = useTranslation();
   const category = useSelector((state: AppState) =>
     selectors.selectCategory(state, id)
   );
@@ -62,7 +62,7 @@ export default function CategoryCard({
       <List
         header={
           <Typography.Text type="secondary">
-            {translate("INDEX_POOLS")}
+            {tx("INDEX_POOLS")}
           </Typography.Text>
         }
       >

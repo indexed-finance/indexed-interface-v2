@@ -20,7 +20,7 @@ interface Props {
 }
 
 export default function TradeInteraction({ pool }: Props) {
-  const translate = useTranslation();
+  const tx = useTranslation();
   const dispatch = useDispatch();
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
   const tokenIds = useMemo(
@@ -140,7 +140,7 @@ export default function TradeInteraction({ pool }: Props) {
 
   return (
     <BaseInteraction
-      title={translate("TRADE")}
+      title={tx("TRADE")}
       assets={assets as any}
       spender={UNISWAP_ROUTER_ADDRESS}
       defaultInputSymbol={COMMON_BASE_TOKENS[0].symbol}

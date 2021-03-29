@@ -48,7 +48,7 @@ export default function BurnInteraction({ pool }: Props) {
 }
 
 function SingleTokenBurnInteraction({ pool }: Props) {
-  const translate = useTranslation();
+  const tx = useTranslation();
   const poolId = pool.id;
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
   const poolsToTokens = usePoolToTokens(pool);
@@ -146,7 +146,7 @@ function SingleTokenBurnInteraction({ pool }: Props) {
 
   return (
     <BaseInteraction
-      title={translate("BURN")}
+      title={tx("BURN")}
       assets={pool.assets}
       spender={poolId}
       onSubmit={handleSubmit}
@@ -159,7 +159,7 @@ function SingleTokenBurnInteraction({ pool }: Props) {
 }
 
 function UniswapBurnInteraction({ pool }: Props) {
-  const translate = useTranslation();
+  const tx = useTranslation();
   const poolId = pool.id;
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
   const poolsToTokens = usePoolToTokens(pool);
@@ -266,7 +266,7 @@ function UniswapBurnInteraction({ pool }: Props) {
 
   return (
     <BaseInteraction
-      title={translate("BURN_WITH_UNISWAP")}
+      title={tx("BURN_WITH_UNISWAP")}
       assets={
         assets.filter((_) => _) as {
           name: string;

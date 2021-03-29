@@ -121,7 +121,7 @@ function InteractionInner({
   disableOutputSelect,
   requiresApproval,
 }: InnerProps) {
-  const translate = useTranslation();
+  const tx = useTranslation();
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
   const [tokenId, exactAmountIn] = useMemo(() => {
     if (values.fromToken && values.fromAmount) {
@@ -192,7 +192,7 @@ function InteractionInner({
     <>
       {/* // Fields */}
       <TokenSelector
-        label={translate("FROM")}
+        label={tx("FROM")}
         assets={inputOptions}
         value={{
           token: values.fromToken,
@@ -221,7 +221,7 @@ function InteractionInner({
       <Flipper disabled={disableFlip} onFlip={handleFlip} />
 
       <TokenSelector
-        label={translate("TO")}
+        label={tx("TO")}
         assets={outputOptions}
         value={{
           token: values.toToken,

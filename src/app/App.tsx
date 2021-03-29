@@ -3,7 +3,9 @@ import { BrowserRouter } from "react-router-dom";
 import { DEBUG } from "components";
 import { Parallax } from "react-parallax";
 import { Provider, useDispatch, useSelector } from "react-redux";
+import { Web3ReactProvider } from "@web3-react/core";
 import { actions, selectors, store } from "features";
+import { ethers } from "ethers";
 import { message, notification } from "antd";
 import { useBreakpoints } from "helpers";
 import { useEffect, useRef } from "react";
@@ -61,8 +63,16 @@ export default function App() {
   return (
     <Provider store={store}>
       <AppErrorBoundary>
-        <Inner />
+        <Web3ReactProvider getLibrary={getLibrary}>
+          <Inner />
+        </Web3ReactProvider>
       </AppErrorBoundary>
     </Provider>
   );
 }
+
+// #region Helpers
+function getLibrary(_provider?: any, _connector?: any) {
+  return new ethers.providers.Web3Provider(_provider);
+}
+// #endregion

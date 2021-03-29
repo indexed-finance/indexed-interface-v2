@@ -2,7 +2,7 @@ import { Alert, Space, Statistic } from "antd";
 import { useTranslation } from "i18n";
 
 export default function PlainLanguageTransaction() {
-  const translate = useTranslation();
+  const tx = useTranslation();
 
   return (
     <Alert
@@ -10,7 +10,7 @@ export default function PlainLanguageTransaction() {
       message={
         <Space style={{ width: "100%" }} className="spaced-between">
           <Statistic
-            title={translate("IN_OTHER_WORDS")}
+            title={tx("IN_OTHER_WORDS")}
             valueStyle={{ fontSize: 14 }}
             value="Foo bar baz."
           />

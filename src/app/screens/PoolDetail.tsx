@@ -39,7 +39,7 @@ export default function PoolDetail() {
 }
 
 function Pool({ id }: { id: string }) {
-  const translate = useTranslation();
+  const tx = useTranslation();
   const pool = useSelector((state: AppState) =>
     selectors.selectFormattedIndexPool(state, id)
   );
@@ -64,12 +64,12 @@ function Pool({ id }: { id: string }) {
   if (pool) {
     const performance = <Performance pool={pool} />;
     const chart = (
-      <Subscreen title={translate("PERFORMANCE")}>
+      <Subscreen title={tx("PERFORMANCE")}>
         {id ? <ChartCard poolId={id} /> : null}
       </Subscreen>
     );
     const assets = (
-      <Subscreen title={translate("ASSETS")}>
+      <Subscreen title={tx("ASSETS")}>
         <Space
           wrap={true}
           align="start"
@@ -83,7 +83,7 @@ function Pool({ id }: { id: string }) {
       </Subscreen>
     );
     const interactions = (
-      <Subscreen title={translate("INTERACTIONS")}>
+      <Subscreen title={tx("INTERACTIONS")}>
         <ProviderRequirementDrawer includeSignerRequirement={true} />
         <PoolInteractions pool={pool} />
       </Subscreen>
@@ -131,7 +131,7 @@ function Pool({ id }: { id: string }) {
         <ScreenHeader
           title={pool.name}
           overlay={<PoolDropdown />}
-          activeBreadcrumb={<Link to="/pools">{translate("INDEX_POOLS")}</Link>}
+          activeBreadcrumb={<Link to="/pools">{tx("INDEX_POOLS")}</Link>}
         />
         {performance}
         {(() => {

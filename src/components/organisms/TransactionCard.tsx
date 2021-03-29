@@ -15,7 +15,7 @@ export default function TransactionCard({
   amount,
   kind,
 }: Transaction) {
-  const translate = useTranslation();
+  const tx = useTranslation();
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
 
   return (
@@ -37,10 +37,10 @@ export default function TransactionCard({
         hoverable={true}
         actions={[
           {
-            title: translate("WHEN"),
+            title: tx("WHEN"),
             value: (
               <span style={{ fontSize: 12 }}>
-                {translate("ABOUT_X_MINUTES_AGO", {
+                {tx("ABOUT_X_MINUTES_AGO", {
                   __x: when,
                 })}
               </span>

@@ -16,7 +16,7 @@ export interface Props {
 }
 
 export default function ChartCard({ poolId, expanded = false }: Props) {
-  const translate = useTranslation();
+  const tx = useTranslation();
   const theme = useSelector(selectors.selectTheme);
   const [timeframe, setTimeframe] = useState<Timeframe>("Day");
   const [key, setKey] = useState<SnapshotKey>("value");
@@ -53,7 +53,7 @@ export default function ChartCard({ poolId, expanded = false }: Props) {
           marginBottom: isMobile ? -10 : 0,
         }}
       >
-        {translate("TIMEFRAME")}
+        {tx("TIMEFRAME")}
       </Typography.Paragraph>
       <Menu
         style={{ textAlign: "center", marginTop: 0 }}
@@ -65,14 +65,14 @@ export default function ChartCard({ poolId, expanded = false }: Props) {
           active={timeframe === "Day"}
           onClick={toggleTimeframe}
         >
-          {translate("DAY")}
+          {tx("DAY")}
         </Menu.Item>
         <Menu.Item
           key="Week"
           active={timeframe === "Week"}
           onClick={toggleTimeframe}
         >
-          {translate("WEEK")}
+          {tx("WEEK")}
         </Menu.Item>
       </Menu>
     </>
@@ -87,25 +87,25 @@ export default function ChartCard({ poolId, expanded = false }: Props) {
           marginBottom: isMobile ? 0 : 15,
         }}
       >
-        {translate("CRITERIA")}
+        {tx("CRITERIA")}
       </Typography.Paragraph>
       <Select
         value={key}
         style={{ width: isMobile ? "240px" : "80%" }}
         onChange={setKey}
       >
-        <Select.Option value="value">{translate("VALUE_IN_USD")}</Select.Option>
+        <Select.Option value="value">{tx("VALUE_IN_USD")}</Select.Option>
         <Select.Option value="totalSupply">
-          {translate("SUPPLY_IN_TOKENS")}
+          {tx("SUPPLY_IN_TOKENS")}
         </Select.Option>
         <Select.Option value="totalValueLockedUSD">
-          {translate("TOTAL_VALUE_LOCKED_IN_USD")}
+          {tx("TOTAL_VALUE_LOCKED_IN_USD")}
         </Select.Option>
         <Select.Option value="totalSwapVolumeUSD">
-          {translate("TOTAL_SWAP_VOLUME_IN_USD")}
+          {tx("TOTAL_SWAP_VOLUME_IN_USD")}
         </Select.Option>
         <Select.Option value="feesTotalUSD">
-          {translate("TOTAL_SWAP_FEES_IN_USD")}
+          {tx("TOTAL_SWAP_FEES_IN_USD")}
         </Select.Option>
       </Select>
     </>

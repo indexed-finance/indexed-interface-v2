@@ -28,7 +28,7 @@ interface Props {
 }
 
 export default function PoolInteractions({ pool }: Props) {
-  const translate = useTranslation();
+  const tx = useTranslation();
   const { poolName, interaction: activeInteraction = "trade" } = useParams<{
     poolName: string;
     interaction: PoolInteraction;
@@ -51,7 +51,7 @@ export default function PoolInteractions({ pool }: Props) {
             key="trade"
             tab={
               <Link to={`/pools/${poolName}/trade`}>
-                <FaCoins /> {!isMobile && <span>{translate("TRADE")}</span>}
+                <FaCoins /> {!isMobile && <span>{tx("TRADE")}</span>}
               </Link>
             }
           >
@@ -62,8 +62,7 @@ export default function PoolInteractions({ pool }: Props) {
             key="swap"
             tab={
               <Link to={`/pools/${poolName}/swap`}>
-                <AiOutlineSwap />{" "}
-                {!isMobile && <span>{translate("SWAP")}</span>}
+                <AiOutlineSwap /> {!isMobile && <span>{tx("SWAP")}</span>}
               </Link>
             }
           >
@@ -74,7 +73,7 @@ export default function PoolInteractions({ pool }: Props) {
             key="mint"
             tab={
               <Link to={`/pools/${poolName}/mint`}>
-                <FaHammer /> {!isMobile && <span>{translate("MINT")}</span>}
+                <FaHammer /> {!isMobile && <span>{tx("MINT")}</span>}
               </Link>
             }
           >
@@ -85,7 +84,7 @@ export default function PoolInteractions({ pool }: Props) {
             key="burn"
             tab={
               <Link to={`/pools/${poolName}/burn`}>
-                <FaFireAlt /> {!isMobile && <span>{translate("BURN")}</span>}
+                <FaFireAlt /> {!isMobile && <span>{tx("BURN")}</span>}
               </Link>
             }
           >

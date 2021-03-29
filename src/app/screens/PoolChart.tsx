@@ -5,7 +5,7 @@ import { useSelector } from "react-redux";
 import { useTranslation } from "i18n";
 
 export default function PoolChart() {
-  const translate = useTranslation();
+  const tx = useTranslation();
   const { poolName } = useParams<{ poolName: string }>();
   const pool = useSelector((state: AppState) =>
     selectors.selectFormattedIndexPool(state, poolName)
@@ -15,11 +15,11 @@ export default function PoolChart() {
     return (
       <>
         <ScreenHeader
-          title={translate("X_CHART", {
+          title={tx("X_CHART", {
             __x: pool.name,
           })}
           overlay={<PoolDropdown />}
-          activeBreadcrumb={<Link to="/pools">{translate("INDEX_POOLS")}</Link>}
+          activeBreadcrumb={<Link to="/pools">{tx("INDEX_POOLS")}</Link>}
         />
         <ChartCard poolId={pool.id} expanded={true} />;
       </>

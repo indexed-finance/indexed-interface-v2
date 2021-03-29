@@ -12,27 +12,27 @@ interface Props {
 }
 
 export default function JazzIcon({ address }: Props) {
-  const translate = useTranslation();
+  const tx = useTranslation();
   const dispatch = useDispatch();
   const blockie = useRef<null | HTMLSpanElement>(null);
   const handleDisconnect = useCallback(() => {
     dispatch(actions.userDisconnected());
 
     notification.info({
-      message: translate("DISCONNECTED"),
-      description: translate("YOU_HAVE_SUCCESSFULLY_DISCONNECTED_YOUR_WALLET"),
+      message: tx("DISCONNECTED"),
+      description: tx("YOU_HAVE_SUCCESSFULLY_DISCONNECTED_YOUR_WALLET"),
     });
-  }, [dispatch, translate]);
+  }, [dispatch, tx]);
   const breakpoints = useBreakpoints();
 
   // Effect:
   // On load, display a success notification.
   useEffect(() => {
     notification.success({
-      message: translate("CONNECTED"),
-      description: translate("YOU_HAVE_SUCCESSFULLY_CONNECTED_YOUR_WALLET"),
+      message: tx("CONNECTED"),
+      description: tx("YOU_HAVE_SUCCESSFULLY_CONNECTED_YOUR_WALLET"),
     });
-  }, [translate]);
+  }, [tx]);
 
   // Effect:
   // Use refs to integrate the third party library for displaying a wallet identicon.
@@ -75,12 +75,10 @@ export default function JazzIcon({ address }: Props) {
               rel="noopener noreferrer"
               href={`https://etherscan.io/address/${address}`}
             >
-              {translate("VIEW_ON_ETHERSCAN")}
+              {tx("VIEW_ON_ETHERSCAN")}
             </a>
           </Menu.Item>
-          <Menu.Item onClick={handleDisconnect}>
-            {translate("DISCONNECT")}
-          </Menu.Item>
+          <Menu.Item onClick={handleDisconnect}>{tx("DISCONNECT")}</Menu.Item>
         </Menu>
       }
     >

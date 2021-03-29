@@ -11,48 +11,48 @@ export type Props = {
 };
 
 export default function CategoryTable({ pools }: Props) {
-  const translate = useTranslation();
+  const tx = useTranslation();
   const history = useHistory();
   const { isMobile } = useBreakpoints();
   const columns = useMemo(
     () => [
       {
-        title: translate("SYMBOL"),
+        title: tx("SYMBOL"),
         dataIndex: "symbol",
         key: "symbol",
       },
       {
-        title: translate("SIZE"),
+        title: tx("SIZE"),
         dataIndex: "size",
         key: "size",
       },
       {
-        title: translate("PRICE"),
+        title: tx("PRICE"),
         dataIndex: "price",
         key: "price",
       },
       {
-        title: translate("SUPPLY"),
+        title: tx("SUPPLY"),
         dataIndex: "supply",
         key: "supply",
       },
       {
-        title: translate("MARKET_CAP"),
+        title: tx("MARKET_CAP"),
         dataIndex: "marketCap",
         key: "marketCap",
       },
       {
-        title: translate("SWAP_FEE"),
+        title: tx("SWAP_FEE"),
         dataIndex: "swapFee",
         key: "swapFee",
       },
       {
-        title: translate("CUMULATIVE_FEES"),
+        title: tx("CUMULATIVE_FEES"),
         dataIndex: "cumulativeFees",
         key: "cumulativeFees",
       },
       {
-        title: translate("VOLUME"),
+        title: tx("VOLUME"),
         dataIndex: "volume",
         key: "volume",
       },
@@ -62,7 +62,7 @@ export default function CategoryTable({ pools }: Props) {
         key: "action",
       },
     ],
-    [translate]
+    [tx]
   );
 
   return isMobile ? (

@@ -19,7 +19,7 @@ import { useEffect, useMemo } from "react";
 import { useTranslation } from "i18n";
 
 export default function Portfolio() {
-  const translate = useTranslation();
+  const tx = useTranslation();
   const dispatch = useDispatch();
   const pools = useSelector(selectors.selectAllPools);
   const poolsToTokens = pools.reduce((prev, next) => {
@@ -52,7 +52,7 @@ export default function Portfolio() {
   return (
     <div>
       <ProviderRequirementDrawer includeSignerRequirement={true} />
-      <ScreenHeader title={translate("PORTFOLIO")} />
+      <ScreenHeader title={tx("PORTFOLIO")} />
       {formattedPortfolio ? (
         <>
           <Space
@@ -67,7 +67,7 @@ export default function Portfolio() {
           </Space>
           <Divider />
           <Typography.Title style={{ textAlign: "right" }}>
-            {translate("TOTAL_VALUE")}{" "}
+            {tx("TOTAL_VALUE")}{" "}
             <Typography.Text type="success">
               {formattedPortfolio.totalValue}
             </Typography.Text>

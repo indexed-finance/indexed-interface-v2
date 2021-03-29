@@ -7,16 +7,13 @@ import { useSelector } from "react-redux";
 import { useTranslation } from "i18n";
 
 export default function Stake() {
-  const translate = useTranslation();
+  const tx = useTranslation();
   const staking = useSelector(selectors.selectFormattedStaking);
   const indexTokens = (
-    <Staking title={translate("INDEX_TOKENS")} data={staking.indexTokens} />
+    <Staking title={tx("INDEX_TOKENS")} data={staking.indexTokens} />
   );
   const liquidityTokens = (
-    <Staking
-      title={translate("LIQUIDITY_TOKENS")}
-      data={staking.liquidityTokens}
-    />
+    <Staking title={tx("LIQUIDITY_TOKENS")} data={staking.liquidityTokens} />
   );
   const breakpoints = useBreakpoints();
 
@@ -38,12 +35,10 @@ export default function Stake() {
 
   return (
     <>
-      <ScreenHeader title={translate("STAKE")} />
-      <Typography.Title level={2}>
-        {translate("LIQUIDITY_MINING")}
-      </Typography.Title>
+      <ScreenHeader title={tx("STAKE")} />
+      <Typography.Title level={2}>{tx("LIQUIDITY_MINING")}</Typography.Title>
       <Typography.Paragraph>
-        {translate("STAKE_INDEX_TOKENS_...")}
+        {tx("STAKE_INDEX_TOKENS_...")}
       </Typography.Paragraph>
       <div style={{ marginTop: 50 }}>
         {(() => {

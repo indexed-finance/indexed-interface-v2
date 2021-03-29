@@ -27,7 +27,7 @@ interface Props {
 }
 
 export default function SwapInteraction({ pool }: Props) {
-  const translate = useTranslation();
+  const tx = useTranslation();
   const {
     calculateAmountIn,
     calculateAmountOut,
@@ -128,7 +128,7 @@ export default function SwapInteraction({ pool }: Props) {
 
   return (
     <BaseInteraction
-      title={translate("SWAP")}
+      title={tx("SWAP")}
       assets={pool.assets}
       spender={pool.id}
       onSubmit={handleSubmit}

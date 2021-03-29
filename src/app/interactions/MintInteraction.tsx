@@ -54,7 +54,7 @@ export default function MintInteraction({ pool }: Props) {
 }
 
 function SingleTokenMintInteraction({ pool }: Props) {
-  const translate = useTranslation();
+  const tx = useTranslation();
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
   const {
     calculateAmountIn,
@@ -151,7 +151,7 @@ function SingleTokenMintInteraction({ pool }: Props) {
 
   return (
     <BaseInteraction
-      title={translate("MINT")}
+      title={tx("MINT")}
       assets={pool.assets}
       spender={pool.id}
       onSubmit={handleSubmit}
@@ -167,7 +167,7 @@ function MultiTokenMintInteraction({ pool }: Props) {
 }
 
 function UniswapMintInteraction({ pool }: Props) {
-  const translate = useTranslation();
+  const tx = useTranslation();
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
   const {
     tokenIds,
@@ -279,7 +279,7 @@ function UniswapMintInteraction({ pool }: Props) {
 
   return (
     <BaseInteraction
-      title={translate("MINT_WITH_UNISWAP")}
+      title={tx("MINT_WITH_UNISWAP")}
       assets={
         assets.filter((_) => _) as {
           name: string;

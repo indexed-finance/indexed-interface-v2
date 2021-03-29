@@ -23,7 +23,7 @@ const USEFUL_LINKS: Array<{
 ];
 
 export default function UsefulLinks({ address }: { address: string }) {
-  const translate = useTranslation();
+  const tx = useTranslation();
   const quickswapLink = usePoolQuickswapLink(address);
   const links = useMemo(
     () =>
@@ -59,7 +59,7 @@ export default function UsefulLinks({ address }: { address: string }) {
                   top: -2,
                 }}
               />
-              <span>{translate(text)}</span>
+              <span>{tx(text)}</span>
             </a>
           </Space>
         </Menu.Item>

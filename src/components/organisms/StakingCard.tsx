@@ -7,7 +7,7 @@ import { useTranslation } from "i18n";
 import type { FormattedStakingData } from "features";
 
 export default function StakingCard(props: FormattedStakingData) {
-  const translate = useTranslation();
+  const tx = useTranslation();
   const {
     id,
     rate,
@@ -24,22 +24,22 @@ export default function StakingCard(props: FormattedStakingData) {
   const isExpired = apy === "Expired";
   const commonActions = [
     {
-      title: translate("RATE"),
+      title: tx("RATE"),
       value: rate,
     },
     {
-      title: translate("EARNED"),
+      title: tx("EARNED"),
       value: earned,
     },
   ];
   const actions = isMobile
     ? [
         {
-          title: translate("APY"),
+          title: tx("APY"),
           value: apy,
         },
         {
-          title: translate("STAKED"),
+          title: tx("STAKED"),
           value: staked,
         },
         ...commonActions,
@@ -77,19 +77,19 @@ export default function StakingCard(props: FormattedStakingData) {
       {!isMobile && (
         <Space style={{ width: "100%", justifyContent: "space-evenly" }}>
           <Statistic
-            title={translate("APY")}
+            title={tx("APY")}
             valueStyle={{
               color: apy === "Expired" ? "grey" : "",
             }}
             value={apy ?? ""}
           />
-          <Statistic title={translate("STAKED")} value={staked} />
+          <Statistic title={tx("STAKED")} value={staked} />
           <Button
             type="primary"
             disabled={isExpired}
             style={{ minWidth: 200, justifySelf: "center" }}
           >
-            {isExpired ? translate("STAKING_EXPIRED") : translate("STAKE_POOL")}
+            {isExpired ? tx("STAKING_EXPIRED") : tx("STAKE_POOL")}
           </Button>
         </Space>
       )}

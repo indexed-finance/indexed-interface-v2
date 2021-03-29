@@ -10,18 +10,18 @@ interface Props {
 }
 
 export default function PoolList({ withBreadcrumb = true }: Props) {
-  const translate = useTranslation();
+  const tx = useTranslation();
   const pools = useSelector(selectors.selectAllFormattedIndexPools);
   const headerProps = withBreadcrumb
     ? {
         overlay: <PoolDropdown />,
-        activeBreadcrumb: <Link to="/pools">{translate("INDEX_POOLS")}</Link>,
+        activeBreadcrumb: <Link to="/pools">{tx("INDEX_POOLS")}</Link>,
       }
     : {};
 
   return (
     <div style={{ minHeight: 400, position: "relative" }}>
-      <ScreenHeader title={translate("POOLS")} {...headerProps} />
+      <ScreenHeader title={tx("POOLS")} {...headerProps} />
       <Space direction="vertical" style={{ width: "100%" }}>
         {pools.map((pool) => (
           <PoolCard key={pool!.id} pool={pool!} />

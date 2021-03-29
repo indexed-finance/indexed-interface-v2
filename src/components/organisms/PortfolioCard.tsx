@@ -17,17 +17,17 @@ export default function PortfolioCard({
   staking,
   weight,
 }: FormattedPortfolioDatum) {
-  const translate = useTranslation();
+  const tx = useTranslation();
   const { isMobile } = useBreakpoints();
 
   let ribbonText = "";
 
   if (earned && earned !== "0.00") {
-    ribbonText = translate("EARNED_X_NDX", {
+    ribbonText = tx("EARNED_X_NDX", {
       __x: earned,
     });
   } else if (staking) {
-    ribbonText = translate("STAKING_X_Y", {
+    ribbonText = tx("STAKING_X_Y", {
       __x: staking,
       __y: symbol,
     });
@@ -41,11 +41,11 @@ export default function PortfolioCard({
       subtitle={symbol}
       actions={[
         {
-          title: translate("BALANCE_IN_TOKENS"),
+          title: tx("BALANCE_IN_TOKENS"),
           value: `${balance} ${symbol}`,
         },
         {
-          title: translate("VALUE_IN_USD"),
+          title: tx("VALUE_IN_USD"),
           value: <Typography.Text type="success">{value}</Typography.Text>,
         },
       ]}

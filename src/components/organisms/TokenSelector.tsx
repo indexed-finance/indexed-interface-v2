@@ -44,7 +44,7 @@ export default function TokenSelector({
   selectable = true,
   onChange,
 }: Props) {
-  const translate = useTranslation();
+  const tx = useTranslation();
   const tokenField = `${label.toLowerCase()} Token`;
   const amountField = `${label.toLowerCase()} Amount`;
   const { setTouched } = useFormikContext<any>();
@@ -161,12 +161,12 @@ export default function TokenSelector({
                         onClick={handleMaxOut}
                         style={{ fontSize: 12 }}
                       >
-                        {translate("MAX")}
+                        {tx("MAX")}
                       </Button>
                     )}
                   </>
                 ) : (
-                  translate("NO_BALANCE")
+                  tx("NO_BALANCE")
                 )}
               </Typography.Text>
             ) : (
@@ -209,7 +209,7 @@ export default function TokenSelector({
                   </>
                 ) : (
                   <div className="fancy" style={{ fontSize: 12 }}>
-                    {translate("SELECT_ONE")}
+                    {tx("SELECT_ONE")}
                   </div>
                 )}
                 {selectable && <AiOutlineCaretDown />}
@@ -239,7 +239,7 @@ export default function TokenSelector({
               <Input.Search
                 name="tokens"
                 size="large"
-                placeholder={translate("SEARCH_TOKENS")}
+                placeholder={tx("SEARCH_TOKENS")}
                 enterButton
               />
             </AutoComplete>
@@ -256,7 +256,7 @@ export default function TokenSelector({
               onClick={handleCloseTokenSelection}
               style={{ width: "100%" }}
             >
-              {translate("CLOSE")}
+              {tx("CLOSE")}
             </Button>
           }
         >

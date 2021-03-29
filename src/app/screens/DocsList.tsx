@@ -4,11 +4,11 @@ import ReactMarkdown from "react-markdown";
 import data from "data.json";
 
 export default function DocsList() {
-  const translate = useTranslation();
+  const tx = useTranslation();
 
   return (
     <>
-      <ScreenHeader title={translate("DOCS")} />
+      <ScreenHeader title={tx("DOCS")} />
       <ReactMarkdown>{(data as any).docs}</ReactMarkdown>
     </>
   );

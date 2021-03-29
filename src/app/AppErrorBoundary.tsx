@@ -66,19 +66,19 @@ function ErrorHandler({
   children: ReactNode;
   onResolved(): void;
 }) {
-  const translate = useTranslation();
+  const tx = useTranslation();
   const dispatch = useDispatch();
 
   useEffect(() => {
     const timeToWait = timeInSeconds[errorCount] * 1000;
 
-    message.error(translate("AN_UNKNOWN_ERROR_HAS_OCCURRED_..."));
+    message.error(tx("AN_UNKNOWN_ERROR_HAS_OCCURRED_..."));
 
     sleep(timeToWait).then(() => {
       dispatch(actions.restartedDueToError());
       onResolved();
     });
-  }, [dispatch, onResolved, translate, errorCount]);
+  }, [dispatch, onResolved, tx, errorCount]);
 
   return <>{children}</>;
 }

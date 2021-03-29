@@ -10,20 +10,18 @@ interface Props {
 }
 
 export default function CategoryList({ withBreadcrumb = true }: Props) {
-  const translate = useTranslation();
+  const tx = useTranslation();
   const categories = useSelector(selectors.selectAllFormattedCategories);
   const headerProps = withBreadcrumb
     ? {
         overlay: <CategoryDropdown />,
-        activeBreadcrumb: (
-          <Link to="/categories">{translate("CATEGORIES")}</Link>
-        ),
+        activeBreadcrumb: <Link to="/categories">{tx("CATEGORIES")}</Link>,
       }
     : {};
 
   return (
     <>
-      <ScreenHeader title={translate("CATEGORIES")} {...headerProps} />
+      <ScreenHeader title={tx("CATEGORIES")} {...headerProps} />
       <Space size="large" style={{ width: "100%" }} wrap={true}>
         {categories.map((category) => (
           <div style={{ flex: "1 1 50%" }} key={category!.id}>

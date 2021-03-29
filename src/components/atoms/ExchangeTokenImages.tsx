@@ -9,20 +9,20 @@ type Props = {
 };
 
 export default function ExchangeTokenImages({ baseline, comparison }: Props) {
-  const translate = useTranslation();
+  const tx = useTranslation();
 
   return (
     <Space align="center" className="spaced-between">
       {baseline && comparison && (
         <div style={{ position: "relative", top: 0, right: 0 }}>
-          <Token name={translate("BASELINE")} image={baseline} />
+          <Token name={tx("BASELINE")} image={baseline} />
           <AiOutlineArrowRight
             style={{
               position: "absolute",
               fontSize: "32px",
             }}
           />
-          <Token name={translate("COMPARISON")} image={comparison} />
+          <Token name={tx("COMPARISON")} image={comparison} />
         </div>
       )}
     </Space>

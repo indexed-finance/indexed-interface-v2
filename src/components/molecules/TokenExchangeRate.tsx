@@ -16,7 +16,7 @@ export default function TokenExchangeRate({
   fee,
   rate,
 }: Props) {
-  const translate = useTranslation();
+  const tx = useTranslation();
   const { isMobile } = useBreakpoints();
   const converted = convert.toComma(
     typeof rate === "number" ? rate : parseFloat(rate)
@@ -31,7 +31,7 @@ export default function TokenExchangeRate({
           className={isMobile ? "" : "spaced-between"}
         >
           <Statistic
-            title={translate("EXCHANGE_RATE")}
+            title={tx("EXCHANGE_RATE")}
             valueRender={() => (
               <div className="spaced-between">
                 <Space style={{ marginRight: 8 }}>

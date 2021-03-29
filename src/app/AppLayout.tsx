@@ -1,7 +1,6 @@
-import { BuildingWall, QuoteCarousel } from "components";
+import { BuildingWall } from "components";
 import { Button, Layout, Spin } from "antd";
 import { CSSTransition } from "react-transition-group";
-import { FormattedIndexPool, actions, selectors } from "features";
 import { Helmet } from "react-helmet";
 import {
   ReactNode,
@@ -13,6 +12,7 @@ import {
 } from "react";
 import { Route, Switch as RouterSwitch } from "react-router-dom";
 import { Suspense } from "react";
+import { actions, selectors } from "features";
 import { useBreakpoints } from "helpers";
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "i18n";
@@ -25,7 +25,7 @@ import routes from "./routes";
 const { Sider, Content } = Layout;
 
 export default function AppLayout() {
-  const translate = useTranslation();
+  const tx = useTranslation();
   const dispatch = useDispatch();
   const isConnectionEnabled = useSelector(selectors.selectConnectionEnabled);
   const indexPools = useSelector(selectors.selectAllFormattedIndexPools);
@@ -95,15 +95,13 @@ export default function AppLayout() {
 
         {breakpoints.lg && (
           <Sider width={300}>
-            {indexPools.length > 0 ? (
-              <QuoteCarousel pools={indexPools as FormattedIndexPool[]} />
-            ) : (
+            {indexPools.length > 0 ? null : (
               <div className="QuotePlaceholder perfectly-centered">
                 <Button
                   type="primary"
                   onClick={() => dispatch(actions.attachToProvider())}
                 >
-                  {translate("DISCONNECT")}
+                  {tx("DISCONNECT")}
                 </Button>
               </div>
             )}

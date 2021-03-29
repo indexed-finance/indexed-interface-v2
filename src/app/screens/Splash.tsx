@@ -12,11 +12,11 @@ const STEP_COUNT = 3;
 const STEP_PROGRESSION_DURATION = 7500;
 
 export default function Splash() {
-  const translate = useTranslation();
+  const tx = useTranslation();
   const { isMobile } = useBreakpoints();
   const [step, setStep] = useState(0);
   const docsButton = (
-    <Button type="default">{translate("READ_THE_DOCUMENTATION")}</Button>
+    <Button type="default">{tx("READ_THE_DOCUMENTATION")}</Button>
   );
   const DocsButton = () =>
     flags.useInternalDocs ? (
@@ -60,13 +60,13 @@ export default function Splash() {
   return (
     <div style={{ textAlign: "center" }}>
       <Typography.Title style={{ fontSize: isMobile ? 40 : 64 }}>
-        {translate("DECENTRALIZED_INDEX_PROTOCOL")}
+        {tx("DECENTRALIZED_INDEX_PROTOCOL")}
       </Typography.Title>
       <Typography.Title level={isMobile ? 5 : 3}>
-        {translate("PASSIVELY_MANAGED_...")}
+        {tx("PASSIVELY_MANAGED_...")}
       </Typography.Title>
       <Typography.Title level={3}>
-        <div style={{ marginBottom: 10 }}>{translate("GET_STARTED_TODAY")}</div>
+        <div style={{ marginBottom: 10 }}>{tx("GET_STARTED_TODAY")}</div>
         <Button.Group style={{ flexDirection: isMobile ? "column" : "row" }}>
           <Link to="/pools">
             <Button
@@ -76,15 +76,13 @@ export default function Splash() {
                 marginBottom: isMobile ? 10 : 0,
               }}
             >
-              {translate("VIEW_INDEX_POOLS")}
+              {tx("VIEW_INDEX_POOLS")}
             </Button>
           </Link>
           <DocsButton />
           {flags.showFaqLink && (
             <Link to="/faq">
-              <Button type="default">
-                {translate("FREQUENTLY_ASKED_QUESTIONS")}
-              </Button>
+              <Button type="default">{tx("FREQUENTLY_ASKED_QUESTIONS")}</Button>
             </Link>
           )}
         </Button.Group>

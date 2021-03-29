@@ -11,7 +11,7 @@ export interface Props {
 }
 
 export default function RankedToken({ token }: Props) {
-  const translate = useTranslation();
+  const tx = useTranslation();
   const { isMobile } = useBreakpoints();
 
   return (
@@ -43,11 +43,11 @@ export default function RankedToken({ token }: Props) {
         }
         actions={[
           {
-            title: translate("BALANCE_IN_TOKENS"),
+            title: tx("BALANCE_IN_TOKENS"),
             value: `${token.balance} ${token.symbol}`,
           },
           {
-            title: translate("BALANCE_IN_USD"),
+            title: tx("BALANCE_IN_USD"),
             value: (
               <Typography.Text type="success">
                 {token.balanceUsd ? (
