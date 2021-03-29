@@ -1,5 +1,7 @@
 import { Menu, Space } from "antd";
 import { TranslatedTerm, useTranslation } from "i18n";
+import { useMemo } from "react";
+import { usePoolQuickswapLink } from "features";
 
 const USEFUL_LINKS: Array<{
   text: TranslatedTerm;
@@ -22,10 +24,22 @@ const USEFUL_LINKS: Array<{
 
 export default function UsefulLinks({ address }: { address: string }) {
   const translate = useTranslation();
+  const quickswapLink = usePoolQuickswapLink(address);
+  const links = useMemo(
+    () =>
+      quickswapLink
+        ? USEFUL_LINKS.concat({
+            text: "SWAP_WITH_QUICKSWAP",
+            image: require("assets/images/quickswap.png").default,
+            makeLink: (_) => quickswapLink,
+          })
+        : USEFUL_LINKS,
+    [quickswapLink]
+  );
 
   return (
     <Menu mode="horizontal" selectable={false}>
-      {USEFUL_LINKS.map(({ text, image, makeLink }) => (
+      {links.map(({ text, image, makeLink }) => (
         <Menu.Item>
           <Space>
             <a

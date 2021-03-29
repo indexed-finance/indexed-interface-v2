@@ -183,19 +183,23 @@ function useDefaultToken(pool: FormattedIndexPool, token: string) {
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
 
   return useMemo(() => {
+    const fallback = {
+      usedDenorm: "0",
+      usedBalance: "0",
+    };
+
     if (poolInState && token) {
       const { id } = tokenLookup[token.toLowerCase()];
       const entry = poolInState!.tokens.entities[id];
 
-      return {
-        usedDenorm: entry.usedDenorm,
-        usedBalance: entry.usedBalance,
-      };
+      return entry
+        ? {
+            usedDenorm: entry.usedDenorm,
+            usedBalance: entry.usedBalance,
+          }
+        : fallback;
     } else {
-      return {
-        usedDenorm: "0",
-        usedBalance: "0",
-      };
+      return fallback;
     }
   }, [poolInState, token, tokenLookup]);
 }

@@ -7,6 +7,7 @@ import {
 } from "components";
 import { Link, useHistory } from "react-router-dom";
 import { SOCIAL_MEDIA } from "config";
+import { TranslatedTerm, useTranslation } from "i18n";
 import { selectors } from "features";
 import { useBreakpoints, useScrollPrevention } from "helpers";
 import { useSelector } from "react-redux";
@@ -21,6 +22,7 @@ interface Props {
 const { Item, SubMenu } = Menu;
 
 export default function AppMenu({ onItemClick = noop, ...rest }: Props) {
+  const translate = useTranslation();
   const menuModels = useSelector(selectors.selectMenuModels);
   const categoryLookup = useSelector(selectors.selectCategoryLookup);
   const indexPoolsLookup = useSelector(selectors.selectCategoryImagesByPoolIds);
@@ -69,12 +71,17 @@ export default function AppMenu({ onItemClick = noop, ...rest }: Props) {
             if (route.model) {
               const models =
                 menuModels[route.model as "categories" | "indexPools"];
+              const sider =
+                typeof route.sider === "string"
+                  ? translate(route.sider as TranslatedTerm)
+                  : route.sider;
 
               return (
-                <SubMenu
-                  key={route.path}
-                  title={<Link to={route.path}>{route.sider}</Link>}
-                >
+                <SubMenu key={route.path} title={sider}>
+                  <Item style={{ textAlign: "right" }}>
+                    <Link to={route.path}>{translate("VIEW_ALL")}</Link>
+                  </Item>
+                  <Menu.Divider />
                   {models.map((model) => {
                     const isIndexPool = route.model === "indexPools";
                     const image = isIndexPool
@@ -104,13 +111,18 @@ export default function AppMenu({ onItemClick = noop, ...rest }: Props) {
                 </SubMenu>
               );
             } else {
+              const sider =
+                typeof route.sider === "string"
+                  ? translate(route.sider as TranslatedTerm)
+                  : route.sider;
+
               return (
                 <Item key={route.path} onClick={onItemClick}>
                   {route.isExternalLink ? (
-                    route.sider
+                    sider
                   ) : (
                     <Link to={route.path}>
-                      <span>{route.sider}</span>
+                      <span>{sider}</span>
                       {route.icon ?? null}
                     </Link>
                   )}

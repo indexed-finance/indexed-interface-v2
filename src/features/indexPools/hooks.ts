@@ -28,6 +28,25 @@ export const usePoolToTokens = (pool: FormattedIndexPool) => {
   ]);
 };
 
+export const usePoolQuickswapLink = (poolAddress: string) => {
+  const poolAddressToQuickswapToken: Record<string, string> = {
+    // CC10
+    "0x17ac188e09a7890a1844e5e65471fe8b0ccfadf3":
+      "0x9c49ba0212bb5db371e66b59d1565b7c06e4894e",
+    // DEFI5
+    "0xfa6de2697d59e88ed7fc4dfe5a33dac43565ea41":
+      "0x42435f467d33e5c4146a4e8893976ef12bbce762",
+    // DEGEN
+    "0x126c121f99e1e211df2e5f8de2d96fa36647c855":
+      "0x8a2870fb69a90000d6439b7adfb01d4ba383a415",
+  };
+  const quickswapToken = poolAddressToQuickswapToken[poolAddress];
+
+  return quickswapToken
+    ? `https://info.quickswap.exchange/token/${quickswapToken}`
+    : "";
+};
+
 export function createPoolDetailCalls(poolAddress: string, tokenIds: string[]) {
   const target = poolAddress;
   const interfaceKind = "IPool_ABI";

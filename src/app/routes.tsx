@@ -69,7 +69,7 @@ const routes: Route[] = [
     icon: <RiSafe2Line />,
     path: "/portfolio",
     exact: true,
-    sider: "Portfolio",
+    sider: "PORTFOLIO",
     screen: <Portfolio />,
   },
   {
