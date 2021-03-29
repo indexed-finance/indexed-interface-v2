@@ -16,6 +16,7 @@ import { useBreakpoints } from "helpers";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useFormikContext } from "formik";
 import { useSelector } from "react-redux";
+import { useTranslation } from "i18n";
 
 export type TokenSelectorValue = {
   amount?: number;
@@ -33,7 +34,6 @@ export interface Props {
   value?: TokenSelectorValue;
   selectable?: boolean;
   balance?: string;
-  parent?: false | HTMLElement;
   onChange?: (value: TokenSelectorValue) => void;
 }
 
@@ -41,12 +41,12 @@ export default function TokenSelector({
   label = "",
   assets,
   value = {},
-  parent = false,
   selectable = true,
   onChange,
 }: Props) {
-  const tokenField = `${label.toLowerCase()}Token`;
-  const amountField = `${label.toLowerCase()}Amount`;
+  const translate = useTranslation();
+  const tokenField = `${label.toLowerCase()} Token`;
+  const amountField = `${label.toLowerCase()} Amount`;
   const { setTouched } = useFormikContext<any>();
   const [amount, setAmount] = useState(value?.amount ?? 0);
   const [token, setToken] = useState(value?.token ?? "");
@@ -161,12 +161,12 @@ export default function TokenSelector({
                         onClick={handleMaxOut}
                         style={{ fontSize: 12 }}
                       >
-                        MAX
+                        {translate("MAX")}
                       </Button>
                     )}
                   </>
                 ) : (
-                  "No Balance"
+                  translate("NO_BALANCE")
                 )}
               </Typography.Text>
             ) : (
@@ -209,7 +209,7 @@ export default function TokenSelector({
                   </>
                 ) : (
                   <div className="fancy" style={{ fontSize: 12 }}>
-                    Select one
+                    {translate("SELECT_ONE")}
                   </div>
                 )}
                 {selectable && <AiOutlineCaretDown />}
@@ -239,7 +239,7 @@ export default function TokenSelector({
               <Input.Search
                 name="tokens"
                 size="large"
-                placeholder="Search tokens"
+                placeholder={translate("SEARCH_TOKENS")}
                 enterButton
               />
             </AutoComplete>
@@ -256,7 +256,7 @@ export default function TokenSelector({
               onClick={handleCloseTokenSelection}
               style={{ width: "100%" }}
             >
-              Close
+              {translate("CLOSE")}
             </Button>
           }
         >

@@ -1,8 +1,10 @@
 import { Switch } from "antd";
 import { actions, selectors } from "features";
 import { useDispatch, useSelector } from "react-redux";
+import { useTranslation } from "i18n";
 
 export default function ModeSwitch() {
+  const translate = useTranslation();
   const dispatch = useDispatch();
   const theme = useSelector(selectors.selectTheme);
 
@@ -12,13 +14,13 @@ export default function ModeSwitch() {
       checkedChildren={
         theme === "outrun" ? (
           <div className="perfectly-centered">
-            <OutrunEmoji /> Outrun
+            <OutrunEmoji /> {translate("OUTRUN")}
           </div>
         ) : (
-          "🌙 Dark"
+          `🌙 ${translate("DARK")}`
         )
       }
-      unCheckedChildren="🔆 Light"
+      unCheckedChildren={`🔆 ${translate("LIGHT")}`}
       onClick={() => dispatch(actions.themeToggled())}
     />
   );

@@ -18,6 +18,7 @@ import { useCallback, useMemo } from "react";
 import { useFormikContext } from "formik";
 import { useSelector } from "react-redux";
 import { useSwapCallbacks } from "hooks";
+import { useTranslation } from "i18n";
 import BaseInteraction, { InteractionValues } from "./BaseInteraction";
 import flags from "feature-flags";
 
@@ -26,6 +27,7 @@ interface Props {
 }
 
 export default function SwapInteraction({ pool }: Props) {
+  const translate = useTranslation();
   const {
     calculateAmountIn,
     calculateAmountOut,
@@ -126,7 +128,7 @@ export default function SwapInteraction({ pool }: Props) {
 
   return (
     <BaseInteraction
-      title="Swap"
+      title={translate("SWAP")}
       assets={pool.assets}
       spender={pool.id}
       onSubmit={handleSubmit}

@@ -10,7 +10,7 @@ export default function Flipper({ disabled, onFlip }: Props) {
   return (
     <Divider style={{ marginBottom: 0 }}>
       <Button type="default" onClick={onFlip}>
-        { disabled ? <MdArrowDownward /> : <MdSwapCalls /> }
+        {disabled ? <MdArrowDownward /> : <MdSwapCalls />}
       </Button>
     </Divider>
   );

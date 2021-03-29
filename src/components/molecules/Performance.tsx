@@ -1,8 +1,10 @@
 import { FormattedIndexPool } from "features";
 import { Space, Statistic } from "antd";
 import { useBreakpoints } from "helpers";
+import { useTranslation } from "i18n";
 
 export default function Performance({ pool }: { pool: FormattedIndexPool }) {
+  const translate = useTranslation();
   const { isMobile } = useBreakpoints();
 
   return (
@@ -18,22 +20,22 @@ export default function Performance({ pool }: { pool: FormattedIndexPool }) {
       }}
     >
       <Statistic
-        title="Total Value Locked"
+        title={translate("TOTAL_VALUE_LOCKED")}
         value={pool.totalValueLocked}
         style={{ flex: 1, textAlign: "center" }}
       />
       <Statistic
-        title="Volume"
+        title={translate("VOLUME")}
         value={pool.volume}
         style={{ flex: 1, textAlign: "center" }}
       />
       <Statistic
-        title="Cumulative Fees"
+        title={translate("CUMULATIVE_FEES")}
         value={pool.cumulativeFee}
         style={{ flex: 1, textAlign: "center" }}
       />
       <Statistic
-        title="Swap Fee"
+        title={translate("SWAP_FEE")}
         value={pool.swapFee}
         style={{ flex: 1, textAlign: "center" }}
       />

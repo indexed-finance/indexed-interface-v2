@@ -16,8 +16,10 @@ import {
 import { buildUniswapPairs, useEthPrice } from "hooks";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useMemo } from "react";
+import { useTranslation } from "i18n";
 
 export default function Portfolio() {
+  const translate = useTranslation();
   const dispatch = useDispatch();
   const pools = useSelector(selectors.selectAllPools);
   const poolsToTokens = pools.reduce((prev, next) => {
@@ -50,7 +52,7 @@ export default function Portfolio() {
   return (
     <div>
       <ProviderRequirementDrawer includeSignerRequirement={true} />
-      <ScreenHeader title="Portfolio" />
+      <ScreenHeader title={translate("PORTFOLIO")} />
       {formattedPortfolio ? (
         <>
           <Space
@@ -65,7 +67,7 @@ export default function Portfolio() {
           </Space>
           <Divider />
           <Typography.Title style={{ textAlign: "right" }}>
-            Total Value:{" "}
+            {translate("TOTAL_VALUE")}{" "}
             <Typography.Text type="success">
               {formattedPortfolio.totalValue}
             </Typography.Text>

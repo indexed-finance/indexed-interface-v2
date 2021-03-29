@@ -1,6 +1,7 @@
 import { Alert, Space, Statistic } from "antd";
 import { Token } from "components/atoms";
 import { convert, useBreakpoints } from "helpers";
+import { useTranslation } from "i18n";
 
 export interface Props {
   baseline: string;
@@ -15,6 +16,7 @@ export default function TokenExchangeRate({
   fee,
   rate,
 }: Props) {
+  const translate = useTranslation();
   const { isMobile } = useBreakpoints();
   const converted = convert.toComma(
     typeof rate === "number" ? rate : parseFloat(rate)
@@ -29,7 +31,7 @@ export default function TokenExchangeRate({
           className={isMobile ? "" : "spaced-between"}
         >
           <Statistic
-            title="Exchange Rate"
+            title={translate("EXCHANGE_RATE")}
             valueRender={() => (
               <div className="spaced-between">
                 <Space style={{ marginRight: 8 }}>

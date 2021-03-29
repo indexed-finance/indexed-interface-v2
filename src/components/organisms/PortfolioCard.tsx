@@ -4,6 +4,7 @@ import { IndexCard } from "components/molecules";
 import { Link } from "react-router-dom";
 import { Progress } from "components/atoms";
 import { useBreakpoints } from "helpers";
+import { useTranslation } from "i18n";
 
 export default function PortfolioCard({
   address,
@@ -16,14 +17,20 @@ export default function PortfolioCard({
   staking,
   weight,
 }: FormattedPortfolioDatum) {
+  const translate = useTranslation();
   const { isMobile } = useBreakpoints();
 
   let ribbonText = "";
 
   if (earned && earned !== "0.00") {
-    ribbonText = `Earned ${earned} NDX`;
+    ribbonText = translate("EARNED_X_NDX", {
+      __x: earned,
+    });
   } else if (staking) {
-    ribbonText = `Staking ${staking} ${symbol}`;
+    ribbonText = translate("STAKING_X_Y", {
+      __x: staking,
+      __y: symbol,
+    });
   }
 
   const card = (
@@ -34,11 +41,11 @@ export default function PortfolioCard({
       subtitle={symbol}
       actions={[
         {
-          title: "Balance (in tokens)",
+          title: translate("BALANCE_IN_TOKENS"),
           value: `${balance} ${symbol}`,
         },
         {
-          title: "Value (in USD)",
+          title: translate("VALUE_IN_USD"),
           value: <Typography.Text type="success">{value}</Typography.Text>,
         },
       ]}

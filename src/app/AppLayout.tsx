@@ -7,6 +7,7 @@ import { Route, Switch as RouterSwitch } from "react-router-dom";
 import { useBreakpoints } from "helpers";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useTranslation } from "i18n";
 import AppHeader from "./AppHeader";
 import AppMenu from "./AppMenu";
 import SocketClient from "sockets/client";
@@ -15,6 +16,7 @@ import routes from "./routes";
 const { Sider, Content } = Layout;
 
 export default function AppLayout() {
+  const translate = useTranslation();
   const dispatch = useDispatch();
   const isConnectionEnabled = useSelector(selectors.selectConnectionEnabled);
   const indexPools = useSelector(selectors.selectAllFormattedIndexPools);
@@ -92,7 +94,7 @@ export default function AppLayout() {
                   type="primary"
                   onClick={() => dispatch(actions.attachToProvider())}
                 >
-                  Connect wallet
+                  {translate("DISCONNECT")}
                 </Button>
               </div>
             )}

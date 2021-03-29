@@ -3,9 +3,11 @@ import { IndexCard } from "components/molecules";
 import { Link } from "react-router-dom";
 import { useBreakpoints } from "helpers";
 import { useStakingApy } from "hooks/use-staking-apy";
+import { useTranslation } from "i18n";
 import type { FormattedStakingData } from "features";
 
 export default function StakingCard(props: FormattedStakingData) {
+  const translate = useTranslation();
   const {
     id,
     rate,
@@ -22,22 +24,22 @@ export default function StakingCard(props: FormattedStakingData) {
   const isExpired = apy === "Expired";
   const commonActions = [
     {
-      title: "Rate",
+      title: translate("RATE"),
       value: rate,
     },
     {
-      title: "Earned",
+      title: translate("EARNED"),
       value: earned,
     },
   ];
   const actions = isMobile
     ? [
         {
-          title: "APY",
+          title: translate("APY"),
           value: apy,
         },
         {
-          title: "Staked",
+          title: translate("STAKED"),
           value: staked,
         },
         ...commonActions,
@@ -75,19 +77,19 @@ export default function StakingCard(props: FormattedStakingData) {
       {!isMobile && (
         <Space style={{ width: "100%", justifyContent: "space-evenly" }}>
           <Statistic
-            title="APY"
+            title={translate("APY")}
             valueStyle={{
               color: apy === "Expired" ? "grey" : "",
             }}
             value={apy ?? ""}
           />
-          <Statistic title="Staked" value={staked} />
+          <Statistic title={translate("STAKED")} value={staked} />
           <Button
             type="primary"
             disabled={isExpired}
             style={{ minWidth: 200, justifySelf: "center" }}
           >
-            {isExpired ? "Staking expired" : "Stake pool"}
+            {isExpired ? translate("STAKING_EXPIRED") : translate("STAKE_POOL")}
           </Button>
         </Space>
       )}

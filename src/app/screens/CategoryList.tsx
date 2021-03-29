@@ -3,23 +3,27 @@ import { Link } from "react-router-dom";
 import { Space } from "antd";
 import { selectors } from "features";
 import { useSelector } from "react-redux";
+import { useTranslation } from "i18n";
 
 interface Props {
   withBreadcrumb?: boolean;
 }
 
 export default function CategoryList({ withBreadcrumb = true }: Props) {
+  const translate = useTranslation();
   const categories = useSelector(selectors.selectAllFormattedCategories);
   const headerProps = withBreadcrumb
     ? {
         overlay: <CategoryDropdown />,
-        activeBreadcrumb: <Link to="/categories">Categories</Link>,
+        activeBreadcrumb: (
+          <Link to="/categories">{translate("CATEGORIES")}</Link>
+        ),
       }
     : {};
 
   return (
     <>
-      <ScreenHeader title="Categories" {...headerProps} />
+      <ScreenHeader title={translate("CATEGORIES")} {...headerProps} />
       <Space size="large" style={{ width: "100%" }} wrap={true}>
         {categories.map((category) => (
           <div style={{ flex: "1 1 50%" }} key={category!.id}>

@@ -3,6 +3,7 @@ import { IndexCard, Quote } from "components/molecules";
 import { Progress, Token } from "components/atoms";
 import { Space, Spin, Typography } from "antd";
 import { convert, useBreakpoints } from "helpers";
+import { useTranslation } from "i18n";
 
 export interface Props {
   token: Asset;
@@ -10,6 +11,7 @@ export interface Props {
 }
 
 export default function RankedToken({ token }: Props) {
+  const translate = useTranslation();
   const { isMobile } = useBreakpoints();
 
   return (
@@ -41,11 +43,11 @@ export default function RankedToken({ token }: Props) {
         }
         actions={[
           {
-            title: "Balance (in tokens)",
+            title: translate("BALANCE_IN_TOKENS"),
             value: `${token.balance} ${token.symbol}`,
           },
           {
-            title: "Balance (in USD)",
+            title: translate("BALANCE_IN_USD"),
             value: (
               <Typography.Text type="success">
                 {token.balanceUsd ? (

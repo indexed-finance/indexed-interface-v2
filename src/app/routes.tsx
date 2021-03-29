@@ -17,12 +17,13 @@ import { ReactNode } from "react";
 import { RiSafe2Line } from "react-icons/ri";
 import flags from "feature-flags";
 import type { AppState } from "features";
+import type { TranslatedTerm } from "i18n";
 
 type Route = {
   icon?: ReactNode;
   path: string;
   exact: boolean;
-  sider?: ReactNode;
+  sider?: TranslatedTerm | ReactNode;
   screen: ReactNode;
   model?: keyof AppState;
   isExternalLink?: boolean;
@@ -38,14 +39,14 @@ const routes: Route[] = [
   {
     path: "/pools",
     exact: true,
-    sider: "Pools",
+    sider: "POOLS",
     screen: <PoolList />,
     model: "indexPools",
   },
   {
     path: "/categories",
     exact: true,
-    sider: "Categories",
+    sider: "CATEGORIES",
     screen: <CategoryList />,
     model: "categories",
   },
@@ -75,7 +76,7 @@ const routes: Route[] = [
     icon: <GiStakeHammer />,
     path: "/stake",
     exact: true,
-    sider: "Stake",
+    sider: "STAKE",
     screen: <Stake />,
   },
   {

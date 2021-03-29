@@ -3,6 +3,7 @@ import { Link, useHistory } from "react-router-dom";
 import { List, Typography } from "antd";
 import { toFormattedAsset } from "ethereum";
 import { useSelector } from "react-redux";
+import { useTranslation } from "i18n";
 import ListCard from "./ListCard";
 import type { Token as TokenType } from "indexed-types";
 
@@ -36,6 +37,7 @@ export default function CategoryCard({
     entities: {},
   },
 }: Props) {
+  const translate = useTranslation();
   const category = useSelector((state: AppState) =>
     selectors.selectCategory(state, id)
   );
@@ -58,7 +60,11 @@ export default function CategoryCard({
     >
       {brief}
       <List
-        header={<Typography.Text type="secondary">Index Pools</Typography.Text>}
+        header={
+          <Typography.Text type="secondary">
+            {translate("INDEX_POOLS")}
+          </Typography.Text>
+        }
       >
         {indexPools.map((indexPool) => (
           <List.Item key={indexPool.name}>

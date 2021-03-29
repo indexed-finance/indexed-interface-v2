@@ -12,6 +12,7 @@ import { convert } from "helpers";
 import { downwardSlippage, upwardSlippage } from "ethereum";
 import { useSelector } from "react-redux";
 import { useSingleTokenBurnCallbacks } from "hooks/use-burn-callbacks";
+import { useTranslation } from "i18n";
 import BaseInteraction, { InteractionValues } from "./BaseInteraction";
 import BigNumber from "bignumber.js";
 import useBurnRouterCallbacks from "hooks/use-burn-router-callbacks";
@@ -47,6 +48,7 @@ export default function BurnInteraction({ pool }: Props) {
 }
 
 function SingleTokenBurnInteraction({ pool }: Props) {
+  const translate = useTranslation();
   const poolId = pool.id;
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
   const poolsToTokens = usePoolToTokens(pool);
@@ -144,7 +146,7 @@ function SingleTokenBurnInteraction({ pool }: Props) {
 
   return (
     <BaseInteraction
-      title="Burn"
+      title={translate("BURN")}
       assets={pool.assets}
       spender={poolId}
       onSubmit={handleSubmit}
@@ -157,6 +159,7 @@ function SingleTokenBurnInteraction({ pool }: Props) {
 }
 
 function UniswapBurnInteraction({ pool }: Props) {
+  const translate = useTranslation();
   const poolId = pool.id;
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
   const poolsToTokens = usePoolToTokens(pool);
@@ -263,7 +266,7 @@ function UniswapBurnInteraction({ pool }: Props) {
 
   return (
     <BaseInteraction
-      title="Burn with Uniswap"
+      title={translate("BURN_WITH_UNISWAP")}
       assets={
         assets.filter((_) => _) as {
           name: string;

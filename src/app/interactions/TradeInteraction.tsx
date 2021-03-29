@@ -11,6 +11,7 @@ import { Trade } from "@uniswap/sdk";
 import { convert } from "helpers";
 import { useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useTranslation } from "i18n";
 import { useUniswapTradingPairs } from "hooks";
 import BaseInteraction, { InteractionValues } from "./BaseInteraction";
 
@@ -19,6 +20,7 @@ interface Props {
 }
 
 export default function TradeInteraction({ pool }: Props) {
+  const translate = useTranslation();
   const dispatch = useDispatch();
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
   const tokenIds = useMemo(
@@ -138,7 +140,7 @@ export default function TradeInteraction({ pool }: Props) {
 
   return (
     <BaseInteraction
-      title="Trade"
+      title={translate("TRADE")}
       assets={assets as any}
       spender={UNISWAP_ROUTER_ADDRESS}
       defaultInputSymbol={COMMON_BASE_TOKENS[0].symbol}

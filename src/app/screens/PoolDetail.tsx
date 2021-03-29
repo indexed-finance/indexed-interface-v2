@@ -15,6 +15,7 @@ import { Redirect, useParams } from "react-router-dom";
 import { useBreakpoints } from "helpers";
 import { usePoolDetailRegistrar } from "features";
 import { useSelector } from "react-redux";
+import { useTranslation } from "i18n";
 
 export default function PoolDetail() {
   const { poolName } = useParams<{ poolName: string }>();
@@ -35,6 +36,7 @@ export default function PoolDetail() {
 }
 
 function Pool({ id }: { id: string }) {
+  const translate = useTranslation();
   const pool = useSelector((state: AppState) =>
     selectors.selectFormattedIndexPool(state, id)
   );
@@ -48,12 +50,12 @@ function Pool({ id }: { id: string }) {
   if (pool) {
     const performance = <Performance pool={pool} />;
     const chart = (
-      <Subscreen title="Performance">
+      <Subscreen title={translate("PERFORMANCE")}>
         {id ? <ChartCard poolId={id} /> : null}
       </Subscreen>
     );
     const assets = (
-      <Subscreen title="Assets">
+      <Subscreen title={translate("ASSETS")}>
         <Space
           wrap={true}
           align="start"
@@ -67,7 +69,7 @@ function Pool({ id }: { id: string }) {
       </Subscreen>
     );
     const interactions = (
-      <Subscreen title="Interactions">
+      <Subscreen title={translate("ASSETS")}>
         <ProviderRequirementDrawer includeSignerRequirement={true} />
         <PoolInteractions pool={pool} />
       </Subscreen>
@@ -114,7 +116,7 @@ function Pool({ id }: { id: string }) {
         <ScreenHeader
           title={pool.name}
           overlay={<PoolDropdown />}
-          activeBreadcrumb={<Link to="/pools">Index Pools</Link>}
+          activeBreadcrumb={<Link to="/pools">{translate("INDEX_POOLS")}</Link>}
         />
         {performance}
         {(() => {

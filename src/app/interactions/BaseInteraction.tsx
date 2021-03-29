@@ -9,6 +9,7 @@ import { convert } from "helpers";
 import { selectors } from "features";
 import { useSelector } from "react-redux";
 import { useTokenApproval, useTokenRandomizer } from "hooks";
+import { useTranslation } from "i18n";
 
 type Asset = { name: string; symbol: string; id: string };
 
@@ -56,7 +57,6 @@ export default function BaseInteraction({
   requiresApproval = true,
 }: Props) {
   const interactionRef = useRef<null | HTMLDivElement>(null);
-  const interactionParent = interactionRef.current ?? false;
 
   return (
     <div
@@ -87,7 +87,6 @@ export default function BaseInteraction({
               assets={assets}
               spender={spender}
               extra={extra}
-              parent={interactionParent ?? false}
               onSubmit={onSubmit}
               onChange={onChange}
               defaultInputSymbol={defaultInputSymbol}
@@ -103,16 +102,12 @@ export default function BaseInteraction({
   );
 }
 
-type InnerProps = Omit<Props, "title"> &
-  FormikProps<InteractionValues> & {
-    parent: false | HTMLDivElement;
-  };
+type InnerProps = Omit<Props, "title"> & FormikProps<InteractionValues>;
 
 function InteractionInner({
   spender,
   assets,
   extra,
-  parent,
   values,
   isValid,
   handleSubmit,
@@ -126,6 +121,7 @@ function InteractionInner({
   disableOutputSelect,
   requiresApproval,
 }: InnerProps) {
+  const translate = useTranslation();
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
   const [tokenId, exactAmountIn] = useMemo(() => {
     if (values.fromToken && values.fromAmount) {
@@ -196,9 +192,8 @@ function InteractionInner({
     <>
       {/* // Fields */}
       <TokenSelector
-        label="From"
+        label={translate("FROM")}
         assets={inputOptions}
-        parent={parent ?? false}
         value={{
           token: values.fromToken,
           amount: values.fromAmount,
@@ -226,9 +221,8 @@ function InteractionInner({
       <Flipper disabled={disableFlip} onFlip={handleFlip} />
 
       <TokenSelector
-        label="To"
+        label={translate("TO")}
         assets={outputOptions}
-        parent={parent ?? false}
         value={{
           token: values.toToken,
           amount: values.toAmount,

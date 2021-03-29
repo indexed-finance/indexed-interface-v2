@@ -3,15 +3,67 @@ import { IndexCard } from "components/molecules";
 import { Table } from "antd";
 import { useBreakpoints } from "helpers";
 import { useHistory } from "react-router-dom";
-import S from "string";
+import { useMemo } from "react";
+import { useTranslation } from "i18n";
 
 export type Props = {
   pools: FormattedCategory["indexPools"];
 };
 
 export default function CategoryTable({ pools }: Props) {
+  const translate = useTranslation();
   const history = useHistory();
   const { isMobile } = useBreakpoints();
+  const columns = useMemo(
+    () => [
+      {
+        title: translate("SYMBOL"),
+        dataIndex: "symbol",
+        key: "symbol",
+      },
+      {
+        title: translate("SIZE"),
+        dataIndex: "size",
+        key: "size",
+      },
+      {
+        title: translate("PRICE"),
+        dataIndex: "price",
+        key: "price",
+      },
+      {
+        title: translate("SUPPLY"),
+        dataIndex: "supply",
+        key: "supply",
+      },
+      {
+        title: translate("MARKET_CAP"),
+        dataIndex: "marketCap",
+        key: "marketCap",
+      },
+      {
+        title: translate("SWAP_FEE"),
+        dataIndex: "swapFee",
+        key: "swapFee",
+      },
+      {
+        title: translate("CUMULATIVE_FEES"),
+        dataIndex: "cumulativeFees",
+        key: "cumulativeFees",
+      },
+      {
+        title: translate("VOLUME"),
+        dataIndex: "volume",
+        key: "volume",
+      },
+      {
+        title: "",
+        dataIndex: "action",
+        key: "action",
+      },
+    ],
+    [translate]
+  );
 
   return isMobile ? (
     <>
@@ -22,7 +74,7 @@ export default function CategoryTable({ pools }: Props) {
           actions={Object.entries(pool)
             .filter(([key]) => !["name", "slug", "id"].includes(key))
             .map(([key, value]) => ({
-              title: S(key).humanize().s,
+              title: columns.find((column) => column.key === key)?.title ?? "",
               value,
             }))}
         >
@@ -41,51 +93,3 @@ export default function CategoryTable({ pools }: Props) {
     />
   );
 }
-
-const columns = [
-  {
-    title: "Symbol",
-    dataIndex: "symbol",
-    key: "symbol",
-  },
-  {
-    title: "Size",
-    dataIndex: "size",
-    key: "size",
-  },
-  {
-    title: "Price",
-    dataIndex: "price",
-    key: "price",
-  },
-  {
-    title: "Supply",
-    dataIndex: "supply",
-    key: "supply",
-  },
-  {
-    title: "Market Cap",
-    dataIndex: "marketCap",
-    key: "marketCap",
-  },
-  {
-    title: "Swap Fee",
-    dataIndex: "swapFee",
-    key: "swapFee",
-  },
-  {
-    title: "Cumulative Fees",
-    dataIndex: "cumulativeFees",
-    key: "cumulativeFees",
-  },
-  {
-    title: "Volume",
-    dataIndex: "volume",
-    key: "volume",
-  },
-  {
-    title: "",
-    dataIndex: "action",
-    key: "action",
-  },
-];

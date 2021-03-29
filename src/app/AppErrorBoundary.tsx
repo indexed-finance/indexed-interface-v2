@@ -2,6 +2,7 @@ import { Component, ReactNode, useEffect } from "react";
 import { actions } from "features";
 import { message } from "antd";
 import { useDispatch } from "react-redux";
+import { useTranslation } from "i18n";
 
 export default class AppErrorBoundary extends Component<
   {
@@ -52,19 +53,15 @@ function ErrorHandler({
   children: ReactNode;
   onResolved(): void;
 }) {
+  const translate = useTranslation();
   const dispatch = useDispatch();
 
   useEffect(() => {
-    message.error(
-      <>
-        An unknown error has occurred. <br /> If this happens again, please
-        report this as a bug.
-      </>
-    );
+    message.error(translate("AN_UNKNOWN_ERROR_HAS_OCCURRED_..."));
 
     dispatch(actions.restartedDueToError());
     onResolved();
-  }, [dispatch, onResolved]);
+  }, [dispatch, onResolved, translate]);
 
   return <>{children}</>;
 }

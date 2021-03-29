@@ -1,12 +1,14 @@
 import { Skeleton, Tabs } from "antd";
 import { TransactionCard } from "components";
 import { useState } from "react";
+import { useTranslation } from "i18n";
 import Subscreen from "./Subscreen";
 import type { FormattedIndexPool } from "features";
 
 const { TabPane } = Tabs;
 
 export default function Recent({ pool }: { pool: FormattedIndexPool }) {
+  const translate = useTranslation();
   const [mode, setMode] = useState("Trades");
   const tradesEmpty = pool.recent.trades.length === 0;
   const swapsEmpty = pool.recent.swaps.length === 0;
@@ -23,7 +25,7 @@ export default function Recent({ pool }: { pool: FormattedIndexPool }) {
         activeKey={mode}
         onChange={(next) => setMode(next)}
       >
-        <TabPane tab="Trades" key="Trades">
+        <TabPane tab={translate("TRADES")} key="Trades">
           <div
             style={{
               display: "flex",
@@ -41,7 +43,7 @@ export default function Recent({ pool }: { pool: FormattedIndexPool }) {
                 ))}
           </div>
         </TabPane>
-        <TabPane tab="Swaps" key="Swaps">
+        <TabPane tab={translate("SWAPS")} key="Swaps">
           <div
             style={{
               display: "flex",

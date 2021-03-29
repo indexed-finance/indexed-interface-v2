@@ -4,6 +4,7 @@ import { Space, Typography } from "antd";
 import { Token } from "components/atoms";
 import { selectors } from "features";
 import { useSelector } from "react-redux";
+import { useTranslation } from "i18n";
 import type { Transaction } from "features";
 
 export default function TransactionCard({
@@ -14,6 +15,7 @@ export default function TransactionCard({
   amount,
   kind,
 }: Transaction) {
+  const translate = useTranslation();
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
 
   return (
@@ -35,8 +37,14 @@ export default function TransactionCard({
         hoverable={true}
         actions={[
           {
-            title: "When?",
-            value: <span style={{ fontSize: 12 }}>{when} ago</span>,
+            title: translate("WHEN"),
+            value: (
+              <span style={{ fontSize: 12 }}>
+                {translate("ABOUT_X_MINUTES_AGO", {
+                  __x: when,
+                })}
+              </span>
+            ),
           },
         ]}
       >

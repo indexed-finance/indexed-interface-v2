@@ -4,6 +4,7 @@ import DEFAULT_TRANSLATION_SET from "./translations/en-us.json";
 import selectors from "../features/selectors";
 
 export type SupportedLanguageCode = "en-us" | "es-mx" | "zh-cn";
+export type TranslatedTerm = keyof typeof DEFAULT_TRANSLATION_SET;
 
 export function createTranslator(languageCode: SupportedLanguageCode) {
   let translationSet: Record<string, string>;
@@ -15,7 +16,7 @@ export function createTranslator(languageCode: SupportedLanguageCode) {
   }
 
   return function translate(
-    term: keyof typeof DEFAULT_TRANSLATION_SET,
+    term: TranslatedTerm,
     variables: Record<string, number | string> = {}
   ) {
     for (const variable of Object.keys(variables)) {

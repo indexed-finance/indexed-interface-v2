@@ -3,6 +3,7 @@ import { Card, Menu, Select, Space, Typography } from "antd";
 import { useBreakpoints } from "helpers";
 import { useCallback, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
+import { useTranslation } from "i18n";
 import LineSeriesChart from "./LineSeriesChart";
 import Quote from "./Quote";
 import type { SnapshotKey } from "features/dailySnapshots/slice";
@@ -15,6 +16,7 @@ export interface Props {
 }
 
 export default function ChartCard({ poolId, expanded = false }: Props) {
+  const translate = useTranslation();
   const theme = useSelector(selectors.selectTheme);
   const [timeframe, setTimeframe] = useState<Timeframe>("Day");
   const [key, setKey] = useState<SnapshotKey>("value");
@@ -51,22 +53,27 @@ export default function ChartCard({ poolId, expanded = false }: Props) {
           marginBottom: isMobile ? -10 : 0,
         }}
       >
-        Timeframe
+        {translate("TIMEFRAME")}
       </Typography.Paragraph>
       <Menu
         style={{ textAlign: "center", marginTop: 0 }}
         mode="horizontal"
         selectedKeys={[timeframe]}
       >
-        {["Day", "Week"].map((_timeframe) => (
-          <Menu.Item
-            key={_timeframe}
-            active={_timeframe === timeframe}
-            onClick={toggleTimeframe}
-          >
-            {_timeframe}
-          </Menu.Item>
-        ))}
+        <Menu.Item
+          key="Day"
+          active={timeframe === "Day"}
+          onClick={toggleTimeframe}
+        >
+          {translate("DAY")}
+        </Menu.Item>
+        <Menu.Item
+          key="Week"
+          active={timeframe === "Week"}
+          onClick={toggleTimeframe}
+        >
+          {translate("WEEK")}
+        </Menu.Item>
       </Menu>
     </>
   );
@@ -80,23 +87,25 @@ export default function ChartCard({ poolId, expanded = false }: Props) {
           marginBottom: isMobile ? 0 : 15,
         }}
       >
-        Criteria
+        {translate("CRITERIA")}
       </Typography.Paragraph>
       <Select
         value={key}
         style={{ width: isMobile ? "240px" : "80%" }}
         onChange={setKey}
       >
-        <Select.Option value="value">Value (in USD)</Select.Option>
-        <Select.Option value="totalSupply">Supply (in tokens)</Select.Option>
+        <Select.Option value="value">{translate("VALUE_IN_USD")}</Select.Option>
+        <Select.Option value="totalSupply">
+          {translate("SUPPLY_IN_TOKENS")}
+        </Select.Option>
         <Select.Option value="totalValueLockedUSD">
-          Total Value Locked (in USD)
+          {translate("TOTAL_VALUE_LOCKED_IN_USD")}
         </Select.Option>
         <Select.Option value="totalSwapVolumeUSD">
-          Total Swap Volume (in USD)
+          {translate("TOTAL_SWAP_VOLUME_IN_USD")}
         </Select.Option>
         <Select.Option value="feesTotalUSD">
-          Total Swap Fees (in USD)
+          {translate("TOTAL_SWAP_FEES_IN_USD")}
         </Select.Option>
       </Select>
     </>

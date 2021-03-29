@@ -3,6 +3,7 @@ import { FaCoins, FaFireAlt, FaHammer } from "react-icons/fa";
 import { Link, useParams } from "react-router-dom";
 import { Tabs } from "antd";
 import { useBreakpoints } from "helpers";
+import { useTranslation } from "i18n";
 import BurnInteraction from "./BurnInteraction";
 import MintInteraction from "./MintInteraction";
 import SwapInteraction from "./SwapInteraction";
@@ -25,6 +26,7 @@ interface Props {
 }
 
 export default function PoolInteractions({ pool }: Props) {
+  const translate = useTranslation();
   const { poolName, interaction: activeInteraction = "swap" } = useParams<{
     poolName: string;
     interaction: PoolInteraction;
@@ -47,7 +49,7 @@ export default function PoolInteractions({ pool }: Props) {
             key="trade"
             tab={
               <Link to={`/pools/${poolName}/trade`}>
-                <FaCoins /> {!isMobile && <span>Trade</span>}
+                <FaCoins /> {!isMobile && <span>{translate("TRADE")}</span>}
               </Link>
             }
           >
@@ -58,7 +60,8 @@ export default function PoolInteractions({ pool }: Props) {
             key="swap"
             tab={
               <Link to={`/pools/${poolName}/swap`}>
-                <AiOutlineSwap /> {!isMobile && <span>Swap</span>}
+                <AiOutlineSwap />{" "}
+                {!isMobile && <span>{translate("SWAP")}</span>}
               </Link>
             }
           >
@@ -69,7 +72,7 @@ export default function PoolInteractions({ pool }: Props) {
             key="mint"
             tab={
               <Link to={`/pools/${poolName}/mint`}>
-                <FaHammer /> {!isMobile && <span>Mint</span>}
+                <FaHammer /> {!isMobile && <span>{translate("MINT")}</span>}
               </Link>
             }
           >
@@ -80,7 +83,7 @@ export default function PoolInteractions({ pool }: Props) {
             key="burn"
             tab={
               <Link to={`/pools/${poolName}/burn`}>
-                <FaFireAlt /> {!isMobile && <span>Burn</span>}
+                <FaFireAlt /> {!isMobile && <span>{translate("BURN")}</span>}
               </Link>
             }
           >

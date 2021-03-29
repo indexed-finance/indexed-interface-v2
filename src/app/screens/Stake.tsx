@@ -4,14 +4,19 @@ import { Staking } from "../subscreens";
 import { actions, selectors, useStakingRegistrar } from "features";
 import { useBreakpoints } from "helpers";
 import { useSelector } from "react-redux";
+import { useTranslation } from "i18n";
 
 export default function Stake() {
+  const translate = useTranslation();
   const staking = useSelector(selectors.selectFormattedStaking);
   const indexTokens = (
-    <Staking title="Index Tokens" data={staking.indexTokens} />
+    <Staking title={translate("INDEX_TOKENS")} data={staking.indexTokens} />
   );
   const liquidityTokens = (
-    <Staking title="Liquidity Tokens" data={staking.liquidityTokens} />
+    <Staking
+      title={translate("LIQUIDITY_TOKENS")}
+      data={staking.liquidityTokens}
+    />
   );
   const breakpoints = useBreakpoints();
 
@@ -33,11 +38,12 @@ export default function Stake() {
 
   return (
     <>
-      <ScreenHeader title="Stake" />
-      <Typography.Title level={2}>Liquidity mining</Typography.Title>
+      <ScreenHeader title={translate("STAKE")} />
+      <Typography.Title level={2}>
+        {translate("LIQUIDITY_MINING")}
+      </Typography.Title>
       <Typography.Paragraph>
-        Stake index tokens or their associated Uniswap liquidity tokens to earn
-        NDX, the governance token for Indexed Finance.
+        {translate("STAKE_INDEX_TOKENS_...")}
       </Typography.Paragraph>
       <div style={{ marginTop: 50 }}>
         {(() => {

@@ -13,6 +13,7 @@ import { convert } from "helpers";
 import { downwardSlippage, upwardSlippage } from "ethereum";
 import { useSelector } from "react-redux";
 import { useSingleTokenMintCallbacks } from "hooks/use-mint-callbacks";
+import { useTranslation } from "i18n";
 import BaseInteraction, { InteractionValues } from "./BaseInteraction";
 import BigNumber from "bignumber.js";
 import useMintRouterCallbacks from "hooks/use-mint-router-callbacks";
@@ -53,6 +54,7 @@ export default function MintInteraction({ pool }: Props) {
 }
 
 function SingleTokenMintInteraction({ pool }: Props) {
+  const translate = useTranslation();
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
   const {
     calculateAmountIn,
@@ -149,7 +151,7 @@ function SingleTokenMintInteraction({ pool }: Props) {
 
   return (
     <BaseInteraction
-      title="Mint"
+      title={translate("MINT")}
       assets={pool.assets}
       spender={pool.id}
       onSubmit={handleSubmit}
@@ -165,6 +167,7 @@ function MultiTokenMintInteraction({ pool }: Props) {
 }
 
 function UniswapMintInteraction({ pool }: Props) {
+  const translate = useTranslation();
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
   const {
     tokenIds,
@@ -276,11 +279,7 @@ function UniswapMintInteraction({ pool }: Props) {
 
   return (
     <BaseInteraction
-      title={
-        <>
-          Mint <br /> w/ Uniswap
-        </>
-      }
+      title={translate("MINT_WITH_UNISWAP")}
       assets={
         assets.filter((_) => _) as {
           name: string;

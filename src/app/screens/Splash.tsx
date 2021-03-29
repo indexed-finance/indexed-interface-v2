@@ -2,6 +2,7 @@ import { Button, Divider, Steps, Typography } from "antd";
 import { Link } from "react-router-dom";
 import { useBreakpoints } from "helpers";
 import { useEffect, useState } from "react";
+import { useTranslation } from "i18n";
 import CategoryList from "./CategoryList";
 import PoolList from "./PoolList";
 import flags from "feature-flags";
@@ -11,9 +12,12 @@ const STEP_COUNT = 3;
 const STEP_PROGRESSION_DURATION = 7500;
 
 export default function Splash() {
+  const translate = useTranslation();
   const { isMobile } = useBreakpoints();
   const [step, setStep] = useState(0);
-  const docsButton = <Button type="default">Read the Documentation</Button>;
+  const docsButton = (
+    <Button type="default">{translate("READ_THE_DOCUMENTATION")}</Button>
+  );
   const DocsButton = () =>
     flags.useInternalDocs ? (
       <Link to="/docs">{docsButton}</Link>
@@ -56,13 +60,13 @@ export default function Splash() {
   return (
     <div style={{ textAlign: "center" }}>
       <Typography.Title style={{ fontSize: isMobile ? 40 : 64 }}>
-        Decentralized Index Protocol
+        {translate("DECENTRALIZED_INDEX_PROTOCOL")}
       </Typography.Title>
       <Typography.Title level={isMobile ? 5 : 3}>
-        Passively managed, autonomous AMM pools powering the future of finance.
+        {translate("PASSIVELY_MANAGED_...")}
       </Typography.Title>
       <Typography.Title level={3}>
-        <div style={{ marginBottom: 10 }}>Get started today</div>
+        <div style={{ marginBottom: 10 }}>{translate("GET_STARTED_TODAY")}</div>
         <Button.Group style={{ flexDirection: isMobile ? "column" : "row" }}>
           <Link to="/pools">
             <Button
@@ -72,13 +76,15 @@ export default function Splash() {
                 marginBottom: isMobile ? 10 : 0,
               }}
             >
-              View Index Pools
+              {translate("VIEW_INDEX_POOLS")}
             </Button>
           </Link>
           <DocsButton />
           {flags.showFaqLink && (
             <Link to="/faq">
-              <Button type="default">Check out the FAQ</Button>
+              <Button type="default">
+                {translate("FREQUENTLY_ASKED_QUESTIONS")}
+              </Button>
             </Link>
           )}
         </Button.Group>
