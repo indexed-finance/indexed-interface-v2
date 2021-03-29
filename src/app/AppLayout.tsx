@@ -3,14 +3,22 @@ import { Button, Layout } from "antd";
 import { CSSTransition } from "react-transition-group";
 import { FormattedIndexPool, actions, selectors } from "features";
 import { Helmet } from "react-helmet";
+import {
+  ReactNode,
+  createContext,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { Route, Switch as RouterSwitch } from "react-router-dom";
 import { useBreakpoints } from "helpers";
-import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "i18n";
 import AppHeader from "./AppHeader";
 import AppMenu from "./AppMenu";
 import SocketClient from "sockets/client";
+import noop from "lodash.noop";
 import routes from "./routes";
 
 const { Sider, Content } = Layout;
@@ -103,24 +111,59 @@ export default function AppLayout() {
         )}
 
         <Content style={{ paddingRight: 10, paddingLeft: 10 }}>
-          <div className="Page">
-            {theme === "outrun" && (
-              <>
-                <div className="page-top-wall" />
-                {!breakpoints.isMobile && <div className="page-side-wall" />}
-              </>
-            )}
+          <AbovePageProvider>
+            <div className="Page">
+              {theme === "outrun" && (
+                <>
+                  <div className="page-top-wall" />
+                  {!breakpoints.isMobile && <div className="page-side-wall" />}
+                </>
+              )}
 
-            <RouterSwitch>
-              {routes.map((route, index) => (
-                <Route key={index} path={route.path} exact={route.exact}>
-                  {route.screen}
-                </Route>
-              ))}
-            </RouterSwitch>
-          </div>
+              <RouterSwitch>
+                {routes.map((route, index) => (
+                  <Route key={index} path={route.path} exact={route.exact}>
+                    {route.screen}
+                  </Route>
+                ))}
+              </RouterSwitch>
+            </div>
+          </AbovePageProvider>
         </Content>
       </Layout>
     </>
   );
 }
+
+// #region Helpers
+export type AbovePageContextType = {
+  setAbovePage(to: ReactNode): void;
+  clearAbovePage(): void;
+};
+
+export const AbovePageContext = createContext<AbovePageContextType>({
+  setAbovePage: noop,
+  clearAbovePage: noop,
+});
+
+function AbovePageProvider({ children }: { children: ReactNode }) {
+  const [abovePage, setAbovePage] = useState<ReactNode>(null);
+  const clearAbovePage = useCallback(() => setAbovePage(null), []);
+  const value = useMemo(
+    () => ({
+      setAbovePage,
+      clearAbovePage,
+    }),
+    [setAbovePage, clearAbovePage]
+  );
+
+  return (
+    <AbovePageContext.Provider value={value}>
+      <div style={{ margin: "8rem 0 auto 10rem", width: 1240 }}>
+        {abovePage}
+      </div>
+      {children}
+    </AbovePageContext.Provider>
+  );
+}
+// #endregion

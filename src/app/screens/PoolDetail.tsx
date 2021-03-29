@@ -1,3 +1,4 @@
+import { AbovePageContext } from "../AppLayout";
 import { AppState, actions, selectors } from "features";
 import {
   ChartCard,
@@ -6,6 +7,7 @@ import {
   ProviderRequirementDrawer,
   RankedToken,
   ScreenHeader,
+  UsefulLinks,
 } from "components";
 import { Col, Row, Space } from "antd";
 import { Link } from "react-router-dom";
@@ -13,6 +15,7 @@ import { PoolInteractions } from "app/interactions";
 import { Recent, Subscreen } from "app/subscreens";
 import { Redirect, useParams } from "react-router-dom";
 import { useBreakpoints } from "helpers";
+import { useContext, useEffect } from "react";
 import { usePoolDetailRegistrar } from "features";
 import { useSelector } from "react-redux";
 import { useTranslation } from "i18n";
@@ -44,8 +47,19 @@ function Pool({ id }: { id: string }) {
     selectors.selectPoolTokenIds(state, id)
   );
   const breakpoints = useBreakpoints();
+  const { setAbovePage, clearAbovePage } = useContext(AbovePageContext);
 
   usePoolDetailRegistrar(id, tokenIds, actions, selectors);
+
+  // Effect:
+  // On initial load, set the area above the page to have useful links.
+  useEffect(() => {
+    setAbovePage(<UsefulLinks address={id} />);
+
+    return () => {
+      clearAbovePage();
+    };
+  }, [setAbovePage, clearAbovePage, id]);
 
   if (pool) {
     const performance = <Performance pool={pool} />;
@@ -69,7 +83,7 @@ function Pool({ id }: { id: string }) {
       </Subscreen>
     );
     const interactions = (
-      <Subscreen title={translate("ASSETS")}>
+      <Subscreen title={translate("INTERACTIONS")}>
         <ProviderRequirementDrawer includeSignerRequirement={true} />
         <PoolInteractions pool={pool} />
       </Subscreen>
@@ -88,6 +102,7 @@ function Pool({ id }: { id: string }) {
     const tabletSized = (
       <>
         <Row gutter={25}>
+          <Col span={12}>{chart}</Col>
           <Col span={12}>
             {assets}
             {interactions}

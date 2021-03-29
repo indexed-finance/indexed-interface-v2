@@ -18,6 +18,7 @@ interface SubscreenProps extends CollapseProps {
   title?: ReactNode;
   children: ReactNode;
   defaultActions?: null | Action[];
+  showTitle?: boolean;
 }
 
 const { Panel } = Collapse;
@@ -26,6 +27,7 @@ export default function Subscreen({
   title = "",
   children,
   defaultActions = null,
+  showTitle = true,
   ...rest
 }: SubscreenProps) {
   return (
