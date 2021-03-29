@@ -40,7 +40,7 @@ export default function UsefulLinks({ address }: { address: string }) {
   return (
     <Menu mode="horizontal" selectable={false}>
       {links.map(({ text, image, makeLink }) => (
-        <Menu.Item>
+        <Menu.Item key={image}>
           <Space>
             <a
               key={image}

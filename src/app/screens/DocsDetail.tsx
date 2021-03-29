@@ -7,10 +7,10 @@ export default function DocsDetail() {
   // "/foo/bar/baz.md" -> "foo/bar/baz"
   const detail = (data as any)[window.location.pathname.slice(1).split(".")[0]];
 
-  return detail ? (
+  return (
     <>
       <ScreenHeader title="Document" />
-      <ReactMarkdown>{detail}</ReactMarkdown>
+      {detail && <ReactMarkdown>{detail}</ReactMarkdown>}
     </>
-  ) : null;
+  );
 }

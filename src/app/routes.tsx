@@ -1,32 +1,20 @@
-import {
-  CategoryDetail,
-  CategoryList,
-  DocsDetail,
-  DocsList,
-  FAQ,
-  PoolChart,
-  PoolDetail,
-  PoolList,
-  Portfolio,
-  Splash,
-  Stake,
-} from "./screens";
 import { FiExternalLink } from "react-icons/fi";
 import { GiStakeHammer } from "react-icons/gi";
-import { ReactNode } from "react";
+import { LazyExoticComponent, ReactElement, ReactNode } from "react";
 import { RiSafe2Line } from "react-icons/ri";
+import { lazy } from "react";
 import flags from "feature-flags";
 import type { AppState } from "features";
 import type { TranslatedTerm } from "i18n";
 
 type Route = {
-  icon?: ReactNode;
   path: string;
   exact: boolean;
+  icon?: ReactNode;
   sider?: TranslatedTerm | ReactNode;
-  screen: ReactNode;
   model?: keyof AppState;
   isExternalLink?: boolean;
+  screen?: LazyExoticComponent<(props: any) => ReactElement>;
 };
 
 const routes: Route[] = [
@@ -34,50 +22,50 @@ const routes: Route[] = [
     path: "/",
     exact: true,
     sider: "",
-    screen: <Splash />,
+    screen: lazy(() => import("./screens/Splash")),
   },
   {
     path: "/pools",
     exact: true,
     sider: "POOLS",
-    screen: <PoolList />,
+    screen: lazy(() => import("./screens/PoolList")),
     model: "indexPools",
   },
   {
     path: "/categories",
     exact: true,
     sider: "CATEGORIES",
-    screen: <CategoryList />,
+    screen: lazy(() => import("./screens/CategoryList")),
     model: "categories",
   },
   {
     path: "/categories/:categoryName",
     exact: true,
-    screen: <CategoryDetail />,
+    screen: lazy(() => import("./screens/CategoryDetail")),
   },
   {
     path: "/pools/:poolName/:interaction?",
     exact: false,
-    screen: <PoolDetail />,
+    screen: lazy(() => import("./screens/PoolDetail")),
   },
   {
     path: "/pools/:poolName/chart",
     exact: true,
-    screen: <PoolChart />,
+    screen: lazy(() => import("./screens/PoolChart")),
   },
   {
     icon: <RiSafe2Line />,
     path: "/portfolio",
     exact: true,
     sider: "PORTFOLIO",
-    screen: <Portfolio />,
+    screen: lazy(() => import("./screens/Portfolio")),
   },
   {
     icon: <GiStakeHammer />,
     path: "/stake",
     exact: true,
     sider: "STAKE",
-    screen: <Stake />,
+    screen: lazy(() => import("./screens/Stake")),
   },
   {
     path: "/govern",
@@ -85,7 +73,6 @@ const routes: Route[] = [
     sider: (
       <ExternalLink link="https://vote.indexed.finance/" title="Governance" />
     ),
-    screen: null,
     isExternalLink: true,
   },
 ];
@@ -95,7 +82,7 @@ if (flags.showFaqLink) {
     path: "/faq",
     exact: true,
     sider: "FAQ",
-    screen: <FAQ />,
+    screen: lazy(() => import("./screens/FAQ")),
   });
 }
 
@@ -109,7 +96,6 @@ if (flags.showNewsLink) {
         title="News"
       />
     ),
-    screen: null,
     isExternalLink: true,
   });
 }
@@ -120,12 +106,12 @@ if (flags.useInternalDocs) {
       path: "/docs",
       exact: true,
       sider: "Docs",
-      screen: <DocsList />,
+      screen: lazy(() => import("./screens/DocsList")),
     },
     {
       path: "/docs/:slug",
       exact: false,
-      screen: <DocsDetail />,
+      screen: lazy(() => import("./screens/DocsDetail")),
     }
   );
 } else {
@@ -133,7 +119,6 @@ if (flags.useInternalDocs) {
     path: "/docs",
     exact: true,
     sider: <ExternalLink link="https://docs.indexed.finance/" title="Docs" />,
-    screen: null,
     isExternalLink: true,
   });
 }

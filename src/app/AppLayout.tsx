@@ -1,5 +1,5 @@
 import { BuildingWall, QuoteCarousel } from "components";
-import { Button, Layout } from "antd";
+import { Button, Layout, Spin } from "antd";
 import { CSSTransition } from "react-transition-group";
 import { FormattedIndexPool, actions, selectors } from "features";
 import { Helmet } from "react-helmet";
@@ -12,6 +12,7 @@ import {
   useState,
 } from "react";
 import { Route, Switch as RouterSwitch } from "react-router-dom";
+import { Suspense } from "react";
 import { useBreakpoints } from "helpers";
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "i18n";
@@ -119,13 +120,22 @@ export default function AppLayout() {
                   {!breakpoints.isMobile && <div className="page-side-wall" />}
                 </>
               )}
-
               <RouterSwitch>
-                {routes.map((route, index) => (
-                  <Route key={index} path={route.path} exact={route.exact}>
-                    {route.screen}
-                  </Route>
-                ))}
+                {routes.map((route, index) => {
+                  if (route.screen) {
+                    const ScreenToShow = route.screen;
+
+                    return (
+                      <Route key={index} path={route.path} exact={route.exact}>
+                        <Suspense fallback={<Spin />}>
+                          <ScreenToShow />
+                        </Suspense>
+                      </Route>
+                    );
+                  } else {
+                    return null;
+                  }
+                })}
               </RouterSwitch>
             </div>
           </AbovePageProvider>

@@ -1,8 +1,11 @@
 import { Component, ReactNode, useEffect } from "react";
 import { actions } from "features";
 import { message } from "antd";
+import { sleep } from "helpers";
 import { useDispatch } from "react-redux";
 import { useTranslation } from "i18n";
+
+const timeInSeconds = [1, 1, 3, 5, 8, 13, 21, 99, 999];
 
 export default class AppErrorBoundary extends Component<
   {
@@ -33,11 +36,19 @@ export default class AppErrorBoundary extends Component<
       },
       "---- [Error Boundary] ----"
     );
+
+    this.state.errorHistory.push({
+      error,
+      errorInfo,
+    });
   }
 
   render() {
     return this.state.hasError ? (
-      <ErrorHandler onResolved={this.clearError}>
+      <ErrorHandler
+        onResolved={this.clearError}
+        errorCount={this.state.errorHistory.length}
+      >
         {this.props.children}
       </ErrorHandler>
     ) : (
@@ -47,9 +58,11 @@ export default class AppErrorBoundary extends Component<
 }
 
 function ErrorHandler({
+  errorCount,
   children,
   onResolved,
 }: {
+  errorCount: number;
   children: ReactNode;
   onResolved(): void;
 }) {
@@ -57,11 +70,15 @@ function ErrorHandler({
   const dispatch = useDispatch();
 
   useEffect(() => {
+    const timeToWait = timeInSeconds[errorCount] * 1000;
+
     message.error(translate("AN_UNKNOWN_ERROR_HAS_OCCURRED_..."));
 
-    dispatch(actions.restartedDueToError());
-    onResolved();
-  }, [dispatch, onResolved, translate]);
+    sleep(timeToWait).then(() => {
+      dispatch(actions.restartedDueToError());
+      onResolved();
+    });
+  }, [dispatch, onResolved, translate, errorCount]);
 
   return <>{children}</>;
 }

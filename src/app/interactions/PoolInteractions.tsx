@@ -2,13 +2,15 @@ import { AiOutlineSwap } from "react-icons/ai";
 import { FaCoins, FaFireAlt, FaHammer } from "react-icons/fa";
 import { Link, useParams } from "react-router-dom";
 import { Tabs } from "antd";
+import { lazy } from "react";
 import { useBreakpoints } from "helpers";
 import { useTranslation } from "i18n";
-import BurnInteraction from "./BurnInteraction";
-import MintInteraction from "./MintInteraction";
-import SwapInteraction from "./SwapInteraction";
-import TradeInteraction from "./TradeInteraction";
 import type { FormattedIndexPool } from "features";
+
+const BurnInteraction = lazy(() => import("./BurnInteraction"));
+const MintInteraction = lazy(() => import("./MintInteraction"));
+const SwapInteraction = lazy(() => import("./SwapInteraction"));
+const TradeInteraction = lazy(() => import("./TradeInteraction"));
 
 export type PoolInteraction =
   | "burn"
@@ -27,7 +29,7 @@ interface Props {
 
 export default function PoolInteractions({ pool }: Props) {
   const translate = useTranslation();
-  const { poolName, interaction: activeInteraction = "swap" } = useParams<{
+  const { poolName, interaction: activeInteraction = "trade" } = useParams<{
     poolName: string;
     interaction: PoolInteraction;
   }>();
