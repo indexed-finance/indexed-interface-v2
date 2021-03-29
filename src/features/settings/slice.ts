@@ -69,12 +69,19 @@ const slice = createSlice({
 export const { actions } = slice;
 
 export const selectors = {
-  selectSettings: (state: AppState) => state.settings,
-  selectTheme: (state: AppState) => selectors.selectSettings(state).theme,
-  selectConnected: (state: AppState) => state.settings.connected,
-  selectConnectionEnabled: (state: AppState) =>
-    state.settings.connectionEnabled,
-  selectLanguageName: (state: AppState) => {
+  selectSettings(state: AppState) {
+    return state.settings;
+  },
+  selectTheme(state: AppState) {
+    return state.settings.theme;
+  },
+  selectConnected(state: AppState) {
+    return state.settings.connected;
+  },
+  selectConnectionEnabled(state: AppState) {
+    return state.settings.connectionEnabled;
+  },
+  selectLanguageName(state: AppState) {
     const lookup = {
       "en-us": "English",
       "es-mx": "Spanish",
@@ -82,6 +89,9 @@ export const selectors = {
     };
 
     return lookup[state.settings.languageCode] ?? "None";
+  },
+  selectAvailableLanguages(state: AppState) {
+    // wut
   },
 };
 

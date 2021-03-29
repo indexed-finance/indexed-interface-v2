@@ -52,7 +52,7 @@ export function usePricesRegistrar(
       onChainCalls: [],
       offChainCalls: [
         {
-          function: "retrieveCoingeckoData",
+          function: "retrieveCoingeckoDataForTokens",
           args: tokenIds,
         },
       ],

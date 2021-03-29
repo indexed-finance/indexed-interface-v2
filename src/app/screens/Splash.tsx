@@ -83,25 +83,29 @@ export default function Splash() {
           )}
         </Button.Group>
       </Typography.Title>
-      <Divider />
-      <Steps current={step} responsive={true} type="navigation">
-        <Step
-          title="Foo"
-          subTitle="First thing"
-          description="Lorem ipsum dolor sit amet"
-        />
-        <Step
-          title="Bar"
-          subTitle="First thing"
-          description="Lorem ipsum dolor sit amet"
-        />
-        <Step
-          title="Baz"
-          subTitle="First thing"
-          description="Lorem ipsum dolor sit amet"
-        />
-      </Steps>
-      <Divider />
+      {flags.useHomepageSteps && (
+        <>
+          <Divider />
+          <Steps current={step} responsive={true} type="navigation">
+            <Step
+              title="Foo"
+              subTitle="First thing"
+              description="Lorem ipsum dolor sit amet"
+            />
+            <Step
+              title="Bar"
+              subTitle="First thing"
+              description="Lorem ipsum dolor sit amet"
+            />
+            <Step
+              title="Baz"
+              subTitle="First thing"
+              description="Lorem ipsum dolor sit amet"
+            />
+          </Steps>
+          <Divider />
+        </>
+      )}
       <PoolList withBreadcrumb={false} />
       <Divider />
       <CategoryList withBreadcrumb={false} />

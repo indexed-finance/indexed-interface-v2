@@ -105,7 +105,7 @@ export function deserializeOffChainCall(
       return action;
     }
   } catch (error) {
-    console.error("Bad off-chain call ID", callId);
+    console.error("Bad off-chain call ID", callId, error);
     return null;
   }
 }

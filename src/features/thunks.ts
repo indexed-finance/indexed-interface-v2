@@ -201,6 +201,16 @@ export const thunks = {
 
     dispatch(actions.coingeckoIdsLoaded(supportedCoinIds));
   },
+  retrieveCoingeckoDataForPool: (poolId: string): AppThunk => async (
+    dispatch
+  ) => {
+    dispatch(thunks.retrieveCoingeckoData(poolId));
+  },
+  retrieveCoingeckoDataForTokens: (...tokenIds: string[]): AppThunk => async (
+    dispatch
+  ) => {
+    dispatch(thunks.retrieveCoingeckoData(tokenIds));
+  },
   retrieveCoingeckoData: (
     poolOrTokenIds: string | string[]
   ): AppThunk => async (dispatch, getState) => {

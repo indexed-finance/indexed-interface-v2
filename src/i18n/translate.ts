@@ -19,7 +19,7 @@ export function createTranslator(languageCode: SupportedLanguageCode) {
     variables: Record<string, number | string> = {}
   ) {
     for (const variable of Object.keys(variables)) {
-      if (!variable.startsWith("_")) {
+      if (!variable.startsWith("__")) {
         throw new Error(
           "Translation: Interpolated variables must be prefixed with an underscore."
         );

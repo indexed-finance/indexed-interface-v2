@@ -1,12 +1,13 @@
 import { AppState, actions, selectors, store } from "features";
 import { message } from "antd";
+import flags from "feature-flags";
 
 export let socket: null | WebSocket = null;
 
 const websocketUrl =
-  process.env.NODE_ENV === "development"
-    ? "ws://localhost:13337"
-    : "wss://api.indexed.finance/";
+  process.env.NODE_ENV === "production" || flags.useProductionServerLocally
+    ? "wss://api.indexed.finance/"
+    : "ws://localhost:13337";
 const timeInSeconds = [1, 1, 3, 5, 8, 13, 21, 99, 999];
 let retryAttempts = 0;
 

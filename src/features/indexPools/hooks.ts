@@ -78,7 +78,7 @@ export function createPoolDetailCalls(poolAddress: string, tokenIds: string[]) {
     onChainCalls: poolCalls,
     offChainCalls: [
       {
-        function: "retrieveCoingeckoData",
+        function: "retrieveCoingeckoDataForPool",
         args: [poolAddress],
       },
       {
