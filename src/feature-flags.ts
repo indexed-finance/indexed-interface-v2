@@ -6,6 +6,7 @@ export default {
   usePlainLanguageTransaction: false,
   useProductionServerLocally: false,
   saveStateAcrossSessions: true,
+  useFortmatic: false,
   useHomepageSteps: false,
   // useDEBUG: process.env.NODE_ENV === "development",
   useDEBUG: false,

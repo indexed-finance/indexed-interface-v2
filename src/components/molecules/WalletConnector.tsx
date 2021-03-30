@@ -1,14 +1,14 @@
 import { MdAccountBalanceWallet } from "react-icons/md";
-import { actions } from "features";
-import { useDispatch } from "react-redux";
+import { WalletConnectionContext } from "app/drawers";
+import { useContext } from "react";
 
 export default function WalletConnector() {
-  const dispatch = useDispatch();
+  const { toggleDrawer } = useContext(WalletConnectionContext);
 
   return (
     <MdAccountBalanceWallet
       className="WalletConnector"
-      onClick={() => dispatch(actions.attachToProvider())}
+      onClick={toggleDrawer}
     />
   );
 }

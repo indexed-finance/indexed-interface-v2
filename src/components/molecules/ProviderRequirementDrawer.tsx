@@ -1,6 +1,6 @@
 import { Drawer, DrawerProps, Result } from "antd";
-import { actions, selectors, useProvider } from "features";
-import { useDispatch, useSelector } from "react-redux";
+import { selectors, useProvider } from "features";
+import { useSelector } from "react-redux";
 
 interface Props {
   includeSignerRequirement?: boolean;
@@ -24,7 +24,6 @@ export default function ProviderRequirementDrawer({
   includeSignerRequirement = false,
   placement = "bottom",
 }: Props) {
-  const dispatch = useDispatch();
   const meetsRequirement = useProviderRequirement(includeSignerRequirement);
   const title = includeSignerRequirement
     ? "Signer Required"
@@ -48,7 +47,9 @@ export default function ProviderRequirementDrawer({
 
   return (
     <div
-      onClick={() => dispatch(actions.attachToProvider())}
+      onClick={() => {
+        //
+      }}
       style={{ cursor: "pointer" }}
     >
       <Drawer
