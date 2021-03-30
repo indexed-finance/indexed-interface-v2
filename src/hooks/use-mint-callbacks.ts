@@ -1,5 +1,5 @@
 import { AppState, selectors, thunks } from "features";
-import { BigNumber } from "ethereum/utils/balancer-math";
+import { BigNumber, calcAllInGivenPoolOut } from "ethereum/utils/balancer-math";
 import { SLIPPAGE_RATE } from "config";
 import { 
   calcPoolOutGivenSingleIn,
@@ -97,4 +97,39 @@ export function useSingleTokenMintCallbacks(poolId: string) {
     calculateAmountOut,
     executeMint
   };
+}
+
+export function useMultiTokenMintCallbacks(poolId: string) {
+  const dispatch = useDispatch();
+  const pool = useSelector((state: AppState) => selectors.selectPool(state, poolId));
+
+  const calculateAmountsIn = useCallback(
+    (typedAmountOut: string) => {
+      if (pool) {
+        const balances = pool.tokensList.map((token) => pool.tokens.entities[token].balance);
+        const totalSupply = pool.totalSupply;
+        const poolAmountOut = convert.toToken(typedAmountOut, 18);
+        return {
+          tokens: [...pool.tokensList], // Simplify the form's token lookup to convert amounts to strings
+          amountsIn: calcAllInGivenPoolOut(balances, convert.toBigNumber(totalSupply), poolAmountOut),
+          poolAmountOut
+        };
+      }
+    }, [pool]
+  );
+
+  const executeMint = useCallback(
+    (typedAmountOut: string) => {
+      const result = calculateAmountsIn(typedAmountOut);
+      if (!result) throw Error(`Caught error calculating mint inputs.`);
+      const { amountsIn, poolAmountOut } = result;
+      const maxAmountsIn = amountsIn.map((amount) => upwardSlippage(amount, SLIPPAGE_RATE));
+      dispatch(
+        thunks.joinPool(poolId, poolAmountOut, maxAmountsIn)
+      )
+    },
+    []
+  )
+
+  return { calculateAmountsIn, executeMint }
 }
