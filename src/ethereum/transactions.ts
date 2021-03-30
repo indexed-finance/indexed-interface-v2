@@ -125,6 +125,16 @@ export async function joinswapPoolAmountOut(
   return contract.joinswapPoolAmountOut(...args);
 }
 
+export async function joinPool(
+  signer: JsonRpcSigner,
+  poolAddress: string,
+  poolAmountOut: BigNumber,
+  maxAmountsIn: BigNumber[]
+) {
+  const contract = new Contract(poolAddress, IPool, signer);
+  return contract.joinPool(poolAmountOut, maxAmountsIn);
+}
+
 export async function exitswapPoolAmountIn(
   signer: JsonRpcSigner,
   poolAddress: string,

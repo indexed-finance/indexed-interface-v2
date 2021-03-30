@@ -327,6 +327,20 @@ export const thunks = {
       );
     }
   },
+  joinPool: (
+    indexPool: string,
+    poolAmountOut: BigNumber,
+    maxAmountsIn: BigNumber[]
+  ): AppThunk => async () => {
+    if (signer) {
+      await helpers.joinPool(
+        signer,
+        indexPool,
+        poolAmountOut,
+        maxAmountsIn
+      );
+    }
+  },
   exitswapPoolAmountIn: (
     indexPool: string,
     tokenOut: string,
