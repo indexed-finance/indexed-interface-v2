@@ -1,4 +1,4 @@
-import { actions, useProvider } from "features";
+import { actions } from "features";
 import { ethers } from "ethers";
 import { fortmatic, injected, portis } from "connectors";
 import { isMobile } from "react-device-detect";
@@ -102,10 +102,8 @@ export function useEagerConnect() {
 }
 
 export function useWalletOptions() {
-  const [provider] = useProvider();
   const { ethereum } = window as InjectedWindow;
   const { isMetaMask = false } = ethereum ?? {};
-  const providerExists = Boolean(provider);
   const relevantWallets = isMobile
     ? MOBILE_SUPPORTED_WALLETS
     : DESKTOP_SUPPORTED_WALLETS;
@@ -115,9 +113,9 @@ export function useWalletOptions() {
         const isMetaMaskMismatch = name === "MetaMask" && !isMetaMask;
         const isInjectedMismatch = name === "Injected" && isMetaMask;
 
-        return !(providerExists || isMetaMaskMismatch || isInjectedMismatch);
+        return !(isMetaMaskMismatch || isInjectedMismatch);
       }),
-    [isMetaMask, providerExists, relevantWallets]
+    [isMetaMask, relevantWallets]
   );
 
   return options;
