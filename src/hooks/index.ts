@@ -15,3 +15,4 @@ export { default as useCallRegistrar } from "./use-call-registrar";
 export { useEthPrice, useTokenPrice } from "./use-token-price";
 export * from "./use-wallet-connection";
 export { default as useWalletConnection } from "./use-wallet-connection";
+export { default as usePrevious } from "./use-previous";

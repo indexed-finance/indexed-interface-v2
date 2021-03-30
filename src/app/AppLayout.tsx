@@ -12,6 +12,7 @@ import {
 } from "react";
 import { Route, Switch as RouterSwitch } from "react-router-dom";
 import { Suspense } from "react";
+import { WalletConnectionDrawer } from "./drawers";
 import { actions, selectors } from "features";
 import { useBreakpoints } from "helpers";
 import { useDispatch, useSelector } from "react-redux";
@@ -138,6 +139,8 @@ export default function AppLayout() {
             </div>
           </AbovePageProvider>
         </Content>
+
+        <WalletConnectionDrawer />
       </Layout>
     </>
   );

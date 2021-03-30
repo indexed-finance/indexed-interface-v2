@@ -3,6 +3,8 @@ import { FortmaticConnector as FortmaticConnectorCore } from "@web3-react/fortma
 
 export const OVERLAY_READY = "OVERLAY_READY";
 
+const FORMATIC_KEY = process.env.REACT_APP_FORTMATIC_KEY;
+
 type FormaticSupportedChains = Extract<
   ChainId,
   ChainId.MAINNET | ChainId.ROPSTEN | ChainId.RINKEBY | ChainId.KOVAN
@@ -17,7 +19,7 @@ const CHAIN_ID_NETWORK_ARGUMENT: {
   [ChainId.KOVAN]: "kovan",
 };
 
-export class FortmaticConnector extends FortmaticConnectorCore {
+class FortmaticConnector extends FortmaticConnectorCore {
   async activate() {
     if (!this.fortmatic) {
       const { default: Fortmatic } = await import("fortmatic");
@@ -57,3 +59,8 @@ export class FortmaticConnector extends FortmaticConnectorCore {
     };
   }
 }
+
+export default new FortmaticConnector({
+  apiKey: FORMATIC_KEY ?? "",
+  chainId: 1,
+});
