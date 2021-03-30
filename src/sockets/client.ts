@@ -1,6 +1,8 @@
 import { AppState, actions, selectors, store } from "features";
 import { message } from "antd";
+import { tx } from "i18n";
 import flags from "feature-flags";
+import noop from "lodash.noop";
 
 export let socket: null | WebSocket = null;
 
@@ -12,11 +14,11 @@ const timeInSeconds = [1, 1, 3, 5, 8, 13, 21, 99, 999];
 let retryAttempts = 0;
 
 export default class SocketClient {
-  public static connect() {
+  public static connect(onError: () => void = noop) {
     socket = new WebSocket(websocketUrl);
 
     socket.onopen = () => {
-      message.success("The connection to the server was established.");
+      message.success(tx("A_CONNECTION_TO_THE_SERVER_WAS_ESTABLISHED"));
 
       retryAttempts = 0;
 
@@ -37,18 +39,16 @@ export default class SocketClient {
         await sleep(seconds * 1000);
 
         SocketClient.disconnect();
-        // SocketClient.connect();
       } else {
         const isConnected = selectors.selectConnected(store.getState());
-
-        message.error("Unable to connect to the server. Retrying...");
 
         if (isConnected) {
           store.dispatch(actions.connectionLost());
         }
 
         SocketClient.disconnect();
-        // SocketClient.connect();
+
+        onError();
       }
 
       retryAttempts++;

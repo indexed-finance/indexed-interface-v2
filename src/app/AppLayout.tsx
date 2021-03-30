@@ -1,5 +1,5 @@
 import { BuildingWall } from "components";
-import { Button, Layout, Spin } from "antd";
+import { Button, Layout, Spin, notification } from "antd";
 import { CSSTransition } from "react-transition-group";
 import { Helmet } from "react-helmet";
 import {
@@ -38,12 +38,22 @@ export default function AppLayout() {
     []
   );
   const theme = useSelector(selectors.selectTheme);
+  const [alertedServerError, setAlertedServerError] = useState(false);
 
   // Effect
   // On initial load, open up a connection to the server.
   useEffect(() => {
     if (isConnectionEnabled) {
-      SocketClient.connect();
+      SocketClient.connect(() => {
+        if (!alertedServerError) {
+          notification.error({
+            message: tx("ERROR"),
+            description: tx("UNABLE_TO_CONNECT_TO_SERVER_..."),
+          });
+
+          setAlertedServerError(true);
+        }
+      });
     } else {
       SocketClient.disconnect();
     }
@@ -51,7 +61,7 @@ export default function AppLayout() {
     return () => {
       SocketClient.disconnect();
     };
-  }, [isConnectionEnabled]);
+  }, [isConnectionEnabled, alertedServerError, tx]);
 
   return (
     <>

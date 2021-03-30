@@ -68,28 +68,30 @@ export function useEagerConnect() {
     }
   }, [dispatch, account, connector]);
 
+  // Effect:
+  // If the injected provider is already authorized, silently connect for a seamless experience.
   useEffect(() => {
-    injected.isAuthorized().then((isAuthorized) => {
-      if (isAuthorized) {
-        activate(injected, noop, true)
-          .then(handlePostActivate)
-          .catch(() => {
-            setTried(true);
-          });
-      } else {
-        if (isMobile && (window as InjectedWindow).ethereum) {
+    if (!tried) {
+      injected.isAuthorized().then((isAuthorized) => {
+        if (isAuthorized) {
           activate(injected, noop, true)
             .then(handlePostActivate)
-            .catch(() => {
-              setTried(true);
-            });
+            .catch(() => setTried(true));
         } else {
-          setTried(true);
+          if (isMobile && (window as InjectedWindow).ethereum) {
+            activate(injected, noop, true)
+              .then(handlePostActivate)
+              .catch(() => setTried(true));
+          } else {
+            setTried(true);
+          }
         }
-      }
-    });
-  }, [activate, handlePostActivate]);
+      });
+    }
+  }, [activate, handlePostActivate, tried]);
 
+  // Effect:
+  // Avoid trying multiple times.
   useEffect(() => {
     if (active) {
       setTried(true);

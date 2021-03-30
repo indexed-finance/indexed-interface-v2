@@ -1,4 +1,5 @@
 {
+  "A_CONNECTION_TO_THE_SERVER_WAS_ESTABLISHED": "A connection to the server was established.",
   "ABOUT_X_MINUTES_AGO": "__x ago",
   "AN_UNKNOWN_ERROR_HAS_OCCURRED_...": "An unknown error has occurred. If this happens again, please report this as a bug.",
   "APPROVE": "Approve",
@@ -35,6 +36,7 @@
   "EARNED_X_NDX": "Earned __x NDX",
   "ENABLE_SERVER_CONNECTION": "Enable server connection?",
   "ENGLISH": "English",
+  "ERROR": "Error",
   "EXCEEDS_BALANCE": "Exceeds balance",
   "EXCEEDS_MAXIMUM_INPUT": "Exceeds minimum input",
   "EXCEEDS_MAXIMUM_OUTPUT": "Exceeds maximum output",
@@ -108,6 +110,7 @@
   "TRADE": "Trade",
   "TRADES": "Trades",
   "TRADE_WITH_UNISWAP": "Trade with Uniswap",
+  "UNABLE_TO_CONNECT_TO_SERVER_...": "Unable to connect to server",
   "USEFUL_LINKS": "Useful links",
   "VALUE_IN_USD": "Value (in USD)",
   "VIEW_INDEX_POOLS": "View index pools",

@@ -1,4 +1,5 @@
 {
+  "A_CONNECTION_TO_THE_SERVER_WAS_ESTABLISHED": "La conexión con el servidor ha sido establecida",
   "ABOUT_X_MINUTES_AGO": "hace aproximadamente __x minutos",
   "AN_UNKNOWN_ERROR_HAS_OCCURRED_...": "Un error desconocido ha ocurrido. Sí esto pasa de nuevo, favor de reportar como defecto.",
   "APPROVE": "Aprobar",
@@ -35,6 +36,7 @@
   "EARNED_X_NDX": "Ganado __x NDX",
   "ENABLE_SERVER_CONNECTION": "¿Habilitar la conexión al servidor?",
   "ENGLISH": "Inglés",
+  "ERROR": "Error",
   "EXCEEDS_BALANCE": "Excede el balance",
   "EXCEEDS_MAXIMUM_INPUT": "Excede el máximo de entrada",
   "EXCEEDS_MAXIMUM_OUTPUT": "Excede el maximo de salida",
@@ -108,6 +110,7 @@
   "TRADE": "Intercambiar",
   "TRADES": "Intercambios",
   "TRADE_WITH_UNISWAP": "Intercambiar con Uniswap",
+  "UNABLE_TO_CONNECT_TO_SERVER_...": "No se puede conectar al servidor",
   "USEFUL_LINKS": "Enlaces de ayuda",
   "VALUE_IN_USD": "Value (en USD)",
   "VIEW_ALL": "Ver todo",

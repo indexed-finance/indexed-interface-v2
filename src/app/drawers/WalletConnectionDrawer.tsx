@@ -1,5 +1,5 @@
 import { AbstractConnector } from "@web3-react/abstract-connector";
-import { Avatar, Drawer, Menu, Space, Typography } from "antd";
+import { Avatar, Drawer, Menu, Space, Typography, notification } from "antd";
 import { OVERLAY_READY, fortmatic } from "connectors";
 import {
   ReactNode,
@@ -42,7 +42,7 @@ export function WalletConnectProvider({ children }: { children: ReactNode }) {
   const [
     walletConnectionDrawerActive,
     setWalletConnectionDrawerActive,
-  ] = useState(true);
+  ] = useState(false);
   const previousAccount = usePrevious(account);
   const closeDrawer = useCallback(
     () => setWalletConnectionDrawerActive(false),
@@ -66,6 +66,8 @@ export function WalletConnectProvider({ children }: { children: ReactNode }) {
     [walletConnectionDrawerActive, closeDrawer, openDrawer, toggleDrawer]
   );
 
+  useWalletConnection();
+
   // Effect:
   // [Not connected] -> [Connected]: Close drawer.
   useEffect(() => {
@@ -83,8 +85,6 @@ export function WalletConnectProvider({ children }: { children: ReactNode }) {
       fortmatic.off(OVERLAY_READY, toggleDrawer);
     };
   }, [toggleDrawer]);
-
-  useWalletConnection();
 
   return (
     <WalletConnectionContext.Provider value={value}>
@@ -133,18 +133,26 @@ export default function WalletConnectionDrawer({
                 selectedAddress: account ?? _account ?? "",
               })
             );
+
+            notification.success({
+              message: tx("CONNECTED"),
+              description: tx("YOU_HAVE_SUCCESSFULLY_CONNECTED_YOUR_WALLET"),
+            });
           })
           .catch((error) => {
             if (error instanceof UnsupportedChainIdError) {
               activate(connector);
             } else {
-              // ...
+              notification.error({
+                message: tx("ERROR"),
+                description: tx("AN_UNKNOWN_ERROR_HAS_OCCURRED_..."),
+              });
             }
           })
           .finally(() => setAttemptingActivation(false));
       }
     },
-    [dispatch, activate, attemptingActivation, account]
+    [dispatch, activate, tx, attemptingActivation, account]
   );
 
   return (

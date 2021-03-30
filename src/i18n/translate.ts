@@ -42,11 +42,15 @@ export function createTranslator(languageCode: SupportedLanguageCode) {
   };
 }
 
+export let tx: ReturnType<typeof useTranslation> = createTranslator("en-us"); // Default to Enlish.
+
 export const useTranslation = () => {
   const { languageCode } = useSelector(selectors.selectSettings);
   const translate = useMemo(() => createTranslator(languageCode), [
     languageCode,
   ]);
+
+  tx = translate; // Keep a reference to the current translate function for non-React consumers.
 
   return translate;
 };

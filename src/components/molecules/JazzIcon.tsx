@@ -4,6 +4,7 @@ import { useBreakpoints } from "helpers";
 import { useCallback, useEffect, useRef } from "react";
 import { useDispatch } from "react-redux";
 import { useTranslation } from "i18n";
+import { useWeb3React } from "@web3-react/core";
 import ReactDOM from "react-dom";
 import jazzicon from "@metamask/jazzicon";
 
@@ -13,26 +14,19 @@ interface Props {
 
 export default function JazzIcon({ address }: Props) {
   const tx = useTranslation();
+  const { deactivate } = useWeb3React();
   const dispatch = useDispatch();
   const blockie = useRef<null | HTMLSpanElement>(null);
   const handleDisconnect = useCallback(() => {
+    deactivate();
     dispatch(actions.userDisconnected());
 
     notification.info({
       message: tx("DISCONNECTED"),
       description: tx("YOU_HAVE_SUCCESSFULLY_DISCONNECTED_YOUR_WALLET"),
     });
-  }, [dispatch, tx]);
+  }, [dispatch, deactivate, tx]);
   const breakpoints = useBreakpoints();
-
-  // Effect:
-  // On load, display a success notification.
-  useEffect(() => {
-    notification.success({
-      message: tx("CONNECTED"),
-      description: tx("YOU_HAVE_SUCCESSFULLY_CONNECTED_YOUR_WALLET"),
-    });
-  }, [tx]);
 
   // Effect:
   // Use refs to integrate the third party library for displaying a wallet identicon.
