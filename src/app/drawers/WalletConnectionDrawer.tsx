@@ -1,4 +1,5 @@
 import { AbstractConnector } from "@web3-react/abstract-connector";
+import { Avatar, Drawer, Menu } from "antd";
 import { OVERLAY_READY, fortmatic, injected, portis } from "connectors";
 import { UnsupportedChainIdError, useWeb3React } from "@web3-react/core";
 import { WalletConnectConnector } from "@web3-react/walletconnect-connector";
@@ -6,9 +7,11 @@ import { isMobile } from "react-device-detect";
 import { noop } from "lodash";
 import { useCallback, useEffect, useState } from "react";
 import { usePrevious } from "hooks";
+import { useTranslation } from "i18n";
 
 export default function WalletConnectionDrawer() {
-  const [drawerActive, setDrawerActive] = useState(false);
+  const tx = useTranslation();
+  const [drawerActive, setDrawerActive] = useState(true);
   const { account, active, activate, connector, error } = useWeb3React();
   const [attemptingActivation, setAttemptingActivation] = useState(false);
   const previousAccount = usePrevious(account);
@@ -55,7 +58,41 @@ export default function WalletConnectionDrawer() {
   }, [toggleDrawer]);
   const options = getWalletOptions();
 
-  return <>{JSON.stringify(options, null, 2)}</>;
+  return (
+    <Drawer
+      title={tx("CONNECT_YOUR_WALLET")}
+      placement="right"
+      closable={false}
+      onClose={toggleDrawer}
+      visible={drawerActive}
+      mask={false}
+      bodyStyle={{ padding: 0 }}
+      style={{
+        position: "fixed",
+        top: 64,
+        right: 0,
+        zIndex: 30000,
+      }}
+    >
+      <Menu mode="inline">
+        {options.map((option) => (
+          <Menu.Item
+            key={option.name}
+            onClick={() => {
+              /* */
+            }}
+          >
+            <Avatar
+              shape="circle"
+              src={"https://placehold.it/24x24"}
+              style={{ marginRight: 12 }}
+            />
+            {option.name}
+          </Menu.Item>
+        ))}
+      </Menu>
+    </Drawer>
+  );
 }
 
 // #region Helpers
@@ -65,29 +102,31 @@ function getWalletOptions() {
   const { web3, ethereum } = window as InjectedWindow;
   const { isMetaMask = false } = ethereum ?? {};
   const providerExists = Boolean(web3 || ethereum);
-  const options = Object.entries(SUPPORTED_WALLETS).filter(([, option]) => {
-    const { connector, name, mobile: isSupportedOnMobile, mobileOnly } = option;
+  const options = Object.values(SUPPORTED_WALLETS).filter(
+    ({ connector, name, mobile: isSupportedOnMobile, mobileOnly }) => {
+      if (providerExists) {
+        return false;
+      } else {
+        const isPortis = connector === portis;
+        const isInjected = connector === injected;
+        const isNamedMetaMask = name === "MetaMask";
+        const isNamedInjected = name === "Injected";
+        const isMetaMaskMismatch = isNamedMetaMask && !isMetaMask;
+        const isInjectedMismatch = isNamedInjected && isMetaMask;
+        const isMismatch = isMetaMaskMismatch || isInjectedMismatch;
+        const isSupportedOnDesktop = !mobileOnly;
+        const isValidDesktopOption =
+          (isInjected && isNamedMetaMask) ||
+          (!isMobile && isSupportedOnDesktop);
+        const isValidMobileOption =
+          isMobile && isSupportedOnMobile && !isPortis;
 
-    if (providerExists) {
-      return false;
-    } else {
-      const isPortis = connector === portis;
-      const isInjected = connector === injected;
-      const isNamedMetaMask = name === "MetaMask";
-      const isNamedInjected = name === "Injected";
-      const isMetaMaskMismatch = isNamedMetaMask && !isMetaMask;
-      const isInjectedMismatch = isNamedInjected && isMetaMask;
-      const isMismatch = isMetaMaskMismatch || isInjectedMismatch;
-      const isSupportedOnDesktop = !mobileOnly;
-      const isValidDesktopOption =
-        (isInjected && isNamedMetaMask) || (!isMobile && isSupportedOnDesktop);
-      const isValidMobileOption = isMobile && isSupportedOnMobile && !isPortis;
-
-      return !isMismatch && (isValidMobileOption || isValidDesktopOption);
+        return !isMismatch && (isValidMobileOption || isValidDesktopOption);
+      }
     }
-  });
+  );
 
-  return Object.fromEntries(options);
+  return options;
 }
 
 export interface WalletInfo {
