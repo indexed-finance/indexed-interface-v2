@@ -79,32 +79,6 @@ export const thunks = {
   /**
    *
    */
-  attachToProvider: (): AppThunk => async (dispatch) => {
-    const ethereum = (window as any).ethereum;
-
-    if (ethereum) {
-      const [selectedAddress] = await ethereum.request({
-        method: "eth_requestAccounts",
-      });
-      const provider = new ethers.providers.Web3Provider(ethereum, 1);
-
-      if (provider.blockNumber) {
-        dispatch(actions.blockNumberChanged(provider.blockNumber));
-        dispatch(actions.cachePurged());
-      }
-
-      dispatch(
-        actions.initialize({
-          provider,
-          selectedAddress,
-          withSigner: true,
-        })
-      );
-    }
-  },
-  /**
-   *
-   */
   initialize: (options: InitialzeOptions): AppThunk => async (
     dispatch,
     getState
@@ -112,6 +86,11 @@ export const thunks = {
     let selectedAddress = "";
 
     provider = options.provider;
+
+    if (provider.blockNumber !== -1) {
+      dispatch(actions.blockNumberChanged(provider.blockNumber));
+      dispatch(actions.cachePurged());
+    }
 
     if (options.withSigner) {
       signer = provider.getSigner();

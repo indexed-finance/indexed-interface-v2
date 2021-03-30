@@ -12,11 +12,11 @@ import {
 } from "react";
 import { Route, Switch as RouterSwitch } from "react-router-dom";
 import { Suspense } from "react";
-import { WalletConnectionDrawer } from "./drawers";
-import { actions, selectors } from "features";
+import { selectors } from "features";
 import { useBreakpoints } from "helpers";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { useTranslation } from "i18n";
+import { useWalletConnectionDrawer } from "./drawers";
 import AppHeader from "./AppHeader";
 import AppMenu from "./AppMenu";
 import SocketClient from "sockets/client";
@@ -27,12 +27,12 @@ const { Sider, Content } = Layout;
 
 export default function AppLayout() {
   const tx = useTranslation();
-  const dispatch = useDispatch();
   const isConnectionEnabled = useSelector(selectors.selectConnectionEnabled);
   const indexPools = useSelector(selectors.selectAllFormattedIndexPools);
   const breakpoints = useBreakpoints();
   const [mobileMenuActive, setMobileMenuActive] = useState(false);
   const closeMobileMenu = useCallback(() => setMobileMenuActive(false), []);
+  const { openDrawer } = useWalletConnectionDrawer();
   const toggleMobileMenu = useCallback(
     () => setMobileMenuActive((prev) => !prev),
     []
@@ -98,11 +98,8 @@ export default function AppLayout() {
           <Sider width={300}>
             {indexPools.length > 0 ? null : (
               <div className="QuotePlaceholder perfectly-centered">
-                <Button
-                  type="primary"
-                  onClick={() => dispatch(actions.attachToProvider())}
-                >
-                  {tx("DISCONNECT")}
+                <Button type="primary" onClick={openDrawer}>
+                  {tx("CONNECT_YOUR_WALLET")}
                 </Button>
               </div>
             )}
@@ -139,8 +136,6 @@ export default function AppLayout() {
             </div>
           </AbovePageProvider>
         </Content>
-
-        <WalletConnectionDrawer />
       </Layout>
     </>
   );

@@ -2,25 +2,22 @@ import "theme/index.less";
 import { BrowserRouter } from "react-router-dom";
 import { DEBUG } from "components";
 import { Parallax } from "react-parallax";
-import { Provider, useDispatch, useSelector } from "react-redux";
+import { Provider, useSelector } from "react-redux";
+import { WalletConnectProvider } from "./drawers";
 import { Web3ReactProvider } from "@web3-react/core";
-import { actions, selectors, store } from "features";
 import { ethers } from "ethers";
 import { message, notification } from "antd";
+import { selectors, store } from "features";
 import { useBreakpoints } from "helpers";
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import AppErrorBoundary from "./AppErrorBoundary";
 import AppLayout from "./AppLayout";
 import background from "assets/images/dark-bg.jpg";
 import flags from "feature-flags";
 
 function Inner() {
-  const dispatch = useDispatch();
   const { isMobile } = useBreakpoints();
   const theme = useSelector(selectors.selectTheme);
-  const userAddress = useSelector(selectors.selectUserAddress);
-  const initiallyLoadedUser = useRef(false);
-
   const inner = (
     <>
       <BrowserRouter>
@@ -30,6 +27,8 @@ function Inner() {
     </>
   );
 
+  // Effect:
+  // Configure antd notifications and messages.
   useEffect(() => {
     message.config({
       top: isMobile ? 106 : 66,
@@ -42,13 +41,6 @@ function Inner() {
       duration: 4.2,
     });
   }, [isMobile]);
-
-  useEffect(() => {
-    if (!initiallyLoadedUser.current && userAddress) {
-      initiallyLoadedUser.current = true;
-      dispatch(actions.attachToProvider());
-    }
-  }, [dispatch, userAddress]);
 
   return theme === "outrun" ? (
     <Parallax bgImage={background} bgImageAlt="background" strength={200}>
@@ -64,7 +56,9 @@ export default function App() {
     <Provider store={store}>
       <AppErrorBoundary>
         <Web3ReactProvider getLibrary={getLibrary}>
-          <Inner />
+          <WalletConnectProvider>
+            <Inner />
+          </WalletConnectProvider>
         </Web3ReactProvider>
       </AppErrorBoundary>
     </Provider>
@@ -75,4 +69,5 @@ export default function App() {
 function getLibrary(_provider?: any, _connector?: any) {
   return new ethers.providers.Web3Provider(_provider);
 }
+
 // #endregion
