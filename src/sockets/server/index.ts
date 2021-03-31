@@ -1,10 +1,10 @@
-import { log } from "./helpers";
-import setupClientHandling from "./client-handling";
-import setupLogHandling from "./log-handling";
-import setupStateHandling from "./state-handling";
+// This file was generated via a script in `scripts/`.
+// Do not manually modify this (or any) index files.
 
-log("SocketServer has started up!");
-
-setupClientHandling();
-setupStateHandling();
-setupLogHandling();
+export * from './client-handling';
+export * from './coinapi-connection';
+export * from './helpers';
+export * from './log-handling';
+export * from './models';
+export * from './proxy-handling';
+export * from './state-handling';

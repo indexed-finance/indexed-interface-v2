@@ -2,7 +2,7 @@ import { HTMLProps } from "react";
 import { Skeleton, Spin, Typography } from "antd";
 import { useBreakpoints } from "helpers";
 
-export interface Props extends HTMLProps<HTMLDivElement> {
+interface Props extends HTMLProps<HTMLDivElement> {
   symbol?: string;
   price: string;
   netChange: string;

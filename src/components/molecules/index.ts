@@ -1,22 +1,25 @@
-export { default as CategoryDropdown } from "./CategoryDropdown";
-export { default as ChartCard } from "./ChartCard";
-export { default as DEBUG } from "./DEBUG";
-export { default as EthereumAddressInput } from "./EthereumAddressInput";
-export { default as IndexCard } from "./IndexCard";
-export { default as JazzIcon } from "./JazzIcon";
-export { default as LanguageSelector } from "./LanguageSelector";
-export { default as Logo } from "./Logo";
-export { default as ModeSwitch } from "./ModeSwitch";
-export { default as Performance } from "./Performance";
-export { default as PlainLanguageTransaction } from "./PlainLanguageTransaction";
-export { default as PoolDropdown } from "./PoolDropdown";
-export * from "./ProviderRequirementDrawer";
-export { default as ProviderRequirementDrawer } from "./ProviderRequirementDrawer";
-export { default as Quote } from "./Quote";
-export { default as ScreenHeader } from "./ScreenHeader";
-export { default as SelectableToken } from "./SelectableToken";
-export { default as ServerConnection } from "./ServerConnection";
-export { default as TokenExchangeRate } from "./TokenExchangeRate";
-export { default as UsefulLinks } from "./UsefulLinks";
-export { default as WalletConnector } from "./WalletConnector";
-export { default as LineSeriesChart } from "./LineSeriesChart";
+// This file was generated via a script in `scripts/`.
+// Do not manually modify this (or any) index files.
+
+export * from './CategoryDropdown';
+export * from './ChartCard';
+export * from './DEBUG';
+export * from './EthereumAddressInput';
+export * from './IndexCard';
+export * from './JazzIcon';
+export * from './LanguageSelector';
+export * from './LineSeriesChart';
+export * from './Logo';
+export * from './ModeSwitch';
+export * from './Performance';
+export * from './PlainLanguageTransaction';
+export * from './PoolDropdown';
+export * from './ProviderRequirementDrawer';
+export * from './Quote.stories';
+export * from './Quote';
+export * from './ScreenHeader';
+export * from './SelectableToken';
+export * from './ServerConnection';
+export * from './TokenExchangeRate';
+export * from './UsefulLinks';
+export * from './WalletConnector';

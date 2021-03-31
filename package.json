@@ -101,6 +101,7 @@
     "data:watch": "nodemon --watch ./data --exec \"node ./scripts/build-data.js\" -e js,md",
     "deploy": "git push && npm run storybook:deploy",
     "generate:types": "graphql-codegen",
+    "generate:indices": "node ./scripts/build-indices",
     "lint": "eslint . --fix --ignore-path .gitignore --ext .ts,.tsx,.js",
     "server:build": "node ./scripts/build-server",
     "server:develop": "npm run server:build && npm run server:start",

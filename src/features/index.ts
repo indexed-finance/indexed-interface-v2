@@ -1,15 +1,8 @@
-export * from "./thunks";
-export { default as actions } from "./thunks";
-export * from "./selectors";
-export { default as selectors } from "./selectors";
-export * from "./store";
-export { default as store } from "./store";
-export * from "./reducer";
-export * from "./selectors";
-export * from "./dailySnapshots";
-export * from "./indexPools/hooks";
-export * from "./pairs/hooks";
-export * from "./tokens/hooks";
-export * from "./user/hooks";
-export * from "./staking/hooks";
-export * from "./batcher/slice";
+// This file was generated via a script in `scripts/`.
+// Do not manually modify this (or any) index files.
+
+export * from './actions';
+export * from './reducer';
+export * from './selectors';
+export * from './store';
+export * from './thunks';

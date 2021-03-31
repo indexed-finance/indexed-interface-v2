@@ -1,11 +1,15 @@
-export { default as CategoryDetail } from "./CategoryDetail";
-export { default as CategoryList } from "./CategoryList";
-export { default as DocsDetail } from "./DocsDetail";
-export { default as DocsList } from "./DocsList";
-export { default as FAQ } from "./FAQ";
-export { default as PoolChart } from "./PoolChart";
-export { default as PoolDetail } from "./PoolDetail";
-export { default as PoolList } from "./PoolList";
-export { default as Portfolio } from "./Portfolio";
-export { default as Splash } from "./Splash";
-export { default as Stake } from "./Stake";
+// This file was generated via a script in `scripts/`.
+// Do not manually modify this (or any) index files.
+
+export * from './CategoryDetail';
+export * from './CategoryList';
+export * from './DocsDetail';
+export * from './DocsList';
+export * from './FAQ';
+export * from './PoolChart';
+export * from './PoolDetail';
+export * from './PoolList';
+export * from './Portfolio';
+export * from './Settings';
+export * from './Splash';
+export * from './Stake';

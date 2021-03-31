@@ -1,2 +1,6 @@
-export { actions as tokensActions, default as tokensReducer } from "./slice";
-export { default as tokensSelectors } from "./selectors";
+// This file was generated via a script in `scripts/`.
+// Do not manually modify this (or any) index files.
+
+export * from './hooks';
+export * from './selectors';
+export * from './slice';

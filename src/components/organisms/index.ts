@@ -1,11 +1,15 @@
-export { default as BuildingWall } from "./BuildingWall";
-export { default as CategoryCard } from "./CategoryCard";
-export { default as CategoryTable } from "./CategoryTable";
-export { default as ListCard } from "./ListCard";
-export { default as PoolCard } from "./PoolCard";
-export { default as PortfolioCard } from "./PortfolioCard";
-export { default as QuoteCarousel } from "./QuoteCarousel";
-export { default as RankedToken } from "./RankedToken";
-export { default as StakingCard } from "./StakingCard";
-export { default as TokenSelector } from "./TokenSelector";
-export { default as TransactionCard } from "./TransactionCard";
+// This file was generated via a script in `scripts/`.
+// Do not manually modify this (or any) index files.
+
+export * from './BuildingWall';
+export * from './CategoryCard';
+export * from './CategoryTable';
+export * from './ListCard';
+export * from './PoolCard';
+export * from './PortfolioCard';
+export * from './QuoteCarousel';
+export * from './RankedToken.stories';
+export * from './RankedToken';
+export * from './StakingCard';
+export * from './TokenSelector';
+export * from './TransactionCard';

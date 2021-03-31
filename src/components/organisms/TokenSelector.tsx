@@ -28,7 +28,7 @@ type Asset = {
   symbol: string;
 };
 
-export interface Props {
+interface Props {
   label?: string;
   assets: Asset[];
   value?: TokenSelectorValue;

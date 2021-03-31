@@ -1,6 +1,5 @@
-export {
-  actions as dailySnapshotsActions,
-  default as dailySnapshotsReducer,
-} from "./slice";
-export * from "./selectors";
-export { default as dailySnapshotsSelectors } from "./selectors";
+// This file was generated via a script in `scripts/`.
+// Do not manually modify this (or any) index files.
+
+export * from './selectors';
+export * from './slice';

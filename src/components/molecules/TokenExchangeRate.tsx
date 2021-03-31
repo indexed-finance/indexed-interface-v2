@@ -3,7 +3,7 @@ import { Token } from "components/atoms";
 import { convert, useBreakpoints } from "helpers";
 import { useTranslation } from "i18n";
 
-export interface Props {
+interface Props {
   baseline: string;
   comparison: string;
   rate: string | number;

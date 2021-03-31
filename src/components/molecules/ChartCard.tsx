@@ -10,7 +10,7 @@ import type { SnapshotKey } from "features/dailySnapshots/slice";
 
 type Timeframe = "Day" | "Week";
 
-export interface Props {
+interface Props {
   poolId: string;
   expanded?: boolean;
 }

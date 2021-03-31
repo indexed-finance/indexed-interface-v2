@@ -1,6 +1,6 @@
-export * from "./coingecko";
-export { default as CoinGeckoService } from "./coingecko";
-export * from "./graphql";
-export { default as GraphqlService } from "./graphql";
-export * from "./ipfs";
-export { default as IpfsService } from "./ipfs";
+// This file was generated via a script in `scripts/`.
+// Do not manually modify this (or any) index files.
+
+export * from './coingecko';
+export * from './graphql';
+export * from './ipfs';

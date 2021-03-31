@@ -1,10 +1,12 @@
-export { default as convert } from "./convert";
-export { default as createLookup } from "./create-lookup";
-export * from "./create-multicall-data-parser";
-export { default as createMulticallDataParser } from "./create-multicall-data-parser";
-export { default as dedupe } from "./dedupe";
-export { default as getRandomEntries } from "./get-random-entries";
-export { default as sleep } from "./sleep";
-export { default as useBreakpoints } from "./use-breakpoints";
-export { default as useScrollPrevention } from "./use-scroll-prevention";
-export * from "./serialize";
+// This file was generated via a script in `scripts/`.
+// Do not manually modify this (or any) index files.
+
+export * from './convert';
+export * from './create-lookup';
+export * from './create-multicall-data-parser';
+export * from './dedupe';
+export * from './get-random-entries';
+export * from './serialize';
+export * from './sleep';
+export * from './use-breakpoints';
+export * from './use-scroll-prevention';

@@ -13,7 +13,7 @@ import { useSelector } from "react-redux";
 import ListCard from "./ListCard";
 import RankedToken from "./RankedToken";
 
-export interface Props {
+interface Props {
   pool: FormattedIndexPool;
 }
 

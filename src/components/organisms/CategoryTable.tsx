@@ -6,9 +6,9 @@ import { useHistory } from "react-router-dom";
 import { useMemo } from "react";
 import { useTranslation } from "i18n";
 
-export type Props = {
+interface Props {
   pools: FormattedCategory["indexPools"];
-};
+}
 
 export default function CategoryTable({ pools }: Props) {
   const tx = useTranslation();

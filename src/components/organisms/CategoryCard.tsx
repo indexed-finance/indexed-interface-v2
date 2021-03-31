@@ -7,7 +7,7 @@ import { useTranslation } from "i18n";
 import ListCard from "./ListCard";
 import type { Token as TokenType } from "indexed-types";
 
-export interface Props {
+interface Props {
   id?: string;
   symbol?: string;
   name?: string;

@@ -1,4 +1,6 @@
-export { default as Recent } from "./Recent";
-export * from "./Subscreen";
-export { default as Subscreen } from "./Subscreen";
-export { default as Staking } from "./Staking";
+// This file was generated via a script in `scripts/`.
+// Do not manually modify this (or any) index files.
+
+export * from './Recent';
+export * from './Staking';
+export * from './Subscreen';

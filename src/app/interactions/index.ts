@@ -1,5 +1,9 @@
-export { default as BurnInteraction } from "./BurnInteraction";
-export { default as MintInteraction } from "./MintInteraction";
-export { default as PoolInteractions } from "./PoolInteractions";
-export { default as SwapInteraction } from "./SwapInteraction";
-export { default as TradeInteraction } from "./TradeInteraction";
+// This file was generated via a script in `scripts/`.
+// Do not manually modify this (or any) index files.
+
+export * from './BaseInteraction';
+export * from './BurnInteraction';
+export * from './MintInteraction';
+export * from './PoolInteractions';
+export * from './SwapInteraction';
+export * from './TradeInteraction';

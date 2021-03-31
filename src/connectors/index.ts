@@ -1,8 +1,6 @@
-export const NETWORK_CHAIN_ID: number = parseInt(
-  process.env.REACT_APP_CHAIN_ID ?? "1"
-);
+// This file was generated via a script in `scripts/`.
+// Do not manually modify this (or any) index files.
 
-export * from "./Fortmatic";
-export { default as fortmatic } from "./Fortmatic";
-export { default as injected } from "./Injected";
-export { default as portis } from "./Portis";
+export * from './Fortmatic';
+export * from './Injected';
+export * from './Portis';

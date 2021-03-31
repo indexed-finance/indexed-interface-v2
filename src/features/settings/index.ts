@@ -1,5 +1,4 @@
-export {
-  actions as settingsActions,
-  selectors as settingsSelectors,
-  default as settingsReducer,
-} from "./slice";
+// This file was generated via a script in `scripts/`.
+// Do not manually modify this (or any) index files.
+
+export * from './slice';

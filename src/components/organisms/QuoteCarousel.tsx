@@ -4,7 +4,7 @@ import { Quote } from "components/molecules";
 import { useHistory } from "react-router-dom";
 import { useSelector } from "react-redux";
 
-export interface Props {
+interface Props {
   pools: FormattedIndexPool[];
 }
 

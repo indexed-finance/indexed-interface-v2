@@ -9,7 +9,7 @@ export interface SeriesDataItem {
   value: number;
 }
 
-export interface Props {
+interface Props {
   data: SeriesDataItem[];
   expanded?: boolean;
   settings: [string, string];

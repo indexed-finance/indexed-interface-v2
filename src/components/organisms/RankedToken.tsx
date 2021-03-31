@@ -5,7 +5,7 @@ import { Space, Spin, Typography } from "antd";
 import { convert, useBreakpoints } from "helpers";
 import { useTranslation } from "i18n";
 
-export interface Props {
+interface Props {
   token: Asset;
   rank: number;
 }
