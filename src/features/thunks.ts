@@ -23,9 +23,11 @@ import {
 } from "ethereum/transactions";
 import { helpers, multicall } from "ethereum";
 import { indexPoolsActions } from "./indexPools";
+import { notification } from "antd";
 import { settingsActions } from "./settings";
 import { stakingActions } from "./staking";
 import { tokensActions } from "./tokens";
+import { tx } from "i18n";
 import { userActions } from "./user";
 import debounce from "lodash.debounce";
 import selectors from "./selectors";
@@ -183,31 +185,46 @@ export const thunks = {
   retrieveCoingeckoDataForPool: (poolId: string): AppThunk => async (
     dispatch
   ) => {
-    dispatch(thunks.retrieveCoingeckoData(poolId));
+    try {
+      dispatch((thunks as any).retrieveCoingeckoData(poolId));
+    } catch {}
   },
   retrieveCoingeckoDataForTokens: (...tokenIds: string[]): AppThunk => async (
     dispatch
   ) => {
-    dispatch(thunks.retrieveCoingeckoData(tokenIds));
+    try {
+      dispatch((thunks as any).retrieveCoingeckoData(tokenIds));
+    } catch {}
   },
-  retrieveCoingeckoData: (
-    poolOrTokenIds: string | string[]
-  ): AppThunk => async (dispatch, getState) => {
-    const state = getState();
-    const isPool = typeof poolOrTokenIds === "string";
-    const pool = isPool ? (poolOrTokenIds as string) : null;
-    const tokenIds = pool
-      ? [...selectors.selectPoolTokenIds(state, pool), pool]
-      : (poolOrTokenIds as string[]);
-    const tokens = await CoinGeckoService.getStatsForTokens(tokenIds);
+  retrieveCoingeckoData: debounce(
+    (poolOrTokenIds: string | string[]): AppThunk => async (
+      dispatch,
+      getState
+    ) => {
+      try {
+        const state = getState();
+        const isPool = typeof poolOrTokenIds === "string";
+        const pool = isPool ? (poolOrTokenIds as string) : null;
+        const tokenIds = pool
+          ? [...selectors.selectPoolTokenIds(state, pool), pool]
+          : (poolOrTokenIds as string[]);
+        const tokens = await CoinGeckoService.getStatsForTokens(tokenIds);
 
-    dispatch(
-      actions.coingeckoDataLoaded({
-        pool,
-        tokens,
-      })
-    );
-  },
+        dispatch(
+          actions.coingeckoDataLoaded({
+            pool,
+            tokens,
+          })
+        );
+      } catch {
+        notification.error({
+          message: tx("ERROR"),
+          description: tx("THERE_WAS_A_PROBLEM_LOADING_DATA_FROM_COINGECKO"),
+        });
+      }
+    },
+    10000
+  ),
   /**
    *
    * @param poolAddress -
@@ -312,12 +329,7 @@ export const thunks = {
     maxAmountsIn: BigNumber[]
   ): AppThunk => async () => {
     if (signer) {
-      await helpers.joinPool(
-        signer,
-        indexPool,
-        poolAmountOut,
-        maxAmountsIn
-      );
+      await helpers.joinPool(signer, indexPool, poolAmountOut, maxAmountsIn);
     }
   },
   exitswapPoolAmountIn: (
@@ -613,7 +625,7 @@ export const thunks = {
     }
 
     for (const call of splitOffChainCalls.notCached) {
-      const action = deserializeOffChainCall(call, thunks);
+      const action = deserializeOffChainCall(call, thunks as any);
 
       if (action) {
         dispatch(action());
@@ -643,7 +655,7 @@ export const thunks = {
     batch: ReturnType<typeof selectors.selectOffChainBatch>
   ): AppThunk => async (dispatch) => {
     for (const call of batch) {
-      const action = deserializeOffChainCall(call, thunks);
+      const action = deserializeOffChainCall(call, thunks as any);
 
       if (action) {
         dispatch(action());

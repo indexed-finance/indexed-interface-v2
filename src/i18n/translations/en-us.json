@@ -100,6 +100,7 @@
   "SWAP_WITH_QUICKSWAP": "Swap with Quickswap",
   "SYMBOL": "Symbol",
   "THIS_PROJECT_IS_IN_BETA_...": "This project is beta. Use it at your own risk and don't put in more than you are prepared to lose.",
+  "THERE_WAS_A_PROBLEM_LOADING_DATA_FROM_COINGECKO": "There was a problem loading data from CoinGecko.",
   "TIMEFRAME": "Timeframe",
   "TO": "To",
   "TOTAL_SWAP_FEES_IN_USD": "Total swap fees (in USD)",
