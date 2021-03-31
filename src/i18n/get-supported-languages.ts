@@ -1,6 +1,6 @@
 import type { SupportedLanguageCode } from "./translate";
 
-export default function getSupportedLanguages() {
+export function getSupportedLanguages() {
   return [
     {
       title: "English",

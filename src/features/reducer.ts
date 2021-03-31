@@ -10,7 +10,7 @@ import { stakingReducer } from "./staking";
 import { tokensReducer } from "./tokens";
 import { userReducer } from "./user";
 
-export default combineReducers({
+export const rootReducer = combineReducers({
   batcher: batcherReducer,
   cache: cacheReducer,
   categories: categoriesReducer,

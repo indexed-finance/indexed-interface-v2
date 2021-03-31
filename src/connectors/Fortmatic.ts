@@ -60,7 +60,7 @@ class FortmaticConnector extends FortmaticConnectorCore {
   }
 }
 
-export default new FortmaticConnector({
+export const fortmatic = new FortmaticConnector({
   apiKey: FORMATIC_KEY ?? "",
   chainId: 1,
 });

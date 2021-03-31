@@ -8,7 +8,6 @@ export * from './ListCard';
 export * from './PoolCard';
 export * from './PortfolioCard';
 export * from './QuoteCarousel';
-export * from './RankedToken.stories';
 export * from './RankedToken';
 export * from './StakingCard';
 export * from './TokenSelector';

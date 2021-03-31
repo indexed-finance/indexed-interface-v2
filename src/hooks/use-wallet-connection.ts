@@ -1,3 +1,4 @@
+import { FEATURE_FLAGS } from "feature-flags";
 import { actions } from "features";
 import { ethers } from "ethers";
 import { fortmatic, injected, portis } from "connectors";
@@ -7,7 +8,6 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useWeb3React } from "@web3-react/core";
 import coinbaseWalletIcon from "assets/images/connectors/coinbase.svg";
-import flags from "feature-flags";
 import fortmaticIcon from "assets/images/connectors/fortmatic.png";
 import injectedIcon from "assets/images/connectors/injected.svg";
 import metamaskIcon from "assets/images/connectors/metamask.png";
@@ -182,14 +182,14 @@ export const DESKTOP_SUPPORTED_WALLETS = [
   SupportedWallet.Portis,
 ].map((kind) => SUPPORTED_WALLETS[kind]);
 
-if (flags.useFortmatic) {
+if (FEATURE_FLAGS.useFortmatic) {
   const fortmaticEntry = SUPPORTED_WALLETS[SupportedWallet.Fortmatic];
 
   MOBILE_SUPPORTED_WALLETS.push(fortmaticEntry);
   DESKTOP_SUPPORTED_WALLETS.push(fortmaticEntry);
 }
 
-export default function useWalletConnection() {
+export function useWalletConnection() {
   useInactiveListener();
   useEagerConnect();
 }

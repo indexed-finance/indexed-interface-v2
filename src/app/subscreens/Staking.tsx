@@ -1,8 +1,8 @@
 import { StakingCard } from "components";
-import Subscreen from "./Subscreen";
+import { Subscreen } from "./Subscreen";
 import type { FormattedStakingData } from "features";
 
-export default function Staking({
+export function Staking({
   title,
   data,
 }: {

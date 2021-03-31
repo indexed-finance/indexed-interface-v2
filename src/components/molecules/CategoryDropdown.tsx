@@ -4,7 +4,7 @@ import { Token } from "components/atoms";
 import { selectors } from "features";
 import { useSelector } from "react-redux";
 
-export default function CategoryDropdown() {
+export function CategoryDropdown() {
   const { categories } = useSelector(selectors.selectMenuModels);
 
   return (

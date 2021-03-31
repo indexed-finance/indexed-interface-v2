@@ -10,7 +10,7 @@ interface Props {
   rank: number;
 }
 
-export default function RankedToken({ token }: Props) {
+export function RankedToken({ token }: Props) {
   const tx = useTranslation();
   const { isMobile } = useBreakpoints();
 

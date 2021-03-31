@@ -1,7 +1,7 @@
+import { selectors } from "features";
 import { useMemo } from "react";
 import { useSelector } from "react-redux";
 import DEFAULT_TRANSLATION_SET from "./translations/en-us.json";
-import selectors from "../features/selectors";
 
 export type SupportedLanguageCode = "en-us" | "es-mx" | "zh-cn";
 export type TranslatedTerm = keyof typeof DEFAULT_TRANSLATION_SET;

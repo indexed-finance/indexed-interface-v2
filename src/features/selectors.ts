@@ -22,7 +22,7 @@ const MILLISECONDS_PER_SECOND = 1000;
 
 type ModelKeys = "categories" | "indexPools";
 
-const selectors = {
+export const selectors = {
   ...batcherSelectors,
   ...cacheSelectors,
   ...categoriesSelectors,
@@ -446,8 +446,6 @@ const selectors = {
     return formattedPortfolio;
   },
 };
-
-export default selectors;
 
 export type SelectorType = typeof selectors;
 

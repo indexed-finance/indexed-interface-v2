@@ -59,9 +59,9 @@ const slice = createSlice({
     }),
 });
 
-export const { actions } = slice;
+export const { actions: userActions, reducer: userReducer } = slice;
 
-export const selectors = {
+export const userSelectors = {
   selectUser(state: AppState) {
     return state.user;
   },
@@ -72,7 +72,7 @@ export const selectors = {
     return state.user.ndx ? convert.toBalanceNumber(state.user.ndx) : 0;
   },
   selectTokenAllowance(state: AppState, poolId: string, tokenId: string) {
-    return state.user.allowances[`${poolId}-${tokenId}`.toLowerCase()];
+    return state.user.allowances[`user${poolId}-user${tokenId}`.toLowerCase()];
   },
   selectTokenBalance(state: AppState, tokenId: string) {
     return state.user.balances[tokenId.toLowerCase()] ?? "0";
@@ -86,7 +86,11 @@ export const selectors = {
     const entry = tokensSelectors.selectTokenById(state, tokenId);
 
     if (entry) {
-      const allowance = selectors.selectTokenAllowance(state, spender, tokenId);
+      const allowance = userSelectors.selectTokenAllowance(
+        state,
+        spender,
+        tokenId
+      );
       if (allowance) {
         const needsApproval = convert
           .toBigNumber(amount)
@@ -106,7 +110,7 @@ export const selectors = {
     return Object.entries(tokenLookup).reduce((prev, [key, value]) => {
       if (value) {
         prev[value.symbol.toLowerCase()] = convert.toBalance(
-          selectors.selectTokenBalance(state, key)
+          userSelectors.selectTokenBalance(state, key)
         );
       }
 
@@ -114,8 +118,6 @@ export const selectors = {
     }, {} as Record<string, string>);
   },
 };
-
-export default slice.reducer;
 
 // #region Helpers
 const userMulticallDataParser = createMulticallDataParser(
@@ -133,7 +135,7 @@ const userMulticallDataParser = createMulticallDataParser(
           const [, poolAddress] = _allowanceCall.args!;
           const [allowance] = _allowanceCall.result ?? [];
           const [balanceOf] = _balanceOfCall.result ?? [];
-          const combinedId = `${poolAddress}-${tokenAddress}`;
+          const combinedId = `user${poolAddress}-user${tokenAddress}`;
 
           if (allowance) {
             prev.allowances[combinedId] = allowance.toString();

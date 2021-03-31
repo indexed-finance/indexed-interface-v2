@@ -15,7 +15,7 @@ interface Props {
   onClick?(): void;
 }
 
-export default function ListCard({
+export function ListCard({
   title = "",
   subtitle = "",
   extra = null,

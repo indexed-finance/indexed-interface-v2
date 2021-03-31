@@ -1,13 +1,8 @@
 import { AppState, selectors, thunks } from "features";
 import { BigNumber } from "ethereum/utils/balancer-math";
 import { SLIPPAGE_RATE } from "config";
-import {
-  calcPoolInGivenSingleOut,
-  calcSingleOutGivenPoolIn,
-  downwardSlippage,
-  upwardSlippage,
-} from "ethereum/helpers";
 import { convert } from "helpers";
+import { downwardSlippage, ethereumHelpers, upwardSlippage } from "ethereum";
 import { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useTokenLookupBySymbol } from "features/tokens/hooks";
@@ -29,7 +24,11 @@ export function useSingleTokenBurnCallbacks(poolId: string) {
         if (outputToken) {
           const amountOut = convert.toToken(typedAmountOut, 18);
           const tokenOut = outputToken.token.id;
-          const result = calcPoolInGivenSingleOut(pool, outputToken, amountOut);
+          const result = ethereumHelpers.calcPoolInGivenSingleOut(
+            pool,
+            outputToken,
+            amountOut
+          );
           return {
             tokenOut,
             amountOut,
@@ -52,7 +51,11 @@ export function useSingleTokenBurnCallbacks(poolId: string) {
         if (outputToken) {
           const amountIn = convert.toToken(typedAmountIn, 18);
           const tokenOut = outputToken.token.id;
-          const result = calcSingleOutGivenPoolIn(pool, outputToken, amountIn);
+          const result = ethereumHelpers.calcSingleOutGivenPoolIn(
+            pool,
+            outputToken,
+            amountIn
+          );
           return {
             tokenOut,
             amountIn,

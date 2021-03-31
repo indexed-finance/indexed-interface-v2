@@ -11,7 +11,7 @@ import {
 import { buildUniswapPairs } from "hooks";
 import { log } from "./helpers";
 import { providers } from "ethers";
-import setupCoinapiConnection from "./coinapi-connection";
+import { setupCoinapiConnection } from "./coinapi-connection";
 import type { RegisteredCall, RegisteredCaller } from "helpers";
 
 // The same provider is used for the lifetime of the server.
@@ -21,7 +21,7 @@ const provider = new providers.InfuraProvider("mainnet", INFURA_ID);
 /**
  * After creating the connection, allow it to update before initializing the store.
  */
-export default async function setupStateHandling() {
+export async function setupStateHandling() {
   log("Waiting for provider.");
 
   await provider.ready;

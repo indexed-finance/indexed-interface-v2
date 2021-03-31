@@ -19,7 +19,7 @@ interface Props extends CardProps {
   onClick?(): void;
 }
 
-export default function IndexCard({
+export function IndexCard({
   title,
   titleStyle = {},
   subtitle,

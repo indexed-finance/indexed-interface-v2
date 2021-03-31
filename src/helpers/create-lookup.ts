@@ -1,4 +1,4 @@
-export default function createLookup<T extends { id: string }>(from: T[]) {
+export function createLookup<T extends { id: string }>(from: T[]) {
   return from.reduce(
     (prev, next) => {
       prev.ids.push(next.id);

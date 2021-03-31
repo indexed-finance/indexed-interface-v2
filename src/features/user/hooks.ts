@@ -1,8 +1,8 @@
 import { NDX_ADDRESS } from "config";
 import { RegisteredCall } from "helpers";
-import { USER_CALLER, selectors } from "./slice";
+import { USER_CALLER, userSelectors } from "./slice";
+import { useCallRegistrar } from "hooks";
 import { useSelector } from "react-redux";
-import useCallRegistrar from "hooks/use-call-registrar";
 import type { AppState } from "features/store";
 
 export const useApprovalStatus = (
@@ -11,26 +11,27 @@ export const useApprovalStatus = (
   amount: string
 ) =>
   useSelector((state: AppState) =>
-    selectors.selectApprovalStatus(state, spender, tokenId, amount)
+    userSelectors.selectApprovalStatus(state, spender, tokenId, amount)
   );
 
 export const useTokenBalance = (tokenId: string) =>
   useSelector((state: AppState) =>
-    selectors.selectTokenBalance(state, tokenId)
+    userSelectors.selectTokenBalance(state, tokenId)
   );
 
 export const useTokenAllowance = (tokenId: string, spender: string) =>
   useSelector((state: AppState) =>
-    selectors.selectTokenAllowance(state, spender, tokenId)
+    userSelectors.selectTokenAllowance(state, spender, tokenId)
   );
 
-export const useUserAddress = () => useSelector(selectors.selectUserAddress);
-export const useNdxBalance = () => useSelector(selectors.selectNdxBalance);
+export const useUserAddress = () =>
+  useSelector(userSelectors.selectUserAddress);
+export const useNdxBalance = () => useSelector(userSelectors.selectNdxBalance);
 
 export function useUserDataRegistrar(
   poolTokens: Record<string, string[]>,
   actions: Record<string, any>,
-  selectors: Record<string, any>
+  userSelectors: Record<string, any>
 ) {
   const userAddress = useUserAddress();
   const interfaceKind = "IERC20_ABI";
@@ -66,6 +67,6 @@ export function useUserDataRegistrar(
       onChainCalls: userDataCalls,
     },
     actions,
-    selectors
+    userSelectors
   );
 }

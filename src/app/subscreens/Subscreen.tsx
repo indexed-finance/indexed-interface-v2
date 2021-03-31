@@ -23,7 +23,7 @@ interface SubscreenProps extends CollapseProps {
 
 const { Panel } = Collapse;
 
-export default function Subscreen({
+export function Subscreen({
   title = "",
   children,
   defaultActions = null,

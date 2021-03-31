@@ -1,6 +1,9 @@
 import "theme/index.less";
+import { AppErrorBoundary } from "./AppErrorBoundary";
+import { AppLayout } from "./AppLayout";
 import { BrowserRouter } from "react-router-dom";
 import { DEBUG } from "components";
+import { FEATURE_FLAGS } from "feature-flags";
 import { Parallax } from "react-parallax";
 import { Provider, useSelector } from "react-redux";
 import { WalletConnectProvider } from "./drawers";
@@ -10,10 +13,7 @@ import { message, notification } from "antd";
 import { selectors, store } from "features";
 import { useBreakpoints } from "helpers";
 import { useEffect } from "react";
-import AppErrorBoundary from "./AppErrorBoundary";
-import AppLayout from "./AppLayout";
 import background from "assets/images/dark-bg.jpg";
-import flags from "feature-flags";
 
 function Inner() {
   const { isMobile } = useBreakpoints();
@@ -23,7 +23,7 @@ function Inner() {
       <BrowserRouter>
         <AppLayout />
       </BrowserRouter>
-      {flags.useDEBUG && <DEBUG />}
+      {FEATURE_FLAGS.useDEBUG && <DEBUG />}
     </>
   );
 
@@ -51,7 +51,7 @@ function Inner() {
   );
 }
 
-export default function App() {
+export function App() {
   return (
     <Provider store={store}>
       <AppErrorBoundary>

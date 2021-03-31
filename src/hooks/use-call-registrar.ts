@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useRef } from "react";
 import type { DataReceiverConfig } from "features";
 
-export default function useCallRegistrar(
+export function useCallRegistrar(
   calls: DataReceiverConfig,
   actions: Record<string, any>,
   selectors: Record<string, any>

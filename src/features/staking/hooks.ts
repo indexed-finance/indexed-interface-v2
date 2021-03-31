@@ -1,7 +1,7 @@
 import { stakingCaller } from "./slice";
+import { useCallRegistrar } from "hooks";
 import { useSelector } from "react-redux";
 import { useUserAddress } from "features/user/hooks";
-import useCallRegistrar from "hooks/use-call-registrar";
 import type { NormalizedStakingPool } from "ethereum";
 import type { RegisteredCall } from "helpers";
 

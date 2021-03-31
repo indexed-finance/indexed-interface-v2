@@ -1,4 +1,4 @@
-export default {
+export const FEATURE_FLAGS = {
   showNewsLink: true,
   showFaqLink: false,
   useColorThief: false,

@@ -8,11 +8,11 @@ import {
 
 export type SnapshotKey = keyof Omit<DailyPoolSnapshot, "date">;
 
-export const adapter = createEntityAdapter<DailyPoolSnapshot>({
+export const dailySnapshotsAdapter = createEntityAdapter<DailyPoolSnapshot>({
   selectId: (entry) => entry.id.toLowerCase(),
 });
 
-const initialState = adapter.getInitialState();
+const initialState = dailySnapshotsAdapter.getInitialState();
 
 const slice = createSlice({
   name: "dailySnapshots",
@@ -26,7 +26,7 @@ const slice = createSlice({
           (id) => dailySnapshots.entities[id]
         );
 
-        adapter.addMany(state, fullSnapshots);
+        dailySnapshotsAdapter.addMany(state, fullSnapshots);
       })
       .addCase(mirroredServerState, (_, action) => {
         const { dailySnapshots } = action.payload;
@@ -36,6 +36,7 @@ const slice = createSlice({
       .addCase(restartedDueToError, () => initialState),
 });
 
-export const { actions } = slice;
-
-export default slice.reducer;
+export const {
+  actions: dailySnapshotsActions,
+  reducer: dailySnapshotsReducer,
+} = slice;

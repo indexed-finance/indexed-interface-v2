@@ -1,16 +1,16 @@
 import { AnyAction } from "redux";
+import { FEATURE_FLAGS } from "feature-flags";
 import { LOCALSTORAGE_KEY } from "config";
 import { ThunkAction } from "redux-thunk";
 import { configureStore } from "@reduxjs/toolkit";
 import { disconnectFromProvider } from "./thunks";
+import { rootReducer } from "./reducer";
 import { userActions } from "./user";
-import flags from "feature-flags";
-import reducer from "./reducer";
 
 export const actionHistory: any = [];
 
 const store = configureStore({
-  reducer,
+  reducer: rootReducer,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       immutableCheck: false,
@@ -33,7 +33,7 @@ const store = configureStore({
           return next(action);
         };
       }),
-  preloadedState: flags.saveStateAcrossSessions
+  preloadedState: FEATURE_FLAGS.saveStateAcrossSessions
     ? loadPersistedState()
     : undefined,
 });
@@ -48,7 +48,7 @@ store.subscribe(() => {
   }
 });
 
-export default store;
+export { store };
 
 export type AppState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;

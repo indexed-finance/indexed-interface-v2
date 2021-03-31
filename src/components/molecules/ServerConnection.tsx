@@ -11,7 +11,7 @@ interface Props {
 
 const { Item } = Form;
 
-export default function ServerConnection({ showText = false }: Props) {
+export function ServerConnection({ showText = false }: Props) {
   const tx = useTranslation();
   const dispatch = useDispatch();
   const isConnected = useSelector(selectors.selectConnected);

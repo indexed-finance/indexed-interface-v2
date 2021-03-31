@@ -1,3 +1,4 @@
+import { BaseInteraction, InteractionValues } from "./BaseInteraction";
 import { COMMON_BASE_TOKENS, MINT_ROUTER_ADDRESS, SLIPPAGE_RATE } from "config";
 import {
   FormattedIndexPool,
@@ -11,12 +12,11 @@ import { Radio } from "antd";
 import { Route } from "react-router-dom";
 import { convert } from "helpers";
 import { downwardSlippage, upwardSlippage } from "ethereum";
+import { useMintRouterCallbacks } from "hooks";
 import { useSelector } from "react-redux";
 import { useSingleTokenMintCallbacks } from "hooks/use-mint-callbacks";
 import { useTranslation } from "i18n";
-import BaseInteraction, { InteractionValues } from "./BaseInteraction";
 import BigNumber from "bignumber.js";
-import useMintRouterCallbacks from "hooks/use-mint-router-callbacks";
 
 interface Props {
   pool: FormattedIndexPool;

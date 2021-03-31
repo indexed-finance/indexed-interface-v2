@@ -6,7 +6,7 @@ import { useStakingApy } from "hooks/use-staking-apy";
 import { useTranslation } from "i18n";
 import type { FormattedStakingData } from "features";
 
-export default function StakingCard(props: FormattedStakingData) {
+export function StakingCard(props: FormattedStakingData) {
   const tx = useTranslation();
   const {
     id,

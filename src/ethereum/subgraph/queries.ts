@@ -1,7 +1,7 @@
 import { WETH_CONTRACT_ADDRESS } from "config";
 import { computeUniswapPairAddress } from "@indexed-finance/indexed.js/dist/utils/address";
 
-export const pool = `
+const pool = `
   id
   category {
     id
@@ -65,7 +65,7 @@ export const pool = `
   }
 `;
 
-export const initial = `
+const initial = `
   {
     categories (first: 1000) {
       id
@@ -135,7 +135,7 @@ export const initial = `
   }
 `;
 
-export const singlePool = (address: string) => `
+const singlePool = (address: string) => `
   {
     indexPool(id: "${address}") {
       ${pool}
@@ -143,7 +143,7 @@ export const singlePool = (address: string) => `
   }
 `;
 
-export const allPools = `
+const allPools = `
     {
       indexPools (first: 1000) {
         ${pool}
@@ -151,7 +151,7 @@ export const allPools = `
     }
   `;
 
-export const poolUpdate = (address: string) => `
+const poolUpdate = (address: string) => `
   {
     indexPool(id: "${address}") {
       dailySnapshots(orderBy: date, orderDirection: desc, first: 1) {
@@ -174,7 +174,7 @@ export const poolUpdate = (address: string) => `
   }
   `;
 
-export const trade = (address: string) => `
+const trade = (address: string) => `
 {
     swaps(orderBy: timestamp, orderDirection: desc, first:10, where:{ pair: "${computeUniswapPairAddress(
       address,
@@ -203,7 +203,7 @@ export const trade = (address: string) => `
 }
 `;
 
-export const swap = (address: string) => `
+const swap = (address: string) => `
   {
      swaps(orderBy: timestamp, orderDirection: desc, first:10, where: { pool: "${address}" }) {
         id
@@ -216,7 +216,7 @@ export const swap = (address: string) => `
   }
 `;
 
-export const staking = `
+const staking = `
 {
   ndxStakingPools(first: 20) {
     id
@@ -234,3 +234,14 @@ export const staking = `
   }
 }
 `;
+
+export const queries = {
+  pool,
+  initial,
+  singlePool,
+  allPools,
+  poolUpdate,
+  trade,
+  swap,
+  staking,
+};

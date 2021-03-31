@@ -1,19 +1,20 @@
 import { AppState, actions, selectors, store } from "features";
+import { FEATURE_FLAGS } from "feature-flags";
 import { message } from "antd";
 import { tx } from "i18n";
-import flags from "feature-flags";
 import noop from "lodash.noop";
 
 export let socket: null | WebSocket = null;
 
 const websocketUrl =
-  process.env.NODE_ENV === "production" || flags.useProductionServerLocally
+  process.env.NODE_ENV === "production" ||
+  FEATURE_FLAGS.useProductionServerLocally
     ? "wss://api.indexed.finance/"
     : "ws://localhost:13337";
 const timeInSeconds = [1, 1, 3, 5, 8, 13, 21, 99, 999];
 let retryAttempts = 0;
 
-export default class SocketClient {
+export class SocketClient {
   public static connect(onError: () => void = noop) {
     socket = new WebSocket(websocketUrl);
 

@@ -22,7 +22,7 @@ function shuffle(array: any[]) {
   return array;
 }
 
-export default function getRandomEntries<T>(amount: number, from: T[]): T[] {
+export function getRandomEntries<T>(amount: number, from: T[]): T[] {
   if (from.length < amount) {
     throw new Error(
       `getRandomEntries requires an amount equal to or less than the provided array.`

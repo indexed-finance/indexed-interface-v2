@@ -13,7 +13,7 @@ interface Props {
   spinning?: boolean;
 }
 
-export default function Logo({
+export function Logo({
   link = "/",
   withTitle = true,
   title = "INDEXED",

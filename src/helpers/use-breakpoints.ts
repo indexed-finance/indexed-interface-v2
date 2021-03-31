@@ -2,7 +2,7 @@ import { Grid } from "antd";
 
 const { useBreakpoint } = Grid;
 
-export default function useBreakpoints() {
+export function useBreakpoints() {
   const breakpoints = useBreakpoint();
 
   return {

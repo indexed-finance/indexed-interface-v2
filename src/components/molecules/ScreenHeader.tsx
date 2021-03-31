@@ -8,7 +8,7 @@ interface Props {
   activeBreadcrumb?: ReactElement;
 }
 
-export default function ScreenHeader(props: Props) {
+export function ScreenHeader(props: Props) {
   const { isMobile } = useBreakpoints();
   const title = props.title ? props.title.replace(/ Tokens Index/g, "") : "";
 

@@ -1,7 +1,7 @@
 import { DEFAULT_DECIMAL_COUNT } from "config";
 import { NormalizedPool } from "ethereum";
 import { adapter } from "./slice";
-import { categoriesSelectors } from "../categories";
+import { categoriesSelectors } from "features/categories";
 import { convert } from "helpers";
 import { createSelector } from "reselect";
 import { tokensSelectors } from "features/tokens";
@@ -162,7 +162,7 @@ const selectTokenWeights = (
   return weights;
 };
 
-const selectors = {
+export const indexPoolsSelectors = {
   ...baseSelectors,
   selectAllPools,
   selectPool,
@@ -183,5 +183,3 @@ const selectors = {
   selectPoolTokenAddresses,
   selectTokenWeights,
 };
-
-export default selectors;

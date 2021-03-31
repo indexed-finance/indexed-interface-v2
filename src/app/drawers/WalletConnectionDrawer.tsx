@@ -97,11 +97,7 @@ export function WalletConnectProvider({ children }: { children: ReactNode }) {
   );
 }
 
-export default function WalletConnectionDrawer({
-  onClose,
-}: {
-  onClose(): void;
-}) {
+export function WalletConnectionDrawer({ onClose }: { onClose(): void }) {
   const tx = useTranslation();
   const dispatch = useDispatch();
   const { account, activate } = useWeb3React();

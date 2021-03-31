@@ -1,9 +1,9 @@
 import { ETHEREUM_PRICE_URL, SUBGRAPH_URL_INDEXED } from "config";
+import { IpfsService } from "./ipfs";
 import { convert } from "helpers";
-import IpfsService from "./ipfs";
 import axios from "axios";
 
-export default class GraphqlService {
+export class GraphqlService {
   public static executeRequest = (
     query: string,
     url: string = SUBGRAPH_URL_INDEXED

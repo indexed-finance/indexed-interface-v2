@@ -8,7 +8,7 @@ interface Props {
   pools: FormattedIndexPool[];
 }
 
-export default function QuoteCarousel({ pools }: Props) {
+export function QuoteCarousel({ pools }: Props) {
   const history = useHistory();
   const theme = useSelector(selectors.selectTheme);
 

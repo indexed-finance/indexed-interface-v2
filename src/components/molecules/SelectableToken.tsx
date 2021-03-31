@@ -13,7 +13,7 @@ interface Props {
 
 const { Item } = List;
 
-export default function SelectableToken({ asset, onClick }: Props) {
+export function SelectableToken({ asset, onClick }: Props) {
   return (
     <Item
       onClick={() => onClick(asset)}

@@ -8,7 +8,7 @@ type Props = {
   comparison: string;
 };
 
-export default function ExchangeTokenImages({ baseline, comparison }: Props) {
+export function ExchangeTokenImages({ baseline, comparison }: Props) {
   const tx = useTranslation();
 
   return (

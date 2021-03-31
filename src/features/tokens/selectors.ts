@@ -1,41 +1,39 @@
-import { adapter } from "./slice";
+import { tokensAdapter } from "./slice";
 import type { AppState } from "features/store";
 import type { NormalizedToken } from "ethereum";
 
-const selectors = {
-  ...adapter.getSelectors((state: AppState) => state.tokens),
+export const tokensSelectors = {
+  ...tokensAdapter.getSelectors((state: AppState) => state.tokens),
   selectTokens: (state: AppState) => state.tokens,
   selectTokenById: (state: AppState, id: string) =>
-    selectors.selectById(state, id),
+    tokensSelectors.selectById(state, id),
   selectTokensById: (
     state: AppState,
     ids: string[]
   ): (NormalizedToken | undefined)[] => {
-    const tokens = selectors.selectTokens(state);
+    const tokens = tokensSelectors.selectTokens(state);
     return ids.reduce(
       (prev, next) => [...prev, tokens.entities[next.toLowerCase()]],
       [] as (NormalizedToken | undefined)[]
     );
   },
-  selectAllTokens: (state: AppState) => selectors.selectAll(state),
-  selectTokenLookup: (state: AppState) => selectors.selectEntities(state),
+  selectAllTokens: (state: AppState) => tokensSelectors.selectAll(state),
+  selectTokenLookup: (state: AppState) => tokensSelectors.selectEntities(state),
   selectTokenSymbols: (state: AppState) =>
-    selectors.selectAll(state).map(({ symbol }) => symbol),
+    tokensSelectors.selectAll(state).map(({ symbol }) => symbol),
   selectTokenSymbol: (state: AppState, poolId: string) =>
-    selectors.selectTokenLookup(state)[poolId]?.symbol ?? "",
+    tokensSelectors.selectTokenLookup(state)[poolId]?.symbol ?? "",
   selectTokenPrice: (state: AppState, tokenId: string) =>
-    selectors.selectTokenById(state, tokenId)?.priceData?.price,
+    tokensSelectors.selectTokenById(state, tokenId)?.priceData?.price,
   selectTokenSupplies: (state: AppState, tokenIds: string[]) => {
-    const lookup = selectors.selectTokensById(state, tokenIds);
+    const lookup = tokensSelectors.selectTokensById(state, tokenIds);
     return lookup.map((t) => t?.totalSupply ?? "");
   },
   selectTokenLookupBySymbol: (state: AppState) => {
-    const tokens = selectors.selectAllTokens(state);
+    const tokens = tokensSelectors.selectAllTokens(state);
     return tokens.reduce((prev, next) => {
       prev[next.symbol.toLowerCase()] = next;
       return prev;
     }, {} as Record<string, NormalizedToken>);
   },
 };
-
-export default selectors;

@@ -37,7 +37,7 @@ interface Props {
   onChange?: (value: TokenSelectorValue) => void;
 }
 
-export default function TokenSelector({
+export function TokenSelector({
   label = "",
   assets,
   value = {},

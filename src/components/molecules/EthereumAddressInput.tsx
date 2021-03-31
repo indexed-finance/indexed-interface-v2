@@ -23,7 +23,7 @@ interface Props extends Partial<InputProps> {
   onError?(): void;
 }
 
-export default function EthereumAddressInput({
+export function EthereumAddressInput({
   provider = globalProvider,
   onChange = noop,
   onAddressChange = noop,

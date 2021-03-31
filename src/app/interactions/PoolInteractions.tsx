@@ -27,7 +27,7 @@ interface Props {
   initial?: PoolInteraction;
 }
 
-export default function PoolInteractions({ pool }: Props) {
+export function PoolInteractions({ pool }: Props) {
   const tx = useTranslation();
   const { poolName, interaction: activeInteraction = "trade" } = useParams<{
     poolName: string;

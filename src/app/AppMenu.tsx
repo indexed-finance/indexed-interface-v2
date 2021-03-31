@@ -8,11 +8,11 @@ import {
 import { Link, useHistory } from "react-router-dom";
 import { SOCIAL_MEDIA } from "config";
 import { TranslatedTerm, useTranslation } from "i18n";
+import { routes } from "./routes";
 import { selectors } from "features";
 import { useBreakpoints, useScrollPrevention } from "helpers";
 import { useSelector } from "react-redux";
 import noop from "lodash.noop";
-import routes from "./routes";
 
 interface Props {
   className?: string;
@@ -21,7 +21,7 @@ interface Props {
 
 const { Item, SubMenu } = Menu;
 
-export default function AppMenu({ onItemClick = noop, ...rest }: Props) {
+export function AppMenu({ onItemClick = noop, ...rest }: Props) {
   const tx = useTranslation();
   const menuModels = useSelector(selectors.selectMenuModels);
   const categoryLookup = useSelector(selectors.selectCategoryLookup);

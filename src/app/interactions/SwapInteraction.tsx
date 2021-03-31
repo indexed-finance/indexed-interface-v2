@@ -6,21 +6,21 @@ import {
   usePoolToTokens,
   useUserDataRegistrar,
 } from "features";
+import { BaseInteraction, InteractionValues } from "./BaseInteraction";
 import { BigNumber } from "ethereum/utils/balancer-math";
 import { Divider, Space } from "antd";
+import { FEATURE_FLAGS } from "feature-flags";
 import { PlainLanguageTransaction, TokenExchangeRate } from "components";
 import { SLIPPAGE_RATE } from "config";
-import { calcSwapAmountOut } from "ethereum/helpers";
 import { convert } from "helpers";
 import { downwardSlippage, upwardSlippage } from "ethereum";
+import { ethereumHelpers } from "ethereum";
 import { getSwapCost } from "ethereum/utils";
 import { useCallback, useMemo } from "react";
 import { useFormikContext } from "formik";
 import { useSelector } from "react-redux";
 import { useSwapCallbacks } from "hooks";
 import { useTranslation } from "i18n";
-import BaseInteraction, { InteractionValues } from "./BaseInteraction";
-import flags from "feature-flags";
 
 interface Props {
   pool: FormattedIndexPool;
@@ -148,7 +148,7 @@ function SwapExtras({ pool }: Props) {
     if (fromAmount && toAmount) {
       return (toAmount / fromAmount).toFixed(4);
     } else {
-      const { spotPriceAfter = "" } = calcSwapAmountOut(
+      const { spotPriceAfter = "" } = ethereumHelpers.calcSwapAmountOut(
         defaultFromToken,
         defaultToToken,
         convert.toBigNumber("1"),
@@ -168,7 +168,9 @@ function SwapExtras({ pool }: Props) {
           rate={rate}
           fee={swapCost}
         />
-        {flags.usePlainLanguageTransaction && <PlainLanguageTransaction />}
+        {FEATURE_FLAGS.usePlainLanguageTransaction && (
+          <PlainLanguageTransaction />
+        )}
       </Space>
       <Divider />
     </>

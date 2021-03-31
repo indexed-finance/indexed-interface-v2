@@ -1,10 +1,10 @@
 import { AppState, selectors } from "features";
 import { Link, useHistory } from "react-router-dom";
 import { List, Typography } from "antd";
+import { ListCard } from "./ListCard";
 import { toFormattedAsset } from "ethereum";
 import { useSelector } from "react-redux";
 import { useTranslation } from "i18n";
-import ListCard from "./ListCard";
 import type { Token as TokenType } from "indexed-types";
 
 interface Props {
@@ -25,7 +25,7 @@ interface Props {
   };
 }
 
-export default function CategoryCard({
+export function CategoryCard({
   id = "",
   symbol = "",
   name = "",

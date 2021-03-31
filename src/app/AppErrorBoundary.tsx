@@ -7,7 +7,7 @@ import { useTranslation } from "i18n";
 
 const timeInSeconds = [1, 1, 3, 5, 8, 13, 21, 99, 999];
 
-export default class AppErrorBoundary extends Component<
+export class AppErrorBoundary extends Component<
   {
     children: ReactNode;
   },

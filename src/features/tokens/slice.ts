@@ -16,15 +16,15 @@ import type { NormalizedToken } from "ethereum";
 export const totalSuppliesCaller = "Total Supplies";
 export const pricesCaller = "Token Prices";
 
-export const adapter = createEntityAdapter<NormalizedToken>({
+export const tokensAdapter = createEntityAdapter<NormalizedToken>({
   selectId: (entry) => entry.id.toLowerCase(),
 });
 
-const initialState = adapter.getInitialState();
+const tokensInitialState = tokensAdapter.getInitialState();
 
 const slice = createSlice({
   name: "tokens",
-  initialState,
+  initialState: tokensInitialState,
   reducers: {},
   extraReducers: (builder) =>
     builder
@@ -57,7 +57,7 @@ const slice = createSlice({
           }
         }
 
-        adapter.addMany(state, fullTokens);
+        tokensAdapter.addMany(state, fullTokens);
       })
       .addCase(coingeckoIdsLoaded, (state, action) => {
         const symbolToIdLookup = action.payload.reduce((prev, next) => {
@@ -98,7 +98,7 @@ const slice = createSlice({
 
         return tokens;
       })
-      .addCase(restartedDueToError, () => initialState)
+      .addCase(restartedDueToError, () => tokensInitialState)
       .addCase(totalSuppliesUpdated, (state, action) => {
         for (const { token, totalSupply } of action.payload) {
           const entity = state.entities[token.toLowerCase()];
@@ -123,9 +123,7 @@ const slice = createSlice({
       }),
 });
 
-export const { actions } = slice;
-
-export default slice.reducer;
+export const { actions: tokensActions, reducer: tokensReducer } = slice;
 
 // #region Helpers
 const totalSuppliesMulticallDataParser = createMulticallDataParser(

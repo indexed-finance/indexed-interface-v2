@@ -1,8 +1,4 @@
-import {
-  AppState,
-  actions,
-  selectors,
-} from "features";
+import { AppState, actions, selectors } from "features";
 import { ApprovalStatus } from "features/user/slice";
 import { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -18,7 +14,7 @@ type TokenApprovalHook = {
   approve: () => void;
 };
 
-export default function useTokenApproval({
+export function useTokenApproval({
   spender,
   tokenId,
   amount,
@@ -34,9 +30,7 @@ export default function useTokenApproval({
   );
   const approve = useCallback(() => {
     if (spender && status === "approval needed") {
-      dispatch(
-        actions.approveSpender(spender, tokenId, amount)
-      );
+      dispatch(actions.approveSpender(spender, tokenId, amount));
     }
   }, [dispatch, status, tokenId, spender, amount]);
 

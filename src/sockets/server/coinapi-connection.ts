@@ -40,7 +40,7 @@ export let updatingCoinData: NodeJS.Timer;
 export let reportingCoinapiUsage: NodeJS.Timer;
 export let checkingNeedToRestart: NodeJS.Timer;
 
-export default async function setupCoinapiConnection(symbols: string[]) {
+export async function setupCoinapiConnection(symbols: string[]) {
   if (coinapiClient) {
     log("Cleaning up before reopening.");
 

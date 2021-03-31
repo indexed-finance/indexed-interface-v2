@@ -6,7 +6,7 @@ interface Props {
   zIndex?: number;
 }
 
-export default function BuildingWall({
+export function BuildingWall({
   top,
   left,
   right,

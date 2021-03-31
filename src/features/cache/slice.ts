@@ -7,7 +7,7 @@ import {
   restartedDueToError,
 } from "features/actions";
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import { actions as stakingActions } from "../staking/slice";
+import { stakingActions } from "../staking";
 import type { AppState } from "features/store";
 
 interface CacheState {
@@ -56,7 +56,7 @@ const slice = createSlice({
   extraReducers: (builder) =>
     builder
       .addCase(coingeckoDataLoaded, (state, action) => {
-        const formattedCall = `retrieveCoingeckoData/${
+        const formattedCall = `retrieveCoingeckoData/cache{
           action.payload.pool ?? Object.keys(action.payload.tokens).join("_")
         }`;
 
@@ -67,7 +67,7 @@ const slice = createSlice({
       })
       .addCase(poolTradesAndSwapsLoaded, (state, action) => {
         const { poolId } = action.payload;
-        const formattedCall = `requestPoolTradesAndSwaps/${poolId}`;
+        const formattedCall = `requestPoolTradesAndSwaps/cache${poolId}`;
 
         state.entries[formattedCall] = {
           result: action.payload as any,
@@ -106,9 +106,9 @@ const slice = createSlice({
       ),
 });
 
-export const { actions } = slice;
+export const { actions: cacheActions, reducer: cacheReducer } = slice;
 
-export const selectors = {
+export const cacheSelectors = {
   selectBlockNumber(state: AppState) {
     return state.cache.blockNumber;
   },
@@ -124,5 +124,3 @@ export const selectors = {
       : null;
   },
 };
-
-export default slice.reducer;

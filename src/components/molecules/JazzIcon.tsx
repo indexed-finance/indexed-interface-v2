@@ -12,7 +12,7 @@ interface Props {
   address: string;
 }
 
-export default function JazzIcon({ address }: Props) {
+export function JazzIcon({ address }: Props) {
   const tx = useTranslation();
   const { deactivate } = useWeb3React();
   const dispatch = useDispatch();

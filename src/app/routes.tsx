@@ -1,9 +1,9 @@
+import { FEATURE_FLAGS } from "feature-flags";
 import { FiExternalLink } from "react-icons/fi";
 import { GiStakeHammer } from "react-icons/gi";
 import { LazyExoticComponent, ReactElement, ReactNode } from "react";
 import { RiSafe2Line } from "react-icons/ri";
 import { lazy } from "react";
-import flags from "feature-flags";
 import type { AppState } from "features";
 import type { TranslatedTerm } from "i18n";
 
@@ -17,7 +17,7 @@ type Route = {
   screen?: LazyExoticComponent<(props: any) => ReactElement>;
 };
 
-const routes: Route[] = [
+export const routes: Route[] = [
   {
     path: "/",
     exact: true,
@@ -77,7 +77,7 @@ const routes: Route[] = [
   },
 ];
 
-if (flags.showFaqLink) {
+if (FEATURE_FLAGS.showFaqLink) {
   routes.push({
     path: "/faq",
     exact: true,
@@ -86,7 +86,7 @@ if (flags.showFaqLink) {
   });
 }
 
-if (flags.showNewsLink) {
+if (FEATURE_FLAGS.showNewsLink) {
   routes.push({
     path: "/news",
     exact: true,
@@ -100,7 +100,7 @@ if (flags.showNewsLink) {
   });
 }
 
-if (flags.useInternalDocs) {
+if (FEATURE_FLAGS.useInternalDocs) {
   routes.push(
     {
       path: "/docs",
@@ -122,8 +122,6 @@ if (flags.useInternalDocs) {
     isExternalLink: true,
   });
 }
-
-export default routes;
 
 // #region Helpers
 interface Props {

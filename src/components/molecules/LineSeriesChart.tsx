@@ -16,7 +16,7 @@ interface Props {
   onChangeTheme(): void;
 }
 
-export default function LineSeriesChart({
+export function LineSeriesChart({
   data,
   expanded = false,
   settings,

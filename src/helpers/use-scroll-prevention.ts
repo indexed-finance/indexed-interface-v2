@@ -1,7 +1,7 @@
 // Code adapted from https://stackoverflow.com/questions/4770025/how-to-disable-scrolling-temporarily
 import { useEffect } from "react";
 
-export default function useScrollPrevention(shouldPreventScroll: boolean) {
+export function useScrollPrevention(shouldPreventScroll: boolean) {
   useEffect(() => {
     if (shouldPreventScroll) {
       // modern Chrome requires { passive: false } when adding event

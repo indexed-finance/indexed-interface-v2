@@ -6,7 +6,7 @@ interface Props {
   disabled?: boolean;
 }
 
-export default function Flipper({ disabled, onFlip }: Props) {
+export function Flipper({ disabled, onFlip }: Props) {
   return (
     <Divider style={{ marginBottom: 0 }}>
       <Button type="default" onClick={onFlip}>

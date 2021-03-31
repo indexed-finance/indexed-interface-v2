@@ -3,21 +3,12 @@ import { BigNumber } from "bignumber.js";
 import { NormalizedPool } from "./types.d";
 import { convert } from "helpers";
 
-export * from "./utils";
-export * from "./subgraph";
-export * from "./multicall";
-export * from "./transactions";
-
-export const ZERO = balancerMath.ZERO;
-export const ONE = balancerMath.ONE;
-export const BONE = balancerMath.BONE;
-
 type PoolTokenData = {
   usedDenorm: string;
   usedBalance: string;
 };
 
-export function calcSwapAmountIn(
+function calcSwapAmountIn(
   inputToken: PoolTokenData,
   outputToken: PoolTokenData,
   amountOut: BigNumber,
@@ -67,7 +58,7 @@ export function calcSwapAmountIn(
   };
 }
 
-export function calcSwapAmountOut(
+function calcSwapAmountOut(
   inputToken: PoolTokenData,
   outputToken: PoolTokenData,
   amountIn: BigNumber,
@@ -115,7 +106,7 @@ export function calcSwapAmountOut(
   };
 }
 
-export function calcPoolOutGivenSingleIn(
+function calcPoolOutGivenSingleIn(
   pool: NormalizedPool,
   inputToken: PoolTokenData,
   tokenAmountIn: BigNumber
@@ -147,7 +138,7 @@ export function calcPoolOutGivenSingleIn(
   return { poolAmountOut };
 }
 
-export function calcSingleInGivenPoolOut(
+function calcSingleInGivenPoolOut(
   pool: NormalizedPool,
   inputToken: PoolTokenData,
   poolAmountOut: BigNumber
@@ -181,7 +172,7 @@ export function calcSingleInGivenPoolOut(
   return { tokenAmountIn };
 }
 
-export function calcPoolInGivenSingleOut(
+function calcPoolInGivenSingleOut(
   pool: NormalizedPool,
   outputToken: PoolTokenData,
   tokenAmountOut: BigNumber
@@ -215,7 +206,7 @@ export function calcPoolInGivenSingleOut(
   return { poolAmountIn };
 }
 
-export function calcSingleOutGivenPoolIn(
+function calcSingleOutGivenPoolIn(
   pool: NormalizedPool,
   outputToken: PoolTokenData,
   poolAmountIn: BigNumber
@@ -248,3 +239,12 @@ export function calcSingleOutGivenPoolIn(
   }
   return { tokenAmountOut };
 }
+
+export const ethereumHelpers = {
+  calcSwapAmountIn,
+  calcSwapAmountOut,
+  calcPoolOutGivenSingleIn,
+  calcSingleInGivenPoolOut,
+  calcPoolInGivenSingleOut,
+  calcSingleOutGivenPoolIn,
+};

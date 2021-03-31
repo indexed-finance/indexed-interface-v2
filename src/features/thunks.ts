@@ -11,26 +11,44 @@ import {
 } from "helpers";
 import { SLIPPAGE_RATE, SUBGRAPH_URL_UNISWAP } from "config";
 import { Trade } from "@uniswap/sdk";
+import {
+  approveSpender,
+  burnAndSwapForExactTokens,
+  burnExactAndSwapForTokens,
+  downwardSlippage,
+  executeUniswapTrade,
+  exitswapExternAmountOut,
+  exitswapPoolAmountIn,
+  getUrl,
+  joinPool,
+  joinswapExternAmountIn,
+  joinswapPoolAmountOut,
+  multicall,
+  normalizeInitialData,
+  normalizeStakingData,
+  queryInitial,
+  queryStaking,
+  querySwaps,
+  queryTrades,
+  swapExactAmountIn,
+  swapExactAmountOut,
+  swapExactTokensForTokensAndMint,
+  swapTokensForTokensAndMintExact,
+  upwardSlippage,
+} from "ethereum";
 import { batcherActions } from "./batcher";
 import { cacheActions } from "./cache";
 import { categoriesActions } from "./categories";
 import { ethers, providers } from "ethers";
-import {
-  exitswapExternAmountOut,
-  exitswapPoolAmountIn,
-  joinswapExternAmountIn,
-  joinswapPoolAmountOut,
-} from "ethereum/transactions";
-import { helpers, multicall } from "ethereum";
 import { indexPoolsActions } from "./indexPools";
 import { notification } from "antd";
+import { selectors } from "./selectors";
 import { settingsActions } from "./settings";
 import { stakingActions } from "./staking";
 import { tokensActions } from "./tokens";
 import { tx } from "i18n";
 import { userActions } from "./user";
 import debounce from "lodash.debounce";
-import selectors from "./selectors";
 import type { AppThunk } from "./store";
 
 // #region Provider
@@ -149,9 +167,9 @@ export const thunks = {
   retrieveInitialData: (): AppThunk => async (dispatch) => {
     if (provider) {
       const { chainId } = provider.network;
-      const url = helpers.getUrl(chainId);
-      const initial = await helpers.queryInitial(url);
-      const formatted = helpers.normalizeInitialData(initial);
+      const url = getUrl(chainId);
+      const initial = await queryInitial(url);
+      const formatted = normalizeInitialData(initial);
 
       dispatch(actions.subgraphDataLoaded(formatted));
     }
@@ -235,10 +253,10 @@ export const thunks = {
   ) => {
     if (provider) {
       const { chainId } = await provider.getNetwork();
-      const url = helpers.getUrl(chainId);
+      const url = getUrl(chainId);
       const [trades, swaps] = await Promise.all([
-        helpers.queryTrades(SUBGRAPH_URL_UNISWAP, poolAddress),
-        helpers.querySwaps(url, poolAddress),
+        queryTrades(SUBGRAPH_URL_UNISWAP, poolAddress),
+        querySwaps(url, poolAddress),
       ]);
 
       dispatch(
@@ -253,9 +271,9 @@ export const thunks = {
   requestStakingData: (): AppThunk => async (dispatch) => {
     if (provider) {
       const { chainId } = provider.network;
-      const url = helpers.getUrl(chainId);
-      const staking = await helpers.queryStaking(url);
-      const formatted = helpers.normalizeStakingData(staking);
+      const url = getUrl(chainId);
+      const staking = await queryStaking(url);
+      const formatted = normalizeStakingData(staking);
 
       dispatch(actions.stakingDataLoaded(formatted));
     }
@@ -272,12 +290,7 @@ export const thunks = {
   ): AppThunk => async () => {
     if (signer && tokenAddress) {
       try {
-        await helpers.approveSpender(
-          signer,
-          spenderAddress,
-          tokenAddress,
-          exactAmount
-        );
+        await approveSpender(signer, spenderAddress, tokenAddress, exactAmount);
       } catch (err) {
         // Handle failed approval.
         console.log(err);
@@ -288,7 +301,7 @@ export const thunks = {
     const state = getState();
     if (signer) {
       const userAddress = selectors.selectUserAddress(state);
-      await helpers.executeUniswapTrade(signer, userAddress, trade);
+      await executeUniswapTrade(signer, userAddress, trade);
     }
   },
   joinswapExternAmountIn: (
@@ -329,7 +342,7 @@ export const thunks = {
     maxAmountsIn: BigNumber[]
   ): AppThunk => async () => {
     if (signer) {
-      await helpers.joinPool(signer, indexPool, poolAmountOut, maxAmountsIn);
+      await joinPool(signer, indexPool, poolAmountOut, maxAmountsIn);
     }
   },
   exitswapPoolAmountIn: (
@@ -373,7 +386,7 @@ export const thunks = {
     maximumPrice: BigNumber
   ): AppThunk => async () => {
     if (signer) {
-      await helpers.swapExactAmountIn(
+      await swapExactAmountIn(
         signer,
         indexPool,
         tokenIn,
@@ -393,7 +406,7 @@ export const thunks = {
     maximumPrice: BigNumber
   ): AppThunk => async () => {
     if (signer) {
-      await helpers.swapExactAmountOut(
+      await swapExactAmountOut(
         signer,
         indexPool,
         tokenIn,
@@ -411,7 +424,7 @@ export const thunks = {
     poolAmountOut: BigNumber
   ): AppThunk => async () => {
     if (signer) {
-      await helpers.swapTokensForTokensAndMintExact(
+      await swapTokensForTokensAndMintExact(
         signer,
         indexPool,
         maxAmountIn,
@@ -427,7 +440,7 @@ export const thunks = {
     minPoolAmountOut: BigNumber
   ): AppThunk => async () => {
     if (signer) {
-      await helpers.swapExactTokensForTokensAndMint(
+      await swapExactTokensForTokensAndMint(
         signer,
         indexPool,
         amountIn,
@@ -443,7 +456,7 @@ export const thunks = {
     minAmountOut: BigNumber
   ): AppThunk => async () => {
     if (signer) {
-      await helpers.burnExactAndSwapForTokens(
+      await burnExactAndSwapForTokens(
         signer,
         indexPool,
         poolAmountIn,
@@ -459,7 +472,7 @@ export const thunks = {
     tokenAmountOut: BigNumber
   ): AppThunk => async () => {
     if (signer) {
-      await helpers.burnAndSwapForExactTokens(
+      await burnAndSwapForExactTokens(
         signer,
         indexPool,
         poolAmountInMax,
@@ -487,18 +500,16 @@ export const thunks = {
       let [input, output] = [inputAmount, outputAmount].map(convert.toToken);
 
       if (specifiedSide === "input") {
-        output = helpers.downwardSlippage(output, SLIPPAGE_RATE);
+        output = downwardSlippage(output, SLIPPAGE_RATE);
       } else {
-        input = helpers.upwardSlippage(input, SLIPPAGE_RATE);
+        input = upwardSlippage(input, SLIPPAGE_RATE);
       }
       const { id: inputAddress } = tokensBySymbol[inputTokenSymbol];
       const { id: outputAddress } = tokensBySymbol[outputTokenSymbol];
 
       if (inputAddress && outputAddress) {
         const swapper =
-          specifiedSide === "input"
-            ? helpers.swapExactAmountIn
-            : helpers.swapExactAmountOut;
+          specifiedSide === "input" ? swapExactAmountIn : swapExactAmountOut;
 
         await swapper(
           signer,
@@ -664,7 +675,7 @@ export const thunks = {
   },
 };
 
-const actions = {
+export const actions = {
   ...batcherActions,
   ...cacheActions,
   ...categoriesActions,
@@ -685,9 +696,7 @@ export type DataReceiverConfig = {
   offChainCalls?: any[];
 };
 
-export default actions;
-
-// #region Helpers
+// #region ethereumHelpers
 export function formatMulticallData(
   batchConfig: ReturnType<typeof selectors.selectOnChainBatch>,
   blockNumber: number,

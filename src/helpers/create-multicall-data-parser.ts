@@ -10,12 +10,11 @@ export type RelevantCall = [
   Record<string /* function name */, CallWithResult[]>
 ];
 
-export default function createMulticallDataParser<T>(
+export function createMulticallDataParser<T>(
   prefix: string,
   formatter: (calls: [string, Record<string, CallWithResult[]>][]) => T
 ) {
   return ({
-    callers,
     callers: { [prefix]: relevantCaller },
     callsToResults,
   }: MulticallData) => {

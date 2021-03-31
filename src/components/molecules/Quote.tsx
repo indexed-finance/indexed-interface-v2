@@ -13,7 +13,7 @@ interface Props extends HTMLProps<HTMLDivElement> {
   inline?: boolean;
 }
 
-export default function Quote({
+export function Quote({
   symbol = "",
   price,
   netChange,

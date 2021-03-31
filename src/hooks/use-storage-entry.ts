@@ -9,10 +9,7 @@ interface StorageEntry<T> {
   clear(): void;
 }
 
-export default function useStorageEntry<T>(
-  key: string,
-  fallback: T
-): StorageEntry<T> {
+export function useStorageEntry<T>(key: string, fallback: T): StorageEntry<T> {
   const handlers = useMemo<Omit<StorageEntry<T>, "entry">>(
     () => ({
       store(entry) {

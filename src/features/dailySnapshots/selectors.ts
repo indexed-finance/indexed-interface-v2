@@ -1,17 +1,19 @@
-import { SnapshotKey, adapter } from "./slice";
+import { SnapshotKey, dailySnapshotsAdapter } from "./slice";
 import type { AppState } from "features/store";
 
 const SECONDS_PER_DAY = 24 * 60 * 60;
 const SECONDS_PER_WEEK = SECONDS_PER_DAY * 7;
 
-const selectors = {
-  ...adapter.getSelectors((state: AppState) => state.dailySnapshots),
+export const dailySnapshotsSelectors = {
+  ...dailySnapshotsAdapter.getSelectors(
+    (state: AppState) => state.dailySnapshots
+  ),
   selectSortedSnapshotsOfPool: (
     state: AppState,
     poolId: string,
     direction: "asc" | "desc" = "asc"
   ) => {
-    const snapshots = selectors
+    const snapshots = dailySnapshotsSelectors
       .selectAll(state)
       .filter((dailySnapshot) => dailySnapshot.id.includes(poolId));
 
@@ -24,7 +26,7 @@ const selectors = {
     poolId: string,
     maxAgeInSeconds: number
   ) => {
-    const snapshots = selectors.selectSortedSnapshotsOfPool(
+    const snapshots = dailySnapshotsSelectors.selectSortedSnapshotsOfPool(
       state,
       poolId,
       "asc"
@@ -41,7 +43,7 @@ const selectors = {
     key: SnapshotKey
   ) => {
     const maxAgeInSeconds = timeframe === "Day" ? 86400 : 604800;
-    const snapshots = selectors.selectSortedSnapshotsOfPoolInTimeframe(
+    const snapshots = dailySnapshotsSelectors.selectSortedSnapshotsOfPoolInTimeframe(
       state,
       poolId,
       maxAgeInSeconds
@@ -53,7 +55,7 @@ const selectors = {
     return timeSeriesData;
   },
   selectMostRecentSnapshotOfPool: (state: AppState, poolId: string) => {
-    const snapshots = selectors.selectSortedSnapshotsOfPool(
+    const snapshots = dailySnapshotsSelectors.selectSortedSnapshotsOfPool(
       state,
       poolId,
       "desc"
@@ -62,12 +64,12 @@ const selectors = {
     return mostRecent;
   },
   selectSnapshotPeriodsForPool: (state: AppState, poolId: string) => {
-    const allSnapshots = selectors.selectSortedSnapshotsOfPoolInTimeframe(
+    const allSnapshots = dailySnapshotsSelectors.selectSortedSnapshotsOfPoolInTimeframe(
       state,
       poolId,
       86400 // one day
     );
-    const mostRecentSnapshot = selectors.selectMostRecentSnapshotOfPool(
+    const mostRecentSnapshot = dailySnapshotsSelectors.selectMostRecentSnapshotOfPool(
       state,
       poolId
     );
@@ -84,14 +86,14 @@ const selectors = {
     };
   },
   selectPoolDeltas: (state: AppState, poolId: string) => {
-    const mostRecentSnapshot = selectors.selectMostRecentSnapshotOfPool(
+    const mostRecentSnapshot = dailySnapshotsSelectors.selectMostRecentSnapshotOfPool(
       state,
       poolId
     );
-    const { last24Hours, lastWeek } = selectors.selectSnapshotPeriodsForPool(
-      state,
-      poolId
-    );
+    const {
+      last24Hours,
+      lastWeek,
+    } = dailySnapshotsSelectors.selectSnapshotPeriodsForPool(state, poolId);
     const volumeLast24Hours =
       parseFloat(mostRecentSnapshot.totalVolumeUSD) -
       parseFloat(last24Hours[0].totalVolumeUSD);
@@ -140,11 +142,11 @@ const selectors = {
     };
   },
   selectPoolStats: (state: AppState, poolId: string) => {
-    const mostRecentSnapshot = selectors.selectMostRecentSnapshotOfPool(
+    const mostRecentSnapshot = dailySnapshotsSelectors.selectMostRecentSnapshotOfPool(
       state,
       poolId
     );
-    const deltas = selectors.selectPoolDeltas(state, poolId);
+    const deltas = dailySnapshotsSelectors.selectPoolDeltas(state, poolId);
 
     return {
       marketCap: parseFloat(mostRecentSnapshot.totalValueLockedUSD),
@@ -154,5 +156,3 @@ const selectors = {
     };
   },
 };
-
-export default selectors;

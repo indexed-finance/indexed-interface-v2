@@ -6,6 +6,7 @@ import {
   usePoolToTokens,
   useUserDataRegistrar,
 } from "features";
+import { BaseInteraction, InteractionValues } from "./BaseInteraction";
 import { COMMON_BASE_TOKENS, UNISWAP_ROUTER_ADDRESS } from "config";
 import { Trade } from "@uniswap/sdk";
 import { convert } from "helpers";
@@ -13,7 +14,6 @@ import { useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "i18n";
 import { useUniswapTradingPairs } from "hooks";
-import BaseInteraction, { InteractionValues } from "./BaseInteraction";
 
 interface Props {
   pool: FormattedIndexPool;

@@ -4,7 +4,7 @@ import { Token } from "components/atoms";
 import { selectors } from "features";
 import { useSelector } from "react-redux";
 
-export default function PoolDropdown() {
+export function PoolDropdown() {
   const { indexPools } = useSelector(selectors.selectMenuModels);
   const indexPoolsLookup = useSelector(selectors.selectCategoryImagesByPoolIds);
 

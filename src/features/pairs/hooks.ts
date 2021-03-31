@@ -1,5 +1,5 @@
 import { PAIR_DATA_CALLER } from "./slice";
-import useCallRegistrar from "hooks/use-call-registrar";
+import { useCallRegistrar } from "hooks";
 import type { RegisteredCall } from "helpers";
 
 export type RegisteredPair = {

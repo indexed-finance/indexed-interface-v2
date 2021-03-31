@@ -43,7 +43,7 @@ const interactionSchema = yup.object().shape({
 
 export type InteractionValues = typeof initialValues;
 
-export default function BaseInteraction({
+export function BaseInteraction({
   title,
   assets,
   spender,

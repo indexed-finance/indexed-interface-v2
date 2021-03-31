@@ -66,27 +66,25 @@ const slice = createSlice({
       .addCase(restartedDueToError, () => initialState),
 });
 
-export const { actions } = slice;
+export const { actions: stakingActions, reducer: stakingReducer } = slice;
 
-export const selectors = {
+export const stakingSelectors = {
   ...adapter.getSelectors((state: AppState) => state.staking),
   selectAllStakingPoolIds(state: AppState) {
-    return selectors.selectAll(state).map((entry) => entry.indexPool);
+    return stakingSelectors.selectAll(state).map((entry) => entry.indexPool);
   },
   selectAllStakingPools(state: AppState) {
-    return selectors.selectAll(state);
+    return stakingSelectors.selectAll(state);
   },
   selectStakingPool(state: AppState, id: string) {
-    return selectors.selectById(state, id);
+    return stakingSelectors.selectById(state, id);
   },
   selectStakingPoolByStakingToken(state: AppState, id: string) {
-    return selectors
+    return stakingSelectors
       .selectAllStakingPools(state)
       .find((p) => p.stakingToken.toLowerCase() === id.toLowerCase());
   },
 };
-
-export default slice.reducer;
 
 // #region Helpers
 export const stakingMulticallDataParser = createMulticallDataParser(

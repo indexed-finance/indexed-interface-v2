@@ -22,7 +22,7 @@ const USEFUL_LINKS: Array<{
   },
 ];
 
-export default function UsefulLinks({ address }: { address: string }) {
+export function UsefulLinks({ address }: { address: string }) {
   const tx = useTranslation();
   const quickswapLink = usePoolQuickswapLink(address);
   const links = useMemo(

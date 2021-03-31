@@ -12,10 +12,7 @@ interface Props {
 
 const { Header } = Layout;
 
-export default function AppHeader({
-  mobileMenuActive,
-  onToggleMobileMenu,
-}: Props) {
+export function AppHeader({ mobileMenuActive, onToggleMobileMenu }: Props) {
   const selectedAddress = useSelector(selectors.selectUserAddress);
   const breakpoints = useBreakpoints();
   const MobileMenuIcon = mobileMenuActive

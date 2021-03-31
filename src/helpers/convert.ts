@@ -94,6 +94,6 @@ const convert = {
     ),
 };
 
-export default convert;
+export { convert };
 
 type ProviderLike = { network: { chainId: ChainId } };

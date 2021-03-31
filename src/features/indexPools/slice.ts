@@ -102,9 +102,7 @@ const slice = createSlice({
       .addCase(restartedDueToError, () => initialState),
 });
 
-export const { actions } = slice;
-
-export default slice.reducer;
+export const { actions: indexPoolsActions, reducer: indexPoolsReducer } = slice;
 
 // #region Helpers
 const poolMulticallDataParser = createMulticallDataParser(
@@ -152,7 +150,7 @@ const poolMulticallDataParser = createMulticallDataParser(
           return poolEntry;
         },
         {} as {
-          $blockNumber: number;
+          indexPoolsblockNumber: number;
           totalDenorm: string;
           totalSupply: string;
           swapFee: string;
@@ -195,7 +193,7 @@ const poolMulticallDataParser = createMulticallDataParser(
 );
 
 type FormattedPoolDetail = {
-  $blockNumber: number;
+  indexPoolsblockNumber: number;
   totalDenorm: string;
   totalSupply: string;
   swapFee: string;

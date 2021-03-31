@@ -1,3 +1,5 @@
+import { AppHeader } from "./AppHeader";
+import { AppMenu } from "./AppMenu";
 import { BuildingWall } from "components";
 import { Button, Layout, notification } from "antd";
 import { CSSTransition } from "react-transition-group";
@@ -12,18 +14,16 @@ import {
   useState,
 } from "react";
 import { Route, Switch as RouterSwitch } from "react-router-dom";
+import { SocketClient } from "sockets/client";
 import { Suspense } from "react";
+import { routes } from "./routes";
 import { selectors } from "features";
 import { useBreakpoints } from "helpers";
 import { useSelector } from "react-redux";
 import { useStorageEntry } from "hooks";
 import { useTranslation } from "i18n";
 import { useWalletConnectionDrawer } from "./drawers";
-import AppHeader from "./AppHeader";
-import AppMenu from "./AppMenu";
-import SocketClient from "sockets/client";
 import noop from "lodash.noop";
-import routes from "./routes";
 
 const ERROR_NOTIFICATION_STORAGE_KEY =
   "indexed.finance | Last Showed Error Notification";
@@ -31,7 +31,7 @@ const TIME_BETWEEN_SERVER_ERROR_NOTIFICATIONS = 1000 * 60 * 60 * 3; // Three hou
 
 const { Sider, Content } = Layout;
 
-export default function AppLayout() {
+export function AppLayout() {
   const tx = useTranslation();
   const { entry: lastNotifiedOfError, store } = useStorageEntry(
     ERROR_NOTIFICATION_STORAGE_KEY,

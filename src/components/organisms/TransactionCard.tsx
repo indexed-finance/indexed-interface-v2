@@ -7,7 +7,7 @@ import { useSelector } from "react-redux";
 import { useTranslation } from "i18n";
 import type { Transaction } from "features";
 
-export default function TransactionCard({
+export function TransactionCard({
   transactionHash,
   from,
   to,

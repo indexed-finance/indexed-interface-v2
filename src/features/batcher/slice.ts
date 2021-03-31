@@ -30,7 +30,7 @@ interface BatcherState {
   status: "idle" | "loading" | "deferring to server";
 }
 
-const initialState: BatcherState = {
+const batcherInitialState: BatcherState = {
   onChainCalls: [],
   offChainCalls: [],
   callers: {},
@@ -40,7 +40,7 @@ const initialState: BatcherState = {
 
 const slice = createSlice({
   name: "batcher",
-  initialState,
+  initialState: batcherInitialState,
   reducers: {
     registrantRegistered(
       state,
@@ -113,7 +113,7 @@ const slice = createSlice({
       .addCase(settingsActions.connectionEstablished, (state) => {
         state.status = "deferring to server";
       })
-      .addCase(restartedDueToError, () => initialState)
+      .addCase(restartedDueToError, () => batcherInitialState)
       .addMatcher(
         (action) =>
           [
@@ -175,9 +175,9 @@ const slice = createSlice({
       ),
 });
 
-export const { actions } = slice;
+export const { actions: batcherActions, reducer: batcherReducer } = slice;
 
-export const selectors = {
+export const batcherSelectors = {
   selectOnChainBatch(state: AppState) {
     return {
       callers: state.batcher.callers,
@@ -197,5 +197,3 @@ export const selectors = {
     };
   },
 };
-
-export default slice.reducer;

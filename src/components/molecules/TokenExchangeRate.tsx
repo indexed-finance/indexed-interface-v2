@@ -10,12 +10,7 @@ interface Props {
   fee: string;
 }
 
-export default function TokenExchangeRate({
-  baseline,
-  comparison,
-  fee,
-  rate,
-}: Props) {
+export function TokenExchangeRate({ baseline, comparison, fee, rate }: Props) {
   const tx = useTranslation();
   const { isMobile } = useBreakpoints();
   const converted = convert.toComma(

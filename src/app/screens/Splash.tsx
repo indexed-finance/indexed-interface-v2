@@ -1,11 +1,11 @@
 import { Button, Divider, Steps, Typography } from "antd";
+import { FEATURE_FLAGS } from "feature-flags";
 import { Link } from "react-router-dom";
 import { useBreakpoints } from "helpers";
 import { useEffect, useState } from "react";
 import { useTranslation } from "i18n";
 import CategoryList from "./CategoryList";
 import PoolList from "./PoolList";
-import flags from "feature-flags";
 
 const { Step } = Steps;
 const STEP_COUNT = 3;
@@ -19,7 +19,7 @@ export default function Splash() {
     <Button type="default">{tx("READ_THE_DOCUMENTATION")}</Button>
   );
   const DocsButton = () =>
-    flags.useInternalDocs ? (
+    FEATURE_FLAGS.useInternalDocs ? (
       <Link to="/docs">{docsButton}</Link>
     ) : (
       <a
@@ -80,14 +80,14 @@ export default function Splash() {
             </Button>
           </Link>
           <DocsButton />
-          {flags.showFaqLink && (
+          {FEATURE_FLAGS.showFaqLink && (
             <Link to="/faq">
               <Button type="default">{tx("FREQUENTLY_ASKED_QUESTIONS")}</Button>
             </Link>
           )}
         </Button.Group>
       </Typography.Title>
-      {flags.useHomepageSteps && (
+      {FEATURE_FLAGS.useHomepageSteps && (
         <>
           <Divider />
           <Steps current={step} responsive={true} type="navigation">

@@ -9,7 +9,7 @@ import type { SupportedLanguageCode } from "i18n";
 
 const { Option } = Select;
 
-export default function LanguageSelector() {
+export function LanguageSelector() {
   const dispatch = useDispatch();
   const language = useSelector(selectors.selectLanguageName);
   const supportedLanguages = getSupportedLanguages();

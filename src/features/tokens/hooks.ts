@@ -1,21 +1,25 @@
 import { pricesCaller, totalSuppliesCaller } from "./slice";
+import { tokensSelectors } from "./selectors";
+import { useCallRegistrar } from "hooks";
 import { useSelector } from "react-redux";
-import selectors from "./selectors";
-import useCallRegistrar from "hooks/use-call-registrar";
 import type { AppState } from "features";
 import type { RegisteredCall } from "helpers";
 
 export const useToken = (tokenId: string) =>
-  useSelector((state: AppState) => selectors.selectTokenById(state, tokenId));
+  useSelector((state: AppState) =>
+    tokensSelectors.selectTokenById(state, tokenId)
+  );
 
 export const useTokens = (tokenIds: string[]) =>
-  useSelector((state: AppState) => selectors.selectTokensById(state, tokenIds));
+  useSelector((state: AppState) =>
+    tokensSelectors.selectTokensById(state, tokenIds)
+  );
 
 export const useTokenLookupBySymbol = () =>
-  useSelector(selectors.selectTokenLookupBySymbol);
+  useSelector(tokensSelectors.selectTokenLookupBySymbol);
 
 export const useTokenLookup = () =>
-  useSelector((state: AppState) => selectors.selectTokenLookup(state));
+  useSelector((state: AppState) => tokensSelectors.selectTokenLookup(state));
 
 export function createTotalSuppliesCalls(tokenIds: string[]): RegisteredCall[] {
   return tokenIds.map((id) => ({
@@ -29,7 +33,7 @@ export function createTotalSuppliesCalls(tokenIds: string[]): RegisteredCall[] {
 export function useTotalSuppliesRegistrar(
   tokenIds: string[],
   actions: Record<string, any>,
-  selectors: Record<string, any>
+  tokensSelectors: Record<string, any>
 ) {
   useCallRegistrar(
     {
@@ -37,14 +41,14 @@ export function useTotalSuppliesRegistrar(
       onChainCalls: createTotalSuppliesCalls(tokenIds),
     },
     actions,
-    selectors
+    tokensSelectors
   );
 }
 
 export function usePricesRegistrar(
   tokenIds: string[],
   actions: Record<string, any>,
-  selectors: Record<string, any>
+  tokensSelectors: Record<string, any>
 ) {
   useCallRegistrar(
     {
@@ -58,6 +62,6 @@ export function usePricesRegistrar(
       ],
     },
     actions,
-    selectors
+    tokensSelectors
   );
 }

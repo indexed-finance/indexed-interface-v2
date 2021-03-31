@@ -10,7 +10,7 @@ interface Props {
   pools: FormattedCategory["indexPools"];
 }
 
-export default function CategoryTable({ pools }: Props) {
+export function CategoryTable({ pools }: Props) {
   const tx = useTranslation();
   const history = useHistory();
   const { isMobile } = useBreakpoints();

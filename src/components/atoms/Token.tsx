@@ -11,7 +11,7 @@ interface Props {
   style?: any;
 }
 
-export default function Token({
+export function Token({
   address = "",
   name,
   size = "small",

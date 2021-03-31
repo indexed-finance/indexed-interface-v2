@@ -1,10 +1,18 @@
-import { BURN_ROUTER_ADDRESS, MINT_ROUTER_ADDRESS, UNISWAP_ROUTER_ADDRESS } from "config";
+import {
+  BURN_ROUTER_ADDRESS,
+  MINT_ROUTER_ADDRESS,
+  UNISWAP_ROUTER_ADDRESS,
+} from "config";
 import { BigNumber } from "./utils/balancer-math";
 import { Contract } from "ethers";
-import { IERC20, IPool, IndexedUniswapRouterBurner, IndexedUniswapRouterMinter, UniswapV2Router } from "./abi";
 import { JSBI, Percent, Router, Trade } from "@uniswap/sdk";
 import { JsonRpcSigner } from "@ethersproject/providers";
 import { convert } from "helpers";
+import IERC20 from "./abi/IERC20.json";
+import IPool from "./abi/IPool.json";
+import IndexedUniswapRouterBurner from "./abi/IndexedUniswapRouterBurner.json";
+import IndexedUniswapRouterMinter from "./abi/IndexedUniswapRouterMinter.json";
+import UniswapV2Router from "./abi/UniswapV2Router.json";
 
 export function calculateGasMargin(value: string): string {
   return convert.toBigNumber(value).times(1.1).integerValue().toString(10);
@@ -38,15 +46,22 @@ export async function executeUniswapTrade(
   trade: Trade,
   allowedSlippage = 2
 ) {
-  const contract = new Contract(UNISWAP_ROUTER_ADDRESS, UniswapV2Router, signer);
+  const contract = new Contract(
+    UNISWAP_ROUTER_ADDRESS,
+    UniswapV2Router,
+    signer
+  );
   const timestamp = +(Date.now() / 1000).toFixed(0);
   const gracePeriod = 1800; // add 30 minutes
   const deadline = timestamp + gracePeriod;
   const { args, value, methodName } = Router.swapCallParameters(trade, {
     feeOnTransfer: false,
-    allowedSlippage: new Percent(JSBI.BigInt(allowedSlippage), JSBI.BigInt(10000)),
+    allowedSlippage: new Percent(
+      JSBI.BigInt(allowedSlippage),
+      JSBI.BigInt(10000)
+    ),
     recipient: userAddress,
-    deadline
+    deadline,
   });
 
   return contract[methodName](...args, { value });
@@ -174,12 +189,16 @@ export async function swapTokensForTokensAndMintExact(
   path: string[],
   poolAmountOut: BigNumber
 ) {
-  const contract = new Contract(MINT_ROUTER_ADDRESS, IndexedUniswapRouterMinter, signer);
+  const contract = new Contract(
+    MINT_ROUTER_ADDRESS,
+    IndexedUniswapRouterMinter,
+    signer
+  );
   const args = [
     convert.toHex(maxAmountIn),
     path,
     indexPool,
-    convert.toHex(poolAmountOut)
+    convert.toHex(poolAmountOut),
   ];
   return contract.swapTokensForTokensAndMintExact(...args);
 }
@@ -191,12 +210,16 @@ export async function swapExactTokensForTokensAndMint(
   path: string[],
   minPoolAmountOut: BigNumber
 ) {
-  const contract = new Contract(MINT_ROUTER_ADDRESS, IndexedUniswapRouterMinter, signer);
+  const contract = new Contract(
+    MINT_ROUTER_ADDRESS,
+    IndexedUniswapRouterMinter,
+    signer
+  );
   const args = [
     convert.toHex(amountIn),
     path,
     indexPool,
-    convert.toHex(minPoolAmountOut)
+    convert.toHex(minPoolAmountOut),
   ];
   return contract.swapExactTokensForTokensAndMint(...args);
 }
@@ -208,12 +231,16 @@ export async function burnExactAndSwapForTokens(
   path: string[],
   minAmountOut: BigNumber
 ) {
-  const contract = new Contract(BURN_ROUTER_ADDRESS, IndexedUniswapRouterBurner, signer);
+  const contract = new Contract(
+    BURN_ROUTER_ADDRESS,
+    IndexedUniswapRouterBurner,
+    signer
+  );
   const args = [
     indexPool,
     convert.toHex(poolAmountIn),
     path,
-    convert.toHex(minAmountOut)
+    convert.toHex(minAmountOut),
   ];
   return contract.burnExactAndSwapForTokens(...args);
 }
@@ -225,12 +252,16 @@ export async function burnAndSwapForExactTokens(
   path: string[],
   tokenAmountOut: BigNumber
 ) {
-  const contract = new Contract(BURN_ROUTER_ADDRESS, IndexedUniswapRouterBurner, signer);
+  const contract = new Contract(
+    BURN_ROUTER_ADDRESS,
+    IndexedUniswapRouterBurner,
+    signer
+  );
   const args = [
     indexPool,
     convert.toHex(poolAmountInMax),
     path,
-    convert.toHex(tokenAmountOut)
+    convert.toHex(tokenAmountOut),
   ];
   return contract.burnAndSwapForExactTokens(...args);
 }

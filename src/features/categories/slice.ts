@@ -25,7 +25,7 @@ const adapter = createEntityAdapter<NormalizedCategory>({
   selectId: (entry) => entry.id.toLowerCase(),
 });
 const initialState = adapter.getInitialState();
-const withLocalData = adapter.addMany(
+const categoriesInitialState = adapter.addMany(
   initialState,
   Object.values(LOCAL_DATA_LOOKUP)
 );
@@ -33,13 +33,13 @@ const withLocalData = adapter.addMany(
 
 const slice = createSlice({
   name: "categories",
-  initialState: withLocalData,
+  initialState: categoriesInitialState,
   reducers: {},
   extraReducers: (builder) =>
     builder
       .addCase(subgraphDataLoaded, (state, action) => {
         const { categories } = action.payload;
-        const mapped = selectors
+        const mapped = categoriesSelectors
           .selectAll({ categories: state } as AppState)
           .map((existing) => ({
             ...existing,
@@ -53,21 +53,23 @@ const slice = createSlice({
 
         return categories;
       })
-      .addCase(restartedDueToError, () => withLocalData),
+      .addCase(restartedDueToError, () => categoriesInitialState),
 });
 
-export const { actions } = slice;
+export const { actions: categoriesActions, reducer: categoriesReducer } = slice;
 
-export const selectors = {
+export const categoriesSelectors = {
   ...adapter.getSelectors((state: AppState) => state.categories),
   selectCategory: (state: AppState, categoryId: string) =>
-    selectors.selectById(state, categoryId),
-  selectCategoryLookup: (state: AppState) => selectors.selectEntities(state),
-  selectAllCategories: (state: AppState) => selectors.selectAll(state),
+    categoriesSelectors.selectById(state, categoryId),
+  selectCategoryLookup: (state: AppState) =>
+    categoriesSelectors.selectEntities(state),
+  selectAllCategories: (state: AppState) =>
+    categoriesSelectors.selectAll(state),
   selectCategoryByName: (state: AppState, name: string) => {
     const formatName = (from: string) => S(from).camelize().s.toLowerCase();
     const formattedName = formatName(name);
-    const categories = selectors
+    const categories = categoriesSelectors
       .selectAllCategories(state)
       .reduce((prev, next) => {
         prev[formatName(next.name)] = next;
@@ -77,5 +79,3 @@ export const selectors = {
     return categories[formattedName] ?? null;
   },
 };
-
-export default slice.reducer;

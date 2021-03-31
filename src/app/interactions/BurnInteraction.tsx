@@ -1,4 +1,5 @@
 import { BURN_ROUTER_ADDRESS, COMMON_BASE_TOKENS, SLIPPAGE_RATE } from "config";
+import { BaseInteraction, InteractionValues } from "./BaseInteraction";
 import {
   FormattedIndexPool,
   actions,
@@ -10,12 +11,10 @@ import { Fragment, useCallback, useState } from "react";
 import { Radio } from "antd";
 import { convert } from "helpers";
 import { downwardSlippage, upwardSlippage } from "ethereum";
+import { useBurnRouterCallbacks, useSingleTokenBurnCallbacks } from "hooks";
 import { useSelector } from "react-redux";
-import { useSingleTokenBurnCallbacks } from "hooks/use-burn-callbacks";
 import { useTranslation } from "i18n";
-import BaseInteraction, { InteractionValues } from "./BaseInteraction";
 import BigNumber from "bignumber.js";
-import useBurnRouterCallbacks from "hooks/use-burn-router-callbacks";
 
 interface Props {
   pool: FormattedIndexPool;

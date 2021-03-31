@@ -4,7 +4,7 @@ import { useBreakpoints } from "helpers";
 import { useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 
-export default function DEBUG() {
+export function DEBUG() {
   const {
     isMobile,
     xs = false,

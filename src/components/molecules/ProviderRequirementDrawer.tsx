@@ -20,7 +20,7 @@ export function useProviderRequirement(includeSignerRequirement = false) {
   }
 }
 
-export default function ProviderRequirementDrawer({
+export function ProviderRequirementDrawer({
   includeSignerRequirement = false,
   placement = "bottom",
 }: Props) {

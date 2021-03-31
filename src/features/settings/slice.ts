@@ -16,7 +16,7 @@ const isConnectionEnabled = () => {
   return typeof setting === "undefined" || setting === "true";
 };
 
-const initialState: SettingsState = {
+const settingsInitialState: SettingsState = {
   languageCode: "en-us",
   theme: "dark",
   connected: false,
@@ -25,7 +25,7 @@ const initialState: SettingsState = {
 
 const slice = createSlice({
   name: "settings",
-  initialState,
+  initialState: settingsInitialState,
   reducers: {
     languageChanged: (state, action: PayloadAction<SupportedLanguageCode>) => {
       state.languageCode = action.payload;
@@ -66,9 +66,9 @@ const slice = createSlice({
   },
 });
 
-export const { actions } = slice;
+export const { actions: settingsActions, reducer: settingsReducer } = slice;
 
-export const selectors = {
+export const settingsSelectors = {
   selectSettings(state: AppState) {
     return state.settings;
   },
@@ -94,5 +94,3 @@ export const selectors = {
     // wut
   },
 };
-
-export default slice.reducer;

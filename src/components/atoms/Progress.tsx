@@ -2,7 +2,7 @@ import { Progress as AntProgress, ProgressProps } from "antd";
 import { selectors } from "features";
 import { useSelector } from "react-redux";
 
-export default function Progress(props: ProgressProps) {
+export function Progress(props: ProgressProps) {
   const theme = useSelector(selectors.selectTheme);
   const progressStrokeColor: any =
     theme === "outrun"

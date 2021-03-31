@@ -6,7 +6,7 @@ import { Progress } from "components/atoms";
 import { useBreakpoints } from "helpers";
 import { useTranslation } from "i18n";
 
-export default function PortfolioCard({
+export function PortfolioCard({
   address,
   link,
   name,

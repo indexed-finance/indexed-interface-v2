@@ -3,7 +3,7 @@ import { Space, Statistic } from "antd";
 import { useBreakpoints } from "helpers";
 import { useTranslation } from "i18n";
 
-export default function Performance({ pool }: { pool: FormattedIndexPool }) {
+export function Performance({ pool }: { pool: FormattedIndexPool }) {
   const tx = useTranslation();
   const { isMobile } = useBreakpoints();
 

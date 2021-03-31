@@ -15,7 +15,6 @@ export * from './Performance';
 export * from './PlainLanguageTransaction';
 export * from './PoolDropdown';
 export * from './ProviderRequirementDrawer';
-export * from './Quote.stories';
 export * from './Quote';
 export * from './ScreenHeader';
 export * from './SelectableToken';

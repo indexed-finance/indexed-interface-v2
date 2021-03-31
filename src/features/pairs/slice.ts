@@ -18,11 +18,11 @@ const adapter = createEntityAdapter<NormalizedPair>({
   selectId: (entry) => entry.id.toLowerCase(),
 });
 
-const initialState = adapter.getInitialState();
+const pairsInitialState = adapter.getInitialState();
 
 const slice = createSlice({
   name: "pairs",
-  initialState,
+  initialState: pairsInitialState,
   reducers: {},
   extraReducers: (builder) =>
     builder
@@ -66,19 +66,19 @@ const slice = createSlice({
 
         return pairs;
       })
-      .addCase(restartedDueToError, () => initialState),
+      .addCase(restartedDueToError, () => pairsInitialState),
 });
 
-export const { actions } = slice;
+export const { actions: pairsActions, reducer: pairsReducer } = slice;
 
-export const selectors = {
+export const pairsSelectors = {
   ...adapter.getSelectors((state: AppState) => state.pairs),
   selectPairs: (state: AppState) => state.pairs,
   selectPairsById: (
     state: AppState,
     ids: string[]
   ): (NormalizedPair | undefined)[] => {
-    const allPairs = selectors.selectPairs(state);
+    const allPairs = pairsSelectors.selectPairs(state);
     return ids.reduce(
       (prev, next) => [...prev, allPairs.entities[next.toLowerCase()]],
       [] as (NormalizedPair | undefined)[]
@@ -88,7 +88,7 @@ export const selectors = {
     state: AppState,
     ids: string[]
   ): (FormattedPair | undefined)[] => {
-    const allPairs = selectors.selectPairsById(state, ids);
+    const allPairs = pairsSelectors.selectPairsById(state, ids);
     const allTokens = tokensSelectors.selectEntities(state);
     const formattedPairs: (FormattedPair | undefined)[] = [];
 
@@ -115,14 +115,12 @@ export const selectors = {
     return formattedPairs;
   },
   selectAllUpdatedPairs: (state: AppState) =>
-    selectors.selectAll(state).filter((pair) => pair.exists !== undefined),
+    pairsSelectors.selectAll(state).filter((pair) => pair.exists !== undefined),
   selectTokenPair: (state: AppState, tokenA: string, tokenB: string) => {
     const pairAddress = computeUniswapPairAddress(tokenA, tokenB);
-    return selectors.selectById(state, pairAddress.toLowerCase());
+    return pairsSelectors.selectById(state, pairAddress.toLowerCase());
   },
 };
-
-export default slice.reducer;
 
 // #region Helpers
 const pairMulticallDataParser = createMulticallDataParser(

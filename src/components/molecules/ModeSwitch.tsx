@@ -3,7 +3,7 @@ import { actions, selectors } from "features";
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "i18n";
 
-export default function ModeSwitch() {
+export function ModeSwitch() {
   const tx = useTranslation();
   const dispatch = useDispatch();
   const theme = useSelector(selectors.selectTheme);

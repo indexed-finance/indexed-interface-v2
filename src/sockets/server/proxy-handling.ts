@@ -3,7 +3,7 @@ import express from "express";
 import fs from "fs";
 import httpProxy from "http-proxy";
 
-export default function setupProxy() {
+export function setupProxy() {
   const API_CERT_PATH = process.env.API_CERT_PATH;
   const API_KEY_PATH = process.env.API_KEY_PATH;
 

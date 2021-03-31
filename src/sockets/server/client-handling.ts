@@ -45,7 +45,7 @@ export let previousState = store.getState();
 /**
  * Creates a WebSocket server that provides quick updates to connected clients.
  */
-export default function setupClientHandling() {
+export function setupClientHandling() {
   if (process.env.NODE_ENV === "development") {
     const socketServer = new WebSocket.Server(
       {

@@ -3,7 +3,7 @@ import CID from "cids";
 import axios from "axios";
 import multihashes from "multihashes";
 
-export default class IpfsService {
+export class IpfsService {
   public static async getIPFSFile(sha3Hash: string) {
     const ipfsHash = shaToCid(sha3Hash);
     const url = `${GATEWAY_URL}${ipfsHash}`;

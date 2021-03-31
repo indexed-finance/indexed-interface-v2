@@ -9,7 +9,7 @@ type TokenHistoryResponse = {
   last_updated_at: number;
 };
 
-export default class CoinGeckoService {
+export class CoinGeckoService {
   public static async getSupportedTokens() {
     try {
       const coins = (await client.coins.list()).data;
