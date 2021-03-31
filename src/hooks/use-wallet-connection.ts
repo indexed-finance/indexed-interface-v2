@@ -2,8 +2,9 @@ import { actions } from "features";
 import { ethers } from "ethers";
 import { fortmatic, injected, portis } from "connectors";
 import { isMobile } from "react-device-detect";
+import { selectors } from "features";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useWeb3React } from "@web3-react/core";
 import coinbaseWalletIcon from "assets/images/connectors/coinbase.svg";
 import flags from "feature-flags";
@@ -51,6 +52,7 @@ export function useInactiveListener(suppress = false) {
 
 export function useEagerConnect() {
   const dispatch = useDispatch();
+  const userAddress = useSelector(selectors.selectUserAddress);
   const { account, activate, active, connector } = useWeb3React();
   const [tried, setTried] = useState(false);
   const handlePostActivate = useCallback(async () => {
@@ -72,23 +74,25 @@ export function useEagerConnect() {
   // If the injected provider is already authorized, silently connect for a seamless experience.
   useEffect(() => {
     if (!tried) {
-      injected.isAuthorized().then((isAuthorized) => {
-        if (isAuthorized) {
-          activate(injected, noop, true)
-            .then(handlePostActivate)
-            .catch(() => setTried(true));
-        } else {
-          if (isMobile && (window as InjectedWindow).ethereum) {
+      if (userAddress) {
+        injected.isAuthorized().then((isAuthorized) => {
+          if (isAuthorized) {
             activate(injected, noop, true)
               .then(handlePostActivate)
               .catch(() => setTried(true));
           } else {
-            setTried(true);
+            if (isMobile && (window as InjectedWindow).ethereum) {
+              activate(injected, noop, true)
+                .then(handlePostActivate)
+                .catch(() => setTried(true));
+            } else {
+              setTried(true);
+            }
           }
-        }
-      });
+        });
+      }
     }
-  }, [activate, handlePostActivate, tried]);
+  }, [activate, handlePostActivate, tried, userAddress]);
 
   // Effect:
   // Avoid trying multiple times.
