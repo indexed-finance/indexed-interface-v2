@@ -2,22 +2,31 @@ import { useEffect, useMemo } from "react";
 
 const storageKeyCache: Record<string, 1> = {};
 
-export default function useStorageEntry(key: string) {
-  const handlers = useMemo(
+interface StorageEntry<T> {
+  entry: T;
+  store(entry: T): void;
+  retrieve(): T;
+  clear(): void;
+}
+
+export default function useStorageEntry<T>(
+  key: string,
+  fallback: T
+): StorageEntry<T> {
+  const handlers = useMemo<Omit<StorageEntry<T>, "entry">>(
     () => ({
-      store(entry: any) {
+      store(entry) {
         try {
-          window.localStorage.setItem(
-            key,
-            typeof entry === "object"
-              ? JSON.stringify(entry, null, 2)
-              : entry.toString()
-          );
+          console.log("here");
+          window.localStorage.setItem(key, JSON.stringify(entry, null, 2));
         } catch {}
       },
-      retrieve(fallback?: any) {
+      retrieve() {
         try {
-          return window.localStorage.getItem(key) ?? fallback;
+          return (
+            (JSON.parse(window.localStorage.getItem(key) ?? "") as T) ??
+            fallback
+          );
         } catch {
           return fallback;
         }
@@ -28,7 +37,7 @@ export default function useStorageEntry(key: string) {
         } catch {}
       },
     }),
-    [key]
+    [key, fallback]
   );
 
   // Effect:
@@ -46,9 +55,8 @@ export default function useStorageEntry(key: string) {
     }
   }, [key, handlers]);
 
-  if (window?.localStorage) {
-    return;
-  } else {
-    return null;
-  }
+  return {
+    entry: handlers.retrieve(),
+    ...handlers,
+  };
 }

@@ -1,7 +1,8 @@
 import { BuildingWall } from "components";
-import { Button, Layout, Spin, notification } from "antd";
+import { Button, Layout, notification } from "antd";
 import { CSSTransition } from "react-transition-group";
 import { Helmet } from "react-helmet";
+import { Logo } from "components";
 import {
   ReactNode,
   createContext,
@@ -15,6 +16,7 @@ import { Suspense } from "react";
 import { selectors } from "features";
 import { useBreakpoints } from "helpers";
 import { useSelector } from "react-redux";
+import { useStorageEntry } from "hooks";
 import { useTranslation } from "i18n";
 import { useWalletConnectionDrawer } from "./drawers";
 import AppHeader from "./AppHeader";
@@ -23,10 +25,18 @@ import SocketClient from "sockets/client";
 import noop from "lodash.noop";
 import routes from "./routes";
 
+const ERROR_NOTIFICATION_STORAGE_KEY =
+  "indexed.finance | Last Showed Error Notification";
+const TIME_BETWEEN_SERVER_ERROR_NOTIFICATIONS = 1000 * 60 * 60 * 3; // Three hours.
+
 const { Sider, Content } = Layout;
 
 export default function AppLayout() {
   const tx = useTranslation();
+  const { entry: lastNotifiedOfError, store } = useStorageEntry(
+    ERROR_NOTIFICATION_STORAGE_KEY,
+    -1
+  );
   const isConnectionEnabled = useSelector(selectors.selectConnectionEnabled);
   const indexPools = useSelector(selectors.selectAllFormattedIndexPools);
   const breakpoints = useBreakpoints();
@@ -38,20 +48,24 @@ export default function AppLayout() {
     []
   );
   const theme = useSelector(selectors.selectTheme);
-  const [alertedServerError, setAlertedServerError] = useState(false);
 
   // Effect
   // On initial load, open up a connection to the server.
   useEffect(() => {
     if (isConnectionEnabled) {
       SocketClient.connect(() => {
-        if (!alertedServerError) {
+        const shouldNotify =
+          lastNotifiedOfError === -1 ||
+          Date.now() - lastNotifiedOfError >
+            TIME_BETWEEN_SERVER_ERROR_NOTIFICATIONS;
+
+        if (shouldNotify) {
           notification.error({
             message: tx("ERROR"),
             description: tx("UNABLE_TO_CONNECT_TO_SERVER_..."),
           });
 
-          setAlertedServerError(true);
+          store(Date.now());
         }
       });
     } else {
@@ -61,7 +75,7 @@ export default function AppLayout() {
     return () => {
       SocketClient.disconnect();
     };
-  }, [isConnectionEnabled, alertedServerError, tx]);
+  }, [isConnectionEnabled, lastNotifiedOfError, store, tx]);
 
   return (
     <>
@@ -133,7 +147,24 @@ export default function AppLayout() {
 
                     return (
                       <Route key={index} path={route.path} exact={route.exact}>
-                        <Suspense fallback={<Spin />}>
+                        <Suspense
+                          fallback={
+                            <div
+                              style={{
+                                position: "absolute",
+                                top: 0,
+                                left: 0,
+                                width: "100%",
+                                height: "100%",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                              }}
+                            >
+                              <Logo withTitle={false} spinning={true} />
+                            </div>
+                          }
+                        >
                           <ScreenToShow />
                         </Suspense>
                       </Route>

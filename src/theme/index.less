@@ -244,6 +244,22 @@ body {
   }
 }
 
+@keyframes spinning {
+  0% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(180deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.is-spinning {
+  animation: spinning 3s linear infinite forwards;
+}
+
 .AppMenuAnimation-enter {
   top: -500px;
   left: -300px;
