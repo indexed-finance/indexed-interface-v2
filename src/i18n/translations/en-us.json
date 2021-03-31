@@ -124,5 +124,6 @@
   "X_NDX_PER_DAY": "__x NDX/day",
   "YES": "Yes",
   "YOU_HAVE_SUCCESSFULLY_CONNECTED_YOUR_WALLET": "You have successfully connected your wallet.",
-  "YOU_HAVE_SUCCESSFULLY_DISCONNECTED_YOUR_WALLET": "You have successfully disconnected your wallet."
+  "YOU_HAVE_SUCCESSFULLY_DISCONNECTED_YOUR_WALLET": "You have successfully disconnected your wallet.",
+  "TRANSACTIONS": "Transactions"
 }

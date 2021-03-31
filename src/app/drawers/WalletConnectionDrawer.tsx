@@ -1,103 +1,65 @@
 import { AbstractConnector } from "@web3-react/abstract-connector";
-import { Avatar, Drawer, Menu, Space, Typography, notification } from "antd";
+import { Avatar, Menu, Space, Typography, notification } from "antd";
+import { BaseDrawer } from "./Drawer";
 import { OVERLAY_READY, fortmatic } from "connectors";
-import {
-  ReactNode,
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { ReactNode, useCallback, useContext, useEffect, useState } from "react";
 import { UnsupportedChainIdError, useWeb3React } from "@web3-react/core";
 import { WalletConnectConnector } from "@web3-react/walletconnect-connector";
 import { actions } from "features";
+import { createDrawerContext, useDrawerControls } from "./Drawer";
 import { ethers } from "ethers";
 import { useDispatch } from "react-redux";
 import { usePrevious, useWalletConnection, useWalletOptions } from "hooks";
 import { useTranslation } from "i18n";
 import noop from "lodash.noop";
 
-interface WalletConnectionContext {
-  drawerActive: boolean;
-  openDrawer(): void;
-  closeDrawer(): void;
-  toggleDrawer(): void;
-}
-
-export const WalletConnectionContext = createContext<WalletConnectionContext>({
-  drawerActive: false,
-  openDrawer: noop,
-  closeDrawer: noop,
-  toggleDrawer: noop,
-});
+export const WalletConnectionContext = createDrawerContext();
 
 export function useWalletConnectionDrawer() {
   return useContext(WalletConnectionContext);
 }
 
-export function WalletConnectProvider({ children }: { children: ReactNode }) {
+export function WalletConnectionProvider({
+  children,
+}: {
+  children: ReactNode;
+}) {
+  const drawerControls = useDrawerControls();
+  const { active, toggle } = drawerControls;
   const { account } = useWeb3React();
-  const [
-    walletConnectionDrawerActive,
-    setWalletConnectionDrawerActive,
-  ] = useState(false);
   const previousAccount = usePrevious(account);
-  const closeDrawer = useCallback(
-    () => setWalletConnectionDrawerActive(false),
-    []
-  );
-  const openDrawer = useCallback(
-    () => setWalletConnectionDrawerActive(true),
-    []
-  );
-  const toggleDrawer = useCallback(
-    () => setWalletConnectionDrawerActive((prev) => !prev),
-    []
-  );
-  const value = useMemo(
-    () => ({
-      drawerActive: walletConnectionDrawerActive,
-      closeDrawer,
-      openDrawer,
-      toggleDrawer,
-    }),
-    [walletConnectionDrawerActive, closeDrawer, openDrawer, toggleDrawer]
-  );
 
   useWalletConnection();
 
   // Effect:
   // [Not connected] -> [Connected]: Close drawer.
   useEffect(() => {
-    if (account && !previousAccount && walletConnectionDrawerActive) {
-      toggleDrawer();
+    if (account && !previousAccount && active) {
+      toggle();
     }
-  }, [account, previousAccount, walletConnectionDrawerActive, toggleDrawer]);
+  }, [account, previousAccount, active, toggle]);
 
   // Effect:
   // Close drawer if formatic modal is open.
   useEffect(() => {
-    fortmatic.on(OVERLAY_READY, toggleDrawer);
+    fortmatic.on(OVERLAY_READY, toggle);
 
     return () => {
-      fortmatic.off(OVERLAY_READY, toggleDrawer);
+      fortmatic.off(OVERLAY_READY, toggle);
     };
-  }, [toggleDrawer]);
+  }, [toggle]);
 
   return (
-    <WalletConnectionContext.Provider value={value}>
+    <WalletConnectionContext.Provider value={drawerControls}>
       {children}
 
-      {walletConnectionDrawerActive && (
-        <WalletConnectionDrawer onClose={closeDrawer} />
-      )}
+      {active && <WalletConnectionDrawer />}
     </WalletConnectionContext.Provider>
   );
 }
 
-export function WalletConnectionDrawer({ onClose }: { onClose(): void }) {
+export function WalletConnectionDrawer() {
+  const { close } = useDrawerControls();
   const tx = useTranslation();
   const dispatch = useDispatch();
   const { account, activate } = useWeb3React();
@@ -152,22 +114,7 @@ export function WalletConnectionDrawer({ onClose }: { onClose(): void }) {
   );
 
   return (
-    <Drawer
-      title={tx("CONNECT_YOUR_WALLET")}
-      placement="right"
-      closable={false}
-      onClose={onClose}
-      visible={true}
-      mask={false}
-      bodyStyle={{ padding: 0 }}
-      style={{
-        position: "fixed",
-        top: 64,
-        right: 0,
-        zIndex: 30000,
-        width: 400,
-      }}
-    >
+    <BaseDrawer title={tx("CONNECT_YOUR_WALLET")} onClose={close}>
       <Menu mode="inline">
         {walletOptions.map((option) => (
           <Menu.Item
@@ -193,6 +140,6 @@ export function WalletConnectionDrawer({ onClose }: { onClose(): void }) {
           </Menu.Item>
         ))}
       </Menu>
-    </Drawer>
+    </BaseDrawer>
   );
 }

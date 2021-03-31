@@ -42,7 +42,7 @@ export function AppLayout() {
   const breakpoints = useBreakpoints();
   const [mobileMenuActive, setMobileMenuActive] = useState(false);
   const closeMobileMenu = useCallback(() => setMobileMenuActive(false), []);
-  const { openDrawer } = useWalletConnectionDrawer();
+  const { open: openDrawer } = useWalletConnectionDrawer();
   const toggleMobileMenu = useCallback(
     () => setMobileMenuActive((prev) => !prev),
     []

@@ -3,12 +3,9 @@ import { WalletConnectionContext } from "app/drawers";
 import { useContext } from "react";
 
 export function WalletConnector() {
-  const { toggleDrawer } = useContext(WalletConnectionContext);
+  const { toggle } = useContext(WalletConnectionContext);
 
   return (
-    <MdAccountBalanceWallet
-      className="WalletConnector"
-      onClick={toggleDrawer}
-    />
+    <MdAccountBalanceWallet className="WalletConnector" onClick={toggle} />
   );
 }

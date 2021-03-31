@@ -6,7 +6,7 @@ import { DEBUG } from "components";
 import { FEATURE_FLAGS } from "feature-flags";
 import { Parallax } from "react-parallax";
 import { Provider, useSelector } from "react-redux";
-import { WalletConnectProvider } from "./drawers";
+import { TransactionProvider, WalletConnectionProvider } from "./drawers";
 import { Web3ReactProvider } from "@web3-react/core";
 import { ethers } from "ethers";
 import { message, notification } from "antd";
@@ -56,9 +56,11 @@ export function App() {
     <Provider store={store}>
       <AppErrorBoundary>
         <Web3ReactProvider getLibrary={getLibrary}>
-          <WalletConnectProvider>
-            <Inner />
-          </WalletConnectProvider>
+          <WalletConnectionProvider>
+            <TransactionProvider>
+              <Inner />
+            </TransactionProvider>
+          </WalletConnectionProvider>
         </Web3ReactProvider>
       </AppErrorBoundary>
     </Provider>

@@ -125,5 +125,6 @@
   "X_NDX_PER_DAY": "__x NDX por día",
   "YES": "Si",
   "YOU_HAVE_SUCCESSFULLY_CONNECTED_YOUR_WALLET": "Te has conectado exitosamente a tu cartera",
-  "YOU_HAVE_SUCCESSFULLY_DISCONNECTED_YOUR_WALLET": "Te has desconectado exitosamente de tu cartera"
+  "YOU_HAVE_SUCCESSFULLY_DISCONNECTED_YOUR_WALLET": "Te has desconectado exitosamente de tu cartera",
+  "TRANSACTIONS": "Transacciones"
 }
