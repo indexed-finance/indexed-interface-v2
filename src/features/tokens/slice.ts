@@ -6,6 +6,7 @@ import {
 } from "@reduxjs/toolkit";
 import {
   coingeckoDataLoaded,
+  coingeckoRequestFailed,
   mirroredServerState,
   multicallDataReceived,
   restartedDueToError,
@@ -19,7 +20,9 @@ export const tokensAdapter = createEntityAdapter<NormalizedToken>({
   selectId: (entry) => entry.id.toLowerCase(),
 });
 
-const tokensInitialState = tokensAdapter.getInitialState();
+const tokensInitialState = tokensAdapter.getInitialState({
+  lastCoingeckoError: -1,
+});
 
 const slice = createSlice({
   name: "tokens",
@@ -89,6 +92,9 @@ const slice = createSlice({
             }
           }
         }
+      })
+      .addCase(coingeckoRequestFailed, (state, action) => {
+        state.lastCoingeckoError = action.payload.when;
       })
       .addCase(mirroredServerState, (_, action) => {
         const { tokens } = action.payload;

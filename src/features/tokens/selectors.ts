@@ -2,6 +2,8 @@ import { tokensAdapter } from "./slice";
 import type { AppState } from "features/store";
 import type { NormalizedToken } from "ethereum";
 
+const TWO_MINUTES = 1000 * 60 * 2;
+
 export const tokensSelectors = {
   ...tokensAdapter.getSelectors((state: AppState) => state.tokens),
   selectTokens: (state: AppState) => state.tokens,
@@ -35,5 +37,11 @@ export const tokensSelectors = {
       prev[next.symbol.toLowerCase()] = next;
       return prev;
     }, {} as Record<string, NormalizedToken>);
+  },
+  selectCoingeckoRequestable: (state: AppState) => {
+    const now = Date.now();
+    const { lastCoingeckoError: then } = tokensSelectors.selectTokens(state);
+
+    return then === -1 || now - then >= TWO_MINUTES;
   },
 };

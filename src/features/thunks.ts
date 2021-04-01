@@ -181,27 +181,31 @@ export const thunks = {
     poolOrTokenIds: string | string[]
   ): AppThunk => async (dispatch, getState) => {
     const state = getState();
-    const tx = selectors.selectTranslator(state);
-    const isPool = typeof poolOrTokenIds === "string";
-    const pool = isPool ? (poolOrTokenIds as string) : null;
-    const tokenIds = pool
-      ? [...selectors.selectPoolTokenIds(state, pool), pool]
-      : (poolOrTokenIds as string[]);
+    const canRequest = selectors.selectCoingeckoRequestable(state);
 
-    try {
-      const tokens = await coingeckoQueries.getStatsForTokens(tokenIds);
+    if (canRequest) {
+      const tx = selectors.selectTranslator(state);
+      const isPool = typeof poolOrTokenIds === "string";
+      const pool = isPool ? (poolOrTokenIds as string) : null;
+      const tokenIds = pool
+        ? [...selectors.selectPoolTokenIds(state, pool), pool]
+        : (poolOrTokenIds as string[]);
 
-      dispatch(
-        actions.coingeckoDataLoaded({
-          pool,
-          tokens,
-        })
-      );
-    } catch {
-      notification.error({
-        message: tx("ERROR"),
-        description: tx("THERE_WAS_A_PROBLEM_LOADING_DATA_FROM_COINGECKO"),
-      });
+      try {
+        const tokens = await coingeckoQueries.getStatsForTokens(tokenIds);
+
+        dispatch(
+          actions.coingeckoDataLoaded({
+            pool,
+            tokens,
+          })
+        );
+      } catch {
+        notification.error({
+          message: tx("ERROR"),
+          description: tx("THERE_WAS_A_PROBLEM_LOADING_DATA_FROM_COINGECKO"),
+        });
+      }
     }
   },
   /**

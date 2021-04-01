@@ -25,12 +25,13 @@ import noop from "lodash.noop";
 
 const ERROR_NOTIFICATION_STORAGE_KEY =
   "indexed.finance | Last Showed Error Notification";
-const TIME_BETWEEN_SERVER_ERROR_NOTIFICATIONS = 1000 * 60 * 60 * 3; // Three hours.
+const THREE_HOURS = 1000 * 60 * 60 * 3;
 
 const { Sider, Content } = Layout;
 
 export function AppLayout() {
   const tx = useTranslator();
+  const [triedToConnect, setTriedToConnect] = useState(false);
   const { entry: lastNotifiedOfError, store } = useStorageEntry(
     ERROR_NOTIFICATION_STORAGE_KEY,
     -1
@@ -50,7 +51,9 @@ export function AppLayout() {
   // Effect
   // On initial load, open up a connection to the server.
   useEffect(() => {
-    if (isConnectionEnabled) {
+    if (isConnectionEnabled && !triedToConnect) {
+      setTriedToConnect(true);
+
       SocketClient.connect({
         onConnect() {
           message.success(tx("A_CONNECTION_TO_THE_SERVER_WAS_ESTABLISHED"));
@@ -58,8 +61,7 @@ export function AppLayout() {
         onError() {
           const shouldNotify =
             lastNotifiedOfError === -1 ||
-            Date.now() - lastNotifiedOfError >
-              TIME_BETWEEN_SERVER_ERROR_NOTIFICATIONS;
+            Date.now() - lastNotifiedOfError > THREE_HOURS;
 
           if (shouldNotify) {
             notification.error({
@@ -76,7 +78,7 @@ export function AppLayout() {
     return () => {
       SocketClient.disconnect();
     };
-  }, [isConnectionEnabled, lastNotifiedOfError, store, tx]);
+  }, [isConnectionEnabled, lastNotifiedOfError, store, tx, triedToConnect]);
 
   return (
     <>

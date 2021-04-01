@@ -29,6 +29,13 @@ export const coingeckoDataLoaded = createAction<{
 /**
  *
  */
+export const coingeckoRequestFailed = createAction<{ when: number }>(
+  "coingeckoRequestFailed"
+);
+
+/**
+ *
+ */
 export const poolTradesAndSwapsLoaded = createAction<{
   poolId: string;
   trades: Trade[];
