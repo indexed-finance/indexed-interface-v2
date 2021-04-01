@@ -2,10 +2,9 @@ import { ImArrowRight } from "react-icons/im";
 import { IndexCard } from "components/molecules";
 import { Space, Typography } from "antd";
 import { Token } from "components/atoms";
-import { selectors } from "features";
+import { Transaction, selectors } from "features";
 import { useSelector } from "react-redux";
 import { useTranslator } from "hooks";
-import type { Transaction } from "features";
 
 export function TransactionCard({
   transactionHash,

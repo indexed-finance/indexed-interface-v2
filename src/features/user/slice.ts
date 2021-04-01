@@ -8,8 +8,6 @@ import type { NormalizedUser } from "ethereum/types";
 
 export type ApprovalStatus = "unknown" | "approval needed" | "approved";
 
-export const USER_CALLER = "User Data";
-
 const initialState: NormalizedUser = {
   address: "",
   allowances: {},
@@ -120,52 +118,49 @@ export const userSelectors = {
 };
 
 // #region Helpers
-const userMulticallDataParser = createMulticallDataParser(
-  USER_CALLER,
-  (calls) => {
-    const formattedUserDetails = calls.reduce(
-      (prev, next) => {
-        const [, details] = next;
-        const { allowance: allowanceCall, balanceOf: balanceOfCall } = details;
+const userMulticallDataParser = createMulticallDataParser("User", (calls) => {
+  const formattedUserDetails = calls.reduce(
+    (prev, next) => {
+      const [, details] = next;
+      const { allowance: allowanceCall, balanceOf: balanceOfCall } = details;
 
-        if (allowanceCall && balanceOfCall) {
-          const [_allowanceCall] = allowanceCall;
-          const [_balanceOfCall] = balanceOfCall;
-          const tokenAddress = _allowanceCall.target;
-          const [, poolAddress] = _allowanceCall.args!;
-          const [allowance] = _allowanceCall.result ?? [];
-          const [balanceOf] = _balanceOfCall.result ?? [];
-          const combinedId = `user${poolAddress}-user${tokenAddress}`;
+      if (allowanceCall && balanceOfCall) {
+        const [_allowanceCall] = allowanceCall;
+        const [_balanceOfCall] = balanceOfCall;
+        const tokenAddress = _allowanceCall.target;
+        const [, poolAddress] = _allowanceCall.args!;
+        const [allowance] = _allowanceCall.result ?? [];
+        const [balanceOf] = _balanceOfCall.result ?? [];
+        const combinedId = `user${poolAddress}-user${tokenAddress}`;
 
-          if (allowance) {
-            prev.allowances[combinedId] = allowance.toString();
-          }
-
-          if (balanceOf) {
-            prev.balances[tokenAddress] = balanceOf.toString();
-          }
-        } else if (balanceOfCall) {
-          // NDX token has no allowance.
-          const [_balanceOfCall] = balanceOfCall;
-          const [balanceOf] = _balanceOfCall.result ?? [];
-
-          prev.ndx = (balanceOf ?? "").toString();
+        if (allowance) {
+          prev.allowances[combinedId] = allowance.toString();
         }
 
-        return prev;
-      },
-      {
-        allowances: {},
-        balances: {},
-        ndx: null,
-      } as {
-        allowances: Record<string, string>;
-        balances: Record<string, string>;
-        ndx: null | string;
-      }
-    );
+        if (balanceOf) {
+          prev.balances[tokenAddress] = balanceOf.toString();
+        }
+      } else if (balanceOfCall) {
+        // NDX token has no allowance.
+        const [_balanceOfCall] = balanceOfCall;
+        const [balanceOf] = _balanceOfCall.result ?? [];
 
-    return formattedUserDetails;
-  }
-);
+        prev.ndx = (balanceOf ?? "").toString();
+      }
+
+      return prev;
+    },
+    {
+      allowances: {},
+      balances: {},
+      ndx: null,
+    } as {
+      allowances: Record<string, string>;
+      balances: Record<string, string>;
+      ndx: null | string;
+    }
+  );
+
+  return formattedUserDetails;
+});
 // #endregion

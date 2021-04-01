@@ -1,5 +1,4 @@
 import { ScreenHeader } from "components";
-
 import ReactMarkdown from "react-markdown";
 import data from "data.json";
 

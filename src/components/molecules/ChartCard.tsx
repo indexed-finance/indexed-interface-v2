@@ -1,11 +1,10 @@
-import { AppState, selectors } from "features";
+import { AppState, SnapshotKey, selectors } from "features";
 import { Card, Menu, Select, Space, Typography } from "antd";
 import { LineSeriesChart } from "./LineSeriesChart";
 import { Quote } from "./Quote";
 import { useBreakpoints, useTranslator } from "hooks";
 import { useCallback, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
-import type { SnapshotKey } from "features/dailySnapshots/slice";
 
 type Timeframe = "Day" | "Week";
 

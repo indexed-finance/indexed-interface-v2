@@ -56,7 +56,7 @@ const slice = createSlice({
   extraReducers: (builder) =>
     builder
       .addCase(coingeckoDataLoaded, (state, action) => {
-        const formattedCall = `retrieveCoingeckoData/cache{
+        const formattedCall = `retrieveCoingeckoData/${
           action.payload.pool ?? Object.keys(action.payload.tokens).join("_")
         }`;
 
@@ -67,7 +67,7 @@ const slice = createSlice({
       })
       .addCase(poolTradesAndSwapsLoaded, (state, action) => {
         const { poolId } = action.payload;
-        const formattedCall = `requestPoolTradesAndSwaps/cache${poolId}`;
+        const formattedCall = `requestPoolTradesAndSwaps/${poolId}`;
 
         state.entries[formattedCall] = {
           result: action.payload as any,

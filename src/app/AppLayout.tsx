@@ -48,7 +48,7 @@ export function AppLayout() {
   );
   const theme = useSelector(selectors.selectTheme);
 
-  // Effect
+  // Effect:
   // On initial load, open up a connection to the server.
   useEffect(() => {
     if (isConnectionEnabled && !triedToConnect) {

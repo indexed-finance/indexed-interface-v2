@@ -1,7 +1,7 @@
 import { FEATURE_FLAGS } from "feature-flags";
 import { actions } from "features";
 import { ethers } from "ethers";
-import { fortmatic, injected, portis } from "connectors";
+import { fortmatic, injected, portis } from "ethereum";
 import { isMobile } from "react-device-detect";
 import { selectors } from "features";
 import { useCallback, useEffect, useMemo, useState } from "react";

@@ -9,10 +9,10 @@ import {
   useBurnRouterCallbacks,
   usePoolToTokens,
   useSingleTokenBurnCallbacks,
+  useTranslator,
   useUserDataRegistrar,
 } from "hooks";
 import { useSelector } from "react-redux";
-import { useTranslator } from "hooks";
 import BigNumber from "bignumber.js";
 
 interface Props {

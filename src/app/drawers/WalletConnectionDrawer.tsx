@@ -1,7 +1,7 @@
 import { AbstractConnector } from "@web3-react/abstract-connector";
 import { Avatar, Menu, Space, Typography, notification } from "antd";
 import { BaseDrawer } from "./Drawer";
-import { OVERLAY_READY, fortmatic } from "connectors";
+import { OVERLAY_READY, fortmatic } from "ethereum";
 import { ReactNode, useCallback, useContext, useEffect, useState } from "react";
 import { UnsupportedChainIdError, useWeb3React } from "@web3-react/core";
 import { WalletConnectConnector } from "@web3-react/walletconnect-connector";

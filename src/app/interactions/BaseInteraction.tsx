@@ -8,8 +8,7 @@ import { TokenSelector } from "components";
 import { convert } from "helpers";
 import { selectors } from "features";
 import { useSelector } from "react-redux";
-import { useTokenApproval, useTokenRandomizer } from "hooks";
-import { useTranslator } from "hooks";
+import { useTokenApproval, useTokenRandomizer, useTranslator } from "hooks";
 
 type Asset = { name: string; symbol: string; id: string };
 

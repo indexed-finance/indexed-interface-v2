@@ -14,10 +14,9 @@ import { Link } from "react-router-dom";
 import { PoolInteractions } from "../interactions";
 import { Recent, Subscreen } from "../subscreens";
 import { Redirect, useParams } from "react-router-dom";
-import { useBreakpoints, usePoolDetailRegistrar } from "hooks";
+import { useBreakpoints, usePoolDetailRegistrar, useTranslator } from "hooks";
 import { useContext, useEffect } from "react";
 import { useSelector } from "react-redux";
-import { useTranslator } from "hooks";
 
 export default function PoolDetail() {
   const { poolName } = useParams<{ poolName: string }>();

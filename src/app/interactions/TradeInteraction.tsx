@@ -7,10 +7,10 @@ import { useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   usePoolToTokens,
+  useTranslator,
   useUniswapTradingPairs,
   useUserDataRegistrar,
 } from "hooks";
-import { useTranslator } from "hooks";
 
 interface Props {
   pool: FormattedIndexPool;

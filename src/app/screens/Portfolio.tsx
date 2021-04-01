@@ -11,11 +11,11 @@ import {
   useEthPrice,
   usePairDataRegistrar,
   useStakingRegistrar,
+  useTranslator,
   useUserDataRegistrar,
 } from "hooks";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useMemo } from "react";
-import { useTranslator } from "hooks";
 
 export default function Portfolio() {
   const tx = useTranslator();
