@@ -11,7 +11,7 @@ import { Web3ReactProvider } from "@web3-react/core";
 import { ethers } from "ethers";
 import { message, notification } from "antd";
 import { selectors, store } from "features";
-import { useBreakpoints } from "helpers";
+import { useBreakpoints } from "hooks";
 import { useEffect } from "react";
 import background from "assets/images/dark-bg.jpg";
 

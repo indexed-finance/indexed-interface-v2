@@ -1,17 +1,16 @@
 import { FormattedCategory } from "features";
 import { IndexCard } from "components/molecules";
 import { Table } from "antd";
-import { useBreakpoints } from "helpers";
+import { useBreakpoints, useTranslator } from "hooks";
 import { useHistory } from "react-router-dom";
 import { useMemo } from "react";
-import { useTranslation } from "i18n";
 
 interface Props {
   pools: FormattedCategory["indexPools"];
 }
 
 export function CategoryTable({ pools }: Props) {
-  const tx = useTranslation();
+  const tx = useTranslator();
   const history = useHistory();
   const { isMobile } = useBreakpoints();
   const columns = useMemo(

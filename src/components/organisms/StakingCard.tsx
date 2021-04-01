@@ -1,13 +1,11 @@
 import { Button, Space, Statistic } from "antd";
 import { IndexCard } from "components/molecules";
 import { Link } from "react-router-dom";
-import { useBreakpoints } from "helpers";
-import { useStakingApy } from "hooks/use-staking-apy";
-import { useTranslation } from "i18n";
+import { useBreakpoints, useStakingApy, useTranslator } from "hooks";
 import type { FormattedStakingData } from "features";
 
 export function StakingCard(props: FormattedStakingData) {
-  const tx = useTranslation();
+  const tx = useTranslator();
   const {
     id,
     rate,

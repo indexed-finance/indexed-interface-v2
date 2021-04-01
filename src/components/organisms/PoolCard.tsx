@@ -1,15 +1,9 @@
-import {
-  AppState,
-  FormattedIndexPool,
-  actions,
-  selectors,
-  usePoolDetailRegistrar,
-} from "features";
+import { AppState, FormattedIndexPool, actions, selectors } from "features";
 import { ListCard } from "./ListCard";
 import { Quote } from "components/molecules";
 import { RankedToken } from "./RankedToken";
 import { Space } from "antd";
-import { useBreakpoints } from "helpers";
+import { useBreakpoints, usePoolDetailRegistrar } from "hooks";
 import { useHistory } from "react-router-dom";
 import { useSelector } from "react-redux";
 

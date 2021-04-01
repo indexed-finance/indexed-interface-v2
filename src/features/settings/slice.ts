@@ -1,14 +1,18 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import type { AppState } from "../store";
-import type { SupportedLanguageCode } from "../../i18n";
+import { SupportedLanguageCode, createTranslator } from "helpers";
+import type { AppState } from "features/store";
 
 type Theme = "dark" | "light" | "outrun";
 
 interface SettingsState {
-  languageCode: SupportedLanguageCode;
   theme: Theme;
   connected: boolean;
   connectionEnabled: boolean;
+  languageCode: SupportedLanguageCode;
+  supportedLanguages: Array<{
+    title: string;
+    value: SupportedLanguageCode;
+  }>;
 }
 
 const isConnectionEnabled = () => {
@@ -17,10 +21,24 @@ const isConnectionEnabled = () => {
 };
 
 const settingsInitialState: SettingsState = {
-  languageCode: "en-us",
   theme: "dark",
   connected: false,
   connectionEnabled: isConnectionEnabled(),
+  languageCode: "en-us",
+  supportedLanguages: [
+    {
+      title: "English",
+      value: "en-us",
+    },
+    {
+      title: "Spanish",
+      value: "es-mx",
+    },
+    {
+      title: "Chinese",
+      value: "zh-cn",
+    },
+  ],
 };
 
 const slice = createSlice({
@@ -81,16 +99,21 @@ export const settingsSelectors = {
   selectConnectionEnabled(state: AppState) {
     return state.settings.connectionEnabled;
   },
+  selectTranslator(state: AppState) {
+    const { languageCode } = settingsSelectors.selectSettings(state);
+    return createTranslator(languageCode);
+  },
   selectLanguageName(state: AppState) {
+    const tx = settingsSelectors.selectTranslator(state);
     const lookup = {
-      "en-us": "English",
-      "es-mx": "Spanish",
-      "zh-cn": "Chinese",
+      "en-us": tx("ENGLISH"),
+      "es-mx": tx("SPANISH"),
+      "zh-cn": tx("CHINESE"),
     };
 
     return lookup[state.settings.languageCode] ?? "None";
   },
-  selectAvailableLanguages(state: AppState) {
-    // wut
+  selectSupportedLanguages(state: AppState) {
+    return settingsSelectors.selectSettings(state).supportedLanguages;
   },
 };

@@ -1,7 +1,7 @@
 import { Alert, Space, Statistic } from "antd";
 import { Token } from "components/atoms";
-import { convert, useBreakpoints } from "helpers";
-import { useTranslation } from "i18n";
+import { convert } from "helpers";
+import { useBreakpoints, useTranslator } from "hooks";
 
 interface Props {
   baseline: string;
@@ -11,7 +11,7 @@ interface Props {
 }
 
 export function TokenExchangeRate({ baseline, comparison, fee, rate }: Props) {
-  const tx = useTranslation();
+  const tx = useTranslator();
   const { isMobile } = useBreakpoints();
   const converted = convert.toComma(
     typeof rate === "number" ? rate : parseFloat(rate)

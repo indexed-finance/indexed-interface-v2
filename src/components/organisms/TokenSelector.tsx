@@ -12,11 +12,10 @@ import {
 } from "antd";
 import { SelectableToken } from "components/molecules";
 import { Token } from "components/atoms";
-import { useBreakpoints } from "helpers";
+import { useBreakpoints, useTranslator } from "hooks";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useFormikContext } from "formik";
 import { useSelector } from "react-redux";
-import { useTranslation } from "i18n";
 
 export type TokenSelectorValue = {
   amount?: number;
@@ -44,7 +43,7 @@ export function TokenSelector({
   selectable = true,
   onChange,
 }: Props) {
-  const tx = useTranslation();
+  const tx = useTranslator();
   const tokenField = `${label.toLowerCase()} Token`;
   const amountField = `${label.toLowerCase()} Amount`;
   const { setTouched } = useFormikContext<any>();

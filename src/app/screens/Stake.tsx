@@ -1,13 +1,12 @@
 import { Col, Row, Typography } from "antd";
 import { ScreenHeader } from "components";
 import { Staking } from "../subscreens";
-import { actions, selectors, useStakingRegistrar } from "features";
-import { useBreakpoints } from "helpers";
+import { actions, selectors } from "features";
+import { useBreakpoints, useStakingRegistrar, useTranslator } from "hooks";
 import { useSelector } from "react-redux";
-import { useTranslation } from "i18n";
 
 export default function Stake() {
-  const tx = useTranslation();
+  const tx = useTranslator();
   const staking = useSelector(selectors.selectFormattedStaking);
   const indexTokens = (
     <Staking title={tx("INDEX_TOKENS")} data={staking.indexTokens} />

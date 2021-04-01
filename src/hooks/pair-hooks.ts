@@ -1,24 +1,60 @@
-import {
-  BestTradeOptions,
-  Pair,
-  Token,
-  TokenAmount,
-  Trade,
-} from "@uniswap/sdk";
-import { actions, provider, selectors, usePairDataRegistrar } from "features";
+import { actions, provider, selectors } from "features";
 import {
   bestTradeExactIn,
   bestTradeExactOut,
   buildCommonTokenPairs,
   computeUniswapPairAddress,
   sortTokens,
-} from "ethereum/utils/uniswap";
+} from "ethereum";
 import { convert } from "helpers";
+import { useCallRegistrar } from "./use-call-registrar";
 import { useCallback, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import type { AppState, FormattedPair } from "features";
-import type { NormalizedToken } from "ethereum/types";
+import type {
+  BestTradeOptions,
+  Pair,
+  Token,
+  TokenAmount,
+  Trade,
+} from "@uniswap/sdk";
+import type { NormalizedToken } from "ethereum";
+import type { RegisteredCall } from "helpers";
 
+export const PAIR_DATA_CALLER = "Pair Data";
+
+export type RegisteredPair = {
+  id: string;
+  token0: string;
+  token1: string;
+  exists?: boolean;
+};
+
+export function createPairDataCalls(pairs: RegisteredPair[]): RegisteredCall[] {
+  return pairs.map((pair) => ({
+    caller: PAIR_DATA_CALLER,
+    interfaceKind: "Pair_ABI",
+    target: pair.id,
+    function: "getReserves",
+  }));
+}
+
+export function usePairDataRegistrar(
+  pairs: RegisteredPair[],
+  actions: Record<string, any>,
+  selectors: Record<string, any>
+) {
+  useCallRegistrar(
+    {
+      caller: PAIR_DATA_CALLER,
+      onChainCalls: createPairDataCalls(pairs),
+    },
+    actions,
+    selectors
+  );
+}
+
+// #region Uniswap
 type PairToken = {
   id: string;
   exists: boolean | undefined;
@@ -137,3 +173,4 @@ export function useUniswapTradingPairs(baseTokens: string[]) {
     calculateBestTradeForExactOutput,
   };
 }
+// #endregion

@@ -1,7 +1,7 @@
 import { AiOutlineArrowRight } from "react-icons/ai";
 import { Space } from "antd";
-import { Token } from "components/atoms";
-import { useTranslation } from "i18n";
+import { Token } from "./Token";
+import { useTranslator } from "hooks";
 
 type Props = {
   baseline: string;
@@ -9,7 +9,7 @@ type Props = {
 };
 
 export function ExchangeTokenImages({ baseline, comparison }: Props) {
-  const tx = useTranslation();
+  const tx = useTranslator();
 
   return (
     <Space align="center" className="spaced-between">

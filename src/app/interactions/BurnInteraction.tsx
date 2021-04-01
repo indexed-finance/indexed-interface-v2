@@ -1,19 +1,18 @@
 import { BURN_ROUTER_ADDRESS, COMMON_BASE_TOKENS, SLIPPAGE_RATE } from "config";
 import { BaseInteraction, InteractionValues } from "./BaseInteraction";
-import {
-  FormattedIndexPool,
-  actions,
-  selectors,
-  usePoolToTokens,
-  useUserDataRegistrar,
-} from "features";
+import { FormattedIndexPool, actions, selectors } from "features";
 import { Fragment, useCallback, useState } from "react";
 import { Radio } from "antd";
 import { convert } from "helpers";
 import { downwardSlippage, upwardSlippage } from "ethereum";
-import { useBurnRouterCallbacks, useSingleTokenBurnCallbacks } from "hooks";
+import {
+  useBurnRouterCallbacks,
+  usePoolToTokens,
+  useSingleTokenBurnCallbacks,
+  useUserDataRegistrar,
+} from "hooks";
 import { useSelector } from "react-redux";
-import { useTranslation } from "i18n";
+import { useTranslator } from "hooks";
 import BigNumber from "bignumber.js";
 
 interface Props {
@@ -47,7 +46,7 @@ export default function BurnInteraction({ pool }: Props) {
 }
 
 function SingleTokenBurnInteraction({ pool }: Props) {
-  const tx = useTranslation();
+  const tx = useTranslator();
   const poolId = pool.id;
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
   const poolsToTokens = usePoolToTokens(pool);
@@ -158,7 +157,7 @@ function SingleTokenBurnInteraction({ pool }: Props) {
 }
 
 function UniswapBurnInteraction({ pool }: Props) {
-  const tx = useTranslation();
+  const tx = useTranslator();
   const poolId = pool.id;
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
   const poolsToTokens = usePoolToTokens(pool);

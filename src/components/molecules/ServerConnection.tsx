@@ -3,7 +3,7 @@ import { ImConnection } from "react-icons/im";
 import { actions, selectors } from "features";
 import { useDispatch, useSelector } from "react-redux";
 import { useMemo } from "react";
-import { useTranslation } from "i18n";
+import { useTranslator } from "hooks";
 
 interface Props {
   showText?: boolean;
@@ -12,7 +12,7 @@ interface Props {
 const { Item } = Form;
 
 export function ServerConnection({ showText = false }: Props) {
-  const tx = useTranslation();
+  const tx = useTranslator();
   const dispatch = useDispatch();
   const isConnected = useSelector(selectors.selectConnected);
   const isConnectionEnabled = useSelector(selectors.selectConnectionEnabled);

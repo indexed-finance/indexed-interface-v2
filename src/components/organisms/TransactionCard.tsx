@@ -4,7 +4,7 @@ import { Space, Typography } from "antd";
 import { Token } from "components/atoms";
 import { selectors } from "features";
 import { useSelector } from "react-redux";
-import { useTranslation } from "i18n";
+import { useTranslator } from "hooks";
 import type { Transaction } from "features";
 
 export function TransactionCard({
@@ -15,7 +15,7 @@ export function TransactionCard({
   amount,
   kind,
 }: Transaction) {
-  const tx = useTranslation();
+  const tx = useTranslator();
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
 
   return (

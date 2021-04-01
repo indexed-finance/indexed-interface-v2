@@ -1,18 +1,17 @@
 import { Select } from "antd";
 import { actions, selectors } from "features";
-import { getSupportedLanguages } from "i18n";
-import { useBreakpoints } from "helpers";
+import { useBreakpoints } from "hooks";
 import { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import cx from "classnames";
-import type { SupportedLanguageCode } from "i18n";
+import type { SupportedLanguageCode } from "helpers";
 
 const { Option } = Select;
 
 export function LanguageSelector() {
   const dispatch = useDispatch();
   const language = useSelector(selectors.selectLanguageName);
-  const supportedLanguages = getSupportedLanguages();
+  const supportedLanguages = useSelector(selectors.selectSupportedLanguages);
   const breakpoints = useBreakpoints();
   const handleLanguageChange = useCallback(
     (nextLanguage: string) =>

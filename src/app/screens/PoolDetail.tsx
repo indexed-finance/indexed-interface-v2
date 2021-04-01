@@ -11,14 +11,13 @@ import {
 } from "components";
 import { Col, Row, Space } from "antd";
 import { Link } from "react-router-dom";
-import { PoolInteractions } from "app/interactions";
-import { Recent, Subscreen } from "app/subscreens";
+import { PoolInteractions } from "../interactions";
+import { Recent, Subscreen } from "../subscreens";
 import { Redirect, useParams } from "react-router-dom";
-import { useBreakpoints } from "helpers";
+import { useBreakpoints, usePoolDetailRegistrar } from "hooks";
 import { useContext, useEffect } from "react";
-import { usePoolDetailRegistrar } from "features";
 import { useSelector } from "react-redux";
-import { useTranslation } from "i18n";
+import { useTranslator } from "hooks";
 
 export default function PoolDetail() {
   const { poolName } = useParams<{ poolName: string }>();
@@ -39,7 +38,7 @@ export default function PoolDetail() {
 }
 
 function Pool({ id }: { id: string }) {
-  const tx = useTranslation();
+  const tx = useTranslator();
   const pool = useSelector((state: AppState) =>
     selectors.selectFormattedIndexPool(state, id)
   );

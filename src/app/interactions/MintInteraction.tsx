@@ -1,21 +1,19 @@
 import { BaseInteraction, InteractionValues } from "./BaseInteraction";
 import { COMMON_BASE_TOKENS, MINT_ROUTER_ADDRESS, SLIPPAGE_RATE } from "config";
-import {
-  FormattedIndexPool,
-  actions,
-  selectors,
-  usePoolToTokens,
-  useUserDataRegistrar,
-} from "features";
+import { FormattedIndexPool, actions, selectors } from "features";
 import { Fragment, useCallback, useMemo, useState } from "react";
 import { Radio } from "antd";
 import { Route } from "react-router-dom";
 import { convert } from "helpers";
 import { downwardSlippage, upwardSlippage } from "ethereum";
 import { useMintRouterCallbacks } from "hooks";
+import {
+  usePoolToTokens,
+  useSingleTokenMintCallbacks,
+  useUserDataRegistrar,
+} from "hooks";
 import { useSelector } from "react-redux";
-import { useSingleTokenMintCallbacks } from "hooks/use-mint-callbacks";
-import { useTranslation } from "i18n";
+import { useTranslator } from "hooks";
 import BigNumber from "bignumber.js";
 
 interface Props {
@@ -54,7 +52,7 @@ export default function MintInteraction({ pool }: Props) {
 }
 
 function SingleTokenMintInteraction({ pool }: Props) {
-  const tx = useTranslation();
+  const tx = useTranslator();
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
   const {
     calculateAmountIn,
@@ -167,7 +165,7 @@ function MultiTokenMintInteraction({ pool }: Props) {
 }
 
 function UniswapMintInteraction({ pool }: Props) {
-  const tx = useTranslation();
+  const tx = useTranslator();
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
   const {
     tokenIds,

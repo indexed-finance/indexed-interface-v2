@@ -2,10 +2,9 @@ import { AppState, selectors } from "features";
 import { Card, Menu, Select, Space, Typography } from "antd";
 import { LineSeriesChart } from "./LineSeriesChart";
 import { Quote } from "./Quote";
-import { useBreakpoints } from "helpers";
+import { useBreakpoints, useTranslator } from "hooks";
 import { useCallback, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
-import { useTranslation } from "i18n";
 import type { SnapshotKey } from "features/dailySnapshots/slice";
 
 type Timeframe = "Day" | "Week";
@@ -16,7 +15,7 @@ interface Props {
 }
 
 export function ChartCard({ poolId, expanded = false }: Props) {
-  const tx = useTranslation();
+  const tx = useTranslator();
   const theme = useSelector(selectors.selectTheme);
   const [timeframe, setTimeframe] = useState<Timeframe>("Day");
   const [key, setKey] = useState<SnapshotKey>("value");

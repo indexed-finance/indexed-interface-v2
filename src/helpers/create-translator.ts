@@ -1,16 +1,14 @@
-import { selectors } from "features";
-import { useMemo } from "react";
-import { useSelector } from "react-redux";
-import DEFAULT_TRANSLATION_SET from "./translations/en-us.json";
+import DEFAULT_TRANSLATION_SET from "i18n/en-us.json";
 
 export type SupportedLanguageCode = "en-us" | "es-mx" | "zh-cn";
 export type TranslatedTerm = keyof typeof DEFAULT_TRANSLATION_SET;
+export type Translator = ReturnType<typeof createTranslator>;
 
 export function createTranslator(languageCode: SupportedLanguageCode) {
   let translationSet: Record<string, string>;
 
   try {
-    translationSet = require(`./translations/${languageCode}.json`);
+    translationSet = require(`i18n/${languageCode}.json`);
   } catch (error) {
     translationSet = DEFAULT_TRANSLATION_SET;
   }
@@ -41,16 +39,3 @@ export function createTranslator(languageCode: SupportedLanguageCode) {
     return translation;
   };
 }
-
-export let tx: ReturnType<typeof useTranslation> = createTranslator("en-us"); // Default to Enlish.
-
-export const useTranslation = () => {
-  const { languageCode } = useSelector(selectors.selectSettings);
-  const translate = useMemo(() => createTranslator(languageCode), [
-    languageCode,
-  ]);
-
-  tx = translate; // Keep a reference to the current translate function for non-React consumers.
-
-  return translate;
-};

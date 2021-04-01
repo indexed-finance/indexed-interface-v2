@@ -3,7 +3,7 @@ import { actions } from "features";
 import { message } from "antd";
 import { sleep } from "helpers";
 import { useDispatch } from "react-redux";
-import { useTranslation } from "i18n";
+import { useTranslator } from "hooks";
 
 const timeInSeconds = [1, 1, 3, 5, 8, 13, 21, 99, 999];
 
@@ -66,7 +66,7 @@ function ErrorHandler({
   children: ReactNode;
   onResolved(): void;
 }) {
-  const tx = useTranslation();
+  const tx = useTranslator();
   const dispatch = useDispatch();
 
   useEffect(() => {

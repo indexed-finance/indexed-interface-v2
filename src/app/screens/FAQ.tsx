@@ -1,10 +1,10 @@
 import { ScreenHeader } from "components";
-import { useTranslation } from "i18n";
+import { useTranslator } from "hooks";
 import ReactMarkdown from "react-markdown";
 import data from "data.json";
 
 export default function FAQ() {
-  const tx = useTranslation();
+  const tx = useTranslator();
 
   return (
     <>

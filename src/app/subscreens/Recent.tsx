@@ -2,13 +2,13 @@ import { Skeleton, Tabs } from "antd";
 import { Subscreen } from "./Subscreen";
 import { TransactionCard } from "components";
 import { useState } from "react";
-import { useTranslation } from "i18n";
+import { useTranslator } from "hooks";
 import type { FormattedIndexPool } from "features";
 
 const { TabPane } = Tabs;
 
 export function Recent({ pool }: { pool: FormattedIndexPool }) {
-  const tx = useTranslation();
+  const tx = useTranslator();
   const [mode, setMode] = useState("Trades");
   const tradesEmpty = pool.recent.trades.length === 0;
   const swapsEmpty = pool.recent.swaps.length === 0;

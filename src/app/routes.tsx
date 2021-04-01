@@ -5,7 +5,7 @@ import { LazyExoticComponent, ReactElement, ReactNode } from "react";
 import { RiSafe2Line } from "react-icons/ri";
 import { lazy } from "react";
 import type { AppState } from "features";
-import type { TranslatedTerm } from "i18n";
+import type { TranslatedTerm } from "helpers";
 
 type Route = {
   path: string;

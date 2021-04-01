@@ -1,10 +1,9 @@
 import { FormattedIndexPool } from "features";
 import { Space, Statistic } from "antd";
-import { useBreakpoints } from "helpers";
-import { useTranslation } from "i18n";
+import { useBreakpoints, useTranslator } from "hooks";
 
 export function Performance({ pool }: { pool: FormattedIndexPool }) {
-  const tx = useTranslation();
+  const tx = useTranslator();
   const { isMobile } = useBreakpoints();
 
   return (

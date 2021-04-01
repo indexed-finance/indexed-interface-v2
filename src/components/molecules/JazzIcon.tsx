@@ -1,9 +1,8 @@
 import { Dropdown, Menu, notification } from "antd";
 import { actions } from "features";
-import { useBreakpoints } from "helpers";
+import { useBreakpoints, useTranslator } from "hooks";
 import { useCallback, useEffect, useRef } from "react";
 import { useDispatch } from "react-redux";
-import { useTranslation } from "i18n";
 import { useWeb3React } from "@web3-react/core";
 import ReactDOM from "react-dom";
 import jazzicon from "@metamask/jazzicon";
@@ -13,7 +12,7 @@ interface Props {
 }
 
 export function JazzIcon({ address }: Props) {
-  const tx = useTranslation();
+  const tx = useTranslator();
   const { deactivate } = useWeb3React();
   const dispatch = useDispatch();
   const blockie = useRef<null | HTMLSpanElement>(null);

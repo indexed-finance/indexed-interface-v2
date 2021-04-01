@@ -1,6 +1,6 @@
 import { Space, Typography } from "antd";
 import { selectors } from "features";
-import { useBreakpoints } from "helpers";
+import { useBreakpoints } from "hooks";
 import { useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 

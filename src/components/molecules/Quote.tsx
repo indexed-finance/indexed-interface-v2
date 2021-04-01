@@ -1,6 +1,6 @@
 import { HTMLProps } from "react";
 import { Skeleton, Spin, Typography } from "antd";
-import { useBreakpoints } from "helpers";
+import { useBreakpoints } from "hooks";
 
 interface Props extends HTMLProps<HTMLDivElement> {
   symbol?: string;

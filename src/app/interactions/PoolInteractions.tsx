@@ -3,8 +3,7 @@ import { FaCoins, FaFireAlt, FaHammer } from "react-icons/fa";
 import { Link, useParams } from "react-router-dom";
 import { Tabs } from "antd";
 import { lazy } from "react";
-import { useBreakpoints } from "helpers";
-import { useTranslation } from "i18n";
+import { useBreakpoints, useTranslator } from "hooks";
 import type { FormattedIndexPool } from "features";
 
 const BurnInteraction = lazy(() => import("./BurnInteraction"));
@@ -28,7 +27,7 @@ interface Props {
 }
 
 export function PoolInteractions({ pool }: Props) {
-  const tx = useTranslation();
+  const tx = useTranslator();
   const { poolName, interaction: activeInteraction = "trade" } = useParams<{
     poolName: string;
     interaction: PoolInteraction;

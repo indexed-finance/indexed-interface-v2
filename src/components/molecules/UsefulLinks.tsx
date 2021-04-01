@@ -1,7 +1,8 @@
 import { Menu, Space } from "antd";
-import { TranslatedTerm, useTranslation } from "i18n";
 import { useMemo } from "react";
-import { usePoolQuickswapLink } from "features";
+import { usePoolQuickswapLink } from "hooks";
+import { useTranslator } from "hooks";
+import type { TranslatedTerm } from "helpers";
 
 const USEFUL_LINKS: Array<{
   text: TranslatedTerm;
@@ -23,7 +24,7 @@ const USEFUL_LINKS: Array<{
 ];
 
 export function UsefulLinks({ address }: { address: string }) {
-  const tx = useTranslation();
+  const tx = useTranslator();
   const quickswapLink = usePoolQuickswapLink(address);
   const links = useMemo(
     () =>

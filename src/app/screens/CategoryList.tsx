@@ -3,14 +3,14 @@ import { Link } from "react-router-dom";
 import { Space } from "antd";
 import { selectors } from "features";
 import { useSelector } from "react-redux";
-import { useTranslation } from "i18n";
+import { useTranslator } from "hooks";
 
 interface Props {
   withBreadcrumb?: boolean;
 }
 
 export default function CategoryList({ withBreadcrumb = true }: Props) {
-  const tx = useTranslation();
+  const tx = useTranslator();
   const categories = useSelector(selectors.selectAllFormattedCategories);
   const headerProps = withBreadcrumb
     ? {

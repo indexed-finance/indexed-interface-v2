@@ -1,10 +1,10 @@
 import { Switch } from "antd";
 import { actions, selectors } from "features";
 import { useDispatch, useSelector } from "react-redux";
-import { useTranslation } from "i18n";
+import { useTranslator } from "hooks";
 
 export function ModeSwitch() {
-  const tx = useTranslation();
+  const tx = useTranslator();
   const dispatch = useDispatch();
   const theme = useSelector(selectors.selectTheme);
 

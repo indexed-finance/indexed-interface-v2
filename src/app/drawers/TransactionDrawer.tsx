@@ -1,6 +1,6 @@
 import { BaseDrawer, createDrawerContext, useDrawerControls } from "./Drawer";
 import { ReactNode, useContext } from "react";
-import { useTranslation } from "i18n";
+import { useTranslator } from "hooks";
 
 export const TransactionContext = createDrawerContext();
 
@@ -24,7 +24,7 @@ export function TransactionProvider({ children }: { children: ReactNode }) {
 export function TransactionDrawer() {
   const drawerControls = useDrawerControls();
   const { close } = drawerControls;
-  const tx = useTranslation();
+  const tx = useTranslator();
 
   return (
     <BaseDrawer title={tx("TRANSACTIONS")} onClose={close}>

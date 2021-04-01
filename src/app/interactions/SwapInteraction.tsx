@@ -1,11 +1,4 @@
-import {
-  AppState,
-  FormattedIndexPool,
-  actions,
-  selectors,
-  usePoolToTokens,
-  useUserDataRegistrar,
-} from "features";
+import { AppState, FormattedIndexPool, actions, selectors } from "features";
 import { BaseInteraction, InteractionValues } from "./BaseInteraction";
 import { BigNumber } from "ethereum/utils/balancer-math";
 import { Divider, Space } from "antd";
@@ -18,16 +11,16 @@ import { ethereumHelpers } from "ethereum";
 import { getSwapCost } from "ethereum/utils";
 import { useCallback, useMemo } from "react";
 import { useFormikContext } from "formik";
+import { usePoolToTokens, useSwapCallbacks, useUserDataRegistrar } from "hooks";
 import { useSelector } from "react-redux";
-import { useSwapCallbacks } from "hooks";
-import { useTranslation } from "i18n";
+import { useTranslator } from "hooks";
 
 interface Props {
   pool: FormattedIndexPool;
 }
 
 export default function SwapInteraction({ pool }: Props) {
-  const tx = useTranslation();
+  const tx = useTranslator();
   const {
     calculateAmountIn,
     calculateAmountOut,

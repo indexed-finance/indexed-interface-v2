@@ -53,7 +53,7 @@ const removeBadIndices = () =>
     "app",
     "app/screens",
     "features/categories/local-data",
-    "i18n/translations",
+    "i18n",
     "theme",
     "theme/fonts",
     "sockets",

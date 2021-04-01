@@ -2,7 +2,7 @@ import { AiOutlineMenuFold, AiOutlineMenuUnfold } from "react-icons/ai";
 import { JazzIcon, LanguageSelector, Logo, WalletConnector } from "components";
 import { Layout, Typography } from "antd";
 import { selectors } from "features";
-import { useBreakpoints } from "helpers";
+import { useBreakpoints } from "hooks";
 import { useSelector } from "react-redux";
 
 interface Props {

@@ -1,28 +1,23 @@
-import { indexPoolsSelectors } from "./selectors";
-import { useCallRegistrar } from "hooks";
+import { AppState, FormattedIndexPool, selectors } from "features";
+import { useCallRegistrar } from "./use-call-registrar";
 import { useMemo } from "react";
 import { useSelector } from "react-redux";
-import type { AppState, FormattedIndexPool } from "features";
 import type { RegisteredCall } from "helpers";
 
 export const usePool = (poolId: string) =>
-  useSelector((state: AppState) =>
-    indexPoolsSelectors.selectPool(state, poolId)
-  );
+  useSelector((state: AppState) => selectors.selectPool(state, poolId));
 
 export const usePoolTokenIds = (poolId: string) =>
-  useSelector((state: AppState) =>
-    indexPoolsSelectors.selectPoolTokenIds(state, poolId)
-  );
+  useSelector((state: AppState) => selectors.selectPoolTokenIds(state, poolId));
 
 export const usePoolTokenAddresses = (poolId: string) =>
   useSelector((state: AppState) =>
-    indexPoolsSelectors.selectPoolTokenAddresses(state, poolId)
+    selectors.selectPoolTokenAddresses(state, poolId)
   );
 
 export const usePoolUnderlyingTokens = (poolId: string) =>
   useSelector((state: AppState) =>
-    indexPoolsSelectors.selectPoolUnderlyingTokens(state, poolId)
+    selectors.selectPoolUnderlyingTokens(state, poolId)
   );
 
 export const usePoolToTokens = (pool: FormattedIndexPool) => {

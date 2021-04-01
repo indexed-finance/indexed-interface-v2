@@ -1,9 +1,8 @@
 import { Button, Divider, Steps, Typography } from "antd";
 import { FEATURE_FLAGS } from "feature-flags";
 import { Link } from "react-router-dom";
-import { useBreakpoints } from "helpers";
+import { useBreakpoints, useTranslator } from "hooks";
 import { useEffect, useState } from "react";
-import { useTranslation } from "i18n";
 import CategoryList from "./CategoryList";
 import PoolList from "./PoolList";
 
@@ -12,7 +11,7 @@ const STEP_COUNT = 3;
 const STEP_PROGRESSION_DURATION = 7500;
 
 export default function Splash() {
-  const tx = useTranslation();
+  const tx = useTranslator();
   const { isMobile } = useBreakpoints();
   const [step, setStep] = useState(0);
   const docsButton = (

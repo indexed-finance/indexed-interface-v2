@@ -3,14 +3,14 @@ import { PoolCard, PoolDropdown, ScreenHeader } from "components";
 import { Space } from "antd";
 import { selectors } from "features";
 import { useSelector } from "react-redux";
-import { useTranslation } from "i18n";
+import { useTranslator } from "hooks";
 
 interface Props {
   withBreadcrumb?: boolean;
 }
 
 export default function PoolList({ withBreadcrumb = true }: Props) {
-  const tx = useTranslation();
+  const tx = useTranslator();
   const pools = useSelector(selectors.selectAllFormattedIndexPools);
   const headerProps = withBreadcrumb
     ? {

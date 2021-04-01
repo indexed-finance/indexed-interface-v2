@@ -1,6 +1,6 @@
 import { Card, CardProps, Divider, Space, Typography } from "antd";
 import { ReactNode, useMemo } from "react";
-import { useBreakpoints } from "helpers";
+import { useBreakpoints } from "hooks";
 import noop from "lodash.noop";
 
 type IndexCardAction = {

@@ -1,8 +1,8 @@
 import { Alert, Space, Statistic } from "antd";
-import { useTranslation } from "i18n";
+import { useTranslator } from "hooks";
 
 export function PlainLanguageTransaction() {
-  const tx = useTranslation();
+  const tx = useTranslator();
 
   return (
     <Alert

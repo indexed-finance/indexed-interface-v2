@@ -14,7 +14,6 @@ export function useStorageEntry<T>(key: string, fallback: T): StorageEntry<T> {
     () => ({
       store(entry) {
         try {
-          console.log("here");
           window.localStorage.setItem(key, JSON.stringify(entry, null, 2));
         } catch {}
       },

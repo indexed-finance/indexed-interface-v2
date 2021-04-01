@@ -2,8 +2,8 @@ import { Asset } from "features";
 import { IndexCard, Quote } from "components/molecules";
 import { Progress, Token } from "components/atoms";
 import { Space, Spin, Typography } from "antd";
-import { convert, useBreakpoints } from "helpers";
-import { useTranslation } from "i18n";
+import { convert } from "helpers";
+import { useBreakpoints, useTranslator } from "hooks";
 
 interface Props {
   token: Asset;
@@ -11,7 +11,7 @@ interface Props {
 }
 
 export function RankedToken({ token }: Props) {
-  const tx = useTranslation();
+  const tx = useTranslator();
   const { isMobile } = useBreakpoints();
 
   return (

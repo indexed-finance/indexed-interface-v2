@@ -1,20 +1,19 @@
 import { COMMON_BASE_TOKENS } from "config";
 import {
+  PayloadAction,
+  createEntityAdapter,
+  createSlice,
+} from "@reduxjs/toolkit";
+import {
   coingeckoDataLoaded,
-  coingeckoIdsLoaded,
   mirroredServerState,
   multicallDataReceived,
   restartedDueToError,
   subgraphDataLoaded,
-  totalSuppliesUpdated,
   uniswapPairsRegistered,
 } from "features/actions";
-import { createEntityAdapter, createSlice } from "@reduxjs/toolkit";
 import { createMulticallDataParser } from "helpers";
 import type { NormalizedToken } from "ethereum";
-
-export const totalSuppliesCaller = "Total Supplies";
-export const pricesCaller = "Token Prices";
 
 export const tokensAdapter = createEntityAdapter<NormalizedToken>({
   selectId: (entry) => entry.id.toLowerCase(),
@@ -25,7 +24,19 @@ const tokensInitialState = tokensAdapter.getInitialState();
 const slice = createSlice({
   name: "tokens",
   initialState: tokensInitialState,
-  reducers: {},
+  reducers: {
+    totalSuppliesUpdated(
+      state,
+      action: PayloadAction<Array<{ token: string; totalSupply: string }>>
+    ) {
+      for (const { token, totalSupply } of action.payload) {
+        const entity = state.entities[token.toLowerCase()];
+        if (entity) {
+          entity.totalSupply = totalSupply;
+        }
+      }
+    },
+  },
   extraReducers: (builder) =>
     builder
       .addCase(multicallDataReceived, (state, action) => {
@@ -59,20 +70,6 @@ const slice = createSlice({
 
         tokensAdapter.addMany(state, fullTokens);
       })
-      .addCase(coingeckoIdsLoaded, (state, action) => {
-        const symbolToIdLookup = action.payload.reduce((prev, next) => {
-          prev[next.symbol.toLowerCase()] = next.id;
-          return prev;
-        }, {} as Record<string, string>);
-
-        for (const id of state.ids) {
-          const token = state.entities[id];
-
-          if (token) {
-            token.coingeckoId = symbolToIdLookup[token.symbol];
-          }
-        }
-      })
       .addCase(coingeckoDataLoaded, (state, action) => {
         if (action.payload.tokens) {
           for (const [address, value] of Object.entries(
@@ -99,14 +96,6 @@ const slice = createSlice({
         return tokens;
       })
       .addCase(restartedDueToError, () => tokensInitialState)
-      .addCase(totalSuppliesUpdated, (state, action) => {
-        for (const { token, totalSupply } of action.payload) {
-          const entity = state.entities[token.toLowerCase()];
-          if (entity) {
-            entity.totalSupply = totalSupply;
-          }
-        }
-      })
       .addCase(uniswapPairsRegistered, (state, action) => {
         for (const pair of action.payload) {
           if (!state.entities[pair.id.toLowerCase()]) {
@@ -127,7 +116,7 @@ export const { actions: tokensActions, reducer: tokensReducer } = slice;
 
 // #region Helpers
 const totalSuppliesMulticallDataParser = createMulticallDataParser(
-  totalSuppliesCaller,
+  "Total Supplies",
   (calls) => {
     const formattedTotalSupplies = calls.reduce((prev, next) => {
       const [tokenAddress, functions] = next;
@@ -145,5 +134,4 @@ const totalSuppliesMulticallDataParser = createMulticallDataParser(
     return formattedTotalSupplies;
   }
 );
-
 // #endregion

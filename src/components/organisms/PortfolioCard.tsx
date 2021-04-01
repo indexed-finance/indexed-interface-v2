@@ -3,8 +3,7 @@ import { FormattedPortfolioDatum } from "features";
 import { IndexCard } from "components/molecules";
 import { Link } from "react-router-dom";
 import { Progress } from "components/atoms";
-import { useBreakpoints } from "helpers";
-import { useTranslation } from "i18n";
+import { useBreakpoints, useTranslator } from "hooks";
 
 export function PortfolioCard({
   address,
@@ -17,7 +16,7 @@ export function PortfolioCard({
   staking,
   weight,
 }: FormattedPortfolioDatum) {
-  const tx = useTranslation();
+  const tx = useTranslator();
   const { isMobile } = useBreakpoints();
 
   let ribbonText = "";

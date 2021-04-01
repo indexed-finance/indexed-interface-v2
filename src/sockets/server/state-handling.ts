@@ -1,14 +1,12 @@
 import { INFURA_ID } from "config";
+import { actions, selectors, store } from "features";
 import {
-  actions,
+  buildUniswapPairs,
   createPairDataCalls,
   createPoolDetailCalls,
   createStakingCalls,
   createTotalSuppliesCalls,
-  selectors,
-  store,
-} from "features";
-import { buildUniswapPairs } from "hooks";
+} from "hooks";
 import { log } from "./helpers";
 import { providers } from "ethers";
 import { setupCoinapiConnection } from "./coinapi-connection";

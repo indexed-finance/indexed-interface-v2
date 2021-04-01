@@ -4,7 +4,7 @@ import { Divider, Typography } from "antd";
 import { Link } from "react-router-dom";
 import { Redirect, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { useTranslation } from "i18n";
+import { useTranslator } from "hooks";
 import ReactMarkdown from "react-markdown";
 
 export default function CategoryDetail() {
@@ -12,7 +12,7 @@ export default function CategoryDetail() {
   const category = useSelector((state: AppState) =>
     selectors.selectFormattedCategory(state, categoryName)
   );
-  const tx = useTranslation();
+  const tx = useTranslator();
 
   return category ? (
     <>

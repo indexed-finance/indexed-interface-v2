@@ -9,7 +9,7 @@ import { convert } from "helpers";
 import { selectors } from "features";
 import { useSelector } from "react-redux";
 import { useTokenApproval, useTokenRandomizer } from "hooks";
-import { useTranslation } from "i18n";
+import { useTranslator } from "hooks";
 
 type Asset = { name: string; symbol: string; id: string };
 
@@ -121,7 +121,7 @@ function InteractionInner({
   disableOutputSelect,
   requiresApproval,
 }: InnerProps) {
-  const tx = useTranslation();
+  const tx = useTranslator();
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
   const [tokenId, exactAmountIn] = useMemo(() => {
     if (values.fromToken && values.fromAmount) {

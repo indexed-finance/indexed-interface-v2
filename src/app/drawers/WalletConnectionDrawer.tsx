@@ -10,7 +10,7 @@ import { createDrawerContext, useDrawerControls } from "./Drawer";
 import { ethers } from "ethers";
 import { useDispatch } from "react-redux";
 import { usePrevious, useWalletConnection, useWalletOptions } from "hooks";
-import { useTranslation } from "i18n";
+import { useTranslator } from "hooks";
 import noop from "lodash.noop";
 
 export const WalletConnectionContext = createDrawerContext();
@@ -60,7 +60,7 @@ export function WalletConnectionProvider({
 
 export function WalletConnectionDrawer() {
   const { close } = useDrawerControls();
-  const tx = useTranslation();
+  const tx = useTranslator();
   const dispatch = useDispatch();
   const { account, activate } = useWeb3React();
   const [attemptingActivation, setAttemptingActivation] = useState(false);

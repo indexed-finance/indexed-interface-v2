@@ -9,12 +9,7 @@ import { createAction } from "@reduxjs/toolkit";
 export const subgraphDataLoaded = createAction<NormalizedInitialData>(
   "subgraphDataLoaded"
 );
-/**
- *
- */
-export const coingeckoIdsLoaded = createAction<
-  Array<{ id: string; symbol: string }>
->("coingeckoIdsLoaded");
+
 /**
  *
  */
@@ -30,6 +25,7 @@ export const coingeckoDataLoaded = createAction<{
     }
   >;
 }>("coingeckoDataLoaded");
+
 /**
  *
  */
@@ -38,19 +34,25 @@ export const poolTradesAndSwapsLoaded = createAction<{
   trades: Trade[];
   swaps: Swap[];
 }>("poolTradesAndSwapsLoaded");
+
+/**
+ *
+ */
+export const restartedDueToError = createAction("restartedDueToError");
+
 /**
  *
  */
 export const mirroredServerState = createAction<any>("mirroredServerState");
 
+/**
+ *
+ */
 export const uniswapPairsRegistered = createAction<NormalizedPair[]>(
   "uniswapPairsRegistered"
 );
 
-export const totalSuppliesUpdated = createAction<
-  { token: string; totalSupply: string }[]
->("totalSuppliesUpdated");
-
+// #region Multicall
 export type MulticallData = {
   blockNumber: number;
   callers: Record<
@@ -63,6 +65,8 @@ export type MulticallData = {
   callsToResults: Record<string, string[]>;
 };
 
+export const multicallDataRequested = createAction("multicallDataRequested");
+
 export const multicallDataReceived = createAction<MulticallData>(
   "multicallDataReceived"
 );
@@ -70,7 +74,4 @@ export const multicallDataReceived = createAction<MulticallData>(
 export const cachedMulticallDataReceived = createAction<MulticallData>(
   "cachedMulticallDataReceived"
 );
-
-export const multicallDataRequested = createAction("multicallDataRequested");
-
-export const restartedDueToError = createAction("restartedDueToError");
+// #endregion

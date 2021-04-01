@@ -2,11 +2,17 @@ import { AppState, selectors } from "features";
 import { NDX_ADDRESS, WETH_CONTRACT_ADDRESS } from "config";
 import { convert } from "helpers";
 import { sortTokens } from "ethereum";
+import { useCallRegistrar } from "./use-call-registrar";
 import { useMemo } from "react";
 import { useSelector } from "react-redux";
-import { useTokenPrice } from "./use-token-price";
-import { useTotalSuppliesWithLoadingIndicator } from "./use-total-supplies";
-import { useUniswapPairs } from "./use-uniswap-trading-pairs";
+import {
+  useTokenPrice,
+  useTotalSuppliesWithLoadingIndicator,
+} from "./token-hooks";
+import { useUniswapPairs } from "./pair-hooks";
+import { useUserAddress } from "./user-hooks";
+import type { NormalizedStakingPool } from "ethereum";
+import type { RegisteredCall } from "helpers";
 
 export const useStakingPool = (stakingPoolAddress: string) =>
   useSelector((state: AppState) =>
@@ -120,4 +126,101 @@ export function useStakingApy(stakingPoolAddress: string) {
   } else {
     return null;
   }
+}
+
+export function createStakingCalls(
+  stakingPool: string,
+  userAddress?: string
+): {
+  onChainCalls: RegisteredCall[];
+  offChainCalls: RegisteredCall[];
+} {
+  const onChainCalls: RegisteredCall[] = [
+    {
+      interfaceKind: "StakingRewards_ABI",
+      target: stakingPool,
+      function: "rewardsDuration",
+    },
+    {
+      interfaceKind: "StakingRewards_ABI",
+      target: stakingPool,
+      function: "periodFinish",
+    },
+    {
+      interfaceKind: "StakingRewards_ABI",
+      target: stakingPool,
+      function: "rewardRate",
+    },
+    {
+      interfaceKind: "StakingRewards_ABI",
+      target: stakingPool,
+      function: "rewardPerToken",
+    },
+    {
+      interfaceKind: "StakingRewards_ABI",
+      target: stakingPool,
+      function: "totalSupply",
+    },
+  ];
+
+  if (userAddress) {
+    onChainCalls.push(
+      {
+        interfaceKind: "StakingRewards_ABI",
+        target: stakingPool,
+        function: "balanceOf",
+        args: [userAddress],
+      },
+      {
+        interfaceKind: "StakingRewards_ABI",
+        target: stakingPool,
+        function: "earned",
+        args: [userAddress],
+      }
+    );
+  }
+
+  return {
+    onChainCalls,
+    offChainCalls: [],
+  };
+}
+
+export const STAKING_CALLER = "Staking";
+
+export function useStakingRegistrar(
+  actions: Record<string, any>,
+  selectors: Record<string, any>
+) {
+  const userAddress = useUserAddress();
+  const stakingPools: NormalizedStakingPool[] = useSelector(
+    selectors.selectAllStakingPools
+  );
+  const { onChainCalls, offChainCalls } = stakingPools.reduce(
+    (prev, next) => {
+      const poolCalls = createStakingCalls(next.id, userAddress);
+
+      prev.onChainCalls.push(...poolCalls.onChainCalls);
+      prev.offChainCalls.push(...poolCalls.offChainCalls);
+
+      return prev;
+    },
+    {
+      onChainCalls: [],
+      offChainCalls: [],
+    } as {
+      onChainCalls: RegisteredCall[];
+      offChainCalls: RegisteredCall[];
+    }
+  );
+
+  useCallRegistrar(
+    {
+      caller: STAKING_CALLER,
+      onChainCalls,
+      offChainCalls,
+    },
+    actions,
+    selectors
+  );
 }

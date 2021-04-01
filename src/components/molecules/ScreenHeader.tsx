@@ -1,6 +1,6 @@
 import { Breadcrumb, Divider, Space, Typography } from "antd";
 import { ReactElement } from "react";
-import { useBreakpoints } from "helpers";
+import { useBreakpoints } from "hooks";
 
 interface Props {
   title?: string;

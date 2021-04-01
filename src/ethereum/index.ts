@@ -4,7 +4,6 @@
 export * from './abi';
 export * from './helpers';
 export * from './multicall';
-export * from './subgraph';
 export * from './transactions';
 export * from './types.d';
 export * from './utils';

@@ -7,10 +7,10 @@ import {
 } from "components";
 import { Link, useHistory } from "react-router-dom";
 import { SOCIAL_MEDIA } from "config";
-import { TranslatedTerm, useTranslation } from "i18n";
+import { TranslatedTerm } from "helpers";
 import { routes } from "./routes";
 import { selectors } from "features";
-import { useBreakpoints, useScrollPrevention } from "helpers";
+import { useBreakpoints, useScrollPrevention, useTranslator } from "hooks";
 import { useSelector } from "react-redux";
 import noop from "lodash.noop";
 
@@ -22,7 +22,7 @@ interface Props {
 const { Item, SubMenu } = Menu;
 
 export function AppMenu({ onItemClick = noop, ...rest }: Props) {
-  const tx = useTranslation();
+  const tx = useTranslator();
   const menuModels = useSelector(selectors.selectMenuModels);
   const categoryLookup = useSelector(selectors.selectCategoryLookup);
   const indexPoolsLookup = useSelector(selectors.selectCategoryImagesByPoolIds);

@@ -1,26 +1,23 @@
-import {
-  AppState,
-  FormattedIndexPool,
-  actions,
-  selectors,
-  usePoolToTokens,
-  useUserDataRegistrar,
-} from "features";
+import { AppState, FormattedIndexPool, actions, selectors } from "features";
 import { BaseInteraction, InteractionValues } from "./BaseInteraction";
 import { COMMON_BASE_TOKENS, UNISWAP_ROUTER_ADDRESS } from "config";
 import { Trade } from "@uniswap/sdk";
 import { convert } from "helpers";
 import { useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useTranslation } from "i18n";
-import { useUniswapTradingPairs } from "hooks";
+import {
+  usePoolToTokens,
+  useUniswapTradingPairs,
+  useUserDataRegistrar,
+} from "hooks";
+import { useTranslator } from "hooks";
 
 interface Props {
   pool: FormattedIndexPool;
 }
 
 export default function TradeInteraction({ pool }: Props) {
-  const tx = useTranslation();
+  const tx = useTranslator();
   const dispatch = useDispatch();
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
   const tokenIds = useMemo(

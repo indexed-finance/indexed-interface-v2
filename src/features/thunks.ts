@@ -1,6 +1,7 @@
+import * as coingeckoQueries from "helpers/coingecko-queries";
+import * as supgraphQueries from "helpers/subgraph-queries";
 import * as topLevelActions from "./actions";
 import { BigNumber } from "bignumber.js";
-import { CoinGeckoService } from "services";
 import {
   RegisteredCall,
   convert,
@@ -19,17 +20,12 @@ import {
   executeUniswapTrade,
   exitswapExternAmountOut,
   exitswapPoolAmountIn,
-  getUrl,
   joinPool,
   joinswapExternAmountIn,
   joinswapPoolAmountOut,
   multicall,
   normalizeInitialData,
   normalizeStakingData,
-  queryInitial,
-  queryStaking,
-  querySwaps,
-  queryTrades,
   swapExactAmountIn,
   swapExactAmountOut,
   swapExactTokensForTokensAndMint,
@@ -46,7 +42,6 @@ import { selectors } from "./selectors";
 import { settingsActions } from "./settings";
 import { stakingActions } from "./staking";
 import { tokensActions } from "./tokens";
-import { tx } from "i18n";
 import { userActions } from "./user";
 import debounce from "lodash.debounce";
 import type { AppThunk } from "./store";
@@ -167,8 +162,8 @@ export const thunks = {
   retrieveInitialData: (): AppThunk => async (dispatch) => {
     if (provider) {
       const { chainId } = provider.network;
-      const url = getUrl(chainId);
-      const initial = await queryInitial(url);
+      const url = supgraphQueries.getUrl(chainId);
+      const initial = await supgraphQueries.queryInitial(url);
       const formatted = normalizeInitialData(initial);
 
       dispatch(actions.subgraphDataLoaded(formatted));
@@ -176,73 +171,39 @@ export const thunks = {
 
     dispatch(actions.requestStakingData());
   },
-  /**
-   *
-   */
-  retrieveCoingeckoIds: (): AppThunk => async (dispatch, getState) => {
-    const state = getState();
-    const tokenDictionary = selectors
-      .selectTokenSymbols(state)
-      .reduce((prev, next) => {
-        prev[next.toLowerCase()] = true;
-        return prev;
-      }, {} as Record<string, true>);
-    const allSupportedCoins = await CoinGeckoService.getSupportedTokens();
-    const relevantSupportedCoins = allSupportedCoins.filter(
-      (coin: any) => tokenDictionary[coin.symbol.toLowerCase()]
-    );
-    const supportedCoinIds = relevantSupportedCoins.map(
-      ({ id, symbol }: any) => ({
-        id,
-        symbol,
-      })
-    );
-
-    dispatch(actions.coingeckoIdsLoaded(supportedCoinIds));
-  },
   retrieveCoingeckoDataForPool: (poolId: string): AppThunk => async (
     dispatch
-  ) => {
-    try {
-      dispatch((thunks as any).retrieveCoingeckoData(poolId));
-    } catch {}
-  },
+  ) => dispatch(thunks.retrieveCoingeckoData(poolId)),
   retrieveCoingeckoDataForTokens: (...tokenIds: string[]): AppThunk => async (
     dispatch
-  ) => {
-    try {
-      dispatch((thunks as any).retrieveCoingeckoData(tokenIds));
-    } catch {}
-  },
-  retrieveCoingeckoData: debounce(
-    (poolOrTokenIds: string | string[]): AppThunk => async (
-      dispatch,
-      getState
-    ) => {
-      try {
-        const state = getState();
-        const isPool = typeof poolOrTokenIds === "string";
-        const pool = isPool ? (poolOrTokenIds as string) : null;
-        const tokenIds = pool
-          ? [...selectors.selectPoolTokenIds(state, pool), pool]
-          : (poolOrTokenIds as string[]);
-        const tokens = await CoinGeckoService.getStatsForTokens(tokenIds);
+  ) => dispatch(thunks.retrieveCoingeckoData(tokenIds)),
+  retrieveCoingeckoData: (
+    poolOrTokenIds: string | string[]
+  ): AppThunk => async (dispatch, getState) => {
+    const state = getState();
+    const tx = selectors.selectTranslator(state);
+    const isPool = typeof poolOrTokenIds === "string";
+    const pool = isPool ? (poolOrTokenIds as string) : null;
+    const tokenIds = pool
+      ? [...selectors.selectPoolTokenIds(state, pool), pool]
+      : (poolOrTokenIds as string[]);
 
-        dispatch(
-          actions.coingeckoDataLoaded({
-            pool,
-            tokens,
-          })
-        );
-      } catch {
-        notification.error({
-          message: tx("ERROR"),
-          description: tx("THERE_WAS_A_PROBLEM_LOADING_DATA_FROM_COINGECKO"),
-        });
-      }
-    },
-    10000
-  ),
+    try {
+      const tokens = await coingeckoQueries.getStatsForTokens(tokenIds);
+
+      dispatch(
+        actions.coingeckoDataLoaded({
+          pool,
+          tokens,
+        })
+      );
+    } catch {
+      notification.error({
+        message: tx("ERROR"),
+        description: tx("THERE_WAS_A_PROBLEM_LOADING_DATA_FROM_COINGECKO"),
+      });
+    }
+  },
   /**
    *
    * @param poolAddress -
@@ -253,10 +214,10 @@ export const thunks = {
   ) => {
     if (provider) {
       const { chainId } = await provider.getNetwork();
-      const url = getUrl(chainId);
+      const url = supgraphQueries.getUrl(chainId);
       const [trades, swaps] = await Promise.all([
-        queryTrades(SUBGRAPH_URL_UNISWAP, poolAddress),
-        querySwaps(url, poolAddress),
+        supgraphQueries.queryTrades(SUBGRAPH_URL_UNISWAP, poolAddress),
+        supgraphQueries.querySwaps(url, poolAddress),
       ]);
 
       dispatch(
@@ -271,8 +232,8 @@ export const thunks = {
   requestStakingData: (): AppThunk => async (dispatch) => {
     if (provider) {
       const { chainId } = provider.network;
-      const url = getUrl(chainId);
-      const staking = await queryStaking(url);
+      const url = supgraphQueries.getUrl(chainId);
+      const staking = await supgraphQueries.queryStaking(url);
       const formatted = normalizeStakingData(staking);
 
       dispatch(actions.stakingDataLoaded(formatted));
@@ -696,7 +657,7 @@ export type DataReceiverConfig = {
   offChainCalls?: any[];
 };
 
-// #region ethereumHelpers
+// #region Helpers
 export function formatMulticallData(
   batchConfig: ReturnType<typeof selectors.selectOnChainBatch>,
   blockNumber: number,

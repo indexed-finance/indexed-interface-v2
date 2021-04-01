@@ -3,7 +3,7 @@ import { FormattedIndexPool } from "features";
 import { ImArrowLeft, ImArrowRight } from "react-icons/im";
 import { ReactNode, useEffect, useRef, useState } from "react";
 import { Token } from "components/atoms";
-import { useBreakpoints } from "helpers";
+import { useBreakpoints } from "hooks";
 import noop from "lodash.noop";
 
 interface Props {

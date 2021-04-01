@@ -4,7 +4,7 @@ import { List, Typography } from "antd";
 import { ListCard } from "./ListCard";
 import { toFormattedAsset } from "ethereum";
 import { useSelector } from "react-redux";
-import { useTranslation } from "i18n";
+import { useTranslator } from "hooks";
 import type { Token as TokenType } from "indexed-types";
 
 interface Props {
@@ -37,7 +37,7 @@ export function CategoryCard({
     entities: {},
   },
 }: Props) {
-  const tx = useTranslation();
+  const tx = useTranslator();
   const category = useSelector((state: AppState) =>
     selectors.selectCategory(state, id)
   );

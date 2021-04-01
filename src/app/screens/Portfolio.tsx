@@ -1,11 +1,4 @@
-import {
-  AppState,
-  actions,
-  selectors,
-  usePairDataRegistrar,
-  useStakingRegistrar,
-  useUserDataRegistrar,
-} from "features";
+import { AppState, actions, selectors } from "features";
 import { Divider, Space, Typography } from "antd";
 import { NDX_ADDRESS, WETH_CONTRACT_ADDRESS } from "config";
 import {
@@ -13,13 +6,19 @@ import {
   ProviderRequirementDrawer,
   ScreenHeader,
 } from "components";
-import { buildUniswapPairs, useEthPrice } from "hooks";
+import {
+  buildUniswapPairs,
+  useEthPrice,
+  usePairDataRegistrar,
+  useStakingRegistrar,
+  useUserDataRegistrar,
+} from "hooks";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useMemo } from "react";
-import { useTranslation } from "i18n";
+import { useTranslator } from "hooks";
 
 export default function Portfolio() {
-  const tx = useTranslation();
+  const tx = useTranslator();
   const dispatch = useDispatch();
   const pools = useSelector(selectors.selectAllPools);
   const poolsToTokens = pools.reduce((prev, next) => {

@@ -2,10 +2,10 @@ import { AppState, selectors } from "features";
 import { ChartCard, PoolDropdown, ScreenHeader } from "components";
 import { Link, Redirect, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { useTranslation } from "i18n";
+import { useTranslator } from "hooks";
 
 export default function PoolChart() {
-  const tx = useTranslation();
+  const tx = useTranslator();
   const { poolName } = useParams<{ poolName: string }>();
   const pool = useSelector((state: AppState) =>
     selectors.selectFormattedIndexPool(state, poolName)

@@ -1,7 +1,7 @@
 import { AppHeader } from "./AppHeader";
 import { AppMenu } from "./AppMenu";
 import { BuildingWall } from "components";
-import { Button, Layout, notification } from "antd";
+import { Button, Layout, message, notification } from "antd";
 import { CSSTransition } from "react-transition-group";
 import { Helmet } from "react-helmet";
 import { Logo } from "components";
@@ -18,10 +18,8 @@ import { SocketClient } from "sockets/client";
 import { Suspense } from "react";
 import { routes } from "./routes";
 import { selectors } from "features";
-import { useBreakpoints } from "helpers";
+import { useBreakpoints, useStorageEntry, useTranslator } from "hooks";
 import { useSelector } from "react-redux";
-import { useStorageEntry } from "hooks";
-import { useTranslation } from "i18n";
 import { useWalletConnectionDrawer } from "./drawers";
 import noop from "lodash.noop";
 
@@ -32,7 +30,7 @@ const TIME_BETWEEN_SERVER_ERROR_NOTIFICATIONS = 1000 * 60 * 60 * 3; // Three hou
 const { Sider, Content } = Layout;
 
 export function AppLayout() {
-  const tx = useTranslation();
+  const tx = useTranslator();
   const { entry: lastNotifiedOfError, store } = useStorageEntry(
     ERROR_NOTIFICATION_STORAGE_KEY,
     -1
@@ -53,23 +51,26 @@ export function AppLayout() {
   // On initial load, open up a connection to the server.
   useEffect(() => {
     if (isConnectionEnabled) {
-      SocketClient.connect(() => {
-        const shouldNotify =
-          lastNotifiedOfError === -1 ||
-          Date.now() - lastNotifiedOfError >
-            TIME_BETWEEN_SERVER_ERROR_NOTIFICATIONS;
+      SocketClient.connect({
+        onConnect() {
+          message.success(tx("A_CONNECTION_TO_THE_SERVER_WAS_ESTABLISHED"));
+        },
+        onError() {
+          const shouldNotify =
+            lastNotifiedOfError === -1 ||
+            Date.now() - lastNotifiedOfError >
+              TIME_BETWEEN_SERVER_ERROR_NOTIFICATIONS;
 
-        if (shouldNotify) {
-          notification.error({
-            message: tx("ERROR"),
-            description: tx("UNABLE_TO_CONNECT_TO_SERVER_..."),
-          });
+          if (shouldNotify) {
+            notification.error({
+              message: tx("ERROR"),
+              description: tx("UNABLE_TO_CONNECT_TO_SERVER_..."),
+            });
 
-          store(Date.now());
-        }
+            store(Date.now());
+          }
+        },
       });
-    } else {
-      SocketClient.disconnect();
     }
 
     return () => {
