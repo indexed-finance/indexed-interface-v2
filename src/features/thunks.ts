@@ -194,13 +194,16 @@ export const thunks = {
       try {
         const tokens = await coingeckoQueries.getStatsForTokens(tokenIds);
 
-        dispatch(
-          actions.coingeckoDataLoaded({
-            pool,
-            tokens,
-          })
-        );
+        if (!tokens)
+          dispatch(
+            actions.coingeckoDataLoaded({
+              pool,
+              tokens,
+            })
+          );
       } catch {
+        dispatch(actions.coingeckoRequestFailed({ when: Date.now() }));
+
         notification.error({
           message: tx("ERROR"),
           description: tx("THERE_WAS_A_PROBLEM_LOADING_DATA_FROM_COINGECKO"),
