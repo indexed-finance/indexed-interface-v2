@@ -7,7 +7,7 @@ import {
   NEED_TO_RESTART_TIME_LIMIT,
 } from "config";
 import { ExchangeResponse, OhlcvResponse } from "./models";
-import { actions, store } from "features";
+import { fetchTokenStats, store } from "features";
 import { formatPongResponse, log } from "./helpers";
 import { sleep } from "helpers";
 import WebSocket from "isomorphic-ws";
@@ -240,7 +240,9 @@ function continuouslyUpdateCoinData() {
   updatingCoinData = setTimeout(() => {
     log("Sending up-to-date coin data.");
 
-    store.dispatch(actions.tokenStatsDataLoaded(symbolToPriceDataLookup));
+    store.dispatch(
+      fetchTokenStats.fulfilled(symbolToPriceDataLookup, "", { arg: [] })
+    );
     continuouslyUpdateCoinData();
   }, 10000);
 }

@@ -1,4 +1,3 @@
-import * as coingeckoQueries from "helpers/coingecko-queries";
 import * as supgraphQueries from "helpers/subgraph-queries";
 import * as topLevelActions from "./actions";
 import { BigNumber } from "bignumber.js";
@@ -27,9 +26,12 @@ import {
 import { batcherActions } from "./batcher";
 import { cacheActions } from "./cache";
 import { categoriesActions } from "./categories";
-import { fetchMulticallData, fetchPoolTradesSwaps } from "./requests";
+import {
+  fetchMulticallData,
+  fetchPoolTradesSwaps,
+  fetchTokenStats,
+} from "./requests";
 import { indexPoolsActions } from "./indexPools";
-import { notification } from "antd";
 import { providers } from "ethers";
 import { selectors } from "./selectors";
 import { settingsActions } from "./settings";
@@ -145,7 +147,7 @@ export const thunks = {
   /**
    *
    */
-  triggerBatchDump: (): AppThunk => async (dispatch, getState) => {
+  triggerBatchDump: (): AppThunk => (dispatch, getState) => {
     const state = getState();
     const { status } = selectors.selectBatcherStatus(state);
 
@@ -166,6 +168,7 @@ export const thunks = {
           const request = {
             fetchMulticallData,
             fetchPoolTradesSwaps,
+            fetchTokenStats,
           }[fn] as any;
 
           if (request) {
@@ -195,33 +198,6 @@ export const thunks = {
 
     dispatch(actions.requestStakingData());
   },
-  requestTokenStats: (...tokenIds: string[]): AppThunk => async (
-    dispatch,
-    getState
-  ) => {
-    const state = getState();
-    const canRequest = selectors.selectTokenStatsRequestable(state);
-    const ids = typeof tokenIds === "string" ? [tokenIds] : tokenIds;
-
-    if (canRequest) {
-      try {
-        const tokens = await coingeckoQueries.getStatsForTokens(ids);
-
-        if (tokens) {
-          dispatch(actions.tokenStatsDataLoaded(tokens));
-        }
-      } catch {
-        const tx = selectors.selectTranslator(state);
-
-        dispatch(actions.tokenStatsRequestFailed({ when: Date.now() }));
-
-        notification.error({
-          message: tx("ERROR"),
-          description: tx("THERE_WAS_A_PROBLEM_LOADING_DATA_FROM_COINGECKO"),
-        });
-      }
-    }
-  },
   /**
    *
    * @returns
@@ -236,6 +212,9 @@ export const thunks = {
       dispatch(actions.stakingDataLoaded(formatted));
     }
   },
+
+  // Interactions
+
   /**
    * @param spenderAddress - Address of the spender to approve
    * @param tokenAddress - ERC20 token address

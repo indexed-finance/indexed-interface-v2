@@ -85,7 +85,7 @@ export function usePricesRegistrar(tokenIds: string[]) {
     offChainCalls: [
       {
         target: "",
-        function: "requestTokenStats",
+        function: "fetchTokenStats",
         args: tokenIds,
         canBeMerged: true,
       },

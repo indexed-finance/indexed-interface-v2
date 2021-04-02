@@ -5,13 +5,11 @@ import {
   createSlice,
 } from "@reduxjs/toolkit";
 import { createMulticallDataParser } from "helpers";
-import { fetchMulticallData } from "../requests";
+import { fetchMulticallData, fetchTokenStats } from "../requests";
 import {
   mirroredServerState,
   restartedDueToError,
   subgraphDataLoaded,
-  tokenStatsDataLoaded,
-  tokenStatsRequestFailed,
   uniswapPairsRegistered,
 } from "../actions";
 import type { NormalizedToken } from "ethereum";
@@ -73,10 +71,8 @@ const slice = createSlice({
 
         tokensAdapter.addMany(state, fullTokens);
       })
-      .addCase(tokenStatsDataLoaded, (state, action) => {
+      .addCase(fetchTokenStats.fulfilled, (state, action) => {
         if (action.payload) {
-          state.lastTokenStatsError = -1;
-
           for (const [address, value] of Object.entries(action.payload)) {
             if (value) {
               const { price, change24Hours, percentChange24Hours } = value;
@@ -93,14 +89,7 @@ const slice = createSlice({
           }
         }
       })
-      .addCase(tokenStatsRequestFailed, (state, action) => {
-        state.lastTokenStatsError = action.payload.when;
-      })
-      .addCase(mirroredServerState, (_, action) => {
-        const { tokens } = action.payload;
-
-        return tokens;
-      })
+      .addCase(mirroredServerState, (_, action) => action.payload.tokens)
       .addCase(restartedDueToError, () => tokensInitialState)
       .addCase(uniswapPairsRegistered, (state, action) => {
         for (const pair of action.payload) {

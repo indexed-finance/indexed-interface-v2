@@ -11,28 +11,6 @@ export const subgraphDataLoaded = createAction<NormalizedInitialData>(
 /**
  *
  */
-export const tokenStatsDataLoaded = createAction<
-  Record<
-    string,
-    {
-      price: number;
-      change24Hours: number;
-      percentChange24Hours: number;
-      updatedAt: number;
-    }
-  >
->("tokenStatsDataLoaded");
-
-/**
- *
- */
-export const tokenStatsRequestFailed = createAction<{ when: number }>(
-  "tokenStatsRequestFailed"
-);
-
-/**
- *
- */
 export const restartedDueToError = createAction("restartedDueToError");
 
 /**

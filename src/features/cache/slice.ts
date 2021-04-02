@@ -2,9 +2,10 @@ import {
   MulticallData,
   fetchMulticallData,
   fetchPoolTradesSwaps,
+  fetchTokenStats,
 } from "../requests";
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import { restartedDueToError, tokenStatsDataLoaded } from "../actions";
+import { restartedDueToError } from "../actions";
 import { stakingActions } from "../staking";
 import type { AppState } from "../store";
 
@@ -53,9 +54,9 @@ const slice = createSlice({
   },
   extraReducers: (builder) =>
     builder
-      .addCase(tokenStatsDataLoaded, (state, action) => {
-        const formattedCall = `requestTokenStats/${Object.keys(
-          action.payload
+      .addCase(fetchTokenStats.fulfilled, (state, action) => {
+        const formattedCall = `fetchTokenStats/${Object.keys(
+          action.payload ?? {}
         ).join("_")}`;
 
         state.entries[formattedCall] = {
