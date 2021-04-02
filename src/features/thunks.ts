@@ -3,7 +3,7 @@ import * as supgraphQueries from "helpers/subgraph-queries";
 import * as topLevelActions from "./actions";
 import { BigNumber } from "bignumber.js";
 import { RegisteredCall, convert } from "helpers";
-import { SLIPPAGE_RATE, SUBGRAPH_URL_UNISWAP } from "config";
+import { SLIPPAGE_RATE } from "config";
 import { Trade } from "@uniswap/sdk";
 import {
   approveSpender,
@@ -27,7 +27,7 @@ import {
 import { batcherActions } from "./batcher";
 import { cacheActions } from "./cache";
 import { categoriesActions } from "./categories";
-import { fetchMulticallData } from "./requests";
+import { fetchMulticallData, fetchPoolTradesSwaps } from "./requests";
 import { indexPoolsActions } from "./indexPools";
 import { notification } from "antd";
 import { providers } from "ethers";
@@ -38,8 +38,6 @@ import { tokensActions } from "./tokens";
 import { userActions } from "./user";
 import debounce from "lodash.debounce";
 import type { AppThunk } from "./store";
-import type { Swap as PoolSwap } from "indexed-types";
-import type { Swap as PoolTrade } from "uniswap-types";
 
 // #region Provider
 /**
@@ -155,22 +153,30 @@ export const thunks = {
       const cachedCalls = selectors.selectCachedCallsFromCurrentBlock(state);
       const batch = selectors.selectBatch(state, cachedCalls);
 
-      for (const call of batch.offChainCalls) {
-        const [fn, args] = call.split("/");
-        const action = (thunks as any)[fn];
-
-        if (action) {
-          dispatch(action(...args.split("_")));
-        }
-      }
-
       if (provider) {
         dispatch(
           fetchMulticallData({
             provider,
-            batch,
+            arg: batch,
           })
         );
+
+        for (const call of batch.offChainCalls) {
+          const [fn, args] = call.split("/");
+          const request = {
+            fetchMulticallData,
+            fetchPoolTradesSwaps,
+          }[fn] as any;
+
+          if (request) {
+            dispatch(
+              request({
+                provider,
+                arg: [...args.split("_")],
+              })
+            );
+          }
+        }
       }
     }
   },
@@ -214,45 +220,6 @@ export const thunks = {
           description: tx("THERE_WAS_A_PROBLEM_LOADING_DATA_FROM_COINGECKO"),
         });
       }
-    }
-  },
-  /**
-   *
-   * @param poolAddress -
-   * @returns
-   */
-  requestPoolTradesAndSwaps: (...poolAddresses: string[]): AppThunk => async (
-    dispatch
-  ) => {
-    if (provider) {
-      const { chainId } = await provider.getNetwork();
-      const url = supgraphQueries.getUrl(chainId);
-      const [trades, swaps] = await Promise.all([
-        supgraphQueries.queryTradesForPools(
-          SUBGRAPH_URL_UNISWAP,
-          poolAddresses
-        ),
-        supgraphQueries.querySwapsForPools(url, poolAddresses),
-      ]);
-      const formattedTradesAndSwaps = poolAddresses.reduce(
-        (prev, next) => {
-          prev[next] = {
-            trades: trades[next],
-            swaps: swaps[next],
-          };
-
-          return prev;
-        },
-        {} as Record<
-          string,
-          {
-            trades: PoolTrade[];
-            swaps: PoolSwap[];
-          }
-        >
-      );
-
-      dispatch(actions.poolTradesAndSwapsLoaded(formattedTradesAndSwaps));
     }
   },
   /**

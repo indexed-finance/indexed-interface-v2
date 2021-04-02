@@ -2,10 +2,9 @@ import * as balancerMath from "ethereum/utils/balancer-math";
 import { NormalizedPool } from "ethereum";
 import { convert, createMulticallDataParser } from "helpers";
 import { createEntityAdapter, createSlice } from "@reduxjs/toolkit";
-import { fetchMulticallData } from "../requests";
+import { fetchMulticallData, fetchPoolTradesSwaps } from "../requests";
 import {
   mirroredServerState,
-  poolTradesAndSwapsLoaded,
   restartedDueToError,
   subgraphDataLoaded,
 } from "../actions";
@@ -85,7 +84,7 @@ const slice = createSlice({
 
         adapter.addMany(state, fullPools);
       })
-      .addCase(poolTradesAndSwapsLoaded, (state, action) => {
+      .addCase(fetchPoolTradesSwaps.fulfilled, (state, action) => {
         for (const [pool, { trades, swaps }] of Object.entries(
           action.payload
         )) {

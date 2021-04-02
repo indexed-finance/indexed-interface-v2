@@ -1,7 +1,5 @@
 import { NormalizedInitialData, NormalizedPair } from "ethereum";
 import { createAction } from "@reduxjs/toolkit";
-import type { Swap } from "indexed-types";
-import type { Swap as Trade } from "uniswap-types";
 
 /**
  *
@@ -31,13 +29,6 @@ export const tokenStatsDataLoaded = createAction<
 export const tokenStatsRequestFailed = createAction<{ when: number }>(
   "tokenStatsRequestFailed"
 );
-
-/**
- *
- */
-export const poolTradesAndSwapsLoaded = createAction<
-  Record<string, { trades: Trade[]; swaps: Swap[] }>
->("poolTradesAndSwapsLoaded");
 
 /**
  *

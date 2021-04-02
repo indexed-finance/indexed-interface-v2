@@ -16,16 +16,16 @@ export type MulticallData = {
 };
 
 export const fetchMulticallData = createAsyncThunk(
-  "multicall/fetchData",
+  "requests/multicall",
   async ({
     provider,
-    batch,
+    arg: batch,
   }: {
     provider:
       | ethers.providers.Web3Provider
       | ethers.providers.JsonRpcProvider
       | ethers.providers.InfuraProvider;
-    batch: SelectedBatch;
+    arg: SelectedBatch;
   }): Promise<MulticallData> => {
     const { blockNumber, results } = await multicall(
       provider,

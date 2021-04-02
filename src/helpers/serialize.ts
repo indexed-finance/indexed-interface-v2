@@ -1,5 +1,4 @@
 import { abiLookup } from "ethereum/abi";
-import type { AppThunk } from "features/store";
 import type { InterfaceKind } from "ethereum/abi";
 
 export type RegisteredCall = {
@@ -55,25 +54,4 @@ export function serializeOffChainCall(call: RegisteredCall): string {
   return `${call.function}/${(call.args ?? []).join("_")}${
     call.canBeMerged ? "/merge" : ""
   }`;
-}
-
-export function deserializeOffChainCall(
-  callId: string,
-  actions: Record<string, (...params: any[]) => AppThunk>
-) {
-  try {
-    const [fn, args] = callId.split("/");
-    const action = actions[fn];
-
-    if (args) {
-      const split = args.split("_");
-
-      return action.bind(null, split[0], split[1]);
-    } else {
-      return action;
-    }
-  } catch (error) {
-    console.error("Bad off-chain call ID", callId, error);
-    return null;
-  }
 }

@@ -2,3 +2,4 @@
 // Do not manually modify this (or any) index files.
 
 export * from './multicall-request';
+export * from './pool-trades-swaps-request';

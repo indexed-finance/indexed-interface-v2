@@ -1,13 +1,10 @@
 import {
   MulticallData,
   fetchMulticallData,
-} from "../requests/multicall-request";
+  fetchPoolTradesSwaps,
+} from "../requests";
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import {
-  poolTradesAndSwapsLoaded,
-  restartedDueToError,
-  tokenStatsDataLoaded,
-} from "../actions";
+import { restartedDueToError, tokenStatsDataLoaded } from "../actions";
 import { stakingActions } from "../staking";
 import type { AppState } from "../store";
 
@@ -66,8 +63,8 @@ const slice = createSlice({
           fromBlockNumber: state.blockNumber,
         };
       })
-      .addCase(poolTradesAndSwapsLoaded, (state, action) => {
-        const formattedCall = `requestPoolTradesAndSwaps/${Object.keys(
+      .addCase(fetchPoolTradesSwaps.fulfilled, (state, action) => {
+        const formattedCall = `fetchPoolTradesSwaps/${Object.keys(
           action.payload
         ).join("_")}`;
 
