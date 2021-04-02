@@ -147,36 +147,40 @@ export const thunks = {
    */
   triggerBatchDump: (): AppThunk => async (dispatch, getState) => {
     const state = getState();
-    const cachedCalls = selectors.selectCachedCallsFromCurrentBlock(state);
-    const batch = selectors.selectBatch(state, cachedCalls);
+    const { status } = selectors.selectBatcherStatus(state);
 
-    for (const call of batch.offChainCalls) {
-      const [fn, args] = call.split("/");
-      const action = (thunks as any)[fn];
+    if (status === "idle") {
+      const cachedCalls = selectors.selectCachedCallsFromCurrentBlock(state);
+      const batch = selectors.selectBatch(state, cachedCalls);
 
-      if (action) {
-        dispatch(action(...args.split("_")));
+      for (const call of batch.offChainCalls) {
+        const [fn, args] = call.split("/");
+        const action = (thunks as any)[fn];
+
+        if (action) {
+          dispatch(action(...args.split("_")));
+        }
       }
-    }
 
-    if (provider) {
-      try {
-        dispatch(actions.multicallDataRequested());
+      if (provider) {
+        try {
+          dispatch(actions.multicallDataRequested());
 
-        const { blockNumber, results } = await multicall(
-          provider,
-          batch.onChainCalls.deserializedCalls
-        );
-        const formattedMulticallData = formatMulticallData(
-          batch,
-          blockNumber,
-          results
-        );
+          const { blockNumber, results } = await multicall(
+            provider,
+            batch.onChainCalls.deserializedCalls
+          );
+          const formattedMulticallData = formatMulticallData(
+            batch,
+            blockNumber,
+            results
+          );
 
-        dispatch(actions.multicallDataReceived(formattedMulticallData));
-      } catch (error) {
-        console.error(error);
-        dispatch(actions.multicallFailed());
+          dispatch(actions.multicallDataReceived(formattedMulticallData));
+        } catch (error) {
+          console.error(error);
+          dispatch(actions.multicallFailed());
+        }
       }
     }
   },
