@@ -1,23 +1,22 @@
+import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import {
-  MulticallData,
-  cachedMulticallDataReceived,
+  RegisteredCall,
+  deserializeOnChainCall,
+  serializeOffChainCall,
+  serializeOnChainCall,
+} from "helpers";
+import { cacheActions } from "../cache";
+import {
   multicallDataReceived,
   multicallDataRequested,
   restartedDueToError,
 } from "features/actions";
-import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import {
-  RegisteredCall,
-  createOffChainBatch,
-  createOnChainBatch,
-  serializeOffChainCall,
-  serializeOnChainCall,
-} from "helpers";
 import { settingsActions } from "../settings";
 import { userActions } from "../user";
 import type { AppState } from "features/store";
 
 interface BatcherState {
+  blockNumber: number;
   onChainCalls: string[];
   offChainCalls: string[];
   callers: Record<
@@ -32,6 +31,7 @@ interface BatcherState {
 }
 
 const batcherInitialState: BatcherState = {
+  blockNumber: -1,
   onChainCalls: [],
   offChainCalls: [],
   callers: {},
@@ -115,6 +115,29 @@ const slice = createSlice({
         state.status = "deferring to server";
       })
       .addCase(restartedDueToError, () => batcherInitialState)
+      .addCase(cacheActions.blockNumberChanged, (state, action) => {
+        state.blockNumber = action.payload;
+      })
+      .addCase(multicallDataReceived, (state) => {
+        const oldCalls: Record<string, true> = {};
+
+        for (const [call, value] of Object.entries(state.listenerCounts)) {
+          if (value === 0) {
+            oldCalls[call] = true;
+            delete state.listenerCounts[call];
+          }
+        }
+
+        state.onChainCalls = state.onChainCalls.filter(
+          (call) => !oldCalls[call]
+        );
+
+        state.offChainCalls = state.offChainCalls.filter(
+          (call) => !oldCalls[call]
+        );
+
+        state.status = "idle";
+      })
       .addMatcher(
         (action) =>
           [
@@ -142,51 +165,91 @@ const slice = createSlice({
           state.offChainCalls = [];
           state.listenerCounts = {};
         }
-      )
-      .addMatcher(
-        (action) =>
-          [
-            multicallDataReceived.type,
-            cachedMulticallDataReceived.type,
-          ].includes(action.type),
-        (state, action: PayloadAction<MulticallData>) => {
-          const { listenerCounts } = state;
-
-          if (action.type === multicallDataReceived.type) {
-            state.status = "idle";
-          }
-
-          const oldCalls: Record<string, true> = {};
-          for (const [call, value] of Object.entries(listenerCounts)) {
-            if (value === 0) {
-              oldCalls[call] = true;
-              delete listenerCounts[call];
-            }
-          }
-
-          state.onChainCalls = state.onChainCalls.filter(
-            (call) => !oldCalls[call]
-          );
-          state.offChainCalls = state.offChainCalls.filter(
-            (call) => !oldCalls[call]
-          );
-
-          return state;
-        }
       ),
 });
 
 export const { actions: batcherActions, reducer: batcherReducer } = slice;
 
 export const batcherSelectors = {
-  selectOnChainBatch(state: AppState) {
+  selectBatch(state: AppState, cachedCalls: Record<string, boolean>) {
     return {
       callers: state.batcher.callers,
-      batch: createOnChainBatch(state.batcher.onChainCalls),
+      onChainCalls: batcherSelectors.selectOnChainBatch(state, cachedCalls),
+      offChainCalls: batcherSelectors.selectOffChainBatch(state, cachedCalls),
     };
   },
-  selectOffChainBatch(state: AppState) {
-    return createOffChainBatch(state.batcher.offChainCalls);
+  selectOnChainBatch(state: AppState, cachedCalls: CachedCalls) {
+    const { onChainCalls } = state.batcher;
+
+    return onChainCalls
+      .filter((call) => !cachedCalls[call])
+      .reduce(
+        (prev, next) => {
+          const [from] = next.split(": ");
+
+          if (!prev.registrars.includes(from)) {
+            prev.registrars.push(from);
+            prev.callsByRegistrant[from] = [];
+          }
+
+          if (!prev.callsByRegistrant[from].includes(next)) {
+            const deserialized = deserializeOnChainCall(next);
+
+            if (deserialized) {
+              prev.callsByRegistrant[from].push(next);
+              prev.deserializedCalls.push(deserialized);
+            }
+          }
+
+          return prev;
+        },
+        {
+          registrars: [],
+          callsByRegistrant: {},
+          serializedCalls: onChainCalls,
+          deserializedCalls: [],
+        } as {
+          registrars: string[];
+          callsByRegistrant: Record<string, string[]>;
+          serializedCalls: string[];
+          deserializedCalls: RegisteredCall[];
+        }
+      );
+  },
+  selectOffChainBatch(state: AppState, cachedCalls: CachedCalls) {
+    const { offChainCalls } = state.batcher;
+
+    const { toMerge, toKeep } = offChainCalls
+      .filter((call) => !cachedCalls[call])
+      .reduce(
+        (prev, next) => {
+          const [call, args, canBeMerged] = next.split("/");
+
+          if (canBeMerged) {
+            if (!prev.toMerge[call]) {
+              prev.toMerge[call] = [];
+            }
+
+            prev.toMerge[call].push(args);
+          } else {
+            prev.toKeep.push(next);
+          }
+
+          return prev;
+        },
+        {
+          toMerge: {},
+          toKeep: [],
+        } as {
+          toMerge: Record<string, string[]>;
+          toKeep: string[];
+        }
+      );
+    const merged = Object.entries(toMerge).map(
+      ([key, value]) => `${key}/${value.join("_")}`
+    );
+
+    return [...toKeep, ...merged];
   },
   selectBatcherStatus(state: AppState) {
     const { status, onChainCalls, offChainCalls } = state.batcher;
@@ -198,3 +261,5 @@ export const batcherSelectors = {
     };
   },
 };
+
+type CachedCalls = Record<string, boolean>;

@@ -64,12 +64,8 @@ export function useUserDataRegistrar(
     args: [userAddress],
   });
 
-  useCallRegistrar(
-    {
-      caller: USER_CALLER,
-      onChainCalls: userDataCalls,
-    },
-    actions,
-    selectors
-  );
+  useCallRegistrar({
+    caller: USER_CALLER,
+    onChainCalls: userDataCalls,
+  });
 }

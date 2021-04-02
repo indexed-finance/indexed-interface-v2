@@ -40,7 +40,7 @@ export default function Portfolio() {
 
   useUserDataRegistrar(poolsToTokens, actions, selectors);
   useStakingRegistrar(actions, selectors);
-  usePairDataRegistrar(uniswapPairs, actions, selectors);
+  usePairDataRegistrar(uniswapPairs);
 
   // Effect:
   // On portfolio load, register the NDX address.

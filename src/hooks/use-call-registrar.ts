@@ -1,15 +1,12 @@
+import { DataReceiverConfig, actions, selectors } from "features";
 import { isEqual } from "lodash";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useRef } from "react";
-import type { DataReceiverConfig } from "features";
 
-export function useCallRegistrar(
-  calls: DataReceiverConfig,
-  actions: Record<string, any>,
-  selectors: Record<string, any>
-) {
+export function useCallRegistrar(calls: DataReceiverConfig) {
   const dispatch = useDispatch();
   const cachedCalls = useRef(calls);
+  const blockNumber = useSelector(selectors.selectBlockNumber);
   const isConnected = useSelector(selectors.selectConnected);
 
   // Effect:
@@ -41,15 +38,15 @@ export function useCallRegistrar(
         };
       }
     }
-  }, [dispatch, actions, isConnected]);
+  }, [dispatch, isConnected]);
 
   // Effect:
-  // When a call is first registered,
-  //  a) check the cache, or
-  // b) independently query for results separate from the common batch.
+  // To get data to the user as quickly as possible,
+  // we can trigger a changeBlockNumber thunk with the current block number.
+  // As the batch is being selected, it will ignore any calls for which it already has data.
   useEffect(() => {
-    if (!isConnected) {
-      dispatch(actions.independentlyQuery(cachedCalls.current));
+    if (!isConnected && blockNumber !== -1) {
+      dispatch(actions.triggerBatchDump());
     }
-  }, [dispatch, actions, calls.caller, isConnected]);
+  }, [dispatch, isConnected, blockNumber]);
 }

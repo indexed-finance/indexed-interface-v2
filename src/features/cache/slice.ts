@@ -1,6 +1,5 @@
 import {
   MulticallData,
-  cachedMulticallDataReceived,
   multicallDataReceived,
   poolTradesAndSwapsLoaded,
   restartedDueToError,
@@ -22,7 +21,7 @@ interface CacheState {
 }
 
 const initialState: CacheState = {
-  blockNumber: 0,
+  blockNumber: -1,
   entries: {},
 };
 
@@ -87,12 +86,8 @@ const slice = createSlice({
         return state;
       })
       .addCase(restartedDueToError, () => initialState)
-      .addMatcher(
-        (action) =>
-          [
-            multicallDataReceived.type,
-            cachedMulticallDataReceived.type,
-          ].includes(action.type),
+      .addCase(
+        multicallDataReceived,
         (state, action: PayloadAction<MulticallData>) => {
           const { callsToResults } = action.payload;
 
@@ -120,7 +115,17 @@ export const cacheSelectors = {
     const entry = entries[callId];
 
     return entry && blockNumber - entry.fromBlockNumber <= MAX_AGE_IN_BLOCKS
-      ? entry.result
+      ? entry
       : null;
+  },
+  selectCachedCallsFromCurrentBlock(state: AppState) {
+    const blockNumber = cacheSelectors.selectBlockNumber(state);
+    const calls = Object.keys(state.cache.entries);
+
+    return calls.reduce((prev, next) => {
+      const entry = cacheSelectors.selectCacheEntry(state, next);
+      prev[next] = Boolean(entry && entry.fromBlockNumber === blockNumber);
+      return prev;
+    }, {} as Record<string, boolean>);
   },
 };

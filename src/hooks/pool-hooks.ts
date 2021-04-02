@@ -120,13 +120,9 @@ export function usePoolDetailRegistrar(
     tokenIds
   );
 
-  useCallRegistrar(
-    {
-      caller,
-      onChainCalls,
-      offChainCalls,
-    },
-    actions,
-    selectors
-  );
+  useCallRegistrar({
+    caller,
+    onChainCalls,
+    offChainCalls,
+  });
 }

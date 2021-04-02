@@ -39,19 +39,11 @@ export function createPairDataCalls(pairs: RegisteredPair[]): RegisteredCall[] {
   }));
 }
 
-export function usePairDataRegistrar(
-  pairs: RegisteredPair[],
-  actions: Record<string, any>,
-  selectors: Record<string, any>
-) {
-  useCallRegistrar(
-    {
-      caller: PAIR_DATA_CALLER,
-      onChainCalls: createPairDataCalls(pairs),
-    },
-    actions,
-    selectors
-  );
+export function usePairDataRegistrar(pairs: RegisteredPair[]) {
+  useCallRegistrar({
+    caller: PAIR_DATA_CALLER,
+    onChainCalls: createPairDataCalls(pairs),
+  });
 }
 
 // #region Uniswap
@@ -89,7 +81,7 @@ export function useUniswapPairs(
     dispatch(actions.uniswapPairsRegistered(pairs));
   }, [dispatch, pairs]);
 
-  usePairDataRegistrar(pairs, actions, selectors);
+  usePairDataRegistrar(pairs);
 
   return useMemo(() => {
     const loading = pairDatas.some(

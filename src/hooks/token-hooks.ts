@@ -83,21 +83,17 @@ export function usePricesRegistrar(
   actions: Record<string, any>,
   tokensSelectors: Record<string, any>
 ) {
-  useCallRegistrar(
-    {
-      caller: TOKEN_PRICES_CALLER,
-      onChainCalls: [],
-      offChainCalls: [
-        {
-          function: "requestTokenStats",
-          args: tokenIds,
-          canBeMerged: true,
-        },
-      ],
-    },
-    actions,
-    tokensSelectors
-  );
+  useCallRegistrar({
+    caller: TOKEN_PRICES_CALLER,
+    onChainCalls: [],
+    offChainCalls: [
+      {
+        function: "requestTokenStats",
+        args: tokenIds,
+        canBeMerged: true,
+      },
+    ],
+  });
 }
 // #endregion
 
@@ -118,14 +114,10 @@ export function useTotalSuppliesRegistrar(
   actions: Record<string, any>,
   tokensSelectors: Record<string, any>
 ) {
-  useCallRegistrar(
-    {
-      caller: TOTAL_SUPPLIES_CALLER,
-      onChainCalls: createTotalSuppliesCalls(tokenIds),
-    },
-    actions,
-    tokensSelectors
-  );
+  useCallRegistrar({
+    caller: TOTAL_SUPPLIES_CALLER,
+    onChainCalls: createTotalSuppliesCalls(tokenIds),
+  });
 }
 
 export function useTotalSuppliesWithLoadingIndicator(

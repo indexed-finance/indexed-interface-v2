@@ -77,7 +77,5 @@ export const multicallDataReceived = createAction<MulticallData>(
   "multicallDataReceived"
 );
 
-export const cachedMulticallDataReceived = createAction<MulticallData>(
-  "cachedMulticallDataReceived"
-);
+export const multicallFailed = createAction("multicallFailed");
 // #endregion

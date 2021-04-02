@@ -214,13 +214,9 @@ export function useStakingRegistrar(
     }
   );
 
-  useCallRegistrar(
-    {
-      caller: STAKING_CALLER,
-      onChainCalls,
-      offChainCalls,
-    },
-    actions,
-    selectors
-  );
+  useCallRegistrar({
+    caller: STAKING_CALLER,
+    onChainCalls,
+    offChainCalls,
+  });
 }
