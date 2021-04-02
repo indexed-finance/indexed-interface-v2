@@ -2,11 +2,11 @@ import {
   MulticallData,
   fetchMulticallData,
   fetchPoolTradesSwaps,
+  fetchStakingData,
   fetchTokenStats,
 } from "../requests";
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { restartedDueToError } from "../actions";
-import { stakingActions } from "../staking";
 import type { AppState } from "../store";
 
 interface CacheState {
@@ -76,8 +76,8 @@ const slice = createSlice({
 
         return state;
       })
-      .addCase(stakingActions.stakingDataLoaded, (state, action) => {
-        const formattedCall = "requestStakingData";
+      .addCase(fetchStakingData.fulfilled, (state, action) => {
+        const formattedCall = "fetchStakingData";
 
         state.entries[formattedCall] = {
           result: action.payload as any,

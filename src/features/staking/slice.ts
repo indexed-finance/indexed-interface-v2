@@ -1,10 +1,6 @@
-import {
-  PayloadAction,
-  createEntityAdapter,
-  createSlice,
-} from "@reduxjs/toolkit";
 import { convert, createMulticallDataParser } from "helpers";
-import { fetchMulticallData } from "../requests";
+import { createEntityAdapter, createSlice } from "@reduxjs/toolkit";
+import { fetchMulticallData, fetchStakingData } from "../requests";
 import { mirroredServerState, restartedDueToError } from "../actions";
 import type { AppState } from "../store";
 import type { CallWithResult } from "helpers";
@@ -21,13 +17,12 @@ const initialState = adapter.getInitialState();
 const slice = createSlice({
   name: "staking",
   initialState,
-  reducers: {
-    stakingDataLoaded(state, action: PayloadAction<NormalizedStakingPool[]>) {
-      adapter.addMany(state, action.payload);
-    },
-  },
+  reducers: {},
   extraReducers: (builder) =>
     builder
+      .addCase(fetchStakingData.fulfilled, (state, action) => {
+        adapter.addMany(state, action.payload);
+      })
       .addCase(fetchMulticallData.fulfilled, (state, action) => {
         const relevantMulticallData = stakingMulticallDataParser(
           action.payload

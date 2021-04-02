@@ -3,4 +3,5 @@
 
 export * from './multicall-request';
 export * from './pool-trades-swaps-request';
+export * from './staking-data-request';
 export * from './token-stats-request';

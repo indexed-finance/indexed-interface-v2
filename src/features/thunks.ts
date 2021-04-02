@@ -16,7 +16,6 @@ import {
   joinswapExternAmountIn,
   joinswapPoolAmountOut,
   normalizeInitialData,
-  normalizeStakingData,
   swapExactAmountIn,
   swapExactAmountOut,
   swapExactTokensForTokensAndMint,
@@ -194,22 +193,6 @@ export const thunks = {
       const formatted = normalizeInitialData(initial);
 
       dispatch(actions.subgraphDataLoaded(formatted));
-    }
-
-    dispatch(actions.requestStakingData());
-  },
-  /**
-   *
-   * @returns
-   */
-  requestStakingData: (): AppThunk => async (dispatch) => {
-    if (provider) {
-      const { chainId } = provider.network;
-      const url = supgraphQueries.getUrl(chainId);
-      const staking = await supgraphQueries.queryStaking(url);
-      const formatted = normalizeStakingData(staking);
-
-      dispatch(actions.stakingDataLoaded(formatted));
     }
   },
 
