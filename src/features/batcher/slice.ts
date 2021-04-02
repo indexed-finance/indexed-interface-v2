@@ -52,9 +52,10 @@ const slice = createSlice({
       }>
     ) {
       const { caller, onChainCalls, offChainCalls } = action.payload;
+      const existingEntry = state.callers[caller];
       const callerEntry = {
-        onChainCalls: [] as string[],
-        offChainCalls: [] as string[],
+        onChainCalls: existingEntry?.onChainCalls ?? [],
+        offChainCalls: existingEntry?.offChainCalls ?? [],
       };
 
       for (const call of onChainCalls) {
@@ -218,7 +219,6 @@ export const batcherSelectors = {
   },
   selectOffChainBatch(state: AppState, cachedCalls: CachedCalls) {
     const { offChainCalls } = state.batcher;
-
     const { toMerge, toKeep } = offChainCalls
       .filter((call) => !cachedCalls[call])
       .reduce(

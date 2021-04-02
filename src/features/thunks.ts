@@ -38,6 +38,8 @@ import { tokensActions } from "./tokens";
 import { userActions } from "./user";
 import debounce from "lodash.debounce";
 import type { AppThunk } from "./store";
+import type { Swap as PoolSwap } from "indexed-types";
+import type { Swap as PoolTrade } from "uniswap-types";
 
 // #region Provider
 /**
@@ -231,20 +233,38 @@ export const thunks = {
    * @param poolAddress -
    * @returns
    */
-  requestPoolTradesAndSwaps: (poolAddress: string): AppThunk => async (
+  requestPoolTradesAndSwaps: (...poolAddresses: string[]): AppThunk => async (
     dispatch
   ) => {
     if (provider) {
       const { chainId } = await provider.getNetwork();
       const url = supgraphQueries.getUrl(chainId);
       const [trades, swaps] = await Promise.all([
-        supgraphQueries.queryTrades(SUBGRAPH_URL_UNISWAP, poolAddress),
-        supgraphQueries.querySwaps(url, poolAddress),
+        supgraphQueries.queryTradesForPools(
+          SUBGRAPH_URL_UNISWAP,
+          poolAddresses
+        ),
+        supgraphQueries.querySwapsForPools(url, poolAddresses),
       ]);
+      const formattedTradesAndSwaps = poolAddresses.reduce(
+        (prev, next) => {
+          prev[next] = {
+            trades: trades[next],
+            swaps: swaps[next],
+          };
 
-      dispatch(
-        actions.poolTradesAndSwapsLoaded({ poolId: poolAddress, trades, swaps })
+          return prev;
+        },
+        {} as Record<
+          string,
+          {
+            trades: PoolTrade[];
+            swaps: PoolSwap[];
+          }
+        >
       );
+
+      dispatch(actions.poolTradesAndSwapsLoaded(formattedTradesAndSwaps));
     }
   },
   /**
@@ -276,7 +296,7 @@ export const thunks = {
         await approveSpender(signer, spenderAddress, tokenAddress, exactAmount);
       } catch (err) {
         // Handle failed approval.
-        console.log(err);
+        console.error(err);
       }
     }
   },
@@ -528,7 +548,7 @@ export type ActionType = typeof actions;
 export type DataReceiverConfig = {
   caller: string;
   onChainCalls?: RegisteredCall[];
-  offChainCalls?: any[];
+  offChainCalls?: RegisteredCall[];
 };
 
 // #region Helpers

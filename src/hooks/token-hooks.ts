@@ -67,7 +67,7 @@ export const TOKEN_PRICES_CALLER = "Token Prices";
 export function useTokenPrice(id: string): [number, false] | [undefined, true] {
   const token = useToken(id.toLowerCase());
 
-  usePricesRegistrar([id], actions, selectors);
+  usePricesRegistrar([id]);
 
   if (token?.priceData?.price) {
     return [token.priceData.price, false];
@@ -78,16 +78,13 @@ export function useTokenPrice(id: string): [number, false] | [undefined, true] {
 
 export const useEthPrice = () => useTokenPrice(WETH_CONTRACT_ADDRESS);
 
-export function usePricesRegistrar(
-  tokenIds: string[],
-  actions: Record<string, any>,
-  tokensSelectors: Record<string, any>
-) {
+export function usePricesRegistrar(tokenIds: string[]) {
   useCallRegistrar({
     caller: TOKEN_PRICES_CALLER,
     onChainCalls: [],
     offChainCalls: [
       {
+        target: "",
         function: "requestTokenStats",
         args: tokenIds,
         canBeMerged: true,
@@ -109,11 +106,7 @@ export function createTotalSuppliesCalls(tokenIds: string[]): RegisteredCall[] {
   }));
 }
 
-export function useTotalSuppliesRegistrar(
-  tokenIds: string[],
-  actions: Record<string, any>,
-  tokensSelectors: Record<string, any>
-) {
+export function useTotalSuppliesRegistrar(tokenIds: string[]) {
   useCallRegistrar({
     caller: TOTAL_SUPPLIES_CALLER,
     onChainCalls: createTotalSuppliesCalls(tokenIds),
@@ -123,16 +116,15 @@ export function useTotalSuppliesRegistrar(
 export function useTotalSuppliesWithLoadingIndicator(
   tokens: string[]
 ): [string[], false] | [undefined, true] {
-  useTotalSuppliesRegistrar(tokens, actions, selectors);
-
   const supplies = useSelector((state: AppState) =>
     selectors.selectTokenSupplies(state, tokens)
   );
 
-  if (supplies.some((s) => !s)) {
-    return [undefined, true];
-  }
-  return [supplies as string[], false];
+  useTotalSuppliesRegistrar(tokens);
+
+  return supplies.every(Boolean)
+    ? [supplies as string[], false]
+    : [undefined, true];
 }
 // #endregion
 

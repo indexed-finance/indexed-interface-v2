@@ -18,6 +18,7 @@ export async function sendQuery(query: string, url: string) {
   } = await axios.post(url, {
     query,
   });
+
   return data;
 }
 
@@ -160,64 +161,84 @@ export async function queryInitial(url: string): Promise<Category[]> {
   return categories;
 }
 
-export async function queryTrades(
+export async function queryTradesForPools(
   url: string,
-  poolAddress: string
-): Promise<Trade[]> {
-  const { swaps } = await sendQuery(
-    `
-  {
-      swaps(orderBy: timestamp, orderDirection: desc, first:10, where:{ pair: "${computeUniswapPairAddress(
-        poolAddress,
-        config.WETH_CONTRACT_ADDRESS
-      ).toLowerCase()}"}) {
-        transaction {
-          id
-        }
-        pair {
-          token0 {
-            id
-            symbol
-          }
-          token1 {
-            id
-            symbol
-          }
-        }
-        amount0In
-        amount1In
-        amount0Out
-        amount1Out
-        amountUSD
-        timestamp
+  poolAddresses: string[]
+): Promise<Record<string, Trade[]>> {
+  const createSinglePoolCall = (address: string) => `
+    ${address.slice(
+      1
+    )}: swaps(orderBy: timestamp, orderDirection: desc, first:10, where:{ pair: "${computeUniswapPairAddress(
+    address,
+    config.WETH_CONTRACT_ADDRESS
+  ).toLowerCase()}"}) {
+      transaction {
+        id
       }
-  }
-  `,
-    url
-  );
-  return swaps;
+      pair {
+        token0 {
+          id
+          symbol
+        }
+        token1 {
+          id
+          symbol
+        }
+      }
+      amount0In
+      amount1In
+      amount0Out
+      amount1Out
+      amountUSD
+      timestamp
+    }
+  `;
+  const groupedCalls = `
+    {
+      ${poolAddresses.map(createSinglePoolCall).join("\n")}
+    }
+  `;
+  const result = await sendQuery(groupedCalls, url);
+  const formattedResult = Object.entries(
+    result as Record<string, Trade[]>
+  ).reduce((prev, [key, value]) => {
+    prev[`0${key}`] = value;
+    return prev;
+  }, {} as Record<string, Trade[]>);
+
+  return formattedResult;
 }
 
-export async function querySwaps(
+export async function querySwapsForPools(
   url: string,
-  poolAddress: string
-): Promise<Swap[]> {
-  const { swaps } = await sendQuery(
-    `
-  {
-     swaps(orderBy: timestamp, orderDirection: desc, first:10, where: { pool: "${poolAddress}" }) {
-        id
-        tokenIn
-        tokenOut
-        tokenAmountIn
-        tokenAmountOut
-        timestamp
-      }
-  }
-`,
-    url
-  );
-  return swaps;
+  poolAddresses: string[]
+): Promise<Record<string, Swap[]>> {
+  const createSinglePoolCall = (address: string) => `
+    ${address.slice(
+      1
+    )}: swaps(orderBy: timestamp, orderDirection: desc, first:10, where: { pool: "${address}" }) {
+      id
+      tokenIn
+      tokenOut
+      tokenAmountIn
+      tokenAmountOut
+      timestamp
+    }
+  `;
+  const groupedCalls = `
+    {
+      ${poolAddresses.map(createSinglePoolCall).join("\n")}
+    }
+  `;
+  const result = await sendQuery(groupedCalls, url);
+  const formattedResult = Object.entries(
+    result as Record<string, Swap[]>
+  ).reduce((prev, [key, value]) => {
+    prev[`0${key}`] = value;
+    return prev;
+  }, {} as Record<string, Swap[]>);
+
+  return formattedResult;
 }
 
 export async function queryStaking(url: string): Promise<NdxStakingPool[]> {

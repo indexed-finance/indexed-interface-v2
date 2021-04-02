@@ -65,8 +65,9 @@ const slice = createSlice({
         };
       })
       .addCase(poolTradesAndSwapsLoaded, (state, action) => {
-        const { poolId } = action.payload;
-        const formattedCall = `requestPoolTradesAndSwaps/${poolId}`;
+        const formattedCall = `requestPoolTradesAndSwaps/${Object.keys(
+          action.payload
+        ).join("_")}`;
 
         state.entries[formattedCall] = {
           result: action.payload as any,

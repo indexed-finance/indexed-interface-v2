@@ -96,13 +96,16 @@ export function createPoolDetailCalls(poolAddress: string, tokenIds: string[]) {
     onChainCalls: poolCalls,
     offChainCalls: [
       {
+        target: "",
         function: "requestTokenStats",
         args: [poolAddress, ...tokenIds],
         canBeMerged: true,
       },
       {
+        target: "",
         function: "requestPoolTradesAndSwaps",
         args: [poolAddress],
+        canBeMerged: true,
       },
     ],
   };
@@ -110,9 +113,7 @@ export function createPoolDetailCalls(poolAddress: string, tokenIds: string[]) {
 
 export function usePoolDetailRegistrar(
   poolAddress: string,
-  tokenIds: string[],
-  actions: Record<string, any>,
-  selectors: Record<string, any>
+  tokenIds: string[]
 ) {
   const caller = "Pool Detail";
   const { onChainCalls, offChainCalls } = createPoolDetailCalls(

@@ -86,12 +86,15 @@ const slice = createSlice({
         adapter.addMany(state, fullPools);
       })
       .addCase(poolTradesAndSwapsLoaded, (state, action) => {
-        const { poolId, trades, swaps } = action.payload;
-        const poolInState = state.entities[poolId];
+        for (const [pool, { trades, swaps }] of Object.entries(
+          action.payload
+        )) {
+          const poolInState = state.entities[pool];
 
-        if (poolInState) {
-          poolInState.trades = trades ?? poolInState.trades;
-          poolInState.swaps = swaps ?? poolInState.swaps;
+          if (poolInState) {
+            poolInState.trades = trades ?? poolInState.trades;
+            poolInState.swaps = swaps ?? poolInState.swaps;
+          }
         }
       })
       .addCase(mirroredServerState, (_, action) => {

@@ -35,11 +35,9 @@ export const tokenStatsRequestFailed = createAction<{ when: number }>(
 /**
  *
  */
-export const poolTradesAndSwapsLoaded = createAction<{
-  poolId: string;
-  trades: Trade[];
-  swaps: Swap[];
-}>("poolTradesAndSwapsLoaded");
+export const poolTradesAndSwapsLoaded = createAction<
+  Record<string, { trades: Trade[]; swaps: Swap[] }>
+>("poolTradesAndSwapsLoaded");
 
 /**
  *

@@ -1,5 +1,5 @@
 import { AbovePageContext } from "../AppLayout";
-import { AppState, actions, selectors } from "features";
+import { AppState, selectors } from "features";
 import {
   ChartCard,
   Performance,
@@ -47,7 +47,7 @@ function Pool({ id }: { id: string }) {
   const breakpoints = useBreakpoints();
   const { setAbovePage, clearAbovePage } = useContext(AbovePageContext);
 
-  usePoolDetailRegistrar(id, tokenIds, actions, selectors);
+  usePoolDetailRegistrar(id, tokenIds);
 
   // Effect:
   // On initial load, set the area above the page to have useful links.
