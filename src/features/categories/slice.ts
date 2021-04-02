@@ -1,16 +1,13 @@
 import { NormalizedCategory } from "ethereum";
 import { createEntityAdapter, createSlice } from "@reduxjs/toolkit";
-import {
-  mirroredServerState,
-  restartedDueToError,
-  subgraphDataLoaded,
-} from "features/actions";
+import { fetchInitialData } from "../requests";
+import { mirroredServerState, restartedDueToError } from "../actions";
 import S from "string";
 import SigmaTenExOne from "./local-data/sigma-v10x1.json";
 import ZeroExOne from "./local-data/0x1.json";
 import ZeroExThree from "./local-data/0x3.json";
 import ZeroExTwo from "./local-data/0x2.json";
-import type { AppState } from "features/store";
+import type { AppState } from "../store";
 
 // #region Local Data Initialization
 // --
@@ -37,7 +34,7 @@ const slice = createSlice({
   reducers: {},
   extraReducers: (builder) =>
     builder
-      .addCase(subgraphDataLoaded, (state, action) => {
+      .addCase(fetchInitialData.fulfilled, (state, action) => {
         const { categories } = action.payload;
         const mapped = categoriesSelectors
           .selectAll({ categories: state } as AppState)

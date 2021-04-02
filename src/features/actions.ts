@@ -1,12 +1,5 @@
-import { NormalizedInitialData, NormalizedPair } from "ethereum";
+import { NormalizedPair } from "ethereum";
 import { createAction } from "@reduxjs/toolkit";
-
-/**
- *
- */
-export const subgraphDataLoaded = createAction<NormalizedInitialData>(
-  "subgraphDataLoaded"
-);
 
 /**
  *

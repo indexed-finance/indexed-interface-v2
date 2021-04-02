@@ -1,4 +1,3 @@
-import * as supgraphQueries from "helpers/subgraph-queries";
 import * as topLevelActions from "./actions";
 import { BigNumber } from "bignumber.js";
 import { RegisteredCall, convert } from "helpers";
@@ -15,7 +14,6 @@ import {
   joinPool,
   joinswapExternAmountIn,
   joinswapPoolAmountOut,
-  normalizeInitialData,
   swapExactAmountIn,
   swapExactAmountOut,
   swapExactTokensForTokensAndMint,
@@ -26,6 +24,7 @@ import { batcherActions } from "./batcher";
 import { cacheActions } from "./cache";
 import { categoriesActions } from "./categories";
 import {
+  fetchInitialData,
   fetchMulticallData,
   fetchPoolTradesSwaps,
   fetchTokenStats,
@@ -108,7 +107,11 @@ export const thunks = {
 
     await provider.ready;
 
-    dispatch(thunks.retrieveInitialData());
+    dispatch(
+      fetchInitialData({
+        provider,
+      })
+    );
 
     if (selectedAddress) {
       dispatch(actions.userAddressSelected(selectedAddress));
@@ -180,19 +183,6 @@ export const thunks = {
           }
         }
       }
-    }
-  },
-  /**
-   *
-   */
-  retrieveInitialData: (): AppThunk => async (dispatch) => {
-    if (provider) {
-      const { chainId } = provider.network;
-      const url = supgraphQueries.getUrl(chainId);
-      const initial = await supgraphQueries.queryInitial(url);
-      const formatted = normalizeInitialData(initial);
-
-      dispatch(actions.subgraphDataLoaded(formatted));
     }
   },
 

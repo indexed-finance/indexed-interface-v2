@@ -2,12 +2,12 @@ import * as balancerMath from "ethereum/utils/balancer-math";
 import { NormalizedPool } from "ethereum";
 import { convert, createMulticallDataParser } from "helpers";
 import { createEntityAdapter, createSlice } from "@reduxjs/toolkit";
-import { fetchMulticallData, fetchPoolTradesSwaps } from "../requests";
 import {
-  mirroredServerState,
-  restartedDueToError,
-  subgraphDataLoaded,
-} from "../actions";
+  fetchInitialData,
+  fetchMulticallData,
+  fetchPoolTradesSwaps,
+} from "../requests";
+import { mirroredServerState, restartedDueToError } from "../actions";
 import type { CallWithResult } from "helpers";
 
 export const adapter = createEntityAdapter<NormalizedPool>({
@@ -64,7 +64,7 @@ const slice = createSlice({
 
         return state;
       })
-      .addCase(subgraphDataLoaded, (state, action) => {
+      .addCase(fetchInitialData.fulfilled, (state, action) => {
         const { pools } = action.payload;
         const fullPools = pools.ids.map((id) => pools.entities[id]);
 

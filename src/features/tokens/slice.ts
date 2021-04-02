@@ -5,11 +5,14 @@ import {
   createSlice,
 } from "@reduxjs/toolkit";
 import { createMulticallDataParser } from "helpers";
-import { fetchMulticallData, fetchTokenStats } from "../requests";
+import {
+  fetchInitialData,
+  fetchMulticallData,
+  fetchTokenStats,
+} from "../requests";
 import {
   mirroredServerState,
   restartedDueToError,
-  subgraphDataLoaded,
   uniswapPairsRegistered,
 } from "../actions";
 import type { NormalizedToken } from "ethereum";
@@ -59,7 +62,7 @@ const slice = createSlice({
 
         return state;
       })
-      .addCase(subgraphDataLoaded, (state, action) => {
+      .addCase(fetchInitialData.fulfilled, (state, action) => {
         const { tokens } = action.payload;
         const fullTokens = tokens.ids.map((id) => tokens.entities[id]);
 

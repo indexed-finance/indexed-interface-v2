@@ -1,10 +1,7 @@
 import { DailyPoolSnapshot } from "indexed-types";
 import { createEntityAdapter, createSlice } from "@reduxjs/toolkit";
-import {
-  mirroredServerState,
-  restartedDueToError,
-  subgraphDataLoaded,
-} from "features/actions";
+import { fetchInitialData } from "../requests";
+import { mirroredServerState, restartedDueToError } from "../actions";
 
 export type SnapshotKey = keyof Omit<DailyPoolSnapshot, "date">;
 
@@ -20,7 +17,7 @@ const slice = createSlice({
   reducers: {},
   extraReducers: (builder) =>
     builder
-      .addCase(subgraphDataLoaded, (state, action) => {
+      .addCase(fetchInitialData.fulfilled, (state, action) => {
         const { dailySnapshots } = action.payload;
         const fullSnapshots = dailySnapshots.ids.map(
           (id) => dailySnapshots.entities[id]
