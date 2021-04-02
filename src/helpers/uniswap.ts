@@ -6,10 +6,14 @@ import {
   TokenAmount,
   Trade,
 } from "@uniswap/sdk";
-import { BigNumber, BigNumberish } from "ethereum";
+import { BigNumber } from "bignumber.js";
 import { COMMON_BASE_TOKENS, UNISWAP_FACTORY_ADDRESS } from "config";
-import { convert, dedupe } from "helpers";
+import { convert } from "./convert";
+import { dedupe } from "./dedupe";
+import { BigNumberish as eBigNumberish } from "ethers";
 import { getCreate2Address, keccak256 } from "ethers/lib/utils";
+
+type BigNumberish = BigNumber | eBigNumberish;
 
 export type {
   BigNumber,

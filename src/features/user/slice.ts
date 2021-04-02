@@ -1,6 +1,6 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { convert, createMulticallDataParser } from "helpers";
-import { multicallDataReceived } from "features/actions";
+import { fetchMulticallData } from "../requests";
 import { stakingMulticallDataParser } from "../staking/slice";
 import { tokensSelectors } from "features/tokens";
 import type { AppState } from "features/store";
@@ -28,7 +28,7 @@ const slice = createSlice({
     },
   },
   extraReducers: (builder) =>
-    builder.addCase(multicallDataReceived, (state, action) => {
+    builder.addCase(fetchMulticallData.fulfilled, (state, action) => {
       const userData = userMulticallDataParser(action.payload);
       const stakingData = stakingMulticallDataParser(action.payload);
 

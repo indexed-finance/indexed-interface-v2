@@ -1,13 +1,15 @@
 import {
   MulticallData,
-  multicallDataReceived,
+  fetchMulticallData,
+} from "../requests/multicall-request";
+import { PayloadAction, createSlice } from "@reduxjs/toolkit";
+import {
   poolTradesAndSwapsLoaded,
   restartedDueToError,
   tokenStatsDataLoaded,
-} from "features/actions";
-import { PayloadAction, createSlice } from "@reduxjs/toolkit";
+} from "../actions";
 import { stakingActions } from "../staking";
-import type { AppState } from "features/store";
+import type { AppState } from "../store";
 
 interface CacheState {
   blockNumber: number;
@@ -88,7 +90,7 @@ const slice = createSlice({
       })
       .addCase(restartedDueToError, () => initialState)
       .addCase(
-        multicallDataReceived,
+        fetchMulticallData.fulfilled,
         (state, action: PayloadAction<MulticallData>) => {
           const { callsToResults } = action.payload;
 

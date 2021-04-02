@@ -4,9 +4,9 @@ import {
   bestTradeExactOut,
   buildCommonTokenPairs,
   computeUniswapPairAddress,
+  convert,
   sortTokens,
-} from "ethereum";
-import { convert } from "helpers";
+} from "helpers";
 import { useCallRegistrar } from "./use-call-registrar";
 import { useCallback, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";

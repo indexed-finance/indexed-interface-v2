@@ -1,7 +1,6 @@
 import { AppState, selectors } from "features";
 import { NDX_ADDRESS, WETH_CONTRACT_ADDRESS } from "config";
-import { convert } from "helpers";
-import { sortTokens } from "ethereum";
+import { convert, sortTokens } from "helpers";
 import { useCallRegistrar } from "./use-call-registrar";
 import { useMemo } from "react";
 import { useSelector } from "react-redux";

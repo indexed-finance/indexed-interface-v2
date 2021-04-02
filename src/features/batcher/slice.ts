@@ -6,14 +6,11 @@ import {
   serializeOnChainCall,
 } from "helpers";
 import { cacheActions } from "../cache";
-import {
-  multicallDataReceived,
-  multicallDataRequested,
-  restartedDueToError,
-} from "features/actions";
+import { fetchMulticallData } from "../requests";
+import { restartedDueToError } from "../actions";
 import { settingsActions } from "../settings";
 import { userActions } from "../user";
-import type { AppState } from "features/store";
+import type { AppState } from "../store";
 
 interface BatcherState {
   blockNumber: number;
@@ -109,7 +106,7 @@ const slice = createSlice({
   },
   extraReducers: (builder) =>
     builder
-      .addCase(multicallDataRequested, (state) => {
+      .addCase(fetchMulticallData.pending, (state) => {
         state.status = "loading";
       })
       .addCase(settingsActions.connectionEstablished, (state) => {
@@ -119,7 +116,7 @@ const slice = createSlice({
       .addCase(cacheActions.blockNumberChanged, (state, action) => {
         state.blockNumber = action.payload;
       })
-      .addCase(multicallDataReceived, (state) => {
+      .addCase(fetchMulticallData.fulfilled, (state) => {
         const oldCalls: Record<string, true> = {};
 
         for (const [call, value] of Object.entries(state.listenerCounts)) {
@@ -172,7 +169,10 @@ const slice = createSlice({
 export const { actions: batcherActions, reducer: batcherReducer } = slice;
 
 export const batcherSelectors = {
-  selectBatch(state: AppState, cachedCalls: Record<string, boolean>) {
+  selectBatch(
+    state: AppState,
+    cachedCalls: Record<string, boolean>
+  ): SelectedBatch {
     return {
       callers: state.batcher.callers,
       onChainCalls: batcherSelectors.selectOnChainBatch(state, cachedCalls),
@@ -263,3 +263,14 @@ export const batcherSelectors = {
 };
 
 type CachedCalls = Record<string, boolean>;
+
+export type SelectedBatch = {
+  callers: Record<string, { onChainCalls: string[]; offChainCalls: string[] }>;
+  onChainCalls: {
+    registrars: string[];
+    callsByRegistrant: Record<string, string[]>;
+    serializedCalls: string[];
+    deserializedCalls: RegisteredCall[];
+  };
+  offChainCalls: string[];
+};

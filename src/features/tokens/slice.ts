@@ -5,15 +5,15 @@ import {
   createSlice,
 } from "@reduxjs/toolkit";
 import { createMulticallDataParser } from "helpers";
+import { fetchMulticallData } from "../requests";
 import {
   mirroredServerState,
-  multicallDataReceived,
   restartedDueToError,
   subgraphDataLoaded,
   tokenStatsDataLoaded,
   tokenStatsRequestFailed,
   uniswapPairsRegistered,
-} from "features/actions";
+} from "../actions";
 import type { NormalizedToken } from "ethereum";
 
 export const tokensAdapter = createEntityAdapter<NormalizedToken>({
@@ -42,7 +42,7 @@ const slice = createSlice({
   },
   extraReducers: (builder) =>
     builder
-      .addCase(multicallDataReceived, (state, action) => {
+      .addCase(fetchMulticallData.fulfilled, (state, action) => {
         const relevantMulticallData = totalSuppliesMulticallDataParser(
           action.payload
         );

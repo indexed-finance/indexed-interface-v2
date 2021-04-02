@@ -3,7 +3,7 @@ import {
   RegisteredCall,
   deserializeOnChainCall,
 } from "./serialize";
-import type { MulticallData } from "features/actions";
+import type { MulticallData } from "features/requests/multicall-request";
 
 export type RelevantCall = [
   string /* poolAddress */,

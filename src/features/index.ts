@@ -9,6 +9,7 @@ export * from './dailySnapshots';
 export * from './indexPools';
 export * from './pairs';
 export * from './reducer';
+export * from './requests';
 export * from './selectors';
 export * from './settings';
 export * from './staking';

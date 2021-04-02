@@ -16,7 +16,6 @@ import {
   joinPool,
   joinswapExternAmountIn,
   joinswapPoolAmountOut,
-  multicall,
   normalizeInitialData,
   normalizeStakingData,
   swapExactAmountIn,
@@ -28,9 +27,10 @@ import {
 import { batcherActions } from "./batcher";
 import { cacheActions } from "./cache";
 import { categoriesActions } from "./categories";
-import { ethers, providers } from "ethers";
+import { fetchMulticallData } from "./requests";
 import { indexPoolsActions } from "./indexPools";
 import { notification } from "antd";
+import { providers } from "ethers";
 import { selectors } from "./selectors";
 import { settingsActions } from "./settings";
 import { stakingActions } from "./staking";
@@ -165,24 +165,12 @@ export const thunks = {
       }
 
       if (provider) {
-        try {
-          dispatch(actions.multicallDataRequested());
-
-          const { blockNumber, results } = await multicall(
+        dispatch(
+          fetchMulticallData({
             provider,
-            batch.onChainCalls.deserializedCalls
-          );
-          const formattedMulticallData = formatMulticallData(
             batch,
-            blockNumber,
-            results
-          );
-
-          dispatch(actions.multicallDataReceived(formattedMulticallData));
-        } catch (error) {
-          console.error(error);
-          dispatch(actions.multicallFailed());
-        }
+          })
+        );
       }
     }
   },
@@ -550,47 +538,3 @@ export type DataReceiverConfig = {
   onChainCalls?: RegisteredCall[];
   offChainCalls?: RegisteredCall[];
 };
-
-// #region Helpers
-export function formatMulticallData(
-  batch: ReturnType<typeof selectors.selectBatch>,
-  blockNumber: number,
-  results: ethers.utils.Result[]
-) {
-  const { callers, onChainCalls } = batch;
-  const { registrars, callsByRegistrant } = onChainCalls;
-  const callsToResults = registrars.reduce((prev, next) => {
-    prev[next] = [];
-    return prev;
-  }, {} as Record<string, string[]>);
-
-  let previousCutoff = 0;
-  for (const registrar of registrars) {
-    const callCount = callsByRegistrant[registrar].length;
-    const relevantResults = results.slice(
-      previousCutoff,
-      previousCutoff + callCount
-    );
-
-    let index = 0;
-    for (const callResult of relevantResults) {
-      const call = callsByRegistrant[registrar][index];
-      const formattedResults = callResult.map((bn) =>
-        bn.toString()
-      ) as string[];
-
-      callsToResults[call].push(...formattedResults);
-
-      index++;
-    }
-
-    previousCutoff += callCount;
-  }
-
-  return {
-    blockNumber,
-    callers,
-    callsToResults,
-  };
-}
-// #endregion

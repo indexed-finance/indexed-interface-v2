@@ -1,16 +1,19 @@
-import { computeUniswapPairAddress } from "ethereum/utils/uniswap";
-import { convert, createMulticallDataParser } from "helpers";
+import {
+  computeUniswapPairAddress,
+  convert,
+  createMulticallDataParser,
+} from "helpers";
 import { createEntityAdapter, createSlice } from "@reduxjs/toolkit";
+import { fetchMulticallData } from "../requests";
 import {
   mirroredServerState,
-  multicallDataReceived,
   restartedDueToError,
   uniswapPairsRegistered,
-} from "features/actions";
-import { tokensSelectors } from "features/tokens";
-import type { AppState } from "features/store";
-import type { FormattedPair } from "features/selectors";
-import type { NormalizedPair, NormalizedToken } from "ethereum/types";
+} from "../actions";
+import { tokensSelectors } from "../tokens";
+import type { AppState } from "../store";
+import type { FormattedPair } from "../selectors";
+import type { NormalizedPair, NormalizedToken } from "ethereum";
 
 export const PAIR_DATA_CALLER = "Pair Data";
 
@@ -26,7 +29,7 @@ const slice = createSlice({
   reducers: {},
   extraReducers: (builder) =>
     builder
-      .addCase(multicallDataReceived, (state, action) => {
+      .addCase(fetchMulticallData.fulfilled, (state, action) => {
         const relevantMulticallData = pairMulticallDataParser(action.payload);
 
         if (relevantMulticallData) {
