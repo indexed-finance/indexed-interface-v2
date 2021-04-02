@@ -20,7 +20,7 @@ import { routes } from "./routes";
 import { selectors } from "features";
 import { useBreakpoints, useStorageEntry, useTranslator } from "hooks";
 import { useSelector } from "react-redux";
-import { useWalletConnectionDrawer } from "./drawers";
+import { useTransactionDrawer, useWalletConnectionDrawer } from "./drawers";
 import noop from "lodash.noop";
 
 const ERROR_NOTIFICATION_STORAGE_KEY =
@@ -41,7 +41,8 @@ export function AppLayout() {
   const breakpoints = useBreakpoints();
   const [mobileMenuActive, setMobileMenuActive] = useState(false);
   const closeMobileMenu = useCallback(() => setMobileMenuActive(false), []);
-  const { open: openDrawer } = useWalletConnectionDrawer();
+  const { open: openWalletDrawer } = useWalletConnectionDrawer();
+  const { open: openTransactionDrawer } = useTransactionDrawer();
   const toggleMobileMenu = useCallback(
     () => setMobileMenuActive((prev) => !prev),
     []
@@ -79,6 +80,10 @@ export function AppLayout() {
       SocketClient.disconnect();
     };
   }, [isConnectionEnabled, lastNotifiedOfError, store, tx, triedToConnect]);
+
+  useEffect(() => {
+    openTransactionDrawer();
+  }, [openTransactionDrawer]);
 
   return (
     <>
@@ -125,7 +130,7 @@ export function AppLayout() {
           <Sider width={300}>
             {indexPools.length > 0 ? null : (
               <div className="QuotePlaceholder perfectly-centered">
-                <Button type="primary" onClick={openDrawer}>
+                <Button type="primary" onClick={openWalletDrawer}>
                   {tx("CONNECT_YOUR_WALLET")}
                 </Button>
               </div>

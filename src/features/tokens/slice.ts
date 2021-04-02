@@ -4,16 +4,16 @@ import {
   createEntityAdapter,
   createSlice,
 } from "@reduxjs/toolkit";
+import { createMulticallDataParser } from "helpers";
 import {
-  coingeckoDataLoaded,
-  coingeckoRequestFailed,
   mirroredServerState,
   multicallDataReceived,
   restartedDueToError,
   subgraphDataLoaded,
+  tokenStatsDataLoaded,
+  tokenStatsRequestFailed,
   uniswapPairsRegistered,
 } from "features/actions";
-import { createMulticallDataParser } from "helpers";
 import type { NormalizedToken } from "ethereum";
 
 export const tokensAdapter = createEntityAdapter<NormalizedToken>({
@@ -21,7 +21,7 @@ export const tokensAdapter = createEntityAdapter<NormalizedToken>({
 });
 
 const tokensInitialState = tokensAdapter.getInitialState({
-  lastCoingeckoError: -1,
+  lastTokenStatsError: -1,
 });
 
 const slice = createSlice({
@@ -73,11 +73,11 @@ const slice = createSlice({
 
         tokensAdapter.addMany(state, fullTokens);
       })
-      .addCase(coingeckoDataLoaded, (state, action) => {
-        if (action.payload.tokens) {
-          for (const [address, value] of Object.entries(
-            action.payload.tokens
-          )) {
+      .addCase(tokenStatsDataLoaded, (state, action) => {
+        if (action.payload) {
+          state.lastTokenStatsError = -1;
+
+          for (const [address, value] of Object.entries(action.payload)) {
             if (value) {
               const { price, change24Hours, percentChange24Hours } = value;
               const entry = state.entities[address.toLowerCase()];
@@ -93,8 +93,8 @@ const slice = createSlice({
           }
         }
       })
-      .addCase(coingeckoRequestFailed, (state, action) => {
-        state.lastCoingeckoError = action.payload.when;
+      .addCase(tokenStatsRequestFailed, (state, action) => {
+        state.lastTokenStatsError = action.payload.when;
       })
       .addCase(mirroredServerState, (_, action) => {
         const { tokens } = action.payload;

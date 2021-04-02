@@ -38,9 +38,9 @@ export const tokensSelectors = {
       return prev;
     }, {} as Record<string, NormalizedToken>);
   },
-  selectCoingeckoRequestable: (state: AppState) => {
+  selectTokenStatsRequestable: (state: AppState) => {
     const now = Date.now();
-    const { lastCoingeckoError: then } = tokensSelectors.selectTokens(state);
+    const { lastTokenStatsError: then } = tokensSelectors.selectTokens(state);
 
     return then === -1 || now - then >= TWO_MINUTES;
   },

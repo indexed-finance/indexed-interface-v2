@@ -8,6 +8,7 @@ import {
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import {
   RegisteredCall,
+  createOffChainBatch,
   createOnChainBatch,
   serializeOffChainCall,
   serializeOnChainCall,
@@ -185,7 +186,7 @@ export const batcherSelectors = {
     };
   },
   selectOffChainBatch(state: AppState) {
-    return state.batcher.offChainCalls;
+    return createOffChainBatch(state.batcher.offChainCalls);
   },
   selectBatcherStatus(state: AppState) {
     const { status, onChainCalls, offChainCalls } = state.batcher;

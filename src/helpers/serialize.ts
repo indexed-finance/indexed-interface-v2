@@ -7,6 +7,7 @@ export type RegisteredCall = {
   target: string;
   function: string;
   args?: string[];
+  canBeMerged?: boolean;
 };
 
 export type RegisteredCaller = {
@@ -55,6 +56,38 @@ export function createOnChainBatch(fromCalls: string[]) {
   );
 }
 
+export function createOffChainBatch(fromCalls: string[]) {
+  const { toMerge, toKeep } = fromCalls.reduce(
+    (prev, next) => {
+      const [call, args, canBeMerged] = next.split("/");
+
+      if (canBeMerged) {
+        if (!prev.toMerge[call]) {
+          prev.toMerge[call] = [];
+        }
+
+        prev.toMerge[call].push(args);
+      } else {
+        prev.toKeep.push(next);
+      }
+
+      return prev;
+    },
+    {
+      toMerge: {},
+      toKeep: [],
+    } as {
+      toMerge: Record<string, string[]>;
+      toKeep: string[];
+    }
+  );
+  const merged = Object.entries(toMerge).map(
+    ([key, value]) => `${key}/${value.join("_")}`
+  );
+
+  return [...toKeep, ...merged];
+}
+
 export function serializeOnChainCall(call: RegisteredCall): string {
   return `${call.interfaceKind}/${call.target}/${call.function}/${(
     call.args ?? []
@@ -86,7 +119,9 @@ export function deserializeOnChainCall(callId: string): null | RegisteredCall {
 }
 
 export function serializeOffChainCall(call: RegisteredCall): string {
-  return `${call.function}/${(call.args ?? []).join("_")}`;
+  return `${call.function}/${(call.args ?? []).join("_")}${
+    call.canBeMerged ? "/merge" : ""
+  }`;
 }
 
 export function deserializeOffChainCall(
@@ -100,7 +135,7 @@ export function deserializeOffChainCall(
     if (args) {
       const split = args.split("_");
 
-      return action.bind(null, ...split);
+      return action.bind(null, split[0], split[1]);
     } else {
       return action;
     }

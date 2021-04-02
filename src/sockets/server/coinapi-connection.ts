@@ -240,12 +240,7 @@ function continuouslyUpdateCoinData() {
   updatingCoinData = setTimeout(() => {
     log("Sending up-to-date coin data.");
 
-    store.dispatch(
-      actions.coingeckoDataLoaded({
-        pool: "",
-        tokens: symbolToPriceDataLookup,
-      })
-    );
+    store.dispatch(actions.tokenStatsDataLoaded(symbolToPriceDataLookup));
     continuouslyUpdateCoinData();
   }, 10000);
 }

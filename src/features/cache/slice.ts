@@ -1,10 +1,10 @@
 import {
   MulticallData,
   cachedMulticallDataReceived,
-  coingeckoDataLoaded,
   multicallDataReceived,
   poolTradesAndSwapsLoaded,
   restartedDueToError,
+  tokenStatsDataLoaded,
 } from "features/actions";
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { stakingActions } from "../staking";
@@ -55,10 +55,10 @@ const slice = createSlice({
   },
   extraReducers: (builder) =>
     builder
-      .addCase(coingeckoDataLoaded, (state, action) => {
-        const formattedCall = `retrieveCoingeckoData/${
-          action.payload.pool ?? Object.keys(action.payload.tokens).join("_")
-        }`;
+      .addCase(tokenStatsDataLoaded, (state, action) => {
+        const formattedCall = `requestTokenStats/${Object.keys(
+          action.payload
+        ).join("_")}`;
 
         state.entries[formattedCall] = {
           result: action.payload as any,

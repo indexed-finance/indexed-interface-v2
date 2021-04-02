@@ -13,9 +13,8 @@ export const subgraphDataLoaded = createAction<NormalizedInitialData>(
 /**
  *
  */
-export const coingeckoDataLoaded = createAction<{
-  pool: null | string;
-  tokens: Record<
+export const tokenStatsDataLoaded = createAction<
+  Record<
     string,
     {
       price: number;
@@ -23,14 +22,14 @@ export const coingeckoDataLoaded = createAction<{
       percentChange24Hours: number;
       updatedAt: number;
     }
-  >;
-}>("coingeckoDataLoaded");
+  >
+>("tokenStatsDataLoaded");
 
 /**
  *
  */
-export const coingeckoRequestFailed = createAction<{ when: number }>(
-  "coingeckoRequestFailed"
+export const tokenStatsRequestFailed = createAction<{ when: number }>(
+  "tokenStatsRequestFailed"
 );
 
 /**

@@ -33,6 +33,13 @@ const store = configureStore({
           return next(action);
         };
       }),
+  // .concat(function () {
+  //   return (next) => (action) => {
+  //     debugger;
+
+  //     return next(action);
+  //   };
+  // }),
   preloadedState: FEATURE_FLAGS.saveStateAcrossSessions
     ? loadPersistedState()
     : undefined,

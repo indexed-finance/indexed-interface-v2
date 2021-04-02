@@ -41,7 +41,7 @@ export const useDrawerControls = () => {
   return controls;
 };
 
-export interface BaseDrawerProps {
+export interface BaseDrawerProps extends DrawerProps {
   title: string;
   children: ReactNode;
   style?: DrawerProps["style"];
@@ -55,6 +55,7 @@ export function BaseDrawer({
   children,
   style = {},
   bodyStyle = {},
+  ...rest
 }: BaseDrawerProps) {
   return (
     <Drawer
@@ -73,6 +74,7 @@ export function BaseDrawer({
         width: 400,
         ...style,
       }}
+      {...rest}
     >
       {children}
     </Drawer>
