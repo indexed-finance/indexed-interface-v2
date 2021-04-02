@@ -10,11 +10,8 @@ import {
   fetchMulticallData,
   fetchTokenStats,
 } from "../requests";
-import {
-  mirroredServerState,
-  restartedDueToError,
-  uniswapPairsRegistered,
-} from "../actions";
+import { mirroredServerState, restartedDueToError } from "../actions";
+import { pairsActions } from "../pairs";
 import type { NormalizedToken } from "ethereum";
 
 export const tokensAdapter = createEntityAdapter<NormalizedToken>({
@@ -68,7 +65,7 @@ const slice = createSlice({
 
         for (const commonToken of COMMON_BASE_TOKENS) {
           if (!tokens.entities[commonToken.id]) {
-            fullTokens.push({ ...commonToken, coingeckoId: "" });
+            fullTokens.push(commonToken);
           }
         }
 
@@ -94,7 +91,7 @@ const slice = createSlice({
       })
       .addCase(mirroredServerState, (_, action) => action.payload.tokens)
       .addCase(restartedDueToError, () => tokensInitialState)
-      .addCase(uniswapPairsRegistered, (state, action) => {
+      .addCase(pairsActions.uniswapPairsRegistered, (state, action) => {
         for (const pair of action.payload) {
           if (!state.entities[pair.id.toLowerCase()]) {
             state.ids.push(pair.id.toLowerCase());
@@ -103,7 +100,6 @@ const slice = createSlice({
               symbol: "UniV2",
               name: `UniswapV2 LP Token`,
               decimals: 18,
-              coingeckoId: "",
             };
           }
         }

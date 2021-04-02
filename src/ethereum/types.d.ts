@@ -85,7 +85,6 @@ export interface NormalizedToken {
   decimals: number;
   name?: string;
   symbol: string;
-  coingeckoId: string;
   totalSupply?: string;
   priceData?: {
     price?: number;

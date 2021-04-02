@@ -1,6 +1,6 @@
 import { BURN_ROUTER_ADDRESS, COMMON_BASE_TOKENS, SLIPPAGE_RATE } from "config";
 import { BaseInteraction, InteractionValues } from "./BaseInteraction";
-import { FormattedIndexPool, actions, selectors } from "features";
+import { FormattedIndexPool, selectors } from "features";
 import { Fragment, useCallback, useState } from "react";
 import { Radio } from "antd";
 import { convert } from "helpers";
@@ -25,7 +25,7 @@ export default function BurnInteraction({ pool }: Props) {
   );
   const poolsToTokens = usePoolToTokens(pool);
 
-  useUserDataRegistrar(poolsToTokens, actions, selectors);
+  useUserDataRegistrar(poolsToTokens);
 
   return (
     <Fragment>
@@ -56,7 +56,7 @@ function SingleTokenBurnInteraction({ pool }: Props) {
     executeBurn,
   } = useSingleTokenBurnCallbacks(poolId);
 
-  useUserDataRegistrar(poolsToTokens, actions, selectors);
+  useUserDataRegistrar(poolsToTokens);
 
   const handleChange = useCallback(
     (values: InteractionValues) => {
@@ -169,7 +169,7 @@ function UniswapBurnInteraction({ pool }: Props) {
 
   const assets = [...COMMON_BASE_TOKENS];
 
-  useUserDataRegistrar(poolsToTokens, actions, selectors);
+  useUserDataRegistrar(poolsToTokens);
 
   const handleChange = useCallback(
     (values: InteractionValues) => {

@@ -1,19 +1,17 @@
 import {
+  PayloadAction,
+  createEntityAdapter,
+  createSlice,
+} from "@reduxjs/toolkit";
+import {
   computeUniswapPairAddress,
   convert,
   createMulticallDataParser,
 } from "helpers";
-import { createEntityAdapter, createSlice } from "@reduxjs/toolkit";
 import { fetchMulticallData } from "../requests";
-import {
-  mirroredServerState,
-  restartedDueToError,
-  uniswapPairsRegistered,
-} from "../actions";
-import { tokensSelectors } from "../tokens";
+import { mirroredServerState, restartedDueToError } from "../actions";
 import type { AppState } from "../store";
-import type { FormattedPair } from "../selectors";
-import type { NormalizedPair, NormalizedToken } from "ethereum";
+import type { NormalizedPair } from "ethereum";
 
 export const PAIR_DATA_CALLER = "Pair Data";
 
@@ -26,7 +24,20 @@ const pairsInitialState = adapter.getInitialState();
 const slice = createSlice({
   name: "pairs",
   initialState: pairsInitialState,
-  reducers: {},
+  reducers: {
+    uniswapPairsRegistered(state, action: PayloadAction<NormalizedPair[]>) {
+      const formatted = action.payload.map(
+        ({ id, token0 = "", token1 = "", ...rest }) => ({
+          ...rest,
+          id: id.toLowerCase(),
+          token0: token0.toLowerCase(),
+          token1: token1.toLowerCase(),
+        })
+      );
+
+      adapter.upsertMany(state, formatted);
+    },
+  },
   extraReducers: (builder) =>
     builder
       .addCase(fetchMulticallData.fulfilled, (state, action) => {
@@ -52,18 +63,6 @@ const slice = createSlice({
           }
         }
       })
-      .addCase(uniswapPairsRegistered, (state, action) => {
-        const formatted = action.payload.map(
-          ({ id, token0 = "", token1 = "", ...rest }) => ({
-            ...rest,
-            id: id.toLowerCase(),
-            token0: token0.toLowerCase(),
-            token1: token1.toLowerCase(),
-          })
-        );
-
-        adapter.upsertMany(state, formatted);
-      })
       .addCase(mirroredServerState, (_, action) => {
         const { pairs } = action.payload;
 
@@ -86,36 +85,6 @@ export const pairsSelectors = {
       (prev, next) => [...prev, allPairs.entities[next.toLowerCase()]],
       [] as (NormalizedPair | undefined)[]
     );
-  },
-  selectFormattedPairsById: (
-    state: AppState,
-    ids: string[]
-  ): (FormattedPair | undefined)[] => {
-    const allPairs = pairsSelectors.selectPairsById(state, ids);
-    const allTokens = tokensSelectors.selectEntities(state);
-    const formattedPairs: (FormattedPair | undefined)[] = [];
-
-    for (const pair of allPairs) {
-      let formattedPair: FormattedPair | undefined;
-
-      if (pair && pair.exists !== undefined && pair.token0 && pair.token1) {
-        const token0 = allTokens[pair.token0.toLowerCase()] as NormalizedToken;
-        const token1 = allTokens[pair.token1.toLowerCase()] as NormalizedToken;
-
-        formattedPair = {
-          id: pair.id,
-          exists: pair.exists,
-          token0,
-          token1,
-          reserves0: pair.reserves0 as string,
-          reserves1: pair.reserves1 as string,
-        };
-      }
-
-      formattedPairs.push(formattedPair);
-    }
-
-    return formattedPairs;
   },
   selectAllUpdatedPairs: (state: AppState) =>
     pairsSelectors.selectAll(state).filter((pair) => pair.exists !== undefined),

@@ -1,4 +1,4 @@
-import { AppState, FormattedIndexPool, actions, selectors } from "features";
+import { AppState, FormattedIndexPool, selectors } from "features";
 import { BaseInteraction, InteractionValues } from "./BaseInteraction";
 import { BigNumber } from "ethereum/utils/balancer-math";
 import { Divider, Space } from "antd";
@@ -117,7 +117,7 @@ export default function SwapInteraction({ pool }: Props) {
     [executeSwap]
   );
 
-  useUserDataRegistrar(poolToTokens, actions, selectors);
+  useUserDataRegistrar(poolToTokens);
 
   return (
     <BaseInteraction

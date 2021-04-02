@@ -49,7 +49,6 @@ export function normalizeInitialData(categories: Category[]) {
           name,
           decimals,
           symbol,
-          coingeckoId: "",
         };
       }
 
@@ -114,7 +113,6 @@ export function normalizeInitialData(categories: Category[]) {
             name: indexPool.name,
             symbol: indexPool.symbol,
             decimals: 18,
-            coingeckoId: "",
           };
         }
       }
@@ -143,25 +141,20 @@ export function normalizeInitialData(categories: Category[]) {
         entities: {},
       },
       tokens: {
-        ids: [
-          WETH_CONTRACT_ADDRESS.toLowerCase(),
-          NDX_ADDRESS.toLowerCase()
-        ],
+        ids: [WETH_CONTRACT_ADDRESS.toLowerCase(), NDX_ADDRESS.toLowerCase()],
         entities: {
           [WETH_CONTRACT_ADDRESS.toLowerCase()]: {
             id: WETH_CONTRACT_ADDRESS.toLowerCase(),
-            coingeckoId: "",
-            name: 'Wrapped Ether',
-            symbol: 'WETH',
+            name: "Wrapped Ether",
+            symbol: "WETH",
             decimals: 18,
           },
           [NDX_ADDRESS.toLowerCase()]: {
             id: NDX_ADDRESS.toLowerCase(),
-            coingeckoId: "indexed-finance",
-            name: 'Indexed',
-            symbol: 'NDX',
-            decimals: 18
-          }
+            name: "Indexed",
+            symbol: "NDX",
+            decimals: 18,
+          },
         },
       },
     } as NormalizedInitialData

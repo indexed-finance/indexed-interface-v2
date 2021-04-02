@@ -31,11 +31,7 @@ export const useNdxBalance = () => useSelector(selectors.selectNdxBalance);
 
 export const USER_CALLER = "User";
 
-export function useUserDataRegistrar(
-  poolTokens: Record<string, string[]>,
-  actions: Record<string, any>,
-  selectors: Record<string, any>
-) {
+export function useUserDataRegistrar(poolTokens: Record<string, string[]>) {
   const userAddress = useUserAddress();
   const interfaceKind = "IERC20_ABI";
   const userDataCalls: RegisteredCall[] = Object.entries(poolTokens).flatMap(

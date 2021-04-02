@@ -133,7 +133,7 @@ export default function TradeInteraction({ pool }: Props) {
     ]
   );
 
-  useUserDataRegistrar(poolToTokens, actions, selectors);
+  useUserDataRegistrar(poolToTokens);
 
   return (
     <BaseInteraction

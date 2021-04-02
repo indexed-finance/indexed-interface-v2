@@ -30,6 +30,7 @@ import {
   fetchTokenStats,
 } from "./requests";
 import { indexPoolsActions } from "./indexPools";
+import { pairsActions } from "./pairs";
 import { providers } from "ethers";
 import { selectors } from "./selectors";
 import { settingsActions } from "./settings";
@@ -442,6 +443,7 @@ export const actions = {
   ...cacheActions,
   ...categoriesActions,
   ...indexPoolsActions,
+  ...pairsActions,
   ...settingsActions,
   ...stakingActions,
   ...tokensActions,

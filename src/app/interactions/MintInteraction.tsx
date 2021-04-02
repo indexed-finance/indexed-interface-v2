@@ -1,6 +1,6 @@
 import { BaseInteraction, InteractionValues } from "./BaseInteraction";
 import { COMMON_BASE_TOKENS, MINT_ROUTER_ADDRESS, SLIPPAGE_RATE } from "config";
-import { FormattedIndexPool, actions, selectors } from "features";
+import { FormattedIndexPool, selectors } from "features";
 import { Fragment, useCallback, useMemo, useState } from "react";
 import { Radio } from "antd";
 import { Route } from "react-router-dom";
@@ -61,7 +61,7 @@ function SingleTokenMintInteraction({ pool }: Props) {
   } = useSingleTokenMintCallbacks(pool.id);
   const poolToTokens = usePoolToTokens(pool);
 
-  useUserDataRegistrar(poolToTokens, actions, selectors);
+  useUserDataRegistrar(poolToTokens);
 
   const handleChange = useCallback(
     (values: InteractionValues) => {
@@ -178,7 +178,7 @@ function UniswapMintInteraction({ pool }: Props) {
     tokenIds,
   ]);
 
-  useUserDataRegistrar(poolToTokens, actions, selectors);
+  useUserDataRegistrar(poolToTokens);
 
   const handleChange = useCallback(
     (values: InteractionValues) => {

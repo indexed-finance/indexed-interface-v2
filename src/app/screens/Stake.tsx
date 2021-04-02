@@ -1,7 +1,7 @@
 import { Col, Row, Typography } from "antd";
 import { ScreenHeader } from "components";
 import { Staking } from "../subscreens";
-import { actions, selectors } from "features";
+import { selectors } from "features";
 import { useBreakpoints, useStakingRegistrar, useTranslator } from "hooks";
 import { useSelector } from "react-redux";
 
@@ -16,7 +16,7 @@ export default function Stake() {
   );
   const breakpoints = useBreakpoints();
 
-  useStakingRegistrar(actions, selectors);
+  useStakingRegistrar();
 
   // Variants
   const mobileSized = (

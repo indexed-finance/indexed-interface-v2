@@ -38,8 +38,8 @@ export default function Portfolio() {
     []
   );
 
-  useUserDataRegistrar(poolsToTokens, actions, selectors);
-  useStakingRegistrar(actions, selectors);
+  useUserDataRegistrar(poolsToTokens);
+  useStakingRegistrar();
   usePairDataRegistrar(uniswapPairs);
 
   // Effect:

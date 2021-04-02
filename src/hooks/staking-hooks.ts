@@ -187,10 +187,7 @@ export function createStakingCalls(
 
 export const STAKING_CALLER = "Staking";
 
-export function useStakingRegistrar(
-  actions: Record<string, any>,
-  selectors: Record<string, any>
-) {
+export function useStakingRegistrar() {
   const userAddress = useUserAddress();
   const stakingPools: NormalizedStakingPool[] = useSelector(
     selectors.selectAllStakingPools
