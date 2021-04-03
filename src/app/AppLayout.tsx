@@ -81,9 +81,9 @@ export function AppLayout() {
     };
   }, [isConnectionEnabled, lastNotifiedOfError, store, tx, triedToConnect]);
 
-  useEffect(() => {
-    openTransactionDrawer();
-  }, [openTransactionDrawer]);
+  // useEffect(() => {
+  //   openTransactionDrawer();
+  // }, [openTransactionDrawer]);
 
   return (
     <>

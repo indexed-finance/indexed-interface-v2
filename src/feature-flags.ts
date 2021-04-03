@@ -8,7 +8,8 @@ export const FEATURE_FLAGS = {
   useSessionSaving: true,
   useFortmatic: false,
   useHomepageSteps: false,
-  useDEBUG: process.env.NODE_ENV === "development",
+  // useDEBUG: process.env.NODE_ENV === "development",
+  useDEBUG: false,
   useServerConnection: false,
   useMolassesMode: false,
 };

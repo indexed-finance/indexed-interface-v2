@@ -1,16 +1,19 @@
-import { AppState, FormattedIndexPool, actions, selectors } from "features";
+import { AppState, FormattedIndexPool, selectors, useSigner } from "features";
 import { BaseInteraction, InteractionValues } from "./BaseInteraction";
 import { COMMON_BASE_TOKENS, UNISWAP_ROUTER_ADDRESS } from "config";
 import { Trade } from "@uniswap/sdk";
 import { convert } from "helpers";
+import { executeUniswapTrade } from "ethereum";
 import { useCallback, useMemo } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import {
   usePoolToTokens,
+  useTransactionNotification,
   useTranslator,
   useUniswapTradingPairs,
+  useUserAddress,
   useUserDataRegistrar,
 } from "hooks";
+import { useSelector } from "react-redux";
 
 interface Props {
   pool: FormattedIndexPool;
@@ -18,7 +21,7 @@ interface Props {
 
 export default function TradeInteraction({ pool }: Props) {
   const tx = useTranslator();
-  const dispatch = useDispatch();
+  const { handleTrade } = useTradeInteraction();
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
   const tokenIds = useMemo(
     () => [pool.id, ...COMMON_BASE_TOKENS.map(({ id }) => id)],
@@ -121,15 +124,21 @@ export default function TradeInteraction({ pool }: Props) {
           );
         }
         if (trade) {
-          dispatch(actions.trade(trade));
+          handleTrade(trade)
+            .then(() => {
+              // Display success notification and begin tracking transaction.
+            })
+            .catch(() => {
+              // Display error notification informing of failed transaction.
+            });
         }
       }
     },
     [
-      dispatch,
       tokenLookup,
       calculateBestTradeForExactInput,
       calculateBestTradeForExactOutput,
+      handleTrade,
     ]
   );
 
@@ -146,4 +155,32 @@ export default function TradeInteraction({ pool }: Props) {
       onChange={handleChange}
     />
   );
+}
+
+function useTradeInteraction() {
+  const signer = useSigner();
+  const userAddress = useUserAddress();
+  const { sendTransaction } = useTransactionNotification({
+    successMessage: "TODO: Trade Succeed",
+    errorMessage: "TODO: Trade Fail",
+  });
+  const handleTrade = useCallback(
+    (trade: Trade) => {
+      const handler = () =>
+        signer && userAddress
+          ? executeUniswapTrade(signer as any, userAddress, trade)
+          : Promise.reject();
+
+      return sendTransaction(handler)
+        .then(() => {
+          console.info("Tracking new transaction.");
+        })
+        .catch(() => {
+          console.info("Not tracking new transaction.");
+        });
+    },
+    [signer, userAddress, sendTransaction]
+  );
+
+  return { handleTrade };
 }

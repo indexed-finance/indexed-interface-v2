@@ -2,13 +2,11 @@ import * as topLevelActions from "./actions";
 import { BigNumber } from "bignumber.js";
 import { RegisteredCall, convert } from "helpers";
 import { SLIPPAGE_RATE } from "config";
-import { Trade } from "@uniswap/sdk";
 import {
   approveSpender,
   burnAndSwapForExactTokens,
   burnExactAndSwapForTokens,
   downwardSlippage,
-  executeUniswapTrade,
   exitswapExternAmountOut,
   exitswapPoolAmountIn,
   joinPool,
@@ -59,6 +57,12 @@ export const disconnectFromProvider = () => {
 
 export function useProvider() {
   return [provider, signer];
+}
+
+export function useSigner() {
+  const [, signer] = useProvider();
+
+  return signer ?? null;
 }
 // #endregion
 
@@ -212,13 +216,6 @@ export const thunks = {
       }
     }
   },
-  trade: (trade: Trade): AppThunk => async (_, getState) => {
-    const state = getState();
-    if (signer) {
-      const userAddress = selectors.selectUserAddress(state);
-      await executeUniswapTrade(signer, userAddress, trade);
-    }
-  },
   joinswapExternAmountIn: (
     indexPool: string,
     tokenIn: string,
@@ -289,46 +286,6 @@ export const thunks = {
         tokenOut,
         tokenAmountOut,
         maxPoolAmountIn
-      );
-    }
-  },
-  swapExactAmountIn: (
-    indexPool: string,
-    tokenIn: string,
-    amountIn: BigNumber,
-    tokenOut: string,
-    minAmountOut: BigNumber,
-    maximumPrice: BigNumber
-  ): AppThunk => async () => {
-    if (signer) {
-      await swapExactAmountIn(
-        signer,
-        indexPool,
-        tokenIn,
-        tokenOut,
-        amountIn,
-        minAmountOut,
-        maximumPrice
-      );
-    }
-  },
-  swapExactAmountOut: (
-    indexPool: string,
-    tokenIn: string,
-    maxAmountIn: BigNumber,
-    tokenOut: string,
-    amountOut: BigNumber,
-    maximumPrice: BigNumber
-  ): AppThunk => async () => {
-    if (signer) {
-      await swapExactAmountOut(
-        signer,
-        indexPool,
-        tokenIn,
-        tokenOut,
-        maxAmountIn,
-        amountOut,
-        maximumPrice
       );
     }
   },

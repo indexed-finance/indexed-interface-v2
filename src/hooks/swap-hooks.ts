@@ -1,17 +1,23 @@
-import { AppState, selectors, thunks } from "features";
+import { AppState, selectors, useProvider } from "features";
 import { BigNumber } from "ethereum/utils/balancer-math";
 import { SLIPPAGE_RATE } from "config";
 import { convert } from "helpers";
-import { downwardSlippage, ethereumHelpers, upwardSlippage } from "ethereum";
+import {
+  downwardSlippage,
+  ethereumHelpers,
+  swapExactAmountIn,
+  swapExactAmountOut,
+  upwardSlippage,
+} from "ethereum";
 import { useCallback } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 
 export function useSwapCallbacks(poolId: string) {
-  const dispatch = useDispatch();
   const normalizedPool = useSelector((state: AppState) =>
     selectors.selectPool(state, poolId)
   );
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
+  const [, signer] = useProvider();
 
   const calculateAmountIn = useCallback(
     (tokenInSymbol: string, tokenOutSymbol: string, typedAmountOut: string) => {
@@ -88,65 +94,85 @@ export function useSwapCallbacks(poolId: string) {
       specifiedField: "from" | "to",
       typedAmount: string
     ) => {
-      if (specifiedField === "from") {
-        const result = calculateAmountOut(
-          tokenInSymbol,
-          tokenOutSymbol,
-          typedAmount
-        );
-        if (!result) throw Error(`Caught error calculating swap values.`);
-        if (result.error)
-          throw Error(`Caught error calculating swap values: ${result.error}`);
-        /* Do execute */
-        const maxPrice = upwardSlippage(
-          result.spotPriceAfter as BigNumber,
-          SLIPPAGE_RATE * 3
-        );
-        const minAmountOut = downwardSlippage(
-          result.amountOut as BigNumber,
-          SLIPPAGE_RATE
-        );
-        dispatch(
-          thunks.swapExactAmountIn(
-            poolId,
-            result.tokenIn,
-            result.amountIn,
-            result.tokenOut,
-            minAmountOut,
-            maxPrice
-          )
-        );
+      if (signer) {
+        if (specifiedField === "from") {
+          const result = calculateAmountOut(
+            tokenInSymbol,
+            tokenOutSymbol,
+            typedAmount
+          );
+
+          if (result) {
+            if (result.error) {
+              return Promise.reject(
+                `Caught error calculating swap values: ${result.error}`
+              );
+            }
+
+            /* Do execute */
+            const maxPrice = upwardSlippage(
+              result.spotPriceAfter as BigNumber,
+              SLIPPAGE_RATE * 3
+            );
+            const minAmountOut = downwardSlippage(
+              result.amountOut as BigNumber,
+              SLIPPAGE_RATE
+            );
+
+            return swapExactAmountIn(
+              signer as any,
+              poolId,
+              result.tokenIn,
+              result.tokenOut,
+              result.amountIn,
+              minAmountOut,
+              maxPrice
+            );
+          } else {
+            return Promise.reject("Caught error calculating swap values.");
+          }
+        } else {
+          const result = calculateAmountIn(
+            tokenInSymbol,
+            tokenOutSymbol,
+            typedAmount
+          );
+
+          if (result) {
+            if (result.error) {
+              return Promise.reject(
+                `Caught error calculating swap values: ${result.error}`
+              );
+            }
+
+            /* Do execute */
+            const maxPrice = upwardSlippage(
+              result.spotPriceAfter as BigNumber,
+              SLIPPAGE_RATE * 3
+            );
+            const maxAmountIn = upwardSlippage(
+              result.amountIn as BigNumber,
+              SLIPPAGE_RATE
+            );
+
+            return swapExactAmountOut(
+              signer as any,
+              poolId,
+              result.tokenIn,
+              result.tokenOut,
+              maxAmountIn,
+              result.amountOut,
+              maxPrice
+            );
+          } else {
+            return Promise.reject("Caught error calculating swap values.");
+          }
+        }
       } else {
-        const result = calculateAmountIn(
-          tokenInSymbol,
-          tokenOutSymbol,
-          typedAmount
-        );
-        if (!result) throw Error(`Caught error calculating swap values.`);
-        if (result.error)
-          throw Error(`Caught error calculating swap values: ${result.error}`);
-        /* Do execute */
-        const maxPrice = upwardSlippage(
-          result.spotPriceAfter as BigNumber,
-          SLIPPAGE_RATE * 3
-        );
-        const maxAmountIn = upwardSlippage(
-          result.amountIn as BigNumber,
-          SLIPPAGE_RATE
-        );
-        dispatch(
-          thunks.swapExactAmountOut(
-            poolId,
-            result.tokenIn,
-            maxAmountIn,
-            result.tokenOut,
-            result.amountOut,
-            maxPrice
-          )
-        );
+        return Promise.reject();
       }
     },
-    [calculateAmountIn, calculateAmountOut, poolId, dispatch]
+    [signer, calculateAmountIn, calculateAmountOut, poolId]
   );
 
   return {

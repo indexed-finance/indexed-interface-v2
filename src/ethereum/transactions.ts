@@ -40,7 +40,7 @@ export function approveSpender(
   return contract.approve(spenderAddress, formattedAmount);
 }
 
-export async function executeUniswapTrade(
+export function executeUniswapTrade(
   signer: JsonRpcSigner,
   userAddress: string,
   trade: Trade,

@@ -13,7 +13,7 @@ import { useCallback, useMemo } from "react";
 import { useFormikContext } from "formik";
 import { usePoolToTokens, useSwapCallbacks, useUserDataRegistrar } from "hooks";
 import { useSelector } from "react-redux";
-import { useTranslator } from "hooks";
+import { useTransactionNotification, useTranslator } from "hooks";
 
 interface Props {
   pool: FormattedIndexPool;
@@ -28,6 +28,10 @@ export default function SwapInteraction({ pool }: Props) {
   } = useSwapCallbacks(pool.id);
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
   const poolToTokens = usePoolToTokens(pool);
+  const { sendTransaction } = useTransactionNotification({
+    successMessage: "TODO: Swap Succeed",
+    errorMessage: "TODO: Swap Fail",
+  });
   const handleChange = useCallback(
     (values: InteractionValues) => {
       const {
@@ -104,17 +108,25 @@ export default function SwapInteraction({ pool }: Props) {
         lastTouchedField,
       } = values;
       if (fromAmount > 0 && toAmount > 0 && fromToken && toToken) {
-        executeSwap(
-          fromToken,
-          toToken,
-          lastTouchedField,
-          lastTouchedField === "from"
-            ? fromAmount.toString()
-            : toAmount.toString()
-        );
+        sendTransaction(() =>
+          executeSwap(
+            fromToken,
+            toToken,
+            lastTouchedField,
+            lastTouchedField === "from"
+              ? fromAmount.toString()
+              : toAmount.toString()
+          )
+        )
+          .then(() => {
+            console.info("Tracking new transaction.");
+          })
+          .catch(() => {
+            console.info("Not tracking new transaction.");
+          });
       }
     },
-    [executeSwap]
+    [executeSwap, sendTransaction]
   );
 
   useUserDataRegistrar(poolToTokens);

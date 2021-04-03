@@ -3,6 +3,7 @@
 
 export * from './burn-hooks';
 export * from './mint-hooks';
+export * from './notification-hooks';
 export * from './pair-hooks';
 export * from './pool-hooks';
 export * from './staking-hooks';

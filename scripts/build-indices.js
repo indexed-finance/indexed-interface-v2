@@ -52,7 +52,6 @@ const removeBadIndices = () =>
     "assets/images/karate_files",
     "app",
     "app/screens",
-    "features/categories/local-data",
     "i18n",
     "theme",
     "theme/fonts",
