@@ -31,10 +31,10 @@ export function useCallRegistrar(calls: DataReceiverConfig) {
           offChainCalls: _cachedCalls.offChainCalls ?? [],
         };
 
-        dispatch(actions.registrantRegistered(allCalls));
+        dispatch(actions.callsRegistered(allCalls));
 
         return () => {
-          dispatch(actions.registrantUnregistered(allCalls));
+          dispatch(actions.callsUnregistered(allCalls));
         };
       }
     }

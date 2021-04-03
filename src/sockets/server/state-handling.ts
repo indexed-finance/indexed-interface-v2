@@ -98,11 +98,6 @@ function setupRegistrants() {
       totalSuppliesCalls: RegisteredCaller;
     }
   );
-
-  dispatch(actions.registrantRegistered(pairDataCalls));
-  dispatch(actions.registrantRegistered(poolDetailCalls));
-  dispatch(actions.registrantRegistered(totalSuppliesCalls));
-
   const stakingCalls = stakingPools.reduce(
     (prev, next) => {
       const { id, stakingToken } = next;
@@ -122,5 +117,12 @@ function setupRegistrants() {
     } as RegisteredCaller
   );
 
-  dispatch(actions.registrantRegistered(stakingCalls));
+  dispatch(
+    actions.callsRegistered([
+      pairDataCalls,
+      poolDetailCalls,
+      totalSuppliesCalls,
+      stakingCalls,
+    ])
+  );
 }

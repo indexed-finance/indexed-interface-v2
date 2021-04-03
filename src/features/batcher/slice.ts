@@ -22,6 +22,7 @@ interface BatcherState {
   blockNumber: number;
   onChainCalls: string[];
   offChainCalls: string[];
+  listenerCounts: Record<string, number>;
   callers: Record<
     string,
     {
@@ -29,7 +30,6 @@ interface BatcherState {
       offChainCalls: string[];
     }
   >;
-  listenerCounts: Record<string, number>;
   cache: Record<
     string,
     {
@@ -39,6 +39,12 @@ interface BatcherState {
   >;
   status: "idle" | "loading" | "deferring to server";
 }
+
+type CallRegistration = {
+  caller: string;
+  onChainCalls: RegisteredCall[];
+  offChainCalls: RegisteredCall[];
+};
 
 const batcherInitialState: BatcherState = {
   blockNumber: -1,
@@ -61,48 +67,50 @@ const slice = createSlice({
         state.blockNumber = blockNumber;
       }
     },
-    registrantRegistered(
+    callsRegistered(
       state,
-      action: PayloadAction<{
-        caller: string;
-        onChainCalls: RegisteredCall[];
-        offChainCalls: RegisteredCall[];
-      }>
+      action: PayloadAction<CallRegistration | CallRegistration[]>
     ) {
-      const { caller, onChainCalls, offChainCalls } = action.payload;
-      const existingEntry = state.callers[caller];
-      const callerEntry = {
-        onChainCalls: existingEntry?.onChainCalls ?? [],
-        offChainCalls: existingEntry?.offChainCalls ?? [],
-      };
+      const values = [action.payload].flat();
 
-      for (const call of onChainCalls) {
-        const callId = serializeOnChainCall(call);
+      for (const callRegistration of values) {
+        const { caller, onChainCalls, offChainCalls } = callRegistration;
+        const existingEntry = state.callers[caller];
+        const callerEntry = {
+          onChainCalls: existingEntry?.onChainCalls ?? [],
+          offChainCalls: existingEntry?.offChainCalls ?? [],
+        };
 
-        if (!state.onChainCalls.includes(callId)) {
-          state.onChainCalls.push(callId);
+        for (const call of onChainCalls) {
+          const callId = serializeOnChainCall(call);
+
+          if (!state.onChainCalls.includes(callId)) {
+            state.onChainCalls.push(callId);
+          }
+
+          callerEntry.onChainCalls.push(callId);
+
+          state.listenerCounts[callId] =
+            (state.listenerCounts[callId] ?? 0) + 1;
         }
 
-        callerEntry.onChainCalls.push(callId);
+        for (const call of offChainCalls) {
+          const callId = serializeOffChainCall(call);
 
-        state.listenerCounts[callId] = (state.listenerCounts[callId] ?? 0) + 1;
-      }
+          if (!state.offChainCalls.includes(callId)) {
+            state.offChainCalls.push(callId);
+          }
 
-      for (const call of offChainCalls) {
-        const callId = serializeOffChainCall(call);
+          callerEntry.offChainCalls.push(callId);
 
-        if (!state.offChainCalls.includes(callId)) {
-          state.offChainCalls.push(callId);
+          state.listenerCounts[callId] =
+            (state.listenerCounts[callId] ?? 0) + 1;
         }
 
-        callerEntry.offChainCalls.push(callId);
-
-        state.listenerCounts[callId] = (state.listenerCounts[callId] ?? 0) + 1;
+        state.callers[caller] = callerEntry;
       }
-
-      state.callers[caller] = callerEntry;
     },
-    registrantUnregistered(
+    callsUnregistered(
       state,
       action: PayloadAction<{
         caller: string;
