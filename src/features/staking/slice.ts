@@ -50,11 +50,7 @@ const slice = createSlice({
 
         return state;
       })
-      .addCase(mirroredServerState, (_, action) => {
-        const { staking } = action.payload;
-
-        return staking;
-      })
+      .addCase(mirroredServerState, (_, action) => action.payload.staking)
       .addCase(restartedDueToError, () => initialState),
 });
 

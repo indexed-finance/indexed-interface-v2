@@ -96,11 +96,7 @@ const slice = createSlice({
           }
         }
       })
-      .addCase(mirroredServerState, (_, action) => {
-        const { indexPools } = action.payload;
-
-        return indexPools;
-      })
+      .addCase(mirroredServerState, (_, action) => action.payload.indexPools)
       .addCase(restartedDueToError, () => initialState),
 });
 

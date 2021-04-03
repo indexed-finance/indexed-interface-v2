@@ -26,6 +26,7 @@ import {
   fetchInitialData,
   fetchMulticallData,
   fetchPoolTradesSwaps,
+  fetchStakingData,
   fetchTokenStats,
 } from "./requests";
 import { indexPoolsActions } from "./indexPools";
@@ -108,6 +109,11 @@ export const thunks = {
 
     dispatch(
       fetchInitialData({
+        provider,
+      })
+    );
+    dispatch(
+      fetchStakingData({
         provider,
       })
     );

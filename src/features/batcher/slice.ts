@@ -11,7 +11,7 @@ import {
   fetchStakingData,
   fetchTokenStats,
 } from "../requests";
-import { restartedDueToError } from "../actions";
+import { mirroredServerState, restartedDueToError } from "../actions";
 import { settingsActions } from "../settings";
 import { userActions } from "../user";
 import type { AppState } from "../store";
@@ -161,6 +161,9 @@ const slice = createSlice({
 
         state.status = "idle";
       })
+      .addCase(mirroredServerState, (state, action) => {
+        state.blockNumber = action.payload.batcher.blockNumber;
+      })
       .addCase(restartedDueToError, () => batcherInitialState)
       // Caching data from on- and off-chain calls.
       .addMatcher(
@@ -172,9 +175,12 @@ const slice = createSlice({
             fetchStakingData.fulfilled.type,
           ].includes(action.type),
         (state, action) => {
+          const potentialArgs = Object.keys(action.payload).join("_");
           const callLookup = {
-            [fetchTokenStats.fulfilled.type]: "fetchTokenStats",
-            [fetchPoolTradesSwaps.fulfilled.type]: "fetchPoolTradesSwaps",
+            [fetchTokenStats.fulfilled
+              .type]: `fetchTokenStats/${potentialArgs}`,
+            [fetchPoolTradesSwaps.fulfilled
+              .type]: `fetchPoolTradesSwaps/${potentialArgs}`,
             [fetchStakingData.fulfilled.type]: "fetchStakingData",
             [fetchMulticallData.fulfilled.type]: "fetchMulticallData",
           };
@@ -185,9 +191,9 @@ const slice = createSlice({
               callsToResults: Record<string, string[]>;
             };
 
-            for (const [call, result] of Object.entries(callsToResults)) {
-              state.cache[call] = {
-                result,
+            for (const [key, value] of Object.entries(callsToResults)) {
+              state.cache[key] = {
+                result: value,
                 fromBlockNumber: state.blockNumber,
               };
             }

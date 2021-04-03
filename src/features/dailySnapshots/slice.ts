@@ -25,11 +25,10 @@ const slice = createSlice({
 
         dailySnapshotsAdapter.addMany(state, fullSnapshots);
       })
-      .addCase(mirroredServerState, (_, action) => {
-        const { dailySnapshots } = action.payload;
-
-        return dailySnapshots;
-      })
+      .addCase(
+        mirroredServerState,
+        (_, action) => action.payload.dailySnapshots
+      )
       .addCase(restartedDueToError, () => initialState),
 });
 

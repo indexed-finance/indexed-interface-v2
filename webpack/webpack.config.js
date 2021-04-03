@@ -8,7 +8,7 @@ module.exports = {
     global: true,
   },
   target: "node",
-  entry: path.resolve(__dirname, "../src/sockets/server"),
+  entry: path.resolve(__dirname, "../src/sockets/server/start"),
   output: {
     path: path.resolve(__dirname, "server"),
     filename: "server.js",

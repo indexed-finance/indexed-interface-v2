@@ -69,7 +69,9 @@ const slice = createSlice({
           }
         }
 
-        tokensAdapter.addMany(state, fullTokens);
+        console.log("from initial data adding ", fullTokens);
+
+        tokensAdapter.upsertMany(state, fullTokens);
       })
       .addCase(fetchTokenStats.fulfilled, (state, action) => {
         if (action.payload) {
@@ -79,18 +81,21 @@ const slice = createSlice({
               const entry = state.entities[address.toLowerCase()];
 
               if (entry) {
-                entry.priceData = {
+                console.log({ entry });
+                state.entities[address.toLowerCase()]!.priceData = {
                   price,
                   change24Hours,
                   percentChange24Hours,
                 };
+              } else {
+                console.log("no entry for ", address);
               }
+            } else {
+              console.log("no value for ", address);
             }
           }
         }
       })
-      .addCase(mirroredServerState, (_, action) => action.payload.tokens)
-      .addCase(restartedDueToError, () => tokensInitialState)
       .addCase(pairsActions.uniswapPairsRegistered, (state, action) => {
         for (const pair of action.payload) {
           if (!state.entities[pair.id.toLowerCase()]) {
@@ -103,7 +108,9 @@ const slice = createSlice({
             };
           }
         }
-      }),
+      })
+      .addCase(mirroredServerState, (_, action) => action.payload.tokens)
+      .addCase(restartedDueToError, () => tokensInitialState),
 });
 
 export const { actions: tokensActions, reducer: tokensReducer } = slice;

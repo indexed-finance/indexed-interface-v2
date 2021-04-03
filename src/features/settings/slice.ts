@@ -23,7 +23,8 @@ const isConnectionEnabled = () => {
 const settingsInitialState: SettingsState = {
   theme: "dark",
   connected: false,
-  connectionEnabled: isConnectionEnabled(),
+  // connectionEnabled: isConnectionEnabled(),
+  connectionEnabled: false,
   languageCode: "en-us",
   supportedLanguages: [
     {

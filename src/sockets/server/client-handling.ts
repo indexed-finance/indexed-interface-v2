@@ -2,13 +2,14 @@ import {
   CLIENT_STATISTICS_REPORTING_RATE,
   WEBSOCKET_SERVER_PING_RATE,
   WEBSOCKET_SERVER_PORT,
-  WEBSOCKET_SERVER_UPDATE_RATE,
 } from "config";
 import { IncomingMessage } from "http";
 import { createServer } from "https";
 import { formatMirrorStateResponse, log } from "./helpers";
-import { store } from "features";
+import { provider, store } from "features";
+import { symbolToPriceDataLookup } from "./coinapi-connection";
 import WebSocket from "isomorphic-ws";
+import cloneDeep from "lodash.clonedeep";
 import fs from "fs";
 import jsonpatch from "fast-json-patch";
 
@@ -41,6 +42,7 @@ export const clientToIpLookup = new WeakMap<WebSocket, string>();
 export const ipToClientLookup: Record<string, WebSocket> = {};
 export const connections: WebSocket[] = [];
 export let previousState = store.getState();
+export let previousPriceData = symbolToPriceDataLookup;
 
 /**
  * Creates a WebSocket server that provides quick updates to connected clients.
@@ -88,12 +90,22 @@ export function setupClientHandling() {
   }
 
   continuouslyCheckForInactivity();
-  continuouslySendUpdates();
   continuouslyReportStatistics();
 }
 
 // #region helpers
+let isSendingUpdates = false;
+
 function handleConnection(client: WebSocket, incoming: IncomingMessage) {
+  if (
+    provider &&
+    !isSendingUpdates &&
+    provider.listeners("block").length === 0
+  ) {
+    isSendingUpdates = true;
+    provider.addListener("block", sendUpdates);
+  }
+
   const ip = incoming.headers.origin ?? "";
 
   if (!ipToClientLookup[ip]) {
@@ -129,6 +141,29 @@ function handleError(client: WebSocket) {
   clientStatistics.totalErrors++;
 }
 
+function sendUpdates(blockNumber: number) {
+  const currentState = store.getState();
+  const differences = jsonpatch.compare(previousState, currentState);
+
+  if (differences.length > 0 && connections.length > 0) {
+    setTimeout(() => {
+      log(
+        `[Block ${blockNumber}]: Updating clients with ${differences.length} patches.`
+      );
+
+      for (const client of connections) {
+        client.send(formatMirrorStateResponse(currentState));
+      }
+
+      clientStatistics.totalStatePatchesSent += differences.length;
+      clientStatistics.totalStateOperationsSent++;
+    }, 2000); // Give time for the actions to finish. It's fine if they're not all done.
+  }
+
+  previousState = jsonpatch.deepClone(currentState);
+  previousPriceData = cloneDeep(symbolToPriceDataLookup);
+}
+
 function continuouslyCheckForInactivity() {
   setTimeout(async () => {
     for (const connection of connections) {
@@ -140,8 +175,12 @@ function continuouslyCheckForInactivity() {
         );
 
       try {
-        await ping();
-      } catch {
+        if (connection.readyState === connection.OPEN) {
+          await ping();
+        }
+      } catch (error) {
+        console.error("e", error);
+
         log(
           "Pruning disconnected connection.",
           clientToIpLookup.get(connection)
@@ -152,28 +191,6 @@ function continuouslyCheckForInactivity() {
 
     continuouslyCheckForInactivity();
   }, WEBSOCKET_SERVER_PING_RATE);
-}
-
-function continuouslySendUpdates() {
-  setTimeout(() => {
-    const currentState = store.getState();
-    const differences = jsonpatch.compare(previousState, currentState);
-
-    if (differences.length > 0 && connections.length > 0) {
-      log(`Updating clients with ${differences.length} patches.`);
-
-      for (const client of connections) {
-        client.send(formatMirrorStateResponse(currentState));
-      }
-
-      clientStatistics.totalStatePatchesSent += differences.length;
-      clientStatistics.totalStateOperationsSent++;
-    }
-
-    previousState = jsonpatch.deepClone(currentState);
-
-    continuouslySendUpdates();
-  }, WEBSOCKET_SERVER_UPDATE_RATE);
 }
 
 function continuouslyReportStatistics() {
@@ -188,7 +205,7 @@ function continuouslyReportStatistics() {
 
 function pruneClient(client: WebSocket) {
   const droppedIp = clientToIpLookup.get(client) ?? "";
-  connections.splice(connections.indexOf(client, 1));
+  connections.splice(connections.lastIndexOf(client, 1));
   delete ipToClientLookup[droppedIp];
 }
 // #endregion

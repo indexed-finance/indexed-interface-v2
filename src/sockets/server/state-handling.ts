@@ -9,7 +9,6 @@ import {
 } from "hooks";
 import { log } from "./helpers";
 import { providers } from "ethers";
-import { setupCoinapiConnection } from "./coinapi-connection";
 import type { RegisteredCall, RegisteredCaller } from "helpers";
 
 // The same provider is used for the lifetime of the server.
@@ -38,7 +37,6 @@ export async function setupStateHandling() {
  * As soon as the store has all relevant symbols,
  * pass the symbols to the CoinAPI connection to begin receiving updates.
  */
-let relevantSymbols: string[] = [];
 const unsubscribeFromWaitingForSymbols = subscribe(() => {
   const state = getState();
   const pools = selectors.selectAllPools(state);
@@ -48,10 +46,7 @@ const unsubscribeFromWaitingForSymbols = subscribe(() => {
   if (pools.length > 0 && stakingPools.length > 0 && symbols.length > 0) {
     log("Pools and tokens have loaded.");
 
-    relevantSymbols = symbols;
-
     unsubscribeFromWaitingForSymbols();
-    setupCoinapiConnection(relevantSymbols);
     setupRegistrants();
   }
 });
@@ -64,6 +59,10 @@ function setupRegistrants() {
     (prev, next) => {
       const { id } = next;
       const tokenIds = selectors.selectPoolTokenIds(state, id);
+
+      console.log("id", id);
+      console.log("tokens", tokenIds);
+
       const pairs = buildUniswapPairs(tokenIds);
       const pairDataCalls = createPairDataCalls(pairs);
       const poolDetailCalls = createPoolDetailCalls(id, tokenIds);

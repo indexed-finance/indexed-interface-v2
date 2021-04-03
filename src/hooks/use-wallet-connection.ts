@@ -7,12 +7,7 @@ import { selectors } from "features";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useWeb3React } from "@web3-react/core";
-import coinbaseWalletIcon from "assets/images/connectors/coinbase.svg";
-import fortmaticIcon from "assets/images/connectors/fortmatic.png";
-import injectedIcon from "assets/images/connectors/injected.svg";
-import metamaskIcon from "assets/images/connectors/metamask.png";
 import noop from "lodash.noop";
-import portisIcon from "assets/images/connectors/portis.png";
 
 export type InjectedWindow = typeof window & { ethereum?: any; web3?: any };
 
@@ -138,21 +133,21 @@ export const SUPPORTED_WALLETS = {
     kind: SupportedWallet.Injected,
     connector: injected,
     name: "Injected",
-    icon: injectedIcon,
+    icon: "",
     description: "Injected web3 provider.",
   },
   [SupportedWallet.MetaMask]: {
     kind: SupportedWallet.MetaMask,
     connector: injected,
     name: "MetaMask",
-    icon: metamaskIcon,
+    icon: "",
     description: "Easy-to-use browser extension.",
   },
   [SupportedWallet.CoinbaseWallet]: {
     kind: SupportedWallet.CoinbaseWallet,
     connector: null,
     name: "Open in Coinbase Wallet",
-    icon: coinbaseWalletIcon,
+    icon: "",
     description: "Open in Coinbase Wallet app.",
     link: "https://go.cb-w.com/mtUDhEZPy1",
   },
@@ -160,17 +155,39 @@ export const SUPPORTED_WALLETS = {
     kind: SupportedWallet.Fortmatic,
     connector: fortmatic,
     name: "Fortmatic",
-    icon: fortmaticIcon,
+    icon: "",
     description: "Login using Fortmatic hosted wallet.",
   },
   [SupportedWallet.Portis]: {
     kind: SupportedWallet.Portis,
     connector: portis,
     name: "Portis",
-    icon: portisIcon,
+    icon: "",
     description: "Login using Portis hosted wallet.",
   },
 };
+
+try {
+  SUPPORTED_WALLETS[
+    SupportedWallet.Injected
+  ].icon = require("assets/images/connectors/injected.svg").default;
+  SUPPORTED_WALLETS[
+    SupportedWallet.MetaMask
+  ].icon = require("assets/images/connectors/metamask.png").default;
+  SUPPORTED_WALLETS[
+    SupportedWallet.CoinbaseWallet
+  ].icon = require("assets/images/connectors/coinbase.svg").default;
+  SUPPORTED_WALLETS[
+    SupportedWallet.Fortmatic
+  ].icon = require("assets/images/connectors/fortmatic.png").default;
+  SUPPORTED_WALLETS[
+    SupportedWallet.Portis
+  ].icon = require("assets/images/connectors/portis.png").default;
+} catch {
+  console.info(
+    "Unable to imported icons. Probably because this is the server."
+  );
+}
 
 export const MOBILE_SUPPORTED_WALLETS = [SupportedWallet.CoinbaseWallet].map(
   (kind) => SUPPORTED_WALLETS[kind]

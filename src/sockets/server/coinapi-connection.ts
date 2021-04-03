@@ -236,15 +236,11 @@ function handleUnexpectedResponse(data: { type: string }) {
  *
  */
 function continuouslyUpdateCoinData() {
-  clearTimeout(updatingCoinData);
-  updatingCoinData = setTimeout(() => {
-    log("Sending up-to-date coin data.");
-
-    store.dispatch(
-      fetchTokenStats.fulfilled(symbolToPriceDataLookup, "", { arg: [] })
-    );
-    continuouslyUpdateCoinData();
-  }, 10000);
+  // clearTimeout(updatingCoinData);
+  // updatingCoinData = setTimeout(() => {
+  //   log("Sending up-to-date coin data.");
+  //   continuouslyUpdateCoinData();
+  // }, 10000);
 }
 /**
  *

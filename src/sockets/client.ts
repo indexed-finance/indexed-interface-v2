@@ -67,6 +67,6 @@ export class SocketClient {
   }
 
   public static disconnect() {
-    socket?.close(1000);
+    // socket?.close(1000);
   }
 }

@@ -45,11 +45,7 @@ const slice = createSlice({
 
         adapter.upsertMany(state, mapped);
       })
-      .addCase(mirroredServerState, (_, action) => {
-        const { categories } = action.payload;
-
-        return categories;
-      })
+      .addCase(mirroredServerState, (_, action) => action.payload.categories)
       .addCase(restartedDueToError, () => categoriesInitialState),
 });
 

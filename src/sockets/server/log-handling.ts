@@ -3,7 +3,7 @@ import { createServer } from "https";
 import express from "express";
 import fs from "fs";
 
-export function setupLog() {
+export function setupLogHandling() {
   const app = express();
 
   app.get("/", (_, res) => {
