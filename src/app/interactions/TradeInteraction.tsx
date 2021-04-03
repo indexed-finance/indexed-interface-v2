@@ -171,13 +171,7 @@ function useTradeInteraction() {
           ? executeUniswapTrade(signer as any, userAddress, trade)
           : Promise.reject();
 
-      return sendTransaction(handler)
-        .then(() => {
-          console.info("Tracking new transaction.");
-        })
-        .catch(() => {
-          console.info("Not tracking new transaction.");
-        });
+      return sendTransaction(handler);
     },
     [signer, userAddress, sendTransaction]
   );

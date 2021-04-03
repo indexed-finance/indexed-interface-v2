@@ -117,13 +117,7 @@ export default function SwapInteraction({ pool }: Props) {
               ? fromAmount.toString()
               : toAmount.toString()
           )
-        )
-          .then(() => {
-            console.info("Tracking new transaction.");
-          })
-          .catch(() => {
-            console.info("Not tracking new transaction.");
-          });
+        );
       }
     },
     [executeSwap, sendTransaction]

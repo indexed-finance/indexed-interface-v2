@@ -1,11 +1,12 @@
-import { AppState, actions, selectors } from "features";
+import { AppState, selectors, useSigner } from "features";
 import { ApprovalStatus } from "features/user/slice";
 import { RegisteredCall, getRandomEntries } from "helpers";
 import { WETH_CONTRACT_ADDRESS } from "config";
+import { approveSpender } from "ethereum";
 import { useCallRegistrar } from "./use-call-registrar";
-import { useCallback } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
+import { useSelector } from "react-redux";
+import { useTransactionNotification } from "./notification-hooks";
 
 // #region General
 export const useToken = (tokenId: string) =>
@@ -31,7 +32,7 @@ interface TokenApprovalOptions {
 
 type TokenApprovalHook = {
   status: ApprovalStatus;
-  approve: () => void;
+  approve: () => Promise<void>;
 };
 
 export function useTokenApproval({
@@ -39,7 +40,11 @@ export function useTokenApproval({
   tokenId,
   amount,
 }: TokenApprovalOptions): TokenApprovalHook {
-  const dispatch = useDispatch();
+  const signer = useSigner();
+  const { sendTransaction } = useTransactionNotification({
+    successMessage: "TODO: Approve Succeed",
+    errorMessage: "TODO: Approve Fail",
+  });
   const status = useSelector((state: AppState) =>
     selectors.selectApprovalStatus(
       state,
@@ -48,11 +53,15 @@ export function useTokenApproval({
       amount
     )
   );
-  const approve = useCallback(() => {
-    if (spender && status === "approval needed") {
-      dispatch(actions.approveSpender(spender, tokenId, amount));
-    }
-  }, [dispatch, status, tokenId, spender, amount]);
+  const approve = useCallback(
+    () =>
+      signer && spender && status === "approval needed"
+        ? sendTransaction(
+            approveSpender(signer as any, spender, tokenId, amount)
+          )
+        : Promise.reject(),
+    [signer, status, tokenId, spender, amount, sendTransaction]
+  );
 
   return {
     status,

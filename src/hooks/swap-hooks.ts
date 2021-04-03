@@ -1,4 +1,4 @@
-import { AppState, selectors, useProvider } from "features";
+import { AppState, selectors, useSigner } from "features";
 import { BigNumber } from "ethereum/utils/balancer-math";
 import { SLIPPAGE_RATE } from "config";
 import { convert } from "helpers";
@@ -17,8 +17,7 @@ export function useSwapCallbacks(poolId: string) {
     selectors.selectPool(state, poolId)
   );
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
-  const [, signer] = useProvider();
-
+  const signer = useSigner();
   const calculateAmountIn = useCallback(
     (tokenInSymbol: string, tokenOutSymbol: string, typedAmountOut: string) => {
       if (normalizedPool) {
@@ -52,7 +51,6 @@ export function useSwapCallbacks(poolId: string) {
     },
     [tokenLookup, normalizedPool]
   );
-
   const calculateAmountOut = useCallback(
     (tokenInSymbol: string, tokenOutSymbol: string, typedAmountIn: string) => {
       if (normalizedPool) {
@@ -86,7 +84,6 @@ export function useSwapCallbacks(poolId: string) {
     },
     [tokenLookup, normalizedPool]
   );
-
   const executeSwap = useCallback(
     (
       tokenInSymbol: string,
@@ -102,35 +99,20 @@ export function useSwapCallbacks(poolId: string) {
             typedAmount
           );
 
-          if (result) {
-            if (result.error) {
-              return Promise.reject(
-                `Caught error calculating swap values: ${result.error}`
-              );
-            }
-
-            /* Do execute */
-            const maxPrice = upwardSlippage(
-              result.spotPriceAfter as BigNumber,
-              SLIPPAGE_RATE * 3
-            );
-            const minAmountOut = downwardSlippage(
-              result.amountOut as BigNumber,
-              SLIPPAGE_RATE
-            );
-
-            return swapExactAmountIn(
-              signer as any,
-              poolId,
-              result.tokenIn,
-              result.tokenOut,
-              result.amountIn,
-              minAmountOut,
-              maxPrice
-            );
-          } else {
-            return Promise.reject("Caught error calculating swap values.");
-          }
+          return result && !result.error
+            ? swapExactAmountIn(
+                signer as any,
+                poolId,
+                result.tokenIn,
+                result.tokenOut,
+                result.amountIn,
+                downwardSlippage(result.amountOut as BigNumber, SLIPPAGE_RATE),
+                upwardSlippage(
+                  result.spotPriceAfter as BigNumber,
+                  SLIPPAGE_RATE * 3
+                )
+              )
+            : Promise.reject();
         } else {
           const result = calculateAmountIn(
             tokenInSymbol,
@@ -138,35 +120,20 @@ export function useSwapCallbacks(poolId: string) {
             typedAmount
           );
 
-          if (result) {
-            if (result.error) {
-              return Promise.reject(
-                `Caught error calculating swap values: ${result.error}`
-              );
-            }
-
-            /* Do execute */
-            const maxPrice = upwardSlippage(
-              result.spotPriceAfter as BigNumber,
-              SLIPPAGE_RATE * 3
-            );
-            const maxAmountIn = upwardSlippage(
-              result.amountIn as BigNumber,
-              SLIPPAGE_RATE
-            );
-
-            return swapExactAmountOut(
-              signer as any,
-              poolId,
-              result.tokenIn,
-              result.tokenOut,
-              maxAmountIn,
-              result.amountOut,
-              maxPrice
-            );
-          } else {
-            return Promise.reject("Caught error calculating swap values.");
-          }
+          return result && !result.error
+            ? swapExactAmountOut(
+                signer as any,
+                poolId,
+                result.tokenIn,
+                result.tokenOut,
+                upwardSlippage(result.amountIn as BigNumber, SLIPPAGE_RATE),
+                result.amountOut,
+                upwardSlippage(
+                  result.spotPriceAfter as BigNumber,
+                  SLIPPAGE_RATE * 3
+                )
+              )
+            : Promise.reject();
         }
       } else {
         return Promise.reject();

@@ -11,7 +11,7 @@ export function useTransactionNotification({
   errorMessage,
 }: TransactionNotificationConfig) {
   const sendTransaction = useCallback(
-    (call: (...args: any) => Promise<any>) =>
+    (call: () => Promise<any>) =>
       call()
         .then(() => {
           notification.success({

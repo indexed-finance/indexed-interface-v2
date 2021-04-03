@@ -1,10 +1,18 @@
-import { AppState, selectors, thunks } from "features";
+import { AppState, selectors, useSigner } from "features";
 import { COMMON_BASE_TOKENS, SLIPPAGE_RATE } from "config";
+import {
+  burnAndSwapForExactTokens,
+  burnExactAndSwapForTokens,
+  downwardSlippage,
+  ethereumHelpers,
+  exitswapExternAmountOut,
+  exitswapPoolAmountIn,
+  upwardSlippage,
+} from "ethereum";
 import { convert } from "helpers";
-import { downwardSlippage, ethereumHelpers, upwardSlippage } from "ethereum";
 import { useCallback, useMemo } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import { usePoolTokenAddresses, usePoolUnderlyingTokens } from "./pool-hooks";
+import { useSelector } from "react-redux";
 import { useTokenLookupBySymbol } from "./token-hooks";
 import { useUniswapTradingPairs } from "./pair-hooks";
 import type { BigNumber } from "ethereum";
@@ -12,12 +20,11 @@ import type { Trade } from "@uniswap/sdk";
 
 // #region Token
 export function useSingleTokenBurnCallbacks(poolId: string) {
-  const dispatch = useDispatch();
   const pool = useSelector((state: AppState) =>
     selectors.selectPool(state, poolId)
   );
+  const signer = useSigner();
   const tokenLookup = useTokenLookupBySymbol();
-
   const calculateAmountIn = useCallback(
     (tokenOutSymbol: string, typedAmountOut: string) => {
       if (pool) {
@@ -44,7 +51,6 @@ export function useSingleTokenBurnCallbacks(poolId: string) {
     },
     [pool, tokenLookup]
   );
-
   const calculateAmountOut = useCallback(
     (tokenOutSymbol: string, typedAmountIn: string) => {
       if (pool) {
@@ -71,50 +77,46 @@ export function useSingleTokenBurnCallbacks(poolId: string) {
     },
     [pool, tokenLookup]
   );
-
   const executeBurn = useCallback(
     (
       tokenOutSymbol: string,
       specifiedField: "from" | "to",
       typedAmount: string
     ) => {
-      if (specifiedField === "from") {
-        const result = calculateAmountOut(tokenOutSymbol, typedAmount);
-        if (!result) throw Error(`Caught error calculating burn output.`);
-        if (result.error)
-          throw Error(`Caught error calculating burn output: ${result.error}`);
-        const minTokenAmountOut = downwardSlippage(
-          result.tokenAmountOut as BigNumber,
-          SLIPPAGE_RATE
-        );
-        dispatch(
-          thunks.exitswapPoolAmountIn(
-            poolId,
-            result.tokenOut,
-            result.amountIn,
-            minTokenAmountOut
-          )
-        );
+      if (signer) {
+        if (specifiedField === "from") {
+          const result = calculateAmountOut(tokenOutSymbol, typedAmount);
+
+          return result && !result.error
+            ? exitswapPoolAmountIn(
+                signer as any,
+                poolId,
+                result.tokenOut,
+                result.amountIn,
+                downwardSlippage(
+                  result.tokenAmountOut as BigNumber,
+                  SLIPPAGE_RATE
+                )
+              )
+            : Promise.reject();
+        } else {
+          const result = calculateAmountIn(tokenOutSymbol, typedAmount);
+
+          return result && !result.error
+            ? exitswapExternAmountOut(
+                signer as any,
+                poolId,
+                result.tokenOut,
+                result.amountOut,
+                upwardSlippage(result.poolAmountIn as BigNumber, SLIPPAGE_RATE)
+              )
+            : Promise.reject();
+        }
       } else {
-        const result = calculateAmountIn(tokenOutSymbol, typedAmount);
-        if (!result) throw Error(`Caught error calculating burn input.`);
-        if (result.error)
-          throw Error(`Caught error calculating burn input: ${result.error}`);
-        const maxAmountIn = upwardSlippage(
-          result.poolAmountIn as BigNumber,
-          SLIPPAGE_RATE
-        );
-        dispatch(
-          thunks.exitswapExternAmountOut(
-            poolId,
-            result.tokenOut,
-            result.amountOut,
-            maxAmountIn
-          )
-        );
+        return Promise.reject();
       }
     },
-    [dispatch, calculateAmountIn, calculateAmountOut, poolId]
+    [calculateAmountIn, calculateAmountOut, poolId, signer]
   );
 
   return {
@@ -127,7 +129,7 @@ export function useSingleTokenBurnCallbacks(poolId: string) {
 
 // #region Routing
 export function useBurnRouterCallbacks(poolId: string) {
-  const dispatch = useDispatch();
+  const signer = useSigner();
   const poolTokens = usePoolUnderlyingTokens(poolId);
   const poolTokenIds = usePoolTokenAddresses(poolId);
   const tokenLookupBySymbol = useTokenLookupBySymbol();
@@ -135,7 +137,6 @@ export function useBurnRouterCallbacks(poolId: string) {
     () => [...poolTokenIds, ...COMMON_BASE_TOKENS.map(({ id }) => id)],
     [poolTokenIds]
   );
-
   const { calculateAmountIn, calculateAmountOut } = useSingleTokenBurnCallbacks(
     poolId
   );
@@ -143,7 +144,6 @@ export function useBurnRouterCallbacks(poolId: string) {
     calculateBestTradeForExactInput,
     calculateBestTradeForExactOutput,
   } = useUniswapTradingPairs(tokenIds);
-
   const getBestBurnRouteForAmountOut = useCallback(
     (tokenOutSymbol: string, typedTokenAmountOut: string) => {
       const normalizedOutput =
@@ -206,7 +206,6 @@ export function useBurnRouterCallbacks(poolId: string) {
       calculateBestTradeForExactOutput,
     ]
   );
-
   const getBestBurnRouteForAmountIn = useCallback(
     (tokenOutSymbol: string, typedPoolAmountIn: string) => {
       const normalizedOutput =
@@ -267,62 +266,56 @@ export function useBurnRouterCallbacks(poolId: string) {
       calculateBestTradeForExactInput,
     ]
   );
-
   const executeRoutedBurn = useCallback(
     (
       tokenOutSymbol: string,
       specifiedField: "from" | "to",
       typedAmount: string
     ) => {
-      if (specifiedField === "from") {
-        const result = getBestBurnRouteForAmountIn(tokenOutSymbol, typedAmount);
-        if (!result)
-          throw Error("Caught error calculating routed burn output.");
-        if (result.poolResult.error)
-          throw Error(
-            `Caught error calculating routed burn output: ${result.poolResult.error}`
+      if (signer) {
+        if (specifiedField === "from") {
+          const result = getBestBurnRouteForAmountIn(
+            tokenOutSymbol,
+            typedAmount
           );
-        dispatch(
-          thunks.burnExactAndSwapForTokens(
-            poolId,
-            result.poolResult.amountIn,
-            result.uniswapResult.route.path.map((p) => p.address),
-            downwardSlippage(
-              convert.toBigNumber(
-                result.uniswapResult.outputAmount.raw.toString(10)
-              ),
-              SLIPPAGE_RATE
-            )
-          )
-        );
+
+          return result && !result.poolResult.error
+            ? burnExactAndSwapForTokens(
+                signer as any,
+                poolId,
+                result.poolResult.amountIn,
+                result.uniswapResult.route.path.map((p) => p.address),
+                downwardSlippage(
+                  convert.toBigNumber(
+                    result.uniswapResult.outputAmount.raw.toString(10)
+                  ),
+                  SLIPPAGE_RATE
+                )
+              )
+            : Promise.reject();
+        } else {
+          const result = getBestBurnRouteForAmountOut(
+            tokenOutSymbol,
+            typedAmount
+          );
+
+          return result && !result.poolResult.error
+            ? burnAndSwapForExactTokens(
+                signer as any,
+                poolId,
+                upwardSlippage(result.poolResult.poolAmountIn, SLIPPAGE_RATE),
+                result.uniswapResult.route.path.map((p) => p.address),
+                convert.toBigNumber(
+                  result.uniswapResult.outputAmount.raw.toString(10)
+                )
+              )
+            : Promise.reject();
+        }
       } else {
-        const result = getBestBurnRouteForAmountOut(
-          tokenOutSymbol,
-          typedAmount
-        );
-        if (!result) throw Error("Caught error calculating routed burn input.");
-        if (result.poolResult.error)
-          throw Error(
-            `Caught error calculating routed burn input: ${result.poolResult.error}`
-          );
-        dispatch(
-          thunks.burnAndSwapForExactTokens(
-            poolId,
-            upwardSlippage(result.poolResult.poolAmountIn, SLIPPAGE_RATE),
-            result.uniswapResult.route.path.map((p) => p.address),
-            convert.toBigNumber(
-              result.uniswapResult.outputAmount.raw.toString(10)
-            )
-          )
-        );
+        return Promise.reject();
       }
     },
-    [
-      dispatch,
-      getBestBurnRouteForAmountIn,
-      getBestBurnRouteForAmountOut,
-      poolId,
-    ]
+    [getBestBurnRouteForAmountIn, getBestBurnRouteForAmountOut, poolId, signer]
   );
 
   return {

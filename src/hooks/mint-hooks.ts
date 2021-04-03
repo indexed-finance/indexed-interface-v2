@@ -1,18 +1,26 @@
-import { AppState, selectors, thunks } from "features";
-import { BigNumber, calcAllInGivenPoolOut } from "ethereum/utils/balancer-math";
+import { AppState, selectors, useSigner } from "features";
+import {
+  BigNumber,
+  calcAllInGivenPoolOut,
+  joinPool,
+  joinswapExternAmountIn,
+  joinswapPoolAmountOut,
+  swapExactTokensForTokensAndMint,
+  swapTokensForTokensAndMintExact,
+} from "ethereum";
 import { COMMON_BASE_TOKENS, SLIPPAGE_RATE } from "config";
 import { convert } from "helpers";
 import { downwardSlippage, ethereumHelpers, upwardSlippage } from "ethereum";
 import { useCallback, useMemo } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import { usePoolTokenAddresses, usePoolUnderlyingTokens } from "./pool-hooks";
+import { useSelector } from "react-redux";
 import { useTokenLookupBySymbol } from "./token-hooks";
 import { useUniswapTradingPairs } from "./pair-hooks";
 import type { Trade } from "@uniswap/sdk";
 
 // #region Token
 export function useSingleTokenMintCallbacks(poolId: string) {
-  const dispatch = useDispatch();
+  const signer = useSigner();
   const pool = useSelector((state: AppState) =>
     selectors.selectPool(state, poolId)
   );
@@ -75,48 +83,40 @@ export function useSingleTokenMintCallbacks(poolId: string) {
       specifiedField: "from" | "to",
       typedAmount: string
     ) => {
-      if (specifiedField === "from") {
-        const result = calculateAmountOut(tokenInSymbol, typedAmount);
+      if (signer) {
+        if (specifiedField === "from") {
+          const result = calculateAmountOut(tokenInSymbol, typedAmount);
 
-        if (!result) throw Error(`Caught error calculating mint output.`);
-        if (result.error)
-          throw Error(`Caught error calculating mint output: ${result.error}`);
+          return result && !result.error
+            ? joinswapExternAmountIn(
+                signer as any,
+                poolId,
+                result.tokenIn,
+                result.amountIn,
+                downwardSlippage(
+                  result.poolAmountOut as BigNumber,
+                  SLIPPAGE_RATE
+                )
+              )
+            : Promise.reject();
+        } else {
+          const result = calculateAmountIn(tokenInSymbol, typedAmount);
 
-        const minPoolAmountOut = downwardSlippage(
-          result.poolAmountOut as BigNumber,
-          SLIPPAGE_RATE
-        );
-        dispatch(
-          thunks.joinswapExternAmountIn(
-            poolId,
-            result.tokenIn,
-            result.amountIn,
-            minPoolAmountOut
-          )
-        );
+          return result && !result.error
+            ? joinswapPoolAmountOut(
+                signer as any,
+                poolId,
+                result.tokenIn,
+                result.amountOut,
+                upwardSlippage(result.tokenAmountIn as BigNumber, SLIPPAGE_RATE)
+              )
+            : Promise.reject();
+        }
       } else {
-        const result = calculateAmountIn(tokenInSymbol, typedAmount);
-
-        if (!result) throw Error(`Caught error calculating mint input.`);
-        if (result.error)
-          throw Error(`Caught error calculating mint input: ${result.error}`);
-
-        const maxAmountIn = upwardSlippage(
-          result.tokenAmountIn as BigNumber,
-          SLIPPAGE_RATE
-        );
-
-        dispatch(
-          thunks.joinswapPoolAmountOut(
-            poolId,
-            result.tokenIn,
-            result.amountOut,
-            maxAmountIn
-          )
-        );
+        return Promise.reject();
       }
     },
-    [dispatch, calculateAmountIn, calculateAmountOut, poolId]
+    [signer, calculateAmountIn, calculateAmountOut, poolId]
   );
 
   return {
@@ -127,11 +127,10 @@ export function useSingleTokenMintCallbacks(poolId: string) {
 }
 
 export function useMultiTokenMintCallbacks(poolId: string) {
-  const dispatch = useDispatch();
+  const signer = useSigner();
   const pool = useSelector((state: AppState) =>
     selectors.selectPool(state, poolId)
   );
-
   const calculateAmountsIn = useCallback(
     (typedAmountOut: string) => {
       if (pool) {
@@ -154,18 +153,22 @@ export function useMultiTokenMintCallbacks(poolId: string) {
     },
     [pool]
   );
-
   const executeMint = useCallback(
     (typedAmountOut: string) => {
       const result = calculateAmountsIn(typedAmountOut);
-      if (!result) throw Error(`Caught error calculating mint inputs.`);
-      const { amountsIn, poolAmountOut } = result;
-      const maxAmountsIn = amountsIn.map((amount) =>
-        upwardSlippage(amount, SLIPPAGE_RATE)
-      );
-      dispatch(thunks.joinPool(poolId, poolAmountOut, maxAmountsIn));
+
+      return signer && result
+        ? joinPool(
+            signer as any,
+            poolId,
+            result.poolAmountOut,
+            result.amountsIn.map((amount) =>
+              upwardSlippage(amount, SLIPPAGE_RATE)
+            )
+          )
+        : Promise.reject();
     },
-    [dispatch, poolId, calculateAmountsIn]
+    [signer, poolId, calculateAmountsIn]
   );
 
   return { calculateAmountsIn, executeMint };
@@ -174,16 +177,14 @@ export function useMultiTokenMintCallbacks(poolId: string) {
 
 // #region Routing
 export function useMintRouterCallbacks(poolId: string) {
-  const dispatch = useDispatch();
+  const signer = useSigner();
   const poolTokens = usePoolUnderlyingTokens(poolId);
   const poolTokenIds = usePoolTokenAddresses(poolId);
-
   const tokenLookupBySymbol = useTokenLookupBySymbol();
   const tokenIds = useMemo(
     () => [...poolTokenIds, ...COMMON_BASE_TOKENS.map(({ id }) => id)],
     [poolTokenIds]
   );
-
   const { calculateAmountIn, calculateAmountOut } = useSingleTokenMintCallbacks(
     poolId
   );
@@ -191,7 +192,6 @@ export function useMintRouterCallbacks(poolId: string) {
     calculateBestTradeForExactInput,
     calculateBestTradeForExactOutput,
   } = useUniswapTradingPairs(tokenIds);
-
   const getBestMintRouteForAmountOut = useCallback(
     (tokenInSymbol: string, typedPoolAmountOut: string) => {
       const normalizedInput = tokenLookupBySymbol[tokenInSymbol.toLowerCase()];
@@ -249,7 +249,6 @@ export function useMintRouterCallbacks(poolId: string) {
       calculateBestTradeForExactOutput,
     ]
   );
-
   const getBestMintRouteForAmountIn = useCallback(
     (tokenInSymbol: string, typedTokenAmountIn: string) => {
       const normalizedInput = tokenLookupBySymbol[tokenInSymbol.toLowerCase()];
@@ -310,59 +309,56 @@ export function useMintRouterCallbacks(poolId: string) {
       calculateBestTradeForExactInput,
     ]
   );
-
   const executeRoutedMint = useCallback(
     (
       tokenInSymbol: string,
       specifiedField: "from" | "to",
       typedAmount: string
     ) => {
-      if (specifiedField === "from") {
-        const result = getBestMintRouteForAmountIn(tokenInSymbol, typedAmount);
-        if (!result)
-          throw Error("Caught error calculating routed mint output.");
-        if (result.poolResult.error)
-          throw Error(
-            `Caught error calculating routed mint output: ${result.poolResult.error}`
+      if (signer) {
+        if (specifiedField === "from") {
+          const result = getBestMintRouteForAmountIn(
+            tokenInSymbol,
+            typedAmount
           );
-        dispatch(
-          thunks.swapExactTokensForTokensAndMint(
-            poolId,
-            convert.toBigNumber(
-              result.uniswapResult.inputAmount.raw.toString(10)
-            ),
-            result.uniswapResult.route.path.map((p) => p.address),
-            downwardSlippage(result.poolResult.poolAmountOut, SLIPPAGE_RATE)
-          )
-        );
+
+          return result && !result.poolResult.error
+            ? swapExactTokensForTokensAndMint(
+                signer as any,
+                poolId,
+                convert.toBigNumber(
+                  result.uniswapResult.inputAmount.raw.toString(10)
+                ),
+                result.uniswapResult.route.path.map((p) => p.address),
+                downwardSlippage(result.poolResult.poolAmountOut, SLIPPAGE_RATE)
+              )
+            : Promise.reject();
+        } else {
+          const result = getBestMintRouteForAmountOut(
+            tokenInSymbol,
+            typedAmount
+          );
+
+          return result && !result.poolResult.error
+            ? swapTokensForTokensAndMintExact(
+                signer as any,
+                poolId,
+                upwardSlippage(
+                  convert.toBigNumber(
+                    result.uniswapResult.inputAmount.raw.toString(10)
+                  ),
+                  SLIPPAGE_RATE
+                ),
+                result.uniswapResult.route.path.map((p) => p.address),
+                result.poolResult.amountOut
+              )
+            : Promise.reject();
+        }
       } else {
-        const result = getBestMintRouteForAmountOut(tokenInSymbol, typedAmount);
-        if (!result) throw Error("Caught error calculating routed mint input.");
-        if (result.poolResult.error)
-          throw Error(
-            `Caught error calculating routed mint input: ${result.poolResult.error}`
-          );
-        dispatch(
-          thunks.swapTokensForTokensAndMintExact(
-            poolId,
-            upwardSlippage(
-              convert.toBigNumber(
-                result.uniswapResult.inputAmount.raw.toString(10)
-              ),
-              SLIPPAGE_RATE
-            ),
-            result.uniswapResult.route.path.map((p) => p.address),
-            result.poolResult.amountOut
-          )
-        );
+        return Promise.reject();
       }
     },
-    [
-      dispatch,
-      getBestMintRouteForAmountOut,
-      getBestMintRouteForAmountIn,
-      poolId,
-    ]
+    [signer, getBestMintRouteForAmountOut, getBestMintRouteForAmountIn, poolId]
   );
 
   return {

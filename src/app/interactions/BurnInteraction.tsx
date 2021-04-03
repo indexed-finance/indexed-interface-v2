@@ -9,6 +9,7 @@ import {
   useBurnRouterCallbacks,
   usePoolToTokens,
   useSingleTokenBurnCallbacks,
+  useTransactionNotification,
   useTranslator,
   useUserDataRegistrar,
 } from "hooks";
@@ -55,6 +56,10 @@ function SingleTokenBurnInteraction({ pool }: Props) {
     calculateAmountOut,
     executeBurn,
   } = useSingleTokenBurnCallbacks(poolId);
+  const { sendTransaction } = useTransactionNotification({
+    successMessage: "TODO: Burn Succeed",
+    errorMessage: "TODO: Burn Fail",
+  });
 
   useUserDataRegistrar(poolsToTokens);
 
@@ -119,7 +124,6 @@ function SingleTokenBurnInteraction({ pool }: Props) {
     },
     [calculateAmountIn, calculateAmountOut, tokenLookup]
   );
-
   const handleSubmit = useCallback(
     (values: InteractionValues) => {
       const {
@@ -130,16 +134,18 @@ function SingleTokenBurnInteraction({ pool }: Props) {
         lastTouchedField,
       } = values;
       if (fromAmount > 0 && toAmount > 0 && fromToken && toToken) {
-        executeBurn(
-          toToken,
-          lastTouchedField,
-          lastTouchedField === "from"
-            ? fromAmount.toString()
-            : toAmount.toString()
+        sendTransaction(() =>
+          executeBurn(
+            toToken,
+            lastTouchedField,
+            lastTouchedField === "from"
+              ? fromAmount.toString()
+              : toAmount.toString()
+          )
         );
       }
     },
-    [executeBurn]
+    [executeBurn, sendTransaction]
   );
 
   return (

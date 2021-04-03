@@ -1,23 +1,5 @@
 import * as topLevelActions from "./actions";
-import { BigNumber } from "bignumber.js";
-import { RegisteredCall, convert } from "helpers";
-import { SLIPPAGE_RATE } from "config";
-import {
-  approveSpender,
-  burnAndSwapForExactTokens,
-  burnExactAndSwapForTokens,
-  downwardSlippage,
-  exitswapExternAmountOut,
-  exitswapPoolAmountIn,
-  joinPool,
-  joinswapExternAmountIn,
-  joinswapPoolAmountOut,
-  swapExactAmountIn,
-  swapExactAmountOut,
-  swapExactTokensForTokensAndMint,
-  swapTokensForTokensAndMintExact,
-  upwardSlippage,
-} from "ethereum";
+import { RegisteredCall } from "helpers";
 import { batcherActions } from "./batcher";
 import { categoriesActions } from "./categories";
 import {
@@ -162,238 +144,33 @@ export const thunks = {
     const state = getState();
     const { status } = selectors.selectBatcherStatus(state);
 
-    if (status === "idle") {
+    if (provider && status === "idle") {
       const batch = selectors.selectBatch(state);
 
-      if (provider) {
-        dispatch(
-          fetchMulticallData({
-            provider,
-            arg: batch,
-          })
-        );
+      dispatch(
+        fetchMulticallData({
+          provider,
+          arg: batch,
+        })
+      );
 
-        for (const call of batch.offChainCalls) {
-          const [fn, args] = call.split("/");
-          const request = {
-            fetchInitialData,
-            fetchMulticallData,
-            fetchPoolTradesSwaps,
-            fetchTokenStats,
-          }[fn] as any;
+      for (const call of batch.offChainCalls) {
+        const [fn, args] = call.split("/");
+        const request = {
+          fetchInitialData,
+          fetchMulticallData,
+          fetchPoolTradesSwaps,
+          fetchTokenStats,
+        }[fn] as any;
 
-          if (request) {
-            dispatch(
-              request({
-                provider,
-                arg: [...args.split("_")],
-              })
-            );
-          }
+        if (request) {
+          dispatch(
+            request({
+              provider,
+              arg: [...args.split("_")],
+            })
+          );
         }
-      }
-    }
-  },
-
-  // Interactions
-
-  /**
-   * @param spenderAddress - Address of the spender to approve
-   * @param tokenAddress - ERC20 token address
-   * @param exactAmount - Exact amount of tokens to allow spender to transfer
-   */
-  approveSpender: (
-    spenderAddress: string,
-    tokenAddress: string,
-    exactAmount: string
-  ): AppThunk => async () => {
-    if (signer && tokenAddress) {
-      try {
-        await approveSpender(signer, spenderAddress, tokenAddress, exactAmount);
-      } catch (err) {
-        // Handle failed approval.
-        console.error(err);
-      }
-    }
-  },
-  joinswapExternAmountIn: (
-    indexPool: string,
-    tokenIn: string,
-    amountIn: BigNumber,
-    minPoolAmountOut: BigNumber
-  ): AppThunk => async () => {
-    if (signer) {
-      await joinswapExternAmountIn(
-        signer,
-        indexPool,
-        tokenIn,
-        amountIn,
-        minPoolAmountOut
-      );
-    }
-  },
-  joinswapPoolAmountOut: (
-    indexPool: string,
-    tokenIn: string,
-    poolAmountOut: BigNumber,
-    maxAmountIn: BigNumber
-  ): AppThunk => () => {
-    if (signer) {
-      joinswapPoolAmountOut(
-        signer,
-        indexPool,
-        tokenIn,
-        poolAmountOut,
-        maxAmountIn
-      );
-    }
-  },
-  joinPool: (
-    indexPool: string,
-    poolAmountOut: BigNumber,
-    maxAmountsIn: BigNumber[]
-  ): AppThunk => async () => {
-    if (signer) {
-      await joinPool(signer, indexPool, poolAmountOut, maxAmountsIn);
-    }
-  },
-  exitswapPoolAmountIn: (
-    indexPool: string,
-    tokenOut: string,
-    poolAmountIn: BigNumber,
-    minAmountOut: BigNumber
-  ): AppThunk => async () => {
-    if (signer) {
-      await exitswapPoolAmountIn(
-        signer,
-        indexPool,
-        tokenOut,
-        poolAmountIn,
-        minAmountOut
-      );
-    }
-  },
-  exitswapExternAmountOut: (
-    indexPool: string,
-    tokenOut: string,
-    tokenAmountOut: BigNumber,
-    maxPoolAmountIn: BigNumber
-  ): AppThunk => async () => {
-    if (signer) {
-      await exitswapExternAmountOut(
-        signer,
-        indexPool,
-        tokenOut,
-        tokenAmountOut,
-        maxPoolAmountIn
-      );
-    }
-  },
-  swapTokensForTokensAndMintExact: (
-    indexPool: string,
-    maxAmountIn: BigNumber,
-    path: string[],
-    poolAmountOut: BigNumber
-  ): AppThunk => async () => {
-    if (signer) {
-      await swapTokensForTokensAndMintExact(
-        signer,
-        indexPool,
-        maxAmountIn,
-        path,
-        poolAmountOut
-      );
-    }
-  },
-  swapExactTokensForTokensAndMint: (
-    indexPool: string,
-    amountIn: BigNumber,
-    path: string[],
-    minPoolAmountOut: BigNumber
-  ): AppThunk => async () => {
-    if (signer) {
-      await swapExactTokensForTokensAndMint(
-        signer,
-        indexPool,
-        amountIn,
-        path,
-        minPoolAmountOut
-      );
-    }
-  },
-  burnExactAndSwapForTokens: (
-    indexPool: string,
-    poolAmountIn: BigNumber,
-    path: string[],
-    minAmountOut: BigNumber
-  ): AppThunk => async () => {
-    if (signer) {
-      await burnExactAndSwapForTokens(
-        signer,
-        indexPool,
-        poolAmountIn,
-        path,
-        minAmountOut
-      );
-    }
-  },
-  burnAndSwapForExactTokens: (
-    indexPool: string,
-    poolAmountInMax: BigNumber,
-    path: string[],
-    tokenAmountOut: BigNumber
-  ): AppThunk => async () => {
-    if (signer) {
-      await burnAndSwapForExactTokens(
-        signer,
-        indexPool,
-        poolAmountInMax,
-        path,
-        tokenAmountOut
-      );
-    }
-  },
-  /**
-   *
-   */
-  swap: (
-    poolAddress: string,
-    specifiedSide: "input" | "output",
-    inputAmount: string,
-    inputTokenSymbol: string,
-    outputAmount: string,
-    outputTokenSymbol: string,
-    maximumPrice: BigNumber
-  ): AppThunk => async (_, getState) => {
-    if (signer) {
-      const state = getState();
-      const tokensBySymbol = selectors.selectTokenLookupBySymbol(state);
-
-      let [input, output] = [inputAmount, outputAmount].map(convert.toToken);
-
-      if (specifiedSide === "input") {
-        output = downwardSlippage(output, SLIPPAGE_RATE);
-      } else {
-        input = upwardSlippage(input, SLIPPAGE_RATE);
-      }
-      const { id: inputAddress } = tokensBySymbol[inputTokenSymbol];
-      const { id: outputAddress } = tokensBySymbol[outputTokenSymbol];
-
-      if (inputAddress && outputAddress) {
-        const swapper =
-          specifiedSide === "input" ? swapExactAmountIn : swapExactAmountOut;
-
-        await swapper(
-          signer,
-          poolAddress,
-          inputAddress,
-          outputAddress,
-          input,
-          output,
-          maximumPrice
-        );
-      } else {
-        // --
       }
     }
   },
