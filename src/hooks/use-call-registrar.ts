@@ -46,7 +46,7 @@ export function useCallRegistrar(calls: DataReceiverConfig) {
   // As the batch is being selected, it will ignore any calls for which it already has data.
   useEffect(() => {
     if (!isConnected && blockNumber !== -1) {
-      dispatch(actions.triggerBatchDump());
+      dispatch(actions.sendBatch());
     }
   }, [dispatch, isConnected, blockNumber]);
 }

@@ -5,12 +5,18 @@ import {
   serializeOffChainCall,
   serializeOnChainCall,
 } from "helpers";
-import { cacheActions } from "../cache";
-import { fetchMulticallData } from "../requests";
+import {
+  fetchMulticallData,
+  fetchPoolTradesSwaps,
+  fetchStakingData,
+  fetchTokenStats,
+} from "../requests";
 import { restartedDueToError } from "../actions";
 import { settingsActions } from "../settings";
 import { userActions } from "../user";
 import type { AppState } from "../store";
+
+const MAX_AGE_IN_BLOCKS = 4; // How old can data be in the cache?
 
 interface BatcherState {
   blockNumber: number;
@@ -24,6 +30,13 @@ interface BatcherState {
     }
   >;
   listenerCounts: Record<string, number>;
+  cache: Record<
+    string,
+    {
+      result: string[];
+      fromBlockNumber: number;
+    }
+  >;
   status: "idle" | "loading" | "deferring to server";
 }
 
@@ -32,6 +45,7 @@ const batcherInitialState: BatcherState = {
   onChainCalls: [],
   offChainCalls: [],
   callers: {},
+  cache: {},
   listenerCounts: {},
   status: "idle",
 } as BatcherState;
@@ -40,6 +54,13 @@ const slice = createSlice({
   name: "batcher",
   initialState: batcherInitialState,
   reducers: {
+    blockNumberChanged(state, action: PayloadAction<number>) {
+      const blockNumber = action.payload;
+
+      if (blockNumber > 0) {
+        state.blockNumber = blockNumber;
+      }
+    },
     registrantRegistered(
       state,
       action: PayloadAction<{
@@ -112,10 +133,6 @@ const slice = createSlice({
       .addCase(settingsActions.connectionEstablished, (state) => {
         state.status = "deferring to server";
       })
-      .addCase(restartedDueToError, () => batcherInitialState)
-      .addCase(cacheActions.blockNumberChanged, (state, action) => {
-        state.blockNumber = action.payload;
-      })
       .addCase(fetchMulticallData.fulfilled, (state) => {
         const oldCalls: Record<string, true> = {};
 
@@ -136,6 +153,45 @@ const slice = createSlice({
 
         state.status = "idle";
       })
+      .addCase(restartedDueToError, () => batcherInitialState)
+      // Caching data from on- and off-chain calls.
+      .addMatcher(
+        (action) =>
+          [
+            fetchMulticallData.fulfilled.type,
+            fetchTokenStats.fulfilled.type,
+            fetchPoolTradesSwaps.fulfilled.type,
+            fetchStakingData.fulfilled.type,
+          ].includes(action.type),
+        (state, action) => {
+          const callLookup = {
+            [fetchTokenStats.fulfilled.type]: "fetchTokenStats",
+            [fetchPoolTradesSwaps.fulfilled.type]: "fetchPoolTradesSwaps",
+            [fetchStakingData.fulfilled.type]: "fetchStakingData",
+            [fetchMulticallData.fulfilled.type]: "fetchMulticallData",
+          };
+          const call = callLookup[action.type];
+
+          if (action.type === fetchMulticallData.fulfilled.type) {
+            const { callsToResults } = action.payload as {
+              callsToResults: Record<string, string[]>;
+            };
+
+            for (const [call, result] of Object.entries(callsToResults)) {
+              state.cache[call] = {
+                result,
+                fromBlockNumber: state.blockNumber,
+              };
+            }
+          } else {
+            state.cache[call] = {
+              result: action.payload as any,
+              fromBlockNumber: state.blockNumber,
+            };
+          }
+        }
+      )
+      // Losing connection.
       .addMatcher(
         (action) =>
           [
@@ -152,6 +208,7 @@ const slice = createSlice({
           }
         }
       )
+      // Resetting when connecting to server or disconnecting wallet.
       .addMatcher(
         (action) =>
           [
@@ -169,18 +226,21 @@ const slice = createSlice({
 export const { actions: batcherActions, reducer: batcherReducer } = slice;
 
 export const batcherSelectors = {
-  selectBatch(
-    state: AppState,
-    cachedCalls: Record<string, boolean>
-  ): SelectedBatch {
+  selectBlockNumber(state: AppState) {
+    return state.batcher.blockNumber;
+  },
+  selectBatch(state: AppState): SelectedBatch {
     return {
       callers: state.batcher.callers,
-      onChainCalls: batcherSelectors.selectOnChainBatch(state, cachedCalls),
-      offChainCalls: batcherSelectors.selectOffChainBatch(state, cachedCalls),
+      onChainCalls: batcherSelectors.selectOnChainBatch(state),
+      offChainCalls: batcherSelectors.selectOffChainBatch(state),
     };
   },
-  selectOnChainBatch(state: AppState, cachedCalls: CachedCalls) {
+  selectOnChainBatch(state: AppState) {
     const { onChainCalls } = state.batcher;
+    const cachedCalls = batcherSelectors.selectCachedCallsFromCurrentBlock(
+      state
+    );
 
     return onChainCalls
       .filter((call) => !cachedCalls[call])
@@ -217,8 +277,11 @@ export const batcherSelectors = {
         }
       );
   },
-  selectOffChainBatch(state: AppState, cachedCalls: CachedCalls) {
+  selectOffChainBatch(state: AppState) {
     const { offChainCalls } = state.batcher;
+    const cachedCalls = batcherSelectors.selectCachedCallsFromCurrentBlock(
+      state
+    );
     const { toMerge, toKeep } = offChainCalls
       .filter((call) => !cachedCalls[call])
       .reduce(
@@ -260,9 +323,28 @@ export const batcherSelectors = {
       offChainCalls: offChainCalls.length,
     };
   },
-};
+  selectCacheSize(state: AppState) {
+    return Object.keys(state.batcher.cache).length;
+  },
+  selectCacheEntry(state: AppState, callId: string) {
+    const { blockNumber, cache } = state.batcher;
+    const entry = cache[callId];
 
-type CachedCalls = Record<string, boolean>;
+    return entry && blockNumber - entry.fromBlockNumber <= MAX_AGE_IN_BLOCKS
+      ? entry
+      : null;
+  },
+  selectCachedCallsFromCurrentBlock(state: AppState) {
+    const blockNumber = batcherSelectors.selectBlockNumber(state);
+    const calls = Object.keys(state.batcher.cache);
+
+    return calls.reduce((prev, next) => {
+      const entry = batcherSelectors.selectCacheEntry(state, next);
+      prev[next] = Boolean(entry && entry.fromBlockNumber === blockNumber);
+      return prev;
+    }, {} as Record<string, boolean>);
+  },
+};
 
 export type SelectedBatch = {
   callers: Record<string, { onChainCalls: string[]; offChainCalls: string[] }>;

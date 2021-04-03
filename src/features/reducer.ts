@@ -1,5 +1,4 @@
 import { batcherReducer } from "./batcher";
-import { cacheReducer } from "./cache";
 import { categoriesReducer } from "./categories";
 import { combineReducers } from "@reduxjs/toolkit";
 import { dailySnapshotsReducer } from "./dailySnapshots";
@@ -12,7 +11,6 @@ import { userReducer } from "./user";
 
 export const rootReducer = combineReducers({
   batcher: batcherReducer,
-  cache: cacheReducer,
   categories: categoriesReducer,
   dailySnapshots: dailySnapshotsReducer,
   indexPools: indexPoolsReducer,

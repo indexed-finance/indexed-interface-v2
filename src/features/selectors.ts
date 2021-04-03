@@ -2,7 +2,6 @@ import { NDX_ADDRESS, WETH_CONTRACT_ADDRESS } from "config";
 import { NormalizedPool, NormalizedToken } from "ethereum";
 import { Pair } from "uniswap-types";
 import { batcherSelectors } from "./batcher";
-import { cacheSelectors } from "./cache";
 import { categoriesSelectors } from "./categories";
 import { computeUniswapPairAddress, convert } from "helpers";
 import { createSelector } from "reselect";
@@ -24,7 +23,6 @@ type ModelKeys = "categories" | "indexPools";
 
 export const selectors = {
   ...batcherSelectors,
-  ...cacheSelectors,
   ...categoriesSelectors,
   ...dailySnapshotsSelectors,
   ...indexPoolsSelectors,

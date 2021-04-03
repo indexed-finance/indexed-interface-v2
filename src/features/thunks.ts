@@ -21,7 +21,6 @@ import {
   upwardSlippage,
 } from "ethereum";
 import { batcherActions } from "./batcher";
-import { cacheActions } from "./cache";
 import { categoriesActions } from "./categories";
 import {
   fetchInitialData,
@@ -91,7 +90,6 @@ export const thunks = {
 
     if (provider.blockNumber !== -1) {
       dispatch(actions.blockNumberChanged(provider.blockNumber));
-      dispatch(actions.cachePurged());
     }
 
     if (options.withSigner) {
@@ -144,19 +142,18 @@ export const thunks = {
     dispatch(actions.blockNumberChanged(blockNumber));
 
     if (initialBlockNumber !== -1) {
-      dispatch(thunks.triggerBatchDump());
+      dispatch(thunks.sendBatch());
     }
   },
   /**
    *
    */
-  triggerBatchDump: (): AppThunk => (dispatch, getState) => {
+  sendBatch: (): AppThunk => (dispatch, getState) => {
     const state = getState();
     const { status } = selectors.selectBatcherStatus(state);
 
     if (status === "idle") {
-      const cachedCalls = selectors.selectCachedCallsFromCurrentBlock(state);
-      const batch = selectors.selectBatch(state, cachedCalls);
+      const batch = selectors.selectBatch(state);
 
       if (provider) {
         dispatch(
@@ -169,6 +166,7 @@ export const thunks = {
         for (const call of batch.offChainCalls) {
           const [fn, args] = call.split("/");
           const request = {
+            fetchInitialData,
             fetchMulticallData,
             fetchPoolTradesSwaps,
             fetchTokenStats,
@@ -440,7 +438,6 @@ export const thunks = {
 
 export const actions = {
   ...batcherActions,
-  ...cacheActions,
   ...categoriesActions,
   ...indexPoolsActions,
   ...pairsActions,
