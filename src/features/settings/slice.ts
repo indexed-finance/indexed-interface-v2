@@ -1,3 +1,4 @@
+import { FEATURE_FLAGS } from "feature-flags";
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { SupportedLanguageCode, createTranslator } from "helpers";
 import type { AppState } from "features/store";
@@ -17,14 +18,16 @@ interface SettingsState {
 
 const isConnectionEnabled = () => {
   const setting = process.env.CONNECTION;
-  return typeof setting === "undefined" || setting === "true";
+  return (
+    (FEATURE_FLAGS.useSessionSaving && typeof setting === "undefined") ||
+    setting === "true"
+  );
 };
 
 const settingsInitialState: SettingsState = {
   theme: "dark",
   connected: false,
-  // connectionEnabled: isConnectionEnabled(),
-  connectionEnabled: false,
+  connectionEnabled: isConnectionEnabled(),
   languageCode: "en-us",
   supportedLanguages: [
     {

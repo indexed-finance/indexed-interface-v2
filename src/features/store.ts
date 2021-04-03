@@ -3,11 +3,8 @@ import { FEATURE_FLAGS } from "feature-flags";
 import { LOCALSTORAGE_KEY } from "config";
 import { ThunkAction } from "redux-thunk";
 import { configureStore } from "@reduxjs/toolkit";
-import { disconnectFromProvider } from "./thunks";
+import { middleware } from "./middleware";
 import { rootReducer } from "./reducer";
-import { userActions } from "./user";
-
-export const actionHistory: any = [];
 
 const store = configureStore({
   reducer: rootReducer,
@@ -15,32 +12,8 @@ const store = configureStore({
     getDefaultMiddleware({
       immutableCheck: false,
       serializableCheck: false,
-    })
-      // When the user disconnects, remove the global provider and signer.
-      .concat(function userDisconnectionMiddleware() {
-        return (next) => (action) => {
-          if (action.type === userActions.userDisconnected.type) {
-            disconnectFromProvider();
-          }
-
-          return next(action);
-        };
-      })
-      .concat(function trackActionMiddleware() {
-        return (next) => (action) => {
-          actionHistory.push(action.type);
-
-          return next(action);
-        };
-      }),
-  // .concat(function () {
-  //   return (next) => (action) => {
-  //     debugger;
-
-  //     return next(action);
-  //   };
-  // }),
-  preloadedState: FEATURE_FLAGS.saveStateAcrossSessions
+    }).concat(middleware),
+  preloadedState: FEATURE_FLAGS.useSessionSaving
     ? loadPersistedState()
     : undefined,
 });
@@ -79,8 +52,6 @@ export function loadPersistedState() {
 
     if (persistedState) {
       const state = JSON.parse(persistedState);
-
-      state.cache.blockNumber = 0;
 
       return state;
     }

@@ -77,7 +77,7 @@ export const routes: Route[] = [
   },
 ];
 
-if (FEATURE_FLAGS.showFaqLink) {
+if (FEATURE_FLAGS.useFaqLink) {
   routes.push({
     path: "/faq",
     exact: true,
@@ -86,7 +86,7 @@ if (FEATURE_FLAGS.showFaqLink) {
   });
 }
 
-if (FEATURE_FLAGS.showNewsLink) {
+if (FEATURE_FLAGS.useNewsLink) {
   routes.push({
     path: "/news",
     exact: true,

@@ -79,7 +79,7 @@ export default function Splash() {
             </Button>
           </Link>
           <DocsButton />
-          {FEATURE_FLAGS.showFaqLink && (
+          {FEATURE_FLAGS.useFaqLink && (
             <Link to="/faq">
               <Button type="default">{tx("FREQUENTLY_ASKED_QUESTIONS")}</Button>
             </Link>

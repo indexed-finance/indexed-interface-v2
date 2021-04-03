@@ -69,8 +69,6 @@ const slice = createSlice({
           }
         }
 
-        console.log("from initial data adding ", fullTokens);
-
         tokensAdapter.upsertMany(state, fullTokens);
       })
       .addCase(fetchTokenStats.fulfilled, (state, action) => {
@@ -81,17 +79,14 @@ const slice = createSlice({
               const entry = state.entities[address.toLowerCase()];
 
               if (entry) {
-                console.log({ entry });
                 state.entities[address.toLowerCase()]!.priceData = {
                   price,
                   change24Hours,
                   percentChange24Hours,
                 };
-              } else {
-                console.log("no entry for ", address);
               }
             } else {
-              console.log("no value for ", address);
+              // TODO: Put data here anyway when waiting for data to come in.
             }
           }
         }
