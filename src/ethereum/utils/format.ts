@@ -18,6 +18,8 @@ import type {
 import type { FormattedIndexPool } from "features";
 
 export function normalizeInitialData(categories: Category[]) {
+  console.log({ categories });
+
   return categories.reduce(
     (prev, next) => {
       const category = next;
@@ -39,17 +41,28 @@ export function normalizeInitialData(categories: Category[]) {
       };
 
       // Token data.
-      const categoryTokenIds = [];
-      for (const categoryToken of category.tokens) {
-        const { id: tokenId, symbol, name, decimals } = categoryToken;
-        categoryTokenIds.push(tokenId);
-        normalizedTokensForCategory.ids.push(tokenId);
-        normalizedTokensForCategory.entities[tokenId] = {
-          id: tokenId,
-          name,
-          decimals,
-          symbol,
-        };
+      if (category.tokens.length === 0) {
+        // "Borrow" the token data from the pools in the category.
+        const tokensFromPools = category.indexPools
+          .map(({ tokens }) => tokens)
+          .filter((each): each is PoolUnderlyingToken[] => Boolean(each))
+          .flat();
+
+        for (const token of tokensFromPools) {
+          normalizedTokensForCategory.ids.push(token.id);
+          normalizedTokensForCategory.entities[token.id] = token.token;
+        }
+      } else {
+        for (const categoryToken of category.tokens) {
+          const { id: tokenId, symbol, name, decimals } = categoryToken;
+          normalizedTokensForCategory.ids.push(tokenId);
+          normalizedTokensForCategory.entities[tokenId] = {
+            id: tokenId,
+            name,
+            decimals,
+            symbol,
+          };
+        }
       }
 
       // Pool data.
@@ -73,6 +86,15 @@ export function normalizeInitialData(categories: Category[]) {
         > = {};
         for (const token of tokens ?? []) {
           const [, tokenId] = token.id.split("-");
+
+          if (!normalizedTokensForCategory.ids.includes(tokenId)) {
+            normalizedTokensForCategory.ids.push(tokenId);
+            normalizedTokensForCategory.entities[tokenId] = {
+              decimals: 18,
+              symbol: "",
+              ...token,
+            };
+          }
 
           tokenIds.push(tokenId);
           const extras = token.ready

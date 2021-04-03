@@ -15,6 +15,7 @@ export function PoolCard({ pool }: Props) {
   const { assets, category, name, slug } = pool;
   const history = useHistory();
   const { isMobile } = useBreakpoints();
+  const categoryLookup = useSelector(selectors.selectCategoryLookup);
   const tokenIds = useSelector((state: AppState) =>
     selectors.selectPoolTokenIds(state, pool.id)
   );
@@ -26,7 +27,7 @@ export function PoolCard({ pool }: Props) {
       onClick={() => history.push(`/pools/${slug}`)}
       assets={assets}
       title={name}
-      subtitle={category}
+      subtitle={categoryLookup[category]?.name ?? ""}
       extra={
         <Quote
           price={pool.priceUsd}

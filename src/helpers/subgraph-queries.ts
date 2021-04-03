@@ -74,6 +74,9 @@ export async function queryPoolUpdate(
       tokens {
         token {
           id
+          decimals
+          name
+          symbol
           priceUSD
         }
       }
