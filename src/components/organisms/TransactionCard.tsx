@@ -1,8 +1,8 @@
+import { FormattedIndexPoolTransactions, selectors } from "features";
 import { ImArrowRight } from "react-icons/im";
-import { IndexCard } from "components/molecules";
+import { IndexCard } from "../molecules";
 import { Space, Typography } from "antd";
-import { Token } from "components/atoms";
-import { Transaction, selectors } from "features";
+import { Token } from "../atoms";
 import { useSelector } from "react-redux";
 import { useTranslator } from "hooks";
 
@@ -13,7 +13,7 @@ export function TransactionCard({
   when,
   amount,
   kind,
-}: Transaction) {
+}: FormattedIndexPoolTransactions["trades"]) {
   const tx = useTranslator();
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
 

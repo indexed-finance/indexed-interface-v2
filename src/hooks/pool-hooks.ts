@@ -103,7 +103,7 @@ export function createPoolDetailCalls(poolAddress: string, tokenIds: string[]) {
       },
       {
         target: "",
-        function: "fetchPoolTradesSwaps",
+        function: "fetchIndexPoolTransactions",
         args: [poolAddress],
         canBeMerged: true,
       },

@@ -1,9 +1,9 @@
-import { NormalizedCategory } from "ethereum";
 import { createEntityAdapter, createSlice } from "@reduxjs/toolkit";
 import { fetchInitialData } from "../requests";
 import { mirroredServerState, restartedDueToError } from "../actions";
 import S from "string";
 import type { AppState } from "../store";
+import type { NormalizedCategory } from "./types";
 
 const adapter = createEntityAdapter<NormalizedCategory>({
   selectId: (entry) => entry.id.toLowerCase(),
@@ -87,7 +87,7 @@ const slice = createSlice({
     builder
       .addCase(fetchInitialData.fulfilled, (state, action) => {
         const { categories } = action.payload;
-        const mapped = categoriesSelectors
+        const mapped = selectors
           .selectAll({ categories: state } as AppState)
           .map((existing) => ({
             ...existing,
@@ -102,14 +102,13 @@ const slice = createSlice({
 
 export const { actions: categoriesActions, reducer: categoriesReducer } = slice;
 
+const selectors = adapter.getSelectors((state: AppState) => state.categories);
+
 export const categoriesSelectors = {
-  ...adapter.getSelectors((state: AppState) => state.categories),
   selectCategory: (state: AppState, categoryId: string) =>
-    categoriesSelectors.selectById(state, categoryId),
-  selectCategoryLookup: (state: AppState) =>
-    categoriesSelectors.selectEntities(state),
-  selectAllCategories: (state: AppState) =>
-    categoriesSelectors.selectAll(state),
+    selectors.selectById(state, categoryId),
+  selectCategoryLookup: (state: AppState) => selectors.selectEntities(state),
+  selectAllCategories: (state: AppState) => selectors.selectAll(state),
   selectCategoryByName: (state: AppState, name: string) => {
     const formatName = (from: string) => S(from).camelize().s.toLowerCase();
     const formattedName = formatName(name);

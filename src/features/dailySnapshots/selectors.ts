@@ -1,19 +1,21 @@
-import { SnapshotKey, dailySnapshotsAdapter } from "./slice";
+import { dailySnapshotsAdapter } from "./slice";
 import type { AppState } from "features/store";
+import type { SnapshotKey } from "./types";
 
 const SECONDS_PER_DAY = 24 * 60 * 60;
 const SECONDS_PER_WEEK = SECONDS_PER_DAY * 7;
 
+const selectors = dailySnapshotsAdapter.getSelectors(
+  (state: AppState) => state.dailySnapshots
+);
+
 export const dailySnapshotsSelectors = {
-  ...dailySnapshotsAdapter.getSelectors(
-    (state: AppState) => state.dailySnapshots
-  ),
   selectSortedSnapshotsOfPool: (
     state: AppState,
     poolId: string,
     direction: "asc" | "desc" = "asc"
   ) => {
-    const snapshots = dailySnapshotsSelectors
+    const snapshots = selectors
       .selectAll(state)
       .filter((dailySnapshot) => dailySnapshot.id.includes(poolId));
 

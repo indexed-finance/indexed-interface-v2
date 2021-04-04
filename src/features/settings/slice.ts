@@ -18,6 +18,7 @@ interface SettingsState {
 
 const isConnectionEnabled = () => {
   const setting = process.env.CONNECTION;
+
   return (
     (FEATURE_FLAGS.useSessionSaving && typeof setting === "undefined") ||
     setting === "true"

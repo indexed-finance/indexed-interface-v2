@@ -1,20 +1,17 @@
-import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import {
+  CallRegistration,
   RegisteredCall,
   deserializeOnChainCall,
   serializeOffChainCall,
   serializeOnChainCall,
 } from "helpers";
-import {
-  fetchMulticallData,
-  fetchPoolTradesSwaps,
-  fetchStakingData,
-  fetchTokenStats,
-} from "../requests";
+import { PayloadAction, createSlice } from "@reduxjs/toolkit";
+import { fetchMulticallData } from "./requests";
 import { mirroredServerState, restartedDueToError } from "../actions";
 import { settingsActions } from "../settings";
 import { userActions } from "../user";
 import type { AppState } from "../store";
+import type { SelectedBatch } from "./types";
 
 const MAX_AGE_IN_BLOCKS = 4; // How old can data be in the cache?
 
@@ -40,12 +37,6 @@ interface BatcherState {
   status: "idle" | "loading" | "deferring to server";
 }
 
-type CallRegistration = {
-  caller: string;
-  onChainCalls: RegisteredCall[];
-  offChainCalls: RegisteredCall[];
-};
-
 const batcherInitialState: BatcherState = {
   blockNumber: -1,
   onChainCalls: [],
@@ -54,7 +45,7 @@ const batcherInitialState: BatcherState = {
   cache: {},
   listenerCounts: {},
   status: "idle",
-} as BatcherState;
+};
 
 const slice = createSlice({
   name: "batcher",
@@ -169,22 +160,25 @@ const slice = createSlice({
       .addMatcher(
         (action) =>
           [
-            fetchMulticallData.fulfilled.type,
-            fetchTokenStats.fulfilled.type,
-            fetchPoolTradesSwaps.fulfilled.type,
-            fetchStakingData.fulfilled.type,
+            // Put these in manually to avoid a circular dependency.
+            "staking/fetch/fulfilled",
+            "indexPools/fetch/fulfilled",
+            "indexPools/fetchUpdates/fulfilled",
+            "indexPools/fetchTransactions/fulfilled",
+            "batcher/multicall/fulfilled",
+            "tokens/fetchStats/fulfilled",
           ].includes(action.type),
         (state, action) => {
           const potentialArgs = Object.keys(action.payload).join("_");
           const callLookup = {
-            [fetchTokenStats.fulfilled
-              .type]: `fetchTokenStats/${potentialArgs}`,
-            [fetchPoolTradesSwaps.fulfilled
-              .type]: `fetchPoolTradesSwaps/${potentialArgs}`,
-            [fetchStakingData.fulfilled.type]: "fetchStakingData",
-            [fetchMulticallData.fulfilled.type]: "fetchMulticallData",
+            "staking/fetch/fulfilled": "fetchStakingData",
+            "indexPools/fetch/fulfilled": `fetchIndexPools/${potentialArgs}`,
+            "indexPools/fetchUpdates/fulfilled": `fetchIndexPoolUpdates/${potentialArgs}`,
+            "indexPools/fetchTransactions/fulfilled": `fetchIndexPoolTransactions/${potentialArgs}`,
+            "batcher/multicall/fulfilled": "fetchMulticallData",
+            "tokens/fetchStats/fulfilled": `getStatsForTokens/${potentialArgs}`,
           };
-          const call = callLookup[action.type];
+          const call = callLookup[action.type as keyof typeof callLookup];
 
           if (action.type === fetchMulticallData.fulfilled.type) {
             const { callsToResults } = action.payload as {
@@ -358,15 +352,4 @@ export const batcherSelectors = {
       return prev;
     }, {} as Record<string, boolean>);
   },
-};
-
-export type SelectedBatch = {
-  callers: Record<string, { onChainCalls: string[]; offChainCalls: string[] }>;
-  onChainCalls: {
-    registrars: string[];
-    callsByRegistrant: Record<string, string[]>;
-    serializedCalls: string[];
-    deserializedCalls: RegisteredCall[];
-  };
-  offChainCalls: string[];
 };

@@ -2,3 +2,4 @@
 // Do not manually modify this (or any) index files.
 
 export * from './slice';
+export * from './types';

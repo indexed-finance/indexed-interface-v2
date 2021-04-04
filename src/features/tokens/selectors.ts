@@ -1,47 +1,45 @@
 import { tokensAdapter } from "./slice";
 import type { AppState } from "features/store";
-import type { NormalizedToken } from "ethereum";
+import type { NormalizedToken } from "./types";
 
-const TWO_MINUTES = 1000 * 60 * 2;
+const selectors = tokensAdapter.getSelectors((state: AppState) => state.tokens);
 
 export const tokensSelectors = {
-  ...tokensAdapter.getSelectors((state: AppState) => state.tokens),
   selectTokens: (state: AppState) => state.tokens,
   selectTokenById: (state: AppState, id: string) =>
-    tokensSelectors.selectById(state, id),
+    selectors.selectById(state, id),
   selectTokensById: (
     state: AppState,
     ids: string[]
   ): (NormalizedToken | undefined)[] => {
     const tokens = tokensSelectors.selectTokens(state);
+
     return ids.reduce(
       (prev, next) => [...prev, tokens.entities[next.toLowerCase()]],
       [] as (NormalizedToken | undefined)[]
     );
   },
-  selectAllTokens: (state: AppState) => tokensSelectors.selectAll(state),
-  selectTokenLookup: (state: AppState) => tokensSelectors.selectEntities(state),
+  selectAllTokens: (state: AppState) => selectors.selectAll(state),
+  selectTokenLookup: (state: AppState) => selectors.selectEntities(state),
   selectTokenSymbols: (state: AppState) =>
-    tokensSelectors.selectAll(state).map(({ symbol }) => symbol),
+    selectors.selectAll(state).map(({ symbol }) => symbol),
   selectTokenSymbol: (state: AppState, poolId: string) =>
     tokensSelectors.selectTokenLookup(state)[poolId]?.symbol ?? "",
   selectTokenPrice: (state: AppState, tokenId: string) =>
     tokensSelectors.selectTokenById(state, tokenId)?.priceData?.price,
   selectTokenSupplies: (state: AppState, tokenIds: string[]) => {
     const lookup = tokensSelectors.selectTokensById(state, tokenIds);
-    return lookup.map((t) => t?.totalSupply ?? "");
+
+    return lookup
+      .filter((each): each is NormalizedToken => Boolean(each))
+      .map(({ totalSupply = "" }) => totalSupply);
   },
   selectTokenLookupBySymbol: (state: AppState) => {
     const tokens = tokensSelectors.selectAllTokens(state);
+
     return tokens.reduce((prev, next) => {
       prev[next.symbol.toLowerCase()] = next;
       return prev;
     }, {} as Record<string, NormalizedToken>);
-  },
-  selectTokenStatsRequestable: (state: AppState) => {
-    const now = Date.now();
-    const { lastTokenStatsError: then } = tokensSelectors.selectTokens(state);
-
-    return then === -1 || now - then >= TWO_MINUTES;
   },
 };

@@ -10,7 +10,7 @@ import {
 } from "./token-hooks";
 import { useUniswapPairs } from "./pair-hooks";
 import { useUserAddress } from "./user-hooks";
-import type { NormalizedStakingPool } from "ethereum";
+import type { NormalizedStakingPool } from "features";
 import type { RegisteredCall } from "helpers";
 
 export const useStakingPool = (stakingPoolAddress: string) =>

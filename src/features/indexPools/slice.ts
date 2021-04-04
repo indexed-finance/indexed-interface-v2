@@ -1,36 +1,27 @@
 import * as balancerMath from "ethereum/utils/balancer-math";
-import { NormalizedPool } from "ethereum";
 import { convert, createMulticallDataParser } from "helpers";
 import { createEntityAdapter, createSlice } from "@reduxjs/toolkit";
-import {
-  fetchInitialData,
-  fetchMulticallData,
-  fetchPoolTradesSwaps,
-} from "../requests";
+import { fetchIndexPoolTransactions } from "./requests";
+import { fetchInitialData } from "../requests";
+import { fetchMulticallData } from "../batcher/requests"; // Circular dependency.
 import { mirroredServerState, restartedDueToError } from "../actions";
 import type { CallWithResult } from "helpers";
+import type {
+  FormattedPoolAsset,
+  FormattedPoolDetail,
+  NormalizedIndexPool,
+} from "./types";
+import type { NormalizedToken } from "../tokens";
 
-export const adapter = createEntityAdapter<NormalizedPool>({
+export const adapter = createEntityAdapter<NormalizedIndexPool>({
   selectId: (entry) => entry.id.toLowerCase(),
 });
 
-const initialState = adapter.getInitialState();
-
 export const POOL_CALLER = "Pool Detail";
-
-export const EMPTY_TOKEN = {
-  address: "",
-  balance: "",
-  minimumBalance: "",
-  usedBalance: "",
-  denorm: "",
-  usedDenorm: "",
-  usedWeight: "",
-};
 
 const slice = createSlice({
   name: "indexPools",
-  initialState,
+  initialState: adapter.getInitialState(),
   reducers: {},
   extraReducers: (builder) =>
     builder
@@ -84,26 +75,23 @@ const slice = createSlice({
 
         adapter.addMany(state, fullPools);
       })
-      .addCase(fetchPoolTradesSwaps.fulfilled, (state, action) => {
-        for (const [pool, { trades, swaps }] of Object.entries(
-          action.payload
-        )) {
+      .addCase(fetchIndexPoolTransactions.fulfilled, (state, action) => {
+        for (const [pool, transactions] of Object.entries(action.payload)) {
           const poolInState = state.entities[pool];
 
           if (poolInState) {
-            poolInState.trades = trades ?? poolInState.trades;
-            poolInState.swaps = swaps ?? poolInState.swaps;
+            poolInState.transactions = transactions;
           }
         }
       })
       .addCase(mirroredServerState, (_, action) => action.payload.indexPools)
-      .addCase(restartedDueToError, () => initialState),
+      .addCase(restartedDueToError, () => adapter.getInitialState()),
 });
 
 export const { actions: indexPoolsActions, reducer: indexPoolsReducer } = slice;
 
 // #region Helpers
-const poolMulticallDataParser = createMulticallDataParser(
+export const poolMulticallDataParser = createMulticallDataParser(
   POOL_CALLER,
   (calls) => {
     const formattedPoolDetails = calls.reduce((prev, next) => {
@@ -141,14 +129,11 @@ const poolMulticallDataParser = createMulticallDataParser(
 
               handler();
             }
-          } catch (error) {
-            console.error("uh oh", error);
-          }
+          } catch {}
 
           return poolEntry;
         },
         {} as {
-          indexPoolsblockNumber: number;
           totalDenorm: string;
           totalSupply: string;
           swapFee: string;
@@ -190,23 +175,68 @@ const poolMulticallDataParser = createMulticallDataParser(
   }
 );
 
-type FormattedPoolDetail = {
-  indexPoolsblockNumber: number;
-  totalDenorm: string;
-  totalSupply: string;
-  swapFee: string;
-  tokens: Array<{
-    address: string;
-    balance: string;
-    minimumBalance: string;
-    usedBalance: string;
-    denorm: string;
-    usedDenorm: string;
-    usedWeight: string;
-  }>;
-};
+export function formatPoolAsset(
+  token?: NormalizedToken,
+  pool?: NormalizedIndexPool
+): FormattedPoolAsset {
+  if (token) {
+    const coingeckoData = token.priceData || {};
+    const withDisplayedSigns = { signDisplay: "always" };
 
-function handleTokenResults(
+    let balance = "";
+    let balanceUsd = "";
+    let weightPercentage = "";
+
+    if (pool) {
+      const { balance: exactBalance, denorm } = pool.tokens.entities[token.id];
+
+      const weight = convert.toBigNumber(denorm).div(pool.totalDenorm);
+      weightPercentage = convert.toPercent(weight.toNumber());
+      balance = convert.toBalance(exactBalance, token.decimals);
+
+      if (coingeckoData.price) {
+        balanceUsd = (coingeckoData.price * parseFloat(balance)).toString();
+      }
+    }
+
+    return {
+      id: token.id,
+      symbol: token.symbol,
+      name: token.name ?? "",
+      balance,
+      balanceUsd,
+      price: coingeckoData.price ? convert.toCurrency(coingeckoData.price) : "",
+      netChange: coingeckoData.change24Hours
+        ? convert.toCurrency(coingeckoData.change24Hours, withDisplayedSigns)
+        : "",
+      netChangePercent: coingeckoData.percentChange24Hours
+        ? convert.toPercent(
+            coingeckoData.percentChange24Hours / 100,
+            withDisplayedSigns
+          )
+        : "",
+      isNegative: Boolean(
+        coingeckoData.change24Hours && coingeckoData.change24Hours < 0
+      ),
+      weightPercentage,
+    };
+  } else {
+    return {
+      id: "",
+      symbol: "",
+      name: "",
+      balance: "",
+      balanceUsd: "",
+      price: "",
+      netChange: "",
+      netChangePercent: "",
+      isNegative: false,
+      weightPercentage: "",
+    };
+  }
+}
+
+export function handleTokenResults(
   fieldName: keyof FormattedPoolDetail["tokens"][0],
   poolEntry: FormattedPoolDetail,
   calls: Array<{ args: string[]; values: any[] }>
@@ -229,7 +259,12 @@ function handleTokenResults(
       token[fieldName] = relevantFieldValue;
     } else {
       poolEntry.tokens.push({
-        ...EMPTY_TOKEN,
+        balance: "",
+        minimumBalance: "",
+        usedBalance: "",
+        denorm: "",
+        usedDenorm: "",
+        usedWeight: "",
         ...intermediary,
       });
     }

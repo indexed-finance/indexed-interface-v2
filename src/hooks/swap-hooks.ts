@@ -1,14 +1,15 @@
 import { AppState, selectors, useSigner } from "features";
 import { BigNumber } from "ethereum/utils/balancer-math";
 import { SLIPPAGE_RATE } from "config";
-import { convert } from "helpers";
 import {
+  calcSwapAmountIn,
+  calcSwapAmountOut,
   downwardSlippage,
-  ethereumHelpers,
   swapExactAmountIn,
   swapExactAmountOut,
   upwardSlippage,
 } from "ethereum";
+import { convert } from "helpers";
 import { useCallback } from "react";
 import { useSelector } from "react-redux";
 
@@ -38,7 +39,7 @@ export function useSwapCallbacks(poolId: string) {
             tokenIn: inputToken.token.id,
             tokenOut: outputToken.token.id,
             amountOut,
-            ...ethereumHelpers.calcSwapAmountIn(
+            ...calcSwapAmountIn(
               inputToken,
               outputToken,
               amountOut,
@@ -71,7 +72,7 @@ export function useSwapCallbacks(poolId: string) {
             tokenIn: inputToken.token.id,
             tokenOut: outputToken.token.id,
             amountIn,
-            ...ethereumHelpers.calcSwapAmountOut(
+            ...calcSwapAmountOut(
               inputToken,
               outputToken,
               amountIn,

@@ -1,6 +1,12 @@
 import { abiLookup } from "ethereum/abi";
 import type { InterfaceKind } from "ethereum/abi";
 
+export type CallRegistration = {
+  caller: string;
+  onChainCalls: RegisteredCall[];
+  offChainCalls: RegisteredCall[];
+};
+
 export type RegisteredCall = {
   interfaceKind?: InterfaceKind;
   target: string;

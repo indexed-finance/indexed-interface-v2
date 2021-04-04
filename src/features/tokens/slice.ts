@@ -5,26 +5,20 @@ import {
   createSlice,
 } from "@reduxjs/toolkit";
 import { createMulticallDataParser } from "helpers";
-import {
-  fetchInitialData,
-  fetchMulticallData,
-  fetchTokenStats,
-} from "../requests";
+import { fetchInitialData } from "../requests";
+import { fetchMulticallData } from "../batcher/requests"; // Circular dependency.
+import { fetchTokenStats } from "./requests";
 import { mirroredServerState, restartedDueToError } from "../actions";
 import { pairsActions } from "../pairs";
-import type { NormalizedToken } from "ethereum";
+import type { NormalizedToken } from "./types";
 
 export const tokensAdapter = createEntityAdapter<NormalizedToken>({
   selectId: (entry) => entry.id.toLowerCase(),
 });
 
-const tokensInitialState = tokensAdapter.getInitialState({
-  lastTokenStatsError: -1,
-});
-
 const slice = createSlice({
   name: "tokens",
-  initialState: tokensInitialState,
+  initialState: tokensAdapter.getInitialState(),
   reducers: {
     totalSuppliesUpdated(
       state,
@@ -32,6 +26,7 @@ const slice = createSlice({
     ) {
       for (const { token, totalSupply } of action.payload) {
         const entity = state.entities[token.toLowerCase()];
+
         if (entity) {
           entity.totalSupply = totalSupply;
         }
@@ -105,7 +100,7 @@ const slice = createSlice({
         }
       })
       .addCase(mirroredServerState, (_, action) => action.payload.tokens)
-      .addCase(restartedDueToError, () => tokensInitialState),
+      .addCase(restartedDueToError, () => tokensAdapter.getInitialState()),
 });
 
 export const { actions: tokensActions, reducer: tokensReducer } = slice;

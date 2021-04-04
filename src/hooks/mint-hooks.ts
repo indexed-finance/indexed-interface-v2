@@ -1,7 +1,9 @@
 import { AppState, selectors, useSigner } from "features";
 import {
   BigNumber,
-  calcAllInGivenPoolOut,
+  _calcAllInGivenPoolOut,
+  calcPoolOutGivenSingleIn,
+  calcSingleInGivenPoolOut,
   joinPool,
   joinswapExternAmountIn,
   joinswapPoolAmountOut,
@@ -10,7 +12,7 @@ import {
 } from "ethereum";
 import { COMMON_BASE_TOKENS, SLIPPAGE_RATE } from "config";
 import { convert } from "helpers";
-import { downwardSlippage, ethereumHelpers, upwardSlippage } from "ethereum";
+import { downwardSlippage, upwardSlippage } from "ethereum";
 import { useCallback, useMemo } from "react";
 import { usePoolTokenAddresses, usePoolUnderlyingTokens } from "./pool-hooks";
 import { useSelector } from "react-redux";
@@ -35,11 +37,7 @@ export function useSingleTokenMintCallbacks(poolId: string) {
         if (inputToken) {
           const amountOut = convert.toToken(typedAmountOut, 18);
           const tokenIn = inputToken.token.id;
-          const result = ethereumHelpers.calcSingleInGivenPoolOut(
-            pool,
-            inputToken,
-            amountOut
-          );
+          const result = calcSingleInGivenPoolOut(pool, inputToken, amountOut);
           return {
             tokenIn,
             amountOut,
@@ -61,11 +59,7 @@ export function useSingleTokenMintCallbacks(poolId: string) {
         if (inputToken) {
           const amountIn = convert.toToken(typedAmountIn, 18);
           const tokenIn = inputToken.token.id;
-          const result = ethereumHelpers.calcPoolOutGivenSingleIn(
-            pool,
-            inputToken,
-            amountIn
-          );
+          const result = calcPoolOutGivenSingleIn(pool, inputToken, amountIn);
           return {
             tokenIn,
             amountIn,
@@ -142,7 +136,7 @@ export function useMultiTokenMintCallbacks(poolId: string) {
 
         return {
           tokens: [...pool.tokensList], // Simplify the form's token lookup to convert amounts to strings
-          amountsIn: calcAllInGivenPoolOut(
+          amountsIn: _calcAllInGivenPoolOut(
             balances,
             convert.toBigNumber(totalSupply),
             poolAmountOut

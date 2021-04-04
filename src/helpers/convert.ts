@@ -8,8 +8,7 @@ import {
 import { ChainId, Pair, Token, TokenAmount } from "@uniswap/sdk";
 import { DEFAULT_DECIMAL_COUNT } from "config";
 import { getAddress } from "@ethersproject/address";
-import type { FormattedPair } from "features";
-import type { NormalizedToken } from "ethereum";
+import type { FormattedPair, NormalizedToken } from "features";
 
 const templateConvert = (
   number: number,

@@ -3,7 +3,7 @@ import {
   RegisteredCall,
   deserializeOnChainCall,
 } from "./serialize";
-import type { MulticallData } from "features/requests/multicall-request";
+import type { NormalizedMulticallData } from "features";
 
 export type RelevantCall = [
   string /* poolAddress */,
@@ -17,7 +17,7 @@ export function createMulticallDataParser<T>(
   return ({
     callers: { [prefix]: relevantCaller },
     callsToResults,
-  }: MulticallData) => {
+  }: NormalizedMulticallData) => {
     if (relevantCaller) {
       const onChainCalls = relevantCaller.onChainCalls
         .map(deserializeOnChainCall)

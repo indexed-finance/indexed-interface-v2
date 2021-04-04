@@ -1,10 +1,11 @@
 import { convert, createMulticallDataParser } from "helpers";
 import { createEntityAdapter, createSlice } from "@reduxjs/toolkit";
-import { fetchMulticallData, fetchStakingData } from "../requests";
+import { fetchMulticallData } from "../batcher/requests"; // Circular dependency.
+import { fetchStakingData } from "./requests";
 import { mirroredServerState, restartedDueToError } from "../actions";
 import type { AppState } from "../store";
 import type { CallWithResult } from "helpers";
-import type { NormalizedStakingPool, StakingPoolUpdate } from "ethereum";
+import type { NormalizedStakingPool, StakingPoolUpdate } from "./types";
 
 export const stakingCaller = "Staking";
 
@@ -12,11 +13,9 @@ const adapter = createEntityAdapter<NormalizedStakingPool>({
   selectId: (entry) => entry.id.toLowerCase(),
 });
 
-const initialState = adapter.getInitialState();
-
 const slice = createSlice({
   name: "staking",
-  initialState,
+  initialState: adapter.getInitialState(),
   reducers: {},
   extraReducers: (builder) =>
     builder
@@ -51,26 +50,29 @@ const slice = createSlice({
         return state;
       })
       .addCase(mirroredServerState, (_, action) => action.payload.staking)
-      .addCase(restartedDueToError, () => initialState),
+      .addCase(restartedDueToError, () => adapter.getInitialState()),
 });
 
 export const { actions: stakingActions, reducer: stakingReducer } = slice;
 
+const selectors = adapter.getSelectors((state: AppState) => state.staking);
+
 export const stakingSelectors = {
-  ...adapter.getSelectors((state: AppState) => state.staking),
   selectAllStakingPoolIds(state: AppState) {
-    return stakingSelectors.selectAll(state).map((entry) => entry.indexPool);
+    return selectors.selectAll(state).map(({ indexPool }) => indexPool);
   },
   selectAllStakingPools(state: AppState) {
-    return stakingSelectors.selectAll(state);
+    return selectors.selectAll(state);
   },
   selectStakingPool(state: AppState, id: string) {
-    return stakingSelectors.selectById(state, id);
+    return selectors.selectById(state, id);
   },
   selectStakingPoolByStakingToken(state: AppState, id: string) {
     return stakingSelectors
       .selectAllStakingPools(state)
-      .find((p) => p.stakingToken.toLowerCase() === id.toLowerCase());
+      .find(
+        ({ stakingToken }) => stakingToken.toLowerCase() === id.toLowerCase()
+      );
   },
 };
 
@@ -168,5 +170,4 @@ export const stakingMulticallDataParser = createMulticallDataParser(
     return formattingStakingData;
   }
 );
-
 // #endregion

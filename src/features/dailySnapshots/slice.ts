@@ -1,19 +1,17 @@
-import { DailyPoolSnapshot } from "indexed-types";
 import { createEntityAdapter, createSlice } from "@reduxjs/toolkit";
 import { fetchInitialData } from "../requests";
 import { mirroredServerState, restartedDueToError } from "../actions";
+import type { NormalizedDailySnapshot } from "./types";
 
-export type SnapshotKey = keyof Omit<DailyPoolSnapshot, "date">;
-
-export const dailySnapshotsAdapter = createEntityAdapter<DailyPoolSnapshot>({
-  selectId: (entry) => entry.id.toLowerCase(),
-});
-
-const initialState = dailySnapshotsAdapter.getInitialState();
+export const dailySnapshotsAdapter = createEntityAdapter<NormalizedDailySnapshot>(
+  {
+    selectId: (entry) => entry.id.toLowerCase(),
+  }
+);
 
 const slice = createSlice({
   name: "dailySnapshots",
-  initialState,
+  initialState: dailySnapshotsAdapter.getInitialState(),
   reducers: {},
   extraReducers: (builder) =>
     builder
@@ -29,7 +27,9 @@ const slice = createSlice({
         mirroredServerState,
         (_, action) => action.payload.dailySnapshots
       )
-      .addCase(restartedDueToError, () => initialState),
+      .addCase(restartedDueToError, () =>
+        dailySnapshotsAdapter.getInitialState()
+      ),
 });
 
 export const {

@@ -143,7 +143,7 @@ export function calcSpotPrice(
   return bmul(ratio, scale);
 }
 
-export function calcAllInGivenPoolOut(
+export function _calcAllInGivenPoolOut(
   tokenBalances: BigNumber[],
   poolSupply: BigNumber,
   poolAmountOut: BigNumber
@@ -157,7 +157,7 @@ export function calcAllInGivenPoolOut(
   return amountsIn;
 }
 
-export function calcPoolOutGivenSingleIn(
+export function _calcPoolOutGivenSingleIn(
   tokenBalanceIn: BigNumber,
   tokenWeightIn: BigNumber,
   poolSupply: BigNumber,
@@ -178,7 +178,7 @@ export function calcPoolOutGivenSingleIn(
   return poolAmountOut;
 }
 
-export function calcPoolInGivenSingleOut(
+export function _calcPoolInGivenSingleOut(
   tokenBalanceOut: BigNumber,
   tokenWeightOut: BigNumber,
   poolSupply: BigNumber,
@@ -202,7 +202,7 @@ export function calcPoolInGivenSingleOut(
   return poolAmountIn;
 }
 
-export function calcAllOutGivenPoolIn(
+export function _calcAllOutGivenPoolIn(
   tokenBalances: BigNumber[],
   tokenDenorms: BigNumber[],
   poolSupply: BigNumber,
@@ -224,7 +224,7 @@ export function calcAllOutGivenPoolIn(
   return amountsOut;
 }
 
-export function calcSingleInGivenPoolOut(
+export function _calcSingleInGivenPoolOut(
   tokenBalanceIn: BigNumber,
   tokenWeightIn: BigNumber,
   poolSupply: BigNumber,
@@ -246,7 +246,7 @@ export function calcSingleInGivenPoolOut(
   return tokenAmountIn;
 }
 
-export function calcSingleOutGivenPoolIn(
+export function _calcSingleOutGivenPoolIn(
   tokenBalanceOut: BigNumber,
   tokenWeightOut: BigNumber,
   poolSupply: BigNumber,

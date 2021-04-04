@@ -1,10 +1,10 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { convert, createMulticallDataParser } from "helpers";
-import { fetchMulticallData } from "../requests";
-import { stakingMulticallDataParser } from "../staking/slice";
-import { tokensSelectors } from "features/tokens";
-import type { AppState } from "features/store";
-import type { NormalizedUser } from "ethereum/types";
+import { fetchMulticallData } from "../batcher/requests"; // Circular dependency.
+import { stakingMulticallDataParser } from "../staking";
+import { tokensSelectors } from "../tokens";
+import type { AppState } from "../store";
+import type { NormalizedUser } from "./types";
 
 export type ApprovalStatus = "unknown" | "approval needed" | "approved";
 

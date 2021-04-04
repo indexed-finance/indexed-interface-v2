@@ -5,9 +5,8 @@ import { Divider, Space } from "antd";
 import { FEATURE_FLAGS } from "feature-flags";
 import { PlainLanguageTransaction, TokenExchangeRate } from "components";
 import { SLIPPAGE_RATE } from "config";
+import { calcSwapAmountOut, downwardSlippage, upwardSlippage } from "ethereum";
 import { convert } from "helpers";
-import { downwardSlippage, upwardSlippage } from "ethereum";
-import { ethereumHelpers } from "ethereum";
 import { getSwapCost } from "ethereum/utils";
 import { useCallback, useMemo } from "react";
 import { useFormikContext } from "formik";
@@ -147,7 +146,7 @@ function SwapExtras({ pool }: Props) {
     if (fromAmount && toAmount) {
       return (toAmount / fromAmount).toFixed(4);
     } else {
-      const { spotPriceAfter = "" } = ethereumHelpers.calcSwapAmountOut(
+      const { spotPriceAfter = "" } = calcSwapAmountOut(
         defaultFromToken,
         defaultToToken,
         convert.toBigNumber("1"),

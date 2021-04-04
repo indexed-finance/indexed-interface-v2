@@ -10,7 +10,7 @@ import {
 import { useCallRegistrar } from "./use-call-registrar";
 import { useCallback, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import type { AppState, FormattedPair } from "features";
+import type { AppState, FormattedPair, NormalizedToken } from "features";
 import type {
   BestTradeOptions,
   Pair,
@@ -18,7 +18,6 @@ import type {
   TokenAmount,
   Trade,
 } from "@uniswap/sdk";
-import type { NormalizedToken } from "ethereum";
 import type { RegisteredCall } from "helpers";
 
 export const PAIR_DATA_CALLER = "Pair Data";

@@ -1,3 +1,4 @@
+import { NDX_ADDRESS, WETH_CONTRACT_ADDRESS } from "config";
 import {
   PayloadAction,
   createEntityAdapter,
@@ -8,10 +9,10 @@ import {
   convert,
   createMulticallDataParser,
 } from "helpers";
-import { fetchMulticallData } from "../requests";
+import { fetchMulticallData } from "../batcher/requests"; // Circular dependency.
 import { mirroredServerState, restartedDueToError } from "../actions";
 import type { AppState } from "../store";
-import type { NormalizedPair } from "ethereum";
+import type { NormalizedPair } from "./types";
 
 export const PAIR_DATA_CALLER = "Pair Data";
 
@@ -19,11 +20,9 @@ const adapter = createEntityAdapter<NormalizedPair>({
   selectId: (entry) => entry.id.toLowerCase(),
 });
 
-const pairsInitialState = adapter.getInitialState();
-
 const slice = createSlice({
   name: "pairs",
-  initialState: pairsInitialState,
+  initialState: adapter.getInitialState(),
   reducers: {
     uniswapPairsRegistered(state, action: PayloadAction<NormalizedPair[]>) {
       const formatted = action.payload.map(
@@ -64,29 +63,60 @@ const slice = createSlice({
         }
       })
       .addCase(mirroredServerState, (_, action) => action.payload.pairs)
-      .addCase(restartedDueToError, () => pairsInitialState),
+      .addCase(restartedDueToError, () => adapter.getInitialState()),
 });
 
 export const { actions: pairsActions, reducer: pairsReducer } = slice;
 
+const selectors = adapter.getSelectors((state: AppState) => state.pairs);
+
 export const pairsSelectors = {
-  ...adapter.getSelectors((state: AppState) => state.pairs),
   selectPairs: (state: AppState) => state.pairs,
   selectPairsById: (
     state: AppState,
     ids: string[]
   ): (NormalizedPair | undefined)[] => {
     const allPairs = pairsSelectors.selectPairs(state);
+
     return ids.reduce(
       (prev, next) => [...prev, allPairs.entities[next.toLowerCase()]],
       [] as (NormalizedPair | undefined)[]
     );
   },
   selectAllUpdatedPairs: (state: AppState) =>
-    pairsSelectors.selectAll(state).filter((pair) => pair.exists !== undefined),
+    selectors.selectAll(state).filter((pair) => pair.exists !== undefined),
   selectTokenPair: (state: AppState, tokenA: string, tokenB: string) => {
     const pairAddress = computeUniswapPairAddress(tokenA, tokenB);
-    return pairsSelectors.selectById(state, pairAddress.toLowerCase());
+    return selectors.selectById(state, pairAddress.toLowerCase());
+  },
+  selectNdxPrice(state: AppState, ethPrice: number) {
+    const wethNdxPair = computeUniswapPairAddress(
+      WETH_CONTRACT_ADDRESS,
+      NDX_ADDRESS
+    );
+    const [pairData] = pairsSelectors.selectPairsById(state, [wethNdxPair]);
+
+    if (pairData) {
+      const { token0, reserves0, reserves1 } = pairData;
+
+      if (token0 && reserves0 && reserves1) {
+        const firstIsNdx = NDX_ADDRESS.toLowerCase() === token0.toLowerCase();
+        const [firstValue, secondValue] = firstIsNdx
+          ? [reserves1, reserves0]
+          : [reserves0, reserves1];
+
+        if (firstValue && secondValue) {
+          const numberOfEth = convert
+            .toBigNumber(firstValue)
+            .dividedBy(convert.toBigNumber(secondValue))
+            .toNumber();
+
+          return numberOfEth * ethPrice;
+        }
+      }
+    }
+
+    return 0;
   },
 };
 

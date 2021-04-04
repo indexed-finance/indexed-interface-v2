@@ -1,12 +1,12 @@
-import { Asset } from "features";
 import { IndexCard, Quote } from "components/molecules";
 import { Progress, Token } from "components/atoms";
 import { Space, Spin, Typography } from "antd";
 import { convert } from "helpers";
 import { useBreakpoints, useTranslator } from "hooks";
+import type { FormattedPoolAsset } from "features";
 
 interface Props {
-  token: Asset;
+  token: FormattedPoolAsset;
   rank: number;
 }
 

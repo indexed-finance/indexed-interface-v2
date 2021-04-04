@@ -1,21 +1,16 @@
 import * as topLevelActions from "./actions";
 import { RegisteredCall } from "helpers";
-import { batcherActions } from "./batcher";
+import { batcherActions, fetchMulticallData } from "./batcher";
 import { categoriesActions } from "./categories";
-import {
-  fetchInitialData,
-  fetchMulticallData,
-  fetchPoolTradesSwaps,
-  fetchStakingData,
-  fetchTokenStats,
-} from "./requests";
-import { indexPoolsActions } from "./indexPools";
+import { fetchIndexPoolTransactions, indexPoolsActions } from "./indexPools";
+import { fetchInitialData } from "./requests";
+import { fetchStakingData, stakingActions } from "./staking";
+import { fetchTokenStats, tokensActions } from "./tokens";
 import { pairsActions } from "./pairs";
 import { providers } from "ethers";
 import { selectors } from "./selectors";
 import { settingsActions } from "./settings";
-import { stakingActions } from "./staking";
-import { tokensActions } from "./tokens";
+import { transactionsActions } from "./transactions";
 import { userActions } from "./user";
 import debounce from "lodash.debounce";
 import type { AppThunk } from "./store";
@@ -159,7 +154,7 @@ export const thunks = {
         const request = {
           fetchInitialData,
           fetchMulticallData,
-          fetchPoolTradesSwaps,
+          fetchIndexPoolTransactions,
           fetchTokenStats,
         }[fn] as any;
 
@@ -184,6 +179,7 @@ export const actions = {
   ...settingsActions,
   ...stakingActions,
   ...tokensActions,
+  ...transactionsActions,
   ...userActions,
   ...topLevelActions,
   ...thunks,

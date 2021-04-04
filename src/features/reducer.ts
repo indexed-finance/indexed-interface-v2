@@ -7,6 +7,7 @@ import { pairsReducer } from "./pairs";
 import { settingsReducer } from "./settings";
 import { stakingReducer } from "./staking";
 import { tokensReducer } from "./tokens";
+import { transactionsReducer } from "./transactions";
 import { userReducer } from "./user";
 
 export const rootReducer = combineReducers({
@@ -14,9 +15,10 @@ export const rootReducer = combineReducers({
   categories: categoriesReducer,
   dailySnapshots: dailySnapshotsReducer,
   indexPools: indexPoolsReducer,
+  pairs: pairsReducer,
   settings: settingsReducer,
   staking: stakingReducer,
   tokens: tokensReducer,
+  transactions: transactionsReducer,
   user: userReducer,
-  pairs: pairsReducer,
 });

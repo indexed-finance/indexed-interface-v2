@@ -3,8 +3,9 @@ import { COMMON_BASE_TOKENS, SLIPPAGE_RATE } from "config";
 import {
   burnAndSwapForExactTokens,
   burnExactAndSwapForTokens,
+  calcPoolInGivenSingleOut,
+  calcSingleOutGivenPoolIn,
   downwardSlippage,
-  ethereumHelpers,
   exitswapExternAmountOut,
   exitswapPoolAmountIn,
   upwardSlippage,
@@ -35,11 +36,7 @@ export function useSingleTokenBurnCallbacks(poolId: string) {
         if (outputToken) {
           const amountOut = convert.toToken(typedAmountOut, 18);
           const tokenOut = outputToken.token.id;
-          const result = ethereumHelpers.calcPoolInGivenSingleOut(
-            pool,
-            outputToken,
-            amountOut
-          );
+          const result = calcPoolInGivenSingleOut(pool, outputToken, amountOut);
           return {
             tokenOut,
             amountOut,
@@ -61,11 +58,7 @@ export function useSingleTokenBurnCallbacks(poolId: string) {
         if (outputToken) {
           const amountIn = convert.toToken(typedAmountIn, 18);
           const tokenOut = outputToken.token.id;
-          const result = ethereumHelpers.calcSingleOutGivenPoolIn(
-            pool,
-            outputToken,
-            amountIn
-          );
+          const result = calcSingleOutGivenPoolIn(pool, outputToken, amountIn);
           return {
             tokenOut,
             amountIn,

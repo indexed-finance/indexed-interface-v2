@@ -3,8 +3,6 @@
 
 export * from './abi';
 export * from './connectors';
-export * from './helpers';
 export * from './multicall';
 export * from './transactions';
-export * from './types.d';
 export * from './utils';
