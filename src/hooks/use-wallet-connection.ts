@@ -184,9 +184,7 @@ try {
     SupportedWallet.Portis
   ].icon = require("assets/images/connectors/portis.png").default;
 } catch {
-  console.info(
-    "Unable to imported icons. Probably because this is the server."
-  );
+  console.info("Unable to import icons; probably because this is the server.");
 }
 
 export const MOBILE_SUPPORTED_WALLETS = [SupportedWallet.CoinbaseWallet].map(

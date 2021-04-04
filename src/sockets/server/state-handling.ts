@@ -44,7 +44,6 @@ const unsubscribeFromWaitingForSymbols = subscribe(() => {
   const symbols = selectors.selectTokenSymbols(state);
 
   if (pools.length > 0 && stakingPools.length > 0 && symbols.length > 0) {
-    log("Pools and tokens have loaded.");
     unsubscribeFromWaitingForSymbols();
     setupRegistrants();
   }

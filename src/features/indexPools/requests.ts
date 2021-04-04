@@ -222,8 +222,6 @@ export function normalizeIndexPoolTransactions(
   swaps: Record<string, PoolSwap[]>,
   trades: Record<string, PoolTrade[]>
 ) {
-  console.log({ poolAddresses, swaps, trades });
-
   return poolAddresses.reduce((prev, next) => {
     const address = next;
     const graphqlSafeAddress = removeLeadingZero(address);

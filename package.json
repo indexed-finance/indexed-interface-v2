@@ -109,7 +109,7 @@
     "develop:server": "npm run build:server && node ./webpack/server/server",
     "lint": "eslint . --fix --ignore-path .gitignore --ext .ts,.tsx,.js",
     "start": "react-app-rewired start",
-    "start:server": "CONNECTION=false API_CERT_PATH=/etc/letsencrypt/live/api.indexed.finance/fullchain.pem API_KEY_PATH=/etc/letsencrypt/live/api.indexed.finance/privkey.pem LOG_CERT_PATH=/etc/letsencrypt/live/api-log.indexed.finance/fullchain.pem LOG_KEY_PATH=/etc/letsencrypt/live/api-log.indexed.finance/privkey.pem node ./webpack/server/server",
+    "start:server": "IS_SERVER=true CONNECTION=false API_CERT_PATH=/etc/letsencrypt/live/api.indexed.finance/fullchain.pem API_KEY_PATH=/etc/letsencrypt/live/api.indexed.finance/privkey.pem LOG_CERT_PATH=/etc/letsencrypt/live/api-log.indexed.finance/fullchain.pem LOG_KEY_PATH=/etc/letsencrypt/live/api-log.indexed.finance/privkey.pem node ./webpack/server/server",
     "storybook": "start-storybook -p 6006",
     "storybook:deploy": "storybook-to-ghpages",
     "test": "react-app-rewired test",

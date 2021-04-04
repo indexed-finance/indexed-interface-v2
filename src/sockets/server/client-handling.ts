@@ -6,12 +6,9 @@ import {
 import { IncomingMessage } from "http";
 import { createServer } from "https";
 import { formatMirrorStateResponse, log } from "./helpers";
-import { provider, store } from "features";
-import { symbolToPriceDataLookup } from "./coinapi-connection";
+import { store } from "features";
 import WebSocket from "isomorphic-ws";
-import cloneDeep from "lodash.clonedeep";
 import fs from "fs";
-import jsonpatch from "fast-json-patch";
 
 const DEFLATION_OPTIONS = {
   zlibDeflateOptions: {
@@ -33,16 +30,13 @@ const DEFLATION_OPTIONS = {
 export const clientStatistics = {
   totalConnections: 0,
   totalErrors: 0,
-  totalStateOperationsSent: 0,
-  totalStatePatchesSent: 0,
+  totalMirrorsSent: 0,
 };
 
 // Set up a collection of client connections.
 export const clientToIpLookup = new WeakMap<WebSocket, string>();
 export const ipToClientLookup: Record<string, WebSocket> = {};
 export const connections: WebSocket[] = [];
-export let previousState = store.getState();
-export let previousPriceData = symbolToPriceDataLookup;
 
 /**
  * Creates a WebSocket server that provides quick updates to connected clients.
@@ -93,19 +87,10 @@ export function setupClientHandling() {
   continuouslyReportStatistics();
 }
 
-// #region helpers
-let isSendingUpdates = false;
+setInterval(sendUpdates, 5000);
 
+// #region Helpers
 function handleConnection(client: WebSocket, incoming: IncomingMessage) {
-  if (
-    provider &&
-    !isSendingUpdates &&
-    provider.listeners("block").length === 0
-  ) {
-    isSendingUpdates = true;
-    provider.addListener("block", sendUpdates);
-  }
-
   const ip = incoming.headers.origin ?? "";
 
   if (!ipToClientLookup[ip]) {
@@ -115,18 +100,20 @@ function handleConnection(client: WebSocket, incoming: IncomingMessage) {
 
     clientToIpLookup.set(client, ip);
 
-    // Prune previous clients with the same IP.
-    for (const connection of connections) {
-      const connectionIp = clientToIpLookup.get(connection);
+    // // Prune previous clients with the same IP.
+    // for (const connection of connections) {
+    //   const connectionIp = clientToIpLookup.get(connection);
 
-      if (connectionIp === ip) {
-        connections.splice(connections.indexOf(connection, 1));
-      }
-    }
+    //   if (connectionIp === ip) {
+    //     connections.splice(connections.indexOf(connection, 1));
+    //   }
+    // }
 
     connections.push(client);
 
     client.send(formatMirrorStateResponse(store.getState()));
+
+    clientStatistics.totalMirrorsSent++;
   }
 }
 
@@ -141,27 +128,22 @@ function handleError(client: WebSocket) {
   clientStatistics.totalErrors++;
 }
 
-function sendUpdates(blockNumber: number) {
+let lastBlockNumber = -1;
+function sendUpdates() {
   const currentState = store.getState();
-  const differences = jsonpatch.compare(previousState, currentState);
+  const currentBlockNumber = currentState.batcher.blockNumber;
 
-  if (differences.length > 0 && connections.length > 0) {
-    setTimeout(() => {
-      log(
-        `[Block ${blockNumber}]: Updating clients with ${differences.length} patches.`
-      );
+  if (currentBlockNumber !== lastBlockNumber && connections.length > 0) {
+    log(`Updating ${connections.length} clients.`);
 
-      for (const client of connections) {
-        client.send(formatMirrorStateResponse(currentState));
-      }
+    for (const client of connections) {
+      client.send(formatMirrorStateResponse(store.getState()));
+    }
 
-      clientStatistics.totalStatePatchesSent += differences.length;
-      clientStatistics.totalStateOperationsSent++;
-    }, 2000); // Give time for the actions to finish. It's fine if they're not all done.
+    clientStatistics.totalMirrorsSent++;
   }
 
-  previousState = jsonpatch.deepClone(currentState);
-  previousPriceData = cloneDeep(symbolToPriceDataLookup);
+  lastBlockNumber = currentBlockNumber;
 }
 
 function continuouslyCheckForInactivity() {
@@ -179,8 +161,6 @@ function continuouslyCheckForInactivity() {
           await ping();
         }
       } catch (error) {
-        console.error("e", error);
-
         log(
           "Pruning disconnected connection.",
           clientToIpLookup.get(connection)

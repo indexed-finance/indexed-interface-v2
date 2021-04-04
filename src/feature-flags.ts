@@ -1,6 +1,6 @@
 /**
- * @remarks Foo
- * "Molasses mode" adds a debugger than triggers following every action.
+ * @remarks [Molasses mode]
+ * Adds a debugger than triggers following every action.
  */
 export const FEATURE_FLAGS = {
   useNewsLink: true,
@@ -12,8 +12,9 @@ export const FEATURE_FLAGS = {
   useSessionSaving: false,
   useFortmatic: false,
   useHomepageSteps: false,
-  // useDEBUG: process.env.NODE_ENV === "development",
+  useActionLogging: process.env.IS_SERVER === "true",
+  useEnglishLogging: true,
   useDEBUG: false,
-  useServerConnection: false,
-  useMolassesMode: false, // "Molasses mode"
+  useServerConnection: true,
+  useMolassesMode: false,
 };
