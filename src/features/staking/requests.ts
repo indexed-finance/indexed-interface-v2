@@ -1,12 +1,12 @@
-import * as supgraphQueries from "helpers/subgraph";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { ethers } from "ethers";
-import { sendQuery } from "helpers";
+import { getIndexedUrl, sendQuery } from "helpers";
 import type { NdxStakingPool } from "indexed-types";
 import type { NormalizedStakingPool } from "../staking";
 
 export async function queryStaking(url: string): Promise<NdxStakingPool[]> {
   const { ndxStakingPools: staking } = await sendQuery(
+    url,
     `
       {
         ndxStakingPools(first: 20) {
@@ -24,8 +24,7 @@ export async function queryStaking(url: string): Promise<NdxStakingPool[]> {
           rewardPerTokenStored
         }
       }
-      `,
-    url
+      `
   );
   return staking;
 }
@@ -61,7 +60,7 @@ export const fetchStakingData = createAsyncThunk(
       | ethers.providers.InfuraProvider;
   }) => {
     const { chainId } = provider.network;
-    const url = supgraphQueries.getUrl(chainId);
+    const url = getIndexedUrl(chainId);
     const staking = await queryStaking(url);
     const formattedStakingData = normalizeStakingData(staking);
 

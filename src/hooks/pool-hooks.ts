@@ -107,6 +107,12 @@ export function createPoolDetailCalls(poolAddress: string, tokenIds: string[]) {
         args: [poolAddress],
         canBeMerged: true,
       },
+      {
+        target: "",
+        function: "fetchIndexPoolUpdates",
+        args: [poolAddress],
+        canBeMerged: true,
+      },
     ],
   };
 }

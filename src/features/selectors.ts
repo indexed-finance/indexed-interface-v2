@@ -129,7 +129,7 @@ export const selectors = {
               parseFloat(convert.toBalance(pool.swapFee))
             ),
             cumulativeFee: convert.toCurrency(pool.feesTotalUSD),
-            recent: {
+            transactions: {
               swaps: (pool.transactions.swaps ?? []).map((swap) => {
                 const from = tokens[swap.tokenIn.toLowerCase()]?.symbol;
                 const to = tokens[swap.tokenOut.toLowerCase()]?.symbol;

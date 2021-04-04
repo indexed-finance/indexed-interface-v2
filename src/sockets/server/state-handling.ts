@@ -45,7 +45,6 @@ const unsubscribeFromWaitingForSymbols = subscribe(() => {
 
   if (pools.length > 0 && stakingPools.length > 0 && symbols.length > 0) {
     log("Pools and tokens have loaded.");
-
     unsubscribeFromWaitingForSymbols();
     setupRegistrants();
   }
@@ -59,10 +58,6 @@ function setupRegistrants() {
     (prev, next) => {
       const { id } = next;
       const tokenIds = selectors.selectPoolTokenIds(state, id);
-
-      console.log("id", id);
-      console.log("tokens", tokenIds);
-
       const pairs = buildUniswapPairs(tokenIds);
       const pairDataCalls = createPairDataCalls(pairs);
       const poolDetailCalls = createPoolDetailCalls(id, tokenIds);

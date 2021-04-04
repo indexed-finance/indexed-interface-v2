@@ -3,7 +3,7 @@ import { NDX_ADDRESS, WETH_CONTRACT_ADDRESS } from "config";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { dedupe } from "helpers";
 import { ethers } from "ethers";
-import { getUrl, sendQuery } from "helpers";
+import { getIndexedUrl, sendQuery } from "helpers";
 import type { Category, PoolUnderlyingToken, Token } from "indexed-types";
 import type { NormalizedCategory } from "./categories";
 import type { NormalizedDailySnapshot } from "./dailySnapshots";
@@ -27,8 +27,17 @@ export type NormalizedInitialData = {
   tokens: NormalizedEntity<NormalizedToken>;
 };
 
+export interface OffChainRequest {
+  provider:
+    | ethers.providers.Web3Provider
+    | ethers.providers.JsonRpcProvider
+    | ethers.providers.InfuraProvider;
+  arg?: string[];
+}
+
 export async function queryInitialData(url: string): Promise<Category[]> {
   const { categories } = await sendQuery(
+    url,
     `
     {
       categories (first: 1000) {
@@ -97,8 +106,7 @@ export async function queryInitialData(url: string): Promise<Category[]> {
         }
       }
     }
-  `,
-    url
+  `
   );
 
   return categories;
@@ -272,16 +280,9 @@ export function normalizeInitialData(categories: Category[]) {
 
 export const fetchInitialData = createAsyncThunk(
   "fetchInitialData",
-  async ({
-    provider,
-  }: {
-    provider:
-      | ethers.providers.Web3Provider
-      | ethers.providers.JsonRpcProvider
-      | ethers.providers.InfuraProvider;
-  }) => {
+  async ({ provider }: OffChainRequest) => {
     const { chainId } = provider.network;
-    const url = getUrl(chainId);
+    const url = getIndexedUrl(chainId);
     const initial = await queryInitialData(url);
 
     return normalizeInitialData(initial);

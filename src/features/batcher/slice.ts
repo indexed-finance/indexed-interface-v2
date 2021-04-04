@@ -163,8 +163,8 @@ const slice = createSlice({
             // Put these in manually to avoid a circular dependency.
             "staking/fetch/fulfilled",
             "indexPools/fetch/fulfilled",
-            "indexPools/fetchUpdates/fulfilled",
             "indexPools/fetchTransactions/fulfilled",
+            "indexPools/fetchUpdates/fulfilled",
             "batcher/multicall/fulfilled",
             "tokens/fetchStats/fulfilled",
           ].includes(action.type),

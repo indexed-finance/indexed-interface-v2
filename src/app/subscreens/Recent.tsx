@@ -10,8 +10,8 @@ const { TabPane } = Tabs;
 export function Recent({ pool }: { pool: FormattedIndexPool }) {
   const tx = useTranslator();
   const [mode, setMode] = useState("Trades");
-  const tradesEmpty = pool.recent.trades.length === 0;
-  const swapsEmpty = pool.recent.swaps.length === 0;
+  const tradesEmpty = pool.transactions.trades.length === 0;
+  const swapsEmpty = pool.transactions.swaps.length === 0;
   const placeholders = Array.from({ length: 10 }, (_, index) => (
     <Skeleton key={index} active={true} />
   ));
@@ -36,7 +36,7 @@ export function Recent({ pool }: { pool: FormattedIndexPool }) {
           >
             {tradesEmpty
               ? placeholders
-              : pool.recent.trades.map((trade, index) => (
+              : pool.transactions.trades.map((trade, index) => (
                   <div key={index} style={{ flex: "1 1 0", padding: 15 }}>
                     <TransactionCard {...trade} />
                   </div>
@@ -54,7 +54,7 @@ export function Recent({ pool }: { pool: FormattedIndexPool }) {
           >
             {swapsEmpty
               ? placeholders
-              : pool.recent.swaps.map((swap, index) => (
+              : pool.transactions.swaps.map((swap, index) => (
                   <div key={index} style={{ flex: "1 1 0", padding: 15 }}>
                     <TransactionCard key={index} {...swap} kind="swap" />
                   </div>

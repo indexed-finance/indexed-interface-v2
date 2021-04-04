@@ -1,9 +1,14 @@
 import { WETH_CONTRACT_ADDRESS } from "config";
-import { computeUniswapPairAddress, getUrl, sendQuery } from "helpers";
+import {
+  computeUniswapPairAddress,
+  getIndexedUrl,
+  getUniswapUrl,
+  sendQuery,
+} from "helpers";
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { ethers } from "ethers";
 import type { IndexPool, Swap as PoolSwap } from "indexed-types";
 import type { NormalizedIndexPoolTransactions } from "./types";
+import type { OffChainRequest } from "../requests";
 import type { Swap as PoolTrade } from "uniswap-types";
 
 // #region Index Pools
@@ -92,18 +97,9 @@ export function normalizeIndexPools(response: Record<string, IndexPool>) {
 
 export const fetchIndexPools = createAsyncThunk(
   "indexPools/fetch",
-  async ({
-    provider,
-    arg: poolAddresses,
-  }: {
-    provider:
-      | ethers.providers.Web3Provider
-      | ethers.providers.JsonRpcProvider
-      | ethers.providers.InfuraProvider;
-    arg: string[];
-  }) => {
+  async ({ provider, arg: poolAddresses = [] }: OffChainRequest) => {
     const { chainId } = await provider.getNetwork();
-    const url = getUrl(chainId);
+    const url = getIndexedUrl(chainId);
     const response = await queryIndexPools(url, poolAddresses);
 
     return normalizeIndexPools(response);
@@ -111,7 +107,7 @@ export const fetchIndexPools = createAsyncThunk(
 );
 // #endregion
 
-// #region Index Pool Updates
+// #region Updates
 export async function queryIndexPoolUpdates(
   url: string,
   poolAddresses: string[]
@@ -144,7 +140,7 @@ export async function queryIndexPoolUpdates(
         ${poolAddresses.map(createUpdateCall).join("\n")}
       }
     `;
-  const updates = await sendQuery(groupedCalls, url);
+  const updates = await sendQuery(url, groupedCalls);
 
   return updates;
 }
@@ -158,18 +154,9 @@ export function normalizeIndexPoolUpdates(response: Record<string, IndexPool>) {
 
 export const fetchIndexPoolUpdates = createAsyncThunk(
   "indexPools/fetchUpdates",
-  async ({
-    provider,
-    arg: poolAddresses,
-  }: {
-    provider:
-      | ethers.providers.Web3Provider
-      | ethers.providers.JsonRpcProvider
-      | ethers.providers.InfuraProvider;
-    arg: string[];
-  }) => {
+  async ({ provider, arg: poolAddresses = [] }: OffChainRequest) => {
     const { chainId } = await provider.getNetwork();
-    const url = getUrl(chainId);
+    const url = getIndexedUrl(chainId);
     const response = await queryIndexPoolUpdates(url, poolAddresses);
 
     return normalizeIndexPoolUpdates(response);
@@ -179,13 +166,13 @@ export const fetchIndexPoolUpdates = createAsyncThunk(
 
 // #region Transactions
 export async function queryIndexPoolTransactions(
-  url: string,
+  { indexedUrl, uniswapUrl }: { indexedUrl: string; uniswapUrl: string },
   poolAddresses: string[]
 ) {
   const createSingleSwapCall = (address: string) => `
       ${removeLeadingZero(
         address
-      )}/swaps: swaps(orderBy: timestamp, orderDirection: desc, first:10, where: { pool: "${address}" }) {
+      )}: swaps(orderBy: timestamp, orderDirection: desc, first:10, where: { pool: "${address}" }) {
         id
         tokenIn
         tokenOut
@@ -197,7 +184,7 @@ export async function queryIndexPoolTransactions(
   const createSingleTradeCall = (address: string) => `
       ${removeLeadingZero(
         address
-      )}/trades: swaps(orderBy: timestamp, orderDirection: desc, first:10, where:{ pair: "${computeUniswapPairAddress(
+      )}: swaps(orderBy: timestamp, orderDirection: desc, first:10, where:{ pair: "${computeUniswapPairAddress(
     address,
     WETH_CONTRACT_ADDRESS
   ).toLowerCase()}"}) {
@@ -222,37 +209,29 @@ export async function queryIndexPoolTransactions(
         timestamp
       }
     `;
-  const groupedCalls = `
-      {
-        ${poolAddresses.map(createSingleSwapCall).join("\n")}
-        ${poolAddresses.map(createSingleTradeCall).join("\n")}
-      }
-    `;
-  const transactions = await sendQuery(url, groupedCalls);
+  const swapCall = `{${poolAddresses.map(createSingleSwapCall).join("\n")}}`;
+  const tradeCall = `{${poolAddresses.map(createSingleTradeCall).join("\n")}}`;
+  const swaps = await sendQuery(indexedUrl, swapCall);
+  const trades = await sendQuery(uniswapUrl, tradeCall);
 
-  return transactions;
+  return { swaps, trades };
 }
 
 export function normalizeIndexPoolTransactions(
-  response: Record<string, PoolSwap[] | PoolTrade[]>
+  poolAddresses: string[],
+  swaps: Record<string, PoolSwap[]>,
+  trades: Record<string, PoolTrade[]>
 ) {
-  return Object.entries(response).reduce((prev, [key, value]) => {
-    const [address, kind] = key.split("/");
-    const fixedAddress = addLeadingZero(address);
-    const transactionKind = kind as "trades" | "swaps";
-    const transactionValue =
-      transactionKind === "trades"
-        ? (value as PoolTrade[])
-        : (value as PoolSwap[]);
+  console.log({ poolAddresses, swaps, trades });
 
-    if (!prev[fixedAddress]) {
-      prev[fixedAddress] = {
-        swaps: [],
-        trades: [],
-      };
-    }
+  return poolAddresses.reduce((prev, next) => {
+    const address = next;
+    const graphqlSafeAddress = removeLeadingZero(address);
 
-    prev[fixedAddress][transactionKind].push(transactionValue as any);
+    prev[address] = {
+      swaps: swaps[graphqlSafeAddress],
+      trades: trades[graphqlSafeAddress],
+    };
 
     return prev;
   }, {} as Record<string, NormalizedIndexPoolTransactions>);
@@ -260,21 +239,17 @@ export function normalizeIndexPoolTransactions(
 
 export const fetchIndexPoolTransactions = createAsyncThunk(
   "indexPools/fetchTransactions",
-  async ({
-    provider,
-    arg: poolAddresses,
-  }: {
-    provider:
-      | ethers.providers.Web3Provider
-      | ethers.providers.JsonRpcProvider
-      | ethers.providers.InfuraProvider;
-    arg: string[];
-  }) => {
+  async ({ provider, arg: poolAddresses = [] }: OffChainRequest) => {
     const { chainId } = await provider.getNetwork();
-    const url = getUrl(chainId);
-    const response = await queryIndexPoolTransactions(url, poolAddresses);
+    const { swaps, trades } = await queryIndexPoolTransactions(
+      {
+        indexedUrl: getIndexedUrl(chainId),
+        uniswapUrl: getUniswapUrl(chainId),
+      },
+      poolAddresses
+    );
 
-    return normalizeIndexPoolTransactions(response);
+    return normalizeIndexPoolTransactions(poolAddresses, swaps, trades);
   }
 );
 // #endregion

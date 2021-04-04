@@ -72,7 +72,7 @@ export function useUniswapPairs(
   const pairDatas = useSelector((state: AppState) =>
     selectors.selectFormattedPairsById(
       state,
-      pairs.map((p) => p.id)
+      pairs.map(({ id }) => id)
     )
   );
 
@@ -83,19 +83,23 @@ export function useUniswapPairs(
   usePairDataRegistrar(pairs);
 
   return useMemo(() => {
-    const loading = pairDatas.some(
-      (p) => !p || typeof p.exists === "undefined"
-    );
-    if (provider && !loading) {
-      const goodPairs = (pairDatas as FormattedPair[]).filter(
-        ({ exists }) => exists
+    try {
+      const loading = pairDatas.some(
+        (p) => !p || typeof p.exists === "undefined"
       );
-      const uniSdkPairs = goodPairs.map((entry) =>
-        convert.toUniswapSDKPair(provider!, entry)
-      ) as Pair[];
+      if (provider && !loading) {
+        const goodPairs = (pairDatas as FormattedPair[]).filter(
+          ({ exists }) => exists
+        );
+        const uniSdkPairs = goodPairs.map((entry) =>
+          convert.toUniswapSDKPair(provider!, entry)
+        ) as Pair[];
 
-      return [uniSdkPairs, false];
-    } else {
+        return [uniSdkPairs, false];
+      } else {
+        return [undefined, true];
+      }
+    } catch (error) {
       return [undefined, true];
     }
   }, [pairDatas]);

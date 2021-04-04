@@ -58,8 +58,7 @@ export interface FormattedIndexPool {
   totalValueLockedPercent: string;
   swapFee: string;
   cumulativeFee: string;
-  // chart data
-  recent: {
+  transactions: {
     swaps: Array<{
       amount: string;
       when: string;
@@ -91,8 +90,8 @@ export interface FormattedIndexPool {
 }
 
 export type FormattedIndexPoolTransactions = {
-  swaps: FormattedIndexPool["recent"]["swaps"][0];
-  trades: FormattedIndexPool["recent"]["trades"][0];
+  swaps: FormattedIndexPool["transactions"]["swaps"][0];
+  trades: FormattedIndexPool["transactions"]["trades"][0];
 };
 export type FormattedPoolAsset = FormattedIndexPool["assets"][0];
 

@@ -2,7 +2,11 @@ import * as topLevelActions from "./actions";
 import { RegisteredCall } from "helpers";
 import { batcherActions, fetchMulticallData } from "./batcher";
 import { categoriesActions } from "./categories";
-import { fetchIndexPoolTransactions, indexPoolsActions } from "./indexPools";
+import {
+  fetchIndexPoolTransactions,
+  fetchIndexPoolUpdates,
+  indexPoolsActions,
+} from "./indexPools";
 import { fetchInitialData } from "./requests";
 import { fetchStakingData, stakingActions } from "./staking";
 import { fetchTokenStats, tokensActions } from "./tokens";
@@ -155,6 +159,7 @@ export const thunks = {
           fetchInitialData,
           fetchMulticallData,
           fetchIndexPoolTransactions,
+          fetchIndexPoolUpdates,
           fetchTokenStats,
         }[fn] as any;
 

@@ -5,6 +5,7 @@ import { useEffect, useRef } from "react";
 
 export function useCallRegistrar(calls: DataReceiverConfig) {
   const dispatch = useDispatch();
+  const hasSentData = useRef(false);
   const cachedCalls = useRef(calls);
   const blockNumber = useSelector(selectors.selectBlockNumber);
   const isConnected = useSelector(selectors.selectConnected);
@@ -45,7 +46,7 @@ export function useCallRegistrar(calls: DataReceiverConfig) {
   // we can trigger a changeBlockNumber thunk with the current block number.
   // As the batch is being selected, it will ignore any calls for which it already has data.
   useEffect(() => {
-    if (!isConnected && blockNumber !== -1) {
+    if (!hasSentData.current && !isConnected && blockNumber !== -1) {
       dispatch(actions.sendBatch());
     }
   }, [dispatch, isConnected, blockNumber]);
