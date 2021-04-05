@@ -97,7 +97,7 @@ export function createPoolDetailCalls(poolAddress: string, tokenIds: string[]) {
     offChainCalls: [
       {
         target: "",
-        function: "fetchTokenStats",
+        function: "fetchTokenPriceData",
         args: [poolAddress, ...tokenIds],
         canBeMerged: true,
       },

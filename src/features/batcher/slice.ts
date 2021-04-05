@@ -166,7 +166,7 @@ const slice = createSlice({
             "indexPools/fetchTransactions/fulfilled",
             "indexPools/fetchUpdates/fulfilled",
             "batcher/multicall/fulfilled",
-            "tokens/fetchStats/fulfilled",
+            "tokens/fetchPriceData/fulfilled",
           ].includes(action.type),
         (state, action) => {
           const potentialArgs = Object.keys(action.payload).join("_");
@@ -176,7 +176,7 @@ const slice = createSlice({
             "indexPools/fetchUpdates/fulfilled": `fetchIndexPoolUpdates/${potentialArgs}`,
             "indexPools/fetchTransactions/fulfilled": `fetchIndexPoolTransactions/${potentialArgs}`,
             "batcher/multicall/fulfilled": "fetchMulticallData",
-            "tokens/fetchStats/fulfilled": `getStatsForTokens/${potentialArgs}`,
+            "tokens/fetchPriceData/fulfilled": `getTokenPriceData/${potentialArgs}`,
           };
           const call = callLookup[action.type as keyof typeof callLookup];
 

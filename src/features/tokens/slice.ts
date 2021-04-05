@@ -7,7 +7,7 @@ import {
 import { createMulticallDataParser } from "helpers";
 import { fetchInitialData } from "../requests";
 import { fetchMulticallData } from "../batcher/requests"; // Circular dependency.
-import { fetchTokenStats } from "./requests";
+import { fetchTokenPriceData } from "./requests";
 import { mirroredServerState, restartedDueToError } from "../actions";
 import { pairsActions } from "../pairs";
 import type { NormalizedToken } from "./types";
@@ -66,7 +66,7 @@ const slice = createSlice({
 
         tokensAdapter.upsertMany(state, fullTokens);
       })
-      .addCase(fetchTokenStats.fulfilled, (state, action) => {
+      .addCase(fetchTokenPriceData.fulfilled, (state, action) => {
         if (action.payload) {
           for (const [address, value] of Object.entries(action.payload)) {
             if (value) {

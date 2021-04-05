@@ -9,7 +9,7 @@ import {
 } from "./indexPools";
 import { fetchInitialData } from "./requests";
 import { fetchStakingData, stakingActions } from "./staking";
-import { fetchTokenStats, tokensActions } from "./tokens";
+import { fetchTokenPriceData, tokensActions } from "./tokens";
 import { pairsActions } from "./pairs";
 import { providers } from "ethers";
 import { selectors } from "./selectors";
@@ -160,7 +160,7 @@ export const thunks = {
           fetchMulticallData,
           fetchIndexPoolTransactions,
           fetchIndexPoolUpdates,
-          fetchTokenStats,
+          fetchTokenPriceData,
         }[fn] as any;
 
         if (request) {

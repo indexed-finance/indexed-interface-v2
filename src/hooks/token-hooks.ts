@@ -20,7 +20,6 @@ export const useTokenLookup = () =>
 
 export const useTokenLookupBySymbol = () =>
   useSelector(selectors.selectTokenLookupBySymbol);
-
 // #endregion
 
 // #region Approval
@@ -94,7 +93,7 @@ export function usePricesRegistrar(tokenIds: string[]) {
     offChainCalls: [
       {
         target: "",
-        function: "fetchTokenStats",
+        function: "fetchTokenPriceData",
         args: tokenIds,
         canBeMerged: true,
       },

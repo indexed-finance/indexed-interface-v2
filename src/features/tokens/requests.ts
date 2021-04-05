@@ -1,10 +1,10 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import CoinGecko from "coingecko-api";
 
-export const fetchTokenStats = createAsyncThunk(
-  "tokens/fetchStats",
+export const fetchTokenPriceData = createAsyncThunk(
+  "tokens/fetchPriceData",
   async ({ arg: tokenAddresses }: { arg: string[] }) => {
-    const tokens = await getStatsForTokens(tokenAddresses);
+    const tokens = await getTokenPriceData(tokenAddresses);
     return tokens;
   }
 );
@@ -16,7 +16,7 @@ type TokenHistoryResponse = {
   last_updated_at: number;
 };
 
-export const getStatsForTokens = async (tokenAddresses: string[]) => {
+export const getTokenPriceData = async (tokenAddresses: string[]) => {
   try {
     const client = new CoinGecko();
     const { data: stats } = await client.simple.fetchTokenPrice({
