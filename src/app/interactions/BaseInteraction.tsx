@@ -10,6 +10,7 @@ import { selectors } from "features";
 import { useSelector } from "react-redux";
 import { useTokenApproval, useTokenRandomizer, useTranslator } from "hooks";
 
+// #region Common
 type Asset = { name: string; symbol: string; id: string };
 
 interface Props {
@@ -22,11 +23,14 @@ interface Props {
   defaultInputSymbol?: string;
   defaultOutputSymbol?: string;
   requiresApproval?: boolean;
-  onSubmit(values: InteractionValues): void;
-  onChange(values: InteractionValues): void | string;
+  onSubmit(values: SingleInteractionValues): void;
+  onChange(values: SingleInteractionValues): void | string;
 }
 
-const initialValues = {
+// #endregion
+
+// #region Single
+const singleInitialValues = {
   fromToken: "",
   fromAmount: 0,
   toToken: "",
@@ -34,15 +38,15 @@ const initialValues = {
   lastTouchedField: "from" as "from" | "to",
 };
 
-const interactionSchema = yup.object().shape({
+const singleInteractionSchema = yup.object().shape({
   fromToken: yup.string().min(0, "A token is required in the 'From' field."),
   fromAmount: yup.number().min(0, "From balance must be greater than zero."),
   toToken: yup.string().min(1, "A token is required in the 'To' field."),
 });
 
-export type InteractionValues = typeof initialValues;
+export type SingleInteractionValues = typeof singleInitialValues;
 
-export function BaseInteraction({
+export function SingleInteraction({
   title,
   assets,
   spender,
@@ -64,9 +68,9 @@ export function BaseInteraction({
       style={{ position: "relative" }}
     >
       <Formik
-        initialValues={initialValues}
+        initialValues={singleInitialValues}
         onSubmit={onSubmit}
-        validationSchema={interactionSchema}
+        validationSchema={singleInteractionSchema}
       >
         {(props) => (
           <>
@@ -81,7 +85,7 @@ export function BaseInteraction({
               <InteractionComparison />
             </Space>
             <Divider />
-            <InteractionInner
+            <SingleInteractionInner
               {...props}
               assets={assets}
               spender={spender}
@@ -101,9 +105,10 @@ export function BaseInteraction({
   );
 }
 
-type InnerProps = Omit<Props, "title"> & FormikProps<InteractionValues>;
+type InnerSingleProps = Omit<Props, "title"> &
+  FormikProps<SingleInteractionValues>;
 
-function InteractionInner({
+function SingleInteractionInner({
   spender,
   assets,
   extra,
@@ -119,7 +124,7 @@ function InteractionInner({
   disableInputSelect,
   disableOutputSelect,
   requiresApproval,
-}: InnerProps) {
+}: InnerSingleProps) {
   const tx = useTranslator();
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
   const [tokenId, exactAmountIn] = useMemo(() => {
@@ -159,7 +164,7 @@ function InteractionInner({
         toAmount: values.fromAmount,
         lastTouchedField: values.lastTouchedField,
       };
-      const error = onChange(newValues as InteractionValues);
+      const error = onChange(newValues as SingleInteractionValues);
       if (error) {
         const inputErr =
           error.includes("Input") ||
@@ -204,7 +209,7 @@ function InteractionInner({
             fromToken: token || "",
             fromAmount: amount || 0,
             lastTouchedField: "from",
-          } as InteractionValues;
+          } as SingleInteractionValues;
           const error = onChange(newValues);
           if (error) {
             if (error.includes("Output")) {
@@ -233,7 +238,7 @@ function InteractionInner({
             toToken: token || "",
             toAmount: amount || 0,
             lastTouchedField: "to",
-          } as InteractionValues;
+          } as SingleInteractionValues;
           const error = onChange(newValues);
           if (error) {
             if (error.includes("Input")) {
@@ -277,7 +282,7 @@ function InteractionInner({
 
 // e.g. [OMG] -> [AAVE]
 function InteractionComparison() {
-  const { values } = useFormikContext<typeof initialValues>();
+  const { values } = useFormikContext<typeof singleInitialValues>();
   const { fromToken, toToken } = values;
 
   return fromToken && toToken ? (
@@ -296,9 +301,9 @@ function InteractionComparison() {
 }
 
 function InteractionErrors() {
-  const { errors, touched } = useFormikContext<typeof initialValues>();
+  const { errors, touched } = useFormikContext<typeof singleInitialValues>();
   const formattedErrors = Object.entries(errors)
-    .filter(([key]) => touched[key as keyof InteractionValues])
+    .filter(([key]) => touched[key as keyof SingleInteractionValues])
     .map(([, value], index) => <li key={index}>{value}</li>);
 
   return formattedErrors.length > 0 ? (
@@ -313,3 +318,127 @@ function InteractionErrors() {
     </>
   ) : null;
 }
+
+// #endregion
+
+// #region Multi
+const multiInitialValues = {
+  fromToken: "",
+  fromAmount: 0,
+  toTokens: {},
+};
+
+export type MultiInteractionValues = typeof multiInitialValues;
+
+const multiInteractionSchema = yup.object().shape({
+  fromToken: yup.string().min(0, "A token is required in the 'From' field."),
+  fromAmount: yup.number().min(0, "From balance must be greater than zero."),
+});
+
+type MultiProps = Omit<Props, "onSubmit" | "onChange"> & {
+  onSubmit(values: MultiInteractionValues): void;
+  onChange(values: MultiInteractionValues): void;
+};
+
+export function MultiInteraction({
+  title,
+  assets,
+  spender,
+  extra = null,
+  onSubmit,
+  onChange,
+  defaultInputSymbol,
+  defaultOutputSymbol,
+  disableInputSelect,
+  disableOutputSelect,
+  requiresApproval = true,
+}: MultiProps) {
+  const interactionRef = useRef<null | HTMLDivElement>(null);
+
+  return (
+    <div
+      className="Interaction"
+      ref={interactionRef}
+      style={{ position: "relative" }}
+    >
+      <Formik
+        initialValues={multiInitialValues}
+        onSubmit={onSubmit}
+        validationSchema={multiInteractionSchema}
+      >
+        {(props) => (
+          <>
+            <Space align="center" className="spaced-between">
+              <Typography.Title
+                level={2}
+                className="fancy no-margin-bottom"
+                type="secondary"
+              >
+                {title}
+              </Typography.Title>
+            </Space>
+            <Divider />
+            <MultiInteractionInner
+              {...props}
+              assets={assets}
+              spender={spender}
+              extra={extra}
+              onSubmit={onSubmit}
+              onChange={onChange}
+              defaultInputSymbol={defaultInputSymbol}
+              defaultOutputSymbol={defaultOutputSymbol}
+              disableInputSelect={disableInputSelect}
+              disableOutputSelect={disableOutputSelect}
+              requiresApproval={requiresApproval}
+            />
+          </>
+        )}
+      </Formik>
+    </div>
+  );
+}
+
+type InnerMultiProps = Omit<MultiProps, "title"> &
+  FormikProps<MultiInteractionValues>;
+
+function MultiInteractionInner({
+  spender,
+  assets,
+  extra,
+  values,
+  isValid,
+  handleSubmit,
+  onChange,
+  setFieldValue,
+  setValues,
+  setFieldError,
+  defaultInputSymbol,
+  defaultOutputSymbol,
+  disableInputSelect,
+  disableOutputSelect,
+  requiresApproval,
+}: InnerMultiProps) {
+  const tx = useTranslator();
+
+  return (
+    <>
+      <TokenSelector
+        assets={[]}
+        label={tx("FROM")}
+        selectable={false}
+        value={{
+          token: "FOO",
+          amount: 25,
+        }}
+        // value={{
+        //   token: values.fromToken,
+        //   amount: values.fromAmount,
+        // }}
+        onChange={({ token, amount }) => {
+          //
+        }}
+      />
+    </>
+  );
+}
+// #endregion

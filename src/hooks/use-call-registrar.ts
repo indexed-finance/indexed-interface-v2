@@ -1,45 +1,41 @@
 import { DataReceiverConfig, actions, selectors } from "features";
 import { isEqual } from "lodash";
 import { useDispatch, useSelector } from "react-redux";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export function useCallRegistrar(calls: DataReceiverConfig) {
   const dispatch = useDispatch();
   const hasSentData = useRef(false);
-  const cachedCalls = useRef(calls);
+  const [cachedCalls, setCachedCalls] = useState(calls);
   const blockNumber = useSelector(selectors.selectBlockNumber);
   const isConnected = useSelector(selectors.selectConnected);
 
   // Effect:
   // Handle updates "gracefully" in a McJanky way.
   useEffect(() => {
-    if (!isEqual(calls, cachedCalls.current)) {
-      cachedCalls.current = calls;
+    if (!isEqual(calls, cachedCalls)) {
+      setCachedCalls(calls);
     }
-  });
+  }, [calls, cachedCalls]);
 
   // Effect:
   // Register a multicall listener that queries certain functions every update.
   // Note: if the user is connected, defer all updates to the server.
   useEffect(() => {
-    if (!isConnected) {
-      const _cachedCalls = cachedCalls.current;
+    if (!isConnected && cachedCalls) {
+      const allCalls = {
+        caller: cachedCalls.caller,
+        onChainCalls: cachedCalls.onChainCalls ?? [],
+        offChainCalls: cachedCalls.offChainCalls ?? [],
+      };
 
-      if (_cachedCalls) {
-        const allCalls = {
-          caller: _cachedCalls.caller,
-          onChainCalls: _cachedCalls.onChainCalls ?? [],
-          offChainCalls: _cachedCalls.offChainCalls ?? [],
-        };
+      dispatch(actions.callsRegistered(allCalls));
 
-        dispatch(actions.callsRegistered(allCalls));
-
-        return () => {
-          dispatch(actions.callsUnregistered(allCalls));
-        };
-      }
+      return () => {
+        dispatch(actions.callsUnregistered(allCalls));
+      };
     }
-  }, [dispatch, isConnected]);
+  }, [dispatch, isConnected, cachedCalls]);
 
   // Effect:
   // To get data to the user as quickly as possible,

@@ -187,9 +187,10 @@ try {
   console.info("Unable to import icons; probably because this is the server.");
 }
 
-export const MOBILE_SUPPORTED_WALLETS = [SupportedWallet.CoinbaseWallet].map(
-  (kind) => SUPPORTED_WALLETS[kind]
-);
+export const MOBILE_SUPPORTED_WALLETS = [
+  SupportedWallet.MetaMask,
+  SupportedWallet.CoinbaseWallet,
+].map((kind) => SUPPORTED_WALLETS[kind]);
 
 export const DESKTOP_SUPPORTED_WALLETS = [
   SupportedWallet.Injected,

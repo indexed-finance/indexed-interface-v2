@@ -1,6 +1,6 @@
 import { AppState, FormattedIndexPool, selectors, useSigner } from "features";
-import { BaseInteraction, InteractionValues } from "./BaseInteraction";
 import { COMMON_BASE_TOKENS, UNISWAP_ROUTER_ADDRESS } from "config";
+import { SingleInteraction, SingleInteractionValues } from "./BaseInteraction";
 import { Trade } from "@uniswap/sdk";
 import { convert } from "helpers";
 import { executeUniswapTrade } from "ethereum";
@@ -36,7 +36,7 @@ export default function TradeInteraction({ pool }: Props) {
     calculateBestTradeForExactOutput,
   } = useUniswapTradingPairs(tokenIds);
   const handleChange = useCallback(
-    (values: InteractionValues) => {
+    (values: SingleInteractionValues) => {
       const {
         fromToken,
         fromAmount,
@@ -99,7 +99,7 @@ export default function TradeInteraction({ pool }: Props) {
       toToken,
       toAmount,
       lastTouchedField,
-    }: InteractionValues) => {
+    }: SingleInteractionValues) => {
       if (fromAmount > 0 && toAmount > 0 && fromToken && toToken) {
         const inputToken = tokenLookup[fromToken.toLowerCase()];
         const outputToken = tokenLookup[toToken.toLowerCase()];
@@ -108,6 +108,7 @@ export default function TradeInteraction({ pool }: Props) {
           const amountIn = convert
             .toToken(fromAmount.toString(), inputToken.decimals)
             .toString(10);
+
           trade = calculateBestTradeForExactInput(
             inputToken,
             outputToken,
@@ -117,6 +118,7 @@ export default function TradeInteraction({ pool }: Props) {
           const amountOut = convert
             .toToken(toAmount.toString(), outputToken.decimals)
             .toString(10);
+
           trade = calculateBestTradeForExactOutput(
             inputToken,
             outputToken,
@@ -145,7 +147,7 @@ export default function TradeInteraction({ pool }: Props) {
   useUserDataRegistrar(poolToTokens);
 
   return (
-    <BaseInteraction
+    <SingleInteraction
       title={tx("TRADE")}
       assets={assets as any}
       spender={UNISWAP_ROUTER_ADDRESS}

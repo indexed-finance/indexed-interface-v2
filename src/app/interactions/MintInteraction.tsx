@@ -1,9 +1,13 @@
-import { BaseInteraction, InteractionValues } from "./BaseInteraction";
 import { COMMON_BASE_TOKENS, MINT_ROUTER_ADDRESS, SLIPPAGE_RATE } from "config";
 import { FormattedIndexPool, selectors } from "features";
 import { Fragment, useCallback, useMemo, useState } from "react";
+import {
+  MultiInteraction,
+  MultiInteractionValues,
+  SingleInteraction,
+  SingleInteractionValues,
+} from "./BaseInteraction";
 import { Radio } from "antd";
-import { Route } from "react-router-dom";
 import { convert } from "helpers";
 import { downwardSlippage, upwardSlippage } from "ethereum";
 import {
@@ -34,19 +38,13 @@ export default function MintInteraction({ pool }: Props) {
         }}
       >
         <Radio.Button value="single">Single Input</Radio.Button>
-        <Radio.Button value="multi">Multi Input</Radio.Button>
         <Radio.Button value="uniswap">Uniswap</Radio.Button>
+        <Radio.Button value="multi">Multi Input</Radio.Button>
       </Radio.Group>
 
-      <Route path="/single">
-        <SingleTokenMintInteraction pool={pool} />
-      </Route>
-      <Route path="/multi">
-        <MultiTokenMintInteraction pool={pool} />
-      </Route>
-      <Route path="/uniswap">
-        <UniswapMintInteraction pool={pool} />
-      </Route>
+      {mintType === "single" && <SingleTokenMintInteraction pool={pool} />}
+      {mintType === "uniswap" && <UniswapMintInteraction pool={pool} />}
+      {mintType === "multi" && <MultiTokenMintInteraction pool={pool} />}
     </Fragment>
   );
 }
@@ -60,11 +58,8 @@ function SingleTokenMintInteraction({ pool }: Props) {
     executeMint,
   } = useSingleTokenMintCallbacks(pool.id);
   const poolToTokens = usePoolToTokens(pool);
-
-  useUserDataRegistrar(poolToTokens);
-
   const handleChange = useCallback(
-    (values: InteractionValues) => {
+    (values: SingleInteractionValues) => {
       const {
         fromToken,
         fromAmount,
@@ -124,9 +119,8 @@ function SingleTokenMintInteraction({ pool }: Props) {
     },
     [calculateAmountIn, calculateAmountOut, tokenLookup]
   );
-
   const handleSubmit = useCallback(
-    (values: InteractionValues) => {
+    (values: SingleInteractionValues) => {
       const {
         fromToken,
         fromAmount,
@@ -147,8 +141,10 @@ function SingleTokenMintInteraction({ pool }: Props) {
     [executeMint]
   );
 
+  useUserDataRegistrar(poolToTokens);
+
   return (
-    <BaseInteraction
+    <SingleInteraction
       title={tx("MINT")}
       assets={pool.assets}
       spender={pool.id}
@@ -158,10 +154,6 @@ function SingleTokenMintInteraction({ pool }: Props) {
       disableOutputSelect
     />
   );
-}
-
-function MultiTokenMintInteraction({ pool }: Props) {
-  return <div>Multi</div>;
 }
 
 function UniswapMintInteraction({ pool }: Props) {
@@ -181,7 +173,7 @@ function UniswapMintInteraction({ pool }: Props) {
   useUserDataRegistrar(poolToTokens);
 
   const handleChange = useCallback(
-    (values: InteractionValues) => {
+    (values: SingleInteractionValues) => {
       const {
         fromToken,
         fromAmount,
@@ -254,7 +246,7 @@ function UniswapMintInteraction({ pool }: Props) {
   );
 
   const handleSubmit = useCallback(
-    (values: InteractionValues) => {
+    (values: SingleInteractionValues) => {
       const {
         fromToken,
         fromAmount,
@@ -276,7 +268,7 @@ function UniswapMintInteraction({ pool }: Props) {
   );
 
   return (
-    <BaseInteraction
+    <SingleInteraction
       title={tx("MINT_WITH_UNISWAP")}
       assets={
         assets.filter((_) => _) as {
@@ -291,6 +283,26 @@ function UniswapMintInteraction({ pool }: Props) {
       defaultInputSymbol={assets[0].symbol}
       defaultOutputSymbol={pool.symbol}
       disableOutputSelect
+    />
+  );
+}
+
+function MultiTokenMintInteraction({ pool }: Props) {
+  const tx = useTranslator();
+  const handleSubmit = useCallback((values: MultiInteractionValues) => {
+    //
+  }, []);
+  const handleChange = useCallback((values: MultiInteractionValues) => {
+    //
+  }, []);
+
+  return (
+    <MultiInteraction
+      title={tx("MINT")}
+      assets={pool.assets}
+      spender={pool.id}
+      onSubmit={handleSubmit}
+      onChange={handleChange}
     />
   );
 }

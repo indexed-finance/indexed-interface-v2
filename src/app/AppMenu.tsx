@@ -10,7 +10,7 @@ import { SOCIAL_MEDIA } from "config";
 import { TranslatedTerm } from "helpers";
 import { routes } from "./routes";
 import { selectors } from "features";
-import { useBreakpoints, useScrollPrevention, useTranslator } from "hooks";
+import { useBreakpoints, useTranslator } from "hooks";
 import { useSelector } from "react-redux";
 import noop from "lodash.noop";
 
@@ -28,8 +28,6 @@ export function AppMenu({ onItemClick = noop, ...rest }: Props) {
   const indexPoolsLookup = useSelector(selectors.selectCategoryImagesByPoolIds);
   const history = useHistory();
   const { isMobile } = useBreakpoints();
-
-  useScrollPrevention(isMobile);
 
   return (
     <>

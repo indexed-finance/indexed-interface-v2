@@ -139,11 +139,11 @@ function Pool({ id }: { id: string }) {
             case breakpoints.xl:
               return tabletSized;
             case breakpoints.lg:
-              return tabletSized;
+              return mobileSized;
             case breakpoints.md:
-              return tabletSized;
+              return mobileSized;
             case breakpoints.sm:
-              return tabletSized;
+              return mobileSized;
             case breakpoints.xs:
               return mobileSized;
           }

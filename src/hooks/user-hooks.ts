@@ -34,31 +34,33 @@ export const USER_CALLER = "User";
 export function useUserDataRegistrar(poolTokens: Record<string, string[]>) {
   const userAddress = useUserAddress();
   const interfaceKind = "IERC20_ABI";
-  const userDataCalls: RegisteredCall[] = Object.entries(poolTokens).flatMap(
-    ([pool, tokens]) => {
-      return tokens.flatMap((token) => [
-        {
-          interfaceKind,
-          target: token,
-          function: "allowance",
-          args: [userAddress, pool],
-        },
-        {
-          interfaceKind,
-          target: token,
-          function: "balanceOf",
-          args: [userAddress],
-        },
-      ]);
-    }
-  );
+  const userDataCalls: RegisteredCall[] = userAddress
+    ? Object.entries(poolTokens).flatMap(([pool, tokens]) =>
+        tokens.flatMap((token) => [
+          {
+            interfaceKind,
+            target: token,
+            function: "allowance",
+            args: [userAddress, pool],
+          },
+          {
+            interfaceKind,
+            target: token,
+            function: "balanceOf",
+            args: [userAddress],
+          },
+        ])
+      )
+    : [];
 
-  userDataCalls.push({
-    interfaceKind,
-    target: NDX_ADDRESS,
-    function: "balanceOf",
-    args: [userAddress],
-  });
+  if (userAddress) {
+    userDataCalls.push({
+      interfaceKind,
+      target: NDX_ADDRESS,
+      function: "balanceOf",
+      args: [userAddress],
+    });
+  }
 
   useCallRegistrar({
     caller: USER_CALLER,

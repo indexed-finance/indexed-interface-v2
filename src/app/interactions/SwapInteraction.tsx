@@ -1,10 +1,10 @@
 import { AppState, FormattedIndexPool, selectors } from "features";
-import { BaseInteraction, InteractionValues } from "./BaseInteraction";
 import { BigNumber } from "ethereum/utils/balancer-math";
 import { Divider, Space } from "antd";
 import { FEATURE_FLAGS } from "feature-flags";
 import { PlainLanguageTransaction, TokenExchangeRate } from "components";
 import { SLIPPAGE_RATE } from "config";
+import { SingleInteraction, SingleInteractionValues } from "./BaseInteraction";
 import { calcSwapAmountOut, downwardSlippage, upwardSlippage } from "ethereum";
 import { convert } from "helpers";
 import { getSwapCost } from "ethereum/utils";
@@ -32,7 +32,7 @@ export default function SwapInteraction({ pool }: Props) {
     errorMessage: "TODO: Swap Fail",
   });
   const handleChange = useCallback(
-    (values: InteractionValues) => {
+    (values: SingleInteractionValues) => {
       const {
         fromToken,
         fromAmount,
@@ -98,7 +98,7 @@ export default function SwapInteraction({ pool }: Props) {
     [calculateAmountIn, calculateAmountOut, tokenLookup]
   );
   const handleSubmit = useCallback(
-    (values: InteractionValues) => {
+    (values: SingleInteractionValues) => {
       const {
         fromToken,
         fromAmount,
@@ -125,7 +125,7 @@ export default function SwapInteraction({ pool }: Props) {
   useUserDataRegistrar(poolToTokens);
 
   return (
-    <BaseInteraction
+    <SingleInteraction
       title={tx("SWAP")}
       assets={pool.assets}
       spender={pool.id}
@@ -137,7 +137,7 @@ export default function SwapInteraction({ pool }: Props) {
 }
 
 function SwapExtras({ pool }: Props) {
-  const { values } = useFormikContext<InteractionValues>();
+  const { values } = useFormikContext<SingleInteractionValues>();
   const { fromToken, fromAmount, toToken, toAmount } = values;
   const swapCost = getSwapCost(toAmount, pool.swapFee);
   const defaultFromToken = useDefaultToken(pool, fromToken);

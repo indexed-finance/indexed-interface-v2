@@ -23,7 +23,6 @@ export default function Portfolio() {
   const pools = useSelector(selectors.selectAllPools);
   const poolsToTokens = pools.reduce((prev, next) => {
     prev[next.id] = next.tokens.ids;
-
     return prev;
   }, {} as Record<string, string[]>);
   const [ethPrice, ethPriceLoading] = useEthPrice();
@@ -32,14 +31,13 @@ export default function Portfolio() {
       ? null
       : selectors.selectFormattedPortfolio(state, ethPrice!)
   );
-
   const uniswapPairs = useMemo(
     () => buildUniswapPairs([NDX_ADDRESS, WETH_CONTRACT_ADDRESS]),
     []
   );
 
-  useUserDataRegistrar(poolsToTokens);
   useStakingRegistrar();
+  useUserDataRegistrar(poolsToTokens);
   usePairDataRegistrar(uniswapPairs);
 
   // Effect:

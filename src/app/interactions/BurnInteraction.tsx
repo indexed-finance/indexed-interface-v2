@@ -1,8 +1,8 @@
 import { BURN_ROUTER_ADDRESS, COMMON_BASE_TOKENS, SLIPPAGE_RATE } from "config";
-import { BaseInteraction, InteractionValues } from "./BaseInteraction";
 import { FormattedIndexPool, selectors } from "features";
 import { Fragment, useCallback, useState } from "react";
 import { Radio } from "antd";
+import { SingleInteraction, SingleInteractionValues } from "./BaseInteraction";
 import { convert } from "helpers";
 import { downwardSlippage, upwardSlippage } from "ethereum";
 import {
@@ -64,7 +64,7 @@ function SingleTokenBurnInteraction({ pool }: Props) {
   useUserDataRegistrar(poolsToTokens);
 
   const handleChange = useCallback(
-    (values: InteractionValues) => {
+    (values: SingleInteractionValues) => {
       const {
         fromToken,
         fromAmount,
@@ -125,7 +125,7 @@ function SingleTokenBurnInteraction({ pool }: Props) {
     [calculateAmountIn, calculateAmountOut, tokenLookup]
   );
   const handleSubmit = useCallback(
-    (values: InteractionValues) => {
+    (values: SingleInteractionValues) => {
       const {
         fromToken,
         fromAmount,
@@ -149,7 +149,7 @@ function SingleTokenBurnInteraction({ pool }: Props) {
   );
 
   return (
-    <BaseInteraction
+    <SingleInteraction
       title={tx("BURN")}
       assets={pool.assets}
       spender={poolId}
@@ -178,7 +178,7 @@ function UniswapBurnInteraction({ pool }: Props) {
   useUserDataRegistrar(poolsToTokens);
 
   const handleChange = useCallback(
-    (values: InteractionValues) => {
+    (values: SingleInteractionValues) => {
       const {
         fromToken,
         fromAmount,
@@ -247,7 +247,7 @@ function UniswapBurnInteraction({ pool }: Props) {
   );
 
   const handleSubmit = useCallback(
-    (values: InteractionValues) => {
+    (values: SingleInteractionValues) => {
       const {
         fromToken,
         fromAmount,
@@ -269,7 +269,7 @@ function UniswapBurnInteraction({ pool }: Props) {
   );
 
   return (
-    <BaseInteraction
+    <SingleInteraction
       title={tx("BURN_WITH_UNISWAP")}
       assets={
         assets.filter((_) => _) as {
