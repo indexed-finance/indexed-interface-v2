@@ -28,6 +28,7 @@ type Asset = {
 };
 
 interface Props {
+  showBalance?: boolean;
   label?: string;
   assets: Asset[];
   value?: TokenSelectorValue;
@@ -37,6 +38,7 @@ interface Props {
 }
 
 export function TokenSelector({
+  showBalance = true,
   label = "",
   assets,
   value = {},
@@ -149,27 +151,34 @@ export function TokenSelector({
       <div onClick={handleWrapperClick}>
         <Space direction="horizontal" className="spaced-between">
           <Space direction="vertical">
-            {value.token ? (
-              <Typography.Text type="secondary" style={{ textAlign: "left" }}>
-                {parseInt(relevantBalance) ? (
-                  <>
-                    Balance: {relevantBalance}{" "}
-                    {value.token && parseFloat(relevantBalance) > 0 && (
-                      <Button
-                        type="text"
-                        onClick={handleMaxOut}
-                        style={{ fontSize: 12 }}
-                      >
-                        {tx("MAX")}
-                      </Button>
+            {showBalance && (
+              <>
+                {value.token ? (
+                  <Typography.Text
+                    type="secondary"
+                    style={{ textAlign: "left" }}
+                  >
+                    {parseInt(relevantBalance) ? (
+                      <>
+                        Balance: {relevantBalance}{" "}
+                        {value.token && parseFloat(relevantBalance) > 0 && (
+                          <Button
+                            type="text"
+                            onClick={handleMaxOut}
+                            style={{ fontSize: 12 }}
+                          >
+                            {tx("MAX")}
+                          </Button>
+                        )}
+                      </>
+                    ) : (
+                      tx("NO_BALANCE")
                     )}
-                  </>
+                  </Typography.Text>
                 ) : (
-                  tx("NO_BALANCE")
+                  "-"
                 )}
-              </Typography.Text>
-            ) : (
-              "-"
+              </>
             )}
             <InputNumber
               bordered={false}

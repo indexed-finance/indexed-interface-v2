@@ -3,12 +3,25 @@ import { AiOutlineArrowRight } from "react-icons/ai";
 import { Alert, Button, Divider, Space, Typography } from "antd";
 import { Flipper, Token } from "components/atoms";
 import { Formik, FormikProps, useFormikContext } from "formik";
-import { ReactNode, useCallback, useMemo, useRef } from "react";
+import {
+  ReactNode,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { TokenSelector } from "components";
 import { convert } from "helpers";
 import { selectors } from "features";
+import {
+  useMultiTokenMintCallbacks,
+  useTokenApproval,
+  useTokenRandomizer,
+  useTranslator,
+} from "hooks";
 import { useSelector } from "react-redux";
-import { useTokenApproval, useTokenRandomizer, useTranslator } from "hooks";
+import noop from "lodash.noop";
 
 // #region Common
 type Asset = { name: string; symbol: string; id: string };
@@ -325,7 +338,6 @@ function InteractionErrors() {
 const multiInitialValues = {
   fromToken: "",
   fromAmount: 0,
-  toTokens: {},
 };
 
 export type MultiInteractionValues = typeof multiInitialValues;
@@ -336,8 +348,8 @@ const multiInteractionSchema = yup.object().shape({
 });
 
 type MultiProps = Omit<Props, "onSubmit" | "onChange"> & {
-  onSubmit(values: MultiInteractionValues): void;
-  onChange(values: MultiInteractionValues): void;
+  onSubmit?(values: MultiInteractionValues): void;
+  onChange?(values: MultiInteractionValues): void;
 };
 
 export function MultiInteraction({
@@ -345,8 +357,8 @@ export function MultiInteraction({
   assets,
   spender,
   extra = null,
-  onSubmit,
-  onChange,
+  onSubmit = noop,
+  onChange = noop,
   defaultInputSymbol,
   defaultOutputSymbol,
   disableInputSelect,
@@ -401,24 +413,47 @@ export function MultiInteraction({
 type InnerMultiProps = Omit<MultiProps, "title"> &
   FormikProps<MultiInteractionValues>;
 
-function MultiInteractionInner({
-  spender,
-  assets,
-  extra,
-  values,
-  isValid,
-  handleSubmit,
-  onChange,
-  setFieldValue,
-  setValues,
-  setFieldError,
-  defaultInputSymbol,
-  defaultOutputSymbol,
-  disableInputSelect,
-  disableOutputSelect,
-  requiresApproval,
-}: InnerMultiProps) {
+function MultiInteractionInner({ spender, assets }: InnerMultiProps) {
   const tx = useTranslator();
+  const tokenLookup = useSelector(selectors.selectTokenLookup);
+  const { values, setFieldValue } = useFormikContext<MultiInteractionValues>();
+  const tokenValue = useMemo(
+    () => ({
+      token: tokenLookup[spender]?.symbol ?? "",
+      amount: values.fromAmount,
+    }),
+    [spender, tokenLookup, values.fromAmount]
+  );
+  const handleChange = useCallback(
+    (changedValue: { token?: string; amount?: number }) => {
+      if (changedValue.token) {
+        setFieldValue("fromToken", changedValue.token);
+      }
+
+      if (changedValue.amount) {
+        setFieldValue("fromAmount", changedValue.amount);
+      }
+    },
+    [setFieldValue]
+  );
+  const [lookup, setLookup] = useState<Record<string, number>>({});
+  const { calculateAmountsIn, executeMint } = useMultiTokenMintCallbacks(
+    spender
+  );
+
+  useEffect(() => {
+    const result = calculateAmountsIn(values.fromAmount.toString());
+
+    if (result) {
+      const { tokens, amountsIn } = result;
+      const formatted = tokens.reduce((prev, next, index) => {
+        prev[next] = parseFloat(convert.toBalance(amountsIn[index]));
+        return prev;
+      }, {} as Record<string, number>);
+
+      setLookup(formatted);
+    }
+  }, [calculateAmountsIn, values.fromAmount]);
 
   return (
     <>
@@ -426,18 +461,24 @@ function MultiInteractionInner({
         assets={[]}
         label={tx("FROM")}
         selectable={false}
-        value={{
-          token: "FOO",
-          amount: 25,
-        }}
-        // value={{
-        //   token: values.fromToken,
-        //   amount: values.fromAmount,
-        // }}
-        onChange={({ token, amount }) => {
-          //
-        }}
+        value={tokenValue}
+        onChange={handleChange}
       />
+      <Divider />
+      <div style={{ maxHeight: 500, overflow: "auto", paddingRight: 25 }}>
+        {assets.map((asset) => (
+          <TokenSelector
+            key={asset.id}
+            selectable={false}
+            assets={[]}
+            showBalance={false}
+            value={{
+              token: asset.symbol,
+              amount: lookup[asset.id] ?? 0,
+            }}
+          />
+        ))}
+      </div>
     </>
   );
 }
