@@ -20,7 +20,7 @@ import { routes } from "./routes";
 import { selectors } from "features";
 import { useBreakpoints, useStorageEntry, useTranslator } from "hooks";
 import { useSelector } from "react-redux";
-import { useTransactionDrawer, useWalletConnectionDrawer } from "./drawers";
+import { useWalletConnectionDrawer } from "./drawers";
 import noop from "lodash.noop";
 
 const ERROR_NOTIFICATION_STORAGE_KEY =
@@ -42,7 +42,7 @@ export function AppLayout() {
   const [mobileMenuActive, setMobileMenuActive] = useState(false);
   const closeMobileMenu = useCallback(() => setMobileMenuActive(false), []);
   const { open: openWalletDrawer } = useWalletConnectionDrawer();
-  const { open: openTransactionDrawer } = useTransactionDrawer();
+  // const { open: openTransactionDrawer } = useTransactionDrawer();
   const toggleMobileMenu = useCallback(
     () => setMobileMenuActive((prev) => !prev),
     []

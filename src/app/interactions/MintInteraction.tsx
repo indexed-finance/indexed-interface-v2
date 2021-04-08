@@ -12,7 +12,7 @@ import { convert } from "helpers";
 import { downwardSlippage, upwardSlippage } from "ethereum";
 import {
   useMintRouterCallbacks,
-  useMultiTokenMintCallbacks,
+  // useMultiTokenMintCallbacks,
   usePoolToTokens,
   useSingleTokenMintCallbacks,
   useTranslator,
@@ -293,9 +293,9 @@ function MultiTokenMintInteraction({ pool }: Props) {
   const handleSubmit = useCallback((values: MultiInteractionValues) => {
     //
   }, []);
-  const { calculateAmountsIn, executeMint } = useMultiTokenMintCallbacks(
-    pool.id
-  );
+  // const { calculateAmountsIn, executeMint } = useMultiTokenMintCallbacks(
+  //   pool.id
+  // );
   // const value = calculateAmountsIn(amount.toString());
 
   return (

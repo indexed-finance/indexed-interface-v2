@@ -21,9 +21,13 @@ const store = configureStore({
 store.subscribe(() => {
   try {
     const { batcher, ...toSave } = store.getState();
+    const saved = {
+      when: Date.now(),
+      what: toSave,
+    };
 
-    window.localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(toSave));
-  } catch (error) {
+    window.localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(saved));
+  } catch {
     // Persistence not available.
   }
 });
@@ -51,9 +55,11 @@ export function loadPersistedState() {
     const persistedState = window.localStorage.getItem(LOCALSTORAGE_KEY);
 
     if (persistedState) {
-      const state = JSON.parse(persistedState);
+      const { when, what: state } = JSON.parse(persistedState);
+      const oneDay = 1000 * 60 * 60 * 24;
+      const isFresh = Date.now() - when <= oneDay;
 
-      return state;
+      return isFresh ? state : undefined;
     }
   }
 }

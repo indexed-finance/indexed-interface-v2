@@ -437,9 +437,7 @@ function MultiInteractionInner({ spender, assets }: InnerMultiProps) {
     [setFieldValue]
   );
   const [lookup, setLookup] = useState<Record<string, number>>({});
-  const { calculateAmountsIn, executeMint } = useMultiTokenMintCallbacks(
-    spender
-  );
+  const { calculateAmountsIn } = useMultiTokenMintCallbacks(spender);
 
   useEffect(() => {
     const result = calculateAmountsIn(values.fromAmount.toString());
