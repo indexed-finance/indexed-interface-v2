@@ -439,6 +439,8 @@ function MultiInteractionInner({ spender, assets }: InnerMultiProps) {
   const [lookup, setLookup] = useState<Record<string, number>>({});
   const { calculateAmountsIn } = useMultiTokenMintCallbacks(spender);
 
+  // Effect:
+  // When the form changes, re-calculate what goes into each field.
   useEffect(() => {
     const result = calculateAmountsIn(values.fromAmount.toString());
 
