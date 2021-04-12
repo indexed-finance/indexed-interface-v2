@@ -1,7 +1,7 @@
 import ReactDOM from "react-dom";
 import React from "react";
 import { BackTop } from "antd";
-import { App } from "./_app/App";
+import { App } from "./app/App";
 
 ReactDOM.render(
   <React.StrictMode>

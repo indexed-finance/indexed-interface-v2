@@ -28,12 +28,15 @@ type Asset = {
 };
 
 interface Props {
+  max?: number | undefined;
   showBalance?: boolean;
   label?: string;
   assets: Asset[];
   value?: TokenSelectorValue;
   selectable?: boolean;
   balance?: string;
+  error?: string;
+  reversed?: boolean;
   onChange?: (value: TokenSelectorValue) => void;
 }
 
@@ -43,6 +46,9 @@ export function TokenSelector({
   assets,
   value = {},
   selectable = true,
+  reversed = false,
+  max,
+  error = "",
   onChange,
 }: Props) {
   const tx = useTranslator();
@@ -148,8 +154,14 @@ export function TokenSelector({
 
   return (
     <>
-      <div onClick={handleWrapperClick}>
-        <Space direction="horizontal" className="spaced-between">
+      <div onClick={handleWrapperClick} style={{ marginBottom: 8 }}>
+        <Space
+          direction="horizontal"
+          className="spaced-between"
+          style={{
+            flexDirection: reversed ? "row-reverse" : "row",
+          }}
+        >
           <Space direction="vertical">
             {showBalance && (
               <>
@@ -184,6 +196,7 @@ export function TokenSelector({
               bordered={false}
               ref={input}
               min={0}
+              max={max}
               step="0.01"
               value={value.amount ?? amount}
               onFocus={() =>
@@ -192,19 +205,23 @@ export function TokenSelector({
                 })
               }
               onChange={onAmountChange}
-              style={{ width: isMobile ? 120 : 200, fontSize: 22 }}
+              style={{
+                width: isMobile ? 120 : 200,
+                fontSize: 22,
+                border: `1px solid ${error ? "#A61C23" : "transparent"}`,
+                flex: reversed ? 1 : 0,
+              }}
             />
           </Space>
           <div>
             <div style={{ paddingRight: 15, textAlign: "right" }}>
               <Typography.Text type="secondary">{label}</Typography.Text>
             </div>
-            {}
             <Button
               type={value.token ? "text" : "primary"}
               onClick={handleOpenTokenSelection}
             >
-              <Space>
+              <Space style={{ position: "relative", top: -4 }}>
                 {value.token ? (
                   <>
                     <Token

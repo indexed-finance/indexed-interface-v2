@@ -465,7 +465,7 @@ function MultiInteractionInner({ spender, assets }: InnerMultiProps) {
         onChange={handleChange}
       />
       <Divider />
-      <div style={{ maxHeight: 500, overflow: "auto", paddingRight: 25 }}>
+      <div style={{ maxHeight: 500, overflow: "auto" }}>
         {assets.map((asset) => (
           <TokenSelector
             key={asset.id}
@@ -476,6 +476,8 @@ function MultiInteractionInner({ spender, assets }: InnerMultiProps) {
               token: asset.symbol,
               amount: lookup[asset.id] ?? 0,
             }}
+            error={tx("EXCEEDS_BALANCE")}
+            reversed={true}
           />
         ))}
       </div>
