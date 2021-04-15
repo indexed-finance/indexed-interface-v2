@@ -2,10 +2,16 @@ import { NDX_ADDRESS } from "config";
 import { RegisteredCall } from "helpers";
 import { selectors } from "features";
 import { useCallRegistrar } from "./use-call-registrar";
+import { useMemo } from "react";
 import { useSelector } from "react-redux";
 import type { AppState } from "features/store";
 
 export const useTranslator = () => useSelector(selectors.selectTranslator);
+
+export const useTokenBalances = (tokenIds: string[]) => {
+  useBalancesRegistrar(tokenIds);
+  return useSelector((state: AppState) => selectors.selectTokenBalances(state, tokenIds));
+}
 
 export const useApprovalStatus = (
   tokenId: string,
@@ -61,6 +67,26 @@ export function useUserDataRegistrar(poolTokens: Record<string, string[]>) {
       args: [userAddress],
     });
   }
+
+  useCallRegistrar({
+    caller: USER_CALLER,
+    onChainCalls: userDataCalls,
+  });
+}
+
+export function useBalancesRegistrar(tokenIds: string[]) {
+  const userAddress = useUserAddress();
+  const interfaceKind = "IERC20_ABI";
+  const userDataCalls: RegisteredCall[] = useMemo(() => {
+    return userAddress ? tokenIds.map(
+      (tokenId) => ({
+        interfaceKind,
+        target: tokenId,
+        function: "balanceOf",
+        args: [userAddress],
+      })
+    ): [];
+  }, [userAddress, tokenIds]);
 
   useCallRegistrar({
     caller: USER_CALLER,
