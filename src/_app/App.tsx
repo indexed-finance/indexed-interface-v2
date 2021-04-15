@@ -1,4 +1,4 @@
-import "theme/index.less";
+// import "theme/index.less";
 import { AppErrorBoundary } from "./AppErrorBoundary";
 import { BrowserRouter } from "react-router-dom";
 import { DEBUG } from "components";
@@ -6,14 +6,13 @@ import { FEATURE_FLAGS } from "feature-flags";
 import { Layout } from "./Layout";
 // import { Parallax } from "react-parallax";
 import { Provider, useSelector } from "react-redux";
-// import { TransactionProvider, WalletConnectionProvider } from "./drawers";
+import { TransactionProvider, WalletConnectionProvider } from "../app/drawers";
 import { Web3ReactProvider } from "@web3-react/core";
 import { ethers } from "ethers";
 import { message, notification } from "antd";
 import { selectors, store } from "features";
 import { useBreakpoints } from "hooks";
 import { useEffect } from "react";
-import background from "assets/images/dark-bg.jpg";
 
 function Inner() {
   const { isMobile } = useBreakpoints();
@@ -58,11 +57,11 @@ export function App() {
     <Provider store={store}>
       <AppErrorBoundary>
         <Web3ReactProvider getLibrary={getLibrary}>
-          {/* <WalletConnectionProvider>
-            <TransactionProvider> */}
-          <Inner />
-          {/* </TransactionProvider>
-          </WalletConnectionProvider> */}
+          <WalletConnectionProvider>
+            <TransactionProvider>
+              <Inner />
+            </TransactionProvider>
+          </WalletConnectionProvider>
         </Web3ReactProvider>
       </AppErrorBoundary>
     </Provider>

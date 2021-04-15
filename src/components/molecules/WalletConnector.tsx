@@ -6,6 +6,10 @@ export function WalletConnector() {
   const { toggle } = useContext(WalletConnectionContext);
 
   return (
-    <MdAccountBalanceWallet className="WalletConnector" onClick={toggle} />
+    <MdAccountBalanceWallet
+      onClick={toggle}
+      fontSize={24}
+      style={{ position: "relative", top: 6 }}
+    />
   );
 }

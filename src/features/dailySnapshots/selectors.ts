@@ -96,52 +96,56 @@ export const dailySnapshotsSelectors = {
       last24Hours,
       lastWeek,
     } = dailySnapshotsSelectors.selectSnapshotPeriodsForPool(state, poolId);
-    const volumeLast24Hours =
-      parseFloat(mostRecentSnapshot.totalVolumeUSD) -
-      parseFloat(last24Hours[0].totalVolumeUSD);
 
-    // Values
-    const priceDelta24Hours = mostRecentSnapshot.value - last24Hours[0].value;
-    const priceDeltaWeek = mostRecentSnapshot.value - lastWeek[0].value;
-    const totalValueLockedUSDDelta24Hours =
-      mostRecentSnapshot.totalValueLockedUSD -
-      last24Hours[0].totalValueLockedUSD;
-    const totalValueLockedUSDDeltaWeek =
-      mostRecentSnapshot.totalValueLockedUSD - lastWeek[0].totalValueLockedUSD;
+    if (mostRecentSnapshot.totalVolumeUSD && last24Hours[0].totalVolumeUSD) {
+      const volumeLast24Hours =
+        parseFloat(mostRecentSnapshot.totalVolumeUSD) -
+        parseFloat(last24Hours[0].totalVolumeUSD);
 
-    // Percents
-    const pricePercentDelta24Hours = priceDelta24Hours / last24Hours[0].value;
-    const pricePercentDeltaWeek = priceDeltaWeek / lastWeek[0].value;
-    const totalValueLockedUSDPercentDelta24Hours =
-      totalValueLockedUSDDelta24Hours / last24Hours[0].totalValueLockedUSD;
-    const totalValueLockedUSDPercentDeltaWeek =
-      totalValueLockedUSDDeltaWeek / lastWeek[0].totalValueLockedUSD;
+      // Values
+      const priceDelta24Hours = mostRecentSnapshot.value - last24Hours[0].value;
+      const priceDeltaWeek = mostRecentSnapshot.value - lastWeek[0].value;
+      const totalValueLockedUSDDelta24Hours =
+        mostRecentSnapshot.totalValueLockedUSD -
+        last24Hours[0].totalValueLockedUSD;
+      const totalValueLockedUSDDeltaWeek =
+        mostRecentSnapshot.totalValueLockedUSD -
+        lastWeek[0].totalValueLockedUSD;
 
-    return {
-      volume: {
-        day: volumeLast24Hours,
-      },
-      price: {
-        day: {
-          value: priceDelta24Hours,
-          percent: pricePercentDelta24Hours,
+      // Percents
+      const pricePercentDelta24Hours = priceDelta24Hours / last24Hours[0].value;
+      const pricePercentDeltaWeek = priceDeltaWeek / lastWeek[0].value;
+      const totalValueLockedUSDPercentDelta24Hours =
+        totalValueLockedUSDDelta24Hours / last24Hours[0].totalValueLockedUSD;
+      const totalValueLockedUSDPercentDeltaWeek =
+        totalValueLockedUSDDeltaWeek / lastWeek[0].totalValueLockedUSD;
+
+      return {
+        volume: {
+          day: volumeLast24Hours,
         },
-        week: {
-          value: priceDeltaWeek,
-          percent: pricePercentDeltaWeek,
+        price: {
+          day: {
+            value: priceDelta24Hours,
+            percent: pricePercentDelta24Hours,
+          },
+          week: {
+            value: priceDeltaWeek,
+            percent: pricePercentDeltaWeek,
+          },
         },
-      },
-      totalValueLockedUSD: {
-        day: {
-          value: totalValueLockedUSDDelta24Hours,
-          percent: totalValueLockedUSDPercentDelta24Hours,
+        totalValueLockedUSD: {
+          day: {
+            value: totalValueLockedUSDDelta24Hours,
+            percent: totalValueLockedUSDPercentDelta24Hours,
+          },
+          week: {
+            value: totalValueLockedUSDDeltaWeek,
+            percent: totalValueLockedUSDPercentDeltaWeek,
+          },
         },
-        week: {
-          value: totalValueLockedUSDDeltaWeek,
-          percent: totalValueLockedUSDPercentDeltaWeek,
-        },
-      },
-    };
+      };
+    }
   },
   selectPoolStats: (state: AppState, poolId: string) => {
     const mostRecentSnapshot = dailySnapshotsSelectors.selectMostRecentSnapshotOfPool(

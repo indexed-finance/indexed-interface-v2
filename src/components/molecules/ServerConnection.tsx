@@ -1,5 +1,5 @@
-import { Form, Popconfirm, Typography } from "antd";
 import { ImConnection } from "react-icons/im";
+import { Popconfirm, Space, Typography } from "antd";
 import { actions, selectors } from "features";
 import { useDispatch, useSelector } from "react-redux";
 import { useMemo } from "react";
@@ -8,8 +8,6 @@ import { useTranslator } from "hooks";
 interface Props {
   showText?: boolean;
 }
-
-const { Item } = Form;
 
 export function ServerConnection({ showText = false }: Props) {
   const tx = useTranslator();
@@ -37,31 +35,33 @@ export function ServerConnection({ showText = false }: Props) {
   }, [isConnectionEnabled, isConnected, tx]);
 
   return (
-    <Item className="ServerConnection">
-      <Popconfirm
-        icon={null}
-        placement="topLeft"
-        title={
+    <Popconfirm
+      icon={null}
+      placement="topLeft"
+      title={
+        <Space>
+          <ImConnection />
           <div>
-            <ImConnection />
-            <div>
-              <strong>{connectionStatus.top}</strong>
-              <br />
-              <em>{connectionStatus.bottom}</em>
-            </div>
+            <strong>{connectionStatus.top}</strong>
+            <br />
+            <em>{connectionStatus.bottom}</em>
           </div>
-        }
-        onConfirm={() => dispatch(actions.connectionToggled())}
-        okText="Yes"
-        cancelText="No"
+        </Space>
+      }
+      onConfirm={() => dispatch(actions.connectionToggled())}
+      okText="Yes"
+      cancelText="No"
+    >
+      <Typography.Title
+        level={5}
+        type={connectionStatus.type}
+        style={{ textTransform: "uppercase", marginBottom: 0 }}
       >
-        <div>
-          <Typography.Text type={connectionStatus.type}>
-            <ImConnection />
-            {showText && connectionStatus.text}
-          </Typography.Text>
-        </div>
-      </Popconfirm>
-    </Item>
+        <Space>
+          <ImConnection style={{ position: "relative", top: 2 }} />
+          {showText && connectionStatus.text}
+        </Space>
+      </Typography.Title>
+    </Popconfirm>
   );
 }
