@@ -1,6 +1,13 @@
 import "./style.less";
 import { AiOutlineUser } from "react-icons/ai";
-import { Layout as AntLayout, Button, Divider, PageHeader, Space } from "antd";
+import {
+  Layout as AntLayout,
+  Button,
+  Divider,
+  PageHeader,
+  Space,
+  Typography,
+} from "antd";
 import { FaEthereum, FaGavel, FaSwimmingPool } from "react-icons/fa";
 import {
   JazzIcon,
@@ -12,6 +19,8 @@ import {
   WalletConnector,
 } from "components";
 import { Link, useHistory } from "react-router-dom";
+import { Portfolio as PortfolioPage } from "./pages";
+import { ReactNode, createContext, useContext, useRef } from "react";
 import { SOCIAL_MEDIA } from "config";
 import { selectors } from "features";
 import { useBreakpoints } from "hooks";
@@ -65,34 +74,40 @@ export function TabletLayout() {
  * @returns JSX.Element
  */
 export function DesktopLayout() {
+  const pageRef = useRef<any>(null);
+  const pageWidth = pageRef.current?.clientWidth ?? "8rem";
+
   return (
     <AntLayout className="with-background">
       <SocialMediaButtons />
       <TransactionHistory />
       <LayoutHeader />
-      <AntLayout.Content
-        style={{
-          width: "80vw",
-          minWidth: 780,
-          height: "100vh",
-          minHeight: 500,
-          margin: "8rem auto 0 auto",
-          background: "rgba(0,0,0,0.75)",
-          borderTopLeftRadius: 12,
-          borderTopRightRadius: 12,
-        }}
-      >
-        <Page />
+      <AntLayout.Content>
+        <div
+          ref={pageRef}
+          style={{
+            width: "80vw",
+            minWidth: 780,
+            minHeight: 500,
+            margin: "8rem auto 0 auto",
+            background: "rgba(0,0,0,0.75)",
+            borderTopLeftRadius: 12,
+            borderTopRightRadius: 12,
+          }}
+        >
+          <PageWrapper />
+        </div>
       </AntLayout.Content>
       <AntLayout.Footer
         style={{
           position: "fixed",
           bottom: 0,
-          left: 0,
-          width: "100vw",
-          height: "20vh",
+          width: pageWidth,
+          height: 60,
           minHeight: 50,
           background: "transparent",
+          padding: 0,
+          borderTop: "1px solid rgba(255, 255, 255, 0.05)",
         }}
       >
         <NavigationControls />
@@ -122,6 +137,7 @@ function LayoutHeader() {
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
+          zIndex: 10,
         }}
       >
         <Space size="large">
@@ -147,23 +163,54 @@ function LayoutHeader() {
   );
 }
 
+interface PageContextInterface {
+  title: string;
+  subtitle: string;
+  content: ReactNode;
+}
+
+const PageContext = createContext<PageContextInterface>({
+  title: "",
+  subtitle: "",
+  content: "",
+});
+
+function PageProvider({ children }: { children: ReactNode }) {
+  return (
+    <PageContext.Provider
+      value={{ title: "Title 2", subtitle: "Subtitle", content: "Content 2" }}
+    >
+      {children}
+    </PageContext.Provider>
+  );
+}
+
+function PageWrapper() {
+  return (
+    <PageProvider>
+      <Page />
+    </PageProvider>
+  );
+}
+
 function Page() {
   const { goBack } = useHistory();
+  const { title, subtitle, content } = useContext(PageContext);
 
   return (
     <Space direction="vertical" style={{ width: "100%" }}>
       <PageHeader
         onBack={goBack}
-        title="Title"
-        subTitle="Subtitle"
+        title={title}
+        subTitle={subtitle}
         breadcrumb={{
           routes: [{ path: "/portfolio", breadcrumbName: "Portfolio" }],
         }}
         style={{ color: "white" }}
       />
-      <Divider />
+      <Divider style={{ margin: 0 }} />
       <Space direction="vertical" style={{ width: "100%", padding: 24 }}>
-        Content
+        <PortfolioPage />
       </Space>
     </Space>
   );
@@ -228,7 +275,12 @@ function TransactionHistory() {
 function NavigationControls() {
   return (
     <Space
-      style={{ justifyContent: "space-evenly", width: "100%", height: "100%" }}
+      style={{
+        justifyContent: "space-evenly",
+        width: "100%",
+        height: "100%",
+        background: "rgba(0,0,0,0.55)",
+      }}
     >
       {[
         {
@@ -253,10 +305,12 @@ function NavigationControls() {
         },
       ].map((link) => {
         const inner = (
-          <Space>
-            {link.icon}
-            <span>{link.title}</span>
-          </Space>
+          <Typography.Title level={3}>
+            <Space>
+              <span style={{ position: "relative", top: 3 }}>{link.icon}</span>
+              <span>{link.title}</span>
+            </Space>
+          </Typography.Title>
         );
 
         return (

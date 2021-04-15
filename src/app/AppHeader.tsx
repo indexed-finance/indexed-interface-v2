@@ -14,15 +14,15 @@ const { Header } = Layout;
 
 export function AppHeader({ mobileMenuActive, onToggleMobileMenu }: Props) {
   const selectedAddress = useSelector(selectors.selectUserAddress);
-  const breakpoints = useBreakpoints();
-  const MobileMenuIcon = mobileMenuActive
-    ? AiOutlineMenuFold
-    : AiOutlineMenuUnfold;
   const icon = selectedAddress ? (
     <JazzIcon address={selectedAddress} />
   ) : (
     <WalletConnector />
   );
+  const breakpoints = useBreakpoints();
+  const MobileMenuIcon = mobileMenuActive
+    ? AiOutlineMenuFold
+    : AiOutlineMenuUnfold;
 
   return (
     <>
