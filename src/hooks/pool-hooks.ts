@@ -4,6 +4,12 @@ import { useMemo } from "react";
 import { useSelector } from "react-redux";
 import type { RegisteredCall } from "helpers";
 
+export const useAllPoolIds = () =>
+  useSelector((state: AppState) => selectors.selectAllPoolIds(state));
+
+export const useAllPools = () =>
+  useSelector((state: AppState) => selectors.selectAllPools(state));
+
 export const usePool = (poolId: string) =>
   useSelector((state: AppState) => selectors.selectPool(state, poolId));
 
