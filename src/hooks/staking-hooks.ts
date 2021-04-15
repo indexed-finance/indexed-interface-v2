@@ -4,10 +4,7 @@ import { convert, sortTokens } from "helpers";
 import { useCallRegistrar } from "./use-call-registrar";
 import { useMemo } from "react";
 import { useSelector } from "react-redux";
-import {
-  useTokenPrice,
-  useTotalSuppliesWithLoadingIndicator,
-} from "./token-hooks";
+import { useTokenPrice, useTotalSuppliesWithLoadingIndicator } from "./token-hooks";
 import { useUniswapPairs } from "./pair-hooks";
 import { useUserAddress } from "./user-hooks";
 import type { NormalizedStakingPool } from "features";
@@ -17,6 +14,13 @@ export const useStakingPool = (stakingPoolAddress: string) =>
   useSelector((state: AppState) =>
     selectors.selectStakingPool(state, stakingPoolAddress.toLowerCase())
   );
+
+export const useStakingInfoLookup = () =>
+  useSelector((state: AppState) => selectors.selectStakingInfoLookup(state));
+
+export const useStakingPoolsForTokens = (stakingTokens: string[]) =>
+  useSelector((state: AppState) => selectors.selectStakingPoolsByStakingTokens(state, stakingTokens));
+
 
 export function useStakingTokenPrice(stakingPoolAddress: string) {
   const stakingPool = useStakingPool(stakingPoolAddress);
@@ -35,7 +39,7 @@ export function useStakingTokenPrice(stakingPoolAddress: string) {
           id: stakingPool.stakingToken.toLowerCase(),
           token0,
           token1,
-          exists: undefined,
+          exists: true,
         },
       ],
     ];
@@ -52,19 +56,17 @@ export function useStakingTokenPrice(stakingPoolAddress: string) {
     stakingPool?.indexPool ?? ""
   );
   const hasLoaded = useMemo(() => {
-    const [_pair] = pairs ?? [];
-    const [_supply] = supplies ?? [];
-    const wasLoadingIndicated = !(
-      pairsLoading ||
-      suppliesLoading ||
-      tokenPriceLoading
-    );
-
-    return stakingPool && !wasLoadingIndicated && Boolean(_pair && _supply);
+    if (!stakingPool) return false;
+    if (stakingPool!.isWethPair) {
+      return !(
+        pairsLoading ||
+        suppliesLoading ||
+        tokenPriceLoading
+      );
+    }
+    return !tokenPriceLoading;
   }, [
     stakingPool,
-    pairs,
-    supplies,
     pairsLoading,
     suppliesLoading,
     tokenPriceLoading,
@@ -73,8 +75,8 @@ export function useStakingTokenPrice(stakingPoolAddress: string) {
   return useMemo(() => {
     if (hasLoaded) {
       if (stakingPool!.isWethPair) {
-        const [pair] = pairs!;
-        const [supply] = supplies!;
+        const [pair] = pairs || [];
+        const [supply] = supplies || [];
         const firstTokenIsStakingPool =
           pair.token0.address.toLowerCase() ===
           stakingPool!.indexPool.toLowerCase();
@@ -83,9 +85,8 @@ export function useStakingTokenPrice(stakingPoolAddress: string) {
           : pair.reserve1;
         const valueOfSupplyInToken = parseFloat(tokenReserve.toExact()) * 2;
         const tokensPerLpToken =
-          valueOfSupplyInToken / parseFloat(convert.toBalance(supply, 18));
-
-        return tokensPerLpToken * tokenPrice!;
+          valueOfSupplyInToken / parseFloat(convert.toBalance(supply, 18, false));
+        return tokensPerLpToken * (tokenPrice as number);
       } else {
         return tokenPrice;
       }
@@ -99,32 +100,32 @@ export function useStakingApy(stakingPoolAddress: string) {
   const stakingPool = useStakingPool(stakingPoolAddress);
   const [ndxPrice] = useTokenPrice(NDX_ADDRESS);
   const tokenPrice = useStakingTokenPrice(stakingPoolAddress);
-  const hasLoaded = ndxPrice && tokenPrice && stakingPool;
-  const isWethAddress = stakingPoolAddress === WETH_CONTRACT_ADDRESS;
-
-  if (!isWethAddress && hasLoaded) {
-    const isExpired = stakingPool!.periodFinish < Date.now() / 1000;
-
-    if (isExpired) {
-      return "Expired";
+  return useMemo(() => {
+    const hasLoaded = ndxPrice && tokenPrice && stakingPool;
+    const isWethAddress = stakingPoolAddress === WETH_CONTRACT_ADDRESS;
+  
+    if (!isWethAddress && hasLoaded) {
+      const isExpired = stakingPool!.periodFinish < (Date.now() / 1000);
+  
+      if (isExpired) {
+        return "Expired";
+      } else {
+        const ndxMinedPerDay = convert.toBigNumber(stakingPool?.rewardRate ?? "0").times(86400);
+        const valueNdxPerYear = parseFloat(
+          convert.toBalance(
+            ndxMinedPerDay.times(365).times(ndxPrice ?? 0),
+            18,
+            false
+          )
+        );
+        const stakedAmount = parseFloat(convert.toBalance(stakingPool?.totalSupply ?? "0", 18));
+        const totalStakedValue = stakedAmount * (tokenPrice ?? 0);
+        return convert.toPercent(valueNdxPerYear / totalStakedValue);
+      }
     } else {
-      const ndxMinedPerDay = parseFloat(
-        convert.toBalance(
-          convert.toBigNumber(stakingPool!.rewardRate ?? "0").times(86400),
-          18
-        )
-      );
-      const valueNdxPerYear = ndxMinedPerDay * 365 * ndxPrice!;
-      const totalStakedValue = convert
-        .toBigNumber(tokenPrice!.toString())
-        .toNumber();
-      const formatted = (valueNdxPerYear / totalStakedValue) * 100;
-
-      return convert.toPercent(formatted);
+      return null;
     }
-  } else {
-    return null;
-  }
+  }, [tokenPrice, ndxPrice, stakingPool, stakingPoolAddress])
 }
 
 export function createStakingCalls(
