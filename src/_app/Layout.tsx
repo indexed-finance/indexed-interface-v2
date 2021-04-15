@@ -19,8 +19,19 @@ import {
   WalletConnector,
 } from "components";
 import { Link, useHistory } from "react-router-dom";
-import { Portfolio as PortfolioPage } from "./pages";
-import { ReactNode, createContext, useContext, useRef } from "react";
+import {
+  Pools as PoolsPage,
+  Portfolio as PortfolioPage,
+  Stake as StakingPage,
+} from "./pages";
+import {
+  ReactNode,
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { SOCIAL_MEDIA } from "config";
 import { selectors } from "features";
 import { useBreakpoints } from "hooks";
@@ -76,6 +87,15 @@ export function TabletLayout() {
 export function DesktopLayout() {
   const pageRef = useRef<any>(null);
   const pageWidth = pageRef.current?.clientWidth ?? "8rem";
+  const [loadedWidth, setLoadedWidth] = useState(false);
+
+  // Effect:
+  // --
+  useEffect(() => {
+    if (!loadedWidth) {
+      setTimeout(() => setLoadedWidth(true), 1200);
+    }
+  }, [loadedWidth]);
 
   return (
     <AntLayout className="with-background">
@@ -88,7 +108,7 @@ export function DesktopLayout() {
           style={{
             width: "80vw",
             minWidth: 780,
-            minHeight: 500,
+            minHeight: "100vh",
             margin: "8rem auto 0 auto",
             background: "rgba(0,0,0,0.75)",
             borderTopLeftRadius: 12,
@@ -102,6 +122,7 @@ export function DesktopLayout() {
         style={{
           position: "fixed",
           bottom: 0,
+          left: "11rem",
           width: pageWidth,
           height: 60,
           minHeight: 50,
@@ -210,7 +231,9 @@ function Page() {
       />
       <Divider style={{ margin: 0 }} />
       <Space direction="vertical" style={{ width: "100%", padding: 24 }}>
-        <PortfolioPage />
+        {/* <PortfolioPage /> */}
+        {/* <StakingPage /> */}
+        <PoolsPage />
       </Space>
     </Space>
   );

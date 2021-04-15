@@ -1,6 +1,7 @@
 import { Card, CardProps, Divider, Space, Typography } from "antd";
 import { ReactNode, useMemo } from "react";
 import { useBreakpoints } from "hooks";
+import React from "react";
 import noop from "lodash.noop";
 
 type IndexCardAction = {
@@ -85,7 +86,6 @@ export function IndexCard({
 
   return (
     <Card
-      className="IndexCard"
       onClick={onClick}
       hoverable={onClick !== noop}
       title={
@@ -124,11 +124,12 @@ export function IndexCard({
         </Space>
       }
       actions={formattedActions}
+      bodyStyle={{
+        display: React.Children.count(children) > 0 ? "initial" : "none",
+      }}
       {...rest}
     >
-      {children && (
-        <div className={centered ? "perfectly-centered" : ""}>{children}</div>
-      )}
+      <div className={centered ? "perfectly-centered" : ""}>{children}</div>
     </Card>
   );
 }

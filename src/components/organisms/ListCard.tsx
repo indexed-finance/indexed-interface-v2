@@ -83,6 +83,7 @@ export function ListCard({
       onClick={onClick}
       hoverable={onClick !== noop}
       style={{ marginBottom: 30, position: "relative" }}
+      bodyStyle={{ overflow: "auto" }}
       title={
         <Space
           align="start"

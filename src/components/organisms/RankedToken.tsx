@@ -15,22 +15,22 @@ export function RankedToken({ token }: Props) {
   const { isMobile } = useBreakpoints();
 
   return (
-    <>
-      <IndexCard
-        direction={isMobile ? "vertical" : "horizontal"}
-        style={{ minWidth: isMobile ? 0 : 400, width: isMobile ? 280 : "auto" }}
-        title={
-          <Space align="center" className="no-margin-bottom">
-            <Token
-              address={token.id}
-              name={token.name}
-              image={token.symbol}
-              size="small"
-            />
-            {token.symbol}
-          </Space>
-        }
-        titleExtra={
+    <IndexCard
+      direction={isMobile ? "vertical" : "horizontal"}
+      style={{ minWidth: isMobile ? 0 : 400, width: isMobile ? 280 : "auto" }}
+      title={
+        <Space align="center" className="no-margin-bottom">
+          <Token
+            address={token.id}
+            name={token.name}
+            image={token.symbol}
+            size="small"
+          />
+          {token.symbol}
+        </Space>
+      }
+      titleExtra={
+        <Space>
           <Quote
             price={token.price}
             netChange={token.netChange}
@@ -40,33 +40,33 @@ export function RankedToken({ token }: Props) {
             inline={isMobile}
             centered={isMobile}
           />
-        }
-        actions={[
-          {
-            title: tx("BALANCE_IN_TOKENS"),
-            value: `${token.balance} ${token.symbol}`,
-          },
-          {
-            title: tx("BALANCE_IN_USD"),
-            value: (
-              <Typography.Text type="success">
-                {token.balanceUsd ? (
-                  convert.toCurrency(
-                    parseFloat(token.balanceUsd.replace(/,/g, ""))
-                  )
-                ) : (
-                  <Spin />
-                )}
-              </Typography.Text>
-            ),
-          },
-        ]}
-      >
-        <Progress
-          type="dashboard"
-          percent={parseFloat(token.weightPercentage.replace(/%/g, ""))}
-        />
-      </IndexCard>
-    </>
+          <Progress
+            size="small"
+            type="dashboard"
+            percent={parseFloat(token.weightPercentage.replace(/%/g, ""))}
+          />
+        </Space>
+      }
+      actions={[
+        {
+          title: tx("BALANCE_IN_TOKENS"),
+          value: `${token.balance} ${token.symbol}`,
+        },
+        {
+          title: tx("BALANCE_IN_USD"),
+          value: (
+            <Typography.Text type="success">
+              {token.balanceUsd ? (
+                convert.toCurrency(
+                  parseFloat(token.balanceUsd.replace(/,/g, ""))
+                )
+              ) : (
+                <Spin />
+              )}
+            </Typography.Text>
+          ),
+        },
+      ]}
+    />
   );
 }

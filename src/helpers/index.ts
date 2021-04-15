@@ -10,4 +10,5 @@ export * from './get-random-entries';
 export * from './serialize';
 export * from './sleep';
 export * from './subgraph';
+export * from './time';
 export * from './uniswap';
