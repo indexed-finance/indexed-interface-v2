@@ -1,6 +1,7 @@
+import { NDX_ADDRESS } from "config";
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import { convert, createMulticallDataParser } from "helpers";
-import { fetchMulticallData } from "../batcher/requests"; // Circular dependency.
+import { convert, createMulticallDataParser } from "helpers"; // Circular dependency.
+import { fetchMulticallData } from "../batcher/requests";
 import { stakingMulticallDataParser } from "../staking";
 import { tokensSelectors } from "../tokens";
 import type { AppState } from "../store";
@@ -34,9 +35,12 @@ const slice = createSlice({
 
       if (userData) {
         const { allowances, balances, ndx } = userData;
-
-        state.allowances = allowances;
-        state.balances = balances;
+        for (const key of Object.keys(balances)) {
+          state.balances[key.toLowerCase()] = balances[key];
+        }
+        for (const key of Object.keys(allowances)) {
+          state.allowances[key.toLowerCase()] = allowances[key];
+        }
         state.ndx = ndx;
       }
 
@@ -74,6 +78,16 @@ export const userSelectors = {
   },
   selectTokenBalance(state: AppState, tokenId: string) {
     return state.user.balances[tokenId.toLowerCase()] ?? "0";
+  },
+  selectTokenBalances(state: AppState, tokenIds: string[]) {
+    return tokenIds.map(id => state.user.balances[id.toLowerCase()] ?? "0");
+  },
+  selectStakingInfoLookup(state: AppState) {
+    const stakingPoolIds = Object.keys(state.user.staking);
+    return stakingPoolIds.reduce((prev, next) => ({
+      ...prev,
+      [next as string]: state.user.staking[next]
+    }), {} as Record<string, { balance: string; earned: string; }>)
   },
   selectApprovalStatus(
     state: AppState,
@@ -138,14 +152,18 @@ const userMulticallDataParser = createMulticallDataParser("User", (calls) => {
         }
 
         if (balanceOf) {
-          prev.balances[tokenAddress] = balanceOf.toString();
+          prev.balances[tokenAddress.toLowerCase()] = balanceOf.toString();
         }
       } else if (balanceOfCall) {
         // NDX token has no allowance.
         const [_balanceOfCall] = balanceOfCall;
         const [balanceOf] = _balanceOfCall.result ?? [];
 
-        prev.ndx = (balanceOf ?? "").toString();
+        const tokenAddress = _balanceOfCall.target.toLowerCase();
+        if (tokenAddress === NDX_ADDRESS.toLowerCase()) {
+          prev.ndx = (balanceOf ?? "").toString();
+        }
+        prev.balances[tokenAddress] = (balanceOf ?? "").toString();
       }
 
       return prev;

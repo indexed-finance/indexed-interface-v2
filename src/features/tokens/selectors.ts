@@ -5,6 +5,7 @@ import type { NormalizedToken } from "./types";
 const selectors = tokensAdapter.getSelectors((state: AppState) => state.tokens);
 
 export const tokensSelectors = {
+  ...selectors,
   selectTokens: (state: AppState) => state.tokens,
   selectTokenById: (state: AppState, id: string) =>
     selectors.selectById(state, id),

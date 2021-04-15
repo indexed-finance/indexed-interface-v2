@@ -29,6 +29,9 @@ export type RegisteredPair = {
   exists?: boolean;
 };
 
+export const usePairExistsLookup = (pairIds: string[]): Record<string, boolean> =>
+  useSelector((state: AppState) => selectors.selectPairExistsLookup(state, pairIds));
+
 export function createPairDataCalls(pairs: RegisteredPair[]): RegisteredCall[] {
   return pairs.map((pair) => ({
     caller: PAIR_DATA_CALLER,

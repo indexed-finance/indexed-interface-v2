@@ -89,6 +89,13 @@ export const pairsSelectors = {
     const pairAddress = computeUniswapPairAddress(tokenA, tokenB);
     return selectors.selectById(state, pairAddress.toLowerCase());
   },
+  selectPairExistsLookup: (state: AppState, pairIds: string[]) => {
+    const allPairs = pairsSelectors.selectPairsById(state, pairIds);
+    return allPairs.reduce((prev, next, i) => ({
+      ...prev,
+      [pairIds[i]]: next ? next.exists === true : false
+    }), {} as Record<string, boolean>);
+  },
   selectNdxPrice(state: AppState, ethPrice: number) {
     const wethNdxPair = computeUniswapPairAddress(
       WETH_CONTRACT_ADDRESS,

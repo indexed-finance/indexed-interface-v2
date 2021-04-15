@@ -194,12 +194,11 @@ export const selectors = {
           userStakedBalance: "0",
           userRewardsEarned: "0",
         };
-        const staked = convert.toBalance(userData.userStakedBalance);
-        const earned = convert.toBalance(userData.userRewardsEarned);
-        const rate = convert.toBalance(
-          convert.toBigNumber(stakingPool.rewardRate).times(86400),
-          18
-        );
+        const staked = convert.toBalance(userData.userStakedBalance, 18);
+        const earned = convert.toBalance(userData.userRewardsEarned, 18);
+        const rate = stakingPool.periodFinish > Date.now() / 1000
+        ? convert.toBalance(convert.toBigNumber(stakingPool.rewardRate).times(86400), 18, false, 2)
+        : '0';
 
         return {
           id: stakingPool.id,
@@ -207,13 +206,19 @@ export const selectors = {
           slug: S(indexPool.name).slugify().s,
           name,
           symbol,
-          staked: `${staked} ${symbol}`,
+          staked,
           stakingToken: stakingPool.stakingToken,
           earned: `${earned} NDX`,
-          rate: `${rate} NDX/Day`,
+          rate,
         };
       })
-      .filter((each): each is FormattedStakingData => Boolean(each));
+      .filter((each): each is FormattedStakingData => Boolean(each))
+      .sort((a, b) => (+b.rate) - (+a.rate))
+      .map((each) => ({
+        ...each,
+        staked: `${convert.toComma(+each.staked)} ${each.symbol}`,
+        rate: `${convert.toComma(+each.rate)} NDX/Day`
+      }));
 
     return formattedStaking.reduce(
       (prev, next) => {
@@ -308,7 +313,7 @@ export const selectors = {
     ids: string[]
   ): (FormattedPair | undefined)[] => {
     const allPairs = selectors.selectPairsById(state, ids);
-    const allTokens = selectors.selectTokenLookupBySymbol(state);
+    const allTokens = tokensSelectors.selectEntities(state);
     const formattedPairs: (FormattedPair | undefined)[] = [];
 
     for (const pair of allPairs) {

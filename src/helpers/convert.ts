@@ -50,17 +50,19 @@ const convert = {
   ) => toTokenAmount(convert.toBigNumber(amount), decimals),
   toBalanceNumber: (
     amount: string | BigNumber,
-    decimals: number = DEFAULT_DECIMAL_COUNT
+    decimals: number = DEFAULT_DECIMAL_COUNT,
+    precision = 4
   ) => {
-    return parseFloat(formatBalance(convert.toBigNumber(amount), decimals, 4));
+    return parseFloat(formatBalance(convert.toBigNumber(amount), decimals, precision));
   },
   toBalance: (
     amount: string | BigNumber,
-    decimals: number = DEFAULT_DECIMAL_COUNT
+    decimals: number = DEFAULT_DECIMAL_COUNT,
+    withCommas = false,
+    precision = 4
   ) => {
-    const result = convert.toBalanceNumber(amount, decimals);
-
-    return convert.toComma(result);
+    const result = convert.toBalanceNumber(amount, decimals, precision);
+    return withCommas ? convert.toComma(result) : result.toString(10);
   },
   // Uniswap SDK
   toUniswapSDKToken: (provider: ProviderLike, token: NormalizedToken) =>
