@@ -313,7 +313,7 @@ export const selectors = {
     ids: string[]
   ): (FormattedPair | undefined)[] => {
     const allPairs = selectors.selectPairsById(state, ids);
-    const allTokens = selectors.selectTokenLookupBySymbol(state);
+    const allTokens = tokensSelectors.selectEntities(state);
     const formattedPairs: (FormattedPair | undefined)[] = [];
 
     for (const pair of allPairs) {
