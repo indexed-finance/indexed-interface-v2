@@ -1,0 +1,132 @@
+import { AppState, selectors } from "features";
+import { NDX_ADDRESS, WETH_CONTRACT_ADDRESS } from "config";
+import { computeUniswapPairAddress, convert } from "helpers";
+import { useAllPools } from "./pool-hooks";
+import { useMemo } from "react";
+import { usePairExistsLookup } from "./pair-hooks";
+import { useSelector } from "react-redux";
+import { useStakingInfoLookup, useStakingPoolsForTokens } from "./staking-hooks";
+import { useTokenBalances } from "./user-hooks";
+import { useTokenPricesLookup } from "./token-hooks";
+
+type PortfolioAsset = {
+  address: string;
+  name: string;
+  image: string;
+  symbol: string;
+  isUniswapPair: boolean;
+  hasStakingPool: boolean;
+
+  balance: string;
+  staking: string;
+  ndxEarned: string;
+  price: string;
+  value: string;
+  weight: string;
+}
+
+export function usePortfolioData(): { tokens: PortfolioAsset[]; ndx: PortfolioAsset; totalValue: string; totalNdxEarned: string; } {
+  const theme = useSelector((state: AppState) => selectors.selectTheme(state));
+  const pools = useAllPools();
+
+  const [assetsRaw, pairIds, priceLookupArgs] = useMemo(() => {
+    const baseTokens = [
+      ...pools.map(({ id, name, symbol }) => ({
+        id: id.toLowerCase(), name, symbol, isUniswapPair: false
+      })),
+      {
+        id: NDX_ADDRESS.toLowerCase(),
+        name: 'Indexed',
+        symbol: 'NDX',
+        isUniswapPair: false
+      }
+    ];
+    const priceLookupArgs = baseTokens.reduce((prev, next) => ([
+      ...prev,
+      {
+        id: next.id,
+        useEthLpTokenPrice: true
+      }, {
+        id: next.id,
+        useEthLpTokenPrice: false
+      }
+    ]), [] as Array<{ id: string; useEthLpTokenPrice: boolean; }>)
+    const pairTokens = baseTokens.map((asset) => {
+      return {
+        id: computeUniswapPairAddress(asset.id, WETH_CONTRACT_ADDRESS).toLowerCase(),
+        symbol: `UNIV2:ETH-${asset.symbol}`,
+        name: `Uniswap V2: ETH-${asset.symbol}`,
+        isUniswapPair: true
+      };
+    });
+    const pairIds = pairTokens.map(p => p.id);
+    return [[...baseTokens, ...pairTokens], pairIds, priceLookupArgs];
+  }, [pools]);
+
+  const priceLookup = useTokenPricesLookup(priceLookupArgs);
+
+  const pairExistsLookup = usePairExistsLookup(pairIds);
+
+  const [assets, assetIds] = useMemo(() => {
+    const assets = assetsRaw.filter((asset) => (!asset.isUniswapPair) || pairExistsLookup[asset.id]);
+    const assetIds = assets.map((asset) => asset.id);
+    return [assets, assetIds];
+  }, [assetsRaw, pairExistsLookup])
+
+  const balances = useTokenBalances(assetIds);
+  const stakingPoolsByTokens = useStakingPoolsForTokens(assetIds);
+  const stakingInfoLookup = useStakingInfoLookup();
+  
+  return useMemo(() => {
+    let totalNdxEarned = 0;
+    let totalValue = 0;
+
+    // const ndxPrice = 
+    const portfolioTokens: PortfolioAsset[] = assets.map(({ name, symbol, id, isUniswapPair }, i) => {
+      const stakingPool = stakingPoolsByTokens[i];
+      const stakingPoolUserInfo = stakingPool ? stakingInfoLookup[stakingPool.id] : undefined;
+      let ndxEarned = 0;
+      let staked = 0;
+      if (stakingPoolUserInfo) {
+        const earned = convert.toBalanceNumber(stakingPoolUserInfo.earned, 18)
+        ndxEarned = earned;
+        staked = convert.toBalanceNumber(stakingPoolUserInfo.balance, 18, 6)
+      }
+      totalNdxEarned += ndxEarned;
+      const price = priceLookup[id] ?? 0;
+      const balance = convert.toBalanceNumber(balances[i] ?? "0", 18, 6);
+      const value = (staked + balance) * price;
+      totalValue += value;
+      return {
+        address: id,
+        name,
+        symbol,
+        image: symbol,
+        isUniswapPair,
+        hasStakingPool: Boolean(stakingPool),
+        price: price.toPrecision(2),
+        balance: balance.toPrecision(2),
+        value: value.toPrecision(2),
+        weight: "",
+        staking: staked > 0 ? staked.toPrecision(2) : "",
+        ndxEarned: ndxEarned.toPrecision(2)
+      }
+    });
+    const ndx = portfolioTokens.find(t => t.address === NDX_ADDRESS.toLowerCase()) as PortfolioAsset;
+    const earnedValue = totalNdxEarned * (+ndx.price);
+    ndx.value = ((+ndx.value) + earnedValue).toPrecision(2);
+    ndx.image = `indexed-${theme}`;
+    totalValue += earnedValue;
+    portfolioTokens.sort((a, b) => +(b.value) - +(a.value))
+    portfolioTokens.forEach((token) => {
+      token.weight = convert.toPercent(parseFloat(token.value) / totalValue);
+      token.value = convert.toCurrency(+token.value)
+    });
+    return {
+      ndx,
+      tokens: portfolioTokens.filter(t => t.address !== NDX_ADDRESS.toLowerCase()),
+      totalValue: convert.toCurrency(totalValue.toPrecision(2)),
+      totalNdxEarned: totalNdxEarned.toPrecision(2)
+    }
+  }, [assets, balances, stakingInfoLookup, theme, stakingPoolsByTokens, priceLookup]);
+}
