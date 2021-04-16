@@ -148,7 +148,7 @@ const userMulticallDataParser = createMulticallDataParser("User", (calls) => {
         const combinedId = `user${poolAddress}-user${tokenAddress}`;
 
         if (allowance) {
-          prev.allowances[combinedId] = allowance.toString();
+          prev.allowances[combinedId.toLowerCase()] = allowance.toString();
         }
 
         if (balanceOf) {
