@@ -86,6 +86,7 @@ export async function queryInitialData(url: string): Promise<Category[]> {
             token {
               id
               symbol
+              decimals
             }
             ready
             balance
