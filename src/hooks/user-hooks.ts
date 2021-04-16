@@ -74,6 +74,43 @@ export function useUserDataRegistrar(poolTokens: Record<string, string[]>) {
   });
 }
 
+export function useBalanceAndApprovalRegistrar(spender: string, _tokens: string | string[]) {
+  const tokens = Array.isArray(_tokens) ? _tokens : [_tokens];
+  const userAddress = useUserAddress();
+  const interfaceKind = "IERC20_ABI";
+  const userDataCalls: RegisteredCall[] = userAddress
+    ? tokens.reduce((calls, token) => ([
+      ...calls,
+      {
+        interfaceKind,
+        target: token.toLowerCase(),
+        function: "allowance",
+        args: [userAddress.toLowerCase(), spender.toLowerCase()],
+      },
+      {
+        interfaceKind,
+        target: token.toLowerCase(),
+        function: "balanceOf",
+        args: [userAddress.toLowerCase()],
+      },
+    ]), [] as RegisteredCall[])
+    : [];
+
+  if (userAddress) {
+    userDataCalls.push({
+      interfaceKind,
+      target: NDX_ADDRESS,
+      function: "balanceOf",
+      args: [userAddress],
+    });
+  }
+
+  useCallRegistrar({
+    caller: USER_CALLER,
+    onChainCalls: userDataCalls,
+  });
+}
+
 export function useBalancesRegistrar(tokenIds: string[]) {
   const userAddress = useUserAddress();
   const interfaceKind = "IERC20_ABI";
