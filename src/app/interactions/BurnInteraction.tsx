@@ -6,12 +6,11 @@ import { SingleInteraction, SingleInteractionValues } from "./BaseInteraction";
 import { convert } from "helpers";
 import { downwardSlippage, upwardSlippage } from "ethereum";
 import {
+  useBalancesRegistrar,
   useBurnRouterCallbacks,
-  usePoolToTokens,
   useSingleTokenBurnCallbacks,
   useTransactionNotification,
   useTranslator,
-  useUserDataRegistrar,
 } from "hooks";
 import { useSelector } from "react-redux";
 import BigNumber from "bignumber.js";
@@ -24,9 +23,6 @@ export default function BurnInteraction({ pool }: Props) {
   const [burnType, setBurnType] = useState<"single" | "uniswap" | "multi">(
     "single"
   );
-  const poolsToTokens = usePoolToTokens(pool);
-
-  useUserDataRegistrar(poolsToTokens);
 
   return (
     <Fragment>
@@ -50,7 +46,7 @@ function SingleTokenBurnInteraction({ pool }: Props) {
   const tx = useTranslator();
   const poolId = pool.id;
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
-  const poolsToTokens = usePoolToTokens(pool);
+  useBalancesRegistrar([ poolId ])
   const {
     calculateAmountIn,
     calculateAmountOut,
@@ -60,8 +56,6 @@ function SingleTokenBurnInteraction({ pool }: Props) {
     successMessage: "TODO: Burn Succeed",
     errorMessage: "TODO: Burn Fail",
   });
-
-  useUserDataRegistrar(poolsToTokens);
 
   const handleChange = useCallback(
     (values: SingleInteractionValues) => {
@@ -166,7 +160,7 @@ function UniswapBurnInteraction({ pool }: Props) {
   const tx = useTranslator();
   const poolId = pool.id;
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
-  const poolsToTokens = usePoolToTokens(pool);
+  useBalancesRegistrar([ poolId ])
   const {
     getBestBurnRouteForAmountIn,
     getBestBurnRouteForAmountOut,
@@ -174,8 +168,6 @@ function UniswapBurnInteraction({ pool }: Props) {
   } = useBurnRouterCallbacks(poolId);
 
   const assets = [...COMMON_BASE_TOKENS];
-
-  useUserDataRegistrar(poolsToTokens);
 
   const handleChange = useCallback(
     (values: SingleInteractionValues) => {

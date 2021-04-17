@@ -59,8 +59,8 @@ const slice = createSlice({
         const fullTokens = tokens.ids.map((id) => tokens.entities[id]);
 
         for (const commonToken of COMMON_BASE_TOKENS) {
-          if (!tokens.entities[commonToken.id]) {
-            fullTokens.push(commonToken);
+          if (!tokens.entities[commonToken.id.toLowerCase()]) {
+            fullTokens.push({ ...commonToken, id: commonToken.id.toLowerCase() });
           }
         }
 

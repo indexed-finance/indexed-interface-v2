@@ -1,18 +1,19 @@
 import { AppState, FormattedIndexPool, selectors, useSigner } from "features";
 import { COMMON_BASE_TOKENS, UNISWAP_ROUTER_ADDRESS } from "config";
+import { Loading } from "components/molecules/Loading";
 import { SingleInteraction, SingleInteractionValues } from "./BaseInteraction";
 import { Trade } from "@uniswap/sdk";
 import { convert } from "helpers";
 import { executeUniswapTrade } from "ethereum";
-import { useCallback, useMemo } from "react";
 import {
-  usePoolToTokens,
+  useBalanceAndApprovalRegistrar,
+  usePoolTokenIds,
   useTransactionNotification,
   useTranslator,
   useUniswapTradingPairs,
   useUserAddress,
-  useUserDataRegistrar,
 } from "hooks";
+import { useCallback, useEffect, useMemo } from "react";
 import { useSelector } from "react-redux";
 
 interface Props {
@@ -30,11 +31,13 @@ export default function TradeInteraction({ pool }: Props) {
   const assets = useSelector((state: AppState) =>
     selectors.selectTokensById(state, tokenIds)
   );
-  const poolToTokens = usePoolToTokens(pool);
+
+  useBalanceAndApprovalRegistrar(UNISWAP_ROUTER_ADDRESS, tokenIds);
   const {
     calculateBestTradeForExactInput,
     calculateBestTradeForExactOutput,
   } = useUniswapTradingPairs(tokenIds);
+
   const handleChange = useCallback(
     (values: SingleInteractionValues) => {
       const {
@@ -143,8 +146,6 @@ export default function TradeInteraction({ pool }: Props) {
       handleTrade,
     ]
   );
-
-  useUserDataRegistrar(poolToTokens);
 
   return (
     <SingleInteraction

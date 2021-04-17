@@ -83,6 +83,7 @@ export function TokenSelector({
   const onAmountChange = useCallback(
     (newAmount?: number | string | null) => {
       if (newAmount == null || Number.isNaN(amount) || amount < 0) {
+        setAmount(0)
         return;
       }
 
@@ -170,7 +171,7 @@ export function TokenSelector({
                     type="secondary"
                     style={{ textAlign: "left" }}
                   >
-                    {parseInt(relevantBalance) ? (
+                    {parseFloat(relevantBalance) ? (
                       <>
                         Balance: {relevantBalance}{" "}
                         {value.token && parseFloat(relevantBalance) > 0 && (

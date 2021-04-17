@@ -11,12 +11,11 @@ import { Radio } from "antd";
 import { convert } from "helpers";
 import { downwardSlippage, upwardSlippage } from "ethereum";
 import {
+  useBalanceAndApprovalRegistrar,
   useMintRouterCallbacks,
-  // useMultiTokenMintCallbacks,
-  usePoolToTokens,
+  usePoolTokenAddresses,
   useSingleTokenMintCallbacks,
   useTranslator,
-  useUserDataRegistrar,
 } from "hooks";
 import { useSelector } from "react-redux";
 import BigNumber from "bignumber.js";
@@ -58,7 +57,7 @@ function SingleTokenMintInteraction({ pool }: Props) {
     calculateAmountOut,
     executeMint,
   } = useSingleTokenMintCallbacks(pool.id);
-  const poolToTokens = usePoolToTokens(pool);
+  // const poolToTokens = usePoolToTokens(pool);
   const handleChange = useCallback(
     (values: SingleInteractionValues) => {
       const {
@@ -142,7 +141,9 @@ function SingleTokenMintInteraction({ pool }: Props) {
     [executeMint]
   );
 
-  useUserDataRegistrar(poolToTokens);
+  const tokenIds = usePoolTokenAddresses(pool.id)
+  useBalanceAndApprovalRegistrar(pool.id, tokenIds);
+  // useUserDataRegistrar(poolToTokens);
 
   return (
     <SingleInteraction
@@ -160,18 +161,15 @@ function SingleTokenMintInteraction({ pool }: Props) {
 function UniswapMintInteraction({ pool }: Props) {
   const tx = useTranslator();
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
+
+  useBalanceAndApprovalRegistrar(MINT_ROUTER_ADDRESS.toLowerCase(), [...COMMON_BASE_TOKENS.map(({ id }) => id)]);
   const {
-    tokenIds,
     getBestMintRouteForAmountIn,
     getBestMintRouteForAmountOut,
     executeRoutedMint,
   } = useMintRouterCallbacks(pool.id);
-  const assets = [...COMMON_BASE_TOKENS];
-  const poolToTokens = useMemo(() => ({ [MINT_ROUTER_ADDRESS]: tokenIds }), [
-    tokenIds,
-  ]);
 
-  useUserDataRegistrar(poolToTokens);
+  const assets = [...COMMON_BASE_TOKENS];
 
   const handleChange = useCallback(
     (values: SingleInteractionValues) => {
@@ -182,7 +180,6 @@ function UniswapMintInteraction({ pool }: Props) {
         toAmount,
         lastTouchedField,
       } = values;
-
       if (!toToken || !fromToken) {
         return;
       }

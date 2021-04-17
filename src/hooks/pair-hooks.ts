@@ -169,6 +169,7 @@ export function useUniswapTradingPairs(baseTokens: string[]) {
   return {
     calculateBestTradeForExactInput,
     calculateBestTradeForExactOutput,
+    loading
   };
 }
 // #endregion
