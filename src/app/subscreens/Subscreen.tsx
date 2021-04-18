@@ -31,7 +31,11 @@ export function Subscreen({
   ...rest
 }: SubscreenProps) {
   return (
-    <Collapse defaultActiveKey={["1"]} {...rest}>
+    <Collapse
+      defaultActiveKey={["1"]}
+      {...rest}
+      style={{ width: "100%", color: "white" }}
+    >
       <Panel
         header={
           title ? (
@@ -43,6 +47,7 @@ export function Subscreen({
           )
         }
         key="1"
+        style={{ width: "100%" }}
       >
         {children}
       </Panel>

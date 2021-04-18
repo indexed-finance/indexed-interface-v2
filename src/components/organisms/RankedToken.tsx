@@ -17,9 +17,8 @@ export function RankedToken({ token }: Props) {
   return (
     <IndexCard
       direction={isMobile ? "vertical" : "horizontal"}
-      style={{ minWidth: isMobile ? 0 : 400, width: isMobile ? 280 : "auto" }}
       title={
-        <Space align="center" className="no-margin-bottom">
+        <Space align="center" style={{ width: "100%" }}>
           <Token
             address={token.id}
             name={token.name}

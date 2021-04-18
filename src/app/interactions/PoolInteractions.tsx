@@ -6,10 +6,15 @@ import { lazy } from "react";
 import { useBreakpoints, useTranslator } from "hooks";
 import type { FormattedIndexPool } from "features";
 
-const BurnInteraction = lazy(() => import("./BurnInteraction"));
-const MintInteraction = lazy(() => import("./MintInteraction"));
-const SwapInteraction = lazy(() => import("./SwapInteraction"));
-const TradeInteraction = lazy(() => import("./TradeInteraction"));
+// const BurnInteraction = lazy(() => import("./BurnInteraction"));
+// const MintInteraction = lazy(() => import("./MintInteraction"));
+// const SwapInteraction = lazy(() => import("./SwapInteraction"));
+// const TradeInteraction = lazy(() => import("./TradeInteraction"));
+
+import BurnInteraction from "./BurnInteraction";
+import MintInteraction from "./MintInteraction";
+import SwapInteraction from "./SwapInteraction";
+import TradeInteraction from "./TradeInteraction";
 
 export type PoolInteraction =
   | "burn"

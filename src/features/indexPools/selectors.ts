@@ -8,7 +8,7 @@ import S from "string";
 import type { AppState } from "../store";
 import type { NormalizedIndexPool } from "./types";
 
-function formatName(from: string) {
+function formatName(from = "") {
   return S(from).camelize().s.toLowerCase();
 }
 

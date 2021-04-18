@@ -18,8 +18,9 @@ import {
   Token,
   WalletConnector,
 } from "components";
-import { Link, useHistory } from "react-router-dom";
+import { Link, Route, useHistory } from "react-router-dom";
 import {
+  Pool as PoolPage,
   Pools as PoolsPage,
   Portfolio as PortfolioPage,
   Stake as StakingPage,
@@ -93,7 +94,7 @@ export function DesktopLayout() {
   // --
   useEffect(() => {
     if (!loadedWidth) {
-      setTimeout(() => setLoadedWidth(true), 1200);
+      setTimeout(() => setLoadedWidth(true), 200);
     }
   }, [loadedWidth]);
 
@@ -129,6 +130,7 @@ export function DesktopLayout() {
           background: "transparent",
           padding: 0,
           borderTop: "1px solid rgba(255, 255, 255, 0.05)",
+          zIndex: 1,
         }}
       >
         <NavigationControls />
@@ -232,8 +234,13 @@ function Page() {
       <Divider style={{ margin: 0 }} />
       <Space direction="vertical" style={{ width: "100%", padding: 24 }}>
         {/* <PortfolioPage /> */}
-        {/* <StakingPage /> */}
-        <PoolsPage />
+        {/* <PoolsPage /> */}
+        <Route exact={true} path="/staking">
+          <StakingPage />
+        </Route>
+        <Route path="/pools/:poolName">
+          <PoolPage />
+        </Route>
       </Space>
     </Space>
   );

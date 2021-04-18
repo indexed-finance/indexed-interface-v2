@@ -1,6 +1,5 @@
 import { AppState, FormattedIndexPool, selectors, useSigner } from "features";
 import { COMMON_BASE_TOKENS, UNISWAP_ROUTER_ADDRESS } from "config";
-import { Loading } from "components/molecules/Loading";
 import { SingleInteraction, SingleInteractionValues } from "./BaseInteraction";
 import { Trade } from "@uniswap/sdk";
 import { convert } from "helpers";
