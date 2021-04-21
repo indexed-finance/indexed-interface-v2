@@ -550,7 +550,7 @@ export function SocialMediaList() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          <Token name={site.name} image={site.image} />
+          <Token name={site.name} image={site.image} asAvatar={true} />
         </a>
       ))}
     </Space>

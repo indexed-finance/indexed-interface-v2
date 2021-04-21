@@ -19,7 +19,7 @@ export function Token({
   size = "small",
   image,
   margin = 0,
-  asAvatar = true,
+  asAvatar = false,
   symbol = "",
   amount = "",
   ...rest

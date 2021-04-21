@@ -128,10 +128,12 @@ export function usePoolDetailRegistrar(
   tokenIds: string[]
 ) {
   const caller = "Pool Detail";
-  const { onChainCalls, offChainCalls } = createPoolDetailCalls(
-    poolAddress,
-    tokenIds
-  );
+  const { onChainCalls, offChainCalls } = poolAddress
+    ? createPoolDetailCalls(poolAddress, tokenIds)
+    : {
+        onChainCalls: [],
+        offChainCalls: [],
+      };
 
   useCallRegistrar({
     caller,
