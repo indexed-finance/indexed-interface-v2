@@ -394,7 +394,7 @@ const SplashSubscreen = () => {
 
 const PortfolioSubscreen = () => {
   const tx = useTranslator();
-  const { ndx, totalValue } = usePortfolioData();
+  const { totalValue } = usePortfolioData();
   const adjustedValues = useMemo(
     () => ({
       hasPageHeader: true,
@@ -403,18 +403,6 @@ const PortfolioSubscreen = () => {
           size="small"
           style={{ justifyContent: "space-evenly", width: "100%" }}
         >
-          <div style={{ textAlign: "right" }}>
-            <Token
-              asAvatar={false}
-              address={ndx.address}
-              size="small"
-              symbol={ndx.symbol}
-              image="indexed-dark"
-              name="Indexed"
-              amount={ndx.balance}
-              style={{ fontSize: 28 }}
-            />
-          </div>
           <span style={{ fontSize: 28 }}>
             {tx("TOTAL_VALUE")} <Divider type="vertical" />
             <Typography.Text type="success">{totalValue}</Typography.Text>
@@ -425,7 +413,7 @@ const PortfolioSubscreen = () => {
       title: tx("PORTFOLIO"),
       subtitle: "<fill me>",
     }),
-    [tx, ndx.address, ndx.symbol, ndx.balance, totalValue]
+    [tx, totalValue]
   );
   const SubscreenComponent = useMemo(
     () => lazy(() => import("./subscreens/Portfolio")),

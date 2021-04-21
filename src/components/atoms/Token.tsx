@@ -27,9 +27,9 @@ export function Token({
   let tokenImage = PLACEHOLDER_TOKEN_IMAGE;
   const tokenImageSize = {
     tiny: 16,
-    small: 32,
-    medium: 48,
-    large: 64,
+    small: 20,
+    medium: 28,
+    large: 36,
   }[size];
   const fontSize = size === "tiny" || size === "small" ? 16 : 24;
 

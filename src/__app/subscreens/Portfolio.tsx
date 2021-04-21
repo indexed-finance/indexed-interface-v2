@@ -1,5 +1,5 @@
+import { Card, Col, Divider, List, Row, Space, Typography } from "antd";
 import { FaTractor } from "react-icons/fa";
-import { List, Space, Typography } from "antd";
 import { Progress, Token } from "components/atoms";
 import { useMemo } from "react";
 import { usePortfolioData } from "hooks/portfolio-hooks";
@@ -8,10 +8,96 @@ import { useTranslator } from "hooks";
 export default function Portfolio() {
   const tx = useTranslator();
   const { ndx, tokens } = usePortfolioData();
-  const data = useMemo(() => [ndx, ...tokens], [ndx, tokens]);
+  const data = useMemo(
+    () =>
+      [ndx, ...tokens].map((t) => ({
+        ...t,
+        staking: "0.05",
+        ndxEarned: "0.05",
+      })),
+    [ndx, tokens]
+  );
+
+  return (
+    <Row gutter={[80, 40]}>
+      {data.map((holding) => (
+        <Col key={holding.address} span={12}>
+          <div
+            style={{
+              width: "100%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            <Space direction="vertical" style={{ flex: 2 }}>
+              <Space size="large">
+                <Token
+                  name={holding.name}
+                  image={holding.image}
+                  symbol={holding.symbol}
+                  amount={holding.balance}
+                  size="medium"
+                />
+                <Typography.Text
+                  type="success"
+                  style={{ flex: 1, fontSize: 24 }}
+                >
+                  {holding.value}
+                </Typography.Text>
+              </Space>
+              <Space size="small">
+                {holding.ndxEarned && holding.ndxEarned !== "0.00" && (
+                  <>
+                    Earned{" "}
+                    <Token
+                      name="indexed-dark"
+                      image=""
+                      address={ndx.address}
+                      symbol={ndx.symbol}
+                      amount={holding.ndxEarned}
+                      size="tiny"
+                    />
+                  </>
+                )}
+                {holding.staking && (
+                  <>
+                    <Divider type="vertical" />
+                    Staking{" "}
+                    <Token
+                      name=""
+                      image=""
+                      address={holding.address}
+                      symbol={holding.symbol}
+                      amount={holding.ndxEarned}
+                      size="tiny"
+                    />
+                  </>
+                )}
+              </Space>
+            </Space>
+            <Progress
+              style={{ flex: 1, fontSize: 24, textAlign: "right" }}
+              width={90}
+              status="active"
+              type="dashboard"
+              percent={parseFloat(holding.weight.replace(/%/g, ""))}
+            />
+          </div>
+        </Col>
+      ))}
+    </Row>
+  );
+
+  return (
+    <Card>
+      <Space wrap={true} size="large" style={{ width: "100%" }}></Space>
+    </Card>
+  );
 
   return (
     <List
+      size="small"
       dataSource={data}
       renderItem={(item) => (
         <List.Item>
@@ -21,7 +107,7 @@ export default function Portfolio() {
               display: "flex",
               alignItems: "center",
               justifyContent: "space-between",
-              width: "100%",
+              width: "50%",
             }}
           >
             <Space direction="vertical" style={{ flex: 1 }}>
@@ -53,13 +139,7 @@ export default function Portfolio() {
                 </Typography.Text>
               )}
             </Space>
-            <Progress
-              style={{ flex: 1, fontSize: 24, textAlign: "center" }}
-              width={90}
-              status="active"
-              type="dashboard"
-              percent={parseFloat(item.weight.replace(/%/g, ""))}
-            />
+
             <Typography.Text
               type="success"
               style={{ flex: 1, fontSize: 24, textAlign: "right" }}
