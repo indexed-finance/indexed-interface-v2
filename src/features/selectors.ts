@@ -138,7 +138,10 @@ export const selectors = {
                 return {
                   when: formatDistance(
                     new Date(swap.timestamp * MILLISECONDS_PER_SECOND),
-                    new Date()
+                    new Date(),
+                    {
+                      addSuffix: true,
+                    }
                   ),
                   from,
                   to,
@@ -148,7 +151,10 @@ export const selectors = {
               trades: (pool.transactions.trades ?? []).map((trade) => ({
                 when: formatDistance(
                   new Date(parseInt(trade.timestamp) * MILLISECONDS_PER_SECOND),
-                  new Date()
+                  new Date(),
+                  {
+                    addSuffix: true,
+                  }
                 ),
                 from: trade.pair.token0.symbol,
                 to: trade.pair.token1.symbol,

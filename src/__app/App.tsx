@@ -125,6 +125,7 @@ export function Screen() {
           height: 60,
           background: "rgba(0, 0, 0, 0.65)",
           borderBottom: "1px solid rgba(255, 255, 255, 0.65)",
+          zIndex: 10,
         }}
       >
         <ScreenHeader />

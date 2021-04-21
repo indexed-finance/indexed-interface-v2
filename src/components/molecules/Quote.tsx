@@ -48,6 +48,7 @@ export function Quote({
               marginRight: 12,
               marginBottom: 0,
               justifyContent: centered ? "center" : "left",
+              textAlign: centered ? "center" : "initial",
             }}
           >
             {price ?? <Skeleton paragraph={{ rows: 1 }} />}
@@ -68,17 +69,21 @@ export function Quote({
     </>
   );
 
-  return inline || centered ? (
-    <div
-      className={centered ? "perfectly-centered" : "flex-center"}
-      style={{
-        display: inline ? "flex" : "block",
-        alignItems: "center",
-      }}
-    >
-      {inner}
+  return (
+    <div>
+      {inline || centered ? (
+        <div
+          className={centered ? "perfectly-centered" : "flex-center"}
+          style={{
+            display: inline ? "flex" : "block",
+            alignItems: "center",
+          }}
+        >
+          {inner}
+        </div>
+      ) : (
+        inner
+      )}
     </div>
-  ) : (
-    inner
   );
 }

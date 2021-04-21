@@ -65,7 +65,13 @@ function PoolItem(pool: FormattedIndexPool) {
             }}
           >
             <Space style={{ flex: 1 }}>
-              <Token name={name} image={id} address={id} symbol={symbol} />
+              <Token
+                name={name}
+                image={id}
+                address={id}
+                symbol={symbol}
+                size="medium"
+              />
               <Divider type="vertical" />
               <Quote
                 price={priceUsd}

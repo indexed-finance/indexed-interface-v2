@@ -31,6 +31,7 @@ export function Token({
     medium: 48,
     large: 64,
   }[size];
+  const fontSize = size === "tiny" || size === "small" ? 16 : 24;
 
   try {
     // First, do we have it locally?
@@ -49,7 +50,7 @@ export function Token({
   return (
     <Space size="small" style={rest.style}>
       {amount && (
-        <Space size="small" style={{ fontSize: 24 }}>
+        <Space size="small" style={{ fontSize }}>
           {amount}
         </Space>
       )}
@@ -64,7 +65,7 @@ export function Token({
         }}
       />
       {symbol && (
-        <Space size="small" style={{ fontSize: 24 }}>
+        <Space size="small" style={{ fontSize }}>
           {symbol}
         </Space>
       )}

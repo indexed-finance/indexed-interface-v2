@@ -192,10 +192,14 @@ export function formatPoolAsset(
 
       const weight = convert.toBigNumber(denorm).div(pool.totalDenorm);
       weightPercentage = convert.toPercent(weight.toNumber());
-      balance = convert.toBalance(exactBalance, token.decimals);
+      balance = parseFloat(
+        convert.toBalance(exactBalance, token.decimals)
+      ).toFixed(2);
 
       if (coingeckoData.price) {
-        balanceUsd = (coingeckoData.price * parseFloat(balance)).toString();
+        balanceUsd = convert.toCurrency(
+          coingeckoData.price * parseFloat(balance)
+        );
       }
     }
 

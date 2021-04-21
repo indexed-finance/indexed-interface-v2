@@ -13,33 +13,6 @@ export default function Portfolio() {
   return (
     <List
       dataSource={data}
-      header={
-        <div
-          className="colored-text"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-          }}
-        >
-          <Typography.Title level={4} style={{ margin: 0, flex: 1 }}>
-            Asset
-          </Typography.Title>
-          <Typography.Title
-            level={4}
-            style={{ margin: 0, textAlign: "center", flex: 1 }}
-          >
-            Weight
-          </Typography.Title>
-          <Typography.Title
-            level={4}
-            style={{ margin: 0, textAlign: "right", flex: 1 }}
-          >
-            Value (in USD)
-          </Typography.Title>
-        </div>
-      }
       renderItem={(item) => (
         <List.Item>
           <div
@@ -57,6 +30,7 @@ export default function Portfolio() {
                 image={item.image}
                 symbol={item.symbol}
                 amount={item.balance}
+                size="large"
               />
               {item.ndxEarned && item.ndxEarned !== "0.00" && (
                 <Typography.Text type="secondary">

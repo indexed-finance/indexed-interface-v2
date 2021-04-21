@@ -44,7 +44,7 @@ export function LineSeriesChart({
     if (cardRef.current && !series) {
       const size = expanded
         ? { width: 1200, height: 500 }
-        : { width: 480, height: 300 };
+        : { width: 360, height: 300 };
 
       const chart_ = createChart(cardRef.current, size);
       setChart(chart_);
@@ -76,7 +76,7 @@ export function LineSeriesChart({
 
   useEffect(() => {
     if (cardRef.current && chart) {
-      const [width, height] = expanded ? [1200, 500] : [400, 300];
+      const [width, height] = expanded ? [1200, 460] : [360, 260];
       const options = CHART_MODES[theme];
 
       chart.resize(width, height);
