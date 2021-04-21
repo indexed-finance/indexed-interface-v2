@@ -38,7 +38,9 @@ function PoolItem(pool: FormattedIndexPool) {
 
   if (remainder) {
     actions.push(
-      <Typography.Text type="secondary">and {remainder} more</Typography.Text>
+      <Typography.Text key="more" type="secondary">
+        and {remainder} more
+      </Typography.Text>
     );
   }
 

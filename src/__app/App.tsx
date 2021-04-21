@@ -1,18 +1,20 @@
 import "./style.less";
 import { AiOutlineUser } from "react-icons/ai";
 import { AppErrorBoundary } from "./AppErrorBoundary";
-import { BrowserRouter, useLocation } from "react-router-dom";
+import { AppState, selectors, store } from "features";
+import { BrowserRouter, useLocation, useParams } from "react-router-dom";
 import {
   Button,
   Divider,
   Layout,
   PageHeader,
   Space,
+  Spin,
   Typography,
   message,
   notification,
 } from "antd";
-import { DEBUG } from "components";
+import { DEBUG, UsefulLinks } from "components";
 import { FEATURE_FLAGS } from "feature-flags";
 import {
   FaCoins,
@@ -51,7 +53,6 @@ import { TransactionProvider, WalletConnectionProvider } from "./drawers";
 import { Web3ReactProvider } from "@web3-react/core";
 import { ethers } from "ethers";
 import { noop } from "lodash";
-import { selectors, store } from "features";
 import {
   useBreakpoints,
   usePortfolioData,
@@ -144,6 +145,7 @@ export function Screen() {
           background: "rgba(0, 0, 0, 0.65)",
           borderTop: "1px solid rgba(255, 255, 255, 0.65)",
           padding: 12,
+          zIndex: 10,
         }}
       >
         <NavigationControls />
@@ -263,7 +265,13 @@ export function ScreenContent() {
     >
       {hasPageHeader && (
         <>
-          <Space style={{ width: "100%", justifyContent: "space-between" }}>
+          <Space
+            style={{
+              width: "100%",
+              alignItems: "flex-start",
+              justifyContent: "space-between",
+            }}
+          >
             <PageHeader
               onBack={goBack}
               title={
@@ -334,6 +342,7 @@ export function ScreenContent() {
             display: "flex",
             alignItems: "center",
             padding: "12px 50px",
+            zIndex: 1,
           }}
         >
           {actions}
@@ -474,15 +483,35 @@ const PoolsSubscreen = () => {
 };
 
 const PoolSubscreen = () => {
+  const { slug } = useParams<{ slug: string }>();
+  const poolId = useSelector((state: AppState) =>
+    selectors.selectPoolIdByName(state, slug)
+  );
+  const pool = useSelector((state: AppState) =>
+    poolId ? selectors.selectFormattedIndexPool(state, poolId) : null
+  );
   const adjustedValues = useMemo(
     () => ({
       hasPageHeader: true,
       actions: null,
-      extra: null,
-      title: "CC10",
-      subtitle: "Cryptocurrency Top 10",
+      extra: pool ? <UsefulLinks address={pool.id} /> : null,
+      title: pool ? (
+        <Space>
+          <Token
+            name={pool.name}
+            image={pool.name}
+            symbol={pool.symbol}
+            address={pool.id}
+          />
+          <Divider type="vertical" />
+          <Typography.Text>{pool.name}</Typography.Text>
+        </Space>
+      ) : (
+        <Spin />
+      ),
+      subtitle: "<fill me>",
     }),
-    []
+    [pool]
   );
   const SubscreenComponent = useMemo(
     () => lazy(() => import("./subscreens/Pool")),
@@ -649,25 +678,30 @@ export function NavigationControls() {
           path: "https://vote.indexed.finance/",
         },
       ].map((link) => {
+        const isActive = pathname.includes(link.key);
         const inner = (
           <Typography.Title level={3}>
-            <Space>
+            <Space
+              style={{
+                color: isActive ? "#FB1ECD" : "rgba(255,255,255,0.85)",
+              }}
+            >
               <span style={{ position: "relative", top: 3 }}>{link.icon}</span>
               <span>{link.title}</span>
             </Space>
           </Typography.Title>
         );
-        const isActive = pathname.includes(link.key);
 
         return (
           <Button
             key={link.key}
             size="large"
-            type={isActive ? "ghost" : "text"}
+            type="text"
             style={{
               textTransform: "uppercase",
               padding: "6px 10px",
               height: "auto",
+              borderLeft: isActive ? "2px solid #FB1ECD" : "none",
             }}
           >
             {link.path.includes("://") ? (
@@ -721,7 +755,7 @@ export const routes = [
     subscreen: PoolsSubscreen,
   },
   {
-    path: "/pools/:id",
+    path: "/pools/:slug",
     subscreen: PoolSubscreen,
   },
 ];

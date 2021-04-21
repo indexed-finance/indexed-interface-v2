@@ -1,14 +1,27 @@
 import { Divider, Space, Statistic } from "antd";
 import { FormattedIndexPool } from "features";
-import { useBreakpoints, useTranslator } from "hooks";
+import { useTranslator } from "hooks";
 
-export function Performance({ pool }: { pool: FormattedIndexPool }) {
+export function Performance({
+  pool,
+  direction = "horizontal",
+}: {
+  pool: FormattedIndexPool;
+  direction?: "vertical" | "horizontal";
+}) {
   const tx = useTranslator();
-  const { isMobile } = useBreakpoints();
+  const oppositeDirection: Record<
+    "vertical" | "horizontal",
+    "vertical" | "horizontal"
+  > = {
+    vertical: "horizontal",
+    horizontal: "vertical",
+  };
+  const dividerDirection = oppositeDirection[direction];
 
   return (
     <Space
-      direction={isMobile ? "vertical" : "horizontal"}
+      direction={direction}
       style={{
         flex: 1,
         flexWrap: "wrap",
@@ -22,19 +35,19 @@ export function Performance({ pool }: { pool: FormattedIndexPool }) {
         value={pool.totalValueLocked}
         style={{ flex: 1, textAlign: "center" }}
       />
-      <Divider type="vertical" />
+      <Divider type={dividerDirection} />
       <Statistic
         title={tx("VOLUME")}
         value={pool.volume}
         style={{ flex: 1, textAlign: "center" }}
       />
-      <Divider type="vertical" />
+      <Divider type={dividerDirection} />
       <Statistic
         title={tx("CUMULATIVE_FEES")}
         value={pool.cumulativeFee}
         style={{ flex: 1, textAlign: "center" }}
       />
-      <Divider type="vertical" />
+      <Divider type={dividerDirection} />
       <Statistic
         title={tx("SWAP_FEE")}
         value={pool.swapFee}

@@ -1,6 +1,6 @@
 Level 10
-    * Layout Header
+    * Screen Header
+    * Screen Footer
 
 Level 1 /
-    * Ant Footer
-    * "Total value" on Portfolio
+    * Screen Actions

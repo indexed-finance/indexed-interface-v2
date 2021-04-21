@@ -119,7 +119,7 @@ export const selectors = {
             ),
             isNegative: stats.deltas.price.day.value < 0,
             name: pool.name.replace(/Tokens Index/g, ""),
-            slug: S(pool.name).slugify().s,
+            slug: `/pools/${S(pool.name).slugify().s}`,
             volume: convert.toCurrency(stats.deltas.volume.day),
             totalValueLocked: convert.toCurrency(pool.totalValueLockedUSD),
             totalValueLockedPercent: convert.toPercent(
