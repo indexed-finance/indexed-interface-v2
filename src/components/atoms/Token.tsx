@@ -55,7 +55,7 @@ export function Token({
         </Space>
       )}
       <Component
-        alt={name}
+        alt={symbol}
         src={tokenImage}
         {...rest}
         style={{

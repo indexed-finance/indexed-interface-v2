@@ -1,7 +1,7 @@
-import { Affix, Divider, Space, Typography } from "antd";
 import { AppState, actions, selectors } from "features";
 import { NDX_ADDRESS, WETH_CONTRACT_ADDRESS } from "config";
-import { PortfolioCard, ProviderRequirementDrawer } from "components";
+import { PortfolioCard } from "components";
+import { Space, Typography } from "antd";
 import {
   buildUniswapPairs,
   useEthPrice,

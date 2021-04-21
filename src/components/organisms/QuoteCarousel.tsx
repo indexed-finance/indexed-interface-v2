@@ -21,8 +21,6 @@ export function QuoteCarousel({ pools }: Props) {
     >
       {pools.map((pool) => {
         const filteredPool = pool as FormattedIndexPool;
-        const isNegative =
-          parseFloat(filteredPool.netChangePercent.replace(/%/g, "")) < 0;
 
         return (
           <div
@@ -35,7 +33,6 @@ export function QuoteCarousel({ pools }: Props) {
               price={filteredPool.priceUsd}
               netChange={filteredPool.netChange}
               netChangePercent={filteredPool.netChangePercent}
-              isNegative={isNegative}
             />
           </div>
         );

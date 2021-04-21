@@ -34,7 +34,6 @@ export function RankedToken({ token }: Props) {
             price={token.price}
             netChange={token.netChange}
             netChangePercent={token.netChangePercent}
-            isNegative={token.isNegative}
             kind="small"
             inline={isMobile}
             centered={isMobile}

@@ -7,7 +7,6 @@ interface Props extends HTMLProps<HTMLDivElement> {
   price: string;
   netChange: string;
   netChangePercent: string;
-  isNegative?: boolean;
   kind?: "small" | "normal";
   centered?: boolean;
   inline?: boolean;
@@ -18,7 +17,6 @@ export function Quote({
   price,
   netChange,
   netChangePercent,
-  isNegative = false,
   inline = false,
   centered = false,
 }: Props) {
@@ -58,7 +56,7 @@ export function Quote({
               marginTop: 0,
               marginBottom: 0,
             }}
-            type={isNegative ? "danger" : "success"}
+            type={netChange.includes("-") ? "danger" : "success"}
           >
             {netChange} ({netChangePercent})
           </Typography.Paragraph>

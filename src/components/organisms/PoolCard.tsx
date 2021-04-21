@@ -33,7 +33,6 @@ export function PoolCard({ pool }: Props) {
           price={pool.priceUsd}
           netChange={pool.netChange}
           netChangePercent={pool.netChangePercent}
-          isNegative={false}
           centered={false}
           inline={isMobile}
         />

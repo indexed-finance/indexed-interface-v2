@@ -8,26 +8,20 @@ import { useTranslator } from "hooks";
 export default function Portfolio() {
   const tx = useTranslator();
   const { ndx, tokens } = usePortfolioData();
-  const data = useMemo(
-    () =>
-      [ndx, ...tokens].map((t) => ({
-        ...t,
-        staking: "0.05",
-        ndxEarned: "0.05",
-      })),
-    [ndx, tokens]
-  );
+  const data = useMemo(() => [ndx, ...tokens], [ndx, tokens]);
 
   return (
-    <Row gutter={[80, 40]}>
+    <Row gutter={[40, 40]}>
       {data.map((holding) => (
         <Col key={holding.address} span={12}>
           <div
+            className="darkened bordered"
             style={{
               width: "100%",
               display: "flex",
               alignItems: "center",
               justifyContent: "space-between",
+              padding: 20,
             }}
           >
             <Space direction="vertical" style={{ flex: 2 }}>
@@ -46,35 +40,38 @@ export default function Portfolio() {
                   {holding.value}
                 </Typography.Text>
               </Space>
-              <Space size="small">
-                {holding.ndxEarned && holding.ndxEarned !== "0.00" && (
-                  <>
-                    Earned{" "}
-                    <Token
-                      name="indexed-dark"
-                      image=""
-                      address={ndx.address}
-                      symbol={ndx.symbol}
-                      amount={holding.ndxEarned}
-                      size="tiny"
-                    />
-                  </>
-                )}
-                {holding.staking && (
-                  <>
-                    <Divider type="vertical" />
-                    Staking{" "}
-                    <Token
-                      name=""
-                      image=""
-                      address={holding.address}
-                      symbol={holding.symbol}
-                      amount={holding.ndxEarned}
-                      size="tiny"
-                    />
-                  </>
-                )}
-              </Space>
+              {((holding.ndxEarned && holding.ndxEarned !== "0.00") ||
+                holding.staking) && (
+                <Space size="small">
+                  {holding.ndxEarned && holding.ndxEarned !== "0.00" && (
+                    <>
+                      Earned{" "}
+                      <Token
+                        name="indexed-dark"
+                        image=""
+                        address={ndx.address}
+                        symbol={ndx.symbol}
+                        amount={holding.ndxEarned}
+                        size="tiny"
+                      />
+                    </>
+                  )}
+                  {holding.staking && (
+                    <>
+                      <Divider type="vertical" />
+                      Staking{" "}
+                      <Token
+                        name=""
+                        image=""
+                        address={holding.address}
+                        symbol={holding.symbol}
+                        amount={holding.ndxEarned}
+                        size="tiny"
+                      />
+                    </>
+                  )}
+                </Space>
+              )}
             </Space>
             <Progress
               style={{ flex: 1, fontSize: 24, textAlign: "right" }}

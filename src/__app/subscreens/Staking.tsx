@@ -1,5 +1,6 @@
 import {
   Button,
+  Card,
   Col,
   Divider,
   List,
@@ -43,7 +44,7 @@ function StakingItem({
   );
 
   return (
-    <List.Item>
+    <List.Item style={{ paddingRight: 20, paddingLeft: 20 }}>
       <div
         className="colored-text"
         style={{
@@ -57,7 +58,7 @@ function StakingItem({
           <Space style={{ justifyContent: "space-between", width: "100%" }}>
             <Token
               name={name}
-              image={id}
+              image=""
               address={id}
               symbol={symbol}
               amount={staked}
@@ -119,30 +120,32 @@ export default function Stake() {
   return (
     <Row gutter={24}>
       <Col xs={24} lg={12}>
-        <List
-          itemLayout="vertical"
-          header={
-            <Typography.Title level={4}>{tx("INDEX_TOKENS")}</Typography.Title>
+        <Card
+          title={
+            <Typography.Title level={3}>{tx("INDEX_TOKENS")}</Typography.Title>
           }
         >
-          {staking.indexTokens.map((token) => (
-            <StakingItem key={token.id} {...token} />
-          ))}
-        </List>
+          <List itemLayout="vertical">
+            {staking.indexTokens.map((token) => (
+              <StakingItem key={token.id} {...token} />
+            ))}
+          </List>
+        </Card>
       </Col>
       <Col xs={24} lg={12}>
-        <List
-          itemLayout="vertical"
-          header={
-            <Typography.Title level={4}>
+        <Card
+          title={
+            <Typography.Title level={3}>
               {tx("LIQUIDITY_TOKENS")}
             </Typography.Title>
           }
         >
-          {staking.liquidityTokens.map((token) => (
-            <StakingItem key={token.id} {...token} />
-          ))}
-        </List>
+          <List itemLayout="vertical">
+            {staking.liquidityTokens.map((token) => (
+              <StakingItem key={token.id} {...token} />
+            ))}
+          </List>
+        </Card>
       </Col>
     </Row>
   );

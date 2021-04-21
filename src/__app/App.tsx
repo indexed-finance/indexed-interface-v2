@@ -1,7 +1,7 @@
 import "./style.less";
 import { AiOutlineUser } from "react-icons/ai";
 import { AppErrorBoundary } from "./AppErrorBoundary";
-import { AppState, selectors, store } from "features";
+import { AppState, FormattedIndexPool, selectors, store } from "features";
 import { BrowserRouter, useLocation, useParams } from "react-router-dom";
 import {
   Button,
@@ -269,7 +269,7 @@ export function ScreenContent() {
           <Space
             style={{
               width: "100%",
-              alignItems: "flex-start",
+              alignItems: "flex-end",
               justifyContent: "space-between",
             }}
           >
@@ -297,7 +297,7 @@ export function ScreenContent() {
             />
             {extra && <div>{extra}</div>}
           </Space>
-          <Divider style={{ marginBottom: 0 }} />
+          <Divider style={{ margin: 0 }} />
         </>
       )}
       <div style={{ padding: "2rem 3rem 10rem 3rem" }}>
@@ -400,13 +400,19 @@ const PortfolioSubscreen = () => {
       hasPageHeader: true,
       actions: (
         <Space
-          size="small"
-          style={{ justifyContent: "space-evenly", width: "100%" }}
+          style={{
+            width: "100%",
+            justifyContent: "flex-end",
+            margin: "0 8rem",
+          }}
         >
-          <span style={{ fontSize: 28 }}>
-            {tx("TOTAL_VALUE")} <Divider type="vertical" />
-            <Typography.Text type="success">{totalValue}</Typography.Text>
-          </span>
+          <Typography.Title level={4} type="secondary" style={{ margin: 0 }}>
+            {tx("TOTAL_VALUE")}
+          </Typography.Title>
+          <Divider type="vertical" />
+          <Typography.Title type="success" level={3}>
+            {totalValue}
+          </Typography.Title>
         </Space>
       ),
       extra: null,
@@ -482,7 +488,7 @@ const PoolSubscreen = () => {
   const adjustedValues = useMemo(
     () => ({
       hasPageHeader: true,
-      actions: null,
+      actions: pool ? <InteractionControls pool={pool} /> : null,
       extra: pool ? <UsefulLinks address={pool.id} /> : null,
       title: pool ? (
         <Space>
@@ -491,6 +497,7 @@ const PoolSubscreen = () => {
             image={pool.name}
             symbol={pool.symbol}
             address={pool.id}
+            size="large"
           />
           <Divider type="vertical" />
           <Typography.Text>{pool.name}</Typography.Text>
@@ -566,17 +573,17 @@ export function TransactionList() {
   );
 }
 
-export function InteractionControls() {
+export function InteractionControls({ pool }: { pool: FormattedIndexPool }) {
   return (
     <Space
       style={{
+        width: "100%",
         justifyContent: "flex-end",
-        width: "80vw",
-        height: "100%",
+        margin: "0 8rem",
       }}
     >
-      <Typography.Title level={3} type="secondary" style={{ margin: 0 }}>
-        Interact with CC10
+      <Typography.Title level={4} type="secondary" style={{ margin: 0 }}>
+        Interact with {pool.name}
       </Typography.Title>
       <Divider type="vertical" />
       <div style={{ flex: 1 }}>

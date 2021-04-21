@@ -51,18 +51,23 @@ export default function Pool() {
                   <Typography.Title level={3} style={{ margin: 0 }}>
                     Recent Trades
                   </Typography.Title>
-                  <Typography.Text type="secondary">
-                    <em>
-                      Showing {trades.length} of{" "}
-                      {pool.transactions.trades.length}
-                    </em>
-                  </Typography.Text>
-                  <Button type="ghost" size="large">
-                    <Space>
-                      <span>View more </span>
-                      <FaCaretRight style={{ position: "relative", top: 2 }} />
-                    </Space>
-                  </Button>
+                  <Space>
+                    <Typography.Text type="secondary">
+                      <em>
+                        Showing {trades.length} of{" "}
+                        {pool.transactions.trades.length}
+                      </em>
+                    </Typography.Text>
+                    <Divider type="vertical" />
+                    <Button type="ghost" size="large">
+                      <Space>
+                        <span>View more </span>
+                        <FaCaretRight
+                          style={{ position: "relative", top: 2 }}
+                        />
+                      </Space>
+                    </Button>
+                  </Space>
                 </Space>
               }
             >
@@ -102,11 +107,28 @@ export default function Pool() {
                         />
                         <Divider style={{ margin: 0 }}>{trade.when}</Divider>
                       </Space>
-                      <Typography.Text
-                        type={trade.kind === "buy" ? "success" : "danger"}
-                      >
-                        {trade.amount}
-                      </Typography.Text>
+                      <Space size="large">
+                        <Typography.Text
+                          type={trade.kind === "buy" ? "success" : "danger"}
+                        >
+                          {trade.amount}
+                        </Typography.Text>
+                        <Button type="ghost">
+                          <img
+                            src={
+                              require("assets/images/etherscan-link.png")
+                                .default
+                            }
+                            alt="View on Etherscan"
+                            style={{
+                              position: "relative",
+                              top: -2,
+                              width: 18,
+                              height: 18,
+                            }}
+                          />
+                        </Button>
+                      </Space>
                     </a>
                   </List.Item>
                 ))}
@@ -157,7 +179,7 @@ export default function Pool() {
                             size="small"
                           />
                           <Typography.Text type="success">
-                            USD {asset.balanceUsd}
+                            {asset.balanceUsd}
                           </Typography.Text>
                         </div>
                         <div

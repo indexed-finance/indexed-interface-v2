@@ -1,12 +1,12 @@
-import { Button, Divider, List, Space, Tag, Typography } from "antd";
+import { Button, Divider, List, Space, Typography } from "antd";
 import { FaCaretRight, FaTractor } from "react-icons/fa";
 import { FormattedIndexPool, selectors } from "features";
 import { Link } from "react-router-dom";
-import { Performance, Quote, Token } from "components";
+import { Quote, Token } from "components";
 import { useSelector } from "react-redux";
 import { useTranslator } from "hooks";
 
-const MAXIMUM_DISPLAYED_ASSETS = 5;
+const MAXIMUM_DISPLAYED_ASSETS = 50;
 
 function PoolItem(pool: FormattedIndexPool) {
   const {
@@ -24,7 +24,7 @@ function PoolItem(pool: FormattedIndexPool) {
   const tx = useTranslator();
   const categoryLookup = useSelector(selectors.selectCategoryLookup);
   const categoryTitle = categoryLookup[category]?.name ?? "";
-  const actions = assets
+  const slicedAssets = assets
     .slice(0, MAXIMUM_DISPLAYED_ASSETS)
     .map((asset) => (
       <Token
@@ -37,7 +37,7 @@ function PoolItem(pool: FormattedIndexPool) {
   const remainder = Math.max(0, assets.length - MAXIMUM_DISPLAYED_ASSETS);
 
   if (remainder) {
-    actions.push(
+    slicedAssets.push(
       <Typography.Text key="more" type="secondary">
         and {remainder} more
       </Typography.Text>
@@ -45,7 +45,7 @@ function PoolItem(pool: FormattedIndexPool) {
   }
 
   return (
-    <List.Item>
+    <List.Item style={{ paddingRight: 20, paddingLeft: 20 }}>
       <div
         className="colored-text"
         style={{
@@ -70,7 +70,7 @@ function PoolItem(pool: FormattedIndexPool) {
                 image={id}
                 address={id}
                 symbol={symbol}
-                size="medium"
+                size="large"
               />
               <Divider type="vertical" />
               <Quote
@@ -87,12 +87,8 @@ function PoolItem(pool: FormattedIndexPool) {
                       <span>{tx("STAKE")}</span>
                     </Space>
                   </Button>
-                  <Divider type="vertical" />
                 </>
               )}
-
-              <Divider type="vertical" />
-              {categoryTitle && <Tag color="purple">{categoryTitle}</Tag>}
             </Space>
             <Space>
               <Typography.Title
@@ -122,8 +118,15 @@ function PoolItem(pool: FormattedIndexPool) {
           justifyContent: "space-between",
         }}
       >
-        <div>{actions}</div>
-        <Performance pool={pool} />
+        <div>{slicedAssets}</div>
+        {categoryTitle && (
+          <Typography.Title level={4}>
+            Category:{" "}
+            <Typography.Text type="secondary">
+              <em>{categoryTitle}</em>
+            </Typography.Text>
+          </Typography.Title>
+        )}
       </Space>
     </List.Item>
   );

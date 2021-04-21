@@ -61,7 +61,6 @@ export function ChartCard({ poolId, expanded = false }: Props) {
                 price={formattedPool.priceUsd}
                 netChange={formattedPool.netChange}
                 netChangePercent={formattedPool.netChangePercent}
-                isNegative={formattedPool.isNegative}
                 inline={true}
               />
             </>
