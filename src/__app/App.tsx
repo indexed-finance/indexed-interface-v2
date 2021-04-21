@@ -1,7 +1,7 @@
 import "./style.less";
 import { AiOutlineUser } from "react-icons/ai";
 import { AppErrorBoundary } from "./AppErrorBoundary";
-import { BrowserRouter } from "react-router-dom";
+import { BrowserRouter, useLocation } from "react-router-dom";
 import {
   Button,
   Divider,
@@ -136,12 +136,11 @@ export function Screen() {
           bottom: 0,
           left: 0,
           width: "100vw",
-          height: 60,
           background: "rgba(0, 0, 0, 0.65)",
           borderTop: "1px solid rgba(255, 255, 255, 0.65)",
         }}
       >
-        <ScreenFooter />
+        <NavigationControls />
       </Layout.Footer>
     </Layout>
   );
@@ -257,21 +256,34 @@ export function ScreenContent() {
       }}
     >
       {hasPageHeader && (
-        <Space style={{ width: "100%", justifyContent: "space-between" }}>
-          <>
+        <>
+          <Space style={{ width: "100%", justifyContent: "space-between" }}>
             <PageHeader
               onBack={goBack}
-              title={title}
-              subTitle={subtitle}
-              breadcrumb={{
-                routes: [{ path: "/portfolio", breadcrumbName: "Portfolio" }],
-              }}
+              title={
+                <div style={{ marginLeft: 12 }}>
+                  <Typography.Title
+                    level={2}
+                    style={{ margin: 0, textTransform: "uppercase" }}
+                  >
+                    {title}
+                  </Typography.Title>
+                  {subtitle && (
+                    <>
+                      <br />
+                      <Typography.Text style={{ fontSize: 18, margin: 0 }}>
+                        {subtitle}
+                      </Typography.Text>
+                    </>
+                  )}
+                </div>
+              }
               style={{ color: "white" }}
             />
             {extra && <div>{extra}</div>}
-            <Divider style={{ margin: 0 }} />
-          </>
-        </Space>
+          </Space>
+          <Divider style={{ marginBottom: 0 }} />
+        </>
       )}
       <div style={{ padding: "3rem 0" }}>
         <Suspense
@@ -324,14 +336,6 @@ export function ScreenContent() {
   );
 }
 
-export function ScreenFooter() {
-  return (
-    <>
-      <NavigationControls />
-    </>
-  );
-}
-
 // -- Subscreens
 // These act as wrappers around page-specific content. The wrapper handles loading contextual content in the page header and footer.
 export function Subscreen({
@@ -375,7 +379,7 @@ const PortfolioSubscreen = () => {
   const tx = useTranslator();
   const adjustedValues = useMemo(
     () => ({
-      hasPageHeader: false,
+      hasPageHeader: true,
       actions: null,
       extra: null,
       title: tx("PORTFOLIO"),
@@ -384,7 +388,7 @@ const PortfolioSubscreen = () => {
     [tx]
   );
   const SubscreenComponent = useMemo(
-    () => lazy(() => import("./subscreens/Splash")),
+    () => lazy(() => import("./subscreens/Portfolio")),
     []
   );
 
@@ -397,16 +401,16 @@ const StakingSubscreen = () => {
   const tx = useTranslator();
   const adjustedValues = useMemo(
     () => ({
-      hasPageHeader: false,
+      hasPageHeader: true,
       actions: null,
       extra: null,
-      title: tx("STAKE"),
-      subtitle: "<fill me>",
+      title: tx("LIQUIDITY_MINING"),
+      subtitle: tx("STAKE_INDEX_TOKENS_..."),
     }),
     [tx]
   );
   const SubscreenComponent = useMemo(
-    () => lazy(() => import("./subscreens/Splash")),
+    () => lazy(() => import("./subscreens/Staking")),
     []
   );
 
@@ -576,6 +580,10 @@ export function InteractionControls() {
 }
 
 export function NavigationControls() {
+  const tx = useTranslator();
+  const { pathname } = useLocation();
+  const activePath = pathname.split("/").pop();
+
   return (
     <Space
       style={{
@@ -586,22 +594,26 @@ export function NavigationControls() {
     >
       {[
         {
-          title: "Portfolio",
+          key: "portfolio",
+          title: tx("PORTFOLIO"),
           icon: <AiOutlineUser />,
           path: "/portfolio",
         },
         {
-          title: "Staking",
+          key: "staking",
+          title: tx("STAKE"),
           icon: <FaEthereum />,
           path: "/staking",
         },
         {
-          title: "Pools",
+          key: "pools",
+          title: tx("POOLS"),
           icon: <FaSwimmingPool />,
           path: "/pools",
         },
         {
-          title: "Govern",
+          key: "govern",
+          title: "GOVERN",
           icon: <FaGavel />,
           path: "https://vote.indexed.finance/",
         },
@@ -614,20 +626,32 @@ export function NavigationControls() {
             </Space>
           </Typography.Title>
         );
+        const isActive = link.key === activePath;
 
         return (
           <Button
-            key={link.title}
+            key={link.key}
             size="large"
-            type="text"
-            style={{ textTransform: "uppercase" }}
+            type={isActive ? "ghost" : "text"}
+            style={{
+              textTransform: "uppercase",
+              padding: "6px 10px",
+              height: "auto",
+            }}
           >
             {link.path.includes("://") ? (
-              <a href={link.path} rel="noopener noreferrer" target="_blank">
+              <a
+                style={{ position: "relative", top: 4 }}
+                href={link.path}
+                rel="noopener noreferrer"
+                target="_blank"
+              >
                 {inner}
               </a>
             ) : (
-              <Link to={link.path}>{inner}</Link>
+              <Link style={{ position: "relative", top: 4 }} to={link.path}>
+                {inner}
+              </Link>
             )}
           </Button>
         );
