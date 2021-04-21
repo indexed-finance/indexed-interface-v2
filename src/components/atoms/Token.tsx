@@ -47,7 +47,7 @@ export function Token({
   const Component = asAvatar ? Avatar : "img";
 
   return (
-    <Space size="small" {...rest.style}>
+    <Space size="small" style={rest.style}>
       {amount && (
         <Space size="small" style={{ fontSize: 24 }}>
           {amount}

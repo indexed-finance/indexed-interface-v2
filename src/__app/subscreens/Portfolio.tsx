@@ -1,5 +1,5 @@
-import { Divider, List, Space, Typography } from "antd";
 import { FaTractor } from "react-icons/fa";
+import { List, Space, Typography } from "antd";
 import { Progress, Token } from "components/atoms";
 import { useMemo } from "react";
 import { usePortfolioData } from "hooks/portfolio-hooks";
@@ -8,62 +8,105 @@ import { useTranslator } from "hooks";
 export default function Portfolio() {
   const tx = useTranslator();
   const { ndx, tokens } = usePortfolioData();
-  const data = useMemo(() => [ndx, ...tokens], [ndx, tokens]);
+  const data = useMemo(
+    () => [ndx, ...tokens].map((t) => ({ ...t, staking: "0.05" })),
+    [ndx, tokens]
+  );
 
   return (
     <List
-      split={false}
       dataSource={data}
+      header={
+        <div
+          className="colored-text"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            width: "100%",
+          }}
+        >
+          <Typography.Title level={4} style={{ margin: 0, flex: 1 }}>
+            Asset
+          </Typography.Title>
+          <Typography.Title
+            level={4}
+            style={{ margin: 0, textAlign: "center", flex: 1 }}
+          >
+            Weight
+          </Typography.Title>
+          <Typography.Title
+            level={4}
+            style={{ margin: 0, textAlign: "right", flex: 1 }}
+          >
+            Value (in USD)
+          </Typography.Title>
+        </div>
+      }
       renderItem={(item) => (
         <List.Item>
-          <List.Item.Meta
-            avatar={
-              <Progress
-                width={60}
-                status="active"
-                type="dashboard"
-                percent={parseFloat(item.weight.replace(/%/g, ""))}
+          <div
+            className="colored-text"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              width: "100%",
+            }}
+          >
+            <Space direction="vertical" style={{ flex: 1 }}>
+              <Token
+                name={item.name}
+                image={item.image}
+                symbol={item.symbol}
+                amount={item.balance}
               />
-            }
-            title={
-              <Space size="small">
-                <Token
-                  name={item.name}
-                  image={item.image}
-                  symbol={item.symbol}
-                  amount={item.balance}
-                />
-                <Divider type="vertical" />
-                <Typography.Text type="success" style={{ fontSize: 24 }}>
-                  {item.value}
+              {item.ndxEarned && item.ndxEarned !== "0.00" && (
+                <Typography.Text type="secondary">
+                  {tx("EARNED_X_NDX", {
+                    __x: item.ndxEarned,
+                  })}
                 </Typography.Text>
-              </Space>
+              )}
+              {item.staking && (
+                <Typography.Text type="secondary">
+                  <Space size="small">
+                    <FaTractor />
+                    <em>
+                      {tx("STAKING_X_Y", {
+                        __x: item.staking,
+                        __y: item.symbol,
+                      })}
+                    </em>
+                  </Space>
+                </Typography.Text>
+              )}
+            </Space>
+            <Progress
+              style={{ flex: 1, fontSize: 24, textAlign: "center" }}
+              width={90}
+              status="active"
+              type="dashboard"
+              percent={parseFloat(item.weight.replace(/%/g, ""))}
+            />
+            <Typography.Text
+              type="success"
+              style={{ flex: 1, fontSize: 24, textAlign: "right" }}
+            >
+              {item.value}
+            </Typography.Text>
+          </div>
+          {/* <List.Item.Meta
+            style={{ alignItems: "center" }}
+            title={
+              
             }
             description={
-              <>
-                {item.ndxEarned && item.ndxEarned !== "0.00" && (
-                  <Typography.Text type="secondary">
-                    {tx("EARNED_X_NDX", {
-                      __x: item.ndxEarned,
-                    })}
-                  </Typography.Text>
-                )}
-                {item.staking && (
-                  <Typography.Text type="secondary">
-                    <Space size="small">
-                      <FaTractor />
-                      <em>
-                        {tx("STAKING_X_Y", {
-                          __x: item.staking,
-                          __y: item.symbol,
-                        })}
-                      </em>
-                    </Space>
-                  </Typography.Text>
-                )}
-              </>
+              (item.ndxEarned && item.ndxEarned !== "0.00") || item.staking ? (
+                
+              ) : null
             }
-          />
+          /> */}
         </List.Item>
       )}
     />
