@@ -69,7 +69,13 @@ export function Quote({
   );
 
   return inline || centered ? (
-    <div className={centered ? "perfectly-centered" : "flex-center"}>
+    <div
+      className={centered ? "perfectly-centered" : "flex-center"}
+      style={{
+        display: inline ? "flex" : "block",
+        alignItems: "center",
+      }}
+    >
       {inner}
     </div>
   ) : (

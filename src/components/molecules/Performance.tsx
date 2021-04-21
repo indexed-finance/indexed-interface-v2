@@ -1,5 +1,5 @@
+import { Divider, Space, Statistic } from "antd";
 import { FormattedIndexPool } from "features";
-import { Space, Statistic } from "antd";
 import { useBreakpoints, useTranslator } from "hooks";
 
 export function Performance({ pool }: { pool: FormattedIndexPool }) {
@@ -8,7 +8,6 @@ export function Performance({ pool }: { pool: FormattedIndexPool }) {
 
   return (
     <Space
-      className="Performance"
       direction={isMobile ? "vertical" : "horizontal"}
       style={{
         flex: 1,
@@ -23,16 +22,19 @@ export function Performance({ pool }: { pool: FormattedIndexPool }) {
         value={pool.totalValueLocked}
         style={{ flex: 1, textAlign: "center" }}
       />
+      <Divider type="vertical" />
       <Statistic
         title={tx("VOLUME")}
         value={pool.volume}
         style={{ flex: 1, textAlign: "center" }}
       />
+      <Divider type="vertical" />
       <Statistic
         title={tx("CUMULATIVE_FEES")}
         value={pool.cumulativeFee}
         style={{ flex: 1, textAlign: "center" }}
       />
+      <Divider type="vertical" />
       <Statistic
         title={tx("SWAP_FEE")}
         value={pool.swapFee}

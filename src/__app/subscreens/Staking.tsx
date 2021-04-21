@@ -43,7 +43,7 @@ function StakingItem({
   );
 
   return (
-    <List.Item style={{ position: "relative" }}>
+    <List.Item>
       <div
         className="colored-text"
         style={{
@@ -55,7 +55,13 @@ function StakingItem({
       >
         <Space direction="vertical" style={{ width: "100%" }}>
           <Space style={{ justifyContent: "space-between", width: "100%" }}>
-            <Token name={name} image={id} symbol={symbol} amount={staked} />
+            <Token
+              name={name}
+              image={id}
+              address={id}
+              symbol={symbol}
+              amount={staked}
+            />
             <Typography.Title level={3}>{title}</Typography.Title>
           </Space>
         </Space>
