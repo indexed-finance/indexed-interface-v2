@@ -27,10 +27,7 @@ export const useDrawerControls = () => {
   const [active, setActive] = useState(false);
   const close = useCallback(() => setActive(false), []);
   const open = useCallback(() => setActive(true), []);
-  const toggle = useCallback(() => {
-    console.log("toggle");
-    setActive((prev) => !prev);
-  }, []);
+  const toggle = useCallback(() => setActive((prev) => !prev), []);
   const controls = useMemo(
     () => ({
       active: active,

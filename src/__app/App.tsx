@@ -47,12 +47,17 @@ import {
 import { Link, Route, useHistory } from "react-router-dom";
 import { Provider } from "react-redux";
 import { SOCIAL_MEDIA } from "config";
-import { TransactionProvider, WalletConnectionProvider } from "../app/drawers";
+import { TransactionProvider, WalletConnectionProvider } from "./drawers";
 import { Web3ReactProvider } from "@web3-react/core";
 import { ethers } from "ethers";
 import { noop } from "lodash";
 import { selectors, store } from "features";
-import { useBreakpoints, useTranslator } from "hooks";
+import {
+  useBreakpoints,
+  usePortfolioData,
+  useStakingRegistrar,
+  useTranslator,
+} from "hooks";
 import { useSelector } from "react-redux";
 
 export function getLibrary(_provider?: any, _connector?: any) {
@@ -138,6 +143,7 @@ export function Screen() {
           width: "100vw",
           background: "rgba(0, 0, 0, 0.65)",
           borderTop: "1px solid rgba(255, 255, 255, 0.65)",
+          padding: 12,
         }}
       >
         <NavigationControls />
@@ -285,7 +291,7 @@ export function ScreenContent() {
           <Divider style={{ marginBottom: 0 }} />
         </>
       )}
-      <div style={{ padding: "3rem 0" }}>
+      <div style={{ padding: "2rem 3rem 10rem 3rem" }}>
         <Suspense
           fallback={
             <div
@@ -314,11 +320,12 @@ export function ScreenContent() {
           ))}
         </Suspense>
       </div>
+      <Divider />
       {actions && (
         <div
           style={{
             position: "fixed",
-            bottom: 60,
+            bottom: 77,
             left: 0,
             width: "100vw",
             height: 45,
@@ -377,20 +384,45 @@ const SplashSubscreen = () => {
 
 const PortfolioSubscreen = () => {
   const tx = useTranslator();
+  const { ndx, totalValue } = usePortfolioData();
   const adjustedValues = useMemo(
     () => ({
       hasPageHeader: true,
-      actions: null,
+      actions: (
+        <Space
+          size="small"
+          style={{ justifyContent: "space-evenly", width: "100%" }}
+        >
+          <div style={{ textAlign: "right" }}>
+            <Token
+              asAvatar={false}
+              address={ndx.address}
+              size="small"
+              symbol={ndx.symbol}
+              image="indexed-dark"
+              name="Indexed"
+              amount={ndx.balance}
+              style={{ fontSize: 28 }}
+            />
+          </div>
+          <span style={{ fontSize: 28 }}>
+            {tx("TOTAL_VALUE")} <Divider type="vertical" />
+            <Typography.Text type="success">{totalValue}</Typography.Text>
+          </span>
+        </Space>
+      ),
       extra: null,
       title: tx("PORTFOLIO"),
       subtitle: "<fill me>",
     }),
-    [tx]
+    [tx, ndx.address, ndx.symbol, ndx.balance, totalValue]
   );
   const SubscreenComponent = useMemo(
     () => lazy(() => import("./subscreens/Portfolio")),
     []
   );
+
+  useStakingRegistrar();
 
   return (
     <Subscreen adjustedValues={adjustedValues} screen={SubscreenComponent} />
@@ -423,16 +455,16 @@ const PoolsSubscreen = () => {
   const tx = useTranslator();
   const adjustedValues = useMemo(
     () => ({
-      hasPageHeader: false,
+      hasPageHeader: true,
       actions: null,
       extra: null,
-      title: tx("POOLS"),
+      title: tx("INDEX_POOLS"),
       subtitle: "<fill me>",
     }),
     [tx]
   );
   const SubscreenComponent = useMemo(
-    () => lazy(() => import("./subscreens/Splash")),
+    () => lazy(() => import("./subscreens/Pools")),
     []
   );
 
@@ -444,7 +476,7 @@ const PoolsSubscreen = () => {
 const PoolSubscreen = () => {
   const adjustedValues = useMemo(
     () => ({
-      hasPageHeader: false,
+      hasPageHeader: true,
       actions: null,
       extra: null,
       title: "CC10",
@@ -453,7 +485,7 @@ const PoolSubscreen = () => {
     []
   );
   const SubscreenComponent = useMemo(
-    () => lazy(() => import("./subscreens/Splash")),
+    () => lazy(() => import("./subscreens/Pool")),
     []
   );
 
@@ -582,7 +614,6 @@ export function InteractionControls() {
 export function NavigationControls() {
   const tx = useTranslator();
   const { pathname } = useLocation();
-  const activePath = pathname.split("/").pop();
 
   return (
     <Space
@@ -626,7 +657,7 @@ export function NavigationControls() {
             </Space>
           </Typography.Title>
         );
-        const isActive = link.key === activePath;
+        const isActive = pathname.includes(link.key);
 
         return (
           <Button

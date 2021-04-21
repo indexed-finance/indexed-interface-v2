@@ -1,4 +1,4 @@
-import { Avatar } from "antd";
+import { Avatar, Space } from "antd";
 import { PLACEHOLDER_TOKEN_IMAGE } from "config";
 
 interface Props {
@@ -9,6 +9,8 @@ interface Props {
   size?: "tiny" | "small" | "medium" | "large";
   margin?: number;
   style?: any;
+  symbol?: string;
+  amount?: string;
 }
 
 export function Token({
@@ -18,6 +20,8 @@ export function Token({
   image,
   margin = 0,
   asAvatar = true,
+  symbol = "",
+  amount = "",
   ...rest
 }: Props) {
   let tokenImage = PLACEHOLDER_TOKEN_IMAGE;
@@ -43,17 +47,27 @@ export function Token({
   const Component = asAvatar ? Avatar : "img";
 
   return (
-    <Component
-      className="Token"
-      alt={name}
-      src={tokenImage}
-      {...rest}
-      style={{
-        width: tokenImageSize,
-        height: tokenImageSize,
-        marginRight: margin,
-        ...rest.style,
-      }}
-    />
+    <Space size="small" {...rest.style}>
+      {amount && (
+        <Space size="small" style={{ fontSize: 24 }}>
+          {amount}
+        </Space>
+      )}
+      <Component
+        alt={name}
+        src={tokenImage}
+        {...rest}
+        style={{
+          width: tokenImageSize,
+          height: tokenImageSize,
+          marginRight: margin,
+        }}
+      />
+      {symbol && (
+        <Space size="small" style={{ fontSize: 24 }}>
+          {symbol}
+        </Space>
+      )}
+    </Space>
   );
 }

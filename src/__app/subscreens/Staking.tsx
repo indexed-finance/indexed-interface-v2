@@ -1,7 +1,7 @@
 import { Col, Row } from "antd";
 import { StakingCard } from "components";
 import { selectors } from "features";
-import { useBreakpoints, useStakingRegistrar, useTranslator } from "hooks";
+import { useBreakpoints, useStakingRegistrar } from "hooks";
 import { useSelector } from "react-redux";
 import type { FormattedStakingData } from "features";
 

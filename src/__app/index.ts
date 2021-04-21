@@ -3,4 +3,6 @@
 
 export * from './App';
 export * from './AppErrorBoundary';
+export * from './drawers';
+export * from './interactions';
 export * from './subscreens';

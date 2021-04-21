@@ -1,5 +1,5 @@
 import { MdAccountBalanceWallet } from "react-icons/md";
-import { WalletConnectionContext } from "app/drawers";
+import { WalletConnectionContext } from "__app/drawers";
 import { useContext } from "react";
 
 export function WalletConnector() {
