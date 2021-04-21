@@ -8,10 +8,7 @@ import { useTranslator } from "hooks";
 export default function Portfolio() {
   const tx = useTranslator();
   const { ndx, tokens } = usePortfolioData();
-  const data = useMemo(
-    () => [ndx, ...tokens].map((t) => ({ ...t, staking: "0.05" })),
-    [ndx, tokens]
-  );
+  const data = useMemo(() => [ndx, ...tokens], [ndx, tokens]);
 
   return (
     <List
@@ -96,32 +93,8 @@ export default function Portfolio() {
               {item.value}
             </Typography.Text>
           </div>
-          {/* <List.Item.Meta
-            style={{ alignItems: "center" }}
-            title={
-              
-            }
-            description={
-              (item.ndxEarned && item.ndxEarned !== "0.00") || item.staking ? (
-                
-              ) : null
-            }
-          /> */}
         </List.Item>
       )}
     />
   );
-
-  // return (
-  //   <Space
-  //     wrap={true}
-  //     size="large"
-  //     style={{ width: "100%", alignItems: "stretch" }}
-  //   >
-  //     <PortfolioCard {...ndx} />
-  //     {tokens.map((token) => (
-  //       <PortfolioCard key={token.address} {...token} />
-  //     ))}
-  //   </Space>
-  // );
 }

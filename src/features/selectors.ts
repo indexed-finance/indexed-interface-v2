@@ -196,9 +196,15 @@ export const selectors = {
         };
         const staked = convert.toBalance(userData.userStakedBalance, 18);
         const earned = convert.toBalance(userData.userRewardsEarned, 18);
-        const rate = stakingPool.periodFinish > Date.now() / 1000
-        ? convert.toBalance(convert.toBigNumber(stakingPool.rewardRate).times(86400), 18, false, 2)
-        : '0';
+        const rate =
+          stakingPool.periodFinish > Date.now() / 1000
+            ? convert.toBalance(
+                convert.toBigNumber(stakingPool.rewardRate).times(86400),
+                18,
+                false,
+                2
+              )
+            : "0";
 
         return {
           id: stakingPool.id,
@@ -213,11 +219,11 @@ export const selectors = {
         };
       })
       .filter((each): each is FormattedStakingData => Boolean(each))
-      .sort((a, b) => (+b.rate) - (+a.rate))
+      .sort((a, b) => +b.rate - +a.rate)
       .map((each) => ({
         ...each,
-        staked: `${convert.toComma(+each.staked)} ${each.symbol}`,
-        rate: `${convert.toComma(+each.rate)} NDX/Day`
+        staked: convert.toComma(+each.staked),
+        rate: `${convert.toComma(+each.rate)} NDX/Day`,
       }));
 
     return formattedStaking.reduce(
