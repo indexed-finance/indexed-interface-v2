@@ -1,0 +1,23 @@
+@import "~antd/dist/antd.dark.less"; // Introduce the official dark less style entry file
+@import "~antd/dist/antd.compact.less"; // Introduce the official compact less style entry file
+
+.with-background {
+  background: url(./background.png) no-repeat center center fixed !important;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+
+// Ant Overrides
+.ant-collapse,
+.ant-collapse-content {
+  background: rgba(0, 0, 0, 0.25) !important;
+}
+
+.ant-collapse-header,
+.ant-steps-item-title,
+.ant-steps-item-subtitle,
+.ant-steps-item-description {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
