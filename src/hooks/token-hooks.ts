@@ -1,13 +1,13 @@
-import { AppState, selectors, useSigner } from "features";
+import { AppState, selectors } from "features";
 import { ApprovalStatus } from "features/user/slice";
 import { Pair } from "@uniswap/sdk";
 import { RegisteredCall, computeUniswapPairAddress, convert, getRandomEntries, sortTokens } from "helpers";
 import { WETH_CONTRACT_ADDRESS } from "config";
-import { approveSpender } from "ethereum";
+import { useAddTransactionCallback } from "./transaction-hooks";
 import { useCallRegistrar } from "./use-call-registrar";
 import { useCallback, useEffect, useMemo } from "react";
 import { useSelector } from "react-redux";
-import { useTransactionNotification } from "./notification-hooks";
+import { useTokenContract } from "./contract-hooks";
 import { useUniswapPairs } from "./pair-hooks";
 
 // #region General
@@ -29,39 +29,44 @@ interface TokenApprovalOptions {
   spender: string;
   tokenId: string;
   amount: string;
+  rawAmount: string;
+  symbol: string;
 }
 
 type TokenApprovalHook = {
   status: ApprovalStatus;
-  approve: () => Promise<void>;
+  approve: () => void;
 };
 
 export function useTokenApproval({
   spender,
   tokenId,
   amount,
+  rawAmount,
+  symbol,
 }: TokenApprovalOptions): TokenApprovalHook {
-  const signer = useSigner();
-  const { sendTransaction } = useTransactionNotification({
-    successMessage: "TODO: Approve Succeed",
-    errorMessage: "TODO: Approve Fail",
-  });
+
+  const contract = useTokenContract(tokenId);
+  const addTransaction = useAddTransactionCallback();
   const status = useSelector((state: AppState) =>
     selectors.selectApprovalStatus(
       state,
       spender.toLowerCase(),
       tokenId,
-      amount
+      rawAmount
     )
   );
   const approve = useCallback(
-    () =>
-      signer && spender && status === "approval needed"
-        ? sendTransaction(
-            approveSpender(signer as any, spender, tokenId, amount)
-          )
-        : Promise.reject(),
-    [signer, status, tokenId, spender, amount, sendTransaction]
+    () => {
+      if (!contract || !spender || status !== "approval needed") throw new Error();
+      const tx = contract.approve(spender, convert.toHex(convert.toBigNumber(rawAmount)));
+      addTransaction(tx, {
+        type: "ERC20.approve",
+        approval: { spender, tokenAddress: tokenId, amount: rawAmount },
+        summary: `Approve: ${amount} ${symbol}`
+      })
+    },
+    [status, spender, amount, rawAmount, addTransaction, symbol, contract, tokenId]
   );
 
   return {
