@@ -1,24 +1,47 @@
-import { AppState, selectors, useSigner } from "features";
+import { AppState, selectors } from "features";
 import { BigNumber } from "ethereum/utils/balancer-math";
 import { SLIPPAGE_RATE } from "config";
 import {
   calcSwapAmountIn,
   calcSwapAmountOut,
   downwardSlippage,
-  swapExactAmountIn,
-  swapExactAmountOut,
   upwardSlippage,
 } from "ethereum";
 import { convert } from "helpers";
 import { useCallback } from "react";
 import { useSelector } from "react-redux";
+import { useSwapTransactionCallbacks } from "./transaction-hooks";
 
-export function useSwapCallbacks(poolId: string) {
+interface SwapCallbacks {
+  calculateAmountIn: (tokenInSymbol: string, tokenOutSymbol: string, typedAmountOut: string) => {
+    tokenIn: string;
+    tokenOut: string;
+    amountOut?: BigNumber;
+    error?: string | undefined;
+    amountIn?: BigNumber | undefined;
+    spotPriceAfter?: BigNumber | undefined;
+  } | null;
+  calculateAmountOut: (tokenInSymbol: string, tokenOutSymbol: string, typedAmountIn: string) => {
+    tokenIn: string;
+    tokenOut: string;
+    amountOut?: BigNumber;
+    error?: string | undefined;
+    amountIn?: BigNumber | undefined;
+    spotPriceAfter?: BigNumber | undefined;
+  } | null;
+  executeSwap: (
+    tokenInSymbol: string,
+    tokenOutSymbol: string,
+    specifiedField: "from" | "to",
+    typedAmount: string
+  ) => void;
+}
+
+export function useSwapCallbacks(poolId: string): SwapCallbacks {
   const normalizedPool = useSelector((state: AppState) =>
     selectors.selectPool(state, poolId)
   );
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
-  const signer = useSigner();
   const calculateAmountIn = useCallback(
     (tokenInSymbol: string, tokenOutSymbol: string, typedAmountOut: string) => {
       if (normalizedPool) {
@@ -85,6 +108,9 @@ export function useSwapCallbacks(poolId: string) {
     },
     [tokenLookup, normalizedPool]
   );
+  const { swapExactAmountIn, swapExactAmountOut } = useSwapTransactionCallbacks(
+    poolId
+  );
   const executeSwap = useCallback(
     (
       tokenInSymbol: string,
@@ -92,55 +118,56 @@ export function useSwapCallbacks(poolId: string) {
       specifiedField: "from" | "to",
       typedAmount: string
     ) => {
-      if (signer) {
-        if (specifiedField === "from") {
-          const result = calculateAmountOut(
-            tokenInSymbol,
-            tokenOutSymbol,
-            typedAmount
-          );
-
-          return result && !result.error
-            ? swapExactAmountIn(
-                signer as any,
-                poolId,
-                result.tokenIn,
-                result.tokenOut,
-                result.amountIn,
-                downwardSlippage(result.amountOut as BigNumber, SLIPPAGE_RATE),
-                upwardSlippage(
-                  result.spotPriceAfter as BigNumber,
-                  SLIPPAGE_RATE * 3
-                )
-              )
-            : Promise.reject();
+      if (specifiedField === "from") {
+        const result = calculateAmountOut(
+          tokenInSymbol,
+          tokenOutSymbol,
+          typedAmount
+        );
+        if (result && !result.error) {
+          swapExactAmountIn(
+            result.tokenIn,
+            result.tokenOut,
+            result.amountIn,
+            downwardSlippage(result.amountOut as BigNumber, SLIPPAGE_RATE),
+            upwardSlippage(
+              result.spotPriceAfter as BigNumber,
+              SLIPPAGE_RATE * 3
+            )
+          )
         } else {
-          const result = calculateAmountIn(
-            tokenInSymbol,
-            tokenOutSymbol,
-            typedAmount
-          );
-
-          return result && !result.error
-            ? swapExactAmountOut(
-                signer as any,
-                poolId,
-                result.tokenIn,
-                result.tokenOut,
-                upwardSlippage(result.amountIn as BigNumber, SLIPPAGE_RATE),
-                result.amountOut,
-                upwardSlippage(
-                  result.spotPriceAfter as BigNumber,
-                  SLIPPAGE_RATE * 3
-                )
-              )
-            : Promise.reject();
+          throw new Error()
+          // Promise.reject();
         }
       } else {
-        return Promise.reject();
+        const result = calculateAmountIn(
+          tokenInSymbol,
+          tokenOutSymbol,
+          typedAmount
+        );
+        if (result && !result.error) {
+          swapExactAmountOut(
+            result.tokenIn,
+            result.tokenOut,
+            upwardSlippage(result.amountIn as BigNumber, SLIPPAGE_RATE),
+            result.amountOut,
+            upwardSlippage(
+              result.spotPriceAfter as BigNumber,
+              SLIPPAGE_RATE * 3
+            )
+          );
+        } else {
+          throw new Error()
+          // Promise.reject();
+        }
       }
     },
-    [signer, calculateAmountIn, calculateAmountOut, poolId]
+    [
+      calculateAmountIn,
+      calculateAmountOut,
+      swapExactAmountIn,
+      swapExactAmountOut,
+    ]
   );
 
   return {
