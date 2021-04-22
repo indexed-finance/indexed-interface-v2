@@ -141,10 +141,10 @@ function SingleInteractionInner({
   const tx = useTranslator();
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
   const {
-    tokenId = "",
-    symbol = "",
-    approveAmount = "",
-    rawApproveAmount = ""
+    tokenId,
+    symbol,
+    approveAmount,
+    rawApproveAmount
   } = useMemo(() => {
     if (values.fromToken && values.fromAmount) {
       const tokenIn = tokenLookup[values.fromToken.toLowerCase()];
@@ -159,7 +159,12 @@ function SingleInteractionInner({
         }
       }
     }
-    return {};
+    return {
+      tokenId: "",
+      symbol: "",
+      approveAmount: "0",
+      rawApproveAmount: "0"
+    };
   }, [values.fromAmount, values.fromToken, tokenLookup]);
   // @todo Clean this up at some point.
   // Not doing the lookup by symbol in the hook because we already have it in scope
