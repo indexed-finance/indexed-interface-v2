@@ -46,13 +46,13 @@ const createIndex = (directory) => {
 };
 const removeBadIndices = () =>
   [
-    "assets",
-    "assets/images",
-    "assets/images/connectors",
-    "assets/images/karate_files",
+    "images",
+    "images/connectors",
+    "images/karate_files",
     "i18n",
     "theme",
     "theme/fonts",
+    "theme/images",
     "sockets",
     "sockets/server",
   ].forEach((illegalPath) =>

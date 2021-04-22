@@ -4,4 +4,4 @@
 export * from './atomic';
 export * from './drawers';
 export * from './interactions';
-export * from './subscreens';
+export * from './screen';

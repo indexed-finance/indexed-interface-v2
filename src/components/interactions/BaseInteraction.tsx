@@ -1,7 +1,7 @@
 import * as yup from "yup";
 import { AiOutlineArrowRight } from "react-icons/ai";
 import { Alert, Button, Divider, Space, Typography } from "antd";
-import { Flipper, Token } from "components/atomic/atoms";
+import { Flipper, Token, TokenSelector } from "components/atomic";
 import { Formik, FormikProps, useFormikContext } from "formik";
 import {
   ReactNode,
@@ -11,7 +11,6 @@ import {
   useRef,
   useState,
 } from "react";
-import { TokenSelector } from "components";
 import { convert } from "helpers";
 import { selectors } from "features";
 import {

@@ -1,6 +1,6 @@
 import { COMMON_BASE_TOKENS, MINT_ROUTER_ADDRESS, SLIPPAGE_RATE } from "config";
 import { FormattedIndexPool, selectors } from "features";
-import { Fragment, useCallback, useMemo, useState } from "react";
+import { Fragment, useCallback, useState } from "react";
 import {
   MultiInteraction,
   MultiInteractionValues,
@@ -141,7 +141,7 @@ function SingleTokenMintInteraction({ pool }: Props) {
     [executeMint]
   );
 
-  const tokenIds = usePoolTokenAddresses(pool.id)
+  const tokenIds = usePoolTokenAddresses(pool.id);
   useBalanceAndApprovalRegistrar(pool.id, tokenIds);
   // useUserDataRegistrar(poolToTokens);
 
@@ -162,7 +162,9 @@ function UniswapMintInteraction({ pool }: Props) {
   const tx = useTranslator();
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
 
-  useBalanceAndApprovalRegistrar(MINT_ROUTER_ADDRESS.toLowerCase(), [...COMMON_BASE_TOKENS.map(({ id }) => id)]);
+  useBalanceAndApprovalRegistrar(MINT_ROUTER_ADDRESS.toLowerCase(), [
+    ...COMMON_BASE_TOKENS.map(({ id }) => id),
+  ]);
   const {
     getBestMintRouteForAmountIn,
     getBestMintRouteForAmountOut,

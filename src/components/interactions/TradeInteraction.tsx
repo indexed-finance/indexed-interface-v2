@@ -6,13 +6,12 @@ import { convert } from "helpers";
 import { executeUniswapTrade } from "ethereum";
 import {
   useBalanceAndApprovalRegistrar,
-  usePoolTokenIds,
   useTransactionNotification,
   useTranslator,
   useUniswapTradingPairs,
   useUserAddress,
 } from "hooks";
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { useSelector } from "react-redux";
 
 interface Props {

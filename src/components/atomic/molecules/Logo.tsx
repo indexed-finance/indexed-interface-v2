@@ -35,7 +35,7 @@ export function Logo({
             "is-spinning": spinning,
           })}
           alt=""
-          src={require(`assets/images/indexed-${theme}.png`).default}
+          src={require(`images/indexed-${theme}.png`).default}
           style={{
             width: spinning ? 48 : 24,
             height: spinning ? 48 : 24,

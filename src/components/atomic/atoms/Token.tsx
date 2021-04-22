@@ -35,7 +35,7 @@ export function Token({
 
   try {
     // First, do we have it locally?
-    tokenImage = require(`assets/images/${image.toLowerCase()}.png`).default;
+    tokenImage = require(`images/${image.toLowerCase()}.png`).default;
   } catch {
     if (address) {
       try {

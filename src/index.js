@@ -1,7 +1,8 @@
+import "theme/style.less";
 import ReactDOM from "react-dom";
 import React from "react";
 import { BackTop } from "antd";
-import { App } from "./__app/App";
+import { App } from "./App";
 
 ReactDOM.render(
   <React.StrictMode>

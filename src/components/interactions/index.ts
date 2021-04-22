@@ -5,5 +5,4 @@ export * from './BaseInteraction';
 export * from './BurnInteraction';
 export * from './MintInteraction';
 export * from './PoolInteractions';
-export * from './SwapInteraction';
 export * from './TradeInteraction';

@@ -11,13 +11,13 @@ const USEFUL_LINKS: Array<{
 }> = [
   {
     text: "VIEW_ON_ETHERSCAN",
-    image: require("assets/images/etherscan-link.png").default,
+    image: require("images/etherscan-link.png").default,
     makeLink: (address) =>
       `https://etherscan.io/address/${address.toLowerCase()}#code`,
   },
   {
     text: "TRADE_WITH_UNISWAP",
-    image: require("assets/images/uniswap-link.png").default,
+    image: require("images/uniswap-link.png").default,
     makeLink: (address) =>
       `https://info.uniswap.org/token/${address.toLowerCase()}`,
   },
@@ -31,7 +31,7 @@ export function UsefulLinks({ address }: { address: string }) {
       quickswapLink
         ? USEFUL_LINKS.concat({
             text: "SWAP_WITH_QUICKSWAP",
-            image: require("assets/images/quickswap.png").default,
+            image: require("images/quickswap.png").default,
             makeLink: (_) => quickswapLink,
           })
         : USEFUL_LINKS,

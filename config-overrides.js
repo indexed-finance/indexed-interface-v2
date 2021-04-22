@@ -14,11 +14,6 @@ const filterWarningsPlugin = (config) => {
 
 module.exports = override(
   filterWarningsPlugin,
-  fixBabelImports("antd", {
-    libraryName: "antd",
-    libraryDirectory: "es",
-    style: true,
-  }),
   fixBabelImports("lodash", {
     libraryName: "lodash",
     libraryDirectory: "",
@@ -33,7 +28,6 @@ module.exports = override(
   addLessLoader({
     lessOptions: {
       javascriptEnabled: true,
-      modifyVars: path.join(__dirname, "./src/theme/variables.less"),
     },
   })
 );

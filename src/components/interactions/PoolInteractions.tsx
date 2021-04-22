@@ -1,4 +1,3 @@
-import { AiOutlineSwap } from "react-icons/ai";
 import { FaCoins, FaFireAlt, FaHammer } from "react-icons/fa";
 import { Link, useParams } from "react-router-dom";
 import { Tabs } from "antd";
@@ -6,15 +5,9 @@ import { lazy } from "react";
 import { useBreakpoints, useTranslator } from "hooks";
 import type { FormattedIndexPool } from "features";
 
-// const BurnInteraction = lazy(() => import("./BurnInteraction"));
-// const MintInteraction = lazy(() => import("./MintInteraction"));
-// const SwapInteraction = lazy(() => import("./SwapInteraction"));
-// const TradeInteraction = lazy(() => import("./TradeInteraction"));
-
-import BurnInteraction from "./BurnInteraction";
-import MintInteraction from "./MintInteraction";
-import SwapInteraction from "./SwapInteraction";
-import TradeInteraction from "./TradeInteraction";
+const BurnInteraction = lazy(() => import("./BurnInteraction"));
+const MintInteraction = lazy(() => import("./MintInteraction"));
+const TradeInteraction = lazy(() => import("./TradeInteraction"));
 
 export type PoolInteraction =
   | "burn"
@@ -23,7 +16,6 @@ export type PoolInteraction =
   | "mint"
   | "multiMint"
   | "uniswapMint"
-  | "swap"
   | "trade";
 
 interface Props {
@@ -60,17 +52,6 @@ export function PoolInteractions({ pool }: Props) {
             }
           >
             <TradeInteraction pool={pool} />
-          </Tabs.TabPane>
-          <Tabs.TabPane
-            style={{ padding: 20 }}
-            key="swap"
-            tab={
-              <Link to={`/pools/${poolName}/swap`}>
-                <AiOutlineSwap /> {!isMobile && <span>{tx("SWAP")}</span>}
-              </Link>
-            }
-          >
-            <SwapInteraction pool={pool} />
           </Tabs.TabPane>
           <Tabs.TabPane
             style={{ padding: 20 }}
