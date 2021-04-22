@@ -6,7 +6,7 @@ import { useSigner } from "features";
 
 export function useContractWithSigner(address: string, abi: Interface | JsonFragment[]): Contract | undefined {
   const signer = useSigner();
-  if (signer) {
+  if (signer && address) {
     return new Contract(address, abi, signer);
   }
 }
