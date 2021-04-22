@@ -1,5 +1,7 @@
 import * as topLevelActions from "./actions";
 import { RegisteredCall } from "helpers";
+import { TransactionExtra, transactionsActions } from "./transactions";
+import { TransactionResponse } from "@ethersproject/abstract-provider";
 import { batcherActions, fetchMulticallData } from "./batcher";
 import { categoriesActions } from "./categories";
 import {
@@ -14,21 +16,21 @@ import { pairsActions } from "./pairs";
 import { providers } from "ethers";
 import { selectors } from "./selectors";
 import { settingsActions } from "./settings";
-import { transactionsActions } from "./transactions";
 import { userActions } from "./user";
 import debounce from "lodash.debounce";
 import type { AppThunk } from "./store";
 
 // #region Provider
+
+type Provider = providers.Web3Provider
+  | providers.JsonRpcProvider
+  | providers.InfuraProvider;
+
 /**
  * A global reference to the provider (always) and signer (for end users) is established
  * and is accessible elsewhere.
  */
-export let provider:
-  | null
-  | providers.Web3Provider
-  | providers.JsonRpcProvider
-  | providers.InfuraProvider = null;
+export let provider: null | Provider = null;
 export let signer: null | providers.JsonRpcSigner = null;
 
 export const disconnectFromProvider = () => {
@@ -174,6 +176,20 @@ export const thunks = {
       }
     }
   },
+  addTransaction: (
+    _tx: TransactionResponse | Promise<TransactionResponse>,
+    extra: TransactionExtra = {}
+  ): AppThunk => async (
+    dispatch,
+    getState
+  ) => {
+    const tx = await Promise.resolve(_tx);
+    const _provider = provider as Provider;
+
+    dispatch(actions.transactionStarted({ tx, extra }));
+    const receipt = await _provider.getTransactionReceipt(tx.hash);
+    dispatch(actions.transactionFinalized(receipt));
+  }
 };
 
 export const actions = {

@@ -14,6 +14,7 @@ import {
 } from "./staking";
 import { NDX_ADDRESS } from "config";
 import { NormalizedToken, tokensSelectors } from "./tokens";
+import { NormalizedTransaction, transactionsSelectors } from "./transactions";
 import { Pair } from "uniswap-types";
 import { batcherSelectors } from "./batcher";
 import { convert } from "helpers";
@@ -21,7 +22,6 @@ import { createSelector } from "reselect";
 import { dailySnapshotsSelectors } from "./dailySnapshots";
 import { formatDistance } from "date-fns";
 import { settingsSelectors } from "./settings";
-import { transactionsSelectors } from "./transactions";
 import S from "string";
 import type { AppState } from "./store";
 
@@ -421,4 +421,10 @@ export const selectors = {
       indexPools,
     };
   },
+  selectUserTransactions: (state: AppState): NormalizedTransaction[] => {
+    const user = selectors.selectUserAddress(state);
+    if (!user) return [];
+    const transactions = selectors.selectTransactions(state);
+    return transactions.filter(t => t.from.toLowerCase() === user.toLowerCase());
+  }
 };

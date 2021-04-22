@@ -9,7 +9,6 @@ import {
   useBalancesRegistrar,
   useBurnRouterCallbacks,
   useSingleTokenBurnCallbacks,
-  useTransactionNotification,
   useTranslator,
 } from "hooks";
 import { useSelector } from "react-redux";
@@ -46,16 +45,12 @@ function SingleTokenBurnInteraction({ pool }: Props) {
   const tx = useTranslator();
   const poolId = pool.id;
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
-  useBalancesRegistrar([ poolId ])
+  useBalancesRegistrar([poolId]);
   const {
     calculateAmountIn,
     calculateAmountOut,
     executeBurn,
   } = useSingleTokenBurnCallbacks(poolId);
-  const { sendTransaction } = useTransactionNotification({
-    successMessage: "TODO: Burn Succeed",
-    errorMessage: "TODO: Burn Fail",
-  });
 
   const handleChange = useCallback(
     (values: SingleInteractionValues) => {
@@ -128,18 +123,16 @@ function SingleTokenBurnInteraction({ pool }: Props) {
         lastTouchedField,
       } = values;
       if (fromAmount > 0 && toAmount > 0 && fromToken && toToken) {
-        sendTransaction(() =>
-          executeBurn(
-            toToken,
-            lastTouchedField,
-            lastTouchedField === "from"
-              ? fromAmount.toString()
-              : toAmount.toString()
-          )
+        executeBurn(
+          toToken,
+          lastTouchedField,
+          lastTouchedField === "from"
+            ? fromAmount.toString()
+            : toAmount.toString()
         );
       }
     },
-    [executeBurn, sendTransaction]
+    [executeBurn]
   );
 
   return (
@@ -160,7 +153,7 @@ function UniswapBurnInteraction({ pool }: Props) {
   const tx = useTranslator();
   const poolId = pool.id;
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
-  useBalancesRegistrar([ poolId ])
+  useBalancesRegistrar([poolId]);
   const {
     getBestBurnRouteForAmountIn,
     getBestBurnRouteForAmountOut,

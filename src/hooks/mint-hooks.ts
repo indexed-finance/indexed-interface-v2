@@ -4,16 +4,19 @@ import {
   _calcAllInGivenPoolOut,
   calcPoolOutGivenSingleIn,
   calcSingleInGivenPoolOut,
-  joinPool,
-  joinswapExternAmountIn,
-  joinswapPoolAmountOut,
-  swapExactTokensForTokensAndMint,
-  swapTokensForTokensAndMintExact,
+  downwardSlippage,
+  // swapExactTokensForTokensAndMint,
+  // swapTokensForTokensAndMintExact,
+  upwardSlippage
 } from "ethereum";
 import { COMMON_BASE_TOKENS, SLIPPAGE_RATE } from "config";
 import { convert } from "helpers";
-import { downwardSlippage, upwardSlippage } from "ethereum";
 import { useCallback, useMemo } from "react";
+import {
+  useMintMultiTransactionCallback,
+  useMintSingleTransactionCallbacks,
+  useRoutedMintTransactionCallbacks
+} from "./transaction-hooks";
 import { usePoolTokenAddresses, usePoolUnderlyingTokens } from "./pool-hooks";
 import { useSelector } from "react-redux";
 import { useTokenLookupBySymbol } from "./token-hooks";
@@ -26,6 +29,7 @@ export function useSingleTokenMintCallbacks(poolId: string) {
   const pool = useSelector((state: AppState) =>
     selectors.selectPool(state, poolId)
   );
+  const { joinswapExternAmountIn, joinswapPoolAmountOut } = useMintSingleTransactionCallbacks(poolId);
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
   const calculateAmountIn = useCallback(
     (tokenInSymbol: string, typedAmountOut: string) => {
@@ -80,37 +84,35 @@ export function useSingleTokenMintCallbacks(poolId: string) {
       if (signer) {
         if (specifiedField === "from") {
           const result = calculateAmountOut(tokenInSymbol, typedAmount);
-
-          return result && !result.error
-            ? joinswapExternAmountIn(
-                signer as any,
-                poolId,
-                result.tokenIn,
-                result.amountIn,
-                downwardSlippage(
-                  result.poolAmountOut as BigNumber,
-                  SLIPPAGE_RATE
-                )
+          if (result && !result.error) {
+            joinswapExternAmountIn(
+              result.tokenIn,
+              result.amountIn,
+              downwardSlippage(
+                result.poolAmountOut as BigNumber,
+                SLIPPAGE_RATE
               )
-            : Promise.reject();
+            )
+          } else {
+            Promise.reject()
+          }
         } else {
           const result = calculateAmountIn(tokenInSymbol, typedAmount);
-
-          return result && !result.error
-            ? joinswapPoolAmountOut(
-                signer as any,
-                poolId,
-                result.tokenIn,
-                result.amountOut,
-                upwardSlippage(result.tokenAmountIn as BigNumber, SLIPPAGE_RATE)
-              )
-            : Promise.reject();
+          if (result && !result.error) {
+            joinswapPoolAmountOut(
+              result.tokenIn,
+              result.amountOut,
+              upwardSlippage(result.tokenAmountIn as BigNumber, SLIPPAGE_RATE)
+            );
+          } else {
+            Promise.reject();
+          }
         }
       } else {
         return Promise.reject();
       }
     },
-    [signer, calculateAmountIn, calculateAmountOut, poolId]
+    [signer, calculateAmountIn, calculateAmountOut, joinswapExternAmountIn, joinswapPoolAmountOut]
   );
 
   return {
@@ -121,10 +123,10 @@ export function useSingleTokenMintCallbacks(poolId: string) {
 }
 
 export function useMultiTokenMintCallbacks(poolId: string) {
-  const signer = useSigner();
   const pool = useSelector((state: AppState) =>
     selectors.selectPool(state, poolId)
   );
+  const joinPool = useMintMultiTransactionCallback(poolId);
   const calculateAmountsIn = useCallback(
     (typedAmountOut: string) => {
       if (pool) {
@@ -150,19 +152,18 @@ export function useMultiTokenMintCallbacks(poolId: string) {
   const executeMint = useCallback(
     (typedAmountOut: string) => {
       const result = calculateAmountsIn(typedAmountOut);
-
-      return signer && result
-        ? joinPool(
-            signer as any,
-            poolId,
-            result.poolAmountOut,
-            result.amountsIn.map((amount) =>
-              upwardSlippage(amount, SLIPPAGE_RATE)
-            )
+      if (result) {
+        joinPool(
+          result.poolAmountOut,
+          result.amountsIn.map((amount) =>
+            upwardSlippage(amount, SLIPPAGE_RATE)
           )
-        : Promise.reject();
+        )
+      } else {
+        Promise.reject()
+      }
     },
-    [signer, poolId, calculateAmountsIn]
+    [joinPool, calculateAmountsIn]
   );
 
   return { calculateAmountsIn, executeMint };
@@ -171,7 +172,6 @@ export function useMultiTokenMintCallbacks(poolId: string) {
 
 // #region Routing
 export function useMintRouterCallbacks(poolId: string) {
-  const signer = useSigner();
   const poolTokens = usePoolUnderlyingTokens(poolId);
   const poolTokenIds = usePoolTokenAddresses(poolId);
   const tokenLookupBySymbol = useTokenLookupBySymbol();
@@ -179,6 +179,7 @@ export function useMintRouterCallbacks(poolId: string) {
     () => [...poolTokenIds, ...COMMON_BASE_TOKENS.map(({ id }) => id)],
     [poolTokenIds]
   );
+  const { mintExactAmountIn, mintExactAmountOut } = useRoutedMintTransactionCallbacks(poolId);
   const { calculateAmountIn, calculateAmountOut } = useSingleTokenMintCallbacks(
     poolId
   );
@@ -309,50 +310,42 @@ export function useMintRouterCallbacks(poolId: string) {
       specifiedField: "from" | "to",
       typedAmount: string
     ) => {
-      if (signer) {
-        if (specifiedField === "from") {
-          const result = getBestMintRouteForAmountIn(
-            tokenInSymbol,
-            typedAmount
-          );
+      if (specifiedField === "from") {
+        const result = getBestMintRouteForAmountIn(
+          tokenInSymbol,
+          typedAmount
+        );
 
-          return result && !result.poolResult.error
-            ? swapExactTokensForTokensAndMint(
-                signer as any,
-                poolId,
-                convert.toBigNumber(
-                  result.uniswapResult.inputAmount.raw.toString(10)
-                ),
-                result.uniswapResult.route.path.map((p) => p.address),
-                downwardSlippage(result.poolResult.poolAmountOut, SLIPPAGE_RATE)
-              )
-            : Promise.reject();
-        } else {
-          const result = getBestMintRouteForAmountOut(
-            tokenInSymbol,
-            typedAmount
-          );
-
-          return result && !result.poolResult.error
-            ? swapTokensForTokensAndMintExact(
-                signer as any,
-                poolId,
-                upwardSlippage(
-                  convert.toBigNumber(
-                    result.uniswapResult.inputAmount.raw.toString(10)
-                  ),
-                  SLIPPAGE_RATE
-                ),
-                result.uniswapResult.route.path.map((p) => p.address),
-                result.poolResult.amountOut
-              )
-            : Promise.reject();
+        if (result && !result.poolResult.error) {
+          return mintExactAmountIn(
+            convert.toBigNumber(
+              result.uniswapResult.inputAmount.raw.toString(10)
+            ),
+            result.uniswapResult.route.path.map((p) => p.address),
+            downwardSlippage(result.poolResult.poolAmountOut, SLIPPAGE_RATE)
+          )
         }
       } else {
-        return Promise.reject();
+        const result = getBestMintRouteForAmountOut(
+          tokenInSymbol,
+          typedAmount
+        );
+        if (result && !result.poolResult.error) {
+          return mintExactAmountOut(
+            upwardSlippage(
+              convert.toBigNumber(
+                result.uniswapResult.inputAmount.raw.toString(10)
+              ),
+              SLIPPAGE_RATE
+            ),
+            result.uniswapResult.route.path.map((p) => p.address),
+            result.poolResult.amountOut
+          )
+        }
       }
+      return Promise.reject();
     },
-    [signer, getBestMintRouteForAmountOut, getBestMintRouteForAmountIn, poolId]
+    [getBestMintRouteForAmountOut, getBestMintRouteForAmountIn, mintExactAmountIn, mintExactAmountOut]
   );
 
   return {
