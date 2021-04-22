@@ -12,7 +12,7 @@ import { useCallback, useMemo } from "react";
 import { useFormikContext } from "formik";
 import { usePoolToTokens, useSwapCallbacks, useUserDataRegistrar } from "hooks";
 import { useSelector } from "react-redux";
-import { useTransactionNotification, useTranslator } from "hooks";
+import { useTranslator } from "hooks";
 
 interface Props {
   pool: FormattedIndexPool;
@@ -27,10 +27,7 @@ export default function SwapInteraction({ pool }: Props) {
   } = useSwapCallbacks(pool.id);
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
   const poolToTokens = usePoolToTokens(pool);
-  const { sendTransaction } = useTransactionNotification({
-    successMessage: "TODO: Swap Succeed",
-    errorMessage: "TODO: Swap Fail",
-  });
+
   const handleChange = useCallback(
     (values: SingleInteractionValues) => {
       const {
@@ -107,19 +104,17 @@ export default function SwapInteraction({ pool }: Props) {
         lastTouchedField,
       } = values;
       if (fromAmount > 0 && toAmount > 0 && fromToken && toToken) {
-        sendTransaction(() =>
-          executeSwap(
-            fromToken,
-            toToken,
-            lastTouchedField,
-            lastTouchedField === "from"
-              ? fromAmount.toString()
-              : toAmount.toString()
-          )
+        executeSwap(
+          fromToken,
+          toToken,
+          lastTouchedField,
+          lastTouchedField === "from"
+            ? fromAmount.toString()
+            : toAmount.toString()
         );
       }
     },
-    [executeSwap, sendTransaction]
+    [executeSwap]
   );
 
   useUserDataRegistrar(poolToTokens);

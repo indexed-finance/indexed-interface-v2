@@ -107,19 +107,17 @@ export default function SwapInteraction({ pool }: Props) {
         lastTouchedField,
       } = values;
       if (fromAmount > 0 && toAmount > 0 && fromToken && toToken) {
-        sendTransaction(() =>
-          executeSwap(
-            fromToken,
-            toToken,
-            lastTouchedField,
-            lastTouchedField === "from"
-              ? fromAmount.toString()
-              : toAmount.toString()
-          )
-        );
+        executeSwap(
+          fromToken,
+          toToken,
+          lastTouchedField,
+          lastTouchedField === "from"
+            ? fromAmount.toString()
+            : toAmount.toString()
+        )
       }
     },
-    [executeSwap, sendTransaction]
+    [executeSwap]
   );
 
   useUserDataRegistrar(poolToTokens);
