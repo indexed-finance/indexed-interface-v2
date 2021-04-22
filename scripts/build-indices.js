@@ -50,8 +50,6 @@ const removeBadIndices = () =>
     "assets/images",
     "assets/images/connectors",
     "assets/images/karate_files",
-    "app",
-    "app/screens",
     "i18n",
     "theme",
     "theme/fonts",

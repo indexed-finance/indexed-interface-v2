@@ -49,7 +49,10 @@ import {
 import { Link, Route, useHistory } from "react-router-dom";
 import { Provider } from "react-redux";
 import { SOCIAL_MEDIA } from "config";
-import { TransactionProvider, WalletConnectionProvider } from "./drawers";
+import {
+  TransactionProvider,
+  WalletConnectionProvider,
+} from "../components/drawers";
 import { Web3ReactProvider } from "@web3-react/core";
 import { ethers } from "ethers";
 import { noop } from "lodash";
@@ -383,7 +386,7 @@ const SplashSubscreen = () => {
     []
   );
   const SubscreenComponent = useMemo(
-    () => lazy(() => import("./subscreens/Splash")),
+    () => lazy(() => import("components/subscreens/Splash")),
     []
   );
 
@@ -403,14 +406,14 @@ const PortfolioSubscreen = () => {
           style={{
             width: "100%",
             justifyContent: "flex-end",
-            margin: "0 8rem",
+            margin: "0 9rem",
           }}
         >
-          <Typography.Title level={4} type="secondary" style={{ margin: 0 }}>
+          <Typography.Title level={3} type="secondary" style={{ margin: 0 }}>
             {tx("TOTAL_VALUE")}
           </Typography.Title>
           <Divider type="vertical" />
-          <Typography.Title type="success" level={3}>
+          <Typography.Title type="success" level={3} style={{ margin: 0 }}>
             {totalValue}
           </Typography.Title>
         </Space>
@@ -422,7 +425,7 @@ const PortfolioSubscreen = () => {
     [tx, totalValue]
   );
   const SubscreenComponent = useMemo(
-    () => lazy(() => import("./subscreens/Portfolio")),
+    () => lazy(() => import("components/subscreens/Portfolio")),
     []
   );
 
@@ -446,7 +449,7 @@ const StakingSubscreen = () => {
     [tx]
   );
   const SubscreenComponent = useMemo(
-    () => lazy(() => import("./subscreens/Staking")),
+    () => lazy(() => import("components/subscreens/Staking")),
     []
   );
 
@@ -468,7 +471,7 @@ const PoolsSubscreen = () => {
     [tx]
   );
   const SubscreenComponent = useMemo(
-    () => lazy(() => import("./subscreens/Pools")),
+    () => lazy(() => import("components/subscreens//Pools")),
     []
   );
 
@@ -510,7 +513,7 @@ const PoolSubscreen = () => {
     [pool]
   );
   const SubscreenComponent = useMemo(
-    () => lazy(() => import("./subscreens/Pool")),
+    () => lazy(() => import("components/subscreens/Pool")),
     []
   );
 
