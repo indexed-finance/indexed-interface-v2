@@ -13,6 +13,8 @@ export const useAllPools = () =>
 export const usePool = (poolId: string) =>
   useSelector((state: AppState) => selectors.selectPool(state, poolId));
 
+export const usePoolSymbol = (poolId: string) => usePool(poolId)?.symbol;
+
 export const usePoolTokenIds = (poolId: string) =>
   useSelector((state: AppState) => selectors.selectPoolTokenIds(state, poolId));
 
