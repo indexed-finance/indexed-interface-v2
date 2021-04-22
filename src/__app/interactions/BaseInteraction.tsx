@@ -140,24 +140,35 @@ function SingleInteractionInner({
 }: InnerSingleProps) {
   const tx = useTranslator();
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
-  const [tokenId, exactAmountIn] = useMemo(() => {
+  const {
+    tokenId = "",
+    symbol = "",
+    approveAmount = "",
+    rawApproveAmount = ""
+  } = useMemo(() => {
     if (values.fromToken && values.fromAmount) {
       const tokenIn = tokenLookup[values.fromToken.toLowerCase()];
       if (tokenIn) {
-        return [
-          tokenIn.id,
-          convert
+        return {
+          tokenId: tokenIn.id,
+          symbol: values.fromToken.toLowerCase(),
+          approveAmount: values.fromAmount.toString(),
+          rawApproveAmount: convert
             .toToken(values.fromAmount.toString(), tokenIn.decimals)
             .toString(10),
-        ];
+        }
       }
     }
-    return ["", "0"];
+    return {};
   }, [values.fromAmount, values.fromToken, tokenLookup]);
+  // @todo Clean this up at some point.
+  // Not doing the lookup by symbol in the hook because we already have it in scope
   const { status, approve } = useTokenApproval({
     spender,
     tokenId,
-    amount: exactAmountIn,
+    amount: approveAmount,
+    rawAmount: rawApproveAmount,
+    symbol
   });
   const inputOptions = useMemo(
     () => assets.filter(({ symbol }) => symbol !== values.toToken),
