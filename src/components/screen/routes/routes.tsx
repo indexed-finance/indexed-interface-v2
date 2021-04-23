@@ -51,10 +51,9 @@ const PortfolioRoute = () => {
             margin: "0 9rem",
           }}
         >
-          <Typography.Title level={3} type="secondary" style={{ margin: 0 }}>
+          <Typography.Title level={3} style={{ margin: 0 }}>
             {tx("TOTAL_VALUE")}
           </Typography.Title>
-          <Divider type="vertical" />
           <Typography.Title type="success" level={3} style={{ margin: 0 }}>
             {totalValue}
           </Typography.Title>

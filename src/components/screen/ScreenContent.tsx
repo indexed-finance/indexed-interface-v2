@@ -59,7 +59,7 @@ export function ScreenContent() {
             />
             {extra && <div>{extra}</div>}
           </Space>
-          <Divider style={{ margin: 0 }} />
+          <Divider style={{ margin: 12 }} />
         </>
       )}
       <div style={{ padding: "2rem 3rem 10rem 3rem" }}>
@@ -86,17 +86,16 @@ export function ScreenContent() {
           ))}
         </Suspense>
       </div>
-      <Divider />
       {actions && (
         <div
           style={{
             position: "fixed",
-            bottom: 77,
+            top: 60,
             left: 0,
             width: "100vw",
             height: 45,
             background: "rgba(0, 0, 0, 0.65)",
-            borderTop: "1px solid rgba(255, 255, 255, 0.65)",
+            borderBottom: "1px solid rgba(255, 255, 255, 0.65)",
             display: "flex",
             alignItems: "center",
             padding: "12px 50px",

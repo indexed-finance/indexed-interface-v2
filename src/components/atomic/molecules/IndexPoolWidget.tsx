@@ -48,7 +48,7 @@ export function IndexPoolWidget(props: FormattedIndexPool) {
           This is a brief description of the purpose of this particular index
           pool.
         </Typography.Paragraph>
-        <Divider style={{ margin: 0 }} />
+        <Divider style={{ marginTop: 0, marginBottom: 12 }} />
         <Space style={{ width: "100%", justifyContent: "space-between" }}>
           <Space>
             <span>

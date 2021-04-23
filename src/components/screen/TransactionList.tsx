@@ -13,6 +13,7 @@ export function TransactionList() {
         borderLeft: "1px solid rgba(255, 255, 255, 0.65)",
         borderTopLeftRadius: 12,
         borderBottomLeftRadius: 12,
+        zIndex: 10,
       }}
     ></div>
   );

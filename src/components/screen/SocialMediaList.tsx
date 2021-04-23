@@ -19,6 +19,7 @@ export function SocialMediaList() {
         padding: "1rem 0.25rem",
         display: "flex",
         flexDirection: "column",
+        zIndex: 10,
       }}
     >
       {SOCIAL_MEDIA.map((site) => (

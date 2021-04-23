@@ -1,12 +1,72 @@
 import { AiOutlineUser } from "react-icons/ai";
-import { Button, Space, Typography } from "antd";
+import { Button, Menu, Space, Typography } from "antd";
+import { ExternalLink } from "components/atomic";
 import { FaEthereum, FaGavel, FaSwimmingPool } from "react-icons/fa";
 import { Link, useLocation } from "react-router-dom";
-import { useTranslator } from "hooks";
+import { useBreakpoints, useTranslator } from "hooks";
+import { useMemo } from "react";
 
 export function Navigation() {
   const tx = useTranslator();
+  const { isMobile } = useBreakpoints();
   const { pathname } = useLocation();
+  const selectedKey = useMemo(() => {
+    for (const link of ["portfolio", "staking", "index-pools"]) {
+      if (pathname.includes(link)) {
+        return link;
+      }
+    }
+
+    return "";
+  }, [pathname]);
+
+  return (
+    <Menu
+      mode="horizontal"
+      selectedKeys={[selectedKey]}
+      style={{
+        flex: 1,
+        textTransform: "uppercase",
+        fontSize: 21,
+        background: "transparent",
+        display: "flex",
+        justifyContent: "space-around",
+      }}
+    >
+      <Menu.Item key="portfolio">
+        <Link to="/portfolio">
+          <Space size="small">
+            <AiOutlineUser style={{ position: "relative", top: 2 }} />{" "}
+            {!isMobile && <span>{tx("PORTFOLIO")}</span>}
+          </Space>
+        </Link>
+      </Menu.Item>
+      <Menu.Item key="staking">
+        <Link to="/staking">
+          <Space>
+            <FaEthereum style={{ position: "relative", top: 2 }} />{" "}
+            {!isMobile && <span>{tx("STAKE")}</span>}
+          </Space>
+        </Link>
+      </Menu.Item>
+      <Menu.Item key="index-pools">
+        <Link to="/index-pools">
+          <Space size="small">
+            <FaSwimmingPool style={{ position: "relative", top: 2 }} />{" "}
+            {!isMobile && <span>{tx("INDEX_POOLS")}</span>}
+          </Space>
+        </Link>
+      </Menu.Item>
+      <Menu.Item>
+        <ExternalLink to="https://vote.indexed.finance/">
+          <Space size="small">
+            <FaGavel style={{ position: "relative", top: 2 }} />{" "}
+            {!isMobile && <span>Govern</span>}
+          </Space>
+        </ExternalLink>
+      </Menu.Item>
+    </Menu>
+  );
 
   return (
     <Space
@@ -39,7 +99,7 @@ export function Navigation() {
           key: "govern",
           title: "GOVERN",
           icon: <FaGavel />,
-          path: "https://vote.indexed.finance/",
+          path: "",
         },
       ].map((link) => {
         const isActive = pathname.includes(link.key);
