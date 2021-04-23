@@ -133,32 +133,34 @@ const PoolRoute = () => {
   const poolId = useSelector((state: AppState) =>
     selectors.selectPoolIdByName(state, slug)
   );
-  const pool = useSelector((state: AppState) =>
+  const indexPool = useSelector((state: AppState) =>
     poolId ? selectors.selectFormattedIndexPool(state, poolId) : null
   );
   const adjustedValues = useMemo(
     () => ({
       hasPageHeader: true,
-      actions: pool ? <PoolInteractionFooter pool={pool} /> : null,
-      extra: pool ? <UsefulLinks address={pool.id} /> : null,
-      title: pool ? (
+      actions: indexPool ? (
+        <PoolInteractionFooter indexPool={indexPool} />
+      ) : null,
+      extra: indexPool ? <UsefulLinks address={indexPool.id} /> : null,
+      title: indexPool ? (
         <Space>
           <Token
-            name={pool.name}
-            image={pool.name}
-            symbol={pool.symbol}
-            address={pool.id}
+            name={indexPool.name}
+            image={indexPool.name}
+            symbol={indexPool.symbol}
+            address={indexPool.id}
             size="large"
           />
           <Divider type="vertical" />
-          <Typography.Text>{pool.name}</Typography.Text>
+          <Typography.Text>{indexPool.name}</Typography.Text>
         </Space>
       ) : (
         <Spin />
       ),
       subtitle: "<fill me>",
     }),
-    [pool]
+    [indexPool]
   );
   const SubscreenComponent = useMemo(
     () => lazy(() => import("./IndexPool")),

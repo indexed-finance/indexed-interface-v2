@@ -1,11 +1,9 @@
 import { SOCIAL_MEDIA } from "config";
-import { Space } from "antd";
 import { Token } from "components/atomic";
 
 export function SocialMediaList() {
   return (
-    <Space
-      direction="vertical"
+    <div
       style={{
         position: "fixed",
         top: 75,
@@ -19,6 +17,8 @@ export function SocialMediaList() {
         borderBottomRightRadius: 12,
         justifyContent: "space-evenly",
         padding: "1rem 0.25rem",
+        display: "flex",
+        flexDirection: "column",
       }}
     >
       {SOCIAL_MEDIA.map((site) => (
@@ -27,10 +27,16 @@ export function SocialMediaList() {
           href={site.link}
           target="_blank"
           rel="noopener noreferrer"
+          style={{ marginBottom: 6 }}
         >
-          <Token name={site.name} image={site.image} asAvatar={true} />
+          <Token
+            name={site.name}
+            image={site.image}
+            asAvatar={true}
+            size="medium"
+          />
         </a>
       ))}
-    </Space>
+    </div>
   );
 }

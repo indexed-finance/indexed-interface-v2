@@ -3,7 +3,11 @@ import { FaCoins, FaFireAlt, FaHammer, FaTractor } from "react-icons/fa";
 import { FormattedIndexPool } from "features";
 import noop from "lodash.noop";
 
-export function PoolInteractionFooter({ pool }: { pool: FormattedIndexPool }) {
+export function PoolInteractionFooter({
+  indexPool,
+}: {
+  indexPool: FormattedIndexPool;
+}) {
   return (
     <Space
       style={{
@@ -13,7 +17,7 @@ export function PoolInteractionFooter({ pool }: { pool: FormattedIndexPool }) {
       }}
     >
       <Typography.Title level={4} type="secondary" style={{ margin: 0 }}>
-        Interact with {pool.name}
+        Interact with {indexPool.name}
       </Typography.Title>
       <Divider type="vertical" />
       <div style={{ flex: 1 }}>

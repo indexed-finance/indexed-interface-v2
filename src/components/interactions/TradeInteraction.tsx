@@ -13,16 +13,16 @@ import { useCallback, useMemo } from "react";
 import { useSelector } from "react-redux";
 
 interface Props {
-  pool: FormattedIndexPool;
+  indexPool: FormattedIndexPool;
 }
 
-export default function TradeInteraction({ pool }: Props) {
+export default function TradeInteraction({ indexPool }: Props) {
   const tx = useTranslator();
   const handleTrade = useUniswapTransactionCallback();
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
   const tokenIds = useMemo(
-    () => [pool.id, ...COMMON_BASE_TOKENS.map(({ id }) => id)],
-    [pool.id]
+    () => [indexPool.id, ...COMMON_BASE_TOKENS.map(({ id }) => id)],
+    [indexPool.id]
   );
   const assets = useSelector((state: AppState) =>
     selectors.selectTokensById(state, tokenIds)
@@ -149,7 +149,7 @@ export default function TradeInteraction({ pool }: Props) {
       assets={assets as any}
       spender={UNISWAP_ROUTER_ADDRESS}
       defaultInputSymbol={COMMON_BASE_TOKENS[0].symbol}
-      defaultOutputSymbol={pool.symbol}
+      defaultOutputSymbol={indexPool.symbol}
       onSubmit={handleSubmit}
       onChange={handleChange}
     />

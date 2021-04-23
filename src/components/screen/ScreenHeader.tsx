@@ -29,11 +29,7 @@ export function ScreenHeader() {
       <div style={{ flex: 1 }}>
         <Logo />
       </div>
-      <Space
-        className="colored-text"
-        size="large"
-        style={{ flex: 1, justifyContent: "flex-end" }}
-      >
+      <Space size="large" style={{ flex: 1, justifyContent: "flex-end" }}>
         <LanguageSelector />
         <ModeSwitch />
         <ServerConnection showText={true} />

@@ -3,10 +3,10 @@ import { FormattedIndexPool } from "features";
 import { useTranslator } from "hooks";
 
 export function Performance({
-  pool,
+  indexPool,
   direction = "horizontal",
 }: {
-  pool: FormattedIndexPool;
+  indexPool: FormattedIndexPool;
   direction?: "vertical" | "horizontal";
 }) {
   const tx = useTranslator();
@@ -32,25 +32,25 @@ export function Performance({
     >
       <Statistic
         title={tx("TOTAL_VALUE_LOCKED")}
-        value={pool.totalValueLocked}
+        value={indexPool.totalValueLocked}
         style={{ flex: 1, textAlign: "center" }}
       />
       <Divider type={dividerDirection} />
       <Statistic
         title={tx("VOLUME")}
-        value={pool.volume}
+        value={indexPool.volume}
         style={{ flex: 1, textAlign: "center" }}
       />
       <Divider type={dividerDirection} />
       <Statistic
         title={tx("CUMULATIVE_FEES")}
-        value={pool.cumulativeFee}
+        value={indexPool.cumulativeFee}
         style={{ flex: 1, textAlign: "center" }}
       />
       <Divider type={dividerDirection} />
       <Statistic
         title={tx("SWAP_FEE")}
-        value={pool.swapFee}
+        value={indexPool.swapFee}
         style={{ flex: 1, textAlign: "center" }}
       />
     </Space>

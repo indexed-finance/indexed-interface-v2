@@ -29,7 +29,6 @@ const selectNameForPool = (state: AppState, poolId: string) => {
 const selectPoolLookUpByName = createSelector(
   [selectAllPools],
   (indexPools) => {
-    const formatName = (from: string) => S(from).camelize().s.toLowerCase();
     return indexPools.reduce((prev, next) => {
       prev[formatName(next.name)] = next;
       return prev;

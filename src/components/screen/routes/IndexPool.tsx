@@ -29,22 +29,22 @@ export default function Pool() {
   const poolId = useSelector((state: AppState) =>
     selectors.selectPoolIdByName(state, slug)
   );
-  const pool = useSelector((state: AppState) =>
+  const indexPool = useSelector((state: AppState) =>
     poolId ? selectors.selectFormattedIndexPool(state, poolId) : null
   );
   const tokenIds = useSelector((state: AppState) =>
     poolId ? selectors.selectPoolTokenIds(state, poolId) : []
   );
-  const trades = pool
-    ? pool.transactions.trades.slice(0, MAXIMUM_DISPLAYED_TRADES)
+  const trades = indexPool
+    ? indexPool.transactions.trades.slice(0, MAXIMUM_DISPLAYED_TRADES)
     : [];
 
   usePoolDetailRegistrar(poolId ?? "", tokenIds);
 
-  if (pool) {
+  if (indexPool) {
     return (
       <>
-        <Performance pool={pool} />
+        <Performance indexPool={indexPool} />
         <Row gutter={24}>
           <Col span={14}>
             {poolId && <ChartCard poolId={poolId} />}
@@ -61,7 +61,7 @@ export default function Pool() {
                     <Typography.Text type="secondary">
                       <em>
                         Showing {trades.length} of{" "}
-                        {pool.transactions.trades.length}
+                        {indexPool.transactions.trades.length}
                       </em>
                     </Typography.Text>
                     <Divider type="vertical" />
@@ -91,12 +91,12 @@ export default function Pool() {
                         flex: 1,
                       }}
                     >
-                      <Space className="colored-text" style={{ width: "100%" }}>
+                      <Space style={{ width: "100%" }}>
                         <Token
                           name=""
                           symbol={trade.from}
                           image=""
-                          address={pool.id}
+                          address={indexPool.id}
                         />
                         <Divider style={{ margin: 0 }}>
                           <Typography.Text
@@ -109,7 +109,7 @@ export default function Pool() {
                           name=""
                           symbol={trade.to}
                           image=""
-                          address={pool.id}
+                          address={indexPool.id}
                         />
                         <Divider style={{ margin: 0 }}>{trade.when}</Divider>
                       </Space>
@@ -139,7 +139,7 @@ export default function Pool() {
             </Card>
           </Col>
           <Col span={10}>
-            {pool && (
+            {indexPool && (
               <Card
                 title={
                   <Space
@@ -149,16 +149,15 @@ export default function Pool() {
                       Assets
                     </Typography.Title>
                     <Typography.Text type="secondary">
-                      <em>Total of {pool.assets.length}</em>
+                      <em>Total of {indexPool.assets.length}</em>
                     </Typography.Text>
                   </Space>
                 }
               >
                 <List>
-                  {pool.assets.map((asset) => (
+                  {indexPool.assets.map((asset) => (
                     <List.Item key={asset.id}>
                       <div
-                        className="colored-text"
                         style={{
                           display: "flex",
                           alignItems: "center",

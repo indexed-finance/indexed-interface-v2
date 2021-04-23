@@ -118,7 +118,7 @@ export const selectors = {
               { signDisplay: "always" }
             ),
             isNegative: stats.deltas.price.day.value < 0,
-            name: pool.name.replace(/Tokens Index/g, ""),
+            name: pool.name,
             slug: `/index-pools/${S(pool.name).slugify().s}`,
             volume: convert.toCurrency(stats.deltas.volume.day),
             totalValueLocked: convert.toCurrency(pool.totalValueLockedUSD),
@@ -391,35 +391,6 @@ export const selectors = {
 
       return prev;
     }, {} as Record<string, string>);
-  },
-  selectMenuModels: (
-    state: AppState
-  ): Record<
-    "categories" | "indexPools",
-    Array<{ name: string; id: string; symbol: string; slug: string }>
-  > => {
-    const categories = selectors
-      .selectAllFormattedCategories(state)
-      .map(({ slug, id, symbol, name }: any) => ({
-        id,
-        symbol,
-        name,
-        slug,
-      }));
-    const indexPools = selectors
-      .selectAllFormattedIndexPools(state)
-      .filter(Boolean)
-      .map(({ slug, id, symbol, name }: any) => ({
-        id,
-        symbol,
-        slug,
-        name: name.replace(/Tokens Index/g, ""),
-      }));
-
-    return {
-      categories,
-      indexPools,
-    };
   },
   selectUserTransactions: (state: AppState): NormalizedTransaction[] => {
     const user = selectors.selectUserAddress(state);

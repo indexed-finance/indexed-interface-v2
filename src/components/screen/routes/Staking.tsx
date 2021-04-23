@@ -46,7 +46,6 @@ function StakingItem({
   return (
     <List.Item style={{ paddingRight: 20, paddingLeft: 20 }}>
       <div
-        className="colored-text"
         style={{
           display: "flex",
           alignItems: "center",
@@ -80,21 +79,11 @@ function StakingItem({
             <>
               <Statistic key="apy" title={tx("APY")} value={apy ?? ""} />
               <Divider type="vertical" />
-              <Statistic
-                key="rate"
-                title={tx("RATE")}
-                className="colored-text"
-                value={rate}
-              />
+              <Statistic key="rate" title={tx("RATE")} value={rate} />
               <Divider type="vertical" />
             </>
           )}
-          <Statistic
-            key="earned"
-            title={tx("EARNED")}
-            className="colored-text"
-            value={earned}
-          />
+          <Statistic key="earned" title={tx("EARNED")} value={earned} />
         </Space>
         <Button
           type={isExpired ? "ghost" : "primary"}

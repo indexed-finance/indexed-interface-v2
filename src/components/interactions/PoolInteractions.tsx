@@ -19,11 +19,11 @@ export type PoolInteraction =
   | "trade";
 
 interface Props {
-  pool: null | FormattedIndexPool;
+  indexPool: null | FormattedIndexPool;
   initial?: PoolInteraction;
 }
 
-export function PoolInteractions({ pool }: Props) {
+export function PoolInteractions({ indexPool }: Props) {
   const tx = useTranslator();
   const { poolName, interaction: activeInteraction = "trade" } = useParams<{
     poolName: string;
@@ -40,7 +40,7 @@ export function PoolInteractions({ pool }: Props) {
       activeKey={activeInteraction}
       destroyInactiveTabPane
     >
-      {pool && (
+      {indexPool && (
         <>
           <Tabs.TabPane
             style={{ padding: 20 }}
@@ -51,7 +51,7 @@ export function PoolInteractions({ pool }: Props) {
               </Link>
             }
           >
-            <TradeInteraction pool={pool} />
+            <TradeInteraction indexPool={indexPool} />
           </Tabs.TabPane>
           <Tabs.TabPane
             style={{ padding: 20 }}
@@ -62,7 +62,7 @@ export function PoolInteractions({ pool }: Props) {
               </Link>
             }
           >
-            <MintInteraction pool={pool} />
+            <MintInteraction indexPool={indexPool} />
           </Tabs.TabPane>
           <Tabs.TabPane
             style={{ padding: 20 }}
@@ -73,7 +73,7 @@ export function PoolInteractions({ pool }: Props) {
               </Link>
             }
           >
-            <BurnInteraction pool={pool} />
+            <BurnInteraction indexPool={indexPool} />
           </Tabs.TabPane>
         </>
       )}

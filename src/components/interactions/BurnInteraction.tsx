@@ -15,10 +15,10 @@ import { useSelector } from "react-redux";
 import BigNumber from "bignumber.js";
 
 interface Props {
-  pool: FormattedIndexPool;
+  indexPool: FormattedIndexPool;
 }
 
-export default function BurnInteraction({ pool }: Props) {
+export default function BurnInteraction({ indexPool }: Props) {
   const [burnType, setBurnType] = useState<"single" | "uniswap" | "multi">(
     "single"
   );
@@ -35,15 +35,19 @@ export default function BurnInteraction({ pool }: Props) {
         <Radio.Button value="multi">Multi Output</Radio.Button>
         <Radio.Button value="uniswap">Uniswap</Radio.Button>
       </Radio.Group>
-      {burnType === "single" && <SingleTokenBurnInteraction pool={pool} />}
-      {burnType === "uniswap" && <UniswapBurnInteraction pool={pool} />}
+      {burnType === "single" && (
+        <SingleTokenBurnInteraction indexPool={indexPool} />
+      )}
+      {burnType === "uniswap" && (
+        <UniswapBurnInteraction indexPool={indexPool} />
+      )}
     </Fragment>
   );
 }
 
-function SingleTokenBurnInteraction({ pool }: Props) {
+function SingleTokenBurnInteraction({ indexPool }: Props) {
   const tx = useTranslator();
-  const poolId = pool.id;
+  const poolId = indexPool.id;
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
   useBalancesRegistrar([poolId]);
   const {
@@ -138,20 +142,20 @@ function SingleTokenBurnInteraction({ pool }: Props) {
   return (
     <SingleInteraction
       title={tx("BURN")}
-      assets={pool.assets}
+      assets={indexPool.assets}
       spender={poolId}
       onSubmit={handleSubmit}
       onChange={handleChange}
-      defaultInputSymbol={pool.symbol}
+      defaultInputSymbol={indexPool.symbol}
       disableInputSelect
       requiresApproval={false}
     />
   );
 }
 
-function UniswapBurnInteraction({ pool }: Props) {
+function UniswapBurnInteraction({ indexPool }: Props) {
   const tx = useTranslator();
-  const poolId = pool.id;
+  const poolId = indexPool.id;
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
   useBalancesRegistrar([poolId]);
   const {
@@ -266,7 +270,7 @@ function UniswapBurnInteraction({ pool }: Props) {
       spender={BURN_ROUTER_ADDRESS}
       onSubmit={handleSubmit}
       onChange={handleChange}
-      defaultInputSymbol={pool.symbol}
+      defaultInputSymbol={indexPool.symbol}
       defaultOutputSymbol={assets[0].symbol}
       disableInputSelect
     />

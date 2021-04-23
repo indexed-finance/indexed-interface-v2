@@ -21,10 +21,10 @@ import { useSelector } from "react-redux";
 import BigNumber from "bignumber.js";
 
 interface Props {
-  pool: FormattedIndexPool;
+  indexPool: FormattedIndexPool;
 }
 
-export default function MintInteraction({ pool }: Props) {
+export default function MintInteraction({ indexPool }: Props) {
   const [mintType, setMintType] = useState<"single" | "uniswap" | "multi">(
     "single"
   );
@@ -42,22 +42,28 @@ export default function MintInteraction({ pool }: Props) {
         <Radio.Button value="multi">Multi Input</Radio.Button>
       </Radio.Group>
 
-      {mintType === "single" && <SingleTokenMintInteraction pool={pool} />}
-      {mintType === "uniswap" && <UniswapMintInteraction pool={pool} />}
-      {mintType === "multi" && <MultiTokenMintInteraction pool={pool} />}
+      {mintType === "single" && (
+        <SingleTokenMintInteraction indexPool={indexPool} />
+      )}
+      {mintType === "uniswap" && (
+        <UniswapMintInteraction indexPool={indexPool} />
+      )}
+      {mintType === "multi" && (
+        <MultiTokenMintInteraction indexPool={indexPool} />
+      )}
     </Fragment>
   );
 }
 
-function SingleTokenMintInteraction({ pool }: Props) {
+function SingleTokenMintInteraction({ indexPool }: Props) {
   const tx = useTranslator();
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
   const {
     calculateAmountIn,
     calculateAmountOut,
     executeMint,
-  } = useSingleTokenMintCallbacks(pool.id);
-  // const poolToTokens = usePoolToTokens(pool);
+  } = useSingleTokenMintCallbacks(indexPool.id);
+  // const indexpoolToTokens = useIndexPoolToTokens(indexpool);
   const handleChange = useCallback(
     (values: SingleInteractionValues) => {
       const {
@@ -141,24 +147,24 @@ function SingleTokenMintInteraction({ pool }: Props) {
     [executeMint]
   );
 
-  const tokenIds = usePoolTokenAddresses(pool.id);
-  useBalanceAndApprovalRegistrar(pool.id, tokenIds);
-  // useUserDataRegistrar(poolToTokens);
+  const tokenIds = usePoolTokenAddresses(indexPool.id);
+  useBalanceAndApprovalRegistrar(indexPool.id, tokenIds);
+  // useUserDataRegistrar(indexpoolToTokens);
 
   return (
     <SingleInteraction
       title={tx("MINT")}
-      assets={pool.assets}
-      spender={pool.id}
+      assets={indexPool.assets}
+      spender={indexPool.id}
       onSubmit={handleSubmit}
       onChange={handleChange}
-      defaultOutputSymbol={pool.symbol}
+      defaultOutputSymbol={indexPool.symbol}
       disableOutputSelect
     />
   );
 }
 
-function UniswapMintInteraction({ pool }: Props) {
+function UniswapMintInteraction({ indexPool }: Props) {
   const tx = useTranslator();
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
 
@@ -169,7 +175,7 @@ function UniswapMintInteraction({ pool }: Props) {
     getBestMintRouteForAmountIn,
     getBestMintRouteForAmountOut,
     executeRoutedMint,
-  } = useMintRouterCallbacks(pool.id);
+  } = useMintRouterCallbacks(indexPool.id);
 
   const assets = [...COMMON_BASE_TOKENS];
 
@@ -281,27 +287,27 @@ function UniswapMintInteraction({ pool }: Props) {
       onSubmit={handleSubmit}
       onChange={handleChange}
       defaultInputSymbol={assets[0].symbol}
-      defaultOutputSymbol={pool.symbol}
+      defaultOutputSymbol={indexPool.symbol}
       disableOutputSelect
     />
   );
 }
 
-function MultiTokenMintInteraction({ pool }: Props) {
+function MultiTokenMintInteraction({ indexPool }: Props) {
   const tx = useTranslator();
   const handleSubmit = useCallback((values: MultiInteractionValues) => {
     //
   }, []);
   // const { calculateAmountsIn, executeMint } = useMultiTokenMintCallbacks(
-  //   pool.id
+  //   indexpool.id
   // );
   // const value = calculateAmountsIn(amount.toString());
 
   return (
     <MultiInteraction
       title={tx("MINT")}
-      assets={pool.assets}
-      spender={pool.id}
+      assets={indexPool.assets}
+      spender={indexPool.id}
       onSubmit={handleSubmit}
     />
   );

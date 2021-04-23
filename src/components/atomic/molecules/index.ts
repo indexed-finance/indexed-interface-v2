@@ -3,6 +3,7 @@
 
 export * from './ChartCard';
 export * from './DEBUG';
+export * from './IndexPoolWidget';
 export * from './JazzIcon';
 export * from './LanguageSelector';
 export * from './LineSeriesChart';
