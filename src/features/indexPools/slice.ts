@@ -56,8 +56,8 @@ const slice = createSlice({
         return state;
       })
       .addCase(fetchInitialData.fulfilled, (state, action) => {
-        const { pools } = action.payload;
-        const fullPools = pools.ids.map((id) => pools.entities[id]);
+        const { indexPools } = action.payload;
+        const fullPools = indexPools.ids.map((id) => indexPools.entities[id]);
 
         for (const { tokens } of fullPools) {
           for (const tokenId of tokens.ids) {

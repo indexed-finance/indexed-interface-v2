@@ -70,7 +70,7 @@ export default function Splash() {
       <Typography.Title level={3}>
         <div style={{ marginBottom: 25 }}>{tx("GET_STARTED_TODAY")}</div>
         <Button.Group style={{ flexDirection: isMobile ? "column" : "row" }}>
-          <Link to="/pools">
+          <Link to="/index-pools">
             <Button
               type="primary"
               style={{

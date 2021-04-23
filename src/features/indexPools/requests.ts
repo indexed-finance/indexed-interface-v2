@@ -83,9 +83,9 @@ export async function queryIndexPools(url: string, poolAddresses: string[]) {
         ${poolAddresses.map(createPoolCall).join("\n")}
       }
     `;
-  const pools = await sendQuery(url, groupedCalls);
+  const indexPools = await sendQuery(url, groupedCalls);
 
-  return pools;
+  return indexPools;
 }
 
 export function normalizeIndexPools(response: Record<string, IndexPool>) {

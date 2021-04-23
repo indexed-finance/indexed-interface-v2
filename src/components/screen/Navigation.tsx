@@ -30,10 +30,10 @@ export function Navigation() {
           path: "/staking",
         },
         {
-          key: "pools",
-          title: tx("POOLS"),
+          key: "index-pools",
+          title: tx("INDEX_POOLS"),
           icon: <FaSwimmingPool />,
-          path: "/pools",
+          path: "/index-pools",
         },
         {
           key: "govern",

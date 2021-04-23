@@ -93,7 +93,7 @@ export const selectors = {
       )
       .filter((each): each is FormattedCategory => Boolean(each));
   },
-  // Pools
+  // Index Pools
   selectFormattedIndexPool: createSelector(
     [
       indexPoolsSelectors.selectPool,
@@ -119,7 +119,7 @@ export const selectors = {
             ),
             isNegative: stats.deltas.price.day.value < 0,
             name: pool.name.replace(/Tokens Index/g, ""),
-            slug: `/pools/${S(pool.name).slugify().s}`,
+            slug: `/index-pools/${S(pool.name).slugify().s}`,
             volume: convert.toCurrency(stats.deltas.volume.day),
             totalValueLocked: convert.toCurrency(pool.totalValueLockedUSD),
             totalValueLockedPercent: convert.toPercent(
@@ -186,8 +186,8 @@ export const selectors = {
   },
   // Staking
   selectFormattedStaking(state: AppState): FormattedStakingDetail {
-    const pools = selectors.selectAllStakingPools(state);
-    const formattedStaking = pools
+    const indexPools = selectors.selectAllStakingPools(state);
+    const formattedStaking = indexPools
       .map((stakingPool) => {
         const indexPool = selectors.selectPool(state, stakingPool.indexPool);
 
@@ -287,7 +287,7 @@ export const selectors = {
 
       return {
         address: pool.id,
-        link: `/pools/${S(pool.name).slugify().s}`,
+        link: `/index-pools/${S(pool.name).slugify().s}`,
         symbol: pool.symbol,
         name: pool.name,
         balance: displayedBalance,
@@ -352,13 +352,13 @@ export const selectors = {
   },
   // Misc
   selectStakingTokenPrices(state: AppState, pairs: Pair[]) {
-    const pools = selectors.selectAllStakingPools(state);
+    const indexPools = selectors.selectAllStakingPools(state);
     const lookup = pairs.reduce((prev, next) => {
       prev[(next as any).liquidityToken.address.toLowerCase()] = next;
       return prev;
     }, {} as Record<string, Pair>);
 
-    return pools.reduce((prev, next) => {
+    return indexPools.reduce((prev, next) => {
       const { indexPool: poolAddress } = next;
       const mostRecentSnapshot = selectors.selectMostRecentSnapshotOfPool(
         state,
@@ -425,6 +425,8 @@ export const selectors = {
     const user = selectors.selectUserAddress(state);
     if (!user) return [];
     const transactions = selectors.selectTransactions(state);
-    return transactions.filter(t => t.from.toLowerCase() === user.toLowerCase());
-  }
+    return transactions.filter(
+      (t) => t.from.toLowerCase() === user.toLowerCase()
+    );
+  },
 };

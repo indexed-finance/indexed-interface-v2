@@ -35,10 +35,10 @@ export function usePortfolioData(): {
   totalNdxEarned: string;
 } {
   const theme = useSelector((state: AppState) => selectors.selectTheme(state));
-  const pools = useAllPools();
+  const indexPools = useAllPools();
   const [assetsRaw, pairIds, priceLookupArgs] = useMemo(() => {
     const baseTokens = [
-      ...pools.map(({ id, name, symbol }) => ({
+      ...indexPools.map(({ id, name, symbol }) => ({
         id: id.toLowerCase(),
         name,
         symbol,
@@ -78,7 +78,7 @@ export function usePortfolioData(): {
     });
     const pairIds = pairTokens.map((p) => p.id);
     return [[...baseTokens, ...pairTokens], pairIds, priceLookupArgs];
-  }, [pools]);
+  }, [indexPools]);
   const priceLookup = useTokenPricesLookup(priceLookupArgs);
   const pairExistsLookup = usePairExistsLookup(pairIds);
   const [assets, assetIds] = useMemo(() => {

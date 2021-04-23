@@ -8,7 +8,7 @@ import { useTranslator } from "hooks";
 
 const MAXIMUM_DISPLAYED_ASSETS = 50;
 
-function PoolItem(pool: FormattedIndexPool) {
+function PoolItem(props: FormattedIndexPool) {
   const {
     id,
     canStake,
@@ -20,7 +20,7 @@ function PoolItem(pool: FormattedIndexPool) {
     category,
     name,
     slug,
-  } = pool;
+  } = props;
   const tx = useTranslator();
   const categoryLookup = useSelector(selectors.selectCategoryLookup);
   const categoryTitle = categoryLookup[category]?.name ?? "";
@@ -65,32 +65,6 @@ function PoolItem(pool: FormattedIndexPool) {
             }}
           >
             <Space style={{ flex: 1 }}>
-              <Token
-                name={name}
-                image={id}
-                address={id}
-                symbol={symbol}
-                size="large"
-              />
-              <Divider type="vertical" />
-              <Quote
-                price={priceUsd}
-                netChange={netChange}
-                netChangePercent={netChangePercent}
-                inline={true}
-              />
-              {canStake && (
-                <>
-                  <Button type="primary" size="large">
-                    <Space>
-                      <FaTractor style={{ position: "relative", top: 2 }} />
-                      <span>{tx("STAKE")}</span>
-                    </Space>
-                  </Button>
-                </>
-              )}
-            </Space>
-            <Space>
               <Typography.Title
                 level={3}
                 style={{ margin: 0, textAlign: "right" }}
@@ -107,37 +81,47 @@ function PoolItem(pool: FormattedIndexPool) {
                 </Link>
               </Button>
             </Space>
+            <Space style={{ flex: 1, justifyContent: "flex-end" }}>
+              <Token
+                name={name}
+                image={id}
+                address={id}
+                symbol={symbol}
+                size="large"
+              />
+              <Quote
+                price={priceUsd}
+                netChange={netChange}
+                netChangePercent={netChangePercent}
+                inline={true}
+              />
+            </Space>
           </div>
         </Space>
       </div>
-      <Space
-        size="large"
-        style={{
-          width: "100%",
-          marginTop: 10,
-          justifyContent: "space-between",
-        }}
-      >
+      <Space direction="vertical" style={{ marginTop: 12 }} size="small">
         <div>{slicedAssets}</div>
-        {categoryTitle && (
-          <Typography.Title level={4}>
-            Category:{" "}
-            <Typography.Text type="secondary">
-              <em>{categoryTitle}</em>
-            </Typography.Text>
-          </Typography.Title>
+        {canStake && (
+          <>
+            <Button type="primary" size="large">
+              <Space>
+                <FaTractor style={{ position: "relative", top: 2 }} />
+                <span>{tx("STAKE")}</span>
+              </Space>
+            </Button>
+          </>
         )}
       </Space>
     </List.Item>
   );
 }
 
-export default function Pools() {
-  const pools = useSelector(selectors.selectAllFormattedIndexPools);
+export default function IndexPools() {
+  const indexPools = useSelector(selectors.selectAllFormattedIndexPools);
 
   return (
     <List itemLayout="vertical">
-      {pools.map((pool) => (
+      {indexPools.map((pool) => (
         <PoolItem key={pool.id} {...pool} />
       ))}
     </List>

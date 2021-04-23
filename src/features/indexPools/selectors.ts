@@ -26,13 +26,16 @@ const selectNameForPool = (state: AppState, poolId: string) => {
   return pool ? formatName(pool.name) : "";
 };
 
-const selectPoolLookUpByName = createSelector([selectAllPools], (pools) => {
-  const formatName = (from: string) => S(from).camelize().s.toLowerCase();
-  return pools.reduce((prev, next) => {
-    prev[formatName(next.name)] = next;
-    return prev;
-  }, {} as Record<string, NormalizedIndexPool>);
-});
+const selectPoolLookUpByName = createSelector(
+  [selectAllPools],
+  (indexPools) => {
+    const formatName = (from: string) => S(from).camelize().s.toLowerCase();
+    return indexPools.reduce((prev, next) => {
+      prev[formatName(next.name)] = next;
+      return prev;
+    }, {} as Record<string, NormalizedIndexPool>);
+  }
+);
 
 /**
  * @returns undefined if no pools are loaded yet;

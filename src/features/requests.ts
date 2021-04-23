@@ -23,7 +23,7 @@ export type NormalizedInitialData = {
     Pick<NormalizedCategory, "tokens" | "indexPools">
   >;
   dailySnapshots: NormalizedEntity<NormalizedDailySnapshot>;
-  pools: NormalizedEntity<NormalizedIndexPool>;
+  indexPools: NormalizedEntity<NormalizedIndexPool>;
   tokens: NormalizedEntity<NormalizedToken>;
 };
 
@@ -207,8 +207,8 @@ export function normalizeInitialData(categories: Category[]) {
           };
         }
 
-        prev.pools.ids.push(indexPool.id);
-        prev.pools.entities[indexPool.id] = {
+        prev.indexPools.ids.push(indexPool.id);
+        prev.indexPools.entities[indexPool.id] = {
           ...indexPool,
           dailySnapshots: dailySnapshotIds,
           tokens: {
@@ -250,7 +250,7 @@ export function normalizeInitialData(categories: Category[]) {
         ids: [],
         entities: {},
       },
-      pools: {
+      indexPools: {
         ids: [],
         entities: {},
       },

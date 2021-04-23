@@ -40,7 +40,7 @@ function StakingItem({
       Uniswap V2 Pair for ETH-{symbol}
     </a>
   ) : (
-    <Link to={`/pools/${slug}`}>{name}</Link>
+    <Link to={`/index-pools/${slug}`}>{name}</Link>
   );
 
   return (

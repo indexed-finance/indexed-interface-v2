@@ -39,11 +39,11 @@ export async function setupStateHandling() {
  */
 const unsubscribeFromWaitingForSymbols = subscribe(() => {
   const state = getState();
-  const pools = selectors.selectAllPools(state);
+  const indexPools = selectors.selectAllPools(state);
   const stakingPools = selectors.selectAllStakingPools(state);
   const symbols = selectors.selectTokenSymbols(state);
 
-  if (pools.length > 0 && stakingPools.length > 0 && symbols.length > 0) {
+  if (indexPools.length > 0 && stakingPools.length > 0 && symbols.length > 0) {
     unsubscribeFromWaitingForSymbols();
     setupRegistrants();
   }
@@ -51,9 +51,13 @@ const unsubscribeFromWaitingForSymbols = subscribe(() => {
 
 function setupRegistrants() {
   const state = getState();
-  const pools = selectors.selectAllPools(state);
+  const indexPools = selectors.selectAllPools(state);
   const stakingPools = selectors.selectAllStakingPools(state);
-  const { pairDataCalls, poolDetailCalls, totalSuppliesCalls } = pools.reduce(
+  const {
+    pairDataCalls,
+    poolDetailCalls,
+    totalSuppliesCalls,
+  } = indexPools.reduce(
     (prev, next) => {
       const { id } = next;
       const tokenIds = selectors.selectPoolTokenIds(state, id);

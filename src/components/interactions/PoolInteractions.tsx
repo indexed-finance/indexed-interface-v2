@@ -46,7 +46,7 @@ export function PoolInteractions({ pool }: Props) {
             style={{ padding: 20 }}
             key="trade"
             tab={
-              <Link to={`/pools/${poolName}/trade`}>
+              <Link to={`/index-pools/${poolName}/trade`}>
                 <FaCoins /> {!isMobile && <span>{tx("TRADE")}</span>}
               </Link>
             }
@@ -57,7 +57,7 @@ export function PoolInteractions({ pool }: Props) {
             style={{ padding: 20 }}
             key="mint"
             tab={
-              <Link to={`/pools/${poolName}/mint`}>
+              <Link to={`/index-pools/${poolName}/mint`}>
                 <FaHammer /> {!isMobile && <span>{tx("MINT")}</span>}
               </Link>
             }
@@ -68,7 +68,7 @@ export function PoolInteractions({ pool }: Props) {
             style={{ padding: 20 }}
             key="burn"
             tab={
-              <Link to={`/pools/${poolName}/burn`}>
+              <Link to={`/index-pools/${poolName}/burn`}>
                 <FaFireAlt /> {!isMobile && <span>{tx("BURN")}</span>}
               </Link>
             }

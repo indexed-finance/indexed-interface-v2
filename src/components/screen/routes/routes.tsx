@@ -79,7 +79,7 @@ routes.push({
 });
 
 // Staking
-// -- Displays all pools and relevant staking data.
+// -- Displays all index pools and relevant staking data.
 const StakingRoute = () => {
   const tx = useTranslator();
   const adjustedValues = useMemo(
@@ -102,8 +102,8 @@ routes.push({
   component: StakingRoute,
 });
 
-// Pools
-// -- Displays all pools and relevant general information.
+// Index Pools
+// -- Displays all index pools and relevant general information.
 const PoolsRoute = () => {
   const tx = useTranslator();
   const adjustedValues = useMemo(
@@ -116,13 +116,13 @@ const PoolsRoute = () => {
     }),
     [tx]
   );
-  const Component = useMemo(() => lazy(() => import("./Pools")), []);
+  const Component = useMemo(() => lazy(() => import("./IndexPools")), []);
 
   return <RouteTemplate adjustedValues={adjustedValues} screen={Component} />;
 };
 
 routes.push({
-  path: "/pools",
+  path: "/index-pools",
   component: PoolsRoute,
 });
 
@@ -161,7 +161,7 @@ const PoolRoute = () => {
     [pool]
   );
   const SubscreenComponent = useMemo(
-    () => lazy(() => import("components/screen/routes/Pool")),
+    () => lazy(() => import("./IndexPool")),
     []
   );
 
@@ -174,7 +174,7 @@ const PoolRoute = () => {
 };
 
 routes.push({
-  path: "/pools/:slug",
+  path: "/index-pools/:slug",
   component: PoolRoute,
 });
 
