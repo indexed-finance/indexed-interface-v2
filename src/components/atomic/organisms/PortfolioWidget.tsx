@@ -1,0 +1,91 @@
+import { AppState, FormattedPortfolioAsset, selectors } from "features";
+import { Button, Space, Statistic, Typography } from "antd";
+import { Progress, Token } from "components/atomic";
+import { Widget } from "./Widget";
+import { useHistory } from "react-router-dom";
+import { usePoolDetailRegistrar, useTranslator } from "hooks";
+import { useSelector } from "react-redux";
+import noop from "lodash.noop";
+
+export function PortfolioWidget(props: FormattedPortfolioAsset) {
+  const tx = useTranslator();
+  const isNdx = props.symbol === "NDX";
+  const formattedIndexPool = useSelector((state: AppState) =>
+    selectors.selectFormattedIndexPool(state, props.address)
+  );
+  const tokenIds = useSelector((state: AppState) =>
+    selectors.selectPoolTokenIds(state, props.address)
+  );
+  const { push } = useHistory();
+
+  usePoolDetailRegistrar(isNdx ? "" : props.address, tokenIds);
+
+  return (
+    <Widget
+      width={380}
+      symbol={props.symbol}
+      address={props.address}
+      price={isNdx ? "" : formattedIndexPool?.priceUsd ?? ""}
+      priceChange={isNdx ? "" : formattedIndexPool?.netChangePercent ?? ""}
+      stats={
+        <Space direction="vertical">
+          <Statistic title={tx("EARNED")} value={`${props.ndxEarned} NDX`} />
+          {props.hasStakingPool && (
+            <Statistic
+              title={tx("STAKED")}
+              value={
+                props.staking
+                  ? `${props.staking} ${props.symbol}`
+                  : `0.00 ${props.symbol}`
+              }
+            />
+          )}
+        </Space>
+      }
+      actions={
+        isNdx ? null : (
+          <Button type="primary">
+            {parseFloat(props.balance) > 0 ? "Buy more" : "Buy"}
+          </Button>
+        )
+      }
+      onClick={() =>
+        formattedIndexPool ? push(formattedIndexPool.slug) : noop
+      }
+    >
+      <div
+        style={{
+          width: "100%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
+        <Space direction="vertical">
+          <Token
+            name={props.name}
+            image={props.image}
+            symbol={props.symbol}
+            amount={props.balance}
+            size="medium"
+          />
+          <Typography.Text type="success" style={{ flex: 1, fontSize: 24 }}>
+            {props.value}
+          </Typography.Text>
+        </Space>
+        <Progress
+          style={{
+            fontSize: 24,
+            textAlign: "right",
+            position: "relative",
+            top: 5,
+          }}
+          width={90}
+          status="active"
+          type="dashboard"
+          percent={parseFloat(props.weight.replace(/%/g, ""))}
+        />
+      </div>
+    </Widget>
+  );
+}

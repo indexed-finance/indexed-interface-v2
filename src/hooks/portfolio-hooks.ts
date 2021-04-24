@@ -1,4 +1,4 @@
-import { AppState, selectors } from "features";
+import { AppState, FormattedPortfolioAsset, selectors } from "features";
 import { NDX_ADDRESS, WETH_CONTRACT_ADDRESS } from "config";
 import { computeUniswapPairAddress, convert } from "helpers";
 import { useAllPools } from "./pool-hooks";
@@ -12,25 +12,9 @@ import {
 import { useTokenBalances } from "./user-hooks";
 import { useTokenPricesLookup } from "./token-hooks";
 
-type PortfolioAsset = {
-  address: string;
-  name: string;
-  image: string;
-  symbol: string;
-  isUniswapPair: boolean;
-  hasStakingPool: boolean;
-
-  balance: string;
-  staking: string;
-  ndxEarned: string;
-  price: string;
-  value: string;
-  weight: string;
-};
-
 export function usePortfolioData(): {
-  tokens: PortfolioAsset[];
-  ndx: PortfolioAsset;
+  tokens: FormattedPortfolioAsset[];
+  ndx: FormattedPortfolioAsset;
   totalValue: string;
   totalNdxEarned: string;
 } {
@@ -97,7 +81,7 @@ export function usePortfolioData(): {
     let totalValue = 0;
 
     // const ndxPrice =
-    const portfolioTokens: PortfolioAsset[] = assets.map(
+    const portfolioTokens: FormattedPortfolioAsset[] = assets.map(
       ({ name, symbol, id, isUniswapPair }, i) => {
         const stakingPool = stakingPoolsByTokens[i];
         const stakingPoolUserInfo = stakingPool
@@ -136,7 +120,7 @@ export function usePortfolioData(): {
     );
     const ndx = portfolioTokens.find(
       (t) => t.address === NDX_ADDRESS.toLowerCase()
-    ) as PortfolioAsset;
+    ) as FormattedPortfolioAsset;
     const earnedValue = totalNdxEarned * +ndx.price;
     ndx.value = (+ndx.value + earnedValue).toFixed(2);
     ndx.image = `indexed-${theme}`;

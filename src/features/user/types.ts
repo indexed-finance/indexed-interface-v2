@@ -31,3 +31,18 @@ export interface FormattedPortfolioData {
   ndx: FormattedPortfolioDatum;
   totalValue: string;
 }
+
+export interface FormattedPortfolioAsset {
+  address: string;
+  name: string;
+  image: string;
+  symbol: string;
+  isUniswapPair: boolean;
+  hasStakingPool: boolean;
+  balance: string;
+  staking: string;
+  ndxEarned: string;
+  price: string;
+  value: string;
+  weight: string;
+}

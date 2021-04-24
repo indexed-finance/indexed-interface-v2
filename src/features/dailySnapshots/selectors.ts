@@ -97,7 +97,7 @@ export const dailySnapshotsSelectors = {
       lastWeek,
     } = dailySnapshotsSelectors.selectSnapshotPeriodsForPool(state, poolId);
 
-    if (mostRecentSnapshot.totalVolumeUSD && last24Hours[0].totalVolumeUSD) {
+    if (mostRecentSnapshot?.totalVolumeUSD && last24Hours[0]?.totalVolumeUSD) {
       const volumeLast24Hours =
         parseFloat(mostRecentSnapshot.totalVolumeUSD) -
         parseFloat(last24Hours[0].totalVolumeUSD);
@@ -152,13 +152,16 @@ export const dailySnapshotsSelectors = {
       state,
       poolId
     );
-    const deltas = dailySnapshotsSelectors.selectPoolDeltas(state, poolId);
 
-    return {
-      marketCap: parseFloat(mostRecentSnapshot.totalValueLockedUSD),
-      price: parseFloat(mostRecentSnapshot.value),
-      deltas,
-      supply: parseFloat(mostRecentSnapshot.totalSupply),
-    };
+    if (mostRecentSnapshot) {
+      const deltas = dailySnapshotsSelectors.selectPoolDeltas(state, poolId);
+
+      return {
+        marketCap: parseFloat(mostRecentSnapshot.totalValueLockedUSD),
+        price: parseFloat(mostRecentSnapshot.value),
+        deltas,
+        supply: parseFloat(mostRecentSnapshot.totalSupply),
+      };
+    }
   },
 };

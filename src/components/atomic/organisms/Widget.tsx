@@ -7,8 +7,8 @@ import noop from "lodash.noop";
 interface Props {
   symbol: string;
   address: string;
-  price: string;
-  priceChange: string;
+  price?: string;
+  priceChange?: string;
   width: number;
   children?: ReactNode;
   stats?: ReactNode;
@@ -19,8 +19,8 @@ interface Props {
 export function Widget({
   symbol,
   address,
-  price,
-  priceChange,
+  price = "",
+  priceChange = "",
   width,
   children = null,
   stats = null,
@@ -43,21 +43,32 @@ export function Widget({
           width,
         }}
       >
-        <Space>
-          <Token name={symbol} address={address} image="" size="large" />
-          <div style={{ display: "flex", flexDirection: "column" }}>
-            <Typography.Title level={2} style={{ margin: 0 }}>
-              {symbol}
-            </Typography.Title>
-            <Space size="small" style={{ margin: 0 }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <Token
+            name={symbol}
+            address={address}
+            symbol={symbol}
+            image=""
+            size="medium"
+          />
+
+          {(price || priceChange) && (
+            <div style={{ textAlign: "right" }}>
               <Quote
                 inline={true}
                 price={price}
                 netChangePercent={priceChange}
               />
-            </Space>
-          </div>
-        </Space>
+            </div>
+          )}
+        </div>
+        {(children || stats || actions) && <Divider style={{ margin: 0 }} />}
         {children && <Typography.Paragraph>{children}</Typography.Paragraph>}
         {(stats || actions) && (
           <>

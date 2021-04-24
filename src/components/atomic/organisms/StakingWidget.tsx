@@ -2,13 +2,20 @@ import { AppState, FormattedStakingData, selectors } from "features";
 import { Badge, Button, Space, Statistic } from "antd";
 import { FaTractor } from "react-icons/fa";
 import { Widget } from "./Widget";
+import { convert } from "helpers";
 import { useHistory } from "react-router-dom";
-import { usePoolDetailRegistrar, useStakingApy, useTranslator } from "hooks";
+import {
+  usePoolDetailRegistrar,
+  useStakingApy,
+  useStakingTokenPrice,
+  useTranslator,
+} from "hooks";
 import { useSelector } from "react-redux";
 
 export function StakingWidget(props: FormattedStakingData) {
   const tx = useTranslator();
   const apy = useStakingApy(props.id);
+  const price = useStakingTokenPrice(props.id);
   const isExpired = apy === "Expired";
   const relevantIndexPool = useSelector((state: AppState) =>
     selectors.selectPoolBySymbol(state, props.symbol)
@@ -30,8 +37,7 @@ export function StakingWidget(props: FormattedStakingData) {
       width={360}
       symbol={symbol}
       address={props.id}
-      price={formattedIndexPool?.priceUsd ?? ""}
-      priceChange={formattedIndexPool?.netChangePercent ?? ""}
+      price={price ? convert.toCurrency(price) : ""}
       onClick={() =>
         props.isWethPair
           ? window.open(

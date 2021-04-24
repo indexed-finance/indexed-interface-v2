@@ -103,7 +103,7 @@ export const selectors = {
     (pool, tokens, stats) => {
       const tokenIds = pool?.tokens.ids ?? [];
 
-      return pool && stats.deltas
+      return pool && stats?.deltas
         ? ({
             category: pool.category.id,
             canStake: false,

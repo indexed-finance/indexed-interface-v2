@@ -2,6 +2,7 @@
 // Do not manually modify this (or any) index files.
 
 export * from './IndexPoolWidget';
+export * from './PortfolioWidget';
 export * from './StakingWidget';
 export * from './TokenSelector';
 export * from './Widget';
