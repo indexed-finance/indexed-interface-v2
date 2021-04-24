@@ -68,8 +68,12 @@ export function Widget({
             </div>
           )}
         </div>
-        {(children || stats || actions) && <Divider style={{ margin: 0 }} />}
-        {children && <Typography.Paragraph>{children}</Typography.Paragraph>}
+        {children && (
+          <>
+            <Divider style={{ margin: 0 }} />
+            <Typography.Paragraph>{children}</Typography.Paragraph>
+          </>
+        )}
         {(stats || actions) && (
           <>
             <Divider style={{ marginTop: 0, marginBottom: 12 }} />

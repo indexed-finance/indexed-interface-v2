@@ -34,7 +34,7 @@ export function StakingWidget(props: FormattedStakingData) {
   const { push } = useHistory();
   const inner = (
     <Widget
-      width={360}
+      width={380}
       symbol={symbol}
       address={props.id}
       price={price ? convert.toCurrency(price) : ""}
@@ -75,7 +75,7 @@ export function StakingWidget(props: FormattedStakingData) {
   usePoolDetailRegistrar(formattedIndexPool?.id ?? "", tokenIds);
 
   return props.isWethPair ? (
-    <Badge.Ribbon text="Uniswap V2" color="purple">
+    <Badge.Ribbon text="Uniswap V2" color="purple" style={{ top: -6 }}>
       {inner}
     </Badge.Ribbon>
   ) : (

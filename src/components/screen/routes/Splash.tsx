@@ -1,4 +1,5 @@
 import { Button, Divider, Steps, Typography } from "antd";
+import { ExternalLink } from "components/atomic";
 import { FEATURE_FLAGS } from "feature-flags";
 import { Link } from "react-router-dom";
 import { useBreakpoints, useTranslator } from "hooks";
@@ -25,13 +26,9 @@ export default function Splash() {
     FEATURE_FLAGS.useInternalDocs ? (
       <Link to="/docs">{docsButton}</Link>
     ) : (
-      <a
-        target="_blank"
-        rel="noopener noreferrer"
-        href="https://docs.indexed.finance/"
-      >
+      <ExternalLink to="https://docs.indexed.finance/">
         {docsButton}
-      </a>
+      </ExternalLink>
     );
 
   // Effect:

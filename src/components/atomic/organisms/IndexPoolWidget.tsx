@@ -15,7 +15,7 @@ export function IndexPoolWidget(props: FormattedIndexPool) {
 
   return (
     <Widget
-      width={320}
+      width={340}
       symbol={props.symbol}
       address={props.id}
       price={props.priceUsd}
