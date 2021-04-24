@@ -33,6 +33,14 @@ export function Navigation() {
         justifyContent: "space-around",
       }}
     >
+      <Menu.Item key="index-pools">
+        <Link to="/index-pools">
+          <Space size="small">
+            <FaSwimmingPool style={{ position: "relative", top: 2 }} />{" "}
+            {!isMobile && <span>{tx("INDEX_POOLS")}</span>}
+          </Space>
+        </Link>
+      </Menu.Item>
       <Menu.Item key="portfolio">
         <Link to="/portfolio">
           <Space size="small">
@@ -46,14 +54,6 @@ export function Navigation() {
           <Space>
             <FaEthereum style={{ position: "relative", top: 2 }} />{" "}
             {!isMobile && <span>{tx("STAKE")}</span>}
-          </Space>
-        </Link>
-      </Menu.Item>
-      <Menu.Item key="index-pools">
-        <Link to="/index-pools">
-          <Space size="small">
-            <FaSwimmingPool style={{ position: "relative", top: 2 }} />{" "}
-            {!isMobile && <span>{tx("INDEX_POOLS")}</span>}
           </Space>
         </Link>
       </Menu.Item>

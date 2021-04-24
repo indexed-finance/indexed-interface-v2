@@ -1,33 +1,24 @@
 import { AbstractConnector } from "@web3-react/abstract-connector";
 import { Avatar, Menu, Space, Typography, notification } from "antd";
-import { BaseDrawer } from "./Drawer";
+import { BaseDrawer, useDrawer } from "./Drawer";
 import { OVERLAY_READY, fortmatic } from "ethereum";
-import { ReactNode, useCallback, useContext, useEffect, useState } from "react";
 import { UnsupportedChainIdError, useWeb3React } from "@web3-react/core";
 import { WalletConnectConnector } from "@web3-react/walletconnect-connector";
 import { actions } from "features";
-import { createDrawerContext, useDrawerControls } from "./Drawer";
 import { ethers } from "ethers";
+import { useCallback, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { usePrevious, useWalletConnection, useWalletOptions } from "hooks";
 import { useTranslator } from "hooks";
 import noop from "lodash.noop";
 
-export const WalletConnectionContext = createDrawerContext();
-
 export function useWalletConnectionDrawer() {
-  return useContext(WalletConnectionContext);
-}
-
-export function WalletConnectionProvider({
-  children,
-}: {
-  children: ReactNode;
-}) {
-  const drawerControls = useDrawerControls();
-  const { active, toggle } = drawerControls;
+  const { active, open: baseOpen, close } = useDrawer();
   const { account } = useWeb3React();
   const previousAccount = usePrevious(account);
+  const open = useCallback(() => baseOpen(<WalletConnectionDrawer />), [
+    baseOpen,
+  ]);
 
   useWalletConnection();
 
@@ -35,31 +26,27 @@ export function WalletConnectionProvider({
   // [Not connected] -> [Connected]: Close drawer.
   useEffect(() => {
     if (account && !previousAccount && active) {
-      toggle();
+      close();
     }
-  }, [account, previousAccount, active, toggle]);
+  }, [account, previousAccount, active, close]);
 
   // Effect:
   // Close drawer if formatic modal is open.
   useEffect(() => {
-    fortmatic.on(OVERLAY_READY, toggle);
+    fortmatic.on(OVERLAY_READY, open);
 
     return () => {
-      fortmatic.off(OVERLAY_READY, toggle);
+      fortmatic.off(OVERLAY_READY, close);
     };
-  }, [toggle]);
+  }, [open, close]);
 
-  return (
-    <WalletConnectionContext.Provider value={drawerControls}>
-      {children}
-
-      {active && <WalletConnectionDrawer />}
-    </WalletConnectionContext.Provider>
-  );
+  return {
+    open,
+  };
 }
 
 export function WalletConnectionDrawer() {
-  const { close } = useDrawerControls();
+  const { close } = useDrawer();
   const tx = useTranslator();
   const dispatch = useDispatch();
   const { account, activate } = useWeb3React();

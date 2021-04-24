@@ -23,7 +23,7 @@ export function Logo({
   const theme = useSelector(selectors.selectTheme);
 
   return (
-    <div onClick={() => history.push(link)}>
+    <div onClick={() => history.push(link)} style={{ cursor: "pointer" }}>
       <Space
         style={{
           transform: spinning ? "scale(2)" : "none",

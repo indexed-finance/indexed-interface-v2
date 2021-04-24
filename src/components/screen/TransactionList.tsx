@@ -1,5 +1,10 @@
+import { selectors } from "features";
+import { useSelector } from "react-redux";
+
 export function TransactionList() {
-  return (
+  const transactions = useSelector(selectors.selectTransactions);
+
+  return transactions.length > 0 ? (
     <div
       style={{
         position: "fixed",
@@ -16,5 +21,5 @@ export function TransactionList() {
         zIndex: 10,
       }}
     ></div>
-  );
+  ) : null;
 }

@@ -3,43 +3,48 @@ import {
   ReactNode,
   createContext,
   useCallback,
+  useContext,
   useMemo,
   useState,
 } from "react";
 import noop from "lodash.noop";
 
-export interface DrawerContext {
-  active: boolean;
-  open(): void;
+export interface DrawerContextInterface {
+  active: ReactNode;
+  open(content: ReactNode): void;
   close(): void;
-  toggle(): void;
 }
 
-export const createDrawerContext = () =>
-  createContext<DrawerContext>({
-    active: false,
-    open: noop,
-    close: noop,
-    toggle: noop,
-  });
+export const DrawerContext = createContext<DrawerContextInterface>({
+  active: false,
+  open: noop,
+  close: noop,
+});
 
-export const useDrawerControls = () => {
-  const [active, setActive] = useState(false);
+export function useDrawer() {
+  return useContext(DrawerContext);
+}
+
+export function DrawerProvider({ children }: { children: ReactNode }) {
+  const [active, setActive] = useState<ReactNode>(null);
   const close = useCallback(() => setActive(false), []);
-  const open = useCallback(() => setActive(true), []);
-  const toggle = useCallback(() => setActive((prev) => !prev), []);
-  const controls = useMemo(
+  const open = setActive;
+  const value = useMemo(
     () => ({
-      active: active,
+      active,
       close,
       open,
-      toggle,
     }),
-    [active, close, open, toggle]
+    [active, close, open]
   );
 
-  return controls;
-};
+  return (
+    <DrawerContext.Provider value={value}>
+      {children}
+      {active}
+    </DrawerContext.Provider>
+  );
+}
 
 export interface BaseDrawerProps extends DrawerProps {
   title: string;
@@ -61,7 +66,7 @@ export function BaseDrawer({
     <Drawer
       title={title}
       placement="right"
-      closable={false}
+      closable={true}
       onClose={onClose}
       visible={true}
       mask={false}
@@ -70,7 +75,7 @@ export function BaseDrawer({
         position: "fixed",
         top: 64,
         right: 0,
-        zIndex: 30000,
+        zIndex: 100,
         width: 400,
         ...style,
       }}

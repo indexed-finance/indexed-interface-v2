@@ -1,8 +1,8 @@
 import { BrowserRouter } from "react-router-dom";
 import { DEBUG, ErrorBoundary, Screen } from "components";
+import { DrawerProvider } from "components";
 import { FEATURE_FLAGS } from "feature-flags";
 import { Provider } from "react-redux";
-import { TransactionProvider, WalletConnectionProvider } from "components";
 import { Web3ReactProvider } from "@web3-react/core";
 import { ethers } from "ethers";
 import { message, notification } from "antd";
@@ -20,11 +20,9 @@ export function App() {
       <Provider store={store}>
         <ErrorBoundary>
           <Web3ReactProvider getLibrary={getLibrary}>
-            <WalletConnectionProvider>
-              <TransactionProvider>
-                <AppInner />
-              </TransactionProvider>
-            </WalletConnectionProvider>
+            <DrawerProvider>
+              <AppInner />
+            </DrawerProvider>
           </Web3ReactProvider>
         </ErrorBoundary>
       </Provider>

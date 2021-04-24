@@ -1,13 +1,12 @@
 import { MdAccountBalanceWallet } from "react-icons/md";
-import { WalletConnectionContext } from "components/drawers";
-import { useContext } from "react";
+import { useWalletConnectionDrawer } from "components/drawers";
 
 export function WalletConnector() {
-  const { toggle } = useContext(WalletConnectionContext);
+  const { open } = useWalletConnectionDrawer();
 
   return (
     <MdAccountBalanceWallet
-      onClick={toggle}
+      onClick={open}
       fontSize={24}
       style={{ position: "relative", top: 6 }}
     />
