@@ -1,6 +1,6 @@
 import { AppState, selectors } from "features";
 import { Divider, Space, Spin, Typography } from "antd";
-import { PoolInteractionFooter, Token, UsefulLinks } from "components/atomic";
+import { IndexPoolInteractionBar, Token, UsefulLinks } from "components/atomic";
 import { RouteTemplate } from "./RouteTemplate";
 import { lazy, useMemo } from "react";
 import { useParams } from "react-router-dom";
@@ -125,7 +125,7 @@ routes.push({
   component: PoolsRoute,
 });
 
-// Pool
+// Index Pool
 // -- Displays general and specific information for a particular pool.
 const PoolRoute = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -139,7 +139,7 @@ const PoolRoute = () => {
     () => ({
       hasPageHeader: true,
       actions: indexPool ? (
-        <PoolInteractionFooter indexPool={indexPool} />
+        <IndexPoolInteractionBar indexPool={indexPool} />
       ) : null,
       extra: indexPool ? <UsefulLinks address={indexPool.id} /> : null,
       title: indexPool ? (

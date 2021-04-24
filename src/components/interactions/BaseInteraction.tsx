@@ -1,7 +1,6 @@
 import * as yup from "yup";
-import { AiOutlineArrowRight } from "react-icons/ai";
 import { Alert, Button, Divider, Space, Typography } from "antd";
-import { Flipper, Token, TokenSelector } from "components/atomic";
+import { Flipper, TokenSelector } from "components/atomic";
 import { Formik, FormikProps, useFormikContext } from "formik";
 import {
   ReactNode,
@@ -85,18 +84,8 @@ export function SingleInteraction({
         validationSchema={singleInteractionSchema}
       >
         {(props) => (
-          <>
-            <Space align="center" className="spaced-between">
-              <Typography.Title
-                level={2}
-                className="fancy no-margin-bottom"
-                type="secondary"
-              >
-                {title}
-              </Typography.Title>
-              <InteractionComparison />
-            </Space>
-            <Divider />
+          <Space direction="vertical">
+            <Typography.Title level={3}>{title}</Typography.Title>
             <SingleInteractionInner
               {...props}
               assets={assets}
@@ -110,7 +99,7 @@ export function SingleInteraction({
               disableOutputSelect={disableOutputSelect}
               requiresApproval={requiresApproval}
             />
-          </>
+          </Space>
         )}
       </Formik>
     </div>
@@ -301,26 +290,6 @@ function SingleInteractionInner({
       )}
     </>
   );
-}
-
-// e.g. [OMG] -> [AAVE]
-function InteractionComparison() {
-  const { values } = useFormikContext<typeof singleInitialValues>();
-  const { fromToken, toToken } = values;
-
-  return fromToken && toToken ? (
-    <Space>
-      <Token name="Baseline" image={fromToken} />
-      <AiOutlineArrowRight
-        style={{
-          position: "relative",
-          top: "4px",
-          fontSize: "32px",
-        }}
-      />
-      <Token name="Comparison" image={toToken} />
-    </Space>
-  ) : null;
 }
 
 function InteractionErrors() {

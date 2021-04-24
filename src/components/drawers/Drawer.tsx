@@ -47,8 +47,11 @@ export function DrawerProvider({ children }: { children: ReactNode }) {
 }
 
 export interface BaseDrawerProps extends DrawerProps {
-  title: string;
+  title: ReactNode;
   children: ReactNode;
+  padding?: number;
+  width?: number;
+  top?: number;
   style?: DrawerProps["style"];
   bodyStyle?: DrawerProps["style"];
   onClose(): void;
@@ -58,6 +61,9 @@ export function BaseDrawer({
   title,
   onClose,
   children,
+  padding = 0,
+  width = 400,
+  top = 64,
   style = {},
   bodyStyle = {},
   ...rest
@@ -70,13 +76,13 @@ export function BaseDrawer({
       onClose={onClose}
       visible={true}
       mask={false}
-      bodyStyle={{ padding: 0, ...bodyStyle }}
+      bodyStyle={{ padding, ...bodyStyle }}
       style={{
         position: "fixed",
-        top: 64,
+        top,
         right: 0,
         zIndex: 100,
-        width: 400,
+        width,
         ...style,
       }}
       {...rest}

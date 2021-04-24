@@ -3,13 +3,13 @@
 
 export * from './ChartCard';
 export * from './DEBUG';
+export * from './IndexPoolInteractionBar';
 export * from './JazzIcon';
 export * from './LanguageSelector';
 export * from './LineSeriesChart';
 export * from './Logo';
 export * from './ModeSwitch';
 export * from './Performance';
-export * from './PoolInteractionFooter';
 export * from './Quote';
 export * from './SelectableToken';
 export * from './ServerConnection';

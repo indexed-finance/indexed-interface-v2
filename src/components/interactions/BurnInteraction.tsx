@@ -1,7 +1,5 @@
 import { BURN_ROUTER_ADDRESS, COMMON_BASE_TOKENS, SLIPPAGE_RATE } from "config";
 import { FormattedIndexPool, selectors } from "features";
-import { Fragment, useCallback, useState } from "react";
-import { Radio } from "antd";
 import { SingleInteraction, SingleInteractionValues } from "./BaseInteraction";
 import { convert } from "helpers";
 import { downwardSlippage, upwardSlippage } from "ethereum";
@@ -11,38 +9,24 @@ import {
   useSingleTokenBurnCallbacks,
   useTranslator,
 } from "hooks";
+import { useCallback } from "react";
 import { useSelector } from "react-redux";
 import BigNumber from "bignumber.js";
 
 interface Props {
   indexPool: FormattedIndexPool;
+  uniswap?: boolean;
+  multi?: boolean;
 }
 
-export default function BurnInteraction({ indexPool }: Props) {
-  const [burnType, setBurnType] = useState<"single" | "uniswap" | "multi">(
-    "single"
-  );
-
-  return (
-    <Fragment>
-      <Radio.Group
-        value={burnType}
-        onChange={({ target: { value } }) => {
-          setBurnType(value);
-        }}
-      >
-        <Radio.Button value="single">Single Output</Radio.Button>
-        <Radio.Button value="multi">Multi Output</Radio.Button>
-        <Radio.Button value="uniswap">Uniswap</Radio.Button>
-      </Radio.Group>
-      {burnType === "single" && (
-        <SingleTokenBurnInteraction indexPool={indexPool} />
-      )}
-      {burnType === "uniswap" && (
-        <UniswapBurnInteraction indexPool={indexPool} />
-      )}
-    </Fragment>
-  );
+export function BurnInteraction({ indexPool, uniswap, multi }: Props) {
+  if (uniswap) {
+    return <UniswapBurnInteraction indexPool={indexPool} />;
+  } else if (multi) {
+    return <MultiTokenBurnInteraction indexPool={indexPool} />;
+  } else {
+    return <SingleTokenBurnInteraction indexPool={indexPool} />;
+  }
 }
 
 function SingleTokenBurnInteraction({ indexPool }: Props) {
@@ -151,6 +135,10 @@ function SingleTokenBurnInteraction({ indexPool }: Props) {
       requiresApproval={false}
     />
   );
+}
+
+function MultiTokenBurnInteraction({ indexPool }: Props) {
+  return <div>Muti</div>;
 }
 
 function UniswapBurnInteraction({ indexPool }: Props) {

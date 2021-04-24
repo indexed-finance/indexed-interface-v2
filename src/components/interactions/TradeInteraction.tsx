@@ -16,7 +16,7 @@ interface Props {
   indexPool: FormattedIndexPool;
 }
 
-export default function TradeInteraction({ indexPool }: Props) {
+export function TradeInteraction({ indexPool }: Props) {
   const tx = useTranslator();
   const handleTrade = useUniswapTransactionCallback();
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
@@ -29,6 +29,7 @@ export default function TradeInteraction({ indexPool }: Props) {
   );
 
   useBalanceAndApprovalRegistrar(UNISWAP_ROUTER_ADDRESS, tokenIds);
+
   const {
     calculateBestTradeForExactInput,
     calculateBestTradeForExactOutput,

@@ -24,7 +24,7 @@ import { useSelector } from "react-redux";
 
 const MAXIMUM_DISPLAYED_TRADES = 8;
 
-export default function Pool() {
+export default function IndexPool() {
   const { slug } = useParams<{ slug: string }>();
   const poolId = useSelector((state: AppState) =>
     selectors.selectPoolIdByName(state, slug)

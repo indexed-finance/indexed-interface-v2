@@ -1,13 +1,11 @@
 import { COMMON_BASE_TOKENS, MINT_ROUTER_ADDRESS, SLIPPAGE_RATE } from "config";
 import { FormattedIndexPool, selectors } from "features";
-import { Fragment, useCallback, useState } from "react";
 import {
   MultiInteraction,
   MultiInteractionValues,
   SingleInteraction,
   SingleInteractionValues,
 } from "./BaseInteraction";
-import { Radio } from "antd";
 import { convert } from "helpers";
 import { downwardSlippage, upwardSlippage } from "ethereum";
 import {
@@ -17,42 +15,24 @@ import {
   useSingleTokenMintCallbacks,
   useTranslator,
 } from "hooks";
+import { useCallback } from "react";
 import { useSelector } from "react-redux";
 import BigNumber from "bignumber.js";
 
 interface Props {
   indexPool: FormattedIndexPool;
+  uniswap?: boolean;
+  multi?: boolean;
 }
 
-export default function MintInteraction({ indexPool }: Props) {
-  const [mintType, setMintType] = useState<"single" | "uniswap" | "multi">(
-    "single"
-  );
-
-  return (
-    <Fragment>
-      <Radio.Group
-        value={mintType}
-        onChange={({ target: { value } }) => {
-          setMintType(value);
-        }}
-      >
-        <Radio.Button value="single">Single Input</Radio.Button>
-        <Radio.Button value="uniswap">Uniswap</Radio.Button>
-        <Radio.Button value="multi">Multi Input</Radio.Button>
-      </Radio.Group>
-
-      {mintType === "single" && (
-        <SingleTokenMintInteraction indexPool={indexPool} />
-      )}
-      {mintType === "uniswap" && (
-        <UniswapMintInteraction indexPool={indexPool} />
-      )}
-      {mintType === "multi" && (
-        <MultiTokenMintInteraction indexPool={indexPool} />
-      )}
-    </Fragment>
-  );
+export function MintInteraction({ indexPool, uniswap, multi }: Props) {
+  if (uniswap) {
+    return <UniswapMintInteraction indexPool={indexPool} />;
+  } else if (multi) {
+    return <MultiTokenMintInteraction indexPool={indexPool} />;
+  } else {
+    return <SingleTokenMintInteraction indexPool={indexPool} />;
+  }
 }
 
 function SingleTokenMintInteraction({ indexPool }: Props) {
