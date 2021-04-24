@@ -166,6 +166,11 @@ const selectNormalizedUnderlyingPoolTokens = (
   return tokensSelectors.selectTokensById(state, tokenIds);
 };
 
+const selectPoolBySymbol = (state: AppState, symbol: string) => {
+  const pools = selectAllPools(state);
+  return pools.find((pool) => pool.symbol === symbol) ?? null;
+};
+
 export const indexPoolsSelectors = {
   selectAllPools,
   selectPool,
@@ -186,4 +191,5 @@ export const indexPoolsSelectors = {
   selectPoolTokenAddresses,
   selectTokenWeights,
   selectNormalizedUnderlyingPoolTokens,
+  selectPoolBySymbol,
 };
