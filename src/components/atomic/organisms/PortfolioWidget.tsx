@@ -2,8 +2,8 @@ import { AppState, FormattedPortfolioAsset, selectors } from "features";
 import { Button, Space, Statistic, Typography } from "antd";
 import { Progress, Token } from "components/atomic";
 import { Widget } from "./Widget";
+import { useBreakpoints, usePoolDetailRegistrar, useTranslator } from "hooks";
 import { useHistory } from "react-router-dom";
-import { usePoolDetailRegistrar, useTranslator } from "hooks";
 import { useSelector } from "react-redux";
 import noop from "lodash.noop";
 
@@ -17,21 +17,29 @@ export function PortfolioWidget(props: FormattedPortfolioAsset) {
     selectors.selectPoolTokenIds(state, props.address)
   );
   const { push } = useHistory();
+  const { isMobile } = useBreakpoints();
 
   usePoolDetailRegistrar(isNdx ? "" : props.address, tokenIds);
 
   return (
     <Widget
-      width={380}
+      width={isMobile ? 280 : 380}
       symbol={props.symbol}
       address={props.address}
       price={isNdx ? "" : formattedIndexPool?.priceUsd ?? ""}
       priceChange={isNdx ? "" : formattedIndexPool?.netChangePercent ?? ""}
       stats={
         <Space direction="vertical">
-          <Statistic title={tx("EARNED")} value={`${props.ndxEarned} NDX`} />
+          <Statistic
+            title={tx("EARNED")}
+            style={{ fontSize: isMobile ? 16 : 24 }}
+            valueStyle={{ fontSize: isMobile ? 16 : 24 }}
+            value={`${props.ndxEarned} NDX`}
+          />
           {props.hasStakingPool && (
             <Statistic
+              style={{ fontSize: isMobile ? 16 : 24 }}
+              valueStyle={{ fontSize: isMobile ? 16 : 24 }}
               title={tx("STAKED")}
               value={
                 props.staking
@@ -67,9 +75,12 @@ export function PortfolioWidget(props: FormattedPortfolioAsset) {
             image={props.image}
             symbol={props.symbol}
             amount={props.balance}
-            size="medium"
+            size={isMobile ? "small" : "medium"}
           />
-          <Typography.Text type="success" style={{ flex: 1, fontSize: 24 }}>
+          <Typography.Text
+            type="success"
+            style={{ flex: 1, fontSize: isMobile ? 16 : 24 }}
+          >
             {props.value}
           </Typography.Text>
         </Space>

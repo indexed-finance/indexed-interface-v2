@@ -3,13 +3,14 @@ import { Badge, Button, Space, Statistic } from "antd";
 import { FaTractor } from "react-icons/fa";
 import { Widget } from "./Widget";
 import { convert } from "helpers";
-import { useHistory } from "react-router-dom";
 import {
+  useBreakpoints,
   usePoolDetailRegistrar,
   useStakingApy,
   useStakingTokenPrice,
   useTranslator,
 } from "hooks";
+import { useHistory } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 export function StakingWidget(props: FormattedStakingData) {
@@ -32,9 +33,10 @@ export function StakingWidget(props: FormattedStakingData) {
       : []
   );
   const { push } = useHistory();
+  const { isMobile } = useBreakpoints();
   const inner = (
     <Widget
-      width={380}
+      width={isMobile ? 280 : 380}
       symbol={symbol}
       address={props.id}
       price={price ? convert.toCurrency(price) : ""}

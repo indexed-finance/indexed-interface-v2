@@ -17,7 +17,11 @@ export default function Splash() {
   const docsButton = (
     <Button
       type="default"
-      style={{ fontSize: 24, height: "auto", textTransform: "uppercase" }}
+      style={{
+        fontSize: isMobile ? 16 : 24,
+        height: "auto",
+        textTransform: "uppercase",
+      }}
     >
       {tx("READ_THE_DOCUMENTATION")}
     </Button>
@@ -74,7 +78,7 @@ export default function Splash() {
                 type="primary"
                 style={{
                   textTransform: "uppercase",
-                  fontSize: 24,
+                  fontSize: isMobile ? 16 : 24,
                   height: "auto",
                   marginRight: isMobile ? 0 : 10,
                   marginBottom: isMobile ? 10 : 0,

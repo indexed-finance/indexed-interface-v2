@@ -4,8 +4,10 @@ import { Route, useHistory } from "react-router-dom";
 import { ScreenContext } from "./ScreenProvider";
 import { Suspense, useContext } from "react";
 import { routes } from "./routes";
+import { useBreakpoints } from "hooks";
 
 export function ScreenContent() {
+  const { isMobile } = useBreakpoints();
   const { goBack } = useHistory();
   const { title, subtitle, extra, actions, hasPageHeader } = useContext(
     ScreenContext
@@ -20,7 +22,7 @@ export function ScreenContent() {
         borderLeft: "1px solid rgba(255, 255, 255, 0.65)",
         borderTopLeftRadius: 12,
         borderTopRightRadius: 12,
-        width: "80vw",
+        width: isMobile ? "96vw" : "80vw",
         minHeight: "100vh",
         margin: "8rem auto 0 auto",
         padding: 24,
@@ -62,7 +64,7 @@ export function ScreenContent() {
           <Divider style={{ margin: 12 }} />
         </>
       )}
-      <div style={{ padding: "2rem 3rem 10rem 3rem" }}>
+      <div style={{ paddingBottom: "10rem" }}>
         <Suspense
           fallback={
             <div

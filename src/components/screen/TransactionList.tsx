@@ -8,7 +8,7 @@ export function TransactionList() {
     <div
       style={{
         position: "fixed",
-        top: 75,
+        top: 165,
         right: 0,
         width: 45,
         height: "25vh",

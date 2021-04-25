@@ -6,7 +6,7 @@ export function SocialMediaList() {
     <div
       style={{
         position: "fixed",
-        top: 75,
+        top: 165,
         left: 0,
         width: 45,
         background: "rgba(0, 0, 0, 0.65)",

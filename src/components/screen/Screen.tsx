@@ -21,6 +21,7 @@ export function Screen() {
           background: "rgba(0, 0, 0, 0.65)",
           borderBottom: "1px solid rgba(255, 255, 255, 0.65)",
           zIndex: 10,
+          padding: isMobile ? "0 25px" : "0 50px",
         }}
       >
         <ScreenHeader />
