@@ -80,7 +80,6 @@ export function usePortfolioData(): {
     let totalNdxEarned = 0;
     let totalValue = 0;
 
-    // const ndxPrice =
     const portfolioTokens: FormattedPortfolioAsset[] = assets.map(
       ({ name, symbol, id, isUniswapPair }, i) => {
         const stakingPool = stakingPoolsByTokens[i];
