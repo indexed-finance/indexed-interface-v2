@@ -14,7 +14,7 @@ export function ScreenContent() {
   return (
     <div
       style={{
-        background: "rgba(0, 0, 0, 0.65)",
+        background: "#151515",
         borderTop: "1px solid rgba(255, 255, 255, 0.65)",
         borderRight: "1px solid rgba(255, 255, 255, 0.65)",
         borderLeft: "1px solid rgba(255, 255, 255, 0.65)",

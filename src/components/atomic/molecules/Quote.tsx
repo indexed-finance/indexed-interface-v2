@@ -1,8 +1,9 @@
 import { HTMLProps } from "react";
-import { Spin, Typography } from "antd";
+import { Space, Spin, Typography } from "antd";
 import { useBreakpoints } from "hooks";
 
 interface Props extends HTMLProps<HTMLDivElement> {
+  name?: string;
   symbol?: string;
   price?: string;
   netChange?: string;
@@ -13,6 +14,7 @@ interface Props extends HTMLProps<HTMLDivElement> {
 }
 
 export function Quote({
+  name = "",
   symbol = "",
   price = "",
   netChange = "",
@@ -34,13 +36,19 @@ export function Quote({
           }}
         >
           {symbol}
+          {name && (
+            <>
+              <br />
+              {name}
+            </>
+          )}
         </Typography.Title>
       )}
       {price || netChange || netChangePercent ? (
-        <>
+        <Space>
           {price && (
             <Typography.Title
-              level={isMobile ? 5 : 3}
+              level={3}
               style={{
                 opacity: 0.75,
                 marginTop: 0,
@@ -53,23 +61,22 @@ export function Quote({
               {price}
             </Typography.Title>
           )}
-          {netChange ||
-            (netChangePercent && (
-              <Typography.Paragraph
-                style={{
-                  marginTop: 0,
-                  marginBottom: 0,
-                }}
-                type={
-                  netChange.includes("-") || netChangePercent.includes("-")
-                    ? "danger"
-                    : "success"
-                }
-              >
-                {netChange} ({netChangePercent})
-              </Typography.Paragraph>
-            ))}
-        </>
+          {(netChange || netChangePercent) && (
+            <Typography.Title
+              level={4}
+              style={{
+                margin: 0,
+              }}
+              type={
+                netChange.includes("-") || netChangePercent.includes("-")
+                  ? "danger"
+                  : "success"
+              }
+            >
+              {netChange} {netChangePercent && `(${netChangePercent})`}
+            </Typography.Title>
+          )}
+        </Space>
       ) : (
         <Spin size="large" />
       )}

@@ -1,8 +1,15 @@
-import { IChartApi, ISeriesApi, createChart } from "lightweight-charts";
+import {
+  IChartApi,
+  ISeriesApi,
+  MouseEventParams,
+  createChart,
+} from "lightweight-charts";
+import { convert } from "helpers";
+import { format } from "date-fns";
 import { selectors } from "features";
 import { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
-import S from "string";
+import throttle from "lodash.throttle";
 
 export interface SeriesDataItem {
   time: number;
@@ -12,15 +19,15 @@ export interface SeriesDataItem {
 interface Props {
   data: SeriesDataItem[];
   expanded?: boolean;
-  settings: [string, string];
   onChangeTheme(): void;
+  onMoveCrosshair(historical: { when: string; price: string }): void;
 }
 
 export function LineSeriesChart({
   data,
   expanded = false,
-  settings,
   onChangeTheme,
+  onMoveCrosshair,
 }: Props) {
   const theme = useSelector(selectors.selectTheme);
   const cardRef = useRef<null | HTMLDivElement>(null);
@@ -29,32 +36,41 @@ export function LineSeriesChart({
   const lastTheme = useRef<string>(theme);
 
   useEffect(() => {
-    const [timeframe, key] = settings;
-
-    chart?.applyOptions({
-      watermark: {
-        text: `Showing ${S(key).humanize().s} (last ${
-          timeframe === "Day" ? "24h" : "week"
-        })`.toUpperCase(),
-      },
-    });
-  }, [chart, settings]);
-
-  useEffect(() => {
     if (cardRef.current && !series) {
       const size = expanded
         ? { width: 1200, height: 500 }
         : { width: 360, height: 300 };
 
       const chart_ = createChart(cardRef.current, size);
+
       setChart(chart_);
 
-      const options = CHART_MODES[theme];
+      const options = (CHART_MODES as any)[theme];
       const lineSeries = chart_.addLineSeries({
-        color: theme === "outrun" ? "#ECC321" : "#187DDC",
+        color: "#FC2FCE",
       });
 
       chart_.applyOptions(options as any);
+      chart_.applyOptions({
+        leftPriceScale: {
+          visible: false,
+        },
+        rightPriceScale: {
+          visible: false,
+        },
+        overlayPriceScales: {
+          borderVisible: false,
+        },
+        timeScale: {
+          visible: false,
+        },
+      });
+
+      lineSeries.applyOptions({
+        baseLineVisible: false,
+        priceLineVisible: false,
+        lastValueVisible: false,
+      });
 
       setSeries(lineSeries);
       setTimeout(() => {
@@ -69,6 +85,29 @@ export function LineSeriesChart({
   }, [expanded, theme, series]);
 
   useEffect(() => {
+    if (chart && series) {
+      const handleCrosshairMove = throttle((params: MouseEventParams) => {
+        const price = params.seriesPrices.get(series);
+
+        if (price) {
+          const coerced = (price as unknown) as string;
+
+          onMoveCrosshair({
+            when: format((params.time as number) * 1000, "d MMMM, y HH:mm:ss"),
+            price: price ? convert.toCurrency(coerced) : "",
+          });
+        }
+      }, 100);
+
+      chart.subscribeCrosshairMove(handleCrosshairMove);
+
+      return () => {
+        chart.unsubscribeCrosshairMove(handleCrosshairMove);
+      };
+    }
+  }, [chart, series, onMoveCrosshair]);
+
+  useEffect(() => {
     if (cardRef.current && series) {
       series.setData(data as any);
     }
@@ -77,7 +116,7 @@ export function LineSeriesChart({
   useEffect(() => {
     if (cardRef.current && chart) {
       const [width, height] = expanded ? [1200, 460] : [360, 260];
-      const options = CHART_MODES[theme];
+      const options = (CHART_MODES as any)[theme];
 
       chart.resize(width, height);
       chart.applyOptions(options as any);
@@ -107,60 +146,37 @@ const COMMON_LAYOUT_OPTIONS = {
   fontSize: 16,
 };
 
-const COMMON_WATERMARK_OPTIONS = {
-  visible: true,
-  fontSize: 18,
-  horzAlign: "left",
-  vertAlign: "top",
-};
-
 const CHART_MODES = {
   dark: {
     layout: {
       ...COMMON_LAYOUT_OPTIONS,
-      backgroundColor: "#0A0A0A",
+      backgroundColor: "#151515",
       textColor: "#fafafa",
     },
-    watermark: {
-      ...COMMON_WATERMARK_OPTIONS,
+    priceAxis: {
+      position: "none",
+    },
+    priceScale: {
+      autoScale: true,
+      position: "none",
+    },
+    grid: {
+      vertLines: {
+        visible: false,
+      },
+      horzLines: {
+        visible: false,
+      },
+    },
+    timeScale: {
+      fixLeftEdge: true,
+      borderVisible: false,
+      secondsVisible: false,
     },
   },
   light: {
     layout: {
       ...COMMON_LAYOUT_OPTIONS,
-    },
-    watermark: {
-      ...COMMON_WATERMARK_OPTIONS,
-    },
-  },
-  outrun: {
-    layout: {
-      ...COMMON_LAYOUT_OPTIONS,
-      backgroundColor: "#0A0A0A",
-      textColor: "#89dce3",
-    },
-    priceScale: {
-      borderColor: "#ECC321",
-    },
-    crosshair: {
-      vertLine: {
-        color: "#ECC321",
-      },
-      horzLine: {
-        color: "#ECC321",
-      },
-    },
-    grid: {
-      vertLines: {
-        color: "#fa79e0",
-      },
-      horzLines: {
-        color: "#fa79e0",
-      },
-    },
-    watermark: {
-      ...COMMON_WATERMARK_OPTIONS,
-      color: "#ECC321",
     },
   },
 };
