@@ -103,7 +103,7 @@ routes.push({
 
 // Index Pools
 // -- Displays all index pools and relevant general information.
-const PoolsRoute = () => {
+const IndexPoolsRoute = () => {
   const tx = useTranslator();
   const adjustedValues = useMemo(
     () => ({
@@ -122,12 +122,12 @@ const PoolsRoute = () => {
 
 routes.push({
   path: "/index-pools",
-  component: PoolsRoute,
+  component: IndexPoolsRoute,
 });
 
 // Index Pool
 // -- Displays general and specific information for a particular pool.
-const PoolRoute = () => {
+const IndexPoolRoute = () => {
   const { slug } = useParams<{ slug: string }>();
   const poolId = useSelector((state: AppState) =>
     selectors.selectPoolIdByName(state, slug)
@@ -176,7 +176,7 @@ const PoolRoute = () => {
 
 routes.push({
   path: "/index-pools/:slug",
-  component: PoolRoute,
+  component: IndexPoolRoute,
 });
 
 export { routes };

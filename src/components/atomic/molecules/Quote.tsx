@@ -1,51 +1,41 @@
 import { HTMLProps } from "react";
 import { Space, Spin, Typography } from "antd";
-import { useBreakpoints } from "hooks";
+import { Token } from "components/atomic/atoms";
 
 interface Props extends HTMLProps<HTMLDivElement> {
+  address?: string;
   name?: string;
   symbol?: string;
   price?: string;
   netChange?: string;
   netChangePercent?: string;
-  kind?: "small" | "normal";
-  centered?: boolean;
   inline?: boolean;
+  textSize?: "small" | "large";
 }
 
 export function Quote({
+  address = "",
   name = "",
   symbol = "",
   price = "",
   netChange = "",
   netChangePercent = "",
   inline = false,
-  centered = false,
+  textSize = "small",
 }: Props) {
-  const { isMobile } = useBreakpoints();
   const inner = (
-    <>
+    <Space direction="vertical">
       {symbol && (
-        <Typography.Title
-          level={isMobile ? 4 : 2}
-          style={{
-            marginTop: 0,
-            marginRight: 12,
-            marginBottom: 0,
-            justifyContent: centered ? "center" : "left",
-          }}
-        >
-          {symbol}
-          {name && (
-            <>
-              <br />
-              {name}
-            </>
-          )}
-        </Typography.Title>
+        <Token image="" address={address} name={name} symbol={symbol} />
       )}
       {price || netChange || netChangePercent ? (
-        <Space>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: inline ? "row" : "column",
+            alignItems: "center",
+          }}
+        >
           {price && (
             <Typography.Title
               level={3}
@@ -54,8 +44,7 @@ export function Quote({
                 marginTop: 0,
                 marginRight: 12,
                 marginBottom: 0,
-                justifyContent: centered ? "center" : "left",
-                textAlign: centered ? "center" : "initial",
+                justifyContent: "left",
               }}
             >
               {price}
@@ -63,7 +52,7 @@ export function Quote({
           )}
           {(netChange || netChangePercent) && (
             <Typography.Title
-              level={4}
+              level={textSize === "small" ? 5 : 4}
               style={{
                 margin: 0,
               }}
@@ -76,20 +65,19 @@ export function Quote({
               {netChange} {netChangePercent && `(${netChangePercent})`}
             </Typography.Title>
           )}
-        </Space>
+        </div>
       ) : (
         <Spin size="large" />
       )}
-    </>
+    </Space>
   );
 
   return (
     <div>
-      {inline || centered ? (
+      {inline ? (
         <div
-          className={centered ? "perfectly-centered" : "flex-center"}
           style={{
-            display: inline ? "flex" : "block",
+            display: "flex",
             alignItems: "center",
           }}
         >

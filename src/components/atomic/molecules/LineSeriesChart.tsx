@@ -37,9 +37,7 @@ export function LineSeriesChart({
 
   useEffect(() => {
     if (cardRef.current && !series) {
-      const size = expanded
-        ? { width: 1200, height: 500 }
-        : { width: 360, height: 300 };
+      const size = { width: 360, height: 260 };
 
       const chart_ = createChart(cardRef.current, size);
 
@@ -115,7 +113,7 @@ export function LineSeriesChart({
 
   useEffect(() => {
     if (cardRef.current && chart) {
-      const [width, height] = expanded ? [1200, 460] : [360, 260];
+      const [width, height] = [360, 260];
       const options = (CHART_MODES as any)[theme];
 
       chart.resize(width, height);
@@ -150,7 +148,7 @@ const CHART_MODES = {
   dark: {
     layout: {
       ...COMMON_LAYOUT_OPTIONS,
-      backgroundColor: "#151515",
+      backgroundColor: "#070707",
       textColor: "#fafafa",
     },
     priceAxis: {

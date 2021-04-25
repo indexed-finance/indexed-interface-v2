@@ -1,7 +1,7 @@
 import { AppState, selectors } from "features";
+import { Card, Radio, RadioChangeEvent, Spin } from "antd";
 import { LineSeriesChart } from "./LineSeriesChart";
 import { Quote } from "./Quote";
-import { Radio, RadioChangeEvent, Space, Spin } from "antd";
 import { useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import noop from "lodash.noop";
@@ -37,32 +37,45 @@ export function ChartCard({ poolId, expanded = false }: Props) {
   }, [timeframe]);
 
   return (
-    <div>
+    <Card>
       {formattedPool ? (
         <>
-          <Space style={{ width: "100%", justifyContent: "space-between" }}>
-            <Quote
-              symbol={formattedPool.symbol}
-              name={formattedPool.name}
-              price={
-                historicalData ? historicalData.price : formattedPool.priceUsd
-              }
-              netChange={
-                historicalData ? historicalData.when : formattedPool.netChange
-              }
-              netChangePercent={
-                historicalData ? "" : formattedPool.netChangePercent
-              }
-            />
-            <Radio.Group
-              onChange={handleTimeframeChange}
-              value={timeframe}
-              size="large"
-            >
-              <Radio.Button value="Day">Day</Radio.Button>
-              <Radio.Button value="Week">Week</Radio.Button>
-            </Radio.Group>
-          </Space>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "flex-start",
+              justifyContent: "space-between",
+            }}
+          >
+            <div style={{ flex: 1 }}>
+              <Quote
+                address={formattedPool.id}
+                symbol={formattedPool.symbol}
+                name={formattedPool.name}
+                price={
+                  historicalData ? historicalData.price : formattedPool.priceUsd
+                }
+                netChange={
+                  historicalData ? historicalData.when : formattedPool.netChange
+                }
+                netChangePercent={
+                  historicalData ? "" : formattedPool.netChangePercent
+                }
+                inline={true}
+                textSize="large"
+              />
+            </div>
+            <div style={{ flex: 1, textAlign: "right" }}>
+              <Radio.Group
+                onChange={handleTimeframeChange}
+                value={timeframe}
+                size="large"
+              >
+                <Radio.Button value="Day">Day</Radio.Button>
+                <Radio.Button value="Week">Week</Radio.Button>
+              </Radio.Group>
+            </div>
+          </div>
           <div
             style={{ height: 260 }}
             onMouseOut={() => setHistoricalData(null)}
@@ -80,6 +93,6 @@ export function ChartCard({ poolId, expanded = false }: Props) {
       ) : (
         <Spin />
       )}
-    </div>
+    </Card>
   );
 }

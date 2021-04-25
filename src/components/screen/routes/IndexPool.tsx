@@ -196,8 +196,6 @@ export default function IndexPool() {
                             price={asset.price}
                             netChange={asset.netChange}
                             netChangePercent={asset.netChangePercent}
-                            kind="small"
-                            centered={true}
                           />
                         </div>
                         <Progress
