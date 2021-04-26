@@ -1,7 +1,6 @@
 import { AppState, selectors } from "features";
 import { Card, Radio, RadioChangeEvent, Spin } from "antd";
-import { LineSeriesChart } from "./LineSeriesChart";
-import { Quote } from "./Quote";
+import { LineSeriesChart, Quote } from "components/atomic/molecules";
 import { useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import noop from "lodash.noop";
@@ -13,7 +12,7 @@ interface Props {
   expanded?: boolean;
 }
 
-export function ChartCard({ poolId, expanded = false }: Props) {
+export function IndexPoolChart({ poolId, expanded = false }: Props) {
   const [timeframe, setTimeframe] = useState<Timeframe>("Week");
   const [rerendering, setRerendering] = useState(false);
   const data = useSelector((state: AppState) =>
@@ -37,7 +36,7 @@ export function ChartCard({ poolId, expanded = false }: Props) {
   }, [timeframe]);
 
   return (
-    <Card>
+    <Card style={{ height: "100%" }}>
       {formattedPool ? (
         <>
           <div
@@ -77,7 +76,7 @@ export function ChartCard({ poolId, expanded = false }: Props) {
             </div>
           </div>
           <div
-            style={{ height: 260 }}
+            style={{ height: 260, overflow: "auto" }}
             onMouseOut={() => setHistoricalData(null)}
           >
             {!rerendering && (

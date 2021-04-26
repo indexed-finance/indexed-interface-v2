@@ -38,7 +38,7 @@ export function Quote({
         >
           {price && (
             <Typography.Title
-              level={3}
+              level={textSize === "small" ? 4 : 3}
               style={{
                 opacity: 0.75,
                 marginTop: 0,

@@ -1,7 +1,10 @@
 import { AppState, selectors } from "features";
-import { Divider, Space, Spin, Typography } from "antd";
-import { IndexPoolInteractionBar, Token, UsefulLinks } from "components/atomic";
+import {
+  IndexPoolInteractionBar,
+  IndexPoolPerformance,
+} from "components/atomic";
 import { RouteTemplate } from "./RouteTemplate";
+import { Space, Spin, Typography } from "antd";
 import { lazy, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import { usePortfolioData, useStakingRegistrar, useTranslator } from "hooks";
@@ -141,23 +144,14 @@ const IndexPoolRoute = () => {
       actions: indexPool ? (
         <IndexPoolInteractionBar indexPool={indexPool} />
       ) : null,
-      extra: indexPool ? <UsefulLinks address={indexPool.id} /> : null,
+      extra: indexPool ? <IndexPoolPerformance {...indexPool} /> : <Spin />,
       title: indexPool ? (
         <Space>
-          <Token
-            name={indexPool.name}
-            image={indexPool.name}
-            symbol={indexPool.symbol}
-            address={indexPool.id}
-            size="large"
-          />
-          <Divider type="vertical" />
           <Typography.Text>{indexPool.name}</Typography.Text>
         </Space>
       ) : (
         <Spin />
       ),
-      subtitle: "<fill me>",
     }),
     [indexPool]
   );

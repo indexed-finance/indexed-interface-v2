@@ -1,5 +1,5 @@
 import * as yup from "yup";
-import { Alert, Button, Divider, Space, Typography } from "antd";
+import { Alert, Button, Col, Divider, Row } from "antd";
 import { Flipper, TokenSelector } from "components/atomic";
 import { Formik, FormikProps, useFormikContext } from "formik";
 import {
@@ -25,7 +25,6 @@ import noop from "lodash.noop";
 type Asset = { name: string; symbol: string; id: string };
 
 interface Props {
-  title: ReactNode;
   assets: Asset[];
   spender: string;
   extra?: ReactNode;
@@ -58,7 +57,6 @@ const singleInteractionSchema = yup.object().shape({
 export type SingleInteractionValues = typeof singleInitialValues;
 
 export function SingleInteraction({
-  title,
   assets,
   spender,
   extra = null,
@@ -84,22 +82,19 @@ export function SingleInteraction({
         validationSchema={singleInteractionSchema}
       >
         {(props) => (
-          <Space direction="vertical">
-            <Typography.Title level={3}>{title}</Typography.Title>
-            <SingleInteractionInner
-              {...props}
-              assets={assets}
-              spender={spender}
-              extra={extra}
-              onSubmit={onSubmit}
-              onChange={onChange}
-              defaultInputSymbol={defaultInputSymbol}
-              defaultOutputSymbol={defaultOutputSymbol}
-              disableInputSelect={disableInputSelect}
-              disableOutputSelect={disableOutputSelect}
-              requiresApproval={requiresApproval}
-            />
-          </Space>
+          <SingleInteractionInner
+            {...props}
+            assets={assets}
+            spender={spender}
+            extra={extra}
+            onSubmit={onSubmit}
+            onChange={onChange}
+            defaultInputSymbol={defaultInputSymbol}
+            defaultOutputSymbol={defaultOutputSymbol}
+            disableInputSelect={disableInputSelect}
+            disableOutputSelect={disableOutputSelect}
+            requiresApproval={requiresApproval}
+          />
         )}
       </Formik>
     </div>
@@ -205,90 +200,93 @@ function SingleInteractionInner({
   });
 
   return (
-    <>
-      {/* // Fields */}
-      <TokenSelector
-        label={tx("FROM")}
-        assets={inputOptions}
-        value={{
-          token: values.fromToken,
-          amount: values.fromAmount,
-        }}
-        selectable={!disableInputSelect}
-        onChange={({ token, amount }) => {
-          const newValues = {
-            ...values,
-            fromToken: token || "",
-            fromAmount: amount || 0,
-            lastTouchedField: "from",
-          } as SingleInteractionValues;
-          const error = onChange(newValues);
-          if (error) {
-            if (error.includes("Output")) {
-              setFieldError("toAmount", error);
-            } else {
-              setFieldError("fromAmount", error);
+    <Row>
+      <Col span={12}>
+        {/* // Fields */}
+        <TokenSelector
+          label={tx("FROM")}
+          assets={inputOptions}
+          value={{
+            token: values.fromToken,
+            amount: values.fromAmount,
+          }}
+          selectable={!disableInputSelect}
+          onChange={({ token, amount }) => {
+            const newValues = {
+              ...values,
+              fromToken: token || "",
+              fromAmount: amount || 0,
+              lastTouchedField: "from",
+            } as SingleInteractionValues;
+            const error = onChange(newValues);
+            if (error) {
+              if (error.includes("Output")) {
+                setFieldError("toAmount", error);
+              } else {
+                setFieldError("fromAmount", error);
+              }
             }
-          }
-          setValues(newValues);
-        }}
-      />
+            setValues(newValues);
+          }}
+        />
 
-      <Flipper disabled={disableFlip} onFlip={handleFlip} />
+        <Flipper disabled={disableFlip} onFlip={handleFlip} />
 
-      <TokenSelector
-        label={tx("TO")}
-        assets={outputOptions}
-        value={{
-          token: values.toToken,
-          amount: values.toAmount,
-        }}
-        selectable={!disableOutputSelect}
-        onChange={({ token, amount }) => {
-          const newValues = {
-            ...values,
-            toToken: token || "",
-            toAmount: amount || 0,
-            lastTouchedField: "to",
-          } as SingleInteractionValues;
-          const error = onChange(newValues);
-          if (error) {
-            if (error.includes("Input")) {
-              setFieldError("fromAmount", error);
-            } else {
-              setFieldError("toAmount", error);
+        <TokenSelector
+          label={tx("TO")}
+          assets={outputOptions}
+          value={{
+            token: values.toToken,
+            amount: values.toAmount,
+          }}
+          selectable={!disableOutputSelect}
+          onChange={({ token, amount }) => {
+            const newValues = {
+              ...values,
+              toToken: token || "",
+              toAmount: amount || 0,
+              lastTouchedField: "to",
+            } as SingleInteractionValues;
+            const error = onChange(newValues);
+            if (error) {
+              if (error.includes("Input")) {
+                setFieldError("fromAmount", error);
+              } else {
+                setFieldError("toAmount", error);
+              }
             }
-          }
-          setValues(newValues);
-        }}
-      />
+            setValues(newValues);
+          }}
+        />
 
-      <Divider />
+        <Divider />
 
-      <InteractionErrors />
+        <InteractionErrors />
 
-      {extra}
+        {extra}
 
-      {requiresApproval && status === "approval needed" ? (
-        <Button
-          type="primary"
-          style={{ width: "100%" }}
-          disabled={!isValid}
-          onClick={approve}
-        >
-          Approve
-        </Button>
-      ) : (
-        <Button
-          type="primary"
-          style={{ width: "100%" }}
-          disabled={!isValid || (requiresApproval && status === "unknown")}
-          onClick={() => handleSubmit()}
-        >
-          Send
-        </Button>
-      )}
-    </>
+        {requiresApproval && status === "approval needed" ? (
+          <Button
+            type="primary"
+            style={{ width: "100%" }}
+            disabled={!isValid}
+            onClick={approve}
+          >
+            Approve
+          </Button>
+        ) : (
+          <Button
+            type="primary"
+            style={{ width: "100%" }}
+            disabled={!isValid || (requiresApproval && status === "unknown")}
+            onClick={() => handleSubmit()}
+          >
+            Send
+          </Button>
+        )}
+      </Col>
+      <Col span={12}></Col>
+    </Row>
   );
 }
 
@@ -332,7 +330,6 @@ type MultiProps = Omit<Props, "onSubmit" | "onChange"> & {
 };
 
 export function MultiInteraction({
-  title,
   assets,
   spender,
   extra = null,
@@ -358,31 +355,19 @@ export function MultiInteraction({
         validationSchema={multiInteractionSchema}
       >
         {(props) => (
-          <>
-            <Space align="center" className="spaced-between">
-              <Typography.Title
-                level={2}
-                className="fancy no-margin-bottom"
-                type="secondary"
-              >
-                {title}
-              </Typography.Title>
-            </Space>
-            <Divider />
-            <MultiInteractionInner
-              {...props}
-              assets={assets}
-              spender={spender}
-              extra={extra}
-              onSubmit={onSubmit}
-              onChange={onChange}
-              defaultInputSymbol={defaultInputSymbol}
-              defaultOutputSymbol={defaultOutputSymbol}
-              disableInputSelect={disableInputSelect}
-              disableOutputSelect={disableOutputSelect}
-              requiresApproval={requiresApproval}
-            />
-          </>
+          <MultiInteractionInner
+            {...props}
+            assets={assets}
+            spender={spender}
+            extra={extra}
+            onSubmit={onSubmit}
+            onChange={onChange}
+            defaultInputSymbol={defaultInputSymbol}
+            defaultOutputSymbol={defaultOutputSymbol}
+            disableInputSelect={disableInputSelect}
+            disableOutputSelect={disableOutputSelect}
+            requiresApproval={requiresApproval}
+          />
         )}
       </Formik>
     </div>
@@ -435,32 +420,35 @@ function MultiInteractionInner({ spender, assets }: InnerMultiProps) {
   }, [calculateAmountsIn, values.fromAmount]);
 
   return (
-    <>
-      <TokenSelector
-        assets={[]}
-        label={tx("FROM")}
-        selectable={false}
-        value={tokenValue}
-        onChange={handleChange}
-      />
-      <Divider />
-      <div style={{ maxHeight: 500, overflow: "auto" }}>
-        {assets.map((asset) => (
-          <TokenSelector
-            key={asset.id}
-            selectable={false}
-            assets={[]}
-            showBalance={false}
-            value={{
-              token: asset.symbol,
-              amount: lookup[asset.id] ?? 0,
-            }}
-            error={tx("EXCEEDS_BALANCE")}
-            reversed={true}
-          />
-        ))}
-      </div>
-    </>
+    <Row gutter={12}>
+      <Col span={12}>
+        <TokenSelector
+          assets={[]}
+          label={tx("FROM")}
+          selectable={false}
+          value={tokenValue}
+          onChange={handleChange}
+        />
+      </Col>
+      <Col span={12}>
+        <div style={{ maxHeight: 500, overflow: "auto" }}>
+          {assets.map((asset) => (
+            <TokenSelector
+              key={asset.id}
+              selectable={false}
+              assets={[]}
+              showBalance={false}
+              value={{
+                token: asset.symbol,
+                amount: lookup[asset.id] ?? 0,
+              }}
+              error={tx("EXCEEDS_BALANCE")}
+              reversed={true}
+            />
+          ))}
+        </div>
+      </Col>
+    </Row>
   );
 }
 // #endregion

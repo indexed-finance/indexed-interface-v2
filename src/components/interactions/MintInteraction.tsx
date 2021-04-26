@@ -13,7 +13,6 @@ import {
   useMintRouterCallbacks,
   usePoolTokenAddresses,
   useSingleTokenMintCallbacks,
-  useTranslator,
 } from "hooks";
 import { useCallback } from "react";
 import { useSelector } from "react-redux";
@@ -36,7 +35,6 @@ export function MintInteraction({ indexPool, uniswap, multi }: Props) {
 }
 
 function SingleTokenMintInteraction({ indexPool }: Props) {
-  const tx = useTranslator();
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
   const {
     calculateAmountIn,
@@ -133,7 +131,6 @@ function SingleTokenMintInteraction({ indexPool }: Props) {
 
   return (
     <SingleInteraction
-      title={tx("MINT")}
       assets={indexPool.assets}
       spender={indexPool.id}
       onSubmit={handleSubmit}
@@ -145,7 +142,6 @@ function SingleTokenMintInteraction({ indexPool }: Props) {
 }
 
 function UniswapMintInteraction({ indexPool }: Props) {
-  const tx = useTranslator();
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
 
   useBalanceAndApprovalRegistrar(MINT_ROUTER_ADDRESS.toLowerCase(), [
@@ -255,7 +251,6 @@ function UniswapMintInteraction({ indexPool }: Props) {
 
   return (
     <SingleInteraction
-      title={tx("MINT_WITH_UNISWAP")}
       assets={
         assets.filter((_) => _) as {
           name: string;
@@ -274,18 +269,12 @@ function UniswapMintInteraction({ indexPool }: Props) {
 }
 
 function MultiTokenMintInteraction({ indexPool }: Props) {
-  const tx = useTranslator();
   const handleSubmit = useCallback((values: MultiInteractionValues) => {
-    //
+    // Pass
   }, []);
-  // const { calculateAmountsIn, executeMint } = useMultiTokenMintCallbacks(
-  //   indexpool.id
-  // );
-  // const value = calculateAmountsIn(amount.toString());
 
   return (
     <MultiInteraction
-      title={tx("MINT")}
       assets={indexPool.assets}
       spender={indexPool.id}
       onSubmit={handleSubmit}

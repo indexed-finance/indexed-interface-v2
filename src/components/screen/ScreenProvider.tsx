@@ -18,8 +18,8 @@ export interface ScreenContextInterface {
 
 export const screenContextState: ScreenContextInterface = {
   adjustScreen: noop,
-  title: "Foo",
-  subtitle: "Bar",
+  title: null,
+  subtitle: null,
   extra: null,
   actions: null,
   hasPageHeader: true,

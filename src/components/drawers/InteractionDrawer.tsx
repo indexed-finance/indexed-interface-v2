@@ -1,15 +1,16 @@
 import { AppState, selectors } from "features";
-import { BaseDrawer, useDrawer } from "./Drawer";
 import {
   BurnInteraction,
   MintInteraction,
   TradeInteraction,
 } from "components/interactions";
-import { Col, Menu, Row, Spin } from "antd";
-import { FaCoins, FaFireAlt, FaHammer } from "react-icons/fa";
-import { Token } from "components/atomic";
+import { Card, Col, Drawer, Menu, Row, Typography } from "antd";
+import { FaCoins, FaFireAlt, FaHammer, FaTractor } from "react-icons/fa";
+import { useBreakpoints } from "hooks";
 import { useCallback, useMemo } from "react";
+import { useDrawer } from "./Drawer";
 import { useSelector } from "react-redux";
+import S from "string";
 
 export type IndexPoolInteraction =
   | "burn"
@@ -43,11 +44,9 @@ export function InteractionDrawer({
   indexPoolAddress: string;
   activeInteraction: IndexPoolInteraction;
 }) {
-  const { close } = useDrawer();
+  const { isMobile } = useBreakpoints();
+  const { active, close } = useDrawer();
   const { open } = useInteractionDrawer(indexPoolAddress);
-  const indexPool = useSelector((state: AppState) =>
-    selectors.selectPool(state, indexPoolAddress)
-  );
   const formattedIndexPool = useSelector((state: AppState) =>
     selectors.selectFormattedIndexPool(state, indexPoolAddress)
   );
@@ -83,7 +82,6 @@ export function InteractionDrawer({
       return null;
     }
   }, [formattedIndexPool, activeInteraction]);
-
   const selectedKeys = useMemo(() => {
     const lowered = activeInteraction.toLowerCase();
 
@@ -97,32 +95,29 @@ export function InteractionDrawer({
   }, [activeInteraction]);
 
   return (
-    <BaseDrawer
-      width={550}
-      top={105}
-      title={
-        indexPool ? (
-          <>
-            Interact with{" "}
-            <Token
-              name={indexPool.name}
-              image=""
-              address={indexPool.id}
-              symbol={indexPool.symbol}
-            />
-          </>
-        ) : (
-          <Spin />
-        )
-      }
+    <Drawer
+      mask={false}
+      visible={Boolean(active)}
       onClose={close}
-      closable={true}
-      bodyStyle={{
-        position: "relative",
+      placement="bottom"
+      style={{
+        justifyContent: "center",
+        display: "flex",
       }}
+      bodyStyle={{
+        padding: 0,
+      }}
+      contentWrapperStyle={{
+        borderTop: "1px solid rgba(255, 255, 255, 0.35)",
+        borderRight: "1px solid rgba(255, 255, 255, 0.15)",
+        borderLeft: "1px solid rgba(255, 255, 255, 0.15)",
+        maxWidth: 1100,
+        width: isMobile ? "96vw" : "80vw",
+      }}
+      height={326}
     >
-      <Row gutter={18}>
-        <Col span={8}>
+      <Row gutter={0} align="stretch">
+        <Col span={6}>
           <Menu
             mode="inline"
             openKeys={["mintGroup", "burnGroup"]}
@@ -147,42 +142,156 @@ export function InteractionDrawer({
             <Menu.Divider />
             <Menu.SubMenu
               key="mintGroup"
-              title="Mint"
-              icon={<FaHammer />}
+              title={<Typography.Text type="secondary">Mint</Typography.Text>}
               onTitleClick={() => open("mint")}
             >
-              <Menu.Item key="mint" onClick={() => open("mint")}>
-                Single
+              <Menu.Item
+                key="mint"
+                onClick={() => open("mint")}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  fontSize: 16,
+                }}
+              >
+                <FaHammer />
+                <span>Single</span>
               </Menu.Item>
-              <Menu.Item key="multiMint" onClick={() => open("multiMint")}>
-                Multi
+              <Menu.Item
+                key="multiMint"
+                onClick={() => open("multiMint")}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  fontSize: 16,
+                }}
+              >
+                <div>
+                  <FaHammer />
+                  <FaHammer
+                    style={{ position: "relative", left: -8, opacity: 0.6 }}
+                  />
+                  <FaHammer
+                    style={{ position: "relative", left: -16, opacity: 0.3 }}
+                  />
+                </div>
+                <span>Multi</span>
               </Menu.Item>
-              <Menu.Item key="uniswapMint" onClick={() => open("uniswapMint")}>
-                Uniswap
+              <Menu.Item
+                key="uniswapMint"
+                onClick={() => open("uniswapMint")}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  fontSize: 16,
+                }}
+              >
+                <img
+                  alt="Uniswap"
+                  src={require("images/uniswap-link.png").default}
+                  style={{
+                    width: 20,
+                    height: 20,
+                  }}
+                />{" "}
+                <span>Uniswap</span>
               </Menu.Item>
             </Menu.SubMenu>
-            <Menu.Divider />
             <Menu.SubMenu
               key="burnGroup"
-              title="Burn"
-              icon={<FaFireAlt />}
+              style={{ justifyContent: "flex-start" }}
+              title={<Typography.Text type="secondary">Burn</Typography.Text>}
               onTitleClick={() => open("burn")}
             >
-              <Menu.Item key="burn" onClick={() => open("burn")}>
-                Single
+              <Menu.Item
+                key="burn"
+                onClick={() => open("burn")}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  fontSize: 16,
+                }}
+              >
+                <FaFireAlt />
+                <span>Single</span>
               </Menu.Item>
-              <Menu.Item key="multiBurn" onClick={() => open("multiBurn")}>
-                Multi
+              <Menu.Item
+                key="multiBurn"
+                onClick={() => open("multiBurn")}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  fontSize: 16,
+                }}
+              >
+                <div>
+                  <FaFireAlt />
+                  <FaFireAlt
+                    style={{ position: "relative", left: -8, opacity: 0.6 }}
+                  />
+                  <FaFireAlt
+                    style={{ position: "relative", left: -16, opacity: 0.3 }}
+                  />
+                </div>
+                <span>Multi</span>
               </Menu.Item>
-              <Menu.Item key="uniswapBurn" onClick={() => open("uniswapBurn")}>
-                Uniswap
+              <Menu.Item
+                key="uniswapBurn"
+                onClick={() => open("uniswapBurn")}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  fontSize: 16,
+                }}
+              >
+                <img
+                  alt="Uniswap"
+                  src={require("images/uniswap-link.png").default}
+                  style={{
+                    width: 20,
+                    height: 20,
+                  }}
+                />{" "}
+                <span>Uniswap</span>
               </Menu.Item>
             </Menu.SubMenu>
-            <Menu.Divider />
+            <Menu.Divider />{" "}
+            <Menu.Item
+              key="stake"
+              icon={<FaTractor />}
+              onClick={() => open("trade")}
+              disabled={true}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
+              Stake
+            </Menu.Item>
           </Menu>
         </Col>
-        <Col span={16}>{interaction}</Col>
+        <Col span={18}>
+          <Card
+            bordered={false}
+            style={{ borderRadius: 0 }}
+            bodyStyle={{ height: 275, overflow: "auto" }}
+            title={
+              <Typography.Title level={3} style={{ margin: 0 }}>
+                {S(activeInteraction).humanize().s}
+              </Typography.Title>
+            }
+          >
+            {interaction}
+          </Card>
+        </Col>
       </Row>
-    </BaseDrawer>
+    </Drawer>
   );
 }

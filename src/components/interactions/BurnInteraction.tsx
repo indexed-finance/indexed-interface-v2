@@ -7,7 +7,6 @@ import {
   useBalancesRegistrar,
   useBurnRouterCallbacks,
   useSingleTokenBurnCallbacks,
-  useTranslator,
 } from "hooks";
 import { useCallback } from "react";
 import { useSelector } from "react-redux";
@@ -30,7 +29,6 @@ export function BurnInteraction({ indexPool, uniswap, multi }: Props) {
 }
 
 function SingleTokenBurnInteraction({ indexPool }: Props) {
-  const tx = useTranslator();
   const poolId = indexPool.id;
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
   useBalancesRegistrar([poolId]);
@@ -125,7 +123,6 @@ function SingleTokenBurnInteraction({ indexPool }: Props) {
 
   return (
     <SingleInteraction
-      title={tx("BURN")}
       assets={indexPool.assets}
       spender={poolId}
       onSubmit={handleSubmit}
@@ -142,7 +139,6 @@ function MultiTokenBurnInteraction({ indexPool }: Props) {
 }
 
 function UniswapBurnInteraction({ indexPool }: Props) {
-  const tx = useTranslator();
   const poolId = indexPool.id;
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
   useBalancesRegistrar([poolId]);
@@ -247,7 +243,6 @@ function UniswapBurnInteraction({ indexPool }: Props) {
 
   return (
     <SingleInteraction
-      title={tx("BURN_WITH_UNISWAP")}
       assets={
         assets.filter((_) => _) as {
           name: string;

@@ -5,7 +5,6 @@ import { Trade } from "@uniswap/sdk";
 import { convert } from "helpers";
 import {
   useBalanceAndApprovalRegistrar,
-  useTranslator,
   useUniswapTradingPairs,
   useUniswapTransactionCallback,
 } from "hooks";
@@ -17,7 +16,6 @@ interface Props {
 }
 
 export function TradeInteraction({ indexPool }: Props) {
-  const tx = useTranslator();
   const handleTrade = useUniswapTransactionCallback();
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
   const tokenIds = useMemo(
@@ -146,7 +144,6 @@ export function TradeInteraction({ indexPool }: Props) {
 
   return (
     <SingleInteraction
-      title={tx("TRADE")}
       assets={assets as any}
       spender={UNISWAP_ROUTER_ADDRESS}
       defaultInputSymbol={COMMON_BASE_TOKENS[0].symbol}

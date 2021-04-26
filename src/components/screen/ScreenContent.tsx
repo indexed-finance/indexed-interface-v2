@@ -23,9 +23,10 @@ export function ScreenContent() {
         borderTopLeftRadius: 12,
         borderTopRightRadius: 12,
         width: isMobile ? "96vw" : "80vw",
+        maxWidth: 1100,
         minHeight: "100vh",
         margin: "8rem auto 0 auto",
-        padding: 24,
+        padding: isMobile ? 12 : 24,
       }}
     >
       {hasPageHeader && (
