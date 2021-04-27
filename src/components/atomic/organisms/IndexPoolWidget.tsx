@@ -1,9 +1,21 @@
 import { AppState, FormattedIndexPool, selectors } from "features";
 import { Button, Statistic } from "antd";
-import { Widget } from "./Widget";
+import { Widget, WidgetGroup } from "./Widget";
 import { useBreakpoints, usePoolDetailRegistrar } from "hooks";
 import { useHistory } from "react-router-dom";
 import { useSelector } from "react-redux";
+
+export function IndexPoolWidgetGroup() {
+  const indexPools = useSelector(selectors.selectAllFormattedIndexPools);
+
+  return (
+    <WidgetGroup>
+      {indexPools.map((pool) => (
+        <IndexPoolWidget key={pool.id} {...pool} />
+      ))}
+    </WidgetGroup>
+  );
+}
 
 export function IndexPoolWidget(props: FormattedIndexPool) {
   const { isMobile } = useBreakpoints();

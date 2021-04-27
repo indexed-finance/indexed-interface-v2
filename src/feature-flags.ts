@@ -16,5 +16,5 @@ export const FEATURE_FLAGS = {
   useEnglishLogging: true,
   useDEBUG: false,
   useServerConnection: true,
-  useMolassesMode: false,
+  useMolassesMode: true,
 };

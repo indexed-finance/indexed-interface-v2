@@ -4,7 +4,5 @@
 export * from './IndexPool';
 export * from './IndexPools';
 export * from './Portfolio';
-export * from './RouteTemplate';
 export * from './Splash';
 export * from './Staking';
-export * from './routes';

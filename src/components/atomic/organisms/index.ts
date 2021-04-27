@@ -8,6 +8,8 @@ export * from './IndexPoolExternalLinks';
 export * from './IndexPoolPerformance';
 export * from './IndexPoolRecentTrades';
 export * from './IndexPoolWidget';
+export * from './LayoutHeader';
+export * from './Page';
 export * from './PortfolioWidget';
 export * from './StakingWidget';
 export * from './TokenSelector';

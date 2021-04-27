@@ -1,10 +1,9 @@
-import { Button, Divider, Steps, Typography } from "antd";
-import { ExternalLink } from "components/atomic";
+import { Button, Card, Divider, Steps, Typography } from "antd";
+import { ExternalLink, IndexPoolWidgetGroup, Page } from "components/atomic";
 import { FEATURE_FLAGS } from "feature-flags";
 import { Link } from "react-router-dom";
 import { useBreakpoints, useTranslator } from "hooks";
 import { useEffect, useState } from "react";
-import IndexPools from "./IndexPools";
 
 const { Step } = Steps;
 const STEP_COUNT = 3;
@@ -62,7 +61,7 @@ export default function Splash() {
   }, []);
 
   return (
-    <>
+    <Page hasPageHeader={false}>
       <div style={{ textAlign: "center" }}>
         <Typography.Title style={{ fontSize: isMobile ? 40 : 64 }}>
           {tx("DECENTRALIZED_INDEX_PROTOCOL")}
@@ -98,19 +97,19 @@ export default function Splash() {
           </Button.Group>
         </Typography.Title>
       </div>
-      <div style={{ padding: "3rem 0" }}>
+      <Card style={{ marginTop: "2rem" }}>
         <Steps current={step} responsive={true} type="navigation">
           <Step title="Foo" description="Lorem ipsum dolor sit amet" />
           <Step title="Bar" description="Lorem ipsum dolor sit amet" />
           <Step title="Baz" description="Lorem ipsum dolor sit amet" />
         </Steps>
-      </div>
+      </Card>
       <Divider orientation="left" style={{ marginBottom: 24 }}>
         <Typography.Title level={2} style={{ margin: 0 }}>
           Index Pools
         </Typography.Title>
       </Divider>
-      <IndexPools />
-    </>
+      <IndexPoolWidgetGroup />
+    </Page>
   );
 }

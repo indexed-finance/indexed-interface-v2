@@ -1,20 +1,27 @@
-import { Col, Divider, Row, Space, Typography } from "antd";
+import { Card, Col, Divider, Row, Space, Typography } from "antd";
+import { HTMLProps, ReactNode } from "react";
 import { Quote } from "components/atomic/molecules";
-import { ReactNode } from "react";
 import { Token } from "components/atomic/atoms";
 import { useBreakpoints } from "hooks";
 import noop from "lodash.noop";
 
-interface Props {
+interface Props extends HTMLProps<HTMLDivElement> {
   symbol: string;
   address: string;
   price?: string;
   priceChange?: string;
-  width: number;
   children?: ReactNode;
   stats?: ReactNode;
   actions?: ReactNode;
   onClick?(): void;
+}
+
+export function WidgetGroup({ children }: { children: ReactNode }) {
+  return (
+    <Space size="large" wrap={true}>
+      {children}
+    </Space>
+  );
 }
 
 export function Widget({
@@ -22,11 +29,11 @@ export function Widget({
   address,
   price = "",
   priceChange = "",
-  width,
   children = null,
   stats = null,
   actions = null,
   onClick = noop,
+  ...rest
 }: Props) {
   const { isMobile } = useBreakpoints();
 
@@ -34,16 +41,16 @@ export function Widget({
     <div
       onClick={onClick}
       role="button"
-      style={{ cursor: onClick === noop ? "initial" : "pointer", width }}
+      style={{
+        cursor: onClick === noop ? "initial" : "pointer",
+      }}
+      {...rest}
     >
-      <Space
-        direction="vertical"
+      <Card
+        hoverable={true}
         style={{
           borderRadius: "1.4rem",
-          border: "1px solid rgba(255,255,255,0.65)",
           padding: "1rem",
-          background: "rgba(0,0,0,0.65)",
-          width,
         }}
       >
         <div
@@ -60,6 +67,7 @@ export function Widget({
             symbol={symbol}
             image=""
             size="medium"
+            style={{ marginRight: 24 }}
           />
 
           {(price || priceChange) && (
@@ -68,13 +76,14 @@ export function Widget({
                 inline={true}
                 price={price}
                 netChangePercent={priceChange}
+                textSize="small"
               />
             </div>
           )}
         </div>
         {children && (
           <>
-            <Divider style={{ margin: 0 }} />
+            <Divider style={{ marginTop: 5, marginBottom: 10 }} />
             <Typography.Paragraph>{children}</Typography.Paragraph>
           </>
         )}
@@ -89,7 +98,7 @@ export function Widget({
             </Row>
           </>
         )}
-      </Space>
+      </Card>
     </div>
   );
 }
