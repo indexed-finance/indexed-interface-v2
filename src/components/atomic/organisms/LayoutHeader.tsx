@@ -47,7 +47,7 @@ export function LayoutHeader() {
         left: 0,
         width: "100vw",
         background: "rgba(0, 0, 0, 0.65)",
-        borderBottom: "1px solid rgba(255, 255, 255, 0.65)",
+        borderBottom: "1px solid rgba(252, 47, 206, 0.4)",
         zIndex: 10,
         padding: isMobile ? "0 25px" : "0 50px",
       }}
@@ -85,7 +85,8 @@ export function LayoutHeader() {
               width: "100vw",
               height: 40,
               background: "rgba(0, 0, 0, 0.65)",
-              borderBottom: "1px solid rgba(255, 255, 255, 0.65)",
+              borderBottom: "1px solid rgba(47, 206, 252, 0.9)",
+              borderLeft: "1px solid rgba(47, 206, 252, 0.9)",
               zIndex: 10,
               padding: "0 25px",
               display: "flex",

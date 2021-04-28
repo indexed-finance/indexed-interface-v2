@@ -148,7 +148,7 @@ const CHART_MODES = {
   dark: {
     layout: {
       ...COMMON_LAYOUT_OPTIONS,
-      backgroundColor: "#070707",
+      backgroundColor: "#151515",
       textColor: "#fafafa",
     },
     priceAxis: {

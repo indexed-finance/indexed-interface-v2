@@ -46,8 +46,7 @@ export function Page({
             <PageHeader
               style={{
                 color: "white",
-                borderBottom: "1px solid #FC2FCE",
-                width: "100%",
+                borderBottom: "1px solid rgba(252, 47, 206, 0.4)",
                 paddingBottom: 18,
                 display: "flex",
                 alignItems: "center",
@@ -90,14 +89,14 @@ export function Page({
             style={{
               position: "fixed",
               top: 60,
-              left: 0,
-              width: "100vw",
-              height: 45,
+              right: -60,
               background: "rgba(0, 0, 0, 0.65)",
-              borderBottom: "1px solid rgba(255, 255, 255, 0.65)",
+              borderBottom: "1px solid rgba(47, 206, 252, 0.4)",
+              borderLeft: "1px solid rgba(47, 206, 252, 0.4)",
+              borderBottomLeftRadius: 12,
               display: "flex",
               alignItems: "center",
-              padding: "12px 50px",
+              justifyContent: "flex-end",
               zIndex: 1,
             }}
           >
