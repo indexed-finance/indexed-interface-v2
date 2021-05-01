@@ -36,7 +36,7 @@ export function StakingWidget(props: FormattedStakingData) {
   const { isMobile } = useBreakpoints();
   const inner = (
     <Widget
-      width={isMobile ? 280 : 380}
+      width={isMobile ? 330 : 420}
       symbol={symbol}
       address={props.id}
       price={price ? convert.toCurrency(price) : ""}

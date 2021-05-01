@@ -1,13 +1,11 @@
 import { DataReceiverConfig, actions, selectors } from "features";
 import { isEqual } from "lodash";
 import { useDispatch, useSelector } from "react-redux";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 export function useCallRegistrar(calls: DataReceiverConfig) {
   const dispatch = useDispatch();
-  const hasSentData = useRef(false);
   const [cachedCalls, setCachedCalls] = useState(calls);
-  const blockNumber = useSelector(selectors.selectBlockNumber);
   const isConnected = useSelector(selectors.selectConnected);
 
   // Effect:
@@ -42,8 +40,8 @@ export function useCallRegistrar(calls: DataReceiverConfig) {
   // we can trigger a changeBlockNumber thunk with the current block number.
   // As the batch is being selected, it will ignore any calls for which it already has data.
   useEffect(() => {
-    if (!hasSentData.current && !isConnected && blockNumber !== -1) {
+    if (!isConnected) {
       dispatch(actions.sendBatch());
     }
-  }, [dispatch, isConnected, blockNumber]);
+  }, [dispatch, isConnected]);
 }

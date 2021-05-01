@@ -80,14 +80,17 @@ export const userSelectors = {
     return state.user.balances[tokenId.toLowerCase()] ?? "0";
   },
   selectTokenBalances(state: AppState, tokenIds: string[]) {
-    return tokenIds.map(id => state.user.balances[id.toLowerCase()] ?? "0");
+    return tokenIds.map((id) => state.user.balances[id.toLowerCase()] ?? "0");
   },
   selectStakingInfoLookup(state: AppState) {
     const stakingPoolIds = Object.keys(state.user.staking);
-    return stakingPoolIds.reduce((prev, next) => ({
-      ...prev,
-      [next as string]: state.user.staking[next]
-    }), {} as Record<string, { balance: string; earned: string; }>)
+    return stakingPoolIds.reduce(
+      (prev, next) => ({
+        ...prev,
+        [next as string]: state.user.staking[next],
+      }),
+      {} as Record<string, { balance: string; earned: string }>
+    );
   },
   selectApprovalStatus(
     state: AppState,
@@ -154,16 +157,18 @@ const userMulticallDataParser = createMulticallDataParser("User", (calls) => {
         if (balanceOf) {
           prev.balances[tokenAddress.toLowerCase()] = balanceOf.toString();
         }
-      } else if (balanceOfCall) {
+      } else if (balanceOfCall.length > 0 && balanceOfCall[0].result) {
         // NDX token has no allowance.
         const [_balanceOfCall] = balanceOfCall;
         const [balanceOf] = _balanceOfCall.result ?? [];
-
         const tokenAddress = _balanceOfCall.target.toLowerCase();
+        const value = (balanceOf ?? "").toString();
+
+        prev.balances[tokenAddress] = value;
+
         if (tokenAddress === NDX_ADDRESS.toLowerCase()) {
-          prev.ndx = (balanceOf ?? "").toString();
+          prev.ndx = value;
         }
-        prev.balances[tokenAddress] = (balanceOf ?? "").toString();
       }
 
       return prev;

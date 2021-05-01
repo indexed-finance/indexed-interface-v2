@@ -22,7 +22,8 @@ import type { AppThunk } from "./store";
 
 // #region Provider
 
-type Provider = providers.Web3Provider
+type Provider =
+  | providers.Web3Provider
   | providers.JsonRpcProvider
   | providers.InfuraProvider;
 
@@ -179,17 +180,14 @@ export const thunks = {
   addTransaction: (
     _tx: TransactionResponse | Promise<TransactionResponse>,
     extra: TransactionExtra = {}
-  ): AppThunk => async (
-    dispatch,
-    getState
-  ) => {
+  ): AppThunk => async (dispatch, getState) => {
     const tx = await Promise.resolve(_tx);
     const _provider = provider as Provider;
 
     dispatch(actions.transactionStarted({ tx, extra }));
     const receipt = await _provider.getTransactionReceipt(tx.hash);
     dispatch(actions.transactionFinalized(receipt));
-  }
+  },
 };
 
 export const actions = {

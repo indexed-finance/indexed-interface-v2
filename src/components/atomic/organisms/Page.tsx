@@ -78,9 +78,7 @@ export function Page({
             >
               {extra && <div>{extra}</div>}
             </PageHeader>
-          ) : (
-            <div style={{ paddingBottom: 18 }} />
-          )
+          ) : null
         }
       >
         {children}

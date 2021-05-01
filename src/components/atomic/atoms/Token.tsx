@@ -40,7 +40,7 @@ export function Token({
     if (address) {
       try {
         // Next, do they have it on 1inch?
-        tokenImage = `https://tokens.1inch.exchange/${address.toLowerCase()}.png`;
+        // tokenImage = `https://tokens.1inch.exchange/${address.toLowerCase()}.png`;
       } catch {}
     }
   }

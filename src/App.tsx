@@ -18,7 +18,7 @@ import { Web3ReactProvider } from "@web3-react/core";
 import { ethers } from "ethers";
 import { routes } from "routes";
 import { store } from "features";
-import { useBreakpoints } from "hooks";
+import { useBreakpoints, useWalletConnection } from "hooks";
 
 export function getLibrary(_provider?: any, _connector?: any) {
   return new ethers.providers.Web3Provider(_provider);
@@ -100,6 +100,8 @@ export function AppLayout() {
       {FEATURE_FLAGS.useDEBUG && <DEBUG />}
     </>
   );
+
+  useWalletConnection();
 
   // Effect:
   // Configure antd notifications and messages.

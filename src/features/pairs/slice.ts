@@ -25,7 +25,8 @@ const slice = createSlice({
   initialState: adapter.getInitialState(),
   reducers: {
     uniswapPairsRegistered(state, action: PayloadAction<NormalizedPair[]>) {
-      const formatted = action.payload.map(
+      const filtered = action.payload.filter(({ id }) => !state.entities[id]);
+      const formatted = filtered.map(
         ({ id, token0 = "", token1 = "", ...rest }) => ({
           ...rest,
           id: id.toLowerCase(),
@@ -91,10 +92,13 @@ export const pairsSelectors = {
   },
   selectPairExistsLookup: (state: AppState, pairIds: string[]) => {
     const allPairs = pairsSelectors.selectPairsById(state, pairIds);
-    return allPairs.reduce((prev, next, i) => ({
-      ...prev,
-      [pairIds[i]]: next ? next.exists === true : false
-    }), {} as Record<string, boolean>);
+    return allPairs.reduce(
+      (prev, next, i) => ({
+        ...prev,
+        [pairIds[i]]: next ? next.exists === true : false,
+      }),
+      {} as Record<string, boolean>
+    );
   },
   selectNdxPrice(state: AppState, ethPrice: number) {
     const wethNdxPair = computeUniswapPairAddress(

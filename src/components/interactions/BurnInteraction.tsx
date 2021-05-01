@@ -31,12 +31,13 @@ export function BurnInteraction({ indexPool, uniswap, multi }: Props) {
 function SingleTokenBurnInteraction({ indexPool }: Props) {
   const poolId = indexPool.id;
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
-  useBalancesRegistrar([poolId]);
   const {
     calculateAmountIn,
     calculateAmountOut,
     executeBurn,
   } = useSingleTokenBurnCallbacks(poolId);
+
+  useBalancesRegistrar([poolId]);
 
   const handleChange = useCallback(
     (values: SingleInteractionValues) => {
@@ -141,7 +142,6 @@ function MultiTokenBurnInteraction({ indexPool }: Props) {
 function UniswapBurnInteraction({ indexPool }: Props) {
   const poolId = indexPool.id;
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
-  useBalancesRegistrar([poolId]);
   const {
     getBestBurnRouteForAmountIn,
     getBestBurnRouteForAmountOut,
@@ -149,6 +149,8 @@ function UniswapBurnInteraction({ indexPool }: Props) {
   } = useBurnRouterCallbacks(poolId);
 
   const assets = [...COMMON_BASE_TOKENS];
+
+  useBalancesRegistrar([poolId]);
 
   const handleChange = useCallback(
     (values: SingleInteractionValues) => {

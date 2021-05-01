@@ -192,6 +192,9 @@ export function formatPoolAsset(
 
       const weight = convert.toBigNumber(denorm).div(pool.totalDenorm);
       weightPercentage = convert.toPercent(weight.toNumber());
+
+      console.log({ token, weight, weightPercentage });
+
       balance = parseFloat(
         convert.toBalance(exactBalance, token.decimals)
       ).toFixed(2);

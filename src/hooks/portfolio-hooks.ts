@@ -61,6 +61,7 @@ export function usePortfolioData(): {
       };
     });
     const pairIds = pairTokens.map((p) => p.id);
+
     return [[...baseTokens, ...pairTokens], pairIds, priceLookupArgs];
   }, [indexPools]);
   const priceLookup = useTokenPricesLookup(priceLookupArgs);
@@ -72,6 +73,7 @@ export function usePortfolioData(): {
     const assetIds = assets.map((asset) => asset.id);
     return [assets, assetIds];
   }, [assetsRaw, pairExistsLookup]);
+
   const balances = useTokenBalances(assetIds);
   const stakingPoolsByTokens = useStakingPoolsForTokens(assetIds);
   const stakingInfoLookup = useStakingInfoLookup();
@@ -100,7 +102,9 @@ export function usePortfolioData(): {
         const price = priceLookup[id] ?? 0;
         const balance = convert.toBalanceNumber(balances[i] ?? "0", 18, 6);
         const value = (staked + balance) * price;
+
         totalValue += value;
+
         return {
           address: id,
           name,
@@ -117,9 +121,11 @@ export function usePortfolioData(): {
         };
       }
     );
+
     const ndx = portfolioTokens.find(
       (t) => t.address === NDX_ADDRESS.toLowerCase()
     ) as FormattedPortfolioAsset;
+
     const earnedValue = totalNdxEarned * +ndx.price;
     ndx.value = (+ndx.value + earnedValue).toFixed(2);
     ndx.image = `indexed-${theme}`;

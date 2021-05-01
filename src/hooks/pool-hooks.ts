@@ -129,13 +129,17 @@ export function usePoolDetailRegistrar(
   poolAddress: string,
   tokenIds: string[]
 ) {
-  const caller = "Pool Detail";
-  const { onChainCalls, offChainCalls } = poolAddress
-    ? createPoolDetailCalls(poolAddress, tokenIds)
-    : {
-        onChainCalls: [],
-        offChainCalls: [],
-      };
+  const caller = `Pool Detail`;
+  const { onChainCalls, offChainCalls } = useMemo(
+    () =>
+      poolAddress
+        ? createPoolDetailCalls(poolAddress, tokenIds)
+        : {
+            onChainCalls: [],
+            offChainCalls: [],
+          },
+    [poolAddress, tokenIds]
+  );
 
   useCallRegistrar({
     caller,

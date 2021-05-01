@@ -1,13 +1,19 @@
 import { Page, PortfolioWidget } from "components/atomic";
 import { Space, Typography } from "antd";
-import { useMemo } from "react";
+import { actions } from "features";
+import { useDispatch } from "react-redux";
+import { useEffect, useMemo } from "react";
 import { usePortfolioData, useTranslator } from "hooks";
 
 export default function Portfolio() {
   const tx = useTranslator();
-  const { ndx, tokens } = usePortfolioData();
+  const dispatch = useDispatch();
+  const { ndx, tokens, totalValue } = usePortfolioData();
   const data = useMemo(() => [ndx, ...tokens], [ndx, tokens]);
-  const { totalValue } = usePortfolioData();
+
+  useEffect(() => {
+    setTimeout(() => dispatch(actions.sendBatch()), 1000);
+  }, [dispatch]);
 
   return (
     <Page

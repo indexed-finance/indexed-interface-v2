@@ -8,7 +8,7 @@ import { actions } from "features";
 import { ethers } from "ethers";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import { usePrevious, useWalletConnection, useWalletOptions } from "hooks";
+import { usePrevious, useWalletOptions } from "hooks";
 import { useTranslator } from "hooks";
 import noop from "lodash.noop";
 
@@ -19,8 +19,6 @@ export function useWalletConnectionDrawer() {
   const open = useCallback(() => baseOpen(<WalletConnectionDrawer />), [
     baseOpen,
   ]);
-
-  useWalletConnection();
 
   // Effect:
   // [Not connected] -> [Connected]: Close drawer.

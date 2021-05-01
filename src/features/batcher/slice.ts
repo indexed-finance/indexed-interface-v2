@@ -135,12 +135,12 @@ const slice = createSlice({
       .addCase(fetchMulticallData.fulfilled, (state) => {
         const oldCalls: Record<string, true> = {};
 
-        for (const [call, value] of Object.entries(state.listenerCounts)) {
-          if (value === 0) {
-            oldCalls[call] = true;
-            delete state.listenerCounts[call];
-          }
-        }
+        // for (const [call, value] of Object.entries(state.listenerCounts)) {
+        //   if (value === 0) {
+        //     oldCalls[call] = true;
+        //     delete state.listenerCounts[call];
+        //   }
+        // }
 
         state.onChainCalls = state.onChainCalls.filter(
           (call) => !oldCalls[call]

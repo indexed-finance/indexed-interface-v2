@@ -10,8 +10,11 @@ export const useTranslator = () => useSelector(selectors.selectTranslator);
 
 export const useTokenBalances = (tokenIds: string[]) => {
   useBalancesRegistrar(tokenIds);
-  return useSelector((state: AppState) => selectors.selectTokenBalances(state, tokenIds));
-}
+
+  return useSelector((state: AppState) =>
+    selectors.selectTokenBalances(state, tokenIds)
+  );
+};
 
 export const useApprovalStatus = (
   tokenId: string,
@@ -74,26 +77,32 @@ export function useUserDataRegistrar(poolTokens: Record<string, string[]>) {
   });
 }
 
-export function useBalanceAndApprovalRegistrar(spender: string, _tokens: string | string[]) {
+export function useBalanceAndApprovalRegistrar(
+  spender: string,
+  _tokens: string | string[]
+) {
   const tokens = Array.isArray(_tokens) ? _tokens : [_tokens];
   const userAddress = useUserAddress();
   const interfaceKind = "IERC20_ABI";
   const userDataCalls: RegisteredCall[] = userAddress
-    ? tokens.reduce((calls, token) => ([
-      ...calls,
-      {
-        interfaceKind,
-        target: token.toLowerCase(),
-        function: "allowance",
-        args: [userAddress.toLowerCase(), spender.toLowerCase()],
-      },
-      {
-        interfaceKind,
-        target: token.toLowerCase(),
-        function: "balanceOf",
-        args: [userAddress.toLowerCase()],
-      },
-    ]), [] as RegisteredCall[])
+    ? tokens.reduce(
+        (calls, token) => [
+          ...calls,
+          {
+            interfaceKind,
+            target: token.toLowerCase(),
+            function: "allowance",
+            args: [userAddress.toLowerCase(), spender.toLowerCase()],
+          },
+          {
+            interfaceKind,
+            target: token.toLowerCase(),
+            function: "balanceOf",
+            args: [userAddress.toLowerCase()],
+          },
+        ],
+        [] as RegisteredCall[]
+      )
     : [];
 
   if (userAddress) {
@@ -115,14 +124,14 @@ export function useBalancesRegistrar(tokenIds: string[]) {
   const userAddress = useUserAddress();
   const interfaceKind = "IERC20_ABI";
   const userDataCalls: RegisteredCall[] = useMemo(() => {
-    return userAddress ? tokenIds.map(
-      (tokenId) => ({
-        interfaceKind,
-        target: tokenId,
-        function: "balanceOf",
-        args: [userAddress],
-      })
-    ): [];
+    return userAddress
+      ? tokenIds.map((tokenId) => ({
+          interfaceKind,
+          target: tokenId,
+          function: "balanceOf",
+          args: [userAddress],
+        }))
+      : [];
   }, [userAddress, tokenIds]);
 
   useCallRegistrar({

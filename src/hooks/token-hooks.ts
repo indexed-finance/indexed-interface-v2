@@ -1,7 +1,13 @@
 import { AppState, selectors } from "features";
 import { ApprovalStatus } from "features/user/slice";
 import { Pair } from "@uniswap/sdk";
-import { RegisteredCall, computeUniswapPairAddress, convert, getRandomEntries, sortTokens } from "helpers";
+import {
+  RegisteredCall,
+  computeUniswapPairAddress,
+  convert,
+  getRandomEntries,
+  sortTokens,
+} from "helpers";
 import { WETH_CONTRACT_ADDRESS } from "config";
 import { useAddTransactionCallback } from "./transaction-hooks";
 import { useCallRegistrar } from "./use-call-registrar";
@@ -45,7 +51,6 @@ export function useTokenApproval({
   rawAmount,
   symbol,
 }: TokenApprovalOptions): TokenApprovalHook {
-
   const contract = useTokenContract(tokenId);
   const addTransaction = useAddTransactionCallback();
   const status = useSelector((state: AppState) =>
@@ -56,18 +61,28 @@ export function useTokenApproval({
       rawAmount
     )
   );
-  const approve = useCallback(
-    () => {
-      if (!contract || !spender || status !== "approval needed") throw new Error();
-      const tx = contract.approve(spender, convert.toHex(convert.toBigNumber(rawAmount)));
-      addTransaction(tx, {
-        type: "ERC20.approve",
-        approval: { spender, tokenAddress: tokenId, amount: rawAmount },
-        summary: `Approve: ${amount} ${symbol}`
-      })
-    },
-    [status, spender, amount, rawAmount, addTransaction, symbol, contract, tokenId]
-  );
+  const approve = useCallback(() => {
+    if (!contract || !spender || status !== "approval needed")
+      throw new Error();
+    const tx = contract.approve(
+      spender,
+      convert.toHex(convert.toBigNumber(rawAmount))
+    );
+    addTransaction(tx, {
+      type: "ERC20.approve",
+      approval: { spender, tokenAddress: tokenId, amount: rawAmount },
+      summary: `Approve: ${amount} ${symbol}`,
+    });
+  }, [
+    status,
+    spender,
+    amount,
+    rawAmount,
+    addTransaction,
+    symbol,
+    contract,
+    tokenId,
+  ]);
 
   return {
     status,
@@ -91,30 +106,40 @@ export function useTokenPrice(id: string): [number, false] | [undefined, true] {
   return [undefined, true];
 }
 
-export function useTokenPrices(ids: string[]): [number[], false] | [undefined, true] {
-  const tokens = useTokens(ids.map(id => id.toLowerCase()));
+export function useTokenPrices(
+  ids: string[]
+): [number[], false] | [undefined, true] {
+  const tokens = useTokens(ids.map((id) => id.toLowerCase()));
 
   usePricesRegistrar(ids);
 
   return useMemo(() => {
     const allPrices = tokens.map((token) => token?.priceData?.price);
-    const loaded = !allPrices.some(p => !p);
+    const loaded = !allPrices.some((p) => !p);
     if (loaded) {
-      return [allPrices as number[], false]
+      return [allPrices as number[], false];
     }
-    return [undefined, true]
+    return [undefined, true];
   }, [tokens]);
 }
 
-const isToken0 = (pair: Pair, token: string) => pair.token0.address.toLowerCase() === token.toLowerCase()
+const isToken0 = (pair: Pair, token: string) =>
+  pair.token0.address.toLowerCase() === token.toLowerCase();
 
-const getLpTokenPrice = (pair: Pair, lpSupply: string, pricedToken: string, price: number) => {
-  const totalSupply = parseFloat(convert.toBalance(convert.toBigNumber(lpSupply), 18, false));
+const getLpTokenPrice = (
+  pair: Pair,
+  lpSupply: string,
+  pricedToken: string,
+  price: number
+) => {
+  const totalSupply = parseFloat(
+    convert.toBalance(convert.toBigNumber(lpSupply), 18, false)
+  );
   const halfReserves = isToken0(pair, pricedToken)
     ? pair.reserve0.toExact()
     : pair.reserve1.toExact();
   return (price * parseFloat(halfReserves) * 2) / totalSupply;
-}
+};
 
 export const last = <T>(arr: T[]): T => arr[arr.length - 1];
 
@@ -137,32 +162,39 @@ type PricedAsset = {
   useEthLpTokenPrice: boolean;
 };
 
-export function useTokenPricesLookup(tokens: PricedAsset[]): Record<string, number> {
+export function useTokenPricesLookup(
+  tokens: PricedAsset[]
+): Record<string, number> {
   const [baseTokenIds, pairTokens, pairTokenIds] = useMemo(() => {
     const baseTokenIds = [
-      ...tokens.filter(t => !t.useEthLpTokenPrice).map(t => t.id),
-      WETH_CONTRACT_ADDRESS
+      ...tokens.filter((t) => !t.useEthLpTokenPrice).map((t) => t.id),
+      WETH_CONTRACT_ADDRESS,
     ];
-    const pairTokens = tokens.filter(t => t.useEthLpTokenPrice).map((token) => {
-      const [token0, token1] = sortTokens(token.id, WETH_CONTRACT_ADDRESS);
-      return {
-        id: computeUniswapPairAddress(token0, token1).toLowerCase(),
-        token0,
-        token1,
-        exists: undefined
-      }
-    });
+    const pairTokens = tokens
+      .filter((t) => t.useEthLpTokenPrice)
+      .map((token) => {
+        const [token0, token1] = sortTokens(token.id, WETH_CONTRACT_ADDRESS);
+        return {
+          id: computeUniswapPairAddress(token0, token1).toLowerCase(),
+          token0,
+          token1,
+          exists: undefined,
+        };
+      });
     if (pairTokens.length) {
       baseTokenIds.push(WETH_CONTRACT_ADDRESS);
     }
-    return [baseTokenIds, pairTokens, pairTokens.map(p => p.id)];
+    return [baseTokenIds, pairTokens, pairTokens.map((p) => p.id)];
   }, [tokens]);
-  const [baseTokenPrices, baseTokenPricesLoading] = useTokenPrices(baseTokenIds);
+  const [baseTokenPrices, baseTokenPricesLoading] = useTokenPrices(
+    baseTokenIds
+  );
   // @todo only lookup supplies if we know the pair actually exists
   const [supplies, suppliesLoading] = useTotalSuppliesWithLoadingIndicator(
     pairTokenIds
   );
   const [pairs, pairsLoading] = useUniswapPairs(pairTokens);
+
   return useMemo(() => {
     const priceMap: Record<string, number> = {};
     if (!baseTokenPricesLoading) {
@@ -171,23 +203,36 @@ export function useTokenPricesLookup(tokens: PricedAsset[]): Record<string, numb
       }
       if (pairTokens.length && !suppliesLoading && !pairsLoading) {
         for (const i in pairTokenIds) {
-          const ethPrice = last(baseTokenPrices as number[])
+          const ethPrice = last(baseTokenPrices as number[]);
           const id = pairTokenIds[i].toLowerCase();
           const supply = (supplies as string[])[i];
           // This might not be at the same index if any of the pairs don't exist
-          const pair = (pairs as Pair[]).find(p => p.liquidityToken.address.toLowerCase() === id);
+          const pair = (pairs as Pair[]).find(
+            (p) => p.liquidityToken.address.toLowerCase() === id
+          );
           if (pair) {
-            priceMap[id] = getLpTokenPrice(pair, supply, WETH_CONTRACT_ADDRESS, ethPrice)
+            priceMap[id] = getLpTokenPrice(
+              pair,
+              supply,
+              WETH_CONTRACT_ADDRESS,
+              ethPrice
+            );
           }
         }
       }
     }
     return priceMap;
   }, [
-    baseTokenIds, pairTokenIds, pairTokens,
-    baseTokenPrices, baseTokenPricesLoading,
-    supplies, suppliesLoading, pairs, pairsLoading
-  ])
+    baseTokenIds,
+    pairTokenIds,
+    pairTokens,
+    baseTokenPrices,
+    baseTokenPricesLoading,
+    supplies,
+    suppliesLoading,
+    pairs,
+    pairsLoading,
+  ]);
 }
 
 export const useEthPrice = () => useTokenPrice(WETH_CONTRACT_ADDRESS);
