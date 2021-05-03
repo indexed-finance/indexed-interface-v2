@@ -1,4 +1,13 @@
-import { Alert, Button, Col, Divider, Row, Space, Typography } from "antd";
+import {
+  Alert,
+  Button,
+  Col,
+  Divider,
+  Radio,
+  Row,
+  Space,
+  Typography,
+} from "antd";
 import { BiLinkExternal } from "react-icons/bi";
 import { FormattedIndexPool } from "features";
 import { Formik } from "formik";
@@ -21,6 +30,15 @@ export function StakeInteraction({ indexPool }: Props) {
           onSubmit={console.log}
         >
           <Space direction="vertical" style={{ width: "100%", height: "100%" }}>
+            <Space style={{ width: "100%", justifyContent: "space-between" }}>
+              <Radio.Group value="Stake">
+                <Radio value="Stake">Stake</Radio>
+                <Radio value="Unstake">Unstake</Radio>
+              </Radio.Group>
+              <Button type="primary" danger={true}>
+                Exit
+              </Button>
+            </Space>
             <TokenSelector
               label=""
               assets={[]}
@@ -89,7 +107,6 @@ export function StakeInteraction({ indexPool }: Props) {
             />
             <Button.Group size="large">
               <Button type="default">Claim</Button>
-              <Button type="default">Exit</Button>
             </Button.Group>
           </Space>
         </div>

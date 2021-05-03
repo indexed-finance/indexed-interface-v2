@@ -158,12 +158,13 @@ export function TokenSelector({
       <div onClick={handleWrapperClick} style={{ marginBottom: 8 }}>
         <Space
           direction="horizontal"
-          className="spaced-between"
           style={{
+            justifyContent: "space-between",
             flexDirection: reversed ? "row-reverse" : "row",
+            width: "100%",
           }}
         >
-          <Space direction="vertical">
+          <Space direction="vertical" style={{ width: "100%" }}>
             {showBalance && (
               <>
                 {value.token ? (
