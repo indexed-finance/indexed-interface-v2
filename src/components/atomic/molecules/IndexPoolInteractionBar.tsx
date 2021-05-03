@@ -28,7 +28,7 @@ export function useIndexPoolInteractions(indexPoolAddress: string) {
       {
         title: "Stake",
         icon: <FaTractor />,
-        onClick: () => open("trade"),
+        onClick: () => open("stake"),
       },
     ],
     [open]

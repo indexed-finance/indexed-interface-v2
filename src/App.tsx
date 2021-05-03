@@ -107,13 +107,13 @@ export function AppLayout() {
   // Configure antd notifications and messages.
   useEffect(() => {
     message.config({
-      top: isMobile ? 106 : 66,
+      top: isMobile ? 136 : 96,
       duration: 4.2,
     });
 
     notification.config({
       placement: "topRight",
-      top: isMobile ? 106 : 66,
+      top: isMobile ? 136 : 96,
       duration: 4.2,
     });
   }, [isMobile]);

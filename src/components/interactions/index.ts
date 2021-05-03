@@ -4,4 +4,5 @@
 export * from './BaseInteraction';
 export * from './BurnInteraction';
 export * from './MintInteraction';
+export * from './StakeInteraction';
 export * from './TradeInteraction';

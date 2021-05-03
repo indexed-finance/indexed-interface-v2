@@ -2,6 +2,7 @@ import { AppState, selectors } from "features";
 import {
   BurnInteraction,
   MintInteraction,
+  StakeInteraction,
   TradeInteraction,
 } from "components/interactions";
 import { Card, Col, Drawer, Menu, Row, Typography } from "antd";
@@ -19,7 +20,8 @@ export type IndexPoolInteraction =
   | "mint"
   | "uniswapMint"
   | "multiMint"
-  | "trade";
+  | "trade"
+  | "stake";
 
 export function useInteractionDrawer(indexPool: string) {
   const { open: baseOpen } = useDrawer();
@@ -75,6 +77,8 @@ export function InteractionDrawer({
           return (
             <BurnInteraction indexPool={formattedIndexPool} multi={true} />
           );
+        case "stake":
+          return <StakeInteraction indexPool={formattedIndexPool} />;
         default:
           return null;
       }
@@ -91,6 +95,8 @@ export function InteractionDrawer({
       return ["mintGroup", activeInteraction];
     } else if (lowered.includes("burn")) {
       return ["burnGroup", activeInteraction];
+    } else if (lowered === "stake") {
+      return ["stake"];
     }
   }, [activeInteraction]);
 
@@ -103,9 +109,11 @@ export function InteractionDrawer({
       style={{
         justifyContent: "center",
         display: "flex",
+        overflow: "hidden",
       }}
       bodyStyle={{
         padding: 0,
+        overflow: "hidden",
       }}
       contentWrapperStyle={{
         borderTop: "1px solid rgba(255, 255, 255, 0.35)",
@@ -113,6 +121,7 @@ export function InteractionDrawer({
         borderLeft: "1px solid rgba(255, 255, 255, 0.15)",
         maxWidth: 1100,
         width: isMobile ? "96vw" : "80vw",
+        overflow: "hidden",
       }}
       height={326}
     >
@@ -265,8 +274,8 @@ export function InteractionDrawer({
             <Menu.Item
               key="stake"
               icon={<FaTractor />}
-              onClick={() => open("trade")}
-              disabled={true}
+              onClick={() => open("stake")}
+              disabled={false}
               style={{
                 display: "flex",
                 alignItems: "center",
@@ -281,7 +290,7 @@ export function InteractionDrawer({
           <Card
             bordered={false}
             style={{ borderRadius: 0 }}
-            bodyStyle={{ height: 275, overflow: "auto" }}
+            bodyStyle={{ overflow: "hidden" }}
             title={
               <Typography.Title level={3} style={{ margin: 0 }}>
                 {S(activeInteraction).humanize().s}
