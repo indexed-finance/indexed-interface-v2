@@ -65,7 +65,6 @@ export function Widget({
             name={symbol}
             address={address}
             symbol={symbol}
-            image=""
             size="medium"
             style={{ marginRight: 24 }}
           />

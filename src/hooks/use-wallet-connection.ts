@@ -171,19 +171,19 @@ export const SUPPORTED_WALLETS = {
 try {
   SUPPORTED_WALLETS[
     SupportedWallet.Injected
-  ].icon = require("images/connectors/injected.svg").default;
+  ].icon = require("images/injected.svg").default;
   SUPPORTED_WALLETS[
     SupportedWallet.MetaMask
-  ].icon = require("images/connectors/metamask.png").default;
+  ].icon = require("images/metamask.png").default;
   SUPPORTED_WALLETS[
     SupportedWallet.CoinbaseWallet
-  ].icon = require("images/connectors/coinbase.svg").default;
+  ].icon = require("images/coinbase.svg").default;
   SUPPORTED_WALLETS[
     SupportedWallet.Fortmatic
-  ].icon = require("images/connectors/fortmatic.png").default;
+  ].icon = require("images/fortmatic.png").default;
   SUPPORTED_WALLETS[
     SupportedWallet.Portis
-  ].icon = require("images/connectors/portis.png").default;
+  ].icon = require("images/portis.png").default;
 } catch {
   console.info("Unable to import icons; probably because this is the server.");
 }

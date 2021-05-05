@@ -6,14 +6,7 @@ export function IndexPoolDescription({ id, name, symbol }: FormattedIndexPool) {
   return (
     <Card>
       <Typography.Title level={2}>
-        About{" "}
-        <Token
-          image=""
-          name={name}
-          symbol={symbol}
-          address={id}
-          size="medium"
-        />
+        About <Token name={name} symbol={symbol} address={id} size="medium" />
       </Typography.Title>
       <Typography.Text
         style={{

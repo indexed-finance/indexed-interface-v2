@@ -2,8 +2,7 @@ import { Button, Card, Divider, Space } from "antd";
 import { ExternalLink } from "components/atomic";
 import { FormattedIndexPool } from "features";
 import { Fragment, useMemo } from "react";
-import { usePoolQuickswapLink } from "hooks";
-import { useTranslator } from "hooks";
+import { usePoolQuickswapLink, useTranslator } from "hooks";
 import type { TranslatedTerm } from "helpers";
 
 const USEFUL_LINKS: Array<{

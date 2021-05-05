@@ -37,7 +37,6 @@ export function IndexPoolAssets({ assets }: FormattedIndexPool) {
               >
                 <Token
                   name={asset.name}
-                  image=""
                   address={asset.id}
                   symbol={asset.symbol}
                   amount={asset.balance}

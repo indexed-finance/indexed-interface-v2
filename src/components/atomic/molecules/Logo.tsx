@@ -1,7 +1,5 @@
 import { Space, Typography } from "antd";
-import { selectors } from "features";
 import { useHistory } from "react-router-dom";
-import { useSelector } from "react-redux";
 import cx from "classnames";
 
 interface Props {
@@ -20,7 +18,6 @@ export function Logo({
   spinning = false,
 }: Props) {
   const history = useHistory();
-  const theme = useSelector(selectors.selectTheme);
 
   return (
     <div onClick={() => history.push(link)} style={{ cursor: "pointer" }}>
@@ -35,7 +32,7 @@ export function Logo({
             "is-spinning": spinning,
           })}
           alt=""
-          src={require(`images/indexed-${theme}.png`).default}
+          src={require(`images/indexed.png`).default}
           style={{
             width: spinning ? 48 : 24,
             height: spinning ? 48 : 24,

@@ -25,9 +25,7 @@ export function Quote({
 }: Props) {
   const inner = (
     <Space direction="vertical">
-      {symbol && (
-        <Token image="" address={address} name={name} symbol={symbol} />
-      )}
+      {symbol && <Token address={address} name={name} symbol={symbol} />}
       {price || netChange || netChangePercent ? (
         <div
           style={{

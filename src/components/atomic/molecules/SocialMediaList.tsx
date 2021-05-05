@@ -30,12 +30,7 @@ export function SocialMediaList() {
           rel="noopener noreferrer"
           style={{ marginBottom: 6 }}
         >
-          <Token
-            name={site.name}
-            image={site.image}
-            asAvatar={true}
-            size="medium"
-          />
+          <Token name={site.name} asAvatar={true} size="medium" />
         </a>
       ))}
     </div>

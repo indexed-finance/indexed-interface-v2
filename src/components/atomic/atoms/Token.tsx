@@ -2,29 +2,25 @@ import { Avatar, Space } from "antd";
 import { PLACEHOLDER_TOKEN_IMAGE } from "config";
 
 interface Props {
-  address?: string;
   asAvatar?: boolean;
+  address?: string;
   name: string;
-  image: string;
   size?: "tiny" | "small" | "medium" | "large";
-  margin?: number;
   style?: any;
   symbol?: string;
   amount?: string;
 }
 
 export function Token({
+  asAvatar = false,
   address = "",
   name,
   size = "small",
-  image,
-  margin = 0,
-  asAvatar = false,
   symbol = "",
   amount = "",
   ...rest
 }: Props) {
-  let tokenImage = PLACEHOLDER_TOKEN_IMAGE;
+  const tokenImage = PLACEHOLDER_TOKEN_IMAGE;
   const tokenImageSize = {
     tiny: 16,
     small: 20,
@@ -32,19 +28,6 @@ export function Token({
     large: 36,
   }[size];
   const fontSize = size === "tiny" || size === "small" ? 16 : 24;
-
-  try {
-    // First, do we have it locally?
-    tokenImage = require(`images/${image.toLowerCase()}.png`).default;
-  } catch {
-    if (address) {
-      try {
-        // Next, do they have it on 1inch?
-        // tokenImage = `https://tokens.1inch.exchange/${address.toLowerCase()}.png`;
-      } catch {}
-    }
-  }
-
   const Component = asAvatar ? Avatar : "img";
 
   return (
@@ -61,7 +44,6 @@ export function Token({
         style={{
           width: tokenImageSize,
           height: tokenImageSize,
-          marginRight: margin,
         }}
       />
       {symbol && (

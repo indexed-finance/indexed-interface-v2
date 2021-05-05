@@ -54,7 +54,6 @@ export function IndexPoolInteractionBar({
         Interact with{" "}
         <Token
           name={indexPool.name}
-          image=""
           address={indexPool.id}
           symbol={indexPool.symbol}
         />

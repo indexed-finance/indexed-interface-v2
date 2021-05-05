@@ -72,7 +72,6 @@ export function PortfolioWidget(props: FormattedPortfolioAsset) {
         <Space direction="vertical" style={{ marginRight: 24 }}>
           <Token
             name={props.name}
-            image={props.image}
             symbol={props.symbol}
             amount={props.balance}
             size="small"

@@ -228,7 +228,6 @@ export function TokenSelector({
                   <>
                     <Token
                       name=""
-                      image={value.token}
                       size="small"
                       address={tokenLookup[value.token]?.id ?? ""}
                     />

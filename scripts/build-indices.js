@@ -47,8 +47,6 @@ const createIndex = (directory) => {
 const removeBadIndices = () =>
   [
     "images",
-    "images/connectors",
-    "images/karate_files",
     "i18n",
     "theme",
     "theme/fonts",

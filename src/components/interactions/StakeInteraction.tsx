@@ -57,7 +57,6 @@ export function StakeInteraction({ indexPool }: Props) {
                     name="NDX"
                     amount="0.00"
                     address={NDX_ADDRESS}
-                    image=""
                     symbol="NDX / Day"
                     size="tiny"
                   />
@@ -101,7 +100,6 @@ export function StakeInteraction({ indexPool }: Props) {
               name="NDX"
               amount="0.00"
               address={NDX_ADDRESS}
-              image=""
               symbol="NDX"
               size="tiny"
             />
@@ -126,7 +124,6 @@ export function StakeInteraction({ indexPool }: Props) {
             name={indexPool.name}
             amount="0.00"
             address={indexPool.id}
-            image=""
             symbol={indexPool.symbol}
             size="tiny"
           />
@@ -148,7 +145,6 @@ export function StakeInteraction({ indexPool }: Props) {
               name="NDX"
               amount="0.00"
               address={NDX_ADDRESS}
-              image=""
               symbol="NDX / Day"
               size="tiny"
             />
@@ -203,7 +199,6 @@ export function StakeInteraction({ indexPool }: Props) {
             name={indexPool.name}
             amount="1770.00"
             address={indexPool.id}
-            image=""
             symbol={indexPool.symbol}
             size="tiny"
           />
@@ -224,7 +219,6 @@ export function StakeInteraction({ indexPool }: Props) {
             name="NDX"
             amount="120.59"
             address={NDX_ADDRESS}
-            image=""
             symbol="NDX"
             size="tiny"
           />
@@ -245,7 +239,6 @@ export function StakeInteraction({ indexPool }: Props) {
             name="NDX"
             amount="1200.00"
             address={NDX_ADDRESS}
-            image=""
             symbol="NDX"
             size="tiny"
           />
