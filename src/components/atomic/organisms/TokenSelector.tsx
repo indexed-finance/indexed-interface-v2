@@ -10,10 +10,17 @@ import {
   Space,
   Typography,
 } from "antd";
+import {
+  ReactNode,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { SelectableToken } from "components/atomic/molecules";
 import { Token } from "components/atomic/atoms";
 import { useBreakpoints, useTranslator } from "hooks";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useFormikContext } from "formik";
 import { useSelector } from "react-redux";
 
@@ -30,7 +37,7 @@ type Asset = {
 interface Props {
   max?: number | undefined;
   showBalance?: boolean;
-  label?: string;
+  label?: ReactNode;
   assets: Asset[];
   value?: TokenSelectorValue;
   selectable?: boolean;
@@ -52,8 +59,8 @@ export function TokenSelector({
   onChange,
 }: Props) {
   const tx = useTranslator();
-  const tokenField = `${label.toLowerCase()} Token`;
-  const amountField = `${label.toLowerCase()} Amount`;
+  const tokenField = `${label} Token`;
+  const amountField = `${label} Amount`;
   const { setTouched } = useFormikContext<any>();
   const [amount, setAmount] = useState(value?.amount ?? 0);
   const [token, setToken] = useState(value?.token ?? "");
@@ -232,7 +239,7 @@ export function TokenSelector({
                       size="small"
                       address={tokenLookup[value.token]?.id ?? ""}
                     />
-                    {value.token}
+                    {selectable && value.token}
                   </>
                 ) : (
                   <div className="fancy" style={{ fontSize: 12 }}>

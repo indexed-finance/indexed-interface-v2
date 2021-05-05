@@ -4,5 +4,6 @@
 export * from './ErrorBoundary';
 export * from './ExternalLink';
 export * from './Flipper';
+export * from './Label';
 export * from './Progress';
 export * from './Token';

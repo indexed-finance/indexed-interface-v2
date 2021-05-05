@@ -114,12 +114,13 @@ export function InteractionDrawer({
       bodyStyle={{
         padding: 0,
         overflow: "hidden",
+        borderRadius: 25,
       }}
       contentWrapperStyle={{
         borderTop: "1px solid rgba(255, 255, 255, 0.35)",
         borderRight: "1px solid rgba(255, 255, 255, 0.15)",
         borderLeft: "1px solid rgba(255, 255, 255, 0.15)",
-        maxWidth: 1100,
+        maxWidth: 1200,
         width: isMobile ? "96vw" : "80vw",
         overflow: "hidden",
       }}

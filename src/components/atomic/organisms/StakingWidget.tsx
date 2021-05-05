@@ -3,14 +3,13 @@ import { Badge, Button, Space, Statistic } from "antd";
 import { FaTractor } from "react-icons/fa";
 import { Widget } from "./Widget";
 import { convert } from "helpers";
+import { useHistory } from "react-router-dom";
 import {
-  useBreakpoints,
   usePoolDetailRegistrar,
   useStakingApy,
   useStakingTokenPrice,
   useTranslator,
 } from "hooks";
-import { useHistory } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 export function StakingWidget(props: FormattedStakingData) {
