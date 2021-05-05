@@ -1,5 +1,6 @@
+import { BiCoin } from "react-icons/bi";
 import { Button, Divider, Space, Typography } from "antd";
-import { FaCoins, FaFireAlt, FaHammer, FaTractor } from "react-icons/fa";
+import { FaCoins, FaFireAlt, FaTractor } from "react-icons/fa";
 import { FormattedIndexPool } from "features";
 import { Token } from "components/atomic";
 import { useInteractionDrawer } from "components/drawers";
@@ -19,7 +20,7 @@ export function useIndexPoolInteractions(indexPoolAddress: string) {
       },
       {
         title: "Mint",
-        icon: <FaHammer />,
+        icon: <BiCoin />,
         onClick: () => open("mint"),
       },
       {

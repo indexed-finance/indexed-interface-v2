@@ -1,4 +1,5 @@
 import { AppState, selectors } from "features";
+import { BiCoin } from "react-icons/bi";
 import {
   BurnInteraction,
   MintInteraction,
@@ -6,7 +7,7 @@ import {
   TradeInteraction,
 } from "components/interactions";
 import { Card, Col, Drawer, Menu, Row, Typography } from "antd";
-import { FaCoins, FaFireAlt, FaHammer, FaTractor } from "react-icons/fa";
+import { FaCoins, FaFireAlt, FaTractor } from "react-icons/fa";
 import { useBreakpoints, useStakingApy } from "hooks";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useDrawer } from "./Drawer";
@@ -176,7 +177,7 @@ export function InteractionDrawer({
                   fontSize: 16,
                 }}
               >
-                <FaHammer />
+                <BiCoin />
                 <span>Single</span>
               </Menu.Item>
               <Menu.Item
@@ -190,11 +191,11 @@ export function InteractionDrawer({
                 }}
               >
                 <div>
-                  <FaHammer />
-                  <FaHammer
+                  <BiCoin />
+                  <BiCoin
                     style={{ position: "relative", left: -8, opacity: 0.6 }}
                   />
-                  <FaHammer
+                  <BiCoin
                     style={{ position: "relative", left: -16, opacity: 0.3 }}
                   />
                 </div>

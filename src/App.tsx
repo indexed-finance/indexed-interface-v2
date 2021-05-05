@@ -7,7 +7,9 @@ import {
   Navigation,
   Page,
   SocialMediaList,
+  TooltipProvider,
   TransactionList,
+  useTooltips,
 } from "components";
 import { FEATURE_FLAGS } from "feature-flags";
 import { Layout, message, notification } from "antd";
@@ -29,9 +31,11 @@ export function App() {
       <Provider store={store}>
         <ErrorBoundary>
           <Web3ReactProvider getLibrary={getLibrary}>
-            <DrawerProvider>
-              <AppLayout />
-            </DrawerProvider>
+            <TooltipProvider>
+              <DrawerProvider>
+                <AppLayout />
+              </DrawerProvider>
+            </TooltipProvider>
           </Web3ReactProvider>
         </ErrorBoundary>
       </Provider>
@@ -40,6 +44,7 @@ export function App() {
 }
 
 export function AppLayout() {
+  const { scan } = useTooltips();
   const { pathname } = useLocation();
   const previousLocation = useRef(pathname);
   const { isMobile } = useBreakpoints();
@@ -103,6 +108,7 @@ export function AppLayout() {
   useEffect(() => {
     if (pathname !== previousLocation.current) {
       previousLocation.current = pathname;
+      scan();
     }
   });
 

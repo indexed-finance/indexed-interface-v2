@@ -30,12 +30,14 @@ export function PortfolioWidget(props: FormattedPortfolioAsset) {
       priceChange={isNdx ? "" : formattedIndexPool?.netChangePercent ?? ""}
       stats={
         <Space direction="vertical">
-          <Statistic
-            title={tx("EARNED")}
-            style={{ fontSize: isMobile ? 16 : 24 }}
-            valueStyle={{ fontSize: isMobile ? 16 : 24 }}
-            value={`${props.ndxEarned} NDX`}
-          />
+          <div data-tooltip="portfolio-widget-earned">
+            <Statistic
+              title={tx("EARNED")}
+              style={{ fontSize: isMobile ? 16 : 24 }}
+              valueStyle={{ fontSize: isMobile ? 16 : 24 }}
+              value={`${props.ndxEarned} NDX`}
+            />
+          </div>
           {props.hasStakingPool && (
             <Statistic
               style={{ fontSize: isMobile ? 16 : 24 }}

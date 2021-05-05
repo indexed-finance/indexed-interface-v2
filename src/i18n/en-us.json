@@ -103,6 +103,7 @@
   "THERE_WAS_A_PROBLEM_LOADING_DATA_FROM_COINGECKO": "There was a problem loading data from CoinGecko.",
   "TIMEFRAME": "Timeframe",
   "TO": "To",
+  "TOOLTIP:_PORTFOLIO-WIDGET-EARNED": "Foo bar baz.",
   "TOTAL_SWAP_FEES_IN_USD": "Total swap fees (in USD)",
   "TOTAL_SWAP_VOLUME_IN_USD": "Total swap volume (in USD)",
   "TOTAL_VALUE": "Portfolio value",
