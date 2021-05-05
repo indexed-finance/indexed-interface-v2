@@ -1,13 +1,12 @@
 import { Avatar, Space } from "antd";
-import { PLACEHOLDER_TOKEN_IMAGE } from "config";
 
 interface Props {
+  symbol: string;
   asAvatar?: boolean;
   address?: string;
   name: string;
   size?: "tiny" | "small" | "medium" | "large";
   style?: any;
-  symbol?: string;
   amount?: string;
 }
 
@@ -16,11 +15,10 @@ export function Token({
   address = "",
   name,
   size = "small",
-  symbol = "",
+  symbol,
   amount = "",
   ...rest
 }: Props) {
-  const tokenImage = PLACEHOLDER_TOKEN_IMAGE;
   const tokenImageSize = {
     tiny: 16,
     small: 20,
@@ -30,6 +28,14 @@ export function Token({
   const fontSize = size === "tiny" || size === "small" ? 16 : 24;
   const Component = asAvatar ? Avatar : "img";
 
+  let image = "";
+
+  try {
+    image = require(`images/${symbol.toLowerCase()}.png`).default;
+  } catch {
+    console.log(`Token ${symbol} is missing a .png image.`);
+  }
+
   return (
     <Space size="small" style={rest.style}>
       {amount && (
@@ -37,16 +43,19 @@ export function Token({
           {amount}
         </Space>
       )}
-      <Component
-        alt={symbol}
-        src={tokenImage}
-        {...rest}
-        style={{
-          width: tokenImageSize,
-          height: tokenImageSize,
-        }}
-      />
-      {symbol && (
+      {image && (
+        <Component
+          alt={symbol}
+          src={image}
+          {...rest}
+          style={{
+            width: tokenImageSize,
+            height: tokenImageSize,
+          }}
+        />
+      )}
+
+      {symbol && !asAvatar && (
         <Space size="small" style={{ fontSize }}>
           {symbol}
         </Space>

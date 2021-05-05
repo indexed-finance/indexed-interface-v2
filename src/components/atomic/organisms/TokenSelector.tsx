@@ -227,7 +227,8 @@ export function TokenSelector({
                 {value.token ? (
                   <>
                     <Token
-                      name=""
+                      name={value.token}
+                      symbol={value.token}
                       size="small"
                       address={tokenLookup[value.token]?.id ?? ""}
                     />

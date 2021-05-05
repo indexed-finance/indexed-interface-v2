@@ -32,7 +32,7 @@ export function TokenExchangeRate({ baseline, comparison, fee, rate }: Props) {
                 <Space style={{ marginRight: 8 }}>
                   1
                   <div style={{ position: "relative", top: -3, right: 0 }}>
-                    <Token name={baseline} size="tiny" />
+                    <Token name={baseline} symbol={baseline} size="tiny" />
                   </div>
                   {baseline}
                 </Space>
@@ -40,7 +40,7 @@ export function TokenExchangeRate({ baseline, comparison, fee, rate }: Props) {
                 <Space style={{ marginLeft: 8 }}>
                   {converted}
                   <div style={{ position: "relative", top: -3, right: 0 }}>
-                    <Token name={baseline} size="tiny" />
+                    <Token name={baseline} symbol={baseline} size="tiny" />
                   </div>
                   {comparison}
                 </Space>
@@ -55,7 +55,7 @@ export function TokenExchangeRate({ baseline, comparison, fee, rate }: Props) {
               <Space>
                 {node}
                 <div style={{ position: "relative", top: -3, right: 0 }}>
-                  <Token name={comparison} size="tiny" />
+                  <Token name={comparison} symbol={comparison} size="tiny" />
                 </div>
                 {comparison}
               </Space>

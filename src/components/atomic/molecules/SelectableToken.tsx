@@ -21,7 +21,7 @@ export function SelectableToken({ asset, onClick }: Props) {
       style={{ padding: "1rem" }}
     >
       <Item.Meta
-        avatar={<Token name={asset.symbol} />}
+        avatar={<Token symbol={asset.symbol} name={asset.symbol} />}
         title={asset.symbol}
         description={asset.name}
       />
