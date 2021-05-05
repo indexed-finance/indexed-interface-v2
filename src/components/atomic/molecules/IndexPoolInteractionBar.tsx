@@ -4,12 +4,14 @@ import { FormattedIndexPool } from "features";
 import { Token } from "components/atomic";
 import { useInteractionDrawer } from "components/drawers";
 import { useMemo } from "react";
+import { useStakingApy } from "hooks";
 
 export function useIndexPoolInteractions(indexPoolAddress: string) {
   const { open } = useInteractionDrawer(indexPoolAddress);
+  const stakingApy = useStakingApy(indexPoolAddress);
 
-  return useMemo(
-    () => [
+  return useMemo(() => {
+    const baseInteractions = [
       {
         title: "Trade",
         icon: <FaCoins />,
@@ -25,14 +27,18 @@ export function useIndexPoolInteractions(indexPoolAddress: string) {
         icon: <FaFireAlt />,
         onClick: () => open("burn"),
       },
-      {
+    ];
+
+    if (stakingApy && stakingApy !== "Expired") {
+      baseInteractions.push({
         title: "Stake",
         icon: <FaTractor />,
         onClick: () => open("stake"),
-      },
-    ],
-    [open]
-  );
+      });
+    }
+
+    return baseInteractions;
+  }, [open, stakingApy]);
 }
 
 export function IndexPoolInteractionBar({

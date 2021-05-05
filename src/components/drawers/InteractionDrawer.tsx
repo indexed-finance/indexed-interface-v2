@@ -7,7 +7,7 @@ import {
 } from "components/interactions";
 import { Card, Col, Drawer, Menu, Row, Typography } from "antd";
 import { FaCoins, FaFireAlt, FaHammer, FaTractor } from "react-icons/fa";
-import { useBreakpoints } from "hooks";
+import { useBreakpoints, useStakingApy } from "hooks";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useDrawer } from "./Drawer";
 import { useLocation } from "react-router-dom";
@@ -102,6 +102,7 @@ export function InteractionDrawer({
       return ["stake"];
     }
   }, [activeInteraction]);
+  const stakingApy = useStakingApy(indexPoolAddress);
 
   useEffect(() => {
     if (pathname !== previousLocation.current) {
@@ -281,20 +282,24 @@ export function InteractionDrawer({
                 <span>Uniswap</span>
               </Menu.Item>
             </Menu.SubMenu>
-            <Menu.Divider />{" "}
-            <Menu.Item
-              key="stake"
-              icon={<FaTractor />}
-              onClick={() => open("stake")}
-              disabled={false}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-              }}
-            >
-              Stake
-            </Menu.Item>
+            {stakingApy && stakingApy !== "Expired" && (
+              <>
+                <Menu.Divider />{" "}
+                <Menu.Item
+                  key="stake"
+                  icon={<FaTractor />}
+                  onClick={() => open("stake")}
+                  disabled={false}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  Stake
+                </Menu.Item>
+              </>
+            )}
           </Menu>
         </Col>
         <Col span={18}>

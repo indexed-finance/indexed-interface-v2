@@ -38,6 +38,7 @@ export function StakeInteraction({ indexPool }: Props) {
                 }}
                 selectable={false}
                 showBalance={false}
+                autoFocus={true}
               />
             </div>
 

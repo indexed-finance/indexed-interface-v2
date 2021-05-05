@@ -13,7 +13,7 @@ import {
 import { IndexPoolInteraction, useInteractionDrawer } from "components/drawers";
 import { useEffect } from "react";
 import { useParams } from "react-router";
-import { usePoolDetailRegistrar, useQuery } from "hooks";
+import { usePoolDetailRegistrar, useQuery, useStakingApy } from "hooks";
 import { useSelector } from "react-redux";
 
 export default function IndexPool() {
@@ -29,14 +29,22 @@ export default function IndexPool() {
   );
   const query = useQuery();
   const { open: openInteraction } = useInteractionDrawer(poolId ?? "");
+  const stakingApy = useStakingApy(poolId ?? "");
 
   usePoolDetailRegistrar(poolId ?? "", tokenIds);
 
   useEffect(() => {
     const interaction = query.get("interaction");
 
-    if (interaction) {
+    if (interaction && indexPool) {
       openInteraction(interaction as IndexPoolInteraction);
+
+      if (
+        interaction !== "stake" ||
+        (interaction === "stake" && stakingApy && stakingApy !== "Expired")
+      ) {
+        openInteraction(interaction as IndexPoolInteraction);
+      }
     }
     // eslint-disable-next-line
   }, []);

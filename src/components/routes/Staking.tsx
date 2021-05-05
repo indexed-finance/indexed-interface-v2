@@ -1,4 +1,4 @@
-import { Card, Space, Typography } from "antd";
+import { Alert, Card, Space, Typography } from "antd";
 import { Page, StakingWidget } from "components/atomic";
 import { selectors } from "features";
 import { useSelector } from "react-redux";
@@ -13,36 +13,44 @@ export default function Stake() {
   useStakingRegistrar();
 
   return (
-    <Page
-      hasPageHeader={true}
-      title={tx("LIQUIDITY_MINING")}
-      subtitle={tx("STAKE_INDEX_TOKENS_...")}
-    >
-      <Space direction="vertical" size="large">
-        <Card
-          title={
-            <Typography.Title level={3}>{tx("INDEX_TOKENS")}</Typography.Title>
+    <Page hasPageHeader={true} title={tx("LIQUIDITY_MINING")}>
+      <Space direction="vertical" size="large" style={{ width: "100%" }}>
+        <Alert
+          type="info"
+          message={
+            <span style={{ fontSize: 18 }}>{tx("STAKE_INDEX_TOKENS_...")}</span>
           }
-        >
-          <Space size="large" wrap={true}>
-            {indexTokens.map((stakingPool) => (
-              <StakingWidget key={stakingPool.id} {...stakingPool} />
-            ))}
-          </Space>
-        </Card>
-        <Card
-          title={
-            <Typography.Title level={3}>
-              {tx("LIQUIDITY_TOKENS")}
-            </Typography.Title>
-          }
-        >
-          <Space size="large" wrap={true}>
-            {liquidityTokens.map((stakingPool) => (
-              <StakingWidget key={stakingPool.id} {...stakingPool} />
-            ))}
-          </Space>
-        </Card>
+        />
+        {indexTokens.length > 0 && (
+          <Card
+            title={
+              <Typography.Title level={3}>
+                {tx("INDEX_TOKENS")}
+              </Typography.Title>
+            }
+          >
+            <Space size="large" wrap={true}>
+              {indexTokens.map((stakingPool) => (
+                <StakingWidget key={stakingPool.id} {...stakingPool} />
+              ))}
+            </Space>
+          </Card>
+        )}
+        {indexTokens.length > 0 && (
+          <Card
+            title={
+              <Typography.Title level={3}>
+                {tx("LIQUIDITY_TOKENS")}
+              </Typography.Title>
+            }
+          >
+            <Space size="large" wrap={true}>
+              {liquidityTokens.map((stakingPool) => (
+                <StakingWidget key={stakingPool.id} {...stakingPool} />
+              ))}
+            </Space>
+          </Card>
+        )}
       </Space>
     </Page>
   );

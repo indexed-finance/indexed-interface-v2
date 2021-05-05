@@ -4,7 +4,6 @@ import {
   DrawerProvider,
   ErrorBoundary,
   LayoutHeader,
-  Logo,
   Navigation,
   Page,
   SocialMediaList,
@@ -52,26 +51,7 @@ export function AppLayout() {
         className="with-background"
         style={{ minHeight: "100vh", paddingTop: 1 }}
       >
-        <Suspense
-          fallback={
-            <Page hasPageHeader={false}>
-              <div
-                style={{
-                  position: "absolute",
-                  top: 0,
-                  left: 0,
-                  width: "100%",
-                  height: "100%",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <Logo withTitle={false} spinning={true} />
-              </div>
-            </Page>
-          }
-        >
+        <Suspense fallback={<Page hasPageHeader={false} />}>
           {routes.map((route, index) => (
             <Route
               key={index}

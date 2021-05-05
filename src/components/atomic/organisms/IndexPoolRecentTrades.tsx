@@ -51,15 +51,13 @@ export function IndexPoolRecentTrades({
             >
               <Space style={{ width: "100%" }}>
                 <Token name="" symbol={trade.from} address={id} />
-                <Divider style={{ margin: 0 }}>
-                  <Typography.Text
-                    type={trade.kind === "buy" ? "success" : "danger"}
-                  >
-                    sold for
-                  </Typography.Text>
-                </Divider>
+                <Typography.Text
+                  type={trade.kind === "buy" ? "success" : "danger"}
+                >
+                  sold for
+                </Typography.Text>
                 <Token name="" symbol={trade.to} address={id} />
-                <Divider style={{ margin: 0 }}>{trade.when}</Divider>
+                {trade.when}
               </Space>
 
               <Typography.Text

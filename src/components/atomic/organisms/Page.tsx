@@ -9,7 +9,7 @@ interface Props {
   subtitle?: ReactNode;
   extra?: ReactNode;
   actions?: ReactNode;
-  children: ReactNode;
+  children?: ReactNode;
   hasPageHeader: boolean;
 }
 
@@ -19,7 +19,7 @@ export function Page({
   subtitle = null,
   extra = null,
   actions = null,
-  children,
+  children = null,
 }: Props) {
   const { isMobile } = useBreakpoints();
   const { goBack } = useHistory();
@@ -35,6 +35,7 @@ export function Page({
       }}
     >
       <Card
+        bordered={false}
         headStyle={{ padding: 0 }}
         bodyStyle={{
           padding: isMobile ? "24px 12px" : 24,
