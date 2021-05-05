@@ -44,6 +44,7 @@ interface Props {
   balance?: string;
   error?: string;
   reversed?: boolean;
+  autoFocus?: boolean;
   onChange?: (value: TokenSelectorValue) => void;
 }
 
@@ -56,6 +57,7 @@ export function TokenSelector({
   reversed = false,
   max,
   error = "",
+  autoFocus = false,
   onChange,
 }: Props) {
   const tx = useTranslator();
@@ -202,6 +204,7 @@ export function TokenSelector({
               </>
             )}
             <InputNumber
+              autoFocus={autoFocus}
               bordered={false}
               ref={input}
               min={0}

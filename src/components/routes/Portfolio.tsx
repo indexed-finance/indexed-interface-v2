@@ -12,7 +12,7 @@ export default function Portfolio() {
   const data = useMemo(() => [ndx, ...tokens], [ndx, tokens]);
 
   useEffect(() => {
-    setTimeout(() => dispatch(actions.sendBatch()), 1000);
+    setTimeout(() => dispatch(actions.sendBatch()), 200);
   }, [dispatch]);
 
   return (

@@ -8,8 +8,9 @@ import {
 import { Card, Col, Drawer, Menu, Row, Typography } from "antd";
 import { FaCoins, FaFireAlt, FaHammer, FaTractor } from "react-icons/fa";
 import { useBreakpoints } from "hooks";
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useDrawer } from "./Drawer";
+import { useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import S from "string";
 
@@ -46,6 +47,8 @@ export function InteractionDrawer({
   indexPoolAddress: string;
   activeInteraction: IndexPoolInteraction;
 }) {
+  const { pathname } = useLocation();
+  const previousLocation = useRef(pathname);
   const { isMobile } = useBreakpoints();
   const { active, close } = useDrawer();
   const { open } = useInteractionDrawer(indexPoolAddress);
@@ -100,6 +103,13 @@ export function InteractionDrawer({
     }
   }, [activeInteraction]);
 
+  useEffect(() => {
+    if (pathname !== previousLocation.current) {
+      previousLocation.current = pathname;
+      close();
+    }
+  });
+
   return (
     <Drawer
       mask={false}
@@ -124,7 +134,7 @@ export function InteractionDrawer({
         width: isMobile ? "96vw" : "80vw",
         overflow: "hidden",
       }}
-      height={326}
+      height={333}
     >
       <Row gutter={0} align="stretch">
         <Col span={6}>

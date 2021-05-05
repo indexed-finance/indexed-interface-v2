@@ -16,6 +16,7 @@ export * from './use-breakpoints';
 export * from './use-call-registrar';
 export * from './use-history-change-callback';
 export * from './use-previous';
+export * from './use-query';
 export * from './use-scroll-prevention';
 export * from './use-storage-entry';
 export * from './use-wallet-connection';

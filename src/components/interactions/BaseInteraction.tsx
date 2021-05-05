@@ -204,6 +204,7 @@ function SingleInteractionInner({
       <Col span={12}>
         {/* // Fields */}
         <TokenSelector
+          autoFocus={true}
           label={tx("FROM")}
           assets={inputOptions}
           value={{

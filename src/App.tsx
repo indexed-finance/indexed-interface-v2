@@ -1,4 +1,4 @@
-import { BrowserRouter, Route } from "react-router-dom";
+import { BrowserRouter, Route, useLocation } from "react-router-dom";
 import {
   DEBUG,
   DrawerProvider,
@@ -13,7 +13,7 @@ import {
 import { FEATURE_FLAGS } from "feature-flags";
 import { Layout, message, notification } from "antd";
 import { Provider } from "react-redux";
-import { Suspense, useEffect } from "react";
+import { Suspense, useEffect, useRef } from "react";
 import { Web3ReactProvider } from "@web3-react/core";
 import { ethers } from "ethers";
 import { routes } from "routes";
@@ -41,6 +41,8 @@ export function App() {
 }
 
 export function AppLayout() {
+  const { pathname } = useLocation();
+  const previousLocation = useRef(pathname);
   const { isMobile } = useBreakpoints();
   const inner = (
     <>
@@ -117,6 +119,12 @@ export function AppLayout() {
       duration: 4.2,
     });
   }, [isMobile]);
+
+  useEffect(() => {
+    if (pathname !== previousLocation.current) {
+      previousLocation.current = pathname;
+    }
+  });
 
   return inner;
 }

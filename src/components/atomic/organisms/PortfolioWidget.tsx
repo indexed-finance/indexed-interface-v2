@@ -1,9 +1,9 @@
 import { AppState, FormattedPortfolioAsset, selectors } from "features";
 import { Button, Space, Statistic, Typography } from "antd";
+import { Link, useHistory } from "react-router-dom";
 import { Progress, Token } from "components/atomic";
 import { Widget } from "./Widget";
 import { useBreakpoints, usePoolDetailRegistrar, useTranslator } from "hooks";
-import { useHistory } from "react-router-dom";
 import { useSelector } from "react-redux";
 import noop from "lodash.noop";
 
@@ -52,8 +52,12 @@ export function PortfolioWidget(props: FormattedPortfolioAsset) {
       }
       actions={
         isNdx ? null : (
-          <Button type="primary">
-            {parseFloat(props.balance) > 0 ? "Buy more" : "Buy"}
+          <Button type="primary" onClick={(event) => event.stopPropagation()}>
+            {formattedIndexPool && (
+              <Link to={`${formattedIndexPool.slug}?interaction=trade`}>
+                {parseFloat(props.balance) > 0 ? "Buy more" : "Buy"}
+              </Link>
+            )}
           </Button>
         )
       }

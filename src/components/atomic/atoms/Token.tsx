@@ -32,9 +32,7 @@ export function Token({
 
   try {
     image = require(`images/${symbol.toLowerCase()}.png`).default;
-  } catch {
-    console.log(`Token ${symbol} is missing a .png image.`);
-  }
+  } catch {}
 
   return (
     <Space size="small" style={rest.style}>

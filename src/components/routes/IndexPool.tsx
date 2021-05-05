@@ -10,8 +10,10 @@ import {
   IndexPoolRecentTrades,
   Page,
 } from "components/atomic";
+import { IndexPoolInteraction, useInteractionDrawer } from "components/drawers";
+import { useEffect } from "react";
 import { useParams } from "react-router";
-import { usePoolDetailRegistrar } from "hooks";
+import { usePoolDetailRegistrar, useQuery } from "hooks";
 import { useSelector } from "react-redux";
 
 export default function IndexPool() {
@@ -25,8 +27,19 @@ export default function IndexPool() {
   const tokenIds = useSelector((state: AppState) =>
     poolId ? selectors.selectPoolTokenIds(state, poolId) : []
   );
+  const query = useQuery();
+  const { open: openInteraction } = useInteractionDrawer(poolId ?? "");
 
   usePoolDetailRegistrar(poolId ?? "", tokenIds);
+
+  useEffect(() => {
+    const interaction = query.get("interaction");
+
+    if (interaction) {
+      openInteraction(interaction as IndexPoolInteraction);
+    }
+    // eslint-disable-next-line
+  }, []);
 
   return (
     <Page

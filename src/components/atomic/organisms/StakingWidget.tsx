@@ -1,9 +1,9 @@
 import { AppState, FormattedStakingData, selectors } from "features";
 import { Badge, Button, Space, Statistic } from "antd";
 import { FaTractor } from "react-icons/fa";
+import { Link, useHistory } from "react-router-dom";
 import { Widget } from "./Widget";
 import { convert } from "helpers";
-import { useHistory } from "react-router-dom";
 import {
   usePoolDetailRegistrar,
   useStakingApy,
@@ -64,11 +64,16 @@ export function StakingWidget(props: FormattedStakingData) {
           type={isExpired ? "ghost" : "primary"}
           disabled={isExpired}
           size="large"
+          onClick={(event) => event.stopPropagation()}
         >
-          <Space>
-            <FaTractor style={{ position: "relative", top: 2 }} />
-            <span>{isExpired ? tx("STAKING_EXPIRED") : tx("STAKE")}</span>
-          </Space>
+          {formattedIndexPool && (
+            <Link to={`${formattedIndexPool.slug}?interaction=stake`}>
+              <Space>
+                <FaTractor style={{ position: "relative", top: 2 }} />
+                <span>{isExpired ? tx("STAKING_EXPIRED") : tx("STAKE")}</span>
+              </Space>
+            </Link>
+          )}
         </Button>
       }
     />
