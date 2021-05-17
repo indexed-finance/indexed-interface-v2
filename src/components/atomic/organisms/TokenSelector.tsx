@@ -220,7 +220,6 @@ export function TokenSelector({
               style={{
                 width: isMobile ? 120 : 200,
                 fontSize: 22,
-                border: `1px solid ${error ? "#A61C23" : "transparent"}`,
                 flex: reversed ? 1 : 0,
               }}
             />
@@ -242,7 +241,7 @@ export function TokenSelector({
                       size="small"
                       address={tokenLookup[value.token]?.id ?? ""}
                     />
-                    {selectable && value.token}
+                    {/* {selectable && value.token} */}
                   </>
                 ) : (
                   <div className="fancy" style={{ fontSize: 12 }}>

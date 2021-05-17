@@ -6,7 +6,6 @@ import {
   useMemo,
 } from "react";
 import { noop } from "lodash";
-import ReactDOM from "react-dom";
 
 interface TooltipContextInterface {
   scan(): void;
@@ -27,7 +26,7 @@ export function TooltipProvider({ children }: { children: ReactNode }) {
     );
 
     for (const tooltip of withTooltips) {
-      // Fix me later.
+      console.log(tooltip);
     }
   }, []);
   const value = useMemo(

@@ -1,5 +1,5 @@
 import * as yup from "yup";
-import { Alert, Button, Col, Divider, Row } from "antd";
+import { Alert, Button, Col, Divider, Row, Space } from "antd";
 import { Flipper, TokenSelector } from "components/atomic";
 import { Formik, FormikProps, useFormikContext } from "formik";
 import {
@@ -378,7 +378,7 @@ export function MultiInteraction({
 type InnerMultiProps = Omit<MultiProps, "title"> &
   FormikProps<MultiInteractionValues>;
 
-function MultiInteractionInner({ spender, assets }: InnerMultiProps) {
+function MultiInteractionInner({ spender, assets, requiresApproval, isValid, handleSubmit }: InnerMultiProps) {
   const tx = useTranslator();
   const tokenLookup = useSelector(selectors.selectTokenLookup);
   const { values, setFieldValue } = useFormikContext<MultiInteractionValues>();
@@ -403,6 +403,34 @@ function MultiInteractionInner({ spender, assets }: InnerMultiProps) {
   );
   const [lookup, setLookup] = useState<Record<string, number>>({});
   const { calculateAmountsIn } = useMultiTokenMintCallbacks(spender);
+  const { tokenId, symbol, approveAmount, rawApproveAmount } = useMemo(() => {
+    if (values.fromToken && values.fromAmount) {
+      const tokenIn = tokenLookup[values.fromToken.toLowerCase()];
+      if (tokenIn) {
+        return {
+          tokenId: tokenIn.id,
+          symbol: values.fromToken.toLowerCase(),
+          approveAmount: values.fromAmount.toString(),
+          rawApproveAmount: convert
+            .toToken(values.fromAmount.toString(), tokenIn.decimals)
+            .toString(10),
+        };
+      }
+    }
+    return {
+      tokenId: "",
+      symbol: "",
+      approveAmount: "0",
+      rawApproveAmount: "0",
+    };
+  }, [values.fromAmount, values.fromToken, tokenLookup]);
+  const { status, approve } = useTokenApproval({
+    spender,
+    tokenId,
+    amount: approveAmount,
+    rawAmount: rawApproveAmount,
+    symbol,
+  });
 
   // Effect:
   // When the form changes, re-calculate what goes into each field.
@@ -423,6 +451,7 @@ function MultiInteractionInner({ spender, assets }: InnerMultiProps) {
   return (
     <Row gutter={12}>
       <Col span={12}>
+        <Space direction="vertical">
         <TokenSelector
           assets={[]}
           label={tx("FROM")}
@@ -430,6 +459,27 @@ function MultiInteractionInner({ spender, assets }: InnerMultiProps) {
           value={tokenValue}
           onChange={handleChange}
         />
+        <Divider />
+        {requiresApproval && status === "approval needed" ? (
+          <Button
+            type="primary"
+            style={{ width: "100%" }}
+            disabled={!isValid}
+            onClick={approve}
+          >
+            Approve
+          </Button>
+        ) : (
+          <Button
+            type="primary"
+            style={{ width: "100%" }}
+            disabled={!isValid || (requiresApproval && status === "unknown")}
+            onClick={() => handleSubmit()}
+          >
+            Send
+          </Button>
+        )}
+        </Space>
       </Col>
       <Col span={12}>
         <div style={{ maxHeight: 500, overflow: "auto" }}>
