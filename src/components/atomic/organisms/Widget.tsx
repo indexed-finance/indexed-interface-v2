@@ -1,4 +1,4 @@
-import { Card, Col, Divider, Row, Space, Typography } from "antd";
+import { Card, Col, Divider, Row, Typography } from "antd";
 import { HTMLProps, ReactNode } from "react";
 import { Quote } from "components/atomic/molecules";
 import { Token } from "components/atomic/atoms";
@@ -17,11 +17,7 @@ interface Props extends HTMLProps<HTMLDivElement> {
 }
 
 export function WidgetGroup({ children }: { children: ReactNode }) {
-  return (
-    <Space size="large" wrap={true}>
-      {children}
-    </Space>
-  );
+  return <div className="fake-flex-gap">{children}</div>;
 }
 
 export function Widget({
@@ -90,8 +86,8 @@ export function Widget({
           <>
             <Divider style={{ marginTop: 0, marginBottom: 12 }} />
             <Row align="bottom">
-              <Col span={12}>{stats}</Col>
-              <Col span={12} style={{ textAlign: "right" }}>
+              <Col span={18}>{stats}</Col>
+              <Col span={6} style={{ textAlign: "right" }}>
                 {actions}
               </Col>
             </Row>

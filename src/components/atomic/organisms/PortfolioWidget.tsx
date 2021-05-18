@@ -23,7 +23,6 @@ export function PortfolioWidget(props: FormattedPortfolioAsset) {
 
   return (
     <Widget
-      width={isMobile ? 280 : 380}
       symbol={props.symbol}
       address={props.address}
       price={isNdx ? "" : formattedIndexPool?.priceUsd ?? ""}
@@ -33,15 +32,15 @@ export function PortfolioWidget(props: FormattedPortfolioAsset) {
           <div data-tooltip="portfolio-widget-earned">
             <Statistic
               title={tx("EARNED")}
-              style={{ fontSize: isMobile ? 16 : 24 }}
-              valueStyle={{ fontSize: isMobile ? 16 : 24 }}
+              style={{ fontSize: isMobile ? 16 : 20 }}
+              valueStyle={{ fontSize: isMobile ? 16 : 20 }}
               value={`${props.ndxEarned} NDX`}
             />
           </div>
           {props.hasStakingPool && (
             <Statistic
-              style={{ fontSize: isMobile ? 16 : 24 }}
-              valueStyle={{ fontSize: isMobile ? 16 : 24 }}
+              style={{ fontSize: isMobile ? 16 : 20 }}
+              valueStyle={{ fontSize: isMobile ? 16 : 20 }}
               title={tx("STAKED")}
               value={
                 props.staking

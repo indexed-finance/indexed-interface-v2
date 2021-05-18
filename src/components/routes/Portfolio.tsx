@@ -1,4 +1,4 @@
-import { Page, PortfolioWidget } from "components/atomic";
+import { Page, PortfolioWidget, WidgetGroup } from "components/atomic";
 import { Space, Typography } from "antd";
 import { useMemo } from "react";
 import { usePortfolioData, useTranslator } from "hooks";
@@ -29,11 +29,11 @@ export default function Portfolio() {
         </Space>
       }
     >
-      <Space size="large" wrap={true} align="end">
+      <WidgetGroup>
         {data.map((heldAsset) => (
           <PortfolioWidget key={heldAsset.address} {...heldAsset} />
         ))}
-      </Space>
+      </WidgetGroup>
     </Page>
   );
 }

@@ -45,7 +45,7 @@ export function LineSeriesChart({
 
       const options = (CHART_MODES as any)[theme];
       const lineSeries = chart_.addLineSeries({
-        color: "#FC2FCE",
+        color: "#49ffff",
       });
 
       chart_.applyOptions(options as any);

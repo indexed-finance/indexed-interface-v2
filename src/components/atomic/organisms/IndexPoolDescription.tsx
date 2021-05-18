@@ -13,7 +13,7 @@ export function IndexPoolDescription({ id, name, symbol }: FormattedIndexPool) {
           fontSize: 14,
           paddingLeft: 24,
           display: "block",
-          borderLeft: "2px solid #FC2FCE",
+          borderLeft: "2px solid #49ffff",
         }}
       >
         Lorem ipsum dolor sit amet, consectetur adipisicing elit. Voluptatem

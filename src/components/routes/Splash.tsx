@@ -96,6 +96,9 @@ export default function Splash() {
             )}
           </Button.Group>
         </Typography.Title>
+        <video width="1100" height="840" autoPlay={true}>
+          <source src="/splash.mp4" type="video/mp4"></source>
+        </video>
       </div>
       <Card style={{ marginTop: "2rem" }}>
         <Steps current={step} responsive={true} type="navigation">

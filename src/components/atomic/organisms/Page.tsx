@@ -47,7 +47,7 @@ export function Page({
             <PageHeader
               style={{
                 color: "white",
-                borderBottom: "1px solid rgba(252, 47, 206, 0.4)",
+                borderBottom: "1px solid #49ffff",
                 paddingBottom: 18,
                 display: "flex",
                 alignItems: "center",
