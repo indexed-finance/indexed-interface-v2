@@ -1,7 +1,7 @@
 import { AppState, FormattedIndexPool, selectors } from "features";
-import { Button, Statistic } from "antd";
+import { Button, Col, Row, Statistic } from "antd";
 import { Link, useHistory } from "react-router-dom";
-import { Widget, WidgetGroup } from "./Widget";
+import { Widget } from "./Widget";
 import { usePoolDetailRegistrar } from "hooks";
 import { useSelector } from "react-redux";
 
@@ -9,11 +9,13 @@ export function IndexPoolWidgetGroup() {
   const indexPools = useSelector(selectors.selectAllFormattedIndexPools);
 
   return (
-    <WidgetGroup>
+    <Row gutter={[20, 20]}>
       {indexPools.map((pool) => (
-        <IndexPoolWidget key={pool.id} {...pool} />
+        <Col span={8} key={pool.id}>
+          <IndexPoolWidget {...pool} />
+        </Col>
       ))}
-    </WidgetGroup>
+    </Row>
   );
 }
 

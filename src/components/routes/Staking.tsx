@@ -1,4 +1,4 @@
-import { Alert, Card, Space, Typography } from "antd";
+import { Alert, Col, Row, Space, Typography } from "antd";
 import { Page, StakingWidget } from "components/atomic";
 import { selectors } from "features";
 import { useSelector } from "react-redux";
@@ -22,34 +22,30 @@ export default function Stake() {
           }
         />
         {indexTokens.length > 0 && (
-          <Card
-            title={
-              <Typography.Title level={3}>
-                {tx("INDEX_TOKENS")}
-              </Typography.Title>
-            }
-          >
-            <Space size="large" wrap={true}>
+          <>
+            <Typography.Title level={3}>{tx("INDEX_TOKENS")}</Typography.Title>
+            <Row gutter={[20, 20]}>
               {indexTokens.map((stakingPool) => (
-                <StakingWidget key={stakingPool.id} {...stakingPool} />
+                <Col span={12} key={stakingPool.id}>
+                  <StakingWidget key={stakingPool.id} {...stakingPool} />
+                </Col>
               ))}
-            </Space>
-          </Card>
+            </Row>
+          </>
         )}
         {indexTokens.length > 0 && (
-          <Card
-            title={
-              <Typography.Title level={3}>
-                {tx("LIQUIDITY_TOKENS")}
-              </Typography.Title>
-            }
-          >
-            <Space size="large" wrap={true}>
+          <>
+            <Typography.Title level={3}>
+              {tx("LIQUIDITY_TOKENS")}
+            </Typography.Title>
+            <Row gutter={[20, 20]}>
               {liquidityTokens.map((stakingPool) => (
-                <StakingWidget key={stakingPool.id} {...stakingPool} />
+                <Col span={12} key={stakingPool.id}>
+                  <StakingWidget key={stakingPool.id} {...stakingPool} />
+                </Col>
               ))}
-            </Space>
-          </Card>
+            </Row>
+          </>
         )}
       </Space>
     </Page>

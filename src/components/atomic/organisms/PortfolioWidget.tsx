@@ -37,7 +37,7 @@ export function PortfolioWidget(props: FormattedPortfolioAsset) {
               value={`${props.ndxEarned} NDX`}
             />
           </div>
-          {props.hasStakingPool && (
+          {props.hasStakingPool ? (
             <Statistic
               style={{ fontSize: isMobile ? 16 : 20 }}
               valueStyle={{ fontSize: isMobile ? 16 : 20 }}
@@ -47,6 +47,12 @@ export function PortfolioWidget(props: FormattedPortfolioAsset) {
                   ? `${props.staking} ${props.symbol}`
                   : `0.00 ${props.symbol}`
               }
+            />
+          ) : (
+            <Statistic
+              style={{ visibility: "hidden" }}
+              title="Foo"
+              value="Bar"
             />
           )}
         </Space>

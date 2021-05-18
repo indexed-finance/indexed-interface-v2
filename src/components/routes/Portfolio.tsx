@@ -1,5 +1,5 @@
-import { Page, PortfolioWidget, WidgetGroup } from "components/atomic";
-import { Space, Typography } from "antd";
+import { Col, Row, Space, Typography } from "antd";
+import { Page, PortfolioWidget } from "components/atomic";
 import { useMemo } from "react";
 import { usePortfolioData, useTranslator } from "hooks";
 
@@ -16,8 +16,9 @@ export default function Portfolio() {
         <Space
           style={{
             width: "100%",
-            justifyContent: "flex-end",
-            margin: "0 9rem",
+            justifyContent: "space-between",
+            marginRight: "5rem",
+            padding: 12,
           }}
         >
           <Typography.Title level={3} style={{ margin: 0 }}>
@@ -29,11 +30,13 @@ export default function Portfolio() {
         </Space>
       }
     >
-      <WidgetGroup>
+      <Row gutter={[20, 20]}>
         {data.map((heldAsset) => (
-          <PortfolioWidget key={heldAsset.address} {...heldAsset} />
+          <Col span={8} key={heldAsset.address}>
+            <PortfolioWidget {...heldAsset} />
+          </Col>
         ))}
-      </WidgetGroup>
+      </Row>
     </Page>
   );
 }

@@ -34,9 +34,6 @@ export function StakingWidget(props: FormattedStakingData) {
   const { push } = useHistory();
   const inner = (
     <Widget
-      style={{
-        width: 340,
-      }}
       symbol={symbol}
       address={props.id}
       price={price ? convert.toCurrency(price) : ""}
