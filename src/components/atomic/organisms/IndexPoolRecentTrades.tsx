@@ -1,5 +1,4 @@
-import { Button, Card, Divider, List, Space, Typography } from "antd";
-import { FaCaretRight } from "react-icons/fa";
+import { Card, List, Space, Typography } from "antd";
 import { FormattedIndexPool } from "features";
 import { Token } from "components/atomic";
 
@@ -14,25 +13,9 @@ export function IndexPoolRecentTrades({
   return (
     <Card
       title={
-        <Space style={{ width: "100%", justifyContent: "space-between" }}>
-          <Typography.Title level={3} style={{ margin: 0 }}>
-            Recent Trades
-          </Typography.Title>
-          <Space>
-            <Typography.Text type="secondary">
-              <em>
-                Showing {trades.length} of {transactions.trades.length}
-              </em>
-            </Typography.Text>
-            <Divider type="vertical" />
-            <Button type="ghost" size="large">
-              <Space>
-                <span>View more </span>
-                <FaCaretRight style={{ position: "relative", top: 2 }} />
-              </Space>
-            </Button>
-          </Space>
-        </Space>
+        <Typography.Title level={3} style={{ margin: 0 }}>
+          Recent Trades
+        </Typography.Title>
       }
     >
       <List size="small" style={{ maxWidth: 580 }}>
