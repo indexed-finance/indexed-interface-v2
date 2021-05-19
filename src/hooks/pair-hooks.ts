@@ -85,12 +85,15 @@ export function useUniswapPairs(
 
   usePairDataRegistrar(pairs);
 
+  const isLoading = useMemo(() => {
+    return pairDatas.some(
+      (p) => !p || typeof p.exists === "undefined"
+    );
+  }, [ pairDatas ])
+
   return useMemo(() => {
     try {
-      const loading = pairDatas.some(
-        (p) => !p || typeof p.exists === "undefined"
-      );
-      if (provider && !loading) {
+      if (provider && !isLoading) {
         const goodPairs = (pairDatas as FormattedPair[]).filter(
           ({ exists }) => exists
         );
@@ -105,7 +108,7 @@ export function useUniswapPairs(
     } catch (error) {
       return [undefined, true];
     }
-  }, [pairDatas]);
+  }, [pairDatas, isLoading]);
 }
 
 export function useCommonUniswapPairs(
