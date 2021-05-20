@@ -97,10 +97,16 @@ export function TokenSelector({
     },
     [onChange, amount, token, value]
   );
+  const haveInsufficientBalance = useMemo(() => {
+    return isInput && (balance < (value.amount || 0))
+  }, [isInput, value.amount, balance])
+
   const onAmountChange = useCallback(
     (newAmount?: number | string | null) => {
       if (newAmount == null || Number.isNaN(amount) || amount < 0) {
+        triggerChange({ amount: 0 });
         setAmount(0);
+        setTouched({ [amountField]: true, })
         return;
       }
 
@@ -168,6 +174,11 @@ export function TokenSelector({
   // --
   useEffect(() => {
     if (value.amount) {
+      /* if (value.amount !== amount) {
+        if (isInput) {
+          
+        }
+      } */
       setAmount(value.amount);
     }
 
@@ -189,7 +200,7 @@ export function TokenSelector({
         >
           <Space direction="vertical" style={{ width: "100%" }}>
             <TokenInputDecorator
-              error={error}
+              error={haveInsufficientBalance ? 'Insufficient balance' : error}
               showBalance={showBalance}
               balance={balance}
               onClickMax={isInput ? handleMaxOut : undefined}
