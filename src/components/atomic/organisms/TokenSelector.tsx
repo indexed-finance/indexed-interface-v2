@@ -1,5 +1,4 @@
 import { AiOutlineCaretDown } from "react-icons/ai";
-import { AppState, selectors } from "features";
 import {
   AutoComplete,
   Button,
@@ -20,13 +19,17 @@ import {
 } from "react";
 import { SelectableToken } from "components/atomic/molecules";
 import { Token } from "components/atomic/atoms";
-import { useBreakpoints, useTranslator } from "hooks";
+import { TokenInputDecorator } from "../atoms/TokenInputDecorator";
+import { convert } from "helpers";
+import { selectors } from "features";
+import { useBreakpoints, useTokenBalance, useTranslator } from "hooks";
 import { useFormikContext } from "formik";
 import { useSelector } from "react-redux";
 
 export type TokenSelectorValue = {
   amount?: number;
   token?: string;
+  error?: string;
 };
 
 type Asset = {
@@ -46,6 +49,7 @@ interface Props {
   reversed?: boolean;
   autoFocus?: boolean;
   onChange?: (value: TokenSelectorValue) => void;
+  isInput?: boolean;
 }
 
 export function TokenSelector({
@@ -59,23 +63,27 @@ export function TokenSelector({
   error = "",
   autoFocus = false,
   onChange,
+  isInput = true
 }: Props) {
   const tx = useTranslator();
-  const tokenField = `${label} Token`;
-  const amountField = `${label} Amount`;
   const { setTouched } = useFormikContext<any>();
   const [amount, setAmount] = useState(value?.amount ?? 0);
   const [token, setToken] = useState(value?.token ?? "");
+
+  const tokenField = `${label} Token`;
+  const amountField = `${label} Amount`;
   const [selectingToken, setSelectingToken] = useState(false);
-  const balances = useSelector((state: AppState) =>
-    selectors.selectTokenSymbolsToBalances(state)
-  );
-  const relevantBalance = useMemo(() => balances[token.toLowerCase()], [
-    balances,
-    token,
-  ]);
   const input = useRef<null | HTMLInputElement>(null);
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
+  const selectedToken = useMemo(() => tokenLookup[token.toLowerCase()], [token, tokenLookup]);
+  const rawBalance = useTokenBalance(selectedToken!.id ?? "");
+  const balance = useMemo(() => {
+    if (rawBalance && selectedToken) {
+      return convert.toBalanceNumber(rawBalance, selectedToken.decimals, 18);
+    }
+    return 0;
+  }, [rawBalance, selectedToken])
+
   const triggerChange = useCallback(
     (changedValue: TokenSelectorValue) => {
       if (onChange) {
@@ -103,9 +111,15 @@ export function TokenSelector({
         setAmount(amountToUse);
       }
 
-      triggerChange({ amount: amountToUse });
+      let error: string | undefined = undefined;
+      if (isInput && amountToUse > 0) {
+        if (amountToUse > balance) {
+          error = 'Insufficient balance';
+        }
+      }
+      triggerChange({ amount: amountToUse, error });
     },
-    [amount, triggerChange, value]
+    [amount, triggerChange, value, balance, isInput]
   );
   const onTokenChange = useCallback(
     (newToken: string) => {
@@ -123,8 +137,8 @@ export function TokenSelector({
     }
   }, []);
   const handleMaxOut = useCallback(() => {
-    onAmountChange(relevantBalance);
-  }, [onAmountChange, relevantBalance]);
+    onAmountChange(balance);
+  }, [onAmountChange, balance]);
   const handleOpenTokenSelection = useCallback(() => {
     if (selectable) {
       setSelectingToken(true);
@@ -174,35 +188,12 @@ export function TokenSelector({
           }}
         >
           <Space direction="vertical" style={{ width: "100%" }}>
-            {showBalance && (
-              <>
-                {value.token ? (
-                  <Typography.Text
-                    type="secondary"
-                    style={{ textAlign: "left" }}
-                  >
-                    {parseFloat(relevantBalance) ? (
-                      <>
-                        Balance: {relevantBalance}{" "}
-                        {value.token && parseFloat(relevantBalance) > 0 && (
-                          <Button
-                            type="text"
-                            onClick={handleMaxOut}
-                            style={{ fontSize: 12 }}
-                          >
-                            {tx("MAX")}
-                          </Button>
-                        )}
-                      </>
-                    ) : (
-                      tx("NO_BALANCE")
-                    )}
-                  </Typography.Text>
-                ) : (
-                  "-"
-                )}
-              </>
-            )}
+            <TokenInputDecorator
+              error={error}
+              showBalance={showBalance}
+              balance={balance}
+              onClickMax={handleMaxOut}
+            />
             <InputNumber
               autoFocus={autoFocus}
               bordered={false}
@@ -211,11 +202,7 @@ export function TokenSelector({
               max={max}
               step="0.01"
               value={value.amount ?? amount}
-              onFocus={() =>
-                setTouched({
-                  [amountField]: true,
-                })
-              }
+              onFocus={() => setTouched({ [amountField]: true, })}
               onChange={onAmountChange}
               style={{
                 width: isMobile ? 120 : 200,
@@ -236,12 +223,11 @@ export function TokenSelector({
                 {value.token ? (
                   <>
                     <Token
-                      name={value.token}
+                      name=""
                       symbol={value.token}
                       size="small"
-                      address={tokenLookup[value.token]?.id ?? ""}
+                      address={selectedToken!.id ?? ""}
                     />
-                    {/* {selectable && value.token} */}
                   </>
                 ) : (
                   <div className="fancy" style={{ fontSize: 12 }}>
