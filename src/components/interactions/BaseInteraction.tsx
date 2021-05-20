@@ -322,12 +322,14 @@ const multiInteractionSchema = yup.object().shape({
 type MultiProps = Omit<Props, "onSubmit" | "onChange"> & {
   onSubmit?(values: MultiInteractionValues): void;
   onChange?(values: MultiInteractionValues): void;
+  isInput?: boolean;
 };
 
 export function MultiInteraction({
   assets,
   spender,
   extra = null,
+  isInput,
   onSubmit = noop,
   onChange = noop,
   defaultInputSymbol,
@@ -352,6 +354,7 @@ export function MultiInteraction({
         {(props) => (
           <MultiInteractionInner
             {...props}
+            isInput={isInput}
             assets={assets}
             spender={spender}
             extra={extra}
@@ -372,7 +375,16 @@ export function MultiInteraction({
 type InnerMultiProps = Omit<MultiProps, "title"> &
   FormikProps<MultiInteractionValues>;
 
-function MultiInteractionInner({ spender, assets, requiresApproval, isValid, handleSubmit }: InnerMultiProps) {
+function MultiInteractionInner({
+  spender,
+  assets,
+  requiresApproval,
+  isValid,
+  handleSubmit,
+  isInput,
+  errors,
+  setFieldError
+}: InnerMultiProps) {
   const tx = useTranslator();
   const tokenLookup = useSelector(selectors.selectTokenLookup);
   const { values, setFieldValue } = useFormikContext<MultiInteractionValues>();
@@ -384,16 +396,19 @@ function MultiInteractionInner({ spender, assets, requiresApproval, isValid, han
     [spender, tokenLookup, values.fromAmount]
   );
   const handleChange = useCallback(
-    (changedValue: { token?: string; amount?: number }) => {
+    (changedValue: { token?: string; amount?: number, error?: string }) => {
       if (changedValue.token) {
-        setFieldValue("fromToken", changedValue.token);
+        setFieldValue("fromToken", changedValue.token, false);
       }
 
       if (changedValue.amount) {
-        setFieldValue("fromAmount", changedValue.amount);
+        setFieldValue("fromAmount", changedValue.amount, false);
+      }
+      if (changedValue.error) {
+        setFieldError('fromAmount', changedValue.error)
       }
     },
-    [setFieldValue]
+    [setFieldError, setFieldValue]
   );
   const [lookup, setLookup] = useState<Record<string, number>>({});
   const { calculateAmountsIn } = useMultiTokenMintCallbacks(spender);
@@ -447,6 +462,8 @@ function MultiInteractionInner({ spender, assets, requiresApproval, isValid, han
       <Col span={12}>
         <Space direction="vertical">
         <TokenSelector
+          isInput={isInput}
+          error={errors.fromAmount}
           assets={[]}
           label={tx("FROM")}
           selectable={false}
@@ -479,6 +496,7 @@ function MultiInteractionInner({ spender, assets, requiresApproval, isValid, han
         <div style={{ maxHeight: 500, overflow: "auto" }}>
           {assets.map((asset) => (
             <TokenSelector
+              isInput={!isInput}
               key={asset.id}
               selectable={false}
               assets={[]}
@@ -487,7 +505,7 @@ function MultiInteractionInner({ spender, assets, requiresApproval, isValid, han
                 token: asset.symbol,
                 amount: lookup[asset.id] ?? 0,
               }}
-              error={tx("EXCEEDS_BALANCE")}
+              error={(errors  as any)[asset.id]}
               reversed={true}
             />
           ))}
