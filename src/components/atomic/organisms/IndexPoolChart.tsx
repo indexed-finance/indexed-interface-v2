@@ -24,7 +24,6 @@ export function IndexPoolChart({ poolId, expanded = false }: Props) {
     when: string;
     price: string;
   }>(null);
-  console.log(data[0])
   const [netChange, netChangePercent] = useMemo(() => {
     const firstValue = data[0].value;
     const currentValue = last(data).value;
