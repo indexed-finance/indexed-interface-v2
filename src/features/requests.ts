@@ -94,7 +94,7 @@ export async function queryInitialData(url: string): Promise<Category[]> {
             denorm
             desiredDenorm
           }
-          dailySnapshots(orderBy: date, orderDirection: desc, first: 90) {
+          dailySnapshots(orderBy: date, orderDirection: desc, first: 168) {
             id
             date
             value
@@ -170,7 +170,10 @@ export function normalizeInitialData(categories: Category[]) {
         for (const snapshot of dailySnapshots) {
           dailySnapshotIds.push(snapshot.id);
           prev.dailySnapshots.ids.push(snapshot.id);
-          prev.dailySnapshots.entities[snapshot.id] = snapshot;
+          prev.dailySnapshots.entities[snapshot.id] = {
+            ...snapshot,
+            value: parseFloat(snapshot.value)
+          };
         }
 
         const tokenIds = [];
