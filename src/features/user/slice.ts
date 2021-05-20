@@ -9,12 +9,13 @@ import type { NormalizedUser } from "./types";
 
 export type ApprovalStatus = "unknown" | "approval needed" | "approved";
 
-const initialState: NormalizedUser = {
+const initialState: NormalizedUser & { connected: boolean } = {
   address: "",
   allowances: {},
   balances: {},
   staking: {},
   ndx: null,
+  connected: false,
 };
 
 const slice = createSlice({
@@ -26,6 +27,9 @@ const slice = createSlice({
     },
     userDisconnected() {
       return initialState;
+    },
+    walletConnected(state) {
+      state.connected = true;
     },
   },
   extraReducers: (builder) =>
@@ -131,6 +135,9 @@ export const userSelectors = {
 
       return prev;
     }, {} as Record<string, string>);
+  },
+  selectUserConnected(state: AppState) {
+    return state.user.connected;
   },
 };
 

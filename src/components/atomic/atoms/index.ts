@@ -7,3 +7,4 @@ export * from './Flipper';
 export * from './Label';
 export * from './Progress';
 export * from './Token';
+export * from './TokenInputDecorator';

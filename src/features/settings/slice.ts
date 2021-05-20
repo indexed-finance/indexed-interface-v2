@@ -1,4 +1,3 @@
-import { FEATURE_FLAGS } from "feature-flags";
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { SupportedLanguageCode, createTranslator } from "helpers";
 import type { AppState } from "features/store";
@@ -8,7 +7,6 @@ type Theme = "dark" | "light" | "outrun";
 interface SettingsState {
   theme: Theme;
   connected: boolean;
-  connectionEnabled: boolean;
   languageCode: SupportedLanguageCode;
   supportedLanguages: Array<{
     title: string;
@@ -16,19 +14,9 @@ interface SettingsState {
   }>;
 }
 
-const isConnectionEnabled = () => {
-  const setting = process.env.CONNECTION;
-
-  return (
-    (FEATURE_FLAGS.useSessionSaving && typeof setting === "undefined") ||
-    setting === "true"
-  );
-};
-
 const settingsInitialState: SettingsState = {
   theme: "dark",
   connected: false,
-  connectionEnabled: isConnectionEnabled(),
   languageCode: "en-us",
   supportedLanguages: [
     {
@@ -76,16 +64,6 @@ const slice = createSlice({
     connectionLost: (state) => {
       state.connected = false;
     },
-    connectionToggled: (state) => {
-      const connected = !state.connectionEnabled;
-
-      if (connected) {
-        state.connectionEnabled = true;
-      } else {
-        state.connected = false;
-        state.connectionEnabled = false;
-      }
-    },
   },
 });
 
@@ -100,9 +78,6 @@ export const settingsSelectors = {
   },
   selectConnected(state: AppState) {
     return state.settings.connected;
-  },
-  selectConnectionEnabled(state: AppState) {
-    return state.settings.connectionEnabled;
   },
   selectTranslator(state: AppState) {
     const { languageCode } = settingsSelectors.selectSettings(state);

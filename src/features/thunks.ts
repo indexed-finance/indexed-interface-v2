@@ -1,5 +1,6 @@
 import * as topLevelActions from "./actions";
 import { RegisteredCall } from "helpers";
+import { SocketClient } from "sockets/client";
 import { TransactionExtra, transactionsActions } from "./transactions";
 import { TransactionResponse } from "@ethersproject/abstract-provider";
 import { batcherActions, fetchMulticallData } from "./batcher";
@@ -69,76 +70,78 @@ export const thunks = {
   /**
    *
    */
-  initialize: (options: InitialzeOptions): AppThunk => async (
-    dispatch,
-    getState
-  ) => {
-    let selectedAddress = "";
+  initialize:
+    (options: InitialzeOptions): AppThunk =>
+    async (dispatch, getState) => {
+      let selectedAddress = "";
 
-    provider = options.provider;
+      provider = options.provider;
 
-    if (provider.blockNumber !== -1) {
-      dispatch(actions.blockNumberChanged(provider.blockNumber));
-    }
-
-    if (options.withSigner) {
-      signer = provider.getSigner();
-
-      if (options.selectedAddress) {
-        selectedAddress = options.selectedAddress;
-      } else if (provider.connection.url === "metamask") {
-        selectedAddress = (provider as any).provider.selectedAddress;
-      } else {
-        throw new Error("Unable to initialize without a selected address.");
+      if (provider.blockNumber !== -1) {
+        dispatch(actions.blockNumberChanged(provider.blockNumber));
       }
-    }
 
-    await provider.ready;
+      if (options.withSigner) {
+        signer = provider.getSigner();
 
-    dispatch(
-      fetchInitialData({
-        provider,
-      })
-    );
-    dispatch(
-      fetchStakingData({
-        provider,
-      })
-    );
-
-    if (selectedAddress) {
-      dispatch(actions.userAddressSelected(selectedAddress));
-    }
-
-    /**
-     * When the block number changes,
-     * change the state so that batcher may process.
-     */
-    const debouncedBlockHandler = debounce((blockNumber) => {
-      const blockNumberAtThisTime = selectors.selectBlockNumber(getState());
-
-      if (blockNumber !== blockNumberAtThisTime) {
-        dispatch(thunks.changeBlockNumber(blockNumber));
+        if (options.selectedAddress) {
+          selectedAddress = options.selectedAddress;
+        } else if (provider.connection.url === "metamask") {
+          selectedAddress = (provider as any).provider.selectedAddress;
+        } else {
+          throw new Error("Unable to initialize without a selected address.");
+        }
       }
-    }, BLOCK_HANDLER_DEBOUNCE_RATE);
 
-    provider.addListener("block", debouncedBlockHandler);
-  },
+      await provider.ready;
+
+      dispatch(
+        fetchInitialData({
+          provider,
+        })
+      );
+      dispatch(
+        fetchStakingData({
+          provider,
+        })
+      );
+
+      if (selectedAddress) {
+        dispatch(actions.userAddressSelected(selectedAddress));
+      }
+
+      dispatch(actions.walletConnected());
+
+      SocketClient.disconnect();
+
+      /**
+       * When the block number changes,
+       * change the state so that batcher may process.
+       */
+      const debouncedBlockHandler = debounce((blockNumber) => {
+        const blockNumberAtThisTime = selectors.selectBlockNumber(getState());
+
+        if (blockNumber !== blockNumberAtThisTime) {
+          dispatch(thunks.changeBlockNumber(blockNumber));
+        }
+      }, BLOCK_HANDLER_DEBOUNCE_RATE);
+
+      provider.addListener("block", debouncedBlockHandler);
+    },
   /**
    *
    */
-  changeBlockNumber: (blockNumber: number): AppThunk => async (
-    dispatch,
-    getState
-  ) => {
-    const initialBlockNumber = selectors.selectBlockNumber(getState());
+  changeBlockNumber:
+    (blockNumber: number): AppThunk =>
+    async (dispatch, getState) => {
+      const initialBlockNumber = selectors.selectBlockNumber(getState());
 
-    dispatch(actions.blockNumberChanged(blockNumber));
+      dispatch(actions.blockNumberChanged(blockNumber));
 
-    if (initialBlockNumber !== -1) {
-      dispatch(thunks.sendBatch());
-    }
-  },
+      if (initialBlockNumber !== -1) {
+        dispatch(thunks.sendBatch());
+      }
+    },
   /**
    *
    */
@@ -177,17 +180,19 @@ export const thunks = {
       }
     }
   },
-  addTransaction: (
-    _tx: TransactionResponse | Promise<TransactionResponse>,
-    extra: TransactionExtra = {}
-  ): AppThunk => async (dispatch, getState) => {
-    const tx = await Promise.resolve(_tx);
-    const _provider = provider as Provider;
+  addTransaction:
+    (
+      _tx: TransactionResponse | Promise<TransactionResponse>,
+      extra: TransactionExtra = {}
+    ): AppThunk =>
+    async (dispatch, getState) => {
+      const tx = await Promise.resolve(_tx);
+      const _provider = provider as Provider;
 
-    dispatch(actions.transactionStarted({ tx, extra }));
-    const receipt = await _provider.getTransactionReceipt(tx.hash);
-    dispatch(actions.transactionFinalized(receipt));
-  },
+      dispatch(actions.transactionStarted({ tx, extra }));
+      const receipt = await _provider.getTransactionReceipt(tx.hash);
+      dispatch(actions.transactionFinalized(receipt));
+    },
 };
 
 export const actions = {

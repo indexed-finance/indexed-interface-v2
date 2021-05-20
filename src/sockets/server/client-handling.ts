@@ -101,13 +101,13 @@ function handleConnection(client: WebSocket, incoming: IncomingMessage) {
     clientToIpLookup.set(client, ip);
 
     // // Prune previous clients with the same IP.
-    // for (const connection of connections) {
-    //   const connectionIp = clientToIpLookup.get(connection);
+    for (const connection of connections) {
+      const connectionIp = clientToIpLookup.get(connection);
 
-    //   if (connectionIp === ip) {
-    //     connections.splice(connections.indexOf(connection, 1));
-    //   }
-    // }
+      if (connectionIp === ip) {
+        connections.splice(connections.indexOf(connection, 1));
+      }
+    }
 
     connections.push(client);
 

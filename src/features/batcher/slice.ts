@@ -201,17 +201,9 @@ const slice = createSlice({
       )
       // Losing connection.
       .addMatcher(
-        (action) =>
-          [
-            settingsActions.connectionLost.type,
-            settingsActions.connectionToggled.type,
-          ].includes(action.type),
+        (action) => [settingsActions.connectionLost.type].includes(action.type),
         (state, action) => {
-          if (
-            action.type === settingsActions.connectionLost.type ||
-            (action.type === settingsActions.connectionToggled.type &&
-              state.status === "deferring to server")
-          ) {
+          if (action.type === settingsActions.connectionLost.type) {
             state.status = "idle";
           }
         }
@@ -246,9 +238,8 @@ export const batcherSelectors = {
   },
   selectOnChainBatch(state: AppState) {
     const { onChainCalls } = state.batcher;
-    const cachedCalls = batcherSelectors.selectCachedCallsFromCurrentBlock(
-      state
-    );
+    const cachedCalls =
+      batcherSelectors.selectCachedCallsFromCurrentBlock(state);
 
     return onChainCalls
       .filter((call) => !cachedCalls[call])
@@ -287,9 +278,8 @@ export const batcherSelectors = {
   },
   selectOffChainBatch(state: AppState) {
     const { offChainCalls } = state.batcher;
-    const cachedCalls = batcherSelectors.selectCachedCallsFromCurrentBlock(
-      state
-    );
+    const cachedCalls =
+      batcherSelectors.selectCachedCallsFromCurrentBlock(state);
     const { toMerge, toKeep } = offChainCalls
       .filter((call) => !cachedCalls[call])
       .reduce(

@@ -1,4 +1,5 @@
 import { FEATURE_FLAGS } from "feature-flags";
+import { SocketClient } from "sockets/client";
 import { actions } from "features";
 import { ethers } from "ethers";
 import { fortmatic, injected, portis } from "ethereum";
@@ -169,21 +170,16 @@ export const SUPPORTED_WALLETS = {
 };
 
 try {
-  SUPPORTED_WALLETS[
-    SupportedWallet.Injected
-  ].icon = require("images/injected.svg").default;
-  SUPPORTED_WALLETS[
-    SupportedWallet.MetaMask
-  ].icon = require("images/metamask.png").default;
-  SUPPORTED_WALLETS[
-    SupportedWallet.CoinbaseWallet
-  ].icon = require("images/coinbase.svg").default;
-  SUPPORTED_WALLETS[
-    SupportedWallet.Fortmatic
-  ].icon = require("images/fortmatic.png").default;
-  SUPPORTED_WALLETS[
-    SupportedWallet.Portis
-  ].icon = require("images/portis.png").default;
+  SUPPORTED_WALLETS[SupportedWallet.Injected].icon =
+    require("images/injected.svg").default;
+  SUPPORTED_WALLETS[SupportedWallet.MetaMask].icon =
+    require("images/metamask.png").default;
+  SUPPORTED_WALLETS[SupportedWallet.CoinbaseWallet].icon =
+    require("images/coinbase.svg").default;
+  SUPPORTED_WALLETS[SupportedWallet.Fortmatic].icon =
+    require("images/fortmatic.png").default;
+  SUPPORTED_WALLETS[SupportedWallet.Portis].icon =
+    require("images/portis.png").default;
 } catch {
   console.info("Unable to import icons; probably because this is the server.");
 }
@@ -209,4 +205,11 @@ if (FEATURE_FLAGS.useFortmatic) {
 export function useWalletConnection() {
   useInactiveListener();
   useEagerConnect();
+
+  useEffect(() => {
+    SocketClient.connect({
+      onConnect: () => console.log("connected."),
+      onError: () => console.log("error"),
+    });
+  }, []);
 }

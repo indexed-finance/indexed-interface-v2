@@ -1,8 +1,10 @@
 import { ImConnection } from "react-icons/im";
-import { Popconfirm, Space, Typography } from "antd";
-import { actions, selectors } from "features";
-import { useDispatch, useSelector } from "react-redux";
+import { MdAccountBalanceWallet } from "react-icons/md";
+import { Space, Typography } from "antd";
+import { abbreviateAddress } from "helpers";
+import { selectors } from "features";
 import { useMemo } from "react";
+import { useSelector } from "react-redux";
 import { useTranslator } from "hooks";
 
 interface Props {
@@ -11,57 +13,44 @@ interface Props {
 
 export function ServerConnection({ showText = false }: Props) {
   const tx = useTranslator();
-  const dispatch = useDispatch();
-  const isConnected = useSelector(selectors.selectConnected);
-  const isConnectionEnabled = useSelector(selectors.selectConnectionEnabled);
-  const connectionStatus = useMemo(() => {
-    if (isConnectionEnabled) {
-      return {
-        type: (isConnected ? "success" : "danger") as any,
-        top: isConnected
-          ? tx("CONNECTED_TO_SERVER")
-          : tx("NOT_CONNECTED_TO_SERVER"),
-        bottom: tx("DISABLE_SERVER_CONNECTION"),
-        text: isConnected ? tx("CONNECTED") : tx("NOT_CONNECTED"),
-      };
-    } else {
-      return {
-        type: "secondary" as any,
-        top: tx("CONNECTION_DISABLED"),
-        bottom: tx("ENABLE_SERVER_CONNECTION"),
-        text: tx("DISABLED"),
-      };
-    }
-  }, [isConnectionEnabled, isConnected, tx]);
+  const userAddress = useSelector(selectors.selectUserAddress);
+  const isUserConnected = useSelector(selectors.selectUserConnected);
+  const isServerConnected = useSelector(selectors.selectConnected);
+  const connectionStatus = useMemo(
+    () => ({
+      type: (isUserConnected || isServerConnected
+        ? "success"
+        : "danger") as any,
+      top: isServerConnected
+        ? tx("CONNECTED_TO_SERVER")
+        : tx("NOT_CONNECTED_TO_SERVER"),
+      bottom: tx("DISABLE_SERVER_CONNECTION"),
+      text: isServerConnected ? tx("CONNECTED") : tx("NOT_CONNECTED"),
+    }),
+    [tx, isUserConnected, isServerConnected]
+  );
+  const ConnectionIcon = isUserConnected
+    ? MdAccountBalanceWallet
+    : ImConnection;
+  const connectionText =
+    isUserConnected && userAddress ? (
+      <div style={{ textTransform: "lowercase" }}>
+        {abbreviateAddress(userAddress)}
+      </div>
+    ) : (
+      connectionStatus.text
+    );
 
   return (
-    <Popconfirm
-      icon={null}
-      placement="topLeft"
-      title={
-        <Space>
-          <ImConnection />
-          <div>
-            <strong>{connectionStatus.top}</strong>
-            <br />
-            <em>{connectionStatus.bottom}</em>
-          </div>
-        </Space>
-      }
-      onConfirm={() => dispatch(actions.connectionToggled())}
-      okText="Yes"
-      cancelText="No"
+    <Typography.Title
+      level={5}
+      type={connectionStatus.type}
+      style={{ textTransform: "uppercase", marginBottom: 0 }}
     >
-      <Typography.Title
-        level={5}
-        type={connectionStatus.type}
-        style={{ textTransform: "uppercase", marginBottom: 0 }}
-      >
-        <Space>
-          <ImConnection style={{ position: "relative", top: 2 }} />
-          {showText && connectionStatus.text}
-        </Space>
-      </Typography.Title>
-    </Popconfirm>
+      <Space>
+        <ConnectionIcon style={{ position: "relative", top: 2 }} />
+        {showText && connectionText}
+      </Space>
+    </Typography.Title>
   );
 }
