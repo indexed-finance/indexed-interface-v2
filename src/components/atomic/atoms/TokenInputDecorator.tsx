@@ -30,13 +30,15 @@ export function TokenInputDecorator({
     {balance > 0 ? (
       <>
         Balance: {balance}{" "}
-        <Button
+        {
+          onClickMax && <Button
             type="text"
             onClick={onClickMax}
             style={{ fontSize: 12 }}
           >
             {tx("MAX")}
           </Button>
+        }
       </>
     ) : (
       tx("NO_BALANCE")
