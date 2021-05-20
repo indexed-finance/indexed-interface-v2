@@ -210,26 +210,6 @@ export function StakeInteraction({ indexPool }: Props) {
           <div
             style={{
               display: "flex",
-              justifyContent: "space-between",
-              flexDirection: "column",
-              width: "100%",
-            }}
-          >
-            <Typography.Title level={4} style={{ margin: 0 }}>
-              Total NDX Staked
-            </Typography.Title>
-            <Token
-              name="NDX"
-              amount="1200.00"
-              address={NDX_ADDRESS}
-              symbol="NDX"
-              size="tiny"
-            />
-          </div>
-
-          <div
-            style={{
-              display: "flex",
               alignItems: "center",
               justifyContent: "space-between",
               width: "100%",
@@ -250,3 +230,4 @@ export function StakeInteraction({ indexPool }: Props) {
     </Row>
   );
 }
+
