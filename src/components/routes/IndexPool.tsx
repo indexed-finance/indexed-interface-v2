@@ -23,39 +23,41 @@ function LoadedIndexPool(props: FormattedIndexPool) {
 
   usePoolDetailRegistrar(props.id, tokenIds);
 
-  return <div style={{ paddingTop: 12 }}>
-  <Row
-    align="stretch"
-    gutter={{
-      xs: 12,
-      sm: 24,
-    }}
-  >
-    <Col xs={24} md={8}>
-      <Space size="large" direction="vertical">
-        <IndexPoolDescription {...props} />
-        <IndexPoolExternalLinks {...props} />
-      </Space>
-    </Col>
-    <Col xs={24} md={16}>
-    <IndexPoolChart poolId={props.id} />
-    </Col>
-  </Row>
-  <Divider />
-  <Row
-    gutter={{
-      xs: 12,
-      sm: 24,
-    }}
-  >
-    <Col xs={24} md={10}>
-      <IndexPoolAssets {...props} />
-    </Col>
-    <Col xs={24} md={14}>
-      <IndexPoolRecentTrades {...props} />
-    </Col>
-  </Row>
-</div>
+  return (
+    <div style={{ paddingTop: 12 }}>
+      <Row
+        align="stretch"
+        gutter={{
+          xs: 12,
+          sm: 24,
+        }}
+      >
+        <Col xs={24} md={8}>
+          <Space size="large" direction="vertical">
+            <IndexPoolDescription {...props} />
+            <IndexPoolExternalLinks {...props} />
+          </Space>
+        </Col>
+        <Col xs={24} md={16}>
+          <IndexPoolChart poolId={props.id} />
+        </Col>
+      </Row>
+      <Divider />
+      <Row
+        gutter={{
+          xs: 12,
+          sm: 24,
+        }}
+      >
+        <Col xs={24} md={10}>
+          <IndexPoolAssets {...props} />
+        </Col>
+        <Col xs={24} md={14}>
+          <IndexPoolRecentTrades {...props} />
+        </Col>
+      </Row>
+    </div>
+  );
 }
 
 export default function IndexPool() {
@@ -101,11 +103,7 @@ export default function IndexPool() {
       }
       hasPageHeader={true}
     >
-      {indexPool ? (
-        <LoadedIndexPool {...indexPool} />
-      ) : (
-        <Spin />
-      )}
+      {indexPool ? <LoadedIndexPool {...indexPool} /> : <Spin />}
     </Page>
   );
 }

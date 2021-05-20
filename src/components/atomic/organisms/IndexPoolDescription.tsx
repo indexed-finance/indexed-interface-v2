@@ -1,5 +1,6 @@
 import { Card, Typography } from "antd";
 import { FormattedIndexPool } from "features";
+import { INDEX_POOL_TAGLINES } from "config";
 import { Token } from "../atoms";
 
 export function IndexPoolDescription({ id, name, symbol }: FormattedIndexPool) {
@@ -16,10 +17,7 @@ export function IndexPoolDescription({ id, name, symbol }: FormattedIndexPool) {
           borderLeft: "2px solid #49ffff",
         }}
       >
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Voluptatem
-        rem, deserunt officiis et, optio, quod eum consequuntur itaque suscipit
-        impedit recusandae incidunt nostrum sapiente expedita ut eius cum ea
-        beatae!
+        {INDEX_POOL_TAGLINES[id] ?? ""}
       </Typography.Text>
     </Card>
   );
