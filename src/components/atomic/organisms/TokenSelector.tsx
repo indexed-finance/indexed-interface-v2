@@ -192,7 +192,7 @@ export function TokenSelector({
               error={error}
               showBalance={showBalance}
               balance={balance}
-              onClickMax={handleMaxOut}
+              onClickMax={isInput ? handleMaxOut : undefined}
             />
             <InputNumber
               autoFocus={autoFocus}
