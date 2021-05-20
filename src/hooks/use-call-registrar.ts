@@ -50,12 +50,7 @@ export function useCallRegistrar(calls: DataReceiverConfig) {
     if (
       !isConnected && haveAnyCalls && haveRegistered
     ) {
-      if (calls.caller === 'Pair Data') {
-        console.log(`Ran effect with update`)
-      }
       dispatch(actions.sendBatch());
-    } else if (calls.caller === 'Pair Data') {
-      console.log(`Ran effect without update`)
     }
   }, [dispatch, isConnected, haveAnyCalls, haveRegistered]);
 }
