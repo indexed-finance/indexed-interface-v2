@@ -142,6 +142,7 @@ function MultiTokenBurnInteraction({ indexPool }: Props) {
 
   return (
     <MultiInteraction
+      isInput={true}
       assets={indexPool.assets}
       spender={indexPool.id}
       onSubmit={handleSubmit}
