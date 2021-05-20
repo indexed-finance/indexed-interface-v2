@@ -114,6 +114,7 @@ function SingleInteractionInner({
   onChange,
   setFieldValue,
   setValues,
+  errors,
   setFieldError,
   defaultInputSymbol,
   defaultOutputSymbol,
@@ -199,11 +200,35 @@ function SingleInteractionInner({
     changeTo: (newTo) => setFieldValue("toToken", newTo),
   });
 
+  const handleChange = (
+    field: "from" | "to",
+    { token, amount, error: fieldError }: { token?: string; amount?: number; error?: string; }
+  ) => {
+    const [tokenField, amountField] = (field === "from") ? ['fromToken', 'fromAmount'] : ['toToken', 'toAmount'];
+    const newValues = {
+      ...values,
+      [tokenField]: token || "",
+      [amountField]: amount || 0,
+      lastTouchedField: field,
+    } as SingleInteractionValues;
+    const calcError = onChange(newValues);
+    setValues(newValues, false);
+    if (fieldError) {
+      setFieldError(amountField, fieldError);
+    } else if (calcError) {
+      if (calcError.includes('Input')) {
+        setFieldError("fromAmount", calcError);
+      } else if (calcError.includes("Output")) {
+        setFieldError("toAmount", calcError);
+      }
+    }
+  }
+
   return (
     <Row>
       <Col span={12}>
-        {/* // Fields */}
         <TokenSelector
+          isInput
           autoFocus={true}
           label={tx("FROM")}
           assets={inputOptions}
@@ -212,23 +237,8 @@ function SingleInteractionInner({
             amount: values.fromAmount,
           }}
           selectable={!disableInputSelect}
-          onChange={({ token, amount }) => {
-            const newValues = {
-              ...values,
-              fromToken: token || "",
-              fromAmount: amount || 0,
-              lastTouchedField: "from",
-            } as SingleInteractionValues;
-            const error = onChange(newValues);
-            if (error) {
-              if (error.includes("Output")) {
-                setFieldError("toAmount", error);
-              } else {
-                setFieldError("fromAmount", error);
-              }
-            }
-            setValues(newValues);
-          }}
+          error={errors.fromAmount}
+          onChange={(newValues) => handleChange('from', newValues)}
         />
 
         <Flipper disabled={disableFlip} onFlip={handleFlip} />
@@ -241,23 +251,7 @@ function SingleInteractionInner({
             amount: values.toAmount,
           }}
           selectable={!disableOutputSelect}
-          onChange={({ token, amount }) => {
-            const newValues = {
-              ...values,
-              toToken: token || "",
-              toAmount: amount || 0,
-              lastTouchedField: "to",
-            } as SingleInteractionValues;
-            const error = onChange(newValues);
-            if (error) {
-              if (error.includes("Input")) {
-                setFieldError("fromAmount", error);
-              } else {
-                setFieldError("toAmount", error);
-              }
-            }
-            setValues(newValues);
-          }}
+          onChange={(newValues) => handleChange('to', newValues)}
         />
 
         <Divider />
