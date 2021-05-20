@@ -1,4 +1,6 @@
 import {
+  ChartOptions,
+  DeepPartial,
   IChartApi,
   ISeriesApi,
   MouseEventParams,
@@ -39,11 +41,14 @@ export function LineSeriesChart({
     if (cardRef.current && !series) {
       const size = { width: 360, height: 260 };
 
-      const chart_ = createChart(cardRef.current, size);
+      const options = (CHART_MODES as any)[theme];
+
+      const chart_ = createChart(cardRef.current, {
+        ...options,
+        ...size
+      });
 
       setChart(chart_);
-
-      const options = (CHART_MODES as any)[theme];
       const lineSeries = chart_.addLineSeries({
         color: "#49ffff",
       });
@@ -51,7 +56,9 @@ export function LineSeriesChart({
       chart_.applyOptions(options as any);
       chart_.applyOptions({
         leftPriceScale: {
-          visible: false,
+          visible: true,
+          entireTextOnly: true,
+          drawTicks: true
         },
         rightPriceScale: {
           visible: false,
@@ -60,7 +67,8 @@ export function LineSeriesChart({
           borderVisible: false,
         },
         timeScale: {
-          visible: false,
+          visible: true,
+          timeVisible: true
         },
       });
 
@@ -147,9 +155,22 @@ const COMMON_LAYOUT_OPTIONS = {
   fontSize: 16,
 };
 
-const COMMON_CHART_OPTIONS = {
-  priceAxis: {
-    position: "none",
+const COMMON_CHART_OPTIONS: DeepPartial<ChartOptions> = {
+  leftPriceScale: {
+    visible: true,
+    entireTextOnly: true,
+    drawTicks: true,
+    alignLabels: true,
+  },
+  rightPriceScale: {
+    visible: false,
+  },
+  overlayPriceScales: {
+    borderVisible: false,
+  },
+  timeScale: {
+    visible: true,
+    timeVisible: true
   },
   grid: {
     vertLines: {
@@ -158,12 +179,6 @@ const COMMON_CHART_OPTIONS = {
     horzLines: {
       visible: false,
     },
-  },
-  timeScale: {
-    fixLeftEdge: true,
-    borderVisible: false,
-    secondsVisible: false,
-    lockVisibleTimeRangeOnResize: true
   },
 }
 
