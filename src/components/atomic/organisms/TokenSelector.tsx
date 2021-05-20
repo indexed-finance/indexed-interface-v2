@@ -63,7 +63,7 @@ export function TokenSelector({
   error = "",
   autoFocus = false,
   onChange,
-  isInput = true
+  isInput
 }: Props) {
   const tx = useTranslator();
   const { setTouched } = useFormikContext<any>();
