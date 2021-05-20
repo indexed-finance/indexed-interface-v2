@@ -3,14 +3,14 @@ import { useTranslator } from "hooks";
 
 type Props = {
   showBalance: boolean;
-  balance?: number;
+  balance: number;
   error?: string;
   onClickMax?: () => void;
 }
 
 export function TokenInputDecorator({
   showBalance,
-  balance = 0,
+  balance,
   error,
   onClickMax
 }: Props) {
