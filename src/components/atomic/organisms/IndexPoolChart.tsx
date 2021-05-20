@@ -1,7 +1,9 @@
 import { AppState, selectors } from "features";
 import { Card, Radio, RadioChangeEvent, Spin } from "antd";
 import { LineSeriesChart, Quote } from "components/atomic/molecules";
-import { useCallback, useEffect, useState } from "react";
+import { convert } from "helpers";
+import { last } from "hooks";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import noop from "lodash.noop";
 
@@ -22,6 +24,16 @@ export function IndexPoolChart({ poolId, expanded = false }: Props) {
     when: string;
     price: string;
   }>(null);
+  console.log(data[0])
+  const [netChange, netChangePercent] = useMemo(() => {
+    const firstValue = data[0].value;
+    const currentValue = last(data).value;
+    const delta = currentValue - firstValue;
+    return [
+      convert.toCurrency(delta, { signDisplay: "always" }),
+      convert.toPercent(delta / firstValue, { signDisplay: "always" })
+    ]
+  }, [data])
   const formattedPool = useSelector((state: AppState) =>
     selectors.selectFormattedIndexPool(state, poolId)
   );
@@ -51,15 +63,9 @@ export function IndexPoolChart({ poolId, expanded = false }: Props) {
                 address={formattedPool.id}
                 symbol={formattedPool.symbol}
                 name={formattedPool.name}
-                price={
-                  historicalData ? historicalData.price : formattedPool.priceUsd
-                }
-                netChange={
-                  historicalData ? historicalData.when : formattedPool.netChange
-                }
-                netChangePercent={
-                  historicalData ? "" : formattedPool.netChangePercent
-                }
+                price={historicalData ? historicalData.price : formattedPool.priceUsd}
+                netChange={historicalData ? historicalData.when : netChange}
+                netChangePercent={historicalData ? "" : netChangePercent}
                 inline={true}
                 textSize="large"
               />
