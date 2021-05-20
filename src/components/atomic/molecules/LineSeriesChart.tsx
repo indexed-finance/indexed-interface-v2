@@ -96,7 +96,6 @@ export function LineSeriesChart({
           });
         }
       }, 100);
-
       chart.subscribeCrosshairMove(handleCrosshairMove);
 
       return () => {
@@ -108,8 +107,12 @@ export function LineSeriesChart({
   useEffect(() => {
     if (cardRef.current && series) {
       series.setData(data as any);
+      if (chart) {
+        const timestamps = data.map(d => d.time);
+        chart.timeScale().setVisibleRange({ from: Math.min(...timestamps), to: Math.max(...timestamps) } as any)
+      }
     }
-  }, [data, series]);
+  }, [data, chart, series]);
 
   useEffect(() => {
     if (cardRef.current && chart) {
@@ -144,6 +147,26 @@ const COMMON_LAYOUT_OPTIONS = {
   fontSize: 16,
 };
 
+const COMMON_CHART_OPTIONS = {
+  priceAxis: {
+    position: "none",
+  },
+  grid: {
+    vertLines: {
+      visible: false,
+    },
+    horzLines: {
+      visible: false,
+    },
+  },
+  timeScale: {
+    fixLeftEdge: true,
+    borderVisible: false,
+    secondsVisible: false,
+    lockVisibleTimeRangeOnResize: true
+  },
+}
+
 const CHART_MODES = {
   dark: {
     layout: {
@@ -151,30 +174,12 @@ const CHART_MODES = {
       backgroundColor: "#151515",
       textColor: "#fafafa",
     },
-    priceAxis: {
-      position: "none",
-    },
-    priceScale: {
-      autoScale: true,
-      position: "none",
-    },
-    grid: {
-      vertLines: {
-        visible: false,
-      },
-      horzLines: {
-        visible: false,
-      },
-    },
-    timeScale: {
-      fixLeftEdge: true,
-      borderVisible: false,
-      secondsVisible: false,
-    },
+    ...COMMON_CHART_OPTIONS
   },
   light: {
     layout: {
       ...COMMON_LAYOUT_OPTIONS,
     },
+    ...COMMON_CHART_OPTIONS
   },
 };
