@@ -148,24 +148,29 @@ export const selectors = {
                   transactionHash,
                 };
               }),
-              trades: (pool.transactions.trades ?? []).map((trade) => ({
-                when: formatDistance(
-                  new Date(parseInt(trade.timestamp) * MILLISECONDS_PER_SECOND),
-                  new Date(),
-                  {
-                    addSuffix: true,
-                  }
-                ),
-                from: trade.pair.token0.symbol,
-                to: trade.pair.token1.symbol,
-                amount: convert.toCurrency(parseFloat(trade.amountUSD)),
-                kind:
-                  trade.pair.token0.symbol.toLowerCase() ===
-                  pool.symbol.toLowerCase()
-                    ? "sell"
-                    : "buy",
-                transactionHash: trade.transaction.id,
-              })),
+              trades: (pool.transactions.trades ?? []).map((trade) => {
+                const zeroForOne = +(trade.amount0In) > 0;
+                const { token0, token1 } = trade.pair;
+                const [tokenIn, tokenOut] = zeroForOne ? [token0, token1] : [token1, token0]
+                return {
+                  when: formatDistance(
+                    new Date(parseInt(trade.timestamp) * MILLISECONDS_PER_SECOND),
+                    new Date(),
+                    {
+                      addSuffix: true,
+                    }
+                  ),
+                  from: tokenIn.symbol,
+                  to: tokenOut.symbol,
+                  amount: convert.toCurrency(parseFloat(trade.amountUSD)),
+                  kind:
+                  tokenIn.symbol.toLowerCase() ===
+                    pool.symbol.toLowerCase()
+                      ? "sell"
+                      : "buy",
+                  transactionHash: trade.transaction.id,
+                }
+              }),
             },
             assets: tokenIds
               .map((poolTokenId) => formatPoolAsset(tokens[poolTokenId], pool))
