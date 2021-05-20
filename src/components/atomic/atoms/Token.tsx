@@ -34,7 +34,7 @@ export function Token({
   try {
     image = require(`images/${symbol.toLowerCase()}.png`).default;
   } catch {
-    image = `https://github.com/defi-wikis/defi-tokens-wiki/blob/master/token-metadata/${getAddress(address)}/logo.png`;
+    if (address) image = `https://github.com/defi-wikis/defi-tokens-wiki/blob/master/token-metadata/${getAddress(address)}/logo.png`;
   }
 
   return (
