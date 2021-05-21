@@ -56,7 +56,6 @@ export function useEagerConnect() {
       const _provider = await connector.getProvider();
       const provider = new ethers.providers.Web3Provider(_provider, 1);
 
-      console.log("here.");
       dispatch(
         actions.initialize({
           provider,

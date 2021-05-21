@@ -89,7 +89,7 @@ export function Page({
               position: "fixed",
               top: 60,
               right: -60,
-              background: "rgba(0, 0, 0, 0.65)",
+              background: "#111",
               borderBottom: "1px solid rgba(47, 206, 252, 0.4)",
               borderLeft: "1px solid rgba(47, 206, 252, 0.4)",
               borderBottomLeftRadius: 12,

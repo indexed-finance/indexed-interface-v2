@@ -114,6 +114,7 @@ export function InteractionDrawer({
 
   return (
     <Drawer
+      push={false}
       mask={false}
       visible={Boolean(active)}
       onClose={close}
@@ -136,7 +137,7 @@ export function InteractionDrawer({
         width: isMobile ? "96vw" : "80vw",
         overflow: "hidden",
       }}
-      height={333}
+      height={360}
     >
       <Row gutter={0} align="stretch">
         <Col span={6}>

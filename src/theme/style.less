@@ -2,16 +2,17 @@
 @import "~antd/dist/antd.compact.less";
 @import "~antd/dist/antd.less";
 
-// Theming
+// -- Theming
 @primary-color: darken(rgb(73, 255, 255), 30%);
 @success-color: #0ed155;
 
-// // -- Fonts
+// -- Fonts
 @font-face {
   font-family: "Main";
   src: url("./fonts/Futura.ttc");
 }
 
+// -- Customs
 .with-background {
   background: url(./images/background.png) no-repeat center center fixed !important;
   -webkit-background-size: cover;
@@ -32,8 +33,26 @@
   margin: 40px 0 0 40px;
 }
 
-// // Ant Overrides
+@keyframes flashing-input-error {
+  0% {
+    border: 1px solid rgba(255, 0, 0, 0.5);
+    background: rgba(255, 0, 0, 0.25);
+  }
+  50% {
+    border: 1px solid rgba(255, 0, 0, 0.25);
+    background: rgba(255, 0, 0, 0.1);
+  }
+  100% {
+    border: 1px solid rgba(255, 0, 0, 0.5);
+    background: rgba(255, 0, 0, 0.25);
+  }
+}
 
+.input-with-error {
+  animation: flashing-input-error 2s ease-in-out infinite;
+}
+
+// -- Ant Overrides
 .ant-page-header-heading-title {
   line-height: 1 !important;
 }
@@ -57,4 +76,8 @@
   justify-content: space-between;
   padding-right: 16px !important;
   padding-left: 16px !important;
+}
+
+.ant-list-item-meta-title {
+  margin-bottom: 0 !important;
 }

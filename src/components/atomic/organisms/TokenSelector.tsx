@@ -63,26 +63,28 @@ export function TokenSelector({
   error = "",
   autoFocus = false,
   onChange,
-  isInput
+  isInput,
 }: Props) {
   const tx = useTranslator();
   const { setTouched } = useFormikContext<any>();
   const [amount, setAmount] = useState(value?.amount ?? 0);
   const [token, setToken] = useState(value?.token ?? "");
-
   const tokenField = `${label} Token`;
   const amountField = `${label} Amount`;
   const [selectingToken, setSelectingToken] = useState(false);
   const input = useRef<null | HTMLInputElement>(null);
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
-  const selectedToken = useMemo(() => tokenLookup[token.toLowerCase()], [token, tokenLookup]);
+  const selectedToken = useMemo(() => tokenLookup[token.toLowerCase()], [
+    token,
+    tokenLookup,
+  ]);
   const rawBalance = useTokenBalance(selectedToken!.id ?? "");
   const balance = useMemo(() => {
     if (rawBalance && selectedToken) {
       return convert.toBalanceNumber(rawBalance, selectedToken.decimals, 18);
     }
     return 0;
-  }, [rawBalance, selectedToken])
+  }, [rawBalance, selectedToken]);
 
   const triggerChange = useCallback(
     (changedValue: TokenSelectorValue) => {
@@ -98,15 +100,15 @@ export function TokenSelector({
     [onChange, amount, token, value]
   );
   const haveInsufficientBalance = useMemo(() => {
-    return isInput && (balance < (value.amount || 0))
-  }, [isInput, value.amount, balance])
+    return isInput && balance < (value.amount || 0);
+  }, [isInput, value.amount, balance]);
 
   const onAmountChange = useCallback(
     (newAmount?: number | string | null) => {
       if (newAmount == null || Number.isNaN(amount) || amount < 0) {
         triggerChange({ amount: 0 });
         setAmount(0);
-        setTouched({ [amountField]: true, })
+        setTouched({ [amountField]: true });
         return;
       }
 
@@ -120,12 +122,12 @@ export function TokenSelector({
       let error: string | undefined = undefined;
       if (isInput && amountToUse > 0) {
         if (amountToUse > balance) {
-          error = 'Insufficient balance';
+          error = "Insufficient balance";
         }
       }
       triggerChange({ amount: amountToUse, error });
     },
-    [amount, triggerChange, value, balance, isInput]
+    [amount, triggerChange, value, balance, isInput, amountField, setTouched]
   );
   const onTokenChange = useCallback(
     (newToken: string) => {
@@ -200,7 +202,7 @@ export function TokenSelector({
         >
           <Space direction="vertical" style={{ width: "100%" }}>
             <TokenInputDecorator
-              error={haveInsufficientBalance ? 'Insufficient balance' : error}
+              error={haveInsufficientBalance ? "Insufficient balance" : error}
               showBalance={showBalance}
               balance={balance}
               onClickMax={isInput ? handleMaxOut : undefined}
@@ -213,13 +215,14 @@ export function TokenSelector({
               max={max}
               step="0.01"
               value={value.amount ?? amount}
-              onFocus={() => setTouched({ [amountField]: true, })}
+              onFocus={() => setTouched({ [amountField]: true })}
               onChange={onAmountChange}
               style={{
                 width: isMobile ? 120 : 200,
                 fontSize: 22,
                 flex: reversed ? 1 : 0,
               }}
+              className={error ? 'input-with-error' : ''}
             />
           </Space>
           <div>
@@ -261,6 +264,7 @@ export function TokenSelector({
                   label,
                   value,
                 }))
+                .filter((a) => a.label)
                 .sort((a, b) => a.label.localeCompare(b.label))}
               filterOption={(inputValue, option) =>
                 option!.value
@@ -279,6 +283,7 @@ export function TokenSelector({
           }
           className="TokenSelectorDrawer"
           placement="right"
+          getContainer={false}
           closable={true}
           maskClosable={true}
           visible={selectingToken}

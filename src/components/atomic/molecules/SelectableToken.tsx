@@ -1,4 +1,4 @@
-import { List } from "antd";
+import { List, Typography } from "antd";
 import { Token } from "components/atomic/atoms";
 
 type Asset = {
@@ -21,9 +21,17 @@ export function SelectableToken({ asset, onClick }: Props) {
       style={{ padding: "1rem" }}
     >
       <Item.Meta
+        style={{ alignItems: "center" }}
         avatar={<Token symbol={asset.symbol} name={asset.symbol} />}
-        title={asset.symbol}
-        description={asset.name}
+        title={
+          <Typography.Title
+            level={5}
+            type="secondary"
+            style={{ marginBottom: 0 }}
+          >
+            {asset.name}
+          </Typography.Title>
+        }
       />
     </Item>
   );
