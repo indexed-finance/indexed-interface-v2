@@ -1,6 +1,7 @@
 import {
   CallRegistration,
   RegisteredCall,
+  dedupe,
   deserializeOnChainCall,
   serializeOffChainCall,
   serializeOnChainCall,
@@ -34,7 +35,7 @@ interface BatcherState {
       fromBlockNumber: number;
     }
   >;
-  status: "idle" | "loading" | "deferring to server";
+  status: "idle" | "loading";
 }
 
 const batcherInitialState: BatcherState = {
@@ -57,6 +58,9 @@ const slice = createSlice({
       if (blockNumber > 0) {
         state.blockNumber = blockNumber;
       }
+
+      state.onChainCalls = dedupe(state.onChainCalls);
+      state.offChainCalls = dedupe(state.offChainCalls);
     },
     callsRegistered(
       state,
@@ -129,18 +133,15 @@ const slice = createSlice({
       .addCase(fetchMulticallData.pending, (state) => {
         state.status = "loading";
       })
-      .addCase(settingsActions.connectionEstablished, (state) => {
-        state.status = "deferring to server";
-      })
       .addCase(fetchMulticallData.fulfilled, (state) => {
         const oldCalls: Record<string, true> = {};
 
-        // for (const [call, value] of Object.entries(state.listenerCounts)) {
-        //   if (value === 0) {
-        //     oldCalls[call] = true;
-        //     delete state.listenerCounts[call];
-        //   }
-        // }
+        for (const [call, value] of Object.entries(state.listenerCounts)) {
+          if (value === 0) {
+            oldCalls[call] = true;
+            delete state.listenerCounts[call];
+          }
+        }
 
         state.onChainCalls = state.onChainCalls.filter(
           (call) => !oldCalls[call]
