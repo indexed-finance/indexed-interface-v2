@@ -29,10 +29,10 @@ export const usePoolUnderlyingTokens = (poolId: string) =>
   );
 
 export const usePoolToTokens = (pool: FormattedIndexPool) => {
-  return useMemo(() => ({ [pool.id]: pool.assets.map(({ id }) => id) }), [
-    pool.id,
-    pool.assets,
-  ]);
+  return useMemo(
+    () => ({ [pool.id]: pool.assets.map(({ id }) => id) }),
+    [pool.id, pool.assets]
+  );
 };
 
 export const usePoolQuickswapLink = (poolAddress: string) => {
@@ -129,7 +129,7 @@ export function usePoolDetailRegistrar(
   poolAddress: string,
   tokenIds: string[]
 ) {
-  const caller = `Pool Detail`;
+  const caller = "Pool Detail";
   const { onChainCalls, offChainCalls } = useMemo(
     () =>
       poolAddress

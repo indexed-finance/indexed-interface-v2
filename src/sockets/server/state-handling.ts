@@ -53,48 +53,49 @@ function setupRegistrants() {
   const state = getState();
   const indexPools = selectors.selectAllPools(state);
   const stakingPools = selectors.selectAllStakingPools(state);
-  const {
-    pairDataCalls,
-    poolDetailCalls,
-    totalSuppliesCalls,
-  } = indexPools.reduce(
-    (prev, next) => {
-      const { id } = next;
-      const tokenIds = selectors.selectPoolTokenIds(state, id);
-      const pairs = buildUniswapPairs(tokenIds);
-      const pairDataCalls = createPairDataCalls(pairs);
-      const poolDetailCalls = createPoolDetailCalls(id, tokenIds);
-      const totalSuppliesCalls = createTotalSuppliesCalls(tokenIds);
+  const { pairDataCalls, poolDetailCalls, totalSuppliesCalls } =
+    indexPools.reduce(
+      (prev, next) => {
+        const { id } = next;
+        const tokenIds = selectors.selectPoolTokenIds(state, id);
+        const pairs = buildUniswapPairs(tokenIds);
+        const pairDataCalls = createPairDataCalls(pairs);
+        prev.pairDataCalls.onChainCalls.push(...pairDataCalls);
 
-      prev.pairDataCalls.onChainCalls = pairDataCalls;
-      prev.poolDetailCalls.onChainCalls = poolDetailCalls.onChainCalls;
-      prev.poolDetailCalls.offChainCalls = poolDetailCalls.offChainCalls as RegisteredCall[];
-      prev.totalSuppliesCalls.onChainCalls = totalSuppliesCalls;
+        const poolDetailCalls = createPoolDetailCalls(id, tokenIds);
+        prev.poolDetailCalls.onChainCalls.push(...poolDetailCalls.onChainCalls);
+        prev.poolDetailCalls.offChainCalls.push(
+          ...(poolDetailCalls.offChainCalls as RegisteredCall[])
+        );
 
-      return prev;
-    },
-    {
-      pairDataCalls: {
-        caller: "Pair Data",
-        onChainCalls: [],
-        offChainCalls: [],
+        const totalSuppliesCalls = createTotalSuppliesCalls(tokenIds);
+        prev.totalSuppliesCalls.onChainCalls.push(...totalSuppliesCalls);
+
+        return prev;
       },
-      poolDetailCalls: {
-        caller: "Pool Data",
-        onChainCalls: [],
-        offChainCalls: [],
-      },
-      totalSuppliesCalls: {
-        caller: "Total Supplies",
-        onChainCalls: [],
-        offChainCalls: [],
-      },
-    } as {
-      pairDataCalls: RegisteredCaller;
-      poolDetailCalls: RegisteredCaller;
-      totalSuppliesCalls: RegisteredCaller;
-    }
-  );
+      {
+        pairDataCalls: {
+          caller: "Pair Data",
+          onChainCalls: [],
+          offChainCalls: [],
+        },
+        poolDetailCalls: {
+          caller: "Pool Data",
+          onChainCalls: [],
+          offChainCalls: [],
+        },
+        totalSuppliesCalls: {
+          caller: "Total Supplies",
+          onChainCalls: [],
+          offChainCalls: [],
+        },
+      } as {
+        pairDataCalls: RegisteredCaller;
+        poolDetailCalls: RegisteredCaller;
+        totalSuppliesCalls: RegisteredCaller;
+      }
+    );
+
   const stakingCalls = stakingPools.reduce(
     (prev, next) => {
       const { id, stakingToken } = next;
