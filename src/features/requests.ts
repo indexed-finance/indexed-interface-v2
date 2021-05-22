@@ -1,3 +1,7 @@
+import * as batcherRequests from './batcher/requests';
+import * as indexPoolsRequests from './indexPools/requests';
+import * as stakingRequests from './staking/requests';
+import * as tokensRequests from './tokens/requests';
 import { MIN_WEIGHT } from "ethereum";
 import { NDX_ADDRESS, WETH_CONTRACT_ADDRESS } from "config";
 import { createAsyncThunk } from "@reduxjs/toolkit";
@@ -292,3 +296,11 @@ export const fetchInitialData = createAsyncThunk(
     return normalizeInitialData(initial);
   }
 );
+
+export const requests = {
+  ...batcherRequests,
+  ...indexPoolsRequests,
+  ...stakingRequests,
+  ...tokensRequests,
+  fetchInitialData
+}

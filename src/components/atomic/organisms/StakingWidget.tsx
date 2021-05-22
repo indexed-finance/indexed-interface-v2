@@ -46,9 +46,11 @@ export function StakingWidget(props: FormattedStakingData) {
       }
       stats={
         <Space direction="vertical">
+          <Statistic title={tx("STAKED")} value={`${props.staked} ${symbol}`} />
+          <Statistic title={tx("EARNED")} value={props.earned} />
           <Statistic
             title={tx("APY")}
-            value={apy ?? tx("STAKING_EXPIRED")}
+            value={apy ?? "Expired"}
             valueStyle={{ color: isExpired ? "#333" : "inherit" }}
           />
           <Statistic
@@ -56,8 +58,6 @@ export function StakingWidget(props: FormattedStakingData) {
             value={isExpired ? "Expired" : props.rate}
             valueStyle={{ color: isExpired ? "#333" : "inherit" }}
           />
-          <Statistic title={tx("STAKED")} value={`${props.staked} ${symbol}`} />
-          <Statistic title={tx("EARNED")} value={props.earned} />
         </Space>
       }
       actions={

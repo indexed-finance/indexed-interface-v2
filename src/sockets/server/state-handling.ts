@@ -1,5 +1,5 @@
 import { INFURA_ID } from "config";
-import { actions, selectors, store } from "features";
+import { actions, requests, selectors, store } from "features";
 import {
   buildUniswapPairs,
   createPairDataCalls,
@@ -95,7 +95,6 @@ function setupRegistrants() {
         totalSuppliesCalls: RegisteredCaller;
       }
     );
-
   const stakingCalls = stakingPools.reduce(
     (prev, next) => {
       const { id, stakingToken } = next;
@@ -123,4 +122,9 @@ function setupRegistrants() {
       stakingCalls,
     ])
   );
+  dispatch(
+    requests.fetchStakingData({
+      provider,
+    })
+  )
 }
