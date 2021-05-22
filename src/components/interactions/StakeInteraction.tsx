@@ -58,6 +58,7 @@ export function StakeInteraction({ indexPool }: Props) {
           </Space>
         </Formik>
       </Col>
+      
       <Col
         span={14}
         style={{ paddingBottom: 12, height: 275, overflow: "auto" }}

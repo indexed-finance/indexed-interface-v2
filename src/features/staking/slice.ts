@@ -74,9 +74,14 @@ export const stakingSelectors = {
         ({ stakingToken }) => stakingToken.toLowerCase() === id.toLowerCase()
       );
   },
-  selectStakingPoolsByStakingTokens(state: AppState, ids: string[]): Array<NormalizedStakingPool | undefined> {
+  selectStakingPoolsByStakingTokens(
+    state: AppState,
+    ids: string[]
+  ): Array<NormalizedStakingPool | undefined> {
     const allPools = stakingSelectors.selectAllStakingPools(state);
-    return ids.map(id => allPools.find(p => p.stakingToken.toLowerCase() === id.toLowerCase()))
+    return ids.map((id) =>
+      allPools.find((p) => p.stakingToken.toLowerCase() === id.toLowerCase())
+    );
   },
 };
 

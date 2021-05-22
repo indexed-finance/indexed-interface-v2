@@ -5,4 +5,5 @@ export * from './IndexPool';
 export * from './IndexPools';
 export * from './Portfolio';
 export * from './Splash';
+export * from './Stake';
 export * from './Staking';

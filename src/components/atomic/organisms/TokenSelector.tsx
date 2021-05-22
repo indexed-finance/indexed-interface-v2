@@ -197,7 +197,6 @@ export function TokenSelector({
           style={{
             justifyContent: "space-between",
             flexDirection: reversed ? "row-reverse" : "row",
-            width: "100%",
           }}
         >
           <Space direction="vertical" style={{ width: "100%" }}>

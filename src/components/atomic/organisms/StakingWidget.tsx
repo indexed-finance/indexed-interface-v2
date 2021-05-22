@@ -1,10 +1,9 @@
 import { AppState, FormattedStakingData, selectors } from "features";
-import { Badge, Button, Drawer, Space, Statistic } from "antd";
+import { Badge, Button, Space, Statistic } from "antd";
 import { FaTractor } from "react-icons/fa";
-import { StakeInteraction } from "components/interactions";
+import { Link, useHistory } from "react-router-dom";
 import { Widget } from "./Widget";
 import { convert } from "helpers";
-import { useHistory } from "react-router-dom";
 import {
   usePoolDetailRegistrar,
   useStakingApy,
@@ -12,7 +11,6 @@ import {
   useTranslator,
 } from "hooks";
 import { useSelector } from "react-redux";
-import { useState } from "react";
 
 export function StakingWidget(props: FormattedStakingData) {
   const tx = useTranslator();
@@ -34,7 +32,6 @@ export function StakingWidget(props: FormattedStakingData) {
       : []
   );
   const { push } = useHistory();
-  const [showingStakingForm, setShowingStakingForm] = useState(false);
   const inner = (
     <div style={{ position: "relative" }}>
       <Widget
@@ -73,36 +70,20 @@ export function StakingWidget(props: FormattedStakingData) {
               type={isExpired ? "ghost" : "primary"}
               disabled={isExpired}
               size="large"
-              onClick={(event) => {
-                event.stopPropagation();
-                setShowingStakingForm(true);
-              }}
+              onClick={(event) => event.stopPropagation()}
             >
               {formattedIndexPool && (
+                <Link to={`/staking/${props.id}`}>
                   <Space>
                     <FaTractor style={{ position: "relative", top: 2 }} />
-                    <span>
-                      {isExpired ? tx("STAKING_EXPIRED") : tx("STAKE")}
-                    </span>
+                    <span>{isExpired ? tx("STAKING_EXPIRED") : tx("STAKE")}</span>
                   </Space>
+                </Link>
               )}
             </Button>
           </>
         }
       />
-      {formattedIndexPool && showingStakingForm && (
-        <Drawer
-          getContainer={false}
-          style={{ position: "absolute", left: 0, top: 75}}
-          width="98%"
-          placement="right"
-          visible={true}
-          closable={true}
-          onClose={() => setShowingStakingForm(false)}
-        >
-          <StakeInteraction indexPool={formattedIndexPool} />
-        </Drawer>
-      )}
     </div>
   );
 

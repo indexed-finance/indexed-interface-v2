@@ -7,6 +7,7 @@ type RouteWithBreadcrumbs = RouteProps & { breadcrumbName?: TranslatedTerm };
 const Splash = lazy(() => import("./components/routes/Splash"));
 const Portfolio = lazy(() => import("./components/routes/Portfolio"));
 const Staking = lazy(() => import("./components/routes/Staking"));
+const Stake = lazy(() => import("./components/routes/Stake"));
 const IndexPools = lazy(() => import("./components/routes/IndexPools"));
 const IndexPool = lazy(() => import("./components/routes/IndexPool"));
 
@@ -27,6 +28,11 @@ export const routes: RouteWithBreadcrumbs[] = [
     breadcrumbName: "STAKE",
     exact: true,
     component: Staking,
+  },
+  {
+    path: "/staking/:id",
+    exact: true,
+    component: Stake,
   },
   {
     path: "/index-pools",

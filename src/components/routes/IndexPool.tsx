@@ -12,7 +12,7 @@ import {
 } from "components/atomic";
 import { IndexPoolInteraction, useInteractionDrawer } from "components/drawers";
 import { useEffect } from "react";
-import { useParams } from "react-router";
+import { useParams } from "react-router-dom";
 import { usePoolDetailRegistrar, useQuery, useStakingApy } from "hooks";
 import { useSelector } from "react-redux";
 
