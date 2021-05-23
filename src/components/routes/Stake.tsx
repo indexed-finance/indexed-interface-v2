@@ -12,7 +12,7 @@ import { Link, useParams } from "react-router-dom";
 import { abbreviateAddress, convert } from "helpers";
 import { format } from "date-fns";
 import { useMemo, useState } from "react";
-import { usePortfolioData, useStakingTransactionCallbacks } from "hooks";
+import { usePortfolioData, useStakingRegistrar, useStakingTransactionCallbacks } from "hooks";
 import { useSelector } from "react-redux";
 
 
@@ -281,7 +281,7 @@ export default function Stake() {
       toStake
         ? data.tokens.find((token) => (token.address.toLowerCase() === toStake.stakingToken.toLowerCase()))
         : null,
-    [data.tokens, ]
+    [data.tokens, toStake]
   );
   const relevantStakingToken = useSelector((state: AppState) =>
     selectors.selectStakingPool(state, id)
