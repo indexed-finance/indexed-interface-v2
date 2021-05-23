@@ -1,4 +1,4 @@
-import { Alert, Button, Col, Descriptions, Row, Space, Statistic } from "antd";
+import { Alert, Button, Col, Descriptions, Row, Space, Statistic, Typography } from "antd";
 import {
   AppState,
   FormattedPortfolioAsset,
@@ -11,69 +11,193 @@ import { Label, Page, TokenSelector } from "components/atomic";
 import { Link, useParams } from "react-router-dom";
 import { abbreviateAddress, convert } from "helpers";
 import { format } from "date-fns";
-import { useMemo } from "react";
-import { usePortfolioData } from "hooks";
+import { useMemo, useState } from "react";
+import { usePortfolioData, useStakingTransactionCallbacks } from "hooks";
 import { useSelector } from "react-redux";
 
-function StakingForm({ token }: { token: FormattedPortfolioAsset }) {
+
+function StakingForm({
+  token,
+  stakingToken,
+  expired
+}: {
+  token: FormattedPortfolioAsset;
+  stakingToken: NormalizedStakingPool;
+  expired: boolean;
+}) {
   const { setFieldValue, setFieldError, values, errors } = useFormikContext<{
     amount: number;
   }>();
+  const [inputType, setInputType] = useState<'stake' | 'unstake'>('stake');
+  const {
+    stake,
+    withdraw,
+    exit,
+    claim
+  } = useStakingTransactionCallbacks(stakingToken.id)
+  
+  const staked = useMemo(() => token.staking, [token.staking])
+
+  const [estimatedReward, weight] = useMemo(() => {
+    const stakedAmount = parseFloat(staked || '0');
+    const addAmount = inputType === 'stake' ? values.amount : -(values.amount);
+    const userNewStaked = stakedAmount + addAmount;
+    if (userNewStaked < 0 || expired) {
+      return [0, 0];
+    }
+    const totalStaked = convert.toBalanceNumber(stakingToken.totalSupply, 18);
+    const newTotalStaked = totalStaked + addAmount;
+    const dailyRewardsTotal = convert.toBalanceNumber(
+      convert.toBigNumber(stakingToken.rewardRate).times(86400), 18
+    );
+    const weight = userNewStaked / newTotalStaked;
+    return [
+      convert.toComma(weight * dailyRewardsTotal),
+      weight
+    ]
+  }, [values.amount, stakingToken.totalSupply, stakingToken.rewardRate, staked, expired, inputType])
+
+  const handleSubmit = () => {
+    if (inputType === 'stake') stake(convert.toToken(values.amount.toString(), 18).toString());
+    else withdraw(convert.toToken(values.amount.toString(), 18).toString())
+  }
+
+  if (expired) {
+    return (
+      <>
+      <Space direction="vertical" size="large" style={{ width: "100%" }}>
+        <Alert
+          type="warning"
+          message={
+            <Row style={{ textAlign: "center", width: "100%" }} justify='center'>
+              <Col span={20}>
+                This staking pool has expired. New deposits can not be made, and all staked tokens should be withdrawn.
+              </Col>
+            </Row>
+          }
+        />
+        {
+          (parseFloat(staked) > 0) && <>
+            <Row style={{ textAlign: "center", width: "100%" }} justify='center'>
+              <Col span={16}>
+                <h2>Staked: {staked} {token.symbol}</h2>
+              </Col>
+            </Row>
+            <Row style={{ textAlign: "center", width: "100%" }} justify='center'>
+              <Col span={16}>
+                <h2>Rewards: {token.ndxEarned} NDX</h2>
+              </Col>
+            </Row>
+              
+            <Row style={{ textAlign: "center", width: "100%" }} justify='center'>
+              <Col span={12}>
+                <Button
+                  type="primary"
+                  block={true}
+                  disabled={parseFloat(staked || '0') <= 0}
+                  danger
+                  title='Withdraw all staked tokens and rewards.'
+                  onClick={exit}
+                >
+                  Exit
+                </Button>
+              </Col>
+            </Row>
+          </>
+        }
+      </Space>
+      </>
+    )
+  }
 
   return (
     <>
       <Space direction="vertical" size="large" style={{ width: "100%" }}>
-        <div>
-          <TokenSelector
-            assets={[]}
-            value={{
-              token: "NFTP",
-              amount: values.amount,
-            }}
-            selectable={false}
-            autoFocus={true}
-            onChange={(value) => {
-              if (value.amount) {
-                setFieldValue("amount", value.amount);
+        <Row style={{ textAlign: "center" }}>
+          <Col span={20}>
+            <TokenSelector
+              assets={[]}
+              value={{
+                token: token.symbol,
+                amount: values.amount,
+              }}
+              isInput
+              autoFocus
+              balanceLabel={inputType === 'unstake' ? 'Staked' : undefined}
+              balanceOverride={inputType === 'unstake' ? staked : undefined}
+              selectable={false}
+              onChange={(value) => {
+                if (value.amount) {
+                  setFieldValue("amount", value.amount);
 
-                if (
-                  value.amount > parseFloat(convert.toBalance(token.balance))
-                ) {
-                  setFieldError("amount", "Insufficient balance");
+                  if (
+                    value.amount > parseFloat(convert.toBalance(token.balance))
+                  ) {
+                    setFieldError("amount", "Insufficient balance");
+                  }
                 }
-              }
-            }}
-            balance={token.balance}
-            error={errors.amount}
-          />
-        </div>
+              }}
+              balance={token.balance}
+              error={errors.amount}
+            />
+          </Col>
+        </Row>
 
         <Alert
           type="warning"
           message={
             <Row style={{ textAlign: "center" }}>
               <Col span={12}>
-                <Statistic title="Estimated Reward" value="0.00 NDX / Day" />
+                <Statistic title="Estimated Reward" value={`${estimatedReward} NDX / Day`} />
               </Col>
               <Col span={12}>
-                <Statistic title="Pool Weight" value="0.113%" />
+                <Statistic title="Pool Weight" value={convert.toPercent(weight)} />
               </Col>
             </Row>
           }
         />
+        <Row justify='space-around' style={{ textAlign: "center", width: '100%' }}>
+          <Col span={12} style={{ textAlign: 'center', alignSelf: 'center' }}>
+            <Button
+              type='primary'
+              danger={inputType === 'unstake'}
+              block={true}
+              onClick={handleSubmit}
+              disabled={inputType === 'stake' ? expired : (parseFloat(staked || '0') <= 0)}
+            >
+              { inputType === 'stake' ? 'Deposit' : 'Withdraw' }
+            </Button>
+          </Col>
+          <Col span={4}>
+            <Button
+              type='primary'
+              danger={inputType === 'stake'}
+              block={true}
+              onClick={() => setInputType(inputType === 'stake' ? 'unstake' : 'stake')}
+            >
+            { inputType === 'stake' ? 'Withdraw' : 'Deposit' }
+            </Button>
+          </Col>
+        </Row>
 
         <Space direction="vertical" style={{ width: "100%" }}>
           <Label>Actions</Label>
-          <Button type="default" block={true}>
-            Stake
-          </Button>
-          <Button type="default" block={true}>
+          <Button
+            type="default"
+            block={true}
+            disabled={parseFloat(staked || '0') <= 0}
+            onClick={claim}
+            title='Claim NDX rewards'
+          >
             Claim
           </Button>
-          <Button type="default" block={true}>
-            Unstake
-          </Button>
-          <Button type="default" block={true}>
+          <Button
+            type="default"
+            block={true}
+            disabled={parseFloat(staked || '0') <= 0}
+            title='Withdraw all staked tokens and rewards.'
+            onClick={exit}
+          >
             Exit
           </Button>
         </Space>
@@ -86,7 +210,9 @@ function StakingStats({
   symbol,
   portfolioToken,
   stakingToken,
+  expired
 }: {
+  expired: boolean;
   symbol: string;
   portfolioToken: FormattedPortfolioAsset;
   stakingToken: NormalizedStakingPool;
@@ -95,18 +221,32 @@ function StakingStats({
     <Descriptions bordered={true} column={1}>
       {/* Left Column */}
       <Descriptions.Item label="Earned Rewards">
-        {portfolioToken.ndxEarned} NDX
+        {
+          (+portfolioToken.ndxEarned > 0) ?
+          <Row style={{ textAlign: "center" }}>
+            <Col span={12}>
+              {portfolioToken.ndxEarned} NDX
+            </Col>
+            <Col span={12}>
+              <Button type="primary" block={true}>
+                Claim
+              </Button>
+            </Col>
+          </Row>
+          : <>{portfolioToken.ndxEarned} NDX</>
+        }
       </Descriptions.Item>
 
       <Descriptions.Item label="Currently Staking">
-        {portfolioToken.staking || `0.00 ${symbol}`}
+        {portfolioToken.staking || `0.00`} {symbol}
       </Descriptions.Item>
 
-      <Descriptions.Item label="Reward Rate per Day">
-        {convert.toBalance(
-          (parseFloat(stakingToken.rewardRate) * 86400).toString()
-        )}{" "}
-        NDX
+      <Descriptions.Item label="Reward Rate per Day" contentStyle={{ color: expired ? "#333" : "inherit" }}>
+        {
+          expired ? "Expired" : `${convert.toBalance(
+            (parseFloat(stakingToken.rewardRate) * 86400).toString()
+          )} NDX`
+        }
       </Descriptions.Item>
 
       <Descriptions.Item label="Rewards Pool">
@@ -116,13 +256,12 @@ function StakingStats({
       </Descriptions.Item>
 
       {/* Right Column */}
-      <Descriptions.Item label="Staking Ends">
+      <Descriptions.Item label={expired ? 'Staking Ended' : 'Staking Ends'} contentStyle={{ color: expired ? "#333" : "inherit" }}>
         {format(stakingToken.periodFinish * 1000, "MMM c, yyyy HH:mm:ss")} UTC
       </Descriptions.Item>
       <Descriptions.Item label="Total Staked">
-        {convert.toBalance(stakingToken.totalSupply)} {symbol}
+        {convert.toBalance(stakingToken.totalSupply, 18, true)} {symbol}
       </Descriptions.Item>
-      <Descriptions.Item label="Total NDX per Day">--</Descriptions.Item>
       <Descriptions.Item label="Staking Token">
         {symbol} <BiLinkExternal />
       </Descriptions.Item>
@@ -133,37 +272,27 @@ function StakingStats({
 export default function Stake() {
   const { id } = useParams<{ id: string }>();
   const data = usePortfolioData();
+  // console.log(data)
   const toStake = useSelector((state: AppState) =>
     selectors.selectStakingPool(state, id)
   );
-  const relevantIndexPool = useSelector((state: AppState) =>
-    toStake ? selectors.selectPool(state, toStake.indexPool) : ""
-  );
   const relevantPortfolioToken = useMemo(
     () =>
-      relevantIndexPool
-        ? data.tokens.find((token) => token.symbol === relevantIndexPool.symbol)
+      toStake
+        ? data.tokens.find((token) => (token.address.toLowerCase() === toStake.stakingToken.toLowerCase()))
         : null,
-    [data.tokens, relevantIndexPool]
+    [data.tokens, ]
   );
   const relevantStakingToken = useSelector((state: AppState) =>
     selectors.selectStakingPool(state, id)
   );
 
-  if (
-    !(
-      toStake &&
-      relevantIndexPool &&
-      relevantPortfolioToken &&
-      relevantStakingToken
-    )
-  ) {
+  if (!(toStake && relevantPortfolioToken && relevantStakingToken)) {
     return <div>Derp</div>;
   }
 
-  const stakingToken = toStake.isWethPair
-    ? `ETH/${relevantIndexPool.symbol}`
-    : relevantIndexPool.symbol;
+  const isExpired = relevantStakingToken.periodFinish < (Date.now() / 1000);
+  const stakingToken = relevantPortfolioToken.symbol
 
   return (
     <Page hasPageHeader={true} title={`Stake ${stakingToken}`}>
@@ -177,7 +306,7 @@ export default function Stake() {
               }}
               onSubmit={console.log}
             >
-              <StakingForm token={relevantPortfolioToken} />
+              <StakingForm token={relevantPortfolioToken} stakingToken={relevantStakingToken} expired={isExpired} />
             </Formik>
           </Col>
           <Col span={14}>
@@ -185,6 +314,7 @@ export default function Stake() {
               symbol={stakingToken}
               portfolioToken={relevantPortfolioToken}
               stakingToken={relevantStakingToken}
+              expired={isExpired}
             />
           </Col>
         </Row>
