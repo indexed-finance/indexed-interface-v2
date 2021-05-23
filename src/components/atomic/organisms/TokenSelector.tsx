@@ -197,6 +197,7 @@ export function TokenSelector({
           style={{
             justifyContent: "space-between",
             flexDirection: reversed ? "row-reverse" : "row",
+            alignItems: "flex-end",
           }}
         >
           <Space direction="vertical" style={{ width: "100%" }}>
@@ -221,7 +222,7 @@ export function TokenSelector({
                 fontSize: 22,
                 flex: reversed ? 1 : 0,
               }}
-              className={error ? 'input-with-error' : ''}
+              className={error ? "input-with-error" : ""}
             />
           </Space>
           <div>

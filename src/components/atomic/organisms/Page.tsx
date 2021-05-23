@@ -2,7 +2,6 @@ import { Card, PageHeader, Typography } from "antd";
 import { ReactNode } from "react";
 import { useBreakpoints } from "hooks";
 import { useHistory } from "react-router-dom";
-import texture from "theme/images/texture.png";
 
 interface Props {
   title?: ReactNode;
@@ -27,7 +26,6 @@ export function Page({
   return (
     <div
       style={{
-        background: `url(${texture})`,
         width: isMobile ? "96vw" : "80vw",
         maxWidth: 1200,
         minHeight: "100vh",
@@ -40,7 +38,6 @@ export function Page({
         bodyStyle={{
           padding: isMobile ? "24px 12px" : 24,
           marginTop: -9,
-          background: `url(${texture})`,
         }}
         title={
           hasPageHeader ? (
