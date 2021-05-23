@@ -40,6 +40,8 @@ type Asset = {
 interface Props {
   max?: number | undefined;
   showBalance?: boolean;
+  balanceLabel?: string;
+  balanceOverride?: string;
   label?: ReactNode;
   assets: Asset[];
   value?: TokenSelectorValue;
@@ -54,6 +56,8 @@ interface Props {
 
 export function TokenSelector({
   showBalance = true,
+  balanceLabel,
+  balanceOverride,
   label = "",
   assets,
   value = {},
@@ -78,13 +82,16 @@ export function TokenSelector({
     token,
     tokenLookup,
   ]);
-  const rawBalance = useTokenBalance(selectedToken!.id ?? "");
+  const rawBalance = useTokenBalance(selectedToken?.id ?? "");
   const balance = useMemo(() => {
+    if (balanceOverride) {
+      return parseFloat(balanceOverride)
+    }
     if (rawBalance && selectedToken) {
       return convert.toBalanceNumber(rawBalance, selectedToken.decimals, 18);
     }
     return 0;
-  }, [rawBalance, selectedToken]);
+  }, [rawBalance, selectedToken, balanceOverride]);
 
   const triggerChange = useCallback(
     (changedValue: TokenSelectorValue) => {
@@ -202,6 +209,7 @@ export function TokenSelector({
         >
           <Space direction="vertical" style={{ width: "100%" }}>
             <TokenInputDecorator
+              balanceLabel={balanceLabel}
               error={haveInsufficientBalance ? "Insufficient balance" : error}
               showBalance={showBalance}
               balance={balance}
@@ -240,7 +248,7 @@ export function TokenSelector({
                       name=""
                       symbol={value.token}
                       size="small"
-                      address={selectedToken!.id ?? ""}
+                      address={selectedToken?.id ?? ""}
                     />
                   </>
                 ) : (

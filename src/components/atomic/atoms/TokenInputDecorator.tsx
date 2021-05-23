@@ -6,10 +6,12 @@ type Props = {
   balance: number;
   error?: string;
   onClickMax?: () => void;
+  balanceLabel?: string;
 };
 
 export function TokenInputDecorator({
   showBalance,
+  balanceLabel = 'Balance',
   balance,
   error,
   onClickMax,
@@ -22,7 +24,7 @@ export function TokenInputDecorator({
     <Typography.Text type="secondary" style={{ textAlign: "left" }}>
       {balance > 0 ? (
         <>
-          Balance: <AbbreviatedBalance balance={balance} />{" "}
+          {balanceLabel}: <AbbreviatedBalance balance={balance} />{" "}
           
           {error && (
             <Typography.Text
