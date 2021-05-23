@@ -345,6 +345,7 @@ export interface StakingTransactionCallbacks {
   stake: (amount: string) => void;
   withdraw: (amount: string) => void;
   exit: () => void;
+  claim: () => void;
 }
 
 export function useStakingTransactionCallbacks(stakingPool: string): StakingTransactionCallbacks {
@@ -354,14 +355,14 @@ export function useStakingTransactionCallbacks(stakingPool: string): StakingTran
   const stake = useCallback((amount: string) => {
     // @todo Figure out a better way to handle this
     if (!contract) throw new Error();
-    const tx = contract.stake(convert.toBigNumber(amount));
+    const tx = contract.stake(amount);
     addTransaction(tx);
   }, [ contract, addTransaction ])
 
   const withdraw = useCallback((amount: string) => {
     // @todo Figure out a better way to handle this
     if (!contract) throw new Error();
-    const tx = contract.withdraw(convert.toBigNumber(amount));
+    const tx = contract.withdraw(amount);
     addTransaction(tx);
   }, [ contract, addTransaction ])
 
@@ -372,9 +373,17 @@ export function useStakingTransactionCallbacks(stakingPool: string): StakingTran
     addTransaction(tx);
   }, [ contract, addTransaction ])
 
+  const claim = useCallback(() => {
+    // @todo Figure out a better way to handle this
+    if (!contract) throw new Error();
+    const tx = contract.claim();
+    addTransaction(tx);
+  }, [ contract, addTransaction ])
+
   return {
     stake,
     exit,
-    withdraw
+    withdraw,
+    claim
   }
 }
