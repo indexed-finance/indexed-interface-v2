@@ -68,7 +68,7 @@ export function StakingWidget(props: FormattedStakingData) {
           <>
             <Button
               type={isExpired ? "ghost" : "primary"}
-              // disabled={isExpired}
+              // disabled={isExpired} This should not be disabled - people need to be able to withdraw.
               size="large"
               onClick={(event) => event.stopPropagation()}
             >
