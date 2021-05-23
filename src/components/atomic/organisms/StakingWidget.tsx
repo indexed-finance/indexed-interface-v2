@@ -68,7 +68,7 @@ export function StakingWidget(props: FormattedStakingData) {
           <>
             <Button
               type={isExpired ? "ghost" : "primary"}
-              disabled={isExpired}
+              // disabled={isExpired}
               size="large"
               onClick={(event) => event.stopPropagation()}
             >
