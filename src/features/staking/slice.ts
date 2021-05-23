@@ -34,11 +34,11 @@ const slice = createSlice({
             const entry = state.entities[stakingPoolAddress];
 
             if (entry) {
-              entry.rewardsDuration = update.rewardsDuration;
-              entry.periodFinish = update.periodFinish;
-              entry.rewardRate = update.rewardRate;
-              entry.rewardPerTokenStored = update.rewardPerTokenStored;
-              entry.totalSupply = update.totalSupply;
+              if (update.rewardsDuration) entry.rewardsDuration = update.rewardsDuration;
+              if (update.periodFinish) entry.periodFinish = update.periodFinish;
+              if (update.rewardRate) entry.rewardRate = update.rewardRate;
+              if (update.rewardPerTokenStored) entry.rewardPerTokenStored = update.rewardPerTokenStored;
+              if (update.totalSupply) entry.totalSupply = update.totalSupply;
 
               if (update.userData) {
                 entry.userData = update.userData;
