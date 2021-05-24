@@ -85,7 +85,7 @@ export function TokenSelector({
   const rawBalance = useTokenBalance(selectedToken?.id ?? "");
   const balance = useMemo(() => {
     if (balanceOverride) {
-      return parseFloat(balanceOverride)
+      return parseFloat(balanceOverride);
     }
     if (rawBalance && selectedToken) {
       return convert.toBalanceNumber(rawBalance, selectedToken.decimals, 18);
@@ -202,6 +202,7 @@ export function TokenSelector({
         <Space
           direction="horizontal"
           style={{
+            width: "100%",
             justifyContent: "space-between",
             flexDirection: reversed ? "row-reverse" : "row",
             alignItems: "flex-end",

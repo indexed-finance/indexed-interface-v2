@@ -28,16 +28,14 @@ function StakingForm({
   stakingToken: NormalizedStakingPool;
   expired: boolean;
 }) {
-  const { setFieldValue, setFieldError, values, errors } = useFormikContext<{
+  const { setFieldValue, values, errors } = useFormikContext<{
     amount: number;
   }>();
   const [inputType, setInputType] = useState<"stake" | "unstake">("stake");
   const { stake, withdraw, exit, claim } = useStakingTransactionCallbacks(
     stakingToken.id
   );
-
   const staked = useMemo(() => token.staking, [token.staking]);
-
   const [estimatedReward, weight] = useMemo(() => {
     const stakedAmount = parseFloat(staked || "0");
     const addAmount = inputType === "stake" ? values.amount : -values.amount;
@@ -73,18 +71,10 @@ function StakingForm({
       <>
         <Space direction="vertical" size="large" style={{ width: "100%" }}>
           <Alert
+            style={{ textAlign: "center" }}
             type="warning"
-            message={
-              <Row
-                style={{ textAlign: "center", width: "100%" }}
-                justify="center"
-              >
-                <Col span={20}>
-                  This staking pool has expired. New deposits can not be made,
-                  and all staked tokens should be withdrawn.
-                </Col>
-              </Row>
-            }
+            message="This staking pool has expired. New deposits can not be made,
+            and all staked tokens should be withdrawn."
           />
           {parseFloat(staked) > 0 && (
             <>
@@ -134,35 +124,25 @@ function StakingForm({
   return (
     <>
       <Space direction="vertical" size="large" style={{ width: "100%" }}>
-        <Row style={{ textAlign: "center" }}>
-          <Col span={20}>
-            <TokenSelector
-              assets={[]}
-              value={{
-                token: token.symbol,
-                amount: values.amount,
-              }}
-              isInput
-              autoFocus
-              balanceLabel={inputType === "unstake" ? "Staked" : undefined}
-              balanceOverride={inputType === "unstake" ? staked : undefined}
-              selectable={false}
-              onChange={(value) => {
-                if (value.amount) {
-                  setFieldValue("amount", value.amount);
-
-                  if (
-                    value.amount > parseFloat(convert.toBalance(token.balance))
-                  ) {
-                    setFieldError("amount", "Insufficient balance");
-                  }
-                }
-              }}
-              balance={token.balance}
-              error={errors.amount}
-            />
-          </Col>
-        </Row>
+        <TokenSelector
+          assets={[]}
+          value={{
+            token: token.symbol,
+            amount: values.amount,
+          }}
+          balanceLabel={inputType === "unstake" ? "Staked" : undefined}
+          balanceOverride={inputType === "unstake" ? staked : undefined}
+          isInput={true}
+          autoFocus={true}
+          selectable={false}
+          onChange={(value) => {
+            if (value.amount) {
+              setFieldValue("amount", value.amount);
+            }
+          }}
+          balance={token.balance}
+          error={errors.amount}
+        />
 
         <Alert
           type="warning"
@@ -303,10 +283,7 @@ function StakingStats({
 
 export default function Stake() {
   const { id } = useParams<{ id: string }>();
-
-  useStakingRegistrar();
   const data = usePortfolioData();
-  // console.log(data)
   const toStake = useSelector((state: AppState) =>
     selectors.selectStakingPool(state, id)
   );
@@ -323,6 +300,8 @@ export default function Stake() {
   const relevantStakingToken = useSelector((state: AppState) =>
     selectors.selectStakingPool(state, id)
   );
+
+  useStakingRegistrar();
 
   if (!(toStake && relevantPortfolioToken && relevantStakingToken)) {
     return <div>Derp</div>;
@@ -342,6 +321,20 @@ export default function Stake() {
                 amount: 0,
               }}
               onSubmit={console.log}
+              validateOnChange={true}
+              validateOnBlur={true}
+              validate={(values) => {
+                const errors: Record<string, string> = {};
+
+                if (
+                  values.amount >
+                  parseFloat(convert.toBalance(relevantPortfolioToken.balance))
+                ) {
+                  errors.amount = "Insufficient balance.";
+                }
+
+                return errors;
+              }}
             >
               <StakingForm
                 token={relevantPortfolioToken}
