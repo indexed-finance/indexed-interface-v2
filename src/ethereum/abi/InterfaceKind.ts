@@ -5,7 +5,9 @@ import IPoolInitializer_ABI from "./IPoolInitializer.json";
 import IPool_ABI from "./IPool.json";
 import IndexedUniswapRouterBurner_ABI from "./IndexedUniswapRouterBurner.json";
 import IndexedUniswapRouterMinter_ABI from "./IndexedUniswapRouterMinter.json";
+import MultiTokenStaking_ABI from "./MultiTokenStaking.json";
 import Pair_ABI from "./Pair.json";
+import RewardsSchedule_ABI from "./RewardsSchedule.json";
 import StakingRewardsFactory_ABI from "./StakingRewardsFactory.json";
 import StakingRewards_ABI from "./StakingRewards.json";
 import UniswapV2Router_ABI from "./UniswapV2Router.json";
@@ -22,6 +24,12 @@ export const IndexedUniswapRouterBurner = new Interface(
 );
 export const IndexedUniswapRouterMinter = new Interface(
   IndexedUniswapRouterMinter_ABI
+);
+export const MultiTokenStaking = new Interface(
+  MultiTokenStaking_ABI
+);
+export const RewardsSchedule = new Interface(
+  RewardsSchedule_ABI
 );
 
 export {
@@ -46,6 +54,8 @@ export const abiLookup = {
   UniswapV2Router_ABI,
   IndexedUniswapRouterBurner_ABI,
   IndexedUniswapRouterMinter_ABI,
+  MultiTokenStaking_ABI,
+  RewardsSchedule_ABI
 };
 
 export type InterfaceKind = keyof typeof abiLookup;
