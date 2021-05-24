@@ -1,9 +1,10 @@
 import { Col, Row, Space, Typography } from "antd";
 import { Page, PortfolioWidget } from "components/atomic";
 import { useMemo } from "react";
-import { usePortfolioData, useTranslator } from "hooks";
+import { usePortfolioData, useStakingRegistrar, useTranslator } from "hooks";
 
 export default function Portfolio() {
+  useStakingRegistrar()
   const tx = useTranslator();
   const { ndx, tokens, totalValue } = usePortfolioData();
   const data = useMemo(() => [ndx, ...tokens], [ndx, tokens]);

@@ -271,6 +271,8 @@ function StakingStats({
 
 export default function Stake() {
   const { id } = useParams<{ id: string }>();
+
+  useStakingRegistrar();
   const data = usePortfolioData();
   // console.log(data)
   const toStake = useSelector((state: AppState) =>
