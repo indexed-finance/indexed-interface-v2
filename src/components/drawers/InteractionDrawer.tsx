@@ -3,7 +3,6 @@ import { BiCoin } from "react-icons/bi";
 import {
   BurnInteraction,
   MintInteraction,
-  StakeInteraction,
   TradeInteraction,
 } from "components/interactions";
 import { Card, Col, Drawer, Menu, Row, Typography } from "antd";
@@ -82,7 +81,7 @@ export function InteractionDrawer({
             <BurnInteraction indexPool={formattedIndexPool} multi={true} />
           );
         case "stake":
-          return <StakeInteraction indexPool={formattedIndexPool} />;
+          return null;
         default:
           return null;
       }

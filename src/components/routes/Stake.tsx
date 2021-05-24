@@ -5,7 +5,6 @@ import {
   NormalizedStakingPool,
   selectors,
 } from "features";
-import { BiLinkExternal } from "react-icons/bi";
 import { ExternalLink, Label, Page, TokenSelector } from "components/atomic";
 import { Formik, useFormikContext } from "formik";
 import { Link, useParams } from "react-router-dom";
@@ -266,7 +265,7 @@ function StakingStats({
 
       <Descriptions.Item label="Rewards Pool">
         <ExternalLink to={`https://etherscan.io/address/${stakingToken.id}`}>
-          {abbreviateAddress(stakingToken.id)} <BiLinkExternal />
+          {abbreviateAddress(stakingToken.id)}
         </ExternalLink>
       </Descriptions.Item>
 
@@ -284,7 +283,7 @@ function StakingStats({
           <ExternalLink
             to={`https://v2.info.uniswap.org/pair/${stakingToken.stakingToken}`}
           >
-            {symbol} <BiLinkExternal />
+            {symbol}
           </ExternalLink>
         ) : (
           <Link to={slug ?? ""}>{symbol}</Link>

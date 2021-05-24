@@ -11,6 +11,8 @@ interface Props extends HTMLProps<HTMLDivElement> {
   netChangePercent?: string;
   inline?: boolean;
   textSize?: "small" | "large";
+  textAlign?: "left" | "center" | "right";
+  style?: any;
 }
 
 export function Quote({
@@ -22,6 +24,8 @@ export function Quote({
   netChangePercent = "",
   inline = false,
   textSize = "small",
+  textAlign = "left",
+  style = {},
 }: Props) {
   const inner = (
     <Space direction="vertical">
@@ -40,9 +44,11 @@ export function Quote({
               style={{
                 opacity: 0.75,
                 marginTop: 0,
-                marginRight: 12,
+                marginRight: 0,
                 marginBottom: 0,
                 justifyContent: "left",
+                textAlign,
+                ...style,
               }}
             >
               {price}
