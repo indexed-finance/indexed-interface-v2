@@ -3,13 +3,14 @@ import { Button, Space, Statistic, Typography } from "antd";
 import { Link, useHistory } from "react-router-dom";
 import { Progress, Token } from "components/atomic";
 import { Widget } from "./Widget";
-import { useBreakpoints, usePoolDetailRegistrar, useTranslator } from "hooks";
+import { useBreakpoints, usePoolDetailRegistrar, useStakingTokenPrice, useTranslator } from "hooks";
 import { useSelector } from "react-redux";
 import noop from "lodash.noop";
 
 export function PortfolioWidget(props: FormattedPortfolioAsset) {
   const tx = useTranslator();
   const isNdx = props.symbol === "NDX";
+  // const price = useStakingTokenPrice(props.address)
   const formattedIndexPool = useSelector((state: AppState) =>
     selectors.selectFormattedIndexPool(state, props.address)
   );
@@ -18,15 +19,20 @@ export function PortfolioWidget(props: FormattedPortfolioAsset) {
   );
   const { push } = useHistory();
   const { isMobile } = useBreakpoints();
+  console.log(props.price)
 
   usePoolDetailRegistrar(isNdx ? "" : props.address, tokenIds);
+
+  if (isNdx) {
+    console.log(`NDX BAL ${props.balance} | PRICE ${props.price}`)
+  }
 
   return (
     <Widget
       symbol={props.symbol}
       address={props.address}
-      price={isNdx ? "" : formattedIndexPool?.priceUsd ?? ""}
-      priceChange={isNdx ? "" : formattedIndexPool?.netChangePercent ?? ""}
+      price={props.price}
+      // priceChange={isNdx ? "" : formattedIndexPool?.netChangePercent ?? ""}
       stats={
         <Space direction="vertical">
           <div data-tooltip="portfolio-widget-earned">
@@ -60,17 +66,19 @@ export function PortfolioWidget(props: FormattedPortfolioAsset) {
       actions={
         isNdx ? null : (
           <Button type="primary" onClick={(event) => event.stopPropagation()}>
-            {formattedIndexPool && (
+            {props.balance}
+            {/* {formattedIndexPool && (
               <Link to={`${formattedIndexPool.slug}?interaction=trade`}>
                 {parseFloat(props.balance) > 0 ? "Buy more" : "Buy"}
               </Link>
-            )}
+            )} */}
           </Button>
         )
       }
-      onClick={() =>
-        formattedIndexPool ? push(formattedIndexPool.slug) : noop
-      }
+      /* onClick={() =>
+        props.
+        // formattedIndexPool ? push(formattedIndexPool.slug) : noop
+      } */
     >
       <div
         style={{
