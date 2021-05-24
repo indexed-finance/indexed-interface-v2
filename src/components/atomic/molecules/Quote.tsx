@@ -44,7 +44,7 @@ export function Quote({
               style={{
                 opacity: 0.75,
                 marginTop: 0,
-                marginRight: 0,
+                marginRight: 8,
                 marginBottom: 0,
                 justifyContent: "left",
                 textAlign,

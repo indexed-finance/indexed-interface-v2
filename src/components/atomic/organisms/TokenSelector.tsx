@@ -198,7 +198,7 @@ export function TokenSelector({
 
   return (
     <>
-      <div onClick={handleWrapperClick} style={{ marginBottom: 8 }}>
+      <div onClick={handleWrapperClick}>
         <Space
           direction="horizontal"
           style={{

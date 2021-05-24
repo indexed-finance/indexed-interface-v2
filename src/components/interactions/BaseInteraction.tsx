@@ -202,9 +202,14 @@ function SingleInteractionInner({
 
   const handleChange = (
     field: "from" | "to",
-    { token, amount, error: fieldError }: { token?: string; amount?: number; error?: string; }
+    {
+      token,
+      amount,
+      error: fieldError,
+    }: { token?: string; amount?: number; error?: string }
   ) => {
-    const [tokenField, amountField] = (field === "from") ? ['fromToken', 'fromAmount'] : ['toToken', 'toAmount'];
+    const [tokenField, amountField] =
+      field === "from" ? ["fromToken", "fromAmount"] : ["toToken", "toAmount"];
     const newValues = {
       ...values,
       [tokenField]: token || "",
@@ -216,13 +221,13 @@ function SingleInteractionInner({
     if (fieldError) {
       setFieldError(amountField, fieldError);
     } else if (calcError) {
-      if (calcError.includes('Input')) {
+      if (calcError.includes("Input")) {
         setFieldError("fromAmount", calcError);
       } else if (calcError.includes("Output")) {
         setFieldError("toAmount", calcError);
       }
     }
-  }
+  };
 
   return (
     <Row>
@@ -238,7 +243,7 @@ function SingleInteractionInner({
           }}
           selectable={!disableInputSelect}
           error={errors.fromAmount}
-          onChange={(newValues) => handleChange('from', newValues)}
+          onChange={(newValues) => handleChange("from", newValues)}
         />
 
         <Flipper disabled={disableFlip} onFlip={handleFlip} />
@@ -251,7 +256,7 @@ function SingleInteractionInner({
             amount: values.toAmount,
           }}
           selectable={!disableOutputSelect}
-          onChange={(newValues) => handleChange('to', newValues)}
+          onChange={(newValues) => handleChange("to", newValues)}
         />
 
         <Divider />
@@ -383,7 +388,7 @@ function MultiInteractionInner({
   handleSubmit,
   isInput,
   errors,
-  setFieldError
+  setFieldError,
 }: InnerMultiProps) {
   const tx = useTranslator();
   const tokenLookup = useSelector(selectors.selectTokenLookup);
@@ -396,7 +401,7 @@ function MultiInteractionInner({
     [spender, tokenLookup, values.fromAmount]
   );
   const handleChange = useCallback(
-    (changedValue: { token?: string; amount?: number, error?: string }) => {
+    (changedValue: { token?: string; amount?: number; error?: string }) => {
       if (changedValue.token) {
         setFieldValue("fromToken", changedValue.token, false);
       }
@@ -405,7 +410,7 @@ function MultiInteractionInner({
         setFieldValue("fromAmount", changedValue.amount, false);
       }
       if (changedValue.error) {
-        setFieldError('fromAmount', changedValue.error)
+        setFieldError("fromAmount", changedValue.error);
       }
     },
     [setFieldError, setFieldValue]
@@ -461,57 +466,92 @@ function MultiInteractionInner({
     <Row gutter={12}>
       <Col span={12}>
         <Space direction="vertical">
-        <TokenSelector
-          isInput={isInput}
-          error={errors.fromAmount}
-          assets={[]}
-          label={tx("FROM")}
-          selectable={false}
-          value={tokenValue}
-          onChange={handleChange}
-        />
-        <Divider />
-        {requiresApproval && status === "approval needed" ? (
-          <Button
-            type="primary"
-            style={{ width: "100%" }}
-            disabled={!isValid}
-            onClick={approve}
-          >
-            Approve
-          </Button>
-        ) : (
-          <Button
-            type="primary"
-            style={{ width: "100%" }}
-            disabled={!isValid || (requiresApproval && status === "unknown")}
-            onClick={() => handleSubmit()}
-          >
-            Send
-          </Button>
-        )}
+          <TokenSelector
+            isInput={isInput}
+            error={errors.fromAmount}
+            assets={[]}
+            label={tx("FROM")}
+            selectable={false}
+            value={tokenValue}
+            onChange={handleChange}
+          />
+          <Divider />
+          {requiresApproval && status === "approval needed" ? (
+            <Button
+              type="primary"
+              style={{ width: "100%" }}
+              disabled={!isValid}
+              onClick={approve}
+            >
+              Approve
+            </Button>
+          ) : (
+            <Button
+              type="primary"
+              style={{ width: "100%" }}
+              disabled={!isValid || (requiresApproval && status === "unknown")}
+              onClick={() => handleSubmit()}
+            >
+              Send
+            </Button>
+          )}
         </Space>
       </Col>
       <Col span={12}>
         <div style={{ maxHeight: 500, overflow: "auto" }}>
           {assets.map((asset) => (
-            <TokenSelector
-              isInput={!isInput}
-              key={asset.id}
-              selectable={false}
-              assets={[]}
-              showBalance={false}
-              value={{
-                token: asset.symbol,
-                amount: lookup[asset.id] ?? 0,
-              }}
-              error={(errors  as any)[asset.id]}
-              reversed={true}
+            <AssetEntry
+              {...asset}
+              spender={spender}
+              amount={lookup[asset.id] ?? 0}
+              error={(errors as any)[asset.id]}
             />
           ))}
         </div>
       </Col>
     </Row>
+  );
+}
+
+function AssetEntry(
+  props: Asset & { spender: string; amount: number; error: string }
+) {
+  const { status, approve } = useTokenApproval({
+    spender: props.spender,
+    tokenId: props.id,
+    amount: props.amount.toString(),
+    rawAmount: convert.toToken(props.amount.toString()).toString(),
+    symbol: props.symbol,
+  });
+  const needsApproval = status !== "approved";
+
+  return (
+    <div
+      style={{
+        width: "100%",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+      }}
+    >
+      <TokenSelector
+        isInput={false}
+        key={props.id}
+        selectable={false}
+        assets={[]}
+        showBalance={false}
+        value={{
+          token: props.symbol,
+          amount: props.amount,
+        }}
+        error={props.error}
+      />
+      {needsApproval && (
+        <Button type="default" disabled={false} onClick={approve}>
+          Approve
+        </Button>
+      )}
+    </div>
   );
 }
 // #endregion

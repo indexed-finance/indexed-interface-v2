@@ -48,7 +48,7 @@ export function IndexPoolAssets({ assets }: FormattedIndexPool) {
                   netChangePercent={asset.netChangePercent}
                   textSize="small"
                   textAlign="right"
-                  style={{ width: "100%" }}
+                  style={{ width: "100%", marginRight: 0 }}
                 />
               </Col>
               <Col span={6}>
