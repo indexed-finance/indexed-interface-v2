@@ -106,6 +106,24 @@ export function useTokenPrice(id: string): [number, false] | [undefined, true] {
   return [undefined, true];
 }
 
+export function useTokenPricesLessStrict(
+  ids: string[]
+): number[] {
+  const tokens = useTokens(ids.map((id) => id.toLowerCase()));
+
+  usePricesRegistrar(ids);
+
+  return useMemo(() => {
+    const allPrices = tokens.map((token) => token?.priceData?.price ?? 0);
+    // const loaded = !allPrices.some((p) => !p);
+    return allPrices as number[]
+    // if (loaded) {
+      // return [allPrices as number[], false];
+    // }
+    // return [undefined, true];
+  }, [tokens]);
+}
+
 export function useTokenPrices(
   ids: string[]
 ): [number[], false] | [undefined, true] {
@@ -186,9 +204,10 @@ export function useTokenPricesLookup(
     }
     return [baseTokenIds, pairTokens, pairTokens.map((p) => p.id)];
   }, [tokens]);
-  const [baseTokenPrices, baseTokenPricesLoading] = useTokenPrices(
-    baseTokenIds
-  );
+  // const [baseTokenPrices, baseTokenPricesLoading] = useTokenPrices(
+  //   baseTokenIds
+  // );
+  const baseTokenPrices = useTokenPricesLessStrict(baseTokenIds)
   // @todo only lookup supplies if we know the pair actually exists
   const [supplies, suppliesLoading] = useTotalSuppliesWithLoadingIndicator(
     pairTokenIds
@@ -197,9 +216,9 @@ export function useTokenPricesLookup(
 
   return useMemo(() => {
     const priceMap: Record<string, number> = {};
-    if (!baseTokenPricesLoading) {
+    // if (!baseTokenPricesLoading) {
       for (const i in baseTokenIds) {
-        priceMap[baseTokenIds[i]] = (baseTokenPrices as number[])[i];
+        priceMap[baseTokenIds[i]] = (baseTokenPrices as number[])[i] || 0;
       }
       if (pairTokens.length && !suppliesLoading && !pairsLoading) {
         for (const i in pairTokenIds) {
@@ -220,14 +239,13 @@ export function useTokenPricesLookup(
           }
         }
       }
-    }
     return priceMap;
   }, [
     baseTokenIds,
     pairTokenIds,
     pairTokens,
     baseTokenPrices,
-    baseTokenPricesLoading,
+    // baseTokenPricesLoading,
     supplies,
     suppliesLoading,
     pairs,
@@ -239,7 +257,7 @@ export const useEthPrice = () => useTokenPrice(WETH_CONTRACT_ADDRESS);
 
 export function usePricesRegistrar(tokenIds: string[]) {
   useCallRegistrar({
-    caller: TOKEN_PRICES_CALLER,
+    caller: TOKEN_PRICES_CALLER.concat('1'),
     onChainCalls: [],
     offChainCalls: [
       {
