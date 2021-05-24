@@ -21,6 +21,7 @@ import { convert } from "helpers";
 import { createSelector } from "reselect";
 import { dailySnapshotsSelectors } from "./dailySnapshots";
 import { formatDistance } from "date-fns";
+import { newStakingSelectors } from "./newStaking"
 import { settingsSelectors } from "./settings";
 import S from "string";
 import type { AppState } from "./store";
@@ -34,6 +35,7 @@ export const selectors = {
   ...indexPoolsSelectors,
   ...settingsSelectors,
   ...stakingSelectors,
+  ...newStakingSelectors,
   ...tokensSelectors,
   ...userSelectors,
   ...pairsSelectors,

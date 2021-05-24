@@ -3,6 +3,7 @@ import { categoriesReducer } from "./categories";
 import { combineReducers } from "@reduxjs/toolkit";
 import { dailySnapshotsReducer } from "./dailySnapshots";
 import { indexPoolsReducer } from "./indexPools";
+import { newStakingReducer } from "./newStaking"
 import { pairsReducer } from "./pairs";
 import { settingsReducer } from "./settings";
 import { stakingReducer } from "./staking";
@@ -18,6 +19,7 @@ export const rootReducer = combineReducers({
   pairs: pairsReducer,
   settings: settingsReducer,
   staking: stakingReducer,
+  newStaking: newStakingReducer,
   tokens: tokensReducer,
   transactions: transactionsReducer,
   user: userReducer,
