@@ -1,5 +1,4 @@
 import { Avatar, Space } from "antd";
-import { getAddress } from "@ethersproject/address";
 
 interface Props {
   symbol: string;
@@ -34,7 +33,7 @@ export function Token({
   try {
     image = require(`images/${symbol.toLowerCase()}.png`).default;
   } catch {
-    if (address) image = `https://github.com/defi-wikis/defi-tokens-wiki/blob/master/token-metadata/${getAddress(address)}/logo.png`;
+    if (address) image = `https://tokens.1inch.exchange/${address.toLowerCase()}.png`;
   }
 
   return (
