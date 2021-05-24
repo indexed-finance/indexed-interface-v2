@@ -126,14 +126,14 @@ export function usePortfolioData(): {
       (t) => t.address === NDX_ADDRESS.toLowerCase()
     ) as FormattedPortfolioAsset;
 
-    const earnedValue = totalNdxEarned * +ndx.price;
-    ndx.value = (+ndx.value + earnedValue).toFixed(2);
+    const earnedValue = totalNdxEarned * parseFloat(ndx.price);
+    ndx.value = (parseFloat(ndx.value) + earnedValue).toFixed(2);
     ndx.image = `indexed-${theme}`;
     totalValue += earnedValue;
-    portfolioTokens.sort((a, b) => +b.value - +a.value);
+    portfolioTokens.sort((a, b) => parseFloat(b.value) - parseFloat(a.value));
     portfolioTokens.forEach((token) => {
       token.weight = convert.toPercent(parseFloat(token.value) / totalValue);
-      token.value = convert.toCurrency(+token.value);
+      token.value = convert.toCurrency(parseFloat(token.value));
     });
     return {
       ndx,
