@@ -6,8 +6,8 @@ import {
   selectors,
 } from "features";
 import { BiLinkExternal } from "react-icons/bi";
+import { ExternalLink, Label, Page, TokenSelector } from "components/atomic";
 import { Formik, useFormikContext } from "formik";
-import { Label, Page, TokenSelector } from "components/atomic";
 import { Link, useParams } from "react-router-dom";
 import { abbreviateAddress, convert } from "helpers";
 import { format } from "date-fns";
@@ -225,9 +225,15 @@ function StakingStats({
   portfolioToken: FormattedPortfolioAsset;
   stakingToken: NormalizedStakingPool;
 }) {
+  const slug = useSelector((state: AppState) =>
+    stakingToken.isWethPair
+      ? null
+      : selectors.selectFormattedIndexPool(state, stakingToken.indexPool)
+          ?.slug ?? ""
+  );
+
   return (
     <Descriptions bordered={true} column={1}>
-      {/* Left Column */}
       <Descriptions.Item label="Earned Rewards">
         {+portfolioToken.ndxEarned > 0 ? (
           <Row style={{ textAlign: "center" }}>
@@ -259,12 +265,11 @@ function StakingStats({
       </Descriptions.Item>
 
       <Descriptions.Item label="Rewards Pool">
-        <Link to={`https://etherscan.io/address/${stakingToken.id}`}>
+        <ExternalLink to={`https://etherscan.io/address/${stakingToken.id}`}>
           {abbreviateAddress(stakingToken.id)} <BiLinkExternal />
-        </Link>
+        </ExternalLink>
       </Descriptions.Item>
 
-      {/* Right Column */}
       <Descriptions.Item
         label={expired ? "Staking Ended" : "Staking Ends"}
         contentStyle={{ color: expired ? "#333" : "inherit" }}
@@ -275,7 +280,15 @@ function StakingStats({
         {convert.toBalance(stakingToken.totalSupply, 18, true)} {symbol}
       </Descriptions.Item>
       <Descriptions.Item label="Staking Token">
-        {symbol} <BiLinkExternal />
+        {stakingToken.isWethPair ? (
+          <ExternalLink
+            to={`https://v2.info.uniswap.org/pair/${stakingToken.stakingToken}`}
+          >
+            {symbol} <BiLinkExternal />
+          </ExternalLink>
+        ) : (
+          <Link to={slug ?? ""}>{symbol}</Link>
+        )}
       </Descriptions.Item>
     </Descriptions>
   );
