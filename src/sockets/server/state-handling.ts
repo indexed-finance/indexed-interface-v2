@@ -7,6 +7,7 @@ import {
   createStakingCalls,
   createTotalSuppliesCalls,
 } from "hooks";
+import { createNewStakingCalls } from "hooks/new-staking-hooks";
 import { log } from "./helpers";
 import { providers } from "ethers";
 import type { RegisteredCall, RegisteredCaller } from "helpers";
@@ -49,10 +50,14 @@ const unsubscribeFromWaitingForSymbols = subscribe(() => {
   }
 });
 
+const BLOCKS_PER_DAY = 86400 / 13.5;
+
 function setupRegistrants() {
   const state = getState();
   const indexPools = selectors.selectAllPools(state);
   const stakingPools = selectors.selectAllStakingPools(state);
+  const newStakingPools = selectors.selectAllNewStakingPools(state);
+  const newStakingMeta = selectors.selectNewStakingMeta(state);
   const { pairDataCalls, poolDetailCalls, totalSuppliesCalls } =
     indexPools.reduce(
       (prev, next) => {
@@ -95,6 +100,7 @@ function setupRegistrants() {
         totalSuppliesCalls: RegisteredCaller;
       }
     );
+  const fromBlock = newStakingPools.sort((a, b) => b.lastRewardBlock - a.lastRewardBlock)[0].lastRewardBlock;
   const stakingCalls = stakingPools.reduce(
     (prev, next) => {
       const { id, stakingToken } = next;
@@ -113,6 +119,27 @@ function setupRegistrants() {
       offChainCalls: [],
     } as RegisteredCaller
   );
+  const newStakingCalls = newStakingPools.reduce(
+    (prev, next) => {
+      const { id, token } = next;
+      const newStakingCalls = createNewStakingCalls(newStakingMeta.id, id, token);
+      prev.onChainCalls.push(...newStakingCalls.offChainCalls);
+      prev.offChainCalls.push(...newStakingCalls.offChainCalls);
+      return prev;
+    },
+    {
+      caller: "NewStaking",
+      onChainCalls: [
+        {
+          target: newStakingMeta.rewardsSchedule,
+          function: 'getRewardsForBlockRange',
+          interfaceKind: 'RewardsSchedule_ABI',
+          args: [fromBlock.toString(), Math.floor(fromBlock + BLOCKS_PER_DAY).toString()]
+        }
+      ],
+      offChainCalls: [],
+    } as RegisteredCaller
+  );
 
   dispatch(
     actions.callsRegistered([
@@ -120,11 +147,17 @@ function setupRegistrants() {
       poolDetailCalls,
       totalSuppliesCalls,
       stakingCalls,
+      newStakingCalls
     ])
   );
   dispatch(
     requests.fetchStakingData({
       provider,
+    })
+  )
+  dispatch(
+    requests.fetchNewStakingData({
+      provider
     })
   )
 }
