@@ -30,9 +30,9 @@ export function IndexPoolChart({ poolId, expanded = false }: Props) {
     const delta = currentValue - firstValue;
     return [
       convert.toCurrency(delta, { signDisplay: "always" }),
-      convert.toPercent(delta / firstValue, { signDisplay: "always" })
-    ]
-  }, [data])
+      convert.toPercent(delta / firstValue, { signDisplay: "always" }),
+    ];
+  }, [data]);
   const formattedPool = useSelector((state: AppState) =>
     selectors.selectFormattedIndexPool(state, poolId)
   );
@@ -62,11 +62,17 @@ export function IndexPoolChart({ poolId, expanded = false }: Props) {
                 address={formattedPool.id}
                 symbol={formattedPool.symbol}
                 name={formattedPool.name}
-                price={historicalData ? historicalData.price : formattedPool.priceUsd}
+                price={
+                  historicalData ? historicalData.price : formattedPool.priceUsd
+                }
                 netChange={historicalData ? historicalData.when : netChange}
                 netChangePercent={historicalData ? "" : netChangePercent}
                 inline={true}
                 textSize="large"
+                style={{
+                  marginRight: 12,
+                  marginBottom: 12,
+                }}
               />
             </div>
             <div style={{ flex: 1, textAlign: "right" }}>

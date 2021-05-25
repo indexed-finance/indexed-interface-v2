@@ -1,4 +1,4 @@
-import { Card, List, Space, Typography } from "antd";
+import { Card, Col, List, Row, Space, Typography } from "antd";
 import { FormattedIndexPool } from "features";
 import { Progress, Quote, Token } from "components/atomic";
 
@@ -20,55 +20,47 @@ export function IndexPoolAssets({ assets }: FormattedIndexPool) {
       <List>
         {assets.map((asset) => (
           <List.Item key={asset.id}>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                width: "100%",
-              }}
-            >
-              <div
-                style={{
-                  flex: 1,
-                  display: "flex",
-                  flexDirection: "column",
-                }}
-              >
-                <Token
-                  name={asset.name}
-                  address={asset.id}
-                  symbol={asset.symbol}
-                  amount={asset.balance}
-                  size="small"
-                />
-                <Typography.Text type="success">
-                  {asset.balanceUsd}
-                </Typography.Text>
-              </div>
-              <div
-                style={{
-                  flex: 2,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
+            <Row gutter={24}>
+              <Col span={10}>
+                <div
+                  style={{
+                    flex: 1,
+                    display: "flex",
+                    flexDirection: "column",
+                  }}
+                >
+                  <Token
+                    name={asset.name}
+                    address={asset.id}
+                    symbol={asset.symbol}
+                    amount={asset.balance}
+                    size="small"
+                  />
+                  <Typography.Text type="success">
+                    {asset.balanceUsd}
+                  </Typography.Text>
+                </div>
+              </Col>
+              <Col span={8} style={{ textAlign: "right" }}>
                 <Quote
                   price={asset.price}
                   netChange={asset.netChange}
                   netChangePercent={asset.netChangePercent}
                   textSize="small"
+                  textAlign="right"
+                  style={{ width: "100%", marginRight: 0 }}
                 />
-              </div>
-              <Progress
-                style={{ flex: 1, textAlign: "right" }}
-                width={80}
-                status="active"
-                type="dashboard"
-                percent={parseFloat(asset.weightPercentage.replace(/%/g, ""))}
-              />
-            </div>
+              </Col>
+              <Col span={6}>
+                <Progress
+                  style={{ flex: 1, textAlign: "right" }}
+                  width={80}
+                  status="active"
+                  type="dashboard"
+                  percent={parseFloat(asset.weightPercentage.replace(/%/g, ""))}
+                />
+              </Col>
+            </Row>
           </List.Item>
         ))}
       </List>

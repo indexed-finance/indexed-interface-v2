@@ -11,7 +11,7 @@ type Props = {
 
 export function TokenInputDecorator({
   showBalance,
-  balanceLabel = 'Balance',
+  balanceLabel = "Balance",
   balance,
   error,
   onClickMax,
@@ -22,28 +22,27 @@ export function TokenInputDecorator({
 
   return (
     <Typography.Text type="secondary" style={{ textAlign: "left" }}>
-      {balance > 0 ? (
+      {error ? (
+        <Typography.Text type="danger"> {error} </Typography.Text>
+      ) : (
         <>
-          {balanceLabel}: <AbbreviatedBalance balance={balance} />{" "}
-          
-          {error && (
-            <Typography.Text
-              type="warning"
-              style={{ color: "red", marginLeft: 12 }}
-            >
-              {" "}
-              {error}{" "}
-            </Typography.Text>
-          )}
-          
-          {!error && onClickMax && (
-            <Button type="text" onClick={onClickMax} style={{ fontSize: 12 }}>
-              {tx("MAX")}
-            </Button>
+          {balance > 0 ? (
+            <>
+              {balanceLabel}: <AbbreviatedBalance balance={balance} />{" "}
+              {!error && onClickMax && (
+                <Button
+                  type="text"
+                  onClick={onClickMax}
+                  style={{ fontSize: 12 }}
+                >
+                  {tx("MAX")}
+                </Button>
+              )}
+            </>
+          ) : (
+            tx("NO_BALANCE")
           )}
         </>
-      ) : (
-        tx("NO_BALANCE")
       )}
     </Typography.Text>
   );
