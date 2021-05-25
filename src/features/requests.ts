@@ -1,5 +1,6 @@
 import * as batcherRequests from './batcher/requests';
 import * as indexPoolsRequests from './indexPools/requests';
+import * as newStakingRequests from './newStaking/requests';
 import * as stakingRequests from './staking/requests';
 import * as tokensRequests from './tokens/requests';
 import { MIN_WEIGHT } from "ethereum";
@@ -301,6 +302,7 @@ export const requests = {
   ...batcherRequests,
   ...indexPoolsRequests,
   ...stakingRequests,
+  ...newStakingRequests,
   ...tokensRequests,
   fetchInitialData
 }
