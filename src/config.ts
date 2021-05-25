@@ -20,6 +20,7 @@ export const WEBSOCKET_SERVER_UPDATE_RATE = 10000;
 export const WEBSOCKET_SERVER_PORT = 13337;
 export const QUIKNODE_WEBSOCKET_PROVIDER =
   "wss://bold-old-pond.quiknode.pro/7876affe5a6bb6688c659b452fe9d81d4125d21f/";
+
 export const ERRORS = {
   Web3Service: {
     badNetwork: "Web3Service: Bad network.",
@@ -127,6 +128,8 @@ export const WETH_CONTRACT_ADDRESS =
   "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2";
 export const MINT_ROUTER_ADDRESS = "0xfb6ac20d38a1f0c4f90747ca0745e140bc17e4c3";
 export const BURN_ROUTER_ADDRESS = "0x348ab9b021fff6016d3eb07d3171bdef0022cfa8";
+export const MULTI_TOKEN_STAKING_ADDRESS = "0xc46e0e7ecb3efcc417f6f89b940ffaff72556382";
+export const REWARDS_SCHEDULE_ADDDRESS = "0x131ba0fc3e4e866e5daf3d16526846fdd3e67623";
 
 export const COMMON_BASE_TOKENS = [
   {
