@@ -29,15 +29,23 @@ function StakingForm({
 }) {
   const { setFieldValue, values, errors } = useFormikContext<{
     amount: number;
+    inputType: 'stake' | 'unstake';
   }>();
-  const [inputType, setInputType] = useState<"stake" | "unstake">("stake");
   const { stake, withdraw, exit, claim } = useStakingTransactionCallbacks(
     stakingToken.id
   );
-  const staked = useMemo(() => token.staking, [token.staking]);
+
+  const [staked, earned] = useMemo(() => {
+    let staked = stakingToken.userData?.userStakedBalance;
+    let earned = stakingToken.userData?.userRewardsEarned;
+    staked = staked ? convert.toBalance(staked, 18) : "0";
+    earned = earned ? convert.toBalance(earned, 18) : "0"
+    return [staked, earned];
+  }, [stakingToken]);
+
   const [estimatedReward, weight] = useMemo(() => {
     const stakedAmount = parseFloat(staked || "0");
-    const addAmount = inputType === "stake" ? values.amount : -values.amount;
+    const addAmount = values.inputType === "stake" ? values.amount : -values.amount;
     const userNewStaked = stakedAmount + addAmount;
     if (userNewStaked < 0 || expired) {
       return [0, 0];
@@ -56,11 +64,11 @@ function StakingForm({
     stakingToken.rewardRate,
     staked,
     expired,
-    inputType,
+    values.inputType,
   ]);
 
   const handleSubmit = () => {
-    if (inputType === "stake")
+    if (values.inputType === "stake")
       stake(convert.toToken(values.amount.toString(), 18).toString());
     else withdraw(convert.toToken(values.amount.toString(), 18).toString());
   };
@@ -129,15 +137,15 @@ function StakingForm({
             token: token.symbol,
             amount: values.amount,
           }}
-          balanceLabel={inputType === "unstake" ? "Staked" : undefined}
-          balanceOverride={inputType === "unstake" ? staked : undefined}
+          balanceLabel={values.inputType === "unstake" ? "Staked" : undefined}
+          balanceOverride={values.inputType === "unstake" ? staked : undefined}
           isInput={true}
           autoFocus={true}
           selectable={false}
           onChange={(value) => {
             setFieldValue("amount", value.amount);
           }}
-          balance={inputType === "unstake" ? staked : token.balance}
+          balance={values.inputType === "unstake" ? staked : token.balance}
           error={errors.amount}
         />
 
@@ -164,24 +172,24 @@ function StakingForm({
         <Button.Group style={{ width: "100%" }}>
           <Button
             type="primary"
-            danger={inputType === "unstake"}
+            danger={values.inputType === "unstake"}
             block={true}
             onClick={handleSubmit}
             disabled={
-              inputType === "stake" ? expired : parseFloat(staked || "0") <= 0
+              values.inputType === "stake" ? expired : parseFloat(staked || "0") <= 0
             }
           >
-            {inputType === "stake" ? "Deposit" : "Withdraw"}
+            {values.inputType === "stake" ? "Deposit" : "Withdraw"}
           </Button>
           <Button
             type="primary"
-            danger={inputType === "stake"}
+            danger={values.inputType === "stake"}
             block={true}
             onClick={() =>
-              setInputType(inputType === "stake" ? "unstake" : "stake")
+              setFieldValue('inputType', values.inputType === "stake" ? "unstake" : "stake")
             }
           >
-            {inputType === "stake" ? "Withdraw" : "Deposit"}
+            {values.inputType === "stake" ? "Withdraw" : "Deposit"}
           </Button>
         </Button.Group>
 
@@ -190,7 +198,7 @@ function StakingForm({
           <Button
             type="default"
             block={true}
-            disabled={parseFloat(staked || "0") <= 0}
+            disabled={parseFloat(earned || "0") <= 0}
             onClick={claim}
             title="Claim NDX rewards"
           >
@@ -213,13 +221,11 @@ function StakingForm({
 
 function StakingStats({
   symbol,
-  portfolioToken,
   stakingToken,
   expired,
 }: {
   expired: boolean;
   symbol: string;
-  portfolioToken: FormattedPortfolioAsset;
   stakingToken: NormalizedStakingPool;
 }) {
   const slug = useSelector((state: AppState) =>
@@ -229,12 +235,20 @@ function StakingStats({
           ?.slug ?? ""
   );
 
+  const [staked, earned] = useMemo(() => {
+    let staked = stakingToken.userData?.userStakedBalance;
+    let earned = stakingToken.userData?.userRewardsEarned;
+    staked = staked ? convert.toBalance(staked, 18) : "0";
+    earned = earned ? convert.toBalance(earned, 18) : "0"
+    return [staked, earned];
+  }, [stakingToken]);
+
   return (
     <Descriptions bordered={true} column={1}>
       <Descriptions.Item label="Earned Rewards">
-        {+portfolioToken.ndxEarned > 0 ? (
+        {parseFloat(earned) > 0 ? (
           <Row style={{ textAlign: "center" }}>
-            <Col span={12}>{portfolioToken.ndxEarned} NDX</Col>
+            <Col span={12}>{earned} NDX</Col>
             <Col span={12}>
               <Button type="primary" block={true}>
                 Claim
@@ -242,12 +256,12 @@ function StakingStats({
             </Col>
           </Row>
         ) : (
-          <>{portfolioToken.ndxEarned} NDX</>
+          <>{earned} NDX</>
         )}
       </Descriptions.Item>
 
       <Descriptions.Item label="Currently Staking">
-        {portfolioToken.staking || `0.00`} {symbol}
+        {staked} {symbol}
       </Descriptions.Item>
 
       <Descriptions.Item
@@ -324,20 +338,19 @@ export default function Stake() {
               initialValues={{
                 asset: "",
                 amount: 0,
+                inputType: 'stake'
               }}
               onSubmit={console.log}
               validateOnChange={true}
               validateOnBlur={true}
               validate={(values) => {
                 const errors: Record<string, string> = {};
-
-                if (
-                  values.amount >
-                  parseFloat(convert.toBalance(relevantPortfolioToken.balance))
-                ) {
+                const maximum = values.inputType === 'stake'
+                  ? parseFloat(convert.toBalance(relevantPortfolioToken.balance))
+                  : parseFloat(convert.toBalance(toStake.userData?.userStakedBalance ?? "0"))
+                if (values.amount > maximum) {
                   errors.amount = "Insufficient balance.";
                 }
-
                 return errors;
               }}
             >
@@ -347,7 +360,6 @@ export default function Stake() {
           <Col span={14}>
             <StakingStats
               symbol={stakingToken}
-              portfolioToken={relevantPortfolioToken}
               stakingToken={toStake}
               expired={isExpired}
             />
