@@ -330,6 +330,7 @@ type MultiProps = Omit<Props, "onSubmit" | "onChange"> & {
   onSubmit?(values: MultiInteractionValues): void;
   onChange?(values: MultiInteractionValues): void;
   isInput?: boolean;
+  kind: "mint" | "burn";
 };
 
 export function MultiInteraction({
@@ -344,6 +345,7 @@ export function MultiInteraction({
   disableInputSelect,
   disableOutputSelect,
   requiresApproval = true,
+  kind,
 }: MultiProps) {
   const interactionRef = useRef<null | HTMLDivElement>(null);
 
@@ -372,6 +374,7 @@ export function MultiInteraction({
             disableInputSelect={disableInputSelect}
             disableOutputSelect={disableOutputSelect}
             requiresApproval={requiresApproval}
+            kind={kind}
           />
         )}
       </Formik>
@@ -391,6 +394,7 @@ function MultiInteractionInner({
   isInput,
   errors,
   setFieldError,
+  kind,
 }: InnerMultiProps) {
   const tx = useTranslator();
   const tokenLookup = useSelector(selectors.selectTokenLookup);
@@ -407,7 +411,6 @@ function MultiInteractionInner({
       if (changedValue.token) {
         setFieldValue("fromToken", changedValue.token, false);
       }
-
       if (changedValue.amount) {
         setFieldValue("fromAmount", changedValue.amount, false);
       }
@@ -508,7 +511,7 @@ function MultiInteractionInner({
               Send
             </Button>
           )}
-          {!allApproved && (
+          {kind === "mint" && !allApproved && (
             <Alert
               type="error"
               message="Ensure all asset amounts are approved prior to sending
@@ -523,6 +526,7 @@ function MultiInteractionInner({
             <AssetEntry
               key={asset.id}
               {...asset}
+              kind={kind}
               spender={spender}
               amount={lookup[asset.id] ?? 0}
               error={(errors as any)[asset.id]}
@@ -535,7 +539,12 @@ function MultiInteractionInner({
 }
 
 function AssetEntry(
-  props: Asset & { spender: string; amount: number; error: string }
+  props: Asset & {
+    spender: string;
+    amount: number;
+    error: string;
+    kind: "mint" | "burn";
+  }
 ) {
   const { status, approve } = useTokenApproval({
     spender: props.spender,
@@ -544,9 +553,10 @@ function AssetEntry(
     rawAmount: convert.toToken(props.amount.toString()).toString(),
     symbol: props.symbol,
   });
-  const needsApproval = status !== "approved";
+  const needsApproval = props.kind === "mint" && status !== "approved";
   const balance = useTokenBalance(props.id);
   const insufficientBalanceError =
+    props.kind === "mint" &&
     parseFloat(convert.toBalance(balance)) < props.amount
       ? "Insufficient balance"
       : "";
