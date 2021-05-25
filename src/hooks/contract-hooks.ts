@@ -1,6 +1,6 @@
-import { BURN_ROUTER_ADDRESS, MINT_ROUTER_ADDRESS, UNISWAP_ROUTER_ADDRESS } from "config";
+import { BURN_ROUTER_ADDRESS, MINT_ROUTER_ADDRESS, MULTI_TOKEN_STAKING_ADDRESS, UNISWAP_ROUTER_ADDRESS } from "config";
 import { Contract } from "@ethersproject/contracts";
-import { IERC20, IPool, IndexedUniswapRouterBurner, IndexedUniswapRouterMinter, StakingRewards, UniswapV2Router } from "ethereum";
+import { IERC20, IPool, IndexedUniswapRouterBurner, IndexedUniswapRouterMinter, MultiTokenStaking, StakingRewards, UniswapV2Router } from "ethereum";
 import { Interface, JsonFragment } from "@ethersproject/abi";
 import { useSigner } from "features";
 
@@ -33,4 +33,8 @@ export function useMintRouterContract() {
 
 export function useStakingRewardsContract(address: string) {
   return useContractWithSigner(address, StakingRewards);
+}
+
+export function useMultiTokenStakingContract() {
+  return useContractWithSigner(MULTI_TOKEN_STAKING_ADDRESS, MultiTokenStaking);
 }
