@@ -3,17 +3,22 @@ import { Page, StakingWidget } from "components/atomic";
 import { StakingWidgetNew } from "components/atomic/organisms/StakingWidgetNew";
 import { selectors } from "features";
 import { useEffect } from "react";
-import { useNewStakingRegistrar, useStakingRegistrar, useTranslator } from "hooks";
+import {
+  useNewStakingRegistrar,
+  useStakingRegistrar,
+  useTranslator,
+} from "hooks";
 import { useSelector } from "react-redux";
 
 export default function Stake() {
   const tx = useTranslator();
   const stakingDetail = useSelector(selectors.selectFormattedStaking);
   const newStakingDetail = useSelector(selectors.selectNewFormattedStaking);
+
   useEffect(() => {
-    console.log('new stake')
-    console.log(newStakingDetail)
-  }, [newStakingDetail])
+    console.log("new stake");
+    console.log(newStakingDetail);
+  }, [newStakingDetail]);
 
   useStakingRegistrar();
   useNewStakingRegistrar();
@@ -50,21 +55,25 @@ export default function Stake() {
                   <StakingWidgetNew key={stakingPool.id} {...stakingPool} />
                 </Col>
               ))}
-              {stakingDetail.liquidityTokens.filter(t => !t.expired).map((stakingPool) => (
-                <Col span={12} key={stakingPool.id}>
-                  <StakingWidget key={stakingPool.id} {...stakingPool} />
-                </Col>
-              ))}
+              {stakingDetail.liquidityTokens
+                .filter((t) => !t.expired)
+                .map((stakingPool) => (
+                  <Col span={12} key={stakingPool.id}>
+                    <StakingWidget key={stakingPool.id} {...stakingPool} />
+                  </Col>
+                ))}
             </Row>
           </>
         )}
       </Space>
-      <Space direction="vertical" size="large" style={{ width: "100%", marginTop: 15 }}>
+      <Space
+        direction="vertical"
+        size="large"
+        style={{ width: "100%", marginTop: 15 }}
+      >
         <Alert
-          type="info"
-          message={
-            <span style={{ fontSize: 18 }}>Expired Staking Pools</span>
-          }
+          type="warning"
+          message={<span style={{ fontSize: 18 }}>Expired Staking Pools</span>}
         />
         {stakingDetail.indexTokens.length > 0 && (
           <>
@@ -84,11 +93,13 @@ export default function Stake() {
               {tx("LIQUIDITY_TOKENS")}
             </Typography.Title>
             <Row gutter={[20, 20]}>
-              {stakingDetail.liquidityTokens.filter(t => t.expired).map((stakingPool) => (
-                <Col span={12} key={stakingPool.id}>
-                  <StakingWidget key={stakingPool.id} {...stakingPool} />
-                </Col>
-              ))}
+              {stakingDetail.liquidityTokens
+                .filter((t) => t.expired)
+                .map((stakingPool) => (
+                  <Col span={12} key={stakingPool.id}>
+                    <StakingWidget key={stakingPool.id} {...stakingPool} />
+                  </Col>
+                ))}
             </Row>
           </>
         )}

@@ -93,19 +93,7 @@ function StakingForm({
                 values.inputType === "unstake" ? staked : undefined
               }
               selectable={false}
-              onChange={(value) => {
-                setFieldValue("amount", value.amount);
-                /* if (value.amount !== undefined) {
-                  setFieldValue("amount", value.amount);
-
-                  if (
-                    value.amount > parseFloat(convert.toBalance(token.balance))
-                  ) {
-                    setFieldError("amount", "Insufficient balance");
-                  }
-                }  */
-              }}
-              // balance={values.inputType === "unstake" ? staked : token.balance}
+              onChange={(value) => setFieldValue("amount", value.amount)}
               error={errors.amount}
             />
           </Col>
