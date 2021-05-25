@@ -1,21 +1,22 @@
+import { AppState, FormattedNewStakingData, selectors } from "features";
 import { Badge, Button, Col, Row, Space, Statistic } from "antd";
 import { FaTractor } from "react-icons/fa";
-import { FormattedStakingData } from "features";
 import { Link, useHistory } from "react-router-dom";
 import { Widget } from "./Widget";
 import { convert } from "helpers";
 import {
-  useStakingApy,
-  useStakingTokenPrice,
+  useNewStakingApy,
+  useNewStakingTokenPrice,
   useTranslator,
 } from "hooks";
 
-export function StakingWidget(props: FormattedStakingData) {
+export function StakingWidgetNew(props: FormattedNewStakingData) {
   const tx = useTranslator();
-  const apy = useStakingApy(props.id);
-  const price = useStakingTokenPrice(props.id);
-  const isExpired = apy === "Expired";
-  const symbol = props.isWethPair ? `ETH/${props.symbol}` : props.symbol;
+  const apy = useNewStakingApy(props.id);
+  const price = useNewStakingTokenPrice(props.id);
+
+  const symbol = props.symbol;
+
   const { push } = useHistory();
   const inner = (
     <div style={{ position: "relative" }}>
@@ -33,7 +34,6 @@ export function StakingWidget(props: FormattedStakingData) {
         stats={
           <Space direction="vertical" style={{ width: '100%' }}>
             <Statistic
-              style={{ width: '100%' }}
               title='Total Staked'
               value={`${props.totalStaked} ${symbol}`}
             />
@@ -49,31 +49,27 @@ export function StakingWidget(props: FormattedStakingData) {
                 <Statistic style={{ width: '100%' }} title={tx("EARNED")} value={props.earned} />
               </Col>
             </Row>
-            
             <Statistic
               title={tx("APY")}
-              value={apy ?? "Expired"}
-              valueStyle={{ color: isExpired ? "#333" : "inherit" }}
+              value={apy ?? ""}
             />
             <Statistic
               title={tx("RATE")}
-              value={isExpired ? "Expired" : props.rate}
-              valueStyle={{ color: isExpired ? "#333" : "inherit" }}
+              value={props.rewardsPerDay}
             />
           </Space>
         }
         actions={
           <>
             <Button
-              type={isExpired ? "ghost" : "primary"}
-              // disabled={isExpired} This should not be disabled - people need to be able to withdraw.
+              type={"primary"}
               size="large"
               onClick={(event) => event.stopPropagation()}
             >
-              <Link to={`/staking/${props.id}`}>
+               <Link to={`/staking-new/${props.id}`}>
                 <Space>
                   <FaTractor style={{ position: "relative", top: 2 }} />
-                  <span>{isExpired ? tx("STAKING_EXPIRED") : tx("STAKE")}</span>
+                  <span>{tx("STAKE")}</span>
                 </Space>
               </Link>
             </Button>
