@@ -1,16 +1,22 @@
 import { Alert, Col, Row, Space, Typography } from "antd";
 import { Page, StakingWidget } from "components/atomic";
+import { StakingWidgetNew } from "components/atomic/organisms/StakingWidgetNew";
 import { selectors } from "features";
+import { useEffect } from "react";
+import { useNewStakingRegistrar, useStakingRegistrar, useTranslator } from "hooks";
 import { useSelector } from "react-redux";
-import { useStakingRegistrar, useTranslator } from "hooks";
 
 export default function Stake() {
   const tx = useTranslator();
-  const { indexTokens, liquidityTokens } = useSelector(
-    selectors.selectFormattedStaking
-  );
+  const stakingDetail = useSelector(selectors.selectFormattedStaking);
+  const newStakingDetail = useSelector(selectors.selectNewFormattedStaking);
+  useEffect(() => {
+    console.log('new stake')
+    console.log(newStakingDetail)
+  }, [newStakingDetail])
 
   useStakingRegistrar();
+  useNewStakingRegistrar();
 
   return (
     <Page hasPageHeader={true} title={tx("LIQUIDITY_MINING")}>
@@ -21,11 +27,30 @@ export default function Stake() {
             <span style={{ fontSize: 18 }}>{tx("STAKE_INDEX_TOKENS_...")}</span>
           }
         />
-        {indexTokens.length > 0 && (
+        {newStakingDetail.indexTokens.length > 0 && (
           <>
             <Typography.Title level={3}>{tx("INDEX_TOKENS")}</Typography.Title>
             <Row gutter={[20, 20]}>
-              {indexTokens.map((stakingPool) => (
+              {newStakingDetail.indexTokens.map((stakingPool) => (
+                <Col span={12} key={stakingPool.id}>
+                  <StakingWidgetNew key={stakingPool.id} {...stakingPool} />
+                </Col>
+              ))}
+            </Row>
+          </>
+        )}
+        {newStakingDetail.liquidityTokens.length > 0 && (
+          <>
+            <Typography.Title level={3}>
+              {tx("LIQUIDITY_TOKENS")}
+            </Typography.Title>
+            <Row gutter={[20, 20]}>
+              {newStakingDetail.liquidityTokens.map((stakingPool) => (
+                <Col span={12} key={stakingPool.id}>
+                  <StakingWidgetNew key={stakingPool.id} {...stakingPool} />
+                </Col>
+              ))}
+              {stakingDetail.liquidityTokens.filter(t => !t.expired).map((stakingPool) => (
                 <Col span={12} key={stakingPool.id}>
                   <StakingWidget key={stakingPool.id} {...stakingPool} />
                 </Col>
@@ -33,13 +58,33 @@ export default function Stake() {
             </Row>
           </>
         )}
-        {indexTokens.length > 0 && (
+      </Space>
+      <Space direction="vertical" size="large" style={{ width: "100%", marginTop: 15 }}>
+        <Alert
+          type="info"
+          message={
+            <span style={{ fontSize: 18 }}>Expired Staking Pools</span>
+          }
+        />
+        {stakingDetail.indexTokens.length > 0 && (
+          <>
+            <Typography.Title level={3}>{tx("INDEX_TOKENS")}</Typography.Title>
+            <Row gutter={[20, 20]}>
+              {stakingDetail.indexTokens.map((stakingPool) => (
+                <Col span={12} key={stakingPool.id}>
+                  <StakingWidget key={stakingPool.id} {...stakingPool} />
+                </Col>
+              ))}
+            </Row>
+          </>
+        )}
+        {stakingDetail.liquidityTokens.length > 0 && (
           <>
             <Typography.Title level={3}>
               {tx("LIQUIDITY_TOKENS")}
             </Typography.Title>
             <Row gutter={[20, 20]}>
-              {liquidityTokens.map((stakingPool) => (
+              {stakingDetail.liquidityTokens.filter(t => t.expired).map((stakingPool) => (
                 <Col span={12} key={stakingPool.id}>
                   <StakingWidget key={stakingPool.id} {...stakingPool} />
                 </Col>
