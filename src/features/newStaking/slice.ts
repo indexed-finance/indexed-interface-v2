@@ -1,6 +1,6 @@
-import { AllStakingInfoData } from '@indexed-finance/subgraph-clients/dist/staking/types';
-import { NewStakingMeta, NewStakingPool, NewStakingPoolUpdate } from "./types"
-import { convert, createMulticallDataParser } from "helpers"; // Circular dependency.
+import { MULTI_TOKEN_STAKING_ADDRESS, REWARDS_SCHEDULE_ADDDRESS } from 'config';
+import { NewStakingMeta, NewStakingPool, NewStakingUpdate } from "./types" // Circular dependency.
+import { convert, createMulticallDataParser } from "helpers";
 import { createEntityAdapter, createSlice } from "@reduxjs/toolkit";
 import { fetchMulticallData } from "../batcher/requests";
 import { fetchNewStakingData } from "./requests";
@@ -14,70 +14,75 @@ const adapter = createEntityAdapter<NewStakingPool>({
   selectId: (entry) => entry.id.toLowerCase(),
 });
 
+const initialState = {
+  metadata: {
+    id: MULTI_TOKEN_STAKING_ADDRESS,
+    owner: '',
+    rewardsSchedule: REWARDS_SCHEDULE_ADDDRESS,
+    startBlock: 12454000,
+    endBlock: 17232181,
+    rewardsToken: '0x86772b1409b61c639eaac9ba0acfbb6e238e5f83',
+    totalAllocPoint: 0,
+    poolCount: 0
+  } as NewStakingMeta
+}
+
 const slice = createSlice({
   name: "newStaking",
-  initialState: adapter.getInitialState({
-    metadata: {
-      id: '',
-      owner: '',
-      rewardsSchedule: '',
-      startBlock: 12454000,
-      endBlock: 17232181,
-      rewardsToken: '0x86772b1409b61c639eaac9ba0acfbb6e238e5f83',
-      totalAllocPoint: 0,
-      poolCount: 0
-    } as NewStakingMeta
-  }),
+  initialState: adapter.getInitialState(initialState),
   reducers: {},
   extraReducers: (builder) =>
     builder
       .addCase(fetchNewStakingData.fulfilled, (state, action) => {
+        console.log(`Got New Staking Data`);
         adapter.addMany(state, action.payload.pools);
         state.metadata = {
           ...state.metadata,
           ...action.payload.meta
         };
+        // console.log(state.entities)
       })
-      // .addCase(fetchMulticallData.fulfilled, (state, action) => {
-      //   const relevantMulticallData = newStakingMulticallDataParser(
-      //     action.payload
-      //   );
+      .addCase(fetchMulticallData.fulfilled, (state, action) => {
+        const relevantMulticallData = newStakingMulticallDataParser(
+          action.payload
+        );
+        if (relevantMulticallData) {
+          console.log(`Got New Staking MultiCall Data`);
+          // console.log(relevantMulticallData)
+          const {
+            totalRewardsPerDay,
+            totalStakedByToken,
+            userDataByPool
+          } = relevantMulticallData;
+          Object.entries(totalStakedByToken).forEach(([ token, staked ]) => {
+            const entry = Object.values(state.entities).find((e) => e?.token.toLowerCase() === token.toLowerCase());
+            if (entry) entry.totalStaked = staked;
+          });
+          Object.entries(userDataByPool).forEach(([ pid, userData]) => {
+            const entry = state.entities[pid];
+            if (!entry) return;
+            entry.userEarnedRewards = userData.userEarnedRewards;
+            entry.userStakedBalance = userData.userStakedBalance;
+          })
+          if (totalRewardsPerDay) {
+            state.metadata.totalRewardsPerDay = totalRewardsPerDay;
+            const totalRewards = convert.toBigNumber(totalRewardsPerDay)
+            for (const id of state.ids) {
+              const entry = state.entities[id];
+              if (entry) {
+                entry.rewardsPerDay = totalRewards
+                  .times(entry.allocPoint)
+                  .div(state.metadata.totalAllocPoint)
+                  .toString();
+              }
+            }
+          }
+        }
 
-      //   if (relevantMulticallData) {
-      //     for (const [stakingPoolAddress, update] of Object.entries(
-      //       relevantMulticallData
-      //     )) {
-      //       const entry = state.entities[stakingPoolAddress];
-
-      //       if (entry) {
-      //         if (update.rewardsDuration) entry.rewardsDuration = update.rewardsDuration;
-      //         if (update.periodFinish) entry.periodFinish = update.periodFinish;
-      //         if (update.rewardRate) entry.rewardRate = update.rewardRate;
-      //         if (update.rewardPerTokenStored) entry.rewardPerTokenStored = update.rewardPerTokenStored;
-      //         if (update.totalSupply) entry.totalSupply = update.totalSupply;
-
-      //         if (update.userData) {
-      //           entry.userData = update.userData;
-      //         }
-      //       }
-      //     }
-      //   }
-
-      //   return state;
-      // })
+        return state;
+      })
       .addCase(mirroredServerState, (_, action) => action.payload.newStaking)
-      .addCase(restartedDueToError, () => adapter.getInitialState({
-        metadata: {
-          id: '',
-          owner: '',
-          rewardsSchedule: '',
-          startBlock: 12454000,
-          endBlock: 17232181,
-          rewardsToken: '0x86772b1409b61c639eaac9ba0acfbb6e238e5f83',
-          totalAllocPoint: 0,
-          poolCount: 0
-        } as NewStakingMeta
-      })),
+      .addCase(restartedDueToError, () => adapter.getInitialState(initialState)),
 });
 
 export const { actions: newStakingActions, reducer: newStakingReducer } = slice;
@@ -101,58 +106,63 @@ export const newStakingSelectors = {
         ({ token }) => token.toLowerCase() === id.toLowerCase()
       );
   },
+  selectNewUserStakedBalance(state: AppState, id: string) {
+    return newStakingSelectors
+      .selectNewStakingPool(state, id)
+      ?.userStakedBalance;
+  }
 };
-
-const BLOCKS_PER_DAY = 86400 / 13.5;
 
 export const newStakingMulticallDataParser = createMulticallDataParser(
   newStakingCaller,
   (calls) => {
-    const formattingStakingData = calls.reduce((prev, next) => {
-      const [, functions] = next;
-      const formattedStakingPoolUpdate = Object.entries(functions).reduce(
-        (prev, next) => {
-          const stakingPoolEntry = prev;
-          const [fn, results] = next;
-          const [{ args, values }] = results.map((item: CallWithResult) => ({
-            args: item.args ?? [],
-            values: (item.result ?? []).map(convert.toBigNumber),
-          }));
-          const [result] = values;
-
-          if (result) {
-            const handlers: Record<string, () => void> = {
-              userInfo() {
-                stakingPoolEntry.userStakedBalance = result.toString();
-                stakingPoolEntry.id = args[0];
-
-              },
-              pendingRewards() {
-                stakingPoolEntry.userEarnedRewards = result.toString();
-              },
-              balanceOf() {
-                stakingPoolEntry.totalStaked = result.toString();
-              },
-            };
-            const handler = handlers[fn];
-
-            handler();
+    const update: NewStakingUpdate = {
+      totalStakedByToken: {},
+      userDataByPool: {},
+      totalRewardsPerDay: ""
+    };
+    const handleCall = ([fn, results]: [ string, CallWithResult[] ]) => {
+      const [{ args, values, target }] = results.map((item: CallWithResult) => ({
+        target: item.target,
+        args: item.args ?? [],
+        values: (item.result ?? []),
+      }));
+      const [result] = values;
+      const handlers: Record<string, () => void> = {
+        userInfo() {
+          const id = args[0];
+          if (!update.userDataByPool[id]) {
+            update.userDataByPool[id] = {
+              userStakedBalance: "",
+              userEarnedRewards: ""
+            }
           }
-
-          return stakingPoolEntry;
+          update.userDataByPool[id].userStakedBalance = result.toString()
         },
-        {
-          totalStaked: "",
-          userEarnedRewards: "",
-          userStakedBalance: ""
-        } as NewStakingPoolUpdate
-      );
+        pendingRewards() {
+          const id = args[0];
+          if (!update.userDataByPool[id]) {
+            update.userDataByPool[id] = {
+              userStakedBalance: "",
+              userEarnedRewards: ""
+            }
+          }
+          update.userDataByPool[id].userEarnedRewards = result.toString()
+        },
+        balanceOf() {
+          update.totalStakedByToken[target] = result.toString()
+        },
+        getRewardsForBlockRange() {
+          update.totalRewardsPerDay = result.toString()
+        }
+      };
+      if (result) {
+        handlers[fn]();
+      }
+    }
 
-      prev[formattedStakingPoolUpdate.id] = formattedStakingPoolUpdate;
+    calls.forEach(([, functions]) => Object.entries(functions).forEach(handleCall));
 
-      return prev;
-    }, {} as Record<string, NewStakingPoolUpdate>);
-
-    return formattingStakingData;
+    return update;
   }
 );

@@ -5,7 +5,9 @@ export type NewStakingPool = {
   name: string;
   decimals: number;
   totalStaked: string;
-  isPairToken: boolean;
+  isWethPair: boolean;
+  token0?: string;
+  token1?: string;
   allocPoint: number;
   lastRewardBlock: number;
   userCount: number;
@@ -23,6 +25,17 @@ export type NewStakingPoolUpdate = {
   userEarnedRewards?: string;
 }
 
+export type NewStakingPoolUserUpdate = {
+  userStakedBalance?: string;
+  userEarnedRewards?: string;
+}
+
+export type NewStakingUpdate = {
+  totalStakedByToken: Record<string, string>;
+  userDataByPool: Record<string, NewStakingPoolUserUpdate>
+  totalRewardsPerDay: string;
+}
+
 export type NewStakingMeta = {
   id: string;
   owner: string;
@@ -32,4 +45,24 @@ export type NewStakingMeta = {
   rewardsToken: string;
   totalAllocPoint: number;
   poolCount: number;
+  totalRewardsPerDay?: string;
+}
+
+export interface FormattedNewStakingData {
+  id: string;
+  slug: string;
+  name: string;
+  symbol: string;
+  staked: string;
+  stakingToken: string;
+  earned: string;
+  rewardsPerDay: string;
+  isWethPair: boolean;
+  indexPool: string;
+  totalStaked: string;
+}
+
+export interface FormattedNewStakingDetail {
+  indexTokens: FormattedNewStakingData[];
+  liquidityTokens: FormattedNewStakingData[];
 }

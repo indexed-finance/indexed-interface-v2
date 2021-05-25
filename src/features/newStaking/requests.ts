@@ -20,7 +20,13 @@ export const fetchNewStakingData = createAsyncThunk(
     const { pools, ...meta } = data;
     return {
       meta,
-      pools: pools.map(({ balance, ...pool }) => ({ ...pool, totalStaked: balance, rewardsPerDay: '0' }))
+      pools: pools.map(
+        ({ balance, isPairToken, ...pool }) => ({
+          ...pool,
+          totalStaked: balance,
+          isWethPair: isPairToken,
+          rewardsPerDay: '0'
+      }))
     }
   }
 );
