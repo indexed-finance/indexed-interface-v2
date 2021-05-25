@@ -11,6 +11,7 @@ import {
   indexPoolsActions,
 } from "./indexPools";
 import { fetchInitialData } from "./requests";
+import { fetchNewStakingData } from "./newStaking";
 import { fetchStakingData, stakingActions } from "./staking";
 import { fetchTokenPriceData, tokensActions } from "./tokens";
 import { pairsActions } from "./pairs";
@@ -105,6 +106,11 @@ export const thunks = {
           provider,
         })
       );
+      dispatch(
+        fetchNewStakingData({
+          provider
+        })
+      )
 
       if (selectedAddress) {
         dispatch(actions.userAddressSelected(selectedAddress));
