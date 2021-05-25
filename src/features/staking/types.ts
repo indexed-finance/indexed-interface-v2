@@ -28,9 +28,12 @@ export interface FormattedStakingData {
   symbol: string;
   staked: string;
   stakingToken: string;
+  periodFinish: number;
   earned: string;
   rate: string;
   isWethPair: boolean;
+  expired: boolean;
+  totalStaked: string;
 }
 
 export interface FormattedStakingDetail {
