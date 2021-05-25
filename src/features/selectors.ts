@@ -5,6 +5,7 @@ import {
   formatPoolAsset,
   indexPoolsSelectors,
 } from "./indexPools";
+import { FormattedNewStakingData, FormattedNewStakingDetail } from "./newStaking/types"
 import { FormattedPair, pairsSelectors } from "./pairs";
 import { FormattedPortfolioData, userSelectors } from "./user";
 import {
@@ -12,7 +13,7 @@ import {
   FormattedStakingDetail,
   stakingSelectors,
 } from "./staking";
-import { NDX_ADDRESS } from "config";
+import { NDX_ADDRESS, WETH_CONTRACT_ADDRESS } from "config";
 import { NormalizedToken, tokensSelectors } from "./tokens";
 import { NormalizedTransaction, transactionsSelectors } from "./transactions";
 import { Pair } from "uniswap-types";
@@ -207,6 +208,8 @@ export const selectors = {
           userStakedBalance: "0",
           userRewardsEarned: "0",
         };
+        const expired = stakingPool.periodFinish < Date.now() / 1000;
+        const totalStaked = convert.toBalance(stakingPool.totalSupply ?? "0", 18, true, 2);
         const staked = convert.toBalance(userData.userStakedBalance, 18);
         const earned = convert.toBalance(userData.userRewardsEarned, 18);
         const rate =
@@ -225,14 +228,17 @@ export const selectors = {
           slug: S(indexPool.name).slugify().s,
           name,
           symbol,
+          totalStaked,
           staked,
+          periodFinish: stakingPool.periodFinish,
           stakingToken: stakingPool.stakingToken,
           earned: `${earned} NDX`,
           rate,
+          expired
         };
       })
       .filter((each): each is FormattedStakingData => Boolean(each))
-      .sort((a, b) => +b.rate - +a.rate)
+      .sort((a, b) => parseFloat(b.rate) - parseFloat(a.rate))
       .map((each) => ({
         ...each,
         staked: convert.toComma(+each.staked),
@@ -253,6 +259,71 @@ export const selectors = {
         indexTokens: [],
         liquidityTokens: [],
       } as FormattedStakingDetail
+    );
+  },
+  // selectNewFormattedStakingToken
+  selectNewFormattedStaking(state: AppState): FormattedNewStakingDetail {
+    const stakingPools = selectors.selectAllNewStakingPools(state);
+    const formattedStaking = stakingPools
+      .map((stakingPool) => {
+        let indexPoolAddress: string;
+        if (stakingPool.isWethPair) {
+          if (stakingPool.token0?.toLowerCase() === WETH_CONTRACT_ADDRESS.toLowerCase()) {
+            indexPoolAddress = stakingPool.token1 as string;
+          } else {
+            indexPoolAddress = stakingPool.token0 as string;
+          }
+        } else {
+          indexPoolAddress = stakingPool.token;
+        }
+        const indexPool = selectors.selectPool(state, indexPoolAddress);
+
+        if (!indexPool) {
+          return null;
+        }
+
+        const { name, symbol } = stakingPool;
+        const totalStaked = convert.toBalance(stakingPool.totalStaked ?? "0", 18, true, 2);
+        const staked = convert.toBalance(stakingPool.userStakedBalance ?? "0", 18);
+        const earned = convert.toBalance(stakingPool.userEarnedRewards ?? "0", 18);
+
+        const rewardsPerDay = convert.toBalance(stakingPool.rewardsPerDay, 18);
+        return {
+          id: stakingPool.id,
+          indexPool: indexPool.id,
+          isWethPair: stakingPool.isWethPair,
+          slug: S(indexPool.name).slugify().s,
+          name,
+          symbol,
+          totalStaked,
+          staked,
+          stakingToken: stakingPool.token,
+          earned: `${earned} NDX`,
+          rewardsPerDay,
+        };
+      })
+      .filter((each): each is FormattedNewStakingData => Boolean(each))
+      .sort((a, b) => +b.rewardsPerDay - +a.rewardsPerDay)
+      .map((each) => ({
+        ...each,
+        staked: convert.toComma(+each.staked),
+        rewardsPerDay: `${convert.toComma(+each.rewardsPerDay)} NDX/Day`,
+      }));
+
+    return formattedStaking.reduce(
+      (prev, next) => {
+        const collection = next.isWethPair
+          ? prev.liquidityTokens
+          : prev.indexTokens;
+
+        collection.push(next);
+
+        return prev;
+      },
+      {
+        indexTokens: [],
+        liquidityTokens: [],
+      } as FormattedNewStakingDetail
     );
   },
   // User
