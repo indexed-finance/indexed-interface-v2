@@ -1,9 +1,126 @@
+import { AppState, selectors } from "features";
+import { NDX_ADDRESS, WETH_CONTRACT_ADDRESS } from "config";
 import { NewStakingMeta, NewStakingPool } from "features/newStaking";
-import { selectors } from "features";
+import { RegisteredCall, convert, sortTokens } from "helpers";
 import { useCallRegistrar } from "./use-call-registrar";
+import { useMemo } from "react";
 import { useSelector } from "react-redux";
+import { useTokenPrice, useTokenPricesLessStrict, useTokenPricesLookup, useTotalSuppliesWithLoadingIndicator } from "./token-hooks";
+import { useUniswapPairs } from "./pair-hooks";
 import { useUserAddress } from "./user-hooks";
-import type { RegisteredCall } from "helpers";
+
+export const useNewStakedBalance = (id: string) => useSelector((state: AppState) =>
+  selectors.selectNewUserStakedBalance(state, id)
+);
+
+export const useNewStakingPool = (id: string) => useSelector((state: AppState) =>
+  selectors.selectNewStakingPool(state, id)
+);
+
+export function useNewStakingTokenPrice(id: string) {
+  const stakingPool = useNewStakingPool(id);
+  const [supplyTokens, _pairs, indexPool] = useMemo(() => {
+    if (!stakingPool) return [[], [], ""]
+    if (!stakingPool.isWethPair) {
+      return [[stakingPool.token], [], stakingPool.token];
+    }
+    const [token0, token1] = [
+      stakingPool.token0 as string,
+      stakingPool.token1 as string
+    ];
+    const indexPool = (stakingPool.token0?.toLowerCase() === WETH_CONTRACT_ADDRESS ? stakingPool.token1 : stakingPool.token0) as string;
+    return [
+      [stakingPool.token.toLowerCase()],
+      [
+        {
+          id: stakingPool.token.toLowerCase(),
+          token0,
+          token1,
+          exists: true,
+        },
+      ],
+      indexPool
+    ];
+  }, [stakingPool]);
+  const [supplies, suppliesLoading] = useTotalSuppliesWithLoadingIndicator(
+    supplyTokens
+  );
+  const [pairs, pairsLoading] = useUniswapPairs(_pairs);
+  const [tokenPrice, tokenPriceLoading] = useTokenPrice(
+    indexPool
+  );
+  const hasLoaded = useMemo(() => {
+    if (!stakingPool) return false;
+    if (stakingPool!.isWethPair) {
+      return !(pairsLoading || suppliesLoading || tokenPriceLoading);
+    }
+    return !tokenPriceLoading;
+  }, [stakingPool, pairsLoading, suppliesLoading, tokenPriceLoading]);
+
+  return useMemo(() => {
+    if (hasLoaded) {
+      if (stakingPool!.isWethPair) {
+        const [pair] = pairs || [];
+        const [supply] = supplies || [];
+        const firstTokenIsStakingPool =
+          pair.token0.address.toLowerCase() ===
+          indexPool.toLowerCase();
+        const tokenReserve = firstTokenIsStakingPool
+          ? pair.reserve0
+          : pair.reserve1;
+        const valueOfSupplyInToken = parseFloat(tokenReserve.toExact()) * 2;
+        const tokensPerLpToken =
+          valueOfSupplyInToken /
+          parseFloat(convert.toBalance(supply, 18, false));
+        return tokensPerLpToken * (tokenPrice as number);
+      } else {
+        return tokenPrice;
+      }
+    } else {
+      return null;
+    }
+  }, [hasLoaded, pairs, stakingPool, supplies, tokenPrice, indexPool]);
+  // const pool = useNewStakingPool(id);
+  // const assets = useMemo(() => {
+  //   if (pool) {
+  //     return [{ id: pool.token, useEthLpTokenPrice: pool.isWethPair }]
+  //   }
+  //   return [];
+  // }, [pool])
+  // const lookup = useTokenPricesLookup(assets);
+  // return useMemo(() => {
+  //   return pool ? lookup[pool.token] : 0;
+  // }, [pool, lookup]);
+}
+
+export function useNewStakingApy(pid: string) {
+  const stakingPool = useNewStakingPool(pid);
+  const [ndxPrice] = useTokenPrice(NDX_ADDRESS);
+  const tokenPrice = useNewStakingTokenPrice(pid);
+
+  return useMemo(() => {
+    const hasLoaded = ndxPrice && tokenPrice && stakingPool;
+
+    if (hasLoaded) {
+      const ndxMinedPerDay = convert
+          .toBigNumber(stakingPool?.rewardsPerDay ?? "0")
+      const valueNdxPerYear = parseFloat(
+        convert.toBalance(
+          ndxMinedPerDay.times(365).times(ndxPrice ?? 0),
+          18,
+          false
+        )
+      );
+      const stakedAmount = parseFloat(
+        convert.toBalance(stakingPool?.totalStaked ?? "0", 18)
+      );
+      const totalStakedValue = stakedAmount * (tokenPrice ?? 0);
+      return convert.toPercent(valueNdxPerYear / totalStakedValue);
+    } else {
+      return null;
+    }
+  }, [tokenPrice, ndxPrice, stakingPool]);
+}
 
 export function createNewStakingCalls(
   multiTokenStaking: string,
@@ -45,7 +162,10 @@ export function createNewStakingCalls(
     offChainCalls: [],
   };
 }
+
 export const NEW_STAKING_CALLER = "NewStaking";
+
+const BLOCKS_PER_DAY = 86400 / 13.5;
 
 export function useNewStakingRegistrar() {
   const userAddress = useUserAddress();
@@ -53,23 +173,36 @@ export function useNewStakingRegistrar() {
   const stakingPools: NewStakingPool[] = useSelector(
     selectors.selectAllNewStakingPools
   );
-  const { onChainCalls, offChainCalls } = stakingPools.reduce(
-    (prev, next) => {
-      const poolCalls = createNewStakingCalls(meta.id, next.id, next.token, userAddress);
-
-      prev.onChainCalls.push(...poolCalls.onChainCalls);
-      prev.offChainCalls.push(...poolCalls.offChainCalls);
-
-      return prev;
-    },
-    {
-      onChainCalls: [],
-      offChainCalls: [],
-    } as {
-      onChainCalls: RegisteredCall[];
-      offChainCalls: RegisteredCall[];
-    }
-  );
+  const firstPool = stakingPools.sort((a, b) => b.lastRewardBlock - a.lastRewardBlock)[0];
+  
+  const fromBlock = firstPool?.lastRewardBlock;
+  const { onChainCalls, offChainCalls } = useMemo(() => {
+    if (!fromBlock) return { onChainCalls: [], offChainCalls: [] };
+    return stakingPools.reduce(
+      (prev, next) => {
+        const poolCalls = createNewStakingCalls(meta.id, next.id, next.token, userAddress);
+  
+        prev.onChainCalls.push(...poolCalls.onChainCalls);
+        prev.offChainCalls.push(...poolCalls.offChainCalls);
+  
+        return prev;
+      },
+      {
+        onChainCalls: [
+          {
+            target: meta.rewardsSchedule,
+            function: 'getRewardsForBlockRange',
+            interfaceKind: 'RewardsSchedule_ABI',
+            args: [fromBlock.toString(), Math.floor(fromBlock + BLOCKS_PER_DAY).toString()]
+          }
+        ],
+        offChainCalls: [],
+      } as {
+        onChainCalls: RegisteredCall[];
+        offChainCalls: RegisteredCall[];
+      }
+    );
+  }, [ stakingPools, meta, fromBlock, userAddress ])
 
   useCallRegistrar({
     caller: NEW_STAKING_CALLER,
