@@ -9,6 +9,7 @@ export * from './pair-hooks';
 export * from './pool-hooks';
 export * from './portfolio-hooks';
 export * from './staking-hooks';
+export * from './new-staking-hooks';
 export * from './swap-hooks';
 export * from './token-hooks';
 export * from './transaction-hooks';
