@@ -4,9 +4,10 @@ import { TransactionExtra } from "features";
 import { TransactionResponse } from "@ethersproject/abstract-provider";
 import { convert } from "helpers";
 import { thunks } from "features/thunks"
-import { useBurnRouterContract, useIndexPoolContract, useMintRouterContract, useStakingRewardsContract, useTokenContract, useUniswapRouterContract } from "./contract-hooks";
+import { useBurnRouterContract, useIndexPoolContract, useMintRouterContract, useMultiTokenStakingContract, useStakingRewardsContract, useTokenContract, useUniswapRouterContract } from "./contract-hooks";
 import { useCallback } from "react";
 import { useDispatch } from "react-redux";
+import { useNewStakedBalance } from "./new-staking-hooks";
 import { usePoolSymbol } from "./pool-hooks";
 import { useUserAddress } from "./user-hooks";
 
@@ -379,6 +380,48 @@ export function useStakingTransactionCallbacks(stakingPool: string): StakingTran
     const tx = contract.claim();
     addTransaction(tx);
   }, [ contract, addTransaction ])
+
+  return {
+    stake,
+    exit,
+    withdraw,
+    claim
+  }
+}
+
+export function useNewStakingTransactionCallbacks(pid: string): StakingTransactionCallbacks {
+  const userAddress = useUserAddress();
+  const stakedBalance = useNewStakedBalance(pid);
+  const contract = useMultiTokenStakingContract();
+  const addTransaction = useAddTransactionCallback();
+
+  const stake = useCallback((amount: string) => {
+    // @todo Figure out a better way to handle this
+    if (!contract) throw new Error();
+    const tx = contract.deposit(pid, amount, userAddress);
+    addTransaction(tx);
+  }, [ contract, addTransaction, pid, userAddress ])
+
+  const withdraw = useCallback((amount: string) => {
+    // @todo Figure out a better way to handle this
+    if (!contract) throw new Error();
+    const tx = contract.withdraw(pid, amount, userAddress);
+    addTransaction(tx);
+  }, [ contract, addTransaction, pid, userAddress ])
+
+  const exit = useCallback(() => {
+    // @todo Figure out a better way to handle this
+    if (!contract) throw new Error();
+    const tx = contract.withdrawAndHarvest(pid, stakedBalance, userAddress);
+    addTransaction(tx);
+  }, [ contract, addTransaction, pid, userAddress, stakedBalance ])
+
+  const claim = useCallback(() => {
+    // @todo Figure out a better way to handle this
+    if (!contract) throw new Error();
+    const tx = contract.harvest(pid, userAddress);
+    addTransaction(tx);
+  }, [ contract, addTransaction, pid, userAddress ])
 
   return {
     stake,
