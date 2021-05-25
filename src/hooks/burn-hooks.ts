@@ -1,6 +1,7 @@
 import { AppState, selectors } from "features";
 import { COMMON_BASE_TOKENS, SLIPPAGE_RATE } from "config";
 import {
+  _calcAllOutGivenPoolIn,
   calcPoolInGivenSingleOut,
   calcSingleOutGivenPoolIn,
   downwardSlippage,
@@ -8,6 +9,7 @@ import {
 } from "ethereum";
 import { convert } from "helpers";
 import {
+  useBurnMultiTransactionCallback,
   useBurnSingleTransactionCallbacks,
   useRoutedBurnTransactionCallbacks
 } from "./transaction-hooks";
@@ -110,6 +112,57 @@ export function useSingleTokenBurnCallbacks(poolId: string) {
   };
 }
 // #endregion
+
+export function useMultiTokenBurnCallbacks(poolId: string) {
+  const pool = useSelector((state: AppState) =>
+    selectors.selectPool(state, poolId)
+  );
+  const exitPool = useBurnMultiTransactionCallback(poolId);
+  const calculateAmountsOut = useCallback(
+    (typedAmountIn: string) => {
+      if (pool) {
+        const balances = pool.tokensList.map(
+          (token) => pool.tokens.entities[token].balance
+        );
+        const denorms = pool.tokensList.map(
+          (token) => pool.tokens.entities[token].denorm
+        );
+        const totalSupply = pool.totalSupply;
+        const poolAmountIn = convert.toToken(typedAmountIn, 18);
+
+        return {
+          tokens: [...pool.tokensList], // Simplify the form's token lookup to convert amounts to strings
+          amountsOut: _calcAllOutGivenPoolIn(
+            balances.map(convert.toBigNumber),
+            denorms.map(convert.toBigNumber),
+            convert.toBigNumber(totalSupply),
+            poolAmountIn
+          ),
+          poolAmountIn,
+        };
+      }
+    },
+    [pool]
+  );
+  const executeBurn = useCallback(
+    (typedAmountIn: string) => {
+      const result = calculateAmountsOut(typedAmountIn);
+      if (result) {
+        exitPool(
+          result.poolAmountIn,
+          result.amountsOut.map((amount) =>
+            upwardSlippage(amount, SLIPPAGE_RATE)
+          )
+        )
+      } else {
+        Promise.reject()
+      }
+    },
+    [exitPool, calculateAmountsOut]
+  );
+
+  return { calculateAmountsOut, executeBurn };
+}
 
 // #region Routing
 export function useBurnRouterCallbacks(poolId: string) {

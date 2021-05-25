@@ -372,6 +372,24 @@ export function useBurnSingleTransactionCallbacks(
   };
 }
 
+export function useBurnMultiTransactionCallback(poolAddress: string) {
+  const contract = useIndexPoolContract(poolAddress);
+  const addTransaction = useAddTransactionCallback();
+
+  return useCallback(
+    (poolAmountIn: BigNumber, minAmountsOut: BigNumber[]) => {
+      // @todo Figure out a better way to handle this
+      if (!contract) throw new Error();
+      const tx = contract.exitPool(
+        convert.toHex(poolAmountIn),
+        minAmountsOut.map(convert.toHex)
+      );
+
+      addTransaction(tx);
+    },
+    [contract, addTransaction]
+  );
+}
 export interface StakingTransactionCallbacks {
   stake: (amount: string) => void;
   withdraw: (amount: string) => void;
