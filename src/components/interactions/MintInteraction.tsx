@@ -281,6 +281,7 @@ function MultiTokenMintInteraction({ indexPool }: Props) {
       spender={indexPool.id}
       onSubmit={handleSubmit}
       requiresApproval={false}
+      kind="mint"
     />
   );
 }

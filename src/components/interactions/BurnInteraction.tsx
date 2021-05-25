@@ -1,6 +1,11 @@
 import { BURN_ROUTER_ADDRESS, COMMON_BASE_TOKENS, SLIPPAGE_RATE } from "config";
 import { FormattedIndexPool, selectors } from "features";
-import { MultiInteraction, MultiInteractionValues, SingleInteraction, SingleInteractionValues } from "./BaseInteraction";
+import {
+  MultiInteraction,
+  MultiInteractionValues,
+  SingleInteraction,
+  SingleInteractionValues,
+} from "./BaseInteraction";
 import { convert } from "helpers";
 import { downwardSlippage, upwardSlippage } from "ethereum";
 import {
@@ -146,6 +151,7 @@ function MultiTokenBurnInteraction({ indexPool }: Props) {
       assets={indexPool.assets}
       spender={indexPool.id}
       onSubmit={handleSubmit}
+      kind="burn"
     />
   );
 }

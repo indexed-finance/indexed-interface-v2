@@ -15,6 +15,8 @@ import { selectors } from "features";
 import {
   useMultiTokenMintCallbacks,
   useTokenApproval,
+  useTokenBalance,
+  useTokenBalances,
   useTokenRandomizer,
   useTranslator,
 } from "hooks";
@@ -328,6 +330,7 @@ type MultiProps = Omit<Props, "onSubmit" | "onChange"> & {
   onSubmit?(values: MultiInteractionValues): void;
   onChange?(values: MultiInteractionValues): void;
   isInput?: boolean;
+  kind: "mint" | "burn";
 };
 
 export function MultiInteraction({
@@ -342,6 +345,7 @@ export function MultiInteraction({
   disableInputSelect,
   disableOutputSelect,
   requiresApproval = true,
+  kind,
 }: MultiProps) {
   const interactionRef = useRef<null | HTMLDivElement>(null);
 
@@ -370,6 +374,7 @@ export function MultiInteraction({
             disableInputSelect={disableInputSelect}
             disableOutputSelect={disableOutputSelect}
             requiresApproval={requiresApproval}
+            kind={kind}
           />
         )}
       </Formik>
@@ -389,6 +394,7 @@ function MultiInteractionInner({
   isInput,
   errors,
   setFieldError,
+  kind,
 }: InnerMultiProps) {
   const tx = useTranslator();
   const tokenLookup = useSelector(selectors.selectTokenLookup);
@@ -405,7 +411,6 @@ function MultiInteractionInner({
       if (changedValue.token) {
         setFieldValue("fromToken", changedValue.token, false);
       }
-
       if (changedValue.amount) {
         setFieldValue("fromAmount", changedValue.amount, false);
       }
@@ -444,6 +449,13 @@ function MultiInteractionInner({
     amount: approveAmount,
     rawAmount: rawApproveAmount,
     symbol,
+  });
+  const tokenBalances = useTokenBalances(assets.map(({ id }) => id));
+  const allApproved = assets.every((asset, index) => {
+    const amount = lookup[asset.id] ?? 0;
+    const balance = parseFloat(convert.toBalance(tokenBalances[index]));
+
+    return balance > amount;
   });
 
   // Effect:
@@ -489,20 +501,32 @@ function MultiInteractionInner({
             <Button
               type="primary"
               style={{ width: "100%" }}
-              disabled={!isValid || (requiresApproval && status === "unknown")}
+              disabled={
+                !allApproved ||
+                !isValid ||
+                (requiresApproval && status === "unknown")
+              }
               onClick={() => handleSubmit()}
             >
               Send
             </Button>
           )}
+          {kind === "mint" && !allApproved && (
+            <Alert
+              type="error"
+              message="Ensure all asset amounts are approved prior to sending
+            transaction."
+            />
+          )}
         </Space>
       </Col>
       <Col span={12}>
-        <div style={{ maxHeight: 500, overflow: "auto" }}>
+        <div style={{ height: 400, paddingBottom: 100, overflow: "auto" }}>
           {assets.map((asset) => (
             <AssetEntry
               key={asset.id}
               {...asset}
+              kind={kind}
               spender={spender}
               amount={lookup[asset.id] ?? 0}
               error={(errors as any)[asset.id]}
@@ -515,7 +539,12 @@ function MultiInteractionInner({
 }
 
 function AssetEntry(
-  props: Asset & { spender: string; amount: number; error: string }
+  props: Asset & {
+    spender: string;
+    amount: number;
+    error: string;
+    kind: "mint" | "burn";
+  }
 ) {
   const { status, approve } = useTokenApproval({
     spender: props.spender,
@@ -524,15 +553,22 @@ function AssetEntry(
     rawAmount: convert.toToken(props.amount.toString()).toString(),
     symbol: props.symbol,
   });
-  const needsApproval = status !== "approved";
+  const needsApproval = props.kind === "mint" && status !== "approved";
+  const balance = useTokenBalance(props.id);
+  const insufficientBalanceError =
+    props.kind === "mint" &&
+    parseFloat(convert.toBalance(balance)) < props.amount
+      ? "Insufficient balance"
+      : "";
 
   return (
     <div
       style={{
         width: "100%",
         display: "flex",
-        alignItems: "center",
+        alignItems: "flex-end",
         justifyContent: "space-between",
+        marginBottom: 12,
       }}
     >
       <TokenSelector
@@ -540,12 +576,12 @@ function AssetEntry(
         key={props.id}
         selectable={false}
         assets={[]}
-        showBalance={false}
+        showBalance={true}
         value={{
           token: props.symbol,
           amount: props.amount,
         }}
-        error={props.error}
+        error={insufficientBalanceError || props.error}
       />
       {needsApproval && (
         <Button type="default" disabled={false} onClick={approve}>

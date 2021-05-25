@@ -19,8 +19,8 @@ export function IndexPoolRecentTrades({
       }
     >
       <List size="small" style={{ maxWidth: 580 }}>
-        {trades.map((trade) => (
-          <List.Item key={trade.transactionHash}>
+        {trades.map((trade, index) => (
+          <List.Item key={index}>
             <a
               href={`https://etherscan.io/tx/${trade.transactionHash}`}
               rel="noopener noreferrer"
