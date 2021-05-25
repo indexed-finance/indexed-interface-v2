@@ -11,6 +11,7 @@ import { downwardSlippage, upwardSlippage } from "ethereum";
 import {
   useBalanceAndApprovalRegistrar,
   useMintRouterCallbacks,
+  useMultiTokenMintCallbacks,
   usePoolTokenAddresses,
   useSingleTokenMintCallbacks,
 } from "hooks";
@@ -41,7 +42,6 @@ function SingleTokenMintInteraction({ indexPool }: Props) {
     calculateAmountOut,
     executeMint,
   } = useSingleTokenMintCallbacks(indexPool.id);
-  // const indexpoolToTokens = useIndexPoolToTokens(indexpool);
   const handleChange = useCallback(
     (values: SingleInteractionValues) => {
       const {
@@ -124,10 +124,9 @@ function SingleTokenMintInteraction({ indexPool }: Props) {
     },
     [executeMint]
   );
-
   const tokenIds = usePoolTokenAddresses(indexPool.id);
+
   useBalanceAndApprovalRegistrar(indexPool.id, tokenIds);
-  // useUserDataRegistrar(indexpoolToTokens);
 
   return (
     <SingleInteraction
@@ -269,15 +268,19 @@ function UniswapMintInteraction({ indexPool }: Props) {
 }
 
 function MultiTokenMintInteraction({ indexPool }: Props) {
-  const handleSubmit = useCallback((values: MultiInteractionValues) => {
-    // Pass
-  }, []);
+  const { executeMint } = useMultiTokenMintCallbacks(indexPool.id);
+  const handleSubmit = useCallback(
+    (values: MultiInteractionValues) =>
+      executeMint(values.fromAmount.toString()),
+    [executeMint]
+  );
 
   return (
     <MultiInteraction
       assets={indexPool.assets}
       spender={indexPool.id}
       onSubmit={handleSubmit}
+      requiresApproval={false}
     />
   );
 }

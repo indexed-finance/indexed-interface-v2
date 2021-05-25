@@ -1,34 +1,41 @@
 import { AppState, selectors } from "features";
 import { NDX_ADDRESS, WETH_CONTRACT_ADDRESS } from "config";
 import { NewStakingMeta, NewStakingPool } from "features/newStaking";
-import { RegisteredCall, convert, sortTokens } from "helpers";
+import { RegisteredCall, convert } from "helpers";
 import { useCallRegistrar } from "./use-call-registrar";
 import { useMemo } from "react";
 import { useSelector } from "react-redux";
-import { useTokenPrice, useTokenPricesLessStrict, useTokenPricesLookup, useTotalSuppliesWithLoadingIndicator } from "./token-hooks";
+import {
+  useTokenPrice,
+  useTotalSuppliesWithLoadingIndicator,
+} from "./token-hooks";
 import { useUniswapPairs } from "./pair-hooks";
 import { useUserAddress } from "./user-hooks";
 
-export const useNewStakedBalance = (id: string) => useSelector((state: AppState) =>
-  selectors.selectNewUserStakedBalance(state, id)
-);
+export const useNewStakedBalance = (id: string) =>
+  useSelector((state: AppState) =>
+    selectors.selectNewUserStakedBalance(state, id)
+  );
 
-export const useNewStakingPool = (id: string) => useSelector((state: AppState) =>
-  selectors.selectNewStakingPool(state, id)
-);
+export const useNewStakingPool = (id: string) =>
+  useSelector((state: AppState) => selectors.selectNewStakingPool(state, id));
 
 export function useNewStakingTokenPrice(id: string) {
   const stakingPool = useNewStakingPool(id);
   const [supplyTokens, _pairs, indexPool] = useMemo(() => {
-    if (!stakingPool) return [[], [], ""]
+    if (!stakingPool) return [[], [], ""];
     if (!stakingPool.isWethPair) {
       return [[stakingPool.token], [], stakingPool.token];
     }
     const [token0, token1] = [
       stakingPool.token0 as string,
-      stakingPool.token1 as string
+      stakingPool.token1 as string,
     ];
-    const indexPool = (stakingPool.token0?.toLowerCase() === WETH_CONTRACT_ADDRESS ? stakingPool.token1 : stakingPool.token0) as string;
+    const indexPool = (
+      stakingPool.token0?.toLowerCase() === WETH_CONTRACT_ADDRESS
+        ? stakingPool.token1
+        : stakingPool.token0
+    ) as string;
     return [
       [stakingPool.token.toLowerCase()],
       [
@@ -39,16 +46,13 @@ export function useNewStakingTokenPrice(id: string) {
           exists: true,
         },
       ],
-      indexPool
+      indexPool,
     ];
   }, [stakingPool]);
-  const [supplies, suppliesLoading] = useTotalSuppliesWithLoadingIndicator(
-    supplyTokens
-  );
+  const [supplies, suppliesLoading] =
+    useTotalSuppliesWithLoadingIndicator(supplyTokens);
   const [pairs, pairsLoading] = useUniswapPairs(_pairs);
-  const [tokenPrice, tokenPriceLoading] = useTokenPrice(
-    indexPool
-  );
+  const [tokenPrice, tokenPriceLoading] = useTokenPrice(indexPool);
   const hasLoaded = useMemo(() => {
     if (!stakingPool) return false;
     if (stakingPool!.isWethPair) {
@@ -63,8 +67,7 @@ export function useNewStakingTokenPrice(id: string) {
         const [pair] = pairs || [];
         const [supply] = supplies || [];
         const firstTokenIsStakingPool =
-          pair.token0.address.toLowerCase() ===
-          indexPool.toLowerCase();
+          pair.token0.address.toLowerCase() === indexPool.toLowerCase();
         const tokenReserve = firstTokenIsStakingPool
           ? pair.reserve0
           : pair.reserve1;
@@ -80,17 +83,6 @@ export function useNewStakingTokenPrice(id: string) {
       return null;
     }
   }, [hasLoaded, pairs, stakingPool, supplies, tokenPrice, indexPool]);
-  // const pool = useNewStakingPool(id);
-  // const assets = useMemo(() => {
-  //   if (pool) {
-  //     return [{ id: pool.token, useEthLpTokenPrice: pool.isWethPair }]
-  //   }
-  //   return [];
-  // }, [pool])
-  // const lookup = useTokenPricesLookup(assets);
-  // return useMemo(() => {
-  //   return pool ? lookup[pool.token] : 0;
-  // }, [pool, lookup]);
 }
 
 export function useNewStakingApy(pid: string) {
@@ -102,8 +94,9 @@ export function useNewStakingApy(pid: string) {
     const hasLoaded = ndxPrice && tokenPrice && stakingPool;
 
     if (hasLoaded) {
-      const ndxMinedPerDay = convert
-          .toBigNumber(stakingPool?.rewardsPerDay ?? "0")
+      const ndxMinedPerDay = convert.toBigNumber(
+        stakingPool?.rewardsPerDay ?? "0"
+      );
       const valueNdxPerYear = parseFloat(
         convert.toBalance(
           ndxMinedPerDay.times(365).times(ndxPrice ?? 0),
@@ -136,7 +129,7 @@ export function createNewStakingCalls(
       interfaceKind: "IERC20_ABI",
       target: stakingToken,
       function: "balanceOf",
-      args: [multiTokenStaking]
+      args: [multiTokenStaking],
     },
   ];
 
@@ -144,13 +137,13 @@ export function createNewStakingCalls(
     onChainCalls.push(
       {
         target: multiTokenStaking,
-        function: 'userInfo',
+        function: "userInfo",
         args: [pid, userAddress],
         interfaceKind: "MultiTokenStaking_ABI",
       },
       {
         target: multiTokenStaking,
-        function: 'pendingRewards',
+        function: "pendingRewards",
         args: [pid, userAddress],
         interfaceKind: "MultiTokenStaking_ABI",
       }
@@ -169,32 +162,42 @@ const BLOCKS_PER_DAY = 86400 / 13.5;
 
 export function useNewStakingRegistrar() {
   const userAddress = useUserAddress();
-  const meta: NewStakingMeta = useSelector(selectors.selectNewStakingMeta)
+  const meta: NewStakingMeta = useSelector(selectors.selectNewStakingMeta);
   const stakingPools: NewStakingPool[] = useSelector(
     selectors.selectAllNewStakingPools
   );
-  const firstPool = stakingPools.sort((a, b) => b.lastRewardBlock - a.lastRewardBlock)[0];
-  
+  const firstPool = stakingPools.sort(
+    (a, b) => b.lastRewardBlock - a.lastRewardBlock
+  )[0];
+
   const fromBlock = firstPool?.lastRewardBlock;
   const { onChainCalls, offChainCalls } = useMemo(() => {
     if (!fromBlock) return { onChainCalls: [], offChainCalls: [] };
     return stakingPools.reduce(
       (prev, next) => {
-        const poolCalls = createNewStakingCalls(meta.id, next.id, next.token, userAddress);
-  
+        const poolCalls = createNewStakingCalls(
+          meta.id,
+          next.id,
+          next.token,
+          userAddress
+        );
+
         prev.onChainCalls.push(...poolCalls.onChainCalls);
         prev.offChainCalls.push(...poolCalls.offChainCalls);
-  
+
         return prev;
       },
       {
         onChainCalls: [
           {
             target: meta.rewardsSchedule,
-            function: 'getRewardsForBlockRange',
-            interfaceKind: 'RewardsSchedule_ABI',
-            args: [fromBlock.toString(), Math.floor(fromBlock + BLOCKS_PER_DAY).toString()]
-          }
+            function: "getRewardsForBlockRange",
+            interfaceKind: "RewardsSchedule_ABI",
+            args: [
+              fromBlock.toString(),
+              Math.floor(fromBlock + BLOCKS_PER_DAY).toString(),
+            ],
+          },
         ],
         offChainCalls: [],
       } as {
@@ -202,7 +205,7 @@ export function useNewStakingRegistrar() {
         offChainCalls: RegisteredCall[];
       }
     );
-  }, [ stakingPools, meta, fromBlock, userAddress ])
+  }, [stakingPools, meta, fromBlock, userAddress]);
 
   useCallRegistrar({
     caller: NEW_STAKING_CALLER,

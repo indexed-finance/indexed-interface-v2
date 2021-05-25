@@ -1,6 +1,6 @@
-import { AppState, FormattedNewStakingData, selectors } from "features";
 import { Badge, Button, Col, Row, Space, Statistic } from "antd";
 import { FaTractor } from "react-icons/fa";
+import { FormattedNewStakingData } from "features";
 import { Link, useHistory } from "react-router-dom";
 import { Widget } from "./Widget";
 import { convert } from "helpers";
@@ -32,31 +32,29 @@ export function StakingWidgetNew(props: FormattedNewStakingData) {
             : push(props.slug)
         }
         stats={
-          <Space direction="vertical" style={{ width: '100%' }}>
+          <Space direction="vertical" style={{ width: "100%" }}>
             <Statistic
-              title='Total Staked'
+              title="Total Staked"
               value={`${props.totalStaked} ${symbol}`}
             />
-            <Row style={{ width: '100%' }} justify='center'>
-              <Col span={12} >
+            <Row style={{ width: "100%" }} justify="center">
+              <Col span={12}>
                 <Statistic
-                  style={{ width: '100%' }}
+                  style={{ width: "100%" }}
                   title={tx("STAKED")}
                   value={`${props.staked} ${symbol}`}
                 />
               </Col>
               <Col span={12}>
-                <Statistic style={{ width: '100%' }} title={tx("EARNED")} value={props.earned} />
+                <Statistic
+                  style={{ width: "100%" }}
+                  title={tx("EARNED")}
+                  value={props.earned}
+                />
               </Col>
             </Row>
-            <Statistic
-              title={tx("APY")}
-              value={apy ?? ""}
-            />
-            <Statistic
-              title={tx("RATE")}
-              value={props.rewardsPerDay}
-            />
+            <Statistic title={tx("APY")} value={apy ?? ""} />
+            <Statistic title={tx("RATE")} value={props.rewardsPerDay} />
           </Space>
         }
         actions={
@@ -66,7 +64,7 @@ export function StakingWidgetNew(props: FormattedNewStakingData) {
               size="large"
               onClick={(event) => event.stopPropagation()}
             >
-               <Link to={`/staking-new/${props.id}`}>
+              <Link to={`/staking-new/${props.id}`}>
                 <Space>
                   <FaTractor style={{ position: "relative", top: 2 }} />
                   <span>{tx("STAKE")}</span>

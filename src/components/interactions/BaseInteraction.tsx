@@ -501,6 +501,7 @@ function MultiInteractionInner({
         <div style={{ maxHeight: 500, overflow: "auto" }}>
           {assets.map((asset) => (
             <AssetEntry
+              key={asset.id}
               {...asset}
               spender={spender}
               amount={lookup[asset.id] ?? 0}

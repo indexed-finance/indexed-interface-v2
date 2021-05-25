@@ -10,12 +10,8 @@ import { Formik, useFormikContext } from "formik";
 import { Link, useParams } from "react-router-dom";
 import { abbreviateAddress, convert } from "helpers";
 import { format } from "date-fns";
-import { useMemo, useState } from "react";
-import {
-  usePortfolioData,
-  useStakingRegistrar,
-  useStakingTransactionCallbacks,
-} from "hooks";
+import { useMemo } from "react";
+import { usePortfolioData, useStakingTransactionCallbacks } from "hooks";
 import { useSelector } from "react-redux";
 
 function StakingForm({
@@ -29,7 +25,7 @@ function StakingForm({
 }) {
   const { setFieldValue, values, errors } = useFormikContext<{
     amount: number;
-    inputType: 'stake' | 'unstake';
+    inputType: "stake" | "unstake";
   }>();
   const { stake, withdraw, exit, claim } = useStakingTransactionCallbacks(
     stakingToken.id
@@ -39,13 +35,14 @@ function StakingForm({
     let staked = stakingToken.userData?.userStakedBalance;
     let earned = stakingToken.userData?.userRewardsEarned;
     staked = staked ? convert.toBalance(staked, 18) : "0";
-    earned = earned ? convert.toBalance(earned, 18) : "0"
+    earned = earned ? convert.toBalance(earned, 18) : "0";
     return [staked, earned];
   }, [stakingToken]);
 
   const [estimatedReward, weight] = useMemo(() => {
     const stakedAmount = parseFloat(staked || "0");
-    const addAmount = values.inputType === "stake" ? values.amount : -values.amount;
+    const addAmount =
+      values.inputType === "stake" ? values.amount : -values.amount;
     const userNewStaked = stakedAmount + addAmount;
     if (userNewStaked < 0 || expired) {
       return [0, 0];
@@ -176,7 +173,9 @@ function StakingForm({
             block={true}
             onClick={handleSubmit}
             disabled={
-              values.inputType === "stake" ? expired : parseFloat(staked || "0") <= 0
+              values.inputType === "stake"
+                ? expired
+                : parseFloat(staked || "0") <= 0
             }
           >
             {values.inputType === "stake" ? "Deposit" : "Withdraw"}
@@ -186,7 +185,10 @@ function StakingForm({
             danger={values.inputType === "stake"}
             block={true}
             onClick={() =>
-              setFieldValue('inputType', values.inputType === "stake" ? "unstake" : "stake")
+              setFieldValue(
+                "inputType",
+                values.inputType === "stake" ? "unstake" : "stake"
+              )
             }
           >
             {values.inputType === "stake" ? "Withdraw" : "Deposit"}
@@ -239,7 +241,7 @@ function StakingStats({
     let staked = stakingToken.userData?.userStakedBalance;
     let earned = stakingToken.userData?.userRewardsEarned;
     staked = staked ? convert.toBalance(staked, 18) : "0";
-    earned = earned ? convert.toBalance(earned, 18) : "0"
+    earned = earned ? convert.toBalance(earned, 18) : "0";
     return [staked, earned];
   }, [stakingToken]);
 
@@ -326,8 +328,8 @@ export default function Stake() {
     return <div>Derp</div>;
   }
 
-  const isExpired = toStake.periodFinish < (Date.now() / 1000);
-  const stakingToken = relevantPortfolioToken.symbol
+  const isExpired = toStake.periodFinish < Date.now() / 1000;
+  const stakingToken = relevantPortfolioToken.symbol;
 
   return (
     <Page hasPageHeader={true} title={`Stake ${stakingToken}`}>
@@ -338,23 +340,34 @@ export default function Stake() {
               initialValues={{
                 asset: "",
                 amount: 0,
-                inputType: 'stake'
+                inputType: "stake",
               }}
               onSubmit={console.log}
               validateOnChange={true}
               validateOnBlur={true}
               validate={(values) => {
                 const errors: Record<string, string> = {};
-                const maximum = values.inputType === 'stake'
-                  ? parseFloat(convert.toBalance(relevantPortfolioToken.balance))
-                  : parseFloat(convert.toBalance(toStake.userData?.userStakedBalance ?? "0"))
+                const maximum =
+                  values.inputType === "stake"
+                    ? parseFloat(
+                        convert.toBalance(relevantPortfolioToken.balance)
+                      )
+                    : parseFloat(
+                        convert.toBalance(
+                          toStake.userData?.userStakedBalance ?? "0"
+                        )
+                      );
                 if (values.amount > maximum) {
                   errors.amount = "Insufficient balance.";
                 }
                 return errors;
               }}
             >
-              <StakingForm token={relevantPortfolioToken} stakingToken={toStake} expired={isExpired} />
+              <StakingForm
+                token={relevantPortfolioToken}
+                stakingToken={toStake}
+                expired={isExpired}
+              />
             </Formik>
           </Col>
           <Col span={14}>

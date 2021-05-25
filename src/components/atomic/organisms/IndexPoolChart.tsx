@@ -70,8 +70,8 @@ export function IndexPoolChart({ poolId, expanded = false }: Props) {
                 inline={true}
                 textSize="large"
                 style={{
-                  marginRight: 12,
-                  marginBottom: 12,
+                  marginRight: 8,
+                  marginBottom: 0,
                 }}
               />
             </div>
