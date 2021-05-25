@@ -285,15 +285,12 @@ export default function Stake() {
         : null,
     [data.tokens, toStake]
   );
-  const relevantStakingToken = useSelector((state: AppState) =>
-    selectors.selectStakingPool(state, id)
-  );
 
-  if (!(toStake && relevantPortfolioToken && relevantStakingToken)) {
+  if (!(toStake && relevantPortfolioToken)) {
     return <div>Derp</div>;
   }
 
-  const isExpired = relevantStakingToken.periodFinish < (Date.now() / 1000);
+  const isExpired = toStake.periodFinish < (Date.now() / 1000);
   const stakingToken = relevantPortfolioToken.symbol
 
   return (
@@ -308,14 +305,14 @@ export default function Stake() {
               }}
               onSubmit={console.log}
             >
-              <StakingForm token={relevantPortfolioToken} stakingToken={relevantStakingToken} expired={isExpired} />
+              <StakingForm token={relevantPortfolioToken} stakingToken={toStake} expired={isExpired} />
             </Formik>
           </Col>
           <Col span={14}>
             <StakingStats
               symbol={stakingToken}
               portfolioToken={relevantPortfolioToken}
-              stakingToken={relevantStakingToken}
+              stakingToken={toStake}
               expired={isExpired}
             />
           </Col>
