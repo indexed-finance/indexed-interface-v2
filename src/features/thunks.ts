@@ -196,7 +196,7 @@ export const thunks = {
       const _provider = provider as Provider;
 
       dispatch(actions.transactionStarted({ tx, extra }));
-      const receipt = await _provider.getTransactionReceipt(tx.hash);
+      const receipt = await _provider.waitForTransaction(tx.hash);
       dispatch(actions.transactionFinalized(receipt));
     },
 };
