@@ -1,6 +1,7 @@
 import { RouteProps } from "react-router-dom";
 import { TranslatedTerm } from "helpers";
 import { lazy } from "react";
+import StakeNew from "components/routes/StakeNew";
 
 type RouteWithBreadcrumbs = RouteProps & { breadcrumbName?: TranslatedTerm };
 
@@ -33,6 +34,11 @@ export const routes: RouteWithBreadcrumbs[] = [
     path: "/staking/:id",
     exact: true,
     component: Stake,
+  },
+  {
+    path: "/staking-new/:id",
+    exact: true,
+    component: StakeNew
   },
   {
     path: "/index-pools",
