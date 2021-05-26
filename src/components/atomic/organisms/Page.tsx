@@ -27,7 +27,7 @@ export function Page({
     <div
       style={{
         width: isMobile ? "96vw" : "80vw",
-        maxWidth: 1200,
+        maxWidth: isMobile ? "initial" : 1200,
         minHeight: "100vh",
         margin: "8rem auto 0 auto",
         background: "#111",

@@ -4,10 +4,11 @@ import { useMemo } from "react";
 import { usePortfolioData, useStakingRegistrar, useTranslator } from "hooks";
 
 export default function Portfolio() {
-  useStakingRegistrar()
   const tx = useTranslator();
   const { ndx, tokens, totalValue } = usePortfolioData();
   const data = useMemo(() => [ndx, ...tokens], [ndx, tokens]);
+
+  useStakingRegistrar();
 
   return (
     <Page
@@ -33,7 +34,7 @@ export default function Portfolio() {
     >
       <Row gutter={[20, 20]}>
         {data.map((heldAsset) => (
-          <Col span={8} key={heldAsset.address}>
+          <Col xs={24} sm={8} key={heldAsset.address}>
             <PortfolioWidget {...heldAsset} />
           </Col>
         ))}

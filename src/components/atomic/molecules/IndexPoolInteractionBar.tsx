@@ -3,9 +3,9 @@ import { Button, Divider, Space, Typography } from "antd";
 import { FaCoins, FaFireAlt, FaTractor } from "react-icons/fa";
 import { FormattedIndexPool } from "features";
 import { Token } from "components/atomic";
+import { useBreakpoints, useStakingApy } from "hooks";
 import { useInteractionDrawer } from "components/drawers";
 import { useMemo } from "react";
-import { useStakingApy } from "hooks";
 
 export function useIndexPoolInteractions(indexPoolAddress: string) {
   const { open } = useInteractionDrawer(indexPoolAddress);
@@ -47,6 +47,7 @@ export function IndexPoolInteractionBar({
 }: {
   indexPool: FormattedIndexPool;
 }) {
+  const { isMobile } = useBreakpoints();
   const indexPoolInteractions = useIndexPoolInteractions(indexPool.id);
 
   return (
@@ -57,16 +58,28 @@ export function IndexPoolInteractionBar({
         margin: "0 8rem",
       }}
     >
-      <Typography.Title level={4} type="secondary" style={{ margin: 0 }}>
-        Interact with{" "}
-        <Token
-          name={indexPool.name}
-          address={indexPool.id}
-          symbol={indexPool.symbol}
-        />
-      </Typography.Title>
-      <Divider type="vertical" />
-      <div style={{ flex: 1 }}>
+      {!isMobile && (
+        <>
+          <Typography.Title level={4} type="secondary" style={{ margin: 0 }}>
+            Interact with{" "}
+            <Token
+              name={indexPool.name}
+              address={indexPool.id}
+              symbol={indexPool.symbol}
+            />
+          </Typography.Title>
+          <Divider type="vertical" />
+        </>
+      )}
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-evenly",
+          flex: 1,
+        }}
+      >
         {indexPoolInteractions.map((link) => {
           const inner = (
             <Typography.Title level={4} onClick={link.onClick}>

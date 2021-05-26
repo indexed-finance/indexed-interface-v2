@@ -1,6 +1,6 @@
 import { AppState, FormattedPortfolioAsset, selectors } from "features";
-import { Button, Space, Statistic, Typography } from "antd";
 import { Progress, Token } from "components/atomic";
+import { Space, Statistic, Typography } from "antd";
 import { Widget } from "./Widget";
 import { useBreakpoints, usePoolDetailRegistrar, useTranslator } from "hooks";
 import { useSelector } from "react-redux";
@@ -8,17 +8,13 @@ import { useSelector } from "react-redux";
 export function PortfolioWidget(props: FormattedPortfolioAsset) {
   const tx = useTranslator();
   const isNdx = props.symbol === "NDX";
+  const { isMobile } = useBreakpoints();
   const tokenIds = useSelector((state: AppState) =>
     selectors.selectPoolTokenIds(state, props.address)
   );
-  const { isMobile } = useBreakpoints();
-  console.log(props.price);
+  const fontSize = isMobile ? 16 : 20;
 
   usePoolDetailRegistrar(isNdx ? "" : props.address, tokenIds);
-
-  if (isNdx) {
-    console.log(`NDX BAL ${props.balance} | PRICE ${props.price}`);
-  }
 
   return (
     <Widget
@@ -30,15 +26,15 @@ export function PortfolioWidget(props: FormattedPortfolioAsset) {
           <div data-tooltip="portfolio-widget-earned">
             <Statistic
               title={tx("EARNED")}
-              style={{ fontSize: isMobile ? 16 : 20 }}
-              valueStyle={{ fontSize: isMobile ? 16 : 20 }}
+              style={{ fontSize }}
+              valueStyle={{ fontSize }}
               value={`${props.ndxEarned} NDX`}
             />
           </div>
           {props.hasStakingPool ? (
             <Statistic
-              style={{ fontSize: isMobile ? 16 : 20 }}
-              valueStyle={{ fontSize: isMobile ? 16 : 20 }}
+              style={{ fontSize }}
+              valueStyle={{ fontSize }}
               title={tx("STAKED")}
               value={
                 props.staking
@@ -54,13 +50,6 @@ export function PortfolioWidget(props: FormattedPortfolioAsset) {
             />
           )}
         </Space>
-      }
-      actions={
-        isNdx ? null : (
-          <Button type="primary" onClick={(event) => event.stopPropagation()}>
-            {props.balance}
-          </Button>
-        )
       }
     >
       <div
