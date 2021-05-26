@@ -151,7 +151,7 @@ export function useMultiTokenBurnCallbacks(poolId: string) {
         exitPool(
           result.poolAmountIn,
           result.amountsOut.map((amount) =>
-            upwardSlippage(amount, SLIPPAGE_RATE)
+            downwardSlippage(amount, SLIPPAGE_RATE)
           )
         )
       } else {
