@@ -2,7 +2,6 @@ import { Alert, Col, Row, Space, Typography } from "antd";
 import { Page, StakingWidget } from "components/atomic";
 import { StakingWidgetNew } from "components/atomic/organisms/StakingWidgetNew";
 import { selectors } from "features";
-import { useEffect } from "react";
 import {
   useNewStakingRegistrar,
   useStakingRegistrar,
@@ -14,11 +13,6 @@ export default function Stake() {
   const tx = useTranslator();
   const stakingDetail = useSelector(selectors.selectFormattedStaking);
   const newStakingDetail = useSelector(selectors.selectNewFormattedStaking);
-
-  useEffect(() => {
-    console.log("new stake");
-    console.log(newStakingDetail);
-  }, [newStakingDetail]);
 
   useStakingRegistrar();
   useNewStakingRegistrar();
@@ -37,7 +31,7 @@ export default function Stake() {
             <Typography.Title level={3}>{tx("INDEX_TOKENS")}</Typography.Title>
             <Row gutter={[20, 20]}>
               {newStakingDetail.indexTokens.map((stakingPool) => (
-                <Col span={12} key={stakingPool.id}>
+                <Col xs={24} sm={12} key={stakingPool.id}>
                   <StakingWidgetNew key={stakingPool.id} {...stakingPool} />
                 </Col>
               ))}
@@ -51,14 +45,14 @@ export default function Stake() {
             </Typography.Title>
             <Row gutter={[20, 20]}>
               {newStakingDetail.liquidityTokens.map((stakingPool) => (
-                <Col span={12} key={stakingPool.id}>
+                <Col xs={24} sm={12} key={stakingPool.id}>
                   <StakingWidgetNew key={stakingPool.id} {...stakingPool} />
                 </Col>
               ))}
               {stakingDetail.liquidityTokens
                 .filter((t) => !t.expired)
                 .map((stakingPool) => (
-                  <Col span={12} key={stakingPool.id}>
+                  <Col xs={24} sm={12} key={stakingPool.id}>
                     <StakingWidget key={stakingPool.id} {...stakingPool} />
                   </Col>
                 ))}
@@ -80,7 +74,7 @@ export default function Stake() {
             <Typography.Title level={3}>{tx("INDEX_TOKENS")}</Typography.Title>
             <Row gutter={[20, 20]}>
               {stakingDetail.indexTokens.map((stakingPool) => (
-                <Col span={12} key={stakingPool.id}>
+                <Col xs={24} sm={12} key={stakingPool.id}>
                   <StakingWidget key={stakingPool.id} {...stakingPool} />
                 </Col>
               ))}
@@ -96,7 +90,7 @@ export default function Stake() {
               {stakingDetail.liquidityTokens
                 .filter((t) => t.expired)
                 .map((stakingPool) => (
-                  <Col span={12} key={stakingPool.id}>
+                  <Col xs={24} sm={12} key={stakingPool.id}>
                     <StakingWidget key={stakingPool.id} {...stakingPool} />
                   </Col>
                 ))}

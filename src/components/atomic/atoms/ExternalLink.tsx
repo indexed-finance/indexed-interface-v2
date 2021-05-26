@@ -4,10 +4,12 @@ import { ReactNode } from "react";
 export function ExternalLink({
   to,
   children,
+  withIcon = true,
   ...rest
 }: {
   to: string;
   children: ReactNode;
+  withIcon?: boolean;
 }) {
   return (
     <a
@@ -21,7 +23,7 @@ export function ExternalLink({
         justifyContent: "space-between",
       }}
     >
-      <div>{children}</div> <BiLinkExternal />
+      <div>{children}</div> {withIcon && <BiLinkExternal />}
     </a>
   );
 }

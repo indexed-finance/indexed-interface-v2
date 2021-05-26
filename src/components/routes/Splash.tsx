@@ -29,7 +29,7 @@ export default function Splash() {
     FEATURE_FLAGS.useInternalDocs ? (
       <Link to="/docs">{docsButton}</Link>
     ) : (
-      <ExternalLink to="https://docs.indexed.finance/">
+      <ExternalLink to="https://docs.indexed.finance/" withIcon={false}>
         {docsButton}
       </ExternalLink>
     );
@@ -96,9 +96,11 @@ export default function Splash() {
             )}
           </Button.Group>
         </Typography.Title>
-        <video width="1100" height="840" autoPlay={true}>
-          <source src="/splash.mp4" type="video/mp4"></source>
-        </video>
+        {!isMobile && (
+          <video autoPlay={true}>
+            <source src="/splash.mp4" type="video/mp4"></source>
+          </video>
+        )}
       </div>
       <Card style={{ marginTop: "2rem" }}>
         <Steps current={step} responsive={true} type="navigation">

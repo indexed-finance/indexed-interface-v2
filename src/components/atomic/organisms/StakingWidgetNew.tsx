@@ -14,9 +14,7 @@ export function StakingWidgetNew(props: FormattedNewStakingData) {
   const tx = useTranslator();
   const apy = useNewStakingApy(props.id);
   const price = useNewStakingTokenPrice(props.id);
-
   const symbol = props.symbol;
-
   const { push } = useHistory();
   const inner = (
     <div style={{ position: "relative" }}>

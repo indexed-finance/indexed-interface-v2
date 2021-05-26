@@ -58,7 +58,7 @@ export function Navigation() {
         </Link>
       </Menu.Item>
       <Menu.Item>
-        <ExternalLink to="https://vote.indexed.finance/">
+        <ExternalLink to="https://vote.indexed.finance/" withIcon={false}>
           <Space size="small">
             <FaGavel style={{ position: "relative", top: 2 }} />{" "}
             {!isMobile && <span>Govern</span>}

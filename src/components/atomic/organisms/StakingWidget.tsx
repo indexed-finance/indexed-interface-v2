@@ -4,11 +4,7 @@ import { FormattedStakingData } from "features";
 import { Link, useHistory } from "react-router-dom";
 import { Widget } from "./Widget";
 import { convert } from "helpers";
-import {
-  useStakingApy,
-  useStakingTokenPrice,
-  useTranslator,
-} from "hooks";
+import { useStakingApy, useStakingTokenPrice, useTranslator } from "hooks";
 
 export function StakingWidget(props: FormattedStakingData) {
   const tx = useTranslator();
@@ -31,25 +27,29 @@ export function StakingWidget(props: FormattedStakingData) {
             : push(props.slug)
         }
         stats={
-          <Space direction="vertical" style={{ width: '100%' }}>
+          <Space direction="vertical" style={{ width: "100%" }}>
             <Statistic
-              style={{ width: '100%' }}
-              title='Total Staked'
+              style={{ width: "100%" }}
+              title="Total Staked"
               value={`${props.totalStaked} ${symbol}`}
             />
-            <Row style={{ width: '100%' }} justify='center'>
-              <Col span={12} >
+            <Row style={{ width: "100%" }} justify="center">
+              <Col span={12}>
                 <Statistic
-                  style={{ width: '100%' }}
+                  style={{ width: "100%" }}
                   title={tx("STAKED")}
                   value={`${props.staked} ${symbol}`}
                 />
               </Col>
               <Col span={12}>
-                <Statistic style={{ width: '100%' }} title={tx("EARNED")} value={props.earned} />
+                <Statistic
+                  style={{ width: "100%" }}
+                  title={tx("EARNED")}
+                  value={props.earned}
+                />
               </Col>
             </Row>
-            
+
             <Statistic
               title={tx("APY")}
               value={apy ?? "Expired"}
@@ -66,7 +66,6 @@ export function StakingWidget(props: FormattedStakingData) {
           <>
             <Button
               type={isExpired ? "ghost" : "primary"}
-              // disabled={isExpired} This should not be disabled - people need to be able to withdraw.
               size="large"
               onClick={(event) => event.stopPropagation()}
             >

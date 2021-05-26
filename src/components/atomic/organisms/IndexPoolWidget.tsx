@@ -12,7 +12,7 @@ export function IndexPoolWidgetGroup() {
   return (
     <Row gutter={[20, 20]}>
       {indexPools.map((pool) => (
-        <Col span={8} key={pool.id}>
+        <Col xs={24} sm={8} key={pool.id}>
           <IndexPoolWidget {...pool} />
         </Col>
       ))}

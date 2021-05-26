@@ -2,7 +2,6 @@ import { Card, Col, Divider, Row, Typography } from "antd";
 import { HTMLProps, ReactNode } from "react";
 import { Quote } from "components/atomic/molecules";
 import { Token } from "components/atomic/atoms";
-import { useBreakpoints } from "hooks";
 import noop from "lodash.noop";
 
 interface Props extends HTMLProps<HTMLDivElement> {
@@ -31,8 +30,6 @@ export function Widget({
   onClick = noop,
   ...rest
 }: Props) {
-  const { isMobile } = useBreakpoints();
-
   return (
     <div
       onClick={onClick}
@@ -52,7 +49,7 @@ export function Widget({
         <div
           style={{
             display: "flex",
-            flexDirection: isMobile ? "column" : "row",
+            flexDirection: "row",
             alignItems: "center",
             justifyContent: "space-between",
           }}
