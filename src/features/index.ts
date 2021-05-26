@@ -7,6 +7,7 @@ export * from './categories';
 export * from './dailySnapshots';
 export * from './indexPools';
 export * from './middleware';
+export * from './newStaking';
 export * from './pairs';
 export * from './reducer';
 export * from './requests';
@@ -18,4 +19,3 @@ export * from './thunks';
 export * from './tokens';
 export * from './transactions';
 export * from './user';
-export * from './newStaking'

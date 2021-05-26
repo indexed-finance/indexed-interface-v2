@@ -12,6 +12,7 @@ export * from './LayoutHeader';
 export * from './Page';
 export * from './PortfolioWidget';
 export * from './StakingWidget';
+export * from './StakingWidgetNew';
 export * from './TokenSelector';
 export * from './TooltipProvider';
 export * from './Widget';

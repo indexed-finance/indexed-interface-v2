@@ -1,5 +1,6 @@
-import { Space, Typography } from "antd";
+import { Button, Space, Typography } from "antd";
 import { selectors } from "features";
+import { sendMockTransaction } from "mocks";
 import { useBreakpoints } from "hooks";
 import { useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
@@ -83,6 +84,12 @@ export function DEBUG() {
           <li>On-Chain Calls: {batcherStatus.onChainCalls}</li>
           <li>Off-Chain Calls: {batcherStatus.offChainCalls}</li>
         </ul>
+      </div>
+      <div>
+        <legend>Mock Transaction</legend>
+        <Button type="default" block={true} onClick={sendMockTransaction}>
+          Send Tx
+        </Button>
       </div>
     </Space>
   );
