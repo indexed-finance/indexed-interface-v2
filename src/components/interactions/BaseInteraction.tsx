@@ -502,7 +502,7 @@ function MultiInteractionInner({
               type="primary"
               style={{ width: "100%" }}
               disabled={
-                !allApproved ||
+                (kind === "mint" && !allApproved) ||
                 !isValid ||
                 (requiresApproval && status === "unknown")
               }

@@ -155,6 +155,7 @@ function MultiTokenBurnInteraction({ indexPool }: Props) {
       assets={indexPool.assets}
       spender={indexPool.id}
       onSubmit={handleSubmit}
+      requiresApproval={false}
       kind="burn"
     />
   );
