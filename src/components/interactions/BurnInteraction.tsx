@@ -11,6 +11,7 @@ import { downwardSlippage, upwardSlippage } from "ethereum";
 import {
   useBalancesRegistrar,
   useBurnRouterCallbacks,
+  useMultiTokenBurnCallbacks,
   useSingleTokenBurnCallbacks,
 } from "hooks";
 import { useCallback } from "react";
@@ -141,9 +142,12 @@ function SingleTokenBurnInteraction({ indexPool }: Props) {
 }
 
 function MultiTokenBurnInteraction({ indexPool }: Props) {
-  const handleSubmit = useCallback((values: MultiInteractionValues) => {
-    // Pass
-  }, []);
+  const { executeBurn } = useMultiTokenBurnCallbacks(indexPool.id);
+  const handleSubmit = useCallback(
+    (values: MultiInteractionValues) =>
+      executeBurn(values.fromAmount.toString()),
+    [executeBurn]
+  );
 
   return (
     <MultiInteraction
