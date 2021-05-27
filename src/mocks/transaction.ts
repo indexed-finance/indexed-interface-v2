@@ -15,8 +15,8 @@ const availableHashes = [
 
 let hashCounter = 0;
 
-export async function sendMockTransaction(time = 4000) {
-  const next = availableHashes[hashCounter++];
+async function sendTransaction(status: number, time = 4000) {
+  const transactionHash = availableHashes[hashCounter++];
   const receipt: TransactionReceipt = {
     to: "0x0",
     from: "0x0",
@@ -25,13 +25,13 @@ export async function sendMockTransaction(time = 4000) {
     gasUsed: BigNumber.from("1"),
     logsBloom: "",
     blockHash: "",
-    transactionHash: next,
     logs: [],
     blockNumber: 1,
     confirmations: 30,
     cumulativeGasUsed: BigNumber.from("2"),
     byzantium: false,
-    status: 1,
+    transactionHash,
+    status,
   };
   const transaction: TransactionResponse = {
     blockNumber: 1,
@@ -46,7 +46,7 @@ export async function sendMockTransaction(time = 4000) {
     data: "",
     value: BigNumber.from("5"),
     chainId: 1,
-    hash: next,
+    hash: transactionHash,
     wait: () => Promise.resolve(receipt),
   };
 
@@ -63,3 +63,7 @@ export async function sendMockTransaction(time = 4000) {
 
   hashCounter--;
 }
+
+export const sendMockGoodTransaction = (time = 4000) =>
+  sendTransaction(1, time);
+export const sendMockBadTransaction = (time = 4000) => sendTransaction(0, time);

@@ -78,6 +78,7 @@ export function TransactionList() {
 
           return (
             <ExternalLink
+              key={tx.hash}
               to={`https://etherscan.io/tx/${tx.hash}`}
               withIcon={false}
             >

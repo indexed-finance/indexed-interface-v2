@@ -1,6 +1,6 @@
 import { Button, Space, Typography } from "antd";
 import { selectors } from "features";
-import { sendMockTransaction } from "mocks";
+import { sendMockBadTransaction, sendMockGoodTransaction } from "mocks";
 import { useBreakpoints } from "hooks";
 import { useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
@@ -87,13 +87,23 @@ export function DEBUG() {
       </div>
       <div>
         <legend>Mock Transaction</legend>
-        <Button
-          type="default"
-          block={true}
-          onClick={() => sendMockTransaction()}
-        >
-          Send Tx
-        </Button>
+        <Space direction="vertical" style={{ width: "100%" }}>
+          <Button
+            type="default"
+            block={true}
+            onClick={() => sendMockGoodTransaction()}
+          >
+            Send Tx
+          </Button>
+          <Button
+            type="default"
+            danger={true}
+            block={true}
+            onClick={() => sendMockBadTransaction()}
+          >
+            Send Bad Tx
+          </Button>
+        </Space>
       </div>
     </Space>
   );
