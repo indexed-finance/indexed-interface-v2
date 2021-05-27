@@ -15,7 +15,7 @@ const availableHashes = [
 
 let hashCounter = 0;
 
-export async function sendMockTransaction(time = 12000) {
+export async function sendMockTransaction(time = 4000) {
   const next = availableHashes[hashCounter++];
   const receipt: TransactionReceipt = {
     to: "0x0",
@@ -31,6 +31,7 @@ export async function sendMockTransaction(time = 12000) {
     confirmations: 30,
     cumulativeGasUsed: BigNumber.from("2"),
     byzantium: false,
+    status: 1,
   };
   const transaction: TransactionResponse = {
     blockNumber: 1,

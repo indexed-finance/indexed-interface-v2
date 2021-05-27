@@ -30,7 +30,7 @@ export function Page({
         maxWidth: isMobile ? "initial" : 1200,
         minHeight: "100vh",
         margin: "8rem auto 0 auto",
-        background: "#111",
+        background: "#151515",
       }}
     >
       <Card

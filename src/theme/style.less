@@ -52,6 +52,31 @@
   animation: flashing-input-error 2s ease-in-out infinite;
 }
 
+@keyframes fading-out {
+  0% {
+    opacity: 1;
+  }
+  20% {
+    opacity: 0.4;
+  }
+  40% {
+    opacity: 1;
+  }
+  60% {
+    opacity: 0.4;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.fading-out {
+  animation: fading-out 5s ease-in-out forwards;
+}
+
 // -- Ant Overrides
 .ant-page-header-heading-title {
   line-height: 1 !important;
