@@ -1,4 +1,5 @@
 import { Dropdown, Menu, notification } from "antd";
+import { ExternalLink } from "components/atomic/atoms";
 import { actions } from "features";
 import { useBreakpoints, useTranslator } from "hooks";
 import { useCallback, useEffect, useRef } from "react";
@@ -9,9 +10,10 @@ import jazzicon from "@metamask/jazzicon";
 
 interface Props {
   address: string;
+  isWalletIcon?: boolean;
 }
 
-export function JazzIcon({ address }: Props) {
+export function JazzIcon({ address, isWalletIcon = false }: Props) {
   const tx = useTranslator();
   const { deactivate } = useWeb3React();
   const dispatch = useDispatch();
@@ -26,6 +28,7 @@ export function JazzIcon({ address }: Props) {
     });
   }, [dispatch, deactivate, tx]);
   const breakpoints = useBreakpoints();
+  const inner = <span ref={blockie} />;
 
   // Effect:
   // Use refs to integrate the third party library for displaying a wallet identicon.
@@ -55,26 +58,28 @@ export function JazzIcon({ address }: Props) {
     };
   }, [address, breakpoints]);
 
-  return (
+  return isWalletIcon ? (
     <Dropdown
       arrow={true}
       placement={breakpoints.isMobile ? "topRight" : "bottomLeft"}
       overlay={
         <Menu>
           <Menu.Item>
-            <a
-              target="_blank"
-              rel="noopener noreferrer"
-              href={`https://etherscan.io/address/${address}`}
-            >
+            <ExternalLink to={`https://etherscan.io/address/${address}`}>
               {tx("VIEW_ON_ETHERSCAN")}
-            </a>
+            </ExternalLink>
           </Menu.Item>
-          <Menu.Item onClick={handleDisconnect}>{tx("DISCONNECT")}</Menu.Item>
+          {isWalletIcon && (
+            <Menu.Item onClick={handleDisconnect}>{tx("DISCONNECT")}</Menu.Item>
+          )}
         </Menu>
       }
     >
-      <span ref={blockie} />
+      {inner}
     </Dropdown>
+  ) : (
+    <ExternalLink to={`https://etherscan.io/tx/${address}`} withIcon={false}>
+      {inner}
+    </ExternalLink>
   );
 }

@@ -14,5 +14,4 @@ export * from './SelectableToken';
 export * from './ServerConnection';
 export * from './SocialMediaList';
 export * from './TokenExchangeRate';
-export * from './TransactionList';
 export * from './WalletConnector';

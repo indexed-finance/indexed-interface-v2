@@ -6,7 +6,17 @@ import {
 import { actions, store } from "features";
 import { sleep } from "helpers";
 
-export async function sendMockTransaction() {
+const availableHashes = [
+  "0xb26d07fba6d6f661d5eba72cbf3f390438abc81fb36a30c7b8c5f9d59a080a60",
+  "0x846048ebf6ece170e2565fc982c8927b4df7b3dcaeb3578610dd4cac6441ada9",
+  "0x900b279e26b9e5313ff54a2c66a584b774d17de4de35cedffb9006ea74ae8495",
+  "0x99e5ee03cdecabb45af46fe47cef09e5f9381e0053fc9378f6acccbc573cab3b",
+];
+
+let hashCounter = 0;
+
+export async function sendMockTransaction(time = 12000) {
+  const next = availableHashes[hashCounter++];
   const receipt: TransactionReceipt = {
     to: "0x0",
     from: "0x0",
@@ -15,7 +25,7 @@ export async function sendMockTransaction() {
     gasUsed: BigNumber.from("1"),
     logsBloom: "",
     blockHash: "",
-    transactionHash: "",
+    transactionHash: next,
     logs: [],
     blockNumber: 1,
     confirmations: 30,
@@ -35,7 +45,7 @@ export async function sendMockTransaction() {
     data: "",
     value: BigNumber.from("5"),
     chainId: 1,
-    hash: "",
+    hash: next,
     wait: () => Promise.resolve(receipt),
   };
 
@@ -46,7 +56,9 @@ export async function sendMockTransaction() {
     })
   );
 
-  await sleep(3000);
+  await sleep(time);
 
   store.dispatch(actions.transactionFinalized(receipt));
+
+  hashCounter--;
 }

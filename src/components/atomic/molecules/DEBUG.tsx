@@ -87,7 +87,11 @@ export function DEBUG() {
       </div>
       <div>
         <legend>Mock Transaction</legend>
-        <Button type="default" block={true} onClick={sendMockTransaction}>
+        <Button
+          type="default"
+          block={true}
+          onClick={() => sendMockTransaction()}
+        >
           Send Tx
         </Button>
       </div>

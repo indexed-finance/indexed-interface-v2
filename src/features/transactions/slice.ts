@@ -3,28 +3,34 @@ import {
   createEntityAdapter,
   createSlice,
 } from "@reduxjs/toolkit";
-import { TransactionReceipt, TransactionResponse } from "@ethersproject/abstract-provider";
+import {
+  TransactionReceipt,
+  TransactionResponse,
+} from "@ethersproject/abstract-provider";
 import { restartedDueToError } from "../actions";
 import type { AppState } from "../store";
-
 
 export type TransactionStatus = "pending" | "confirmed" | "reverted";
 
 export type TransactionExtra = {
   /** @param summary - Text summary of what the transaction does */
   summary?: string;
-} & ({
-  /** @param type - Type identifier for icon selection */
-  type: 'ERC20.approve';
-  /** @param approval - Uses to display loading icon for pending approval */
-  approval: { tokenAddress: string; spender: string; amount: string; };
-} | {
-  type: 'StakingRewards.claim';
-  claim: { recipient: string };
-} | {
-  /** @param type - Type identifier for icon selection */
-  type?: undefined;
-});
+} & (
+  | {
+      /** @param type - Type identifier for icon selection */
+      type: "ERC20.approve";
+      /** @param approval - Uses to display loading icon for pending approval */
+      approval: { tokenAddress: string; spender: string; amount: string };
+    }
+  | {
+      type: "StakingRewards.claim";
+      claim: { recipient: string };
+    }
+  | {
+      /** @param type - Type identifier for icon selection */
+      type?: undefined;
+    }
+);
 
 export type NormalizedTransaction = {
   /** @param hash - Transaction hash used for provider queries & EtherScan link */
@@ -59,7 +65,13 @@ const slice = createSlice({
   name: "transactions",
   initialState: adapter.getInitialState(),
   reducers: {
-    transactionStarted(state, action: PayloadAction<{ tx: TransactionResponse; extra?: TransactionExtra; }>) {
+    transactionStarted(
+      state,
+      action: PayloadAction<{
+        tx: TransactionResponse;
+        extra?: TransactionExtra;
+      }>
+    ) {
       const { tx, extra = {} } = action.payload;
       adapter.addOne(state, {
         hash: tx.hash,
@@ -69,7 +81,7 @@ const slice = createSlice({
         gasPrice: tx.gasPrice.toNumber(),
         gasLimit: tx.gasLimit.toNumber(),
         status: "pending",
-        ...extra
+        ...extra,
       });
     },
     transactionsCleared() {
@@ -83,22 +95,34 @@ const slice = createSlice({
         entry.gasUsed = gasUsed.toNumber();
         entry.confirmedTime = Date.now();
       }
-    }
+    },
   },
   extraReducers: (builder) =>
     builder.addCase(restartedDueToError, () => adapter.getInitialState()),
 });
 
-export const {
-  actions: transactionsActions,
-  reducer: transactionsReducer,
-} = slice;
+export const { actions: transactionsActions, reducer: transactionsReducer } =
+  slice;
 
 export const transactionsSelectors = {
+  ...adapter.getSelectors((state: AppState) => state.transactions),
   selectTransactionsLookup(state: AppState) {
     return state.transactions.entities;
   },
+  selectTransactionIds(state: AppState) {
+    return transactionsSelectors.selectIds(state);
+  },
   selectTransactions(state: AppState) {
-    return Object.values(state.transactions.entities) as NormalizedTransaction[];
+    return transactionsSelectors.selectAll(state);
+  },
+  selectTransaction(state: AppState, hash: string) {
+    return transactionsSelectors
+      .selectAll(state)
+      .find((tx) => tx.hash === hash);
+  },
+  selectLatestTransaction(state: AppState) {
+    const all = transactionsSelectors.selectAll(state);
+
+    return all[all.length - 1];
   },
 };

@@ -19,7 +19,7 @@ export function LayoutHeader() {
   const [showingUserControls, setShowingUserControls] = useState(false);
   const selectedAddress = useSelector(selectors.selectUserAddress);
   const walletIcon = selectedAddress ? (
-    <JazzIcon address={selectedAddress} />
+    <JazzIcon address={selectedAddress} isWalletIcon={true} />
   ) : (
     <WalletConnector />
   );
