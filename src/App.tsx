@@ -100,7 +100,7 @@ export function AppLayout() {
 
     notification.config({
       placement: "topRight",
-      top: isMobile ? 136 : 96,
+      top: isMobile ? 96 : 96,
       duration: 4.2,
     });
   }, [isMobile]);

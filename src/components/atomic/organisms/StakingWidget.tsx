@@ -22,7 +22,7 @@ export function StakingWidget(props: FormattedStakingData) {
         onClick={() =>
           props.isWethPair
             ? window.open(
-                `https://info.uniswap.org/pair/${props.stakingToken.toLowerCase()}`
+                `https://v2.uniswap.org/pair/${props.stakingToken.toLowerCase()}`
               )
             : push(props.slug)
         }

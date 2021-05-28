@@ -1,20 +1,18 @@
-import { Card, Col, List, Row, Space, Typography } from "antd";
+import { Card, Col, List, Row, Typography } from "antd";
 import { FormattedIndexPool } from "features";
 import { Progress, Quote, Token } from "components/atomic";
+import { useBreakpoints } from "hooks";
 
 export function IndexPoolAssets({ assets }: FormattedIndexPool) {
+  const { isMobile } = useBreakpoints();
+
   return (
     <Card
       bodyStyle={{ maxWidth: 450 }}
       title={
-        <Space style={{ width: "100%", justifyContent: "space-between" }}>
-          <Typography.Title level={3} style={{ margin: 0 }}>
-            Assets
-          </Typography.Title>
-          <Typography.Text type="secondary">
-            <em>Total of {assets.length}</em>
-          </Typography.Text>
-        </Space>
+        <Typography.Title level={3} style={{ margin: 0 }}>
+          Assets
+        </Typography.Title>
       }
     >
       <List>
@@ -54,7 +52,7 @@ export function IndexPoolAssets({ assets }: FormattedIndexPool) {
               <Col span={6}>
                 <Progress
                   style={{ flex: 1, textAlign: "right" }}
-                  width={80}
+                  width={isMobile ? 60 : 80}
                   status="active"
                   type="dashboard"
                   percent={parseFloat(asset.weightPercentage.replace(/%/g, ""))}

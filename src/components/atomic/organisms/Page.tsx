@@ -29,7 +29,8 @@ export function Page({
         width: isMobile ? "96vw" : "80vw",
         maxWidth: isMobile ? "initial" : 1200,
         minHeight: "100vh",
-        margin: "8rem auto 0 auto",
+        margin: "8rem auto 8rem auto",
+        paddingBottom: "8rem",
         background: "#151515",
       }}
     >

@@ -1,6 +1,7 @@
 import { Card, List, Space, Typography } from "antd";
 import { FormattedIndexPool } from "features";
 import { Token } from "components/atomic";
+import { useBreakpoints } from "hooks";
 
 const MAXIMUM_DISPLAYED_TRADES = 8;
 
@@ -9,6 +10,7 @@ export function IndexPoolRecentTrades({
   transactions,
 }: FormattedIndexPool) {
   const trades = transactions.trades.slice(0, MAXIMUM_DISPLAYED_TRADES);
+  const { isMobile } = useBreakpoints();
 
   return (
     <Card
@@ -27,7 +29,8 @@ export function IndexPoolRecentTrades({
               target="_blank"
               style={{
                 display: "flex",
-                alignItems: "center",
+                flexDirection: isMobile ? "column" : "row",
+                alignItems: isMobile ? "flex-end" : "center",
                 justifyContent: "space-between",
                 flex: 1,
               }}
@@ -40,14 +43,16 @@ export function IndexPoolRecentTrades({
                   sold for
                 </Typography.Text>
                 <Token name="" symbol={trade.to} address={id} />
-                {trade.when}
               </Space>
 
-              <Typography.Text
-                type={trade.kind === "buy" ? "success" : "danger"}
-              >
-                {trade.amount}
-              </Typography.Text>
+              <div>
+                {trade.when} for{" "}
+                <Typography.Text
+                  type={trade.kind === "buy" ? "success" : "danger"}
+                >
+                  {trade.amount}
+                </Typography.Text>
+              </div>
             </a>
           </List.Item>
         ))}
