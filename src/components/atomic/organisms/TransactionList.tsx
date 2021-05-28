@@ -1,10 +1,11 @@
 import { BaseType } from "antd/lib/typography/Base";
+import { BiLinkExternal } from "react-icons/bi";
+import { Button, Space, Typography } from "antd";
 import { ExternalLink } from "components/atomic/atoms";
-import { Space, Typography } from "antd";
 import { abbreviateAddress } from "helpers";
-import { selectors } from "features";
+import { actions, selectors } from "features";
+import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useSelector } from "react-redux";
 import cx from "classnames";
 
 export function TransactionList() {
@@ -15,26 +16,37 @@ export function TransactionList() {
     () => transactions.filter((tx) => !hidden[tx.hash]),
     [transactions, hidden]
   );
+  const dispatch = useDispatch();
 
   // Effect:
-  // 5 seconds after a transaction is confirmed, add it to the "hide" list.
+  // - 5 seconds after a transaction is confirmed, add it to the "hide" list.
+  // - 90 seconds after a transaction is rejected, add it to the "hide" list.
   useEffect(() => {
     for (const tx of transactions) {
-      if (
-        tx.status === "confirmed" &&
-        !hiding.current[tx.hash] &&
-        !hidden[tx.hash]
-      ) {
-        hiding.current[tx.hash] = true;
+      if (!hiding.current[tx.hash] && !hidden[tx.hash]) {
+        if (tx.status === "confirmed") {
+          hiding.current[tx.hash] = true;
 
-        setTimeout(() => {
-          delete hiding.current[tx.hash];
+          setTimeout(() => {
+            delete hiding.current[tx.hash];
 
-          setHidden((prev) => ({
-            ...prev,
-            [tx.hash]: true,
-          }));
-        }, 5000);
+            setHidden((prev) => ({
+              ...prev,
+              [tx.hash]: true,
+            }));
+          }, 5000);
+        } else if (tx.status === "reverted") {
+          hiding.current[tx.hash] = true;
+
+          setTimeout(() => {
+            delete hiding.current[tx.hash];
+
+            setHidden((prev) => ({
+              ...prev,
+              [tx.hash]: true,
+            }));
+          }, 1000 * 60 * 1.5);
+        }
       }
     }
   }, [transactions, hidden]);
@@ -83,15 +95,25 @@ export function TransactionList() {
               withIcon={false}
             >
               <Typography.Text
-                className={cx(tx.status === "confirmed" && "fading-out")}
+                className={cx(
+                  (tx.status === "confirmed" || tx.status === "reverted") &&
+                    "fading-out"
+                )}
                 type={statuses[tx.status]}
                 style={{ marginRight: 6 }}
               >
-                {abbreviateAddress(tx.hash)}
+                {abbreviateAddress(tx.hash)} <BiLinkExternal />
               </Typography.Text>
             </ExternalLink>
           );
         })}
+        <Button
+          type="default"
+          block={true}
+          onClick={() => dispatch(actions.transactionsCleared())}
+        >
+          Clear
+        </Button>
       </Space>
     </div>
   ) : null;
