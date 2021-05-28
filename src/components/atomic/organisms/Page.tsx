@@ -48,13 +48,14 @@ export function Page({
                 borderBottom: "1px solid #49ffff",
                 paddingBottom: 18,
                 display: "flex",
+                flexDirection: isMobile ? "column" : "row",
                 alignItems: "center",
                 justifyContent: "space-between",
               }}
               onBack={goBack}
               title={
                 <Typography.Title
-                  level={2}
+                  level={isMobile ? 5 : 2}
                   style={{ margin: 0, textTransform: "uppercase" }}
                 >
                   {title}

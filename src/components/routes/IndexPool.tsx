@@ -11,12 +11,18 @@ import {
   Page,
 } from "components/atomic";
 import { IndexPoolInteraction, useInteractionDrawer } from "components/drawers";
+import {
+  useBreakpoints,
+  usePoolDetailRegistrar,
+  useQuery,
+  useStakingApy,
+} from "hooks";
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { usePoolDetailRegistrar, useQuery, useStakingApy } from "hooks";
 import { useSelector } from "react-redux";
 
 function LoadedIndexPool(props: FormattedIndexPool) {
+  const { isMobile } = useBreakpoints();
   const tokenIds = useSelector((state: AppState) =>
     selectors.selectPoolTokenIds(state, props.id)
   );
@@ -33,7 +39,11 @@ function LoadedIndexPool(props: FormattedIndexPool) {
         }}
       >
         <Col xs={24} md={8}>
-          <Space size="large" direction="vertical">
+          <Space
+            size="large"
+            direction="vertical"
+            style={{ marginBottom: isMobile ? 24 : 0 }}
+          >
             <IndexPoolDescription {...props} />
             <IndexPoolExternalLinks {...props} />
           </Space>

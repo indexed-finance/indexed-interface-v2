@@ -1,12 +1,13 @@
 import { Divider, Space, Statistic } from "antd";
 import { FormattedIndexPool } from "features";
-import { useTranslator } from "hooks";
+import { useBreakpoints, useTranslator } from "hooks";
 
 export function IndexPoolPerformance({
   totalValueLocked,
   volume,
 }: FormattedIndexPool) {
   const tx = useTranslator();
+  const { isMobile } = useBreakpoints();
   const separator = <Divider type="vertical" style={{ height: 40 }} />;
 
   return (
@@ -14,6 +15,7 @@ export function IndexPoolPerformance({
       size="small"
       style={{
         display: "flex",
+        flexDirection: isMobile ? "column" : "row",
         flex: 1,
       }}
     >
@@ -22,13 +24,13 @@ export function IndexPoolPerformance({
         value={totalValueLocked}
         style={{ flex: 1, textAlign: "center" }}
       />
-      {separator}
+      {!isMobile && separator}
       <Statistic
         title={tx("VOLUME")}
         value={volume}
         style={{ flex: 1, textAlign: "center" }}
       />
-      {separator}
+      {!isMobile && separator}
       <Statistic
         title="Management Fees"
         value="$0.00"
