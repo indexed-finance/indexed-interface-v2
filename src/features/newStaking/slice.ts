@@ -34,7 +34,6 @@ const slice = createSlice({
   extraReducers: (builder) =>
     builder
       .addCase(fetchNewStakingData.fulfilled, (state, action) => {
-        console.log(`Got New Staking Data`);
         adapter.addMany(state, action.payload.pools);
         state.metadata = {
           ...state.metadata,
