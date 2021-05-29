@@ -7,6 +7,7 @@ export type { IndexedUniswapRouterBurner } from "./IndexedUniswapRouterBurner";
 export type { IndexedUniswapRouterMinter } from "./IndexedUniswapRouterMinter";
 export type { IPool } from "./IPool";
 export type { IPoolInitializer } from "./IPoolInitializer";
+export type { MultiCall2 } from "./MultiCall2";
 export type { MultiTokenStaking } from "./MultiTokenStaking";
 export type { Pair } from "./Pair";
 export type { RewardsSchedule } from "./RewardsSchedule";

@@ -113,7 +113,8 @@ const SingletonContracts = {
   MultiTokenStaking: 'MULTI_TOKEN_STAKING_ADDRESS',
   IndexedUniswapRouterMinter: 'MINT_ROUTER_ADDRESS',
   IndexedUniswapRouterBurner: 'BURN_ROUTER_ADDRESS',
-  UniswapV2Router: 'UNISWAP_ROUTER_ADDRESS'
+  UniswapV2Router: 'UNISWAP_ROUTER_ADDRESS',
+  MultiCall2: 'MULTICALL2_ADDRESS'
 };
 
 const ConstantsImports = [

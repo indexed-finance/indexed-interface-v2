@@ -7,6 +7,7 @@ import type {
 	IPoolInitializer,
 	IndexedUniswapRouterBurner,
 	IndexedUniswapRouterMinter,
+	MultiCall2,
 	MultiTokenStaking,
 	Pair,
 	RewardsSchedule,
@@ -21,6 +22,7 @@ import IPoolInitializer_ABI from "./IPoolInitializer.json";
 import IPool_ABI from "./IPool.json";
 import IndexedUniswapRouterBurner_ABI from "./IndexedUniswapRouterBurner.json";
 import IndexedUniswapRouterMinter_ABI from "./IndexedUniswapRouterMinter.json";
+import MultiCall2_ABI from "./MultiCall2.json";
 import MultiTokenStaking_ABI from "./MultiTokenStaking.json";
 import Pair_ABI from "./Pair.json";
 import RewardsSchedule_ABI from "./RewardsSchedule.json";
@@ -34,6 +36,7 @@ export const IndexedUniswapRouterBurnerInterface = new Interface(IndexedUniswapR
 export const IndexedUniswapRouterMinterInterface = new Interface(IndexedUniswapRouterMinter_ABI) as IndexedUniswapRouterMinter["interface"];
 export const IPoolInterface = new Interface(IPool_ABI) as IPool["interface"];
 export const IPoolInitializerInterface = new Interface(IPoolInitializer_ABI) as IPoolInitializer["interface"];
+export const MultiCall2Interface = new Interface(MultiCall2_ABI) as MultiCall2["interface"];
 export const MultiTokenStakingInterface = new Interface(MultiTokenStaking_ABI) as MultiTokenStaking["interface"];
 export const PairInterface = new Interface(Pair_ABI) as Pair["interface"];
 export const RewardsScheduleInterface = new Interface(RewardsSchedule_ABI) as RewardsSchedule["interface"];
@@ -48,6 +51,7 @@ export {
 	IndexedUniswapRouterMinter_ABI,
 	IPool_ABI,
 	IPoolInitializer_ABI,
+	MultiCall2_ABI,
 	MultiTokenStaking_ABI,
 	Pair_ABI,
 	RewardsSchedule_ABI,
@@ -63,6 +67,7 @@ export const interfaceLookup = {
 	IndexedUniswapRouterMinter: IndexedUniswapRouterMinterInterface,
 	IPool: IPoolInterface,
 	IPoolInitializer: IPoolInitializerInterface,
+	MultiCall2: MultiCall2Interface,
 	MultiTokenStaking: MultiTokenStakingInterface,
 	Pair: PairInterface,
 	RewardsSchedule: RewardsScheduleInterface,
