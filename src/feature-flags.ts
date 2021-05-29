@@ -9,7 +9,7 @@ export const FEATURE_FLAGS = {
   useInternalDocs: false,
   usePlainLanguageTransaction: false,
   useProductionServerLocally: false,
-  useSessionSaving: false,
+  useSessionSaving: true,
   useFortmatic: false,
   useHomepageSteps: false,
   useActionLogging: process.env.IS_SERVER === "true",
