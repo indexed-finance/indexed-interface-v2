@@ -1,10 +1,11 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
+import { debugConsole } from "helpers/logger";
 import { ethers } from "ethers";
 import { multicall } from "ethereum";
 import type { NormalizedMulticallData, SelectedBatch } from "./types";
 
 export function normalizeMulticallData(
-  batch: SelectedBatch,
+  batch: Omit<SelectedBatch, "offChainCalls">,
   blockNumber: number,
   results: ethers.utils.Result[]
 ) {
@@ -54,8 +55,9 @@ export const fetchMulticallData = createAsyncThunk(
     provider:
       | ethers.providers.Web3Provider
       | ethers.providers.JsonRpcProvider
-      | ethers.providers.InfuraProvider;
-    arg: SelectedBatch;
+      | ethers.providers.InfuraProvider
+      | ethers.providers.JsonRpcSigner;
+    arg: Omit<SelectedBatch, "offChainCalls">;
   }): Promise<NormalizedMulticallData> => {
     const { blockNumber, results } = await multicall(
       provider,
@@ -66,7 +68,6 @@ export const fetchMulticallData = createAsyncThunk(
       blockNumber,
       results
     );
-
     return formattedMulticallData;
   }
 );
