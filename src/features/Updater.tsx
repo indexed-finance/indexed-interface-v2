@@ -55,11 +55,9 @@ function normalizeCallBatch(outdatedCallKeys: string[]) {
   );
 }
 
-export function BatchUpdater() {
+export function BlockUpdater() {
   const dispatch = useDispatch();
   const [provider,] = useProvider();
-  const activeOutdatedCalls = useSelector((state: AppState) => selectors.selectActiveOutdatedCalls(state));
-  const debouncedCalls = useCachedValue(activeOutdatedCalls);
   const [blockNumber, setBlockNumber] = useState<number | null>(null);
   const debouncedBlockNumber = useDebounce(blockNumber, 100);
 
@@ -91,7 +89,16 @@ export function BatchUpdater() {
   useEffect(() => {
     if (!debouncedBlockNumber) return
     dispatch(actions.blockNumberChanged(debouncedBlockNumber))
-  }, [debouncedBlockNumber, dispatch])
+  }, [debouncedBlockNumber, dispatch]);
+
+  return null;
+}
+
+export function BatchUpdater() {
+  const dispatch = useDispatch();
+  const [provider,] = useProvider();
+  const activeOutdatedCalls = useSelector((state: AppState) => selectors.selectActiveOutdatedCalls(state));
+  const debouncedCalls = useCachedValue(activeOutdatedCalls);
 
   useEffect(() => {
     if (!provider) return undefined;
