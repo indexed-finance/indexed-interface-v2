@@ -33,13 +33,13 @@ export function Token({
   let image = "";
 
   try {
+    image = require(`images/${symbol.toLowerCase()}.png`).default;
+  } catch {
     if (address) {
       image = `https://tokens.dharma.io/assets/${address.toLowerCase()}/icon.png`;
     } else {
-      image = require(`images/${symbol.toLowerCase()}.png`).default;
+      image = PLACEHOLDER_TOKEN_IMAGE;
     }
-  } catch {
-    image = PLACEHOLDER_TOKEN_IMAGE;
   }
 
   return (
