@@ -1,7 +1,7 @@
 import { BigNumber } from "ethereum/utils/balancer-math";
+import { ContractTransaction } from "@ethersproject/contracts";
 import { JSBI, Percent, Router, Trade } from "@uniswap/sdk";
 import { TransactionExtra } from "features";
-import { TransactionResponse } from "@ethersproject/abstract-provider";
 import { convert } from "helpers";
 import { thunks } from "features/thunks";
 import {
@@ -22,7 +22,7 @@ import { useUserAddress } from "./user-hooks";
 export function useAddTransactionCallback() {
   const dispatch = useDispatch();
   return useCallback(
-    (tx: TransactionResponse, extra: TransactionExtra = {}) => {
+    (tx: ContractTransaction | Promise<ContractTransaction>, extra: TransactionExtra = {}) => {
       return dispatch(thunks.addTransaction(tx, extra));
     },
     [dispatch]
@@ -43,14 +43,13 @@ export function useSwapTransactionCallbacks(poolAddress: string) {
     ) => {
       // @todo Figure out a better way to handle this
       if (!contract) throw new Error();
-      const args = [
+      const tx = contract.swapExactAmountIn(
         inputTokenAddress,
         convert.toHex(amountIn),
         outputTokenAddress,
         convert.toHex(minimumAmountOut),
         convert.toHex(maximumPrice),
-      ];
-      const tx = contract.swapExactAmountIn(...args);
+      );
       addTransaction(tx);
     },
     [contract, addTransaction]
@@ -66,14 +65,13 @@ export function useSwapTransactionCallbacks(poolAddress: string) {
     ) => {
       // @todo Figure out a better way to handle this
       if (!contract) throw new Error();
-      const args = [
+      const tx = contract.swapExactAmountOut(
         inputTokenAddress,
         convert.toHex(maxAmountIn),
         outputTokenAddress,
         convert.toHex(amountOut),
         convert.toHex(maximumPrice),
-      ];
-      const tx = contract.swapExactAmountOut(...args);
+      );
       addTransaction(tx);
     },
     [contract, addTransaction]
@@ -102,7 +100,8 @@ export function useUniswapTransactionCallback() {
         recipient: user,
         deadline,
       });
-      const tx = contract[methodName](...args, { value });
+
+      const tx = (contract as any)[methodName](...args, { value });
       addTransaction(tx);
     },
     [user, contract, addTransaction]
@@ -149,12 +148,11 @@ export function useMintSingleTransactionCallbacks(poolAddress: string) {
     ) => {
       // @todo Figure out a better way to handle this
       if (!contract) throw new Error();
-      const args = [
+      const tx = contract.joinswapExternAmountIn(
         inputTokenAddress,
         convert.toHex(tokenAmountIn),
         convert.toHex(minPoolAmountOut),
-      ];
-      const tx = contract.joinswapExternAmountIn(...args);
+      );
       addTransaction(tx);
     },
     [contract, addTransaction]
@@ -168,12 +166,11 @@ export function useMintSingleTransactionCallbacks(poolAddress: string) {
     ) => {
       // @todo Figure out a better way to handle this
       if (!contract) throw new Error();
-      const args = [
+      const tx = contract.joinswapPoolAmountOut(
         inputTokenAddress,
         convert.toHex(poolAmountOut),
         convert.toHex(maxAmountIn),
-      ];
-      const tx = contract.joinswapPoolAmountOut(...args);
+      );
       addTransaction(tx);
     },
     [contract, addTransaction]
@@ -213,13 +210,12 @@ export function useRoutedMintTransactionCallbacks(indexPool: string) {
     (amountIn: BigNumber, path: string[], minPoolAmountOut: BigNumber) => {
       // @todo Figure out a better way to handle this
       if (!contract) throw new Error();
-      const args = [
+      const tx = contract.swapExactTokensForTokensAndMint(
         convert.toHex(amountIn),
         path,
         indexPool,
         convert.toHex(minPoolAmountOut),
-      ];
-      const tx = contract.swapExactTokensForTokensAndMint(...args);
+      );
       const displayAmount = convert.toBalance(minPoolAmountOut, 18, true, 3);
       const summary = `Mint at least ${displayAmount} ${poolSymbol}`;
       addTransaction(tx, { summary });
@@ -231,13 +227,12 @@ export function useRoutedMintTransactionCallbacks(indexPool: string) {
     (maxAmountIn: BigNumber, path: string[], poolAmountOut: BigNumber) => {
       // @todo Figure out a better way to handle this
       if (!contract) throw new Error();
-      const args = [
+      const tx = contract.swapTokensForTokensAndMintExact(
         convert.toHex(maxAmountIn),
         path,
         indexPool,
         convert.toHex(poolAmountOut),
-      ];
-      const tx = contract.swapTokensForTokensAndMintExact(...args);
+      );
       const displayAmount = convert.toBalance(poolAmountOut, 18, true, 3);
       const summary = `Mint ${displayAmount} ${poolSymbol}`;
       addTransaction(tx, { summary });
@@ -273,13 +268,12 @@ export function useRoutedBurnTransactionCallbacks(
     (poolAmountIn: BigNumber, path: string[], minAmountOut: BigNumber) => {
       // @todo Figure out a better way to handle this
       if (!contract) throw new Error();
-      const args = [
+      const tx = contract.burnExactAndSwapForTokens(
         indexPool,
         convert.toHex(poolAmountIn),
         path,
         convert.toHex(minAmountOut),
-      ];
-      const tx = contract.burnExactAndSwapForTokens(...args);
+      );
       const displayAmount = convert.toBalance(poolAmountIn, 18, true, 3);
       const summary = `Burn ${displayAmount} ${poolSymbol}`;
       addTransaction(tx, { summary });
@@ -291,13 +285,12 @@ export function useRoutedBurnTransactionCallbacks(
     (poolAmountInMax: BigNumber, path: string[], tokenAmountOut: BigNumber) => {
       // @todo Figure out a better way to handle this
       if (!contract) throw new Error();
-      const args = [
+      const tx = contract.burnAndSwapForExactTokens(
         indexPool,
         convert.toHex(poolAmountInMax),
         path,
         convert.toHex(tokenAmountOut),
-      ];
-      const tx = contract.burnAndSwapForExactTokens(...args);
+      );
       const displayAmount = convert.toBalance(poolAmountInMax, 18, true, 3);
       const summary = `Burn up to ${displayAmount} ${poolSymbol}`;
       addTransaction(tx, { summary });
@@ -336,12 +329,11 @@ export function useBurnSingleTransactionCallbacks(
     ) => {
       // @todo Figure out a better way to handle this
       if (!contract) throw new Error();
-      const args = [
+      const tx = contract.exitswapPoolAmountIn(
         outputTokenAddress,
         convert.toHex(poolAmountIn),
         convert.toHex(minAmountOut),
-      ];
-      const tx = contract.exitswapPoolAmountIn(...args);
+      );
       addTransaction(tx);
     },
     [contract, addTransaction]
@@ -355,12 +347,11 @@ export function useBurnSingleTransactionCallbacks(
     ) => {
       // @todo Figure out a better way to handle this
       if (!contract) throw new Error();
-      const args = [
+      const tx = contract.exitswapExternAmountOut(
         outputTokenAddress,
         convert.toHex(tokenAmountOut),
         convert.toHex(maxPoolAmountIn),
-      ];
-      const tx = contract.exitswapExternAmountOut(...args);
+      );
       addTransaction(tx);
     },
     [contract, addTransaction]
@@ -433,7 +424,7 @@ export function useStakingTransactionCallbacks(
   const claim = useCallback(() => {
     // @todo Figure out a better way to handle this
     if (!contract) throw new Error();
-    const tx = contract.claim();
+    const tx = contract.getReward();
     addTransaction(tx);
   }, [contract, addTransaction]);
 
@@ -475,7 +466,7 @@ export function useNewStakingTransactionCallbacks(
 
   const exit = useCallback(() => {
     // @todo Figure out a better way to handle this
-    if (!contract) throw new Error();
+    if (!contract || !stakedBalance) throw new Error();
     const tx = contract.withdrawAndHarvest(pid, stakedBalance, userAddress);
     addTransaction(tx);
   }, [contract, addTransaction, pid, userAddress, stakedBalance]);
