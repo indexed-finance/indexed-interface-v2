@@ -33,6 +33,7 @@ export type TokenSelectorValue = {
 };
 
 type Asset = {
+  id: string;
   name: string;
   symbol: string;
 };
@@ -52,6 +53,7 @@ interface Props {
   autoFocus?: boolean;
   onChange?: (value: TokenSelectorValue) => void;
   isInput?: boolean;
+  loading?: boolean;
 }
 
 export function TokenSelector({
@@ -68,6 +70,7 @@ export function TokenSelector({
   autoFocus = false,
   onChange,
   isInput,
+  loading
 }: Props) {
   const tx = useTranslator();
   const { setTouched } = useFormikContext<any>();
