@@ -1,6 +1,6 @@
 import { Card, Col, List, Row, Typography } from "antd";
 import { FormattedIndexPool } from "features";
-import { Progress, Quote, Token } from "components/atomic";
+import { Progress, Token } from "components/atomic";
 import { useBreakpoints } from "hooks";
 
 export function IndexPoolAssets({ assets }: FormattedIndexPool) {
@@ -17,9 +17,9 @@ export function IndexPoolAssets({ assets }: FormattedIndexPool) {
     >
       <List>
         {assets.map((asset) => (
-          <List.Item key={asset.id}>
-            <Row gutter={24}>
-              <Col span={10}>
+          <List.Item key={asset.id} style={{ width: "100%" }}>
+            <Row gutter={24} align="middle" style={{ width: "100%" }}>
+              <Col span={18}>
                 <div
                   style={{
                     flex: 1,
@@ -38,16 +38,6 @@ export function IndexPoolAssets({ assets }: FormattedIndexPool) {
                     {asset.balanceUsd}
                   </Typography.Text>
                 </div>
-              </Col>
-              <Col span={8} style={{ textAlign: "right" }}>
-                <Quote
-                  price={asset.price}
-                  netChange={asset.netChange}
-                  netChangePercent={asset.netChangePercent}
-                  textSize="small"
-                  textAlign="right"
-                  style={{ width: "100%", marginRight: 0 }}
-                />
               </Col>
               <Col span={6}>
                 <Progress

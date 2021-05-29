@@ -30,12 +30,6 @@ export function IndexPoolPerformance({
         value={volume}
         style={{ flex: 1, textAlign: "center" }}
       />
-      {!isMobile && separator}
-      <Statistic
-        title="Management Fees"
-        value="$0.00"
-        style={{ flex: 1, textAlign: "center" }}
-      />
     </Space>
   );
 }
