@@ -21,11 +21,11 @@ export function TokenInputDecorator({
   if (!showBalance) return null;
 
   return (
-    <Typography.Text type="secondary" style={{ textAlign: "left" }}>
+    <>
       {error ? (
-        <Typography.Text type="danger"> {error} </Typography.Text>
+        <Typography.Text type="danger" style={{ textAlign: "left" }}> {error} </Typography.Text>
       ) : (
-        <>
+        <Typography.Text type="secondary" style={{ textAlign: "left" }}>
           {balance > 0 ? (
             <>
               {balanceLabel}: <AbbreviatedBalance balance={balance} />{" "}
@@ -42,9 +42,9 @@ export function TokenInputDecorator({
           ) : (
             tx("NO_BALANCE")
           )}
-        </>
+        </Typography.Text>
       )}
-    </Typography.Text>
+    </>
   );
 }
 
