@@ -25,7 +25,7 @@ const slice = createSlice({
   initialState: adapter.getInitialState(),
   reducers: {
     uniswapPairsRegistered(state, action: PayloadAction<NormalizedPair[]>) {
-      const filtered = action.payload.filter(({ id }) => !state.entities[id]);
+      const filtered = action.payload.filter(({ id }) => !state.entities[id.toLowerCase()]);
       const formatted = filtered.map(
         ({ id, token0 = "", token1 = "", ...rest }) => ({
           ...rest,
