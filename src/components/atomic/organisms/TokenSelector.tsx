@@ -183,11 +183,6 @@ export function TokenSelector({
   // --
   useEffect(() => {
     if (value.amount) {
-      /* if (value.amount !== amount) {
-        if (isInput) {
-          
-        }
-      } */
       setAmount(value.amount);
     }
 
@@ -224,6 +219,7 @@ export function TokenSelector({
               max={max}
               step="0.01"
               value={value.amount ?? amount}
+              disabled={onChange === undefined}
               onFocus={() => setTouched({ [amountField]: true })}
               onChange={onAmountChange}
               style={{
