@@ -3,23 +3,17 @@ import { RegisteredCall } from "helpers";
 import { SocketClient } from "sockets/client";
 import { TransactionExtra, transactionsActions } from "./transactions";
 import { TransactionResponse } from "@ethersproject/abstract-provider";
-import { batcherActions, fetchMulticallData } from "./batcher";
+import { batcherActions } from "./batcher";
 import { categoriesActions } from "./categories";
-import {
-  fetchIndexPoolTransactions,
-  fetchIndexPoolUpdates,
-  indexPoolsActions,
-} from "./indexPools";
 import { fetchInitialData } from "./requests";
 import { fetchNewStakingData } from "./newStaking";
 import { fetchStakingData, stakingActions } from "./staking";
-import { fetchTokenPriceData, tokensActions } from "./tokens";
+import { indexPoolsActions } from "./indexPools";
 import { pairsActions } from "./pairs";
 import { providers } from "ethers";
-import { selectors } from "./selectors";
 import { settingsActions } from "./settings";
+import { tokensActions } from "./tokens";
 import { userActions } from "./user";
-import debounce from "lodash.debounce";
 import type { AppThunk } from "./store";
 
 // #region Provider
@@ -41,7 +35,9 @@ export const disconnectFromProvider = () => {
   signer = null;
 };
 
-export function useProvider() {
+export function useProvider(): [
+  Provider | null, providers.JsonRpcSigner | null
+] {
   return [provider, signer];
 }
 
@@ -60,12 +56,6 @@ type InitialzeOptions = {
   withSigner?: boolean;
   selectedAddress?: string;
 };
-
-/**
- * Since the handler can fire multiple times in quick succession,
- * we need to batch the calls to avoid unnecessary updates.
- */
-const BLOCK_HANDLER_DEBOUNCE_RATE = 250;
 
 export const thunks = {
   /**
@@ -119,73 +109,7 @@ export const thunks = {
       dispatch(actions.walletConnected());
 
       SocketClient.disconnect();
-
-      /**
-       * When the block number changes,
-       * change the state so that batcher may process.
-       */
-      const debouncedBlockHandler = debounce((blockNumber) => {
-        const blockNumberAtThisTime = selectors.selectBlockNumber(getState());
-
-        if (blockNumber !== blockNumberAtThisTime) {
-          dispatch(thunks.changeBlockNumber(blockNumber));
-        }
-      }, BLOCK_HANDLER_DEBOUNCE_RATE);
-
-      provider.addListener("block", debouncedBlockHandler);
     },
-  /**
-   *
-   */
-  changeBlockNumber:
-    (blockNumber: number): AppThunk =>
-    async (dispatch, getState) => {
-      const initialBlockNumber = selectors.selectBlockNumber(getState());
-
-      dispatch(actions.blockNumberChanged(blockNumber));
-
-      if (initialBlockNumber !== -1) {
-        dispatch(thunks.sendBatch());
-      }
-    },
-  /**
-   *
-   */
-  sendBatch: (): AppThunk => (dispatch, getState) => {
-    const state = getState();
-    const { status } = selectors.selectBatcherStatus(state);
-
-    if (provider && status === "idle") {
-      const batch = selectors.selectBatch(state);
-
-      dispatch(
-        fetchMulticallData({
-          provider,
-          arg: batch,
-        })
-      );
-
-      for (const call of batch.offChainCalls) {
-        const [fn, args] = call.split("/");
-        const request = {
-          fetchInitialData,
-          fetchMulticallData,
-          fetchIndexPoolTransactions,
-          fetchIndexPoolUpdates,
-          fetchTokenPriceData,
-        }[fn] as any;
-
-        if (request) {
-          dispatch(
-            request({
-              provider,
-              arg: [...args.split("_")],
-            })
-          );
-        }
-      }
-    }
-  },
   addTransaction:
     (
       _tx: TransactionResponse | Promise<TransactionResponse>,
