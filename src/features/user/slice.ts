@@ -1,6 +1,7 @@
-import { NDX_ADDRESS } from "config";
+import { ETH_BALANCE_GETTER, NDX_ADDRESS } from "config";
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import { convert, createMulticallDataParser } from "helpers"; // Circular dependency.
+import { constants } from "ethers"; // Circular dependency.
+import { convert, createMulticallDataParser } from "helpers";
 import { fetchMulticallData } from "../batcher/requests";
 import { stakingMulticallDataParser } from "../staking";
 import { tokensSelectors } from "../tokens";
@@ -102,6 +103,9 @@ export const userSelectors = {
     tokenId: string,
     amount: string
   ): ApprovalStatus {
+    if (tokenId === constants.AddressZero) {
+      return "approved";
+    }
     const entry = tokensSelectors.selectTokenById(state, tokenId);
 
     if (entry) {
@@ -151,7 +155,10 @@ const userMulticallDataParser = createMulticallDataParser("User", (calls) => {
       if (allowanceCall && balanceOfCall) {
         const [_allowanceCall] = allowanceCall;
         const [_balanceOfCall] = balanceOfCall;
-        const tokenAddress = _allowanceCall.target;
+        let tokenAddress = _allowanceCall.target.toLowerCase();
+        if (tokenAddress === ETH_BALANCE_GETTER.toLowerCase()) {
+          tokenAddress = constants.AddressZero;
+        }
         const [, poolAddress] = _allowanceCall.args!;
         const [allowance] = _allowanceCall.result ?? [];
         const [balanceOf] = _balanceOfCall.result ?? [];
@@ -168,7 +175,10 @@ const userMulticallDataParser = createMulticallDataParser("User", (calls) => {
         // NDX token has no allowance.
         const [_balanceOfCall] = balanceOfCall;
         const [balanceOf] = _balanceOfCall.result ?? [];
-        const tokenAddress = _balanceOfCall.target.toLowerCase();
+        let tokenAddress = _balanceOfCall.target.toLowerCase();
+        if (tokenAddress === ETH_BALANCE_GETTER.toLowerCase()) {
+          tokenAddress = constants.AddressZero;
+        }
         const value = (balanceOf ?? "").toString();
 
         prev.balances[tokenAddress] = value;

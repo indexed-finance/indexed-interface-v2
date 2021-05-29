@@ -5,8 +5,9 @@ import {
   toHex,
   toTokenAmount,
 } from "@indexed-finance/indexed.js";
-import { ChainId, Pair, Token, TokenAmount } from "@uniswap/sdk";
+import { ChainId, Pair, Token, TokenAmount, WETH } from "@uniswap/sdk";
 import { DEFAULT_DECIMAL_COUNT } from "config";
+import { constants } from "ethers";
 import { getAddress } from "@ethersproject/address";
 import type { FormattedPair, NormalizedToken } from "features";
 
@@ -66,7 +67,9 @@ const convert = {
   },
   // Uniswap SDK
   toUniswapSDKToken: (provider: ProviderLike, token: NormalizedToken) =>
-    new Token(
+    token.id === constants.AddressZero
+    ? WETH[provider.network.chainId]
+    : new Token(
       provider.network.chainId,
       convert.toChecksumAddress(token.id),
       token.decimals,
