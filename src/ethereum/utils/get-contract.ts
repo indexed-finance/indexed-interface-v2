@@ -28,20 +28,20 @@ export function getProviderOrSigner(
   return account ? getSigner(library, account) : library;
 }
 
-// account is optional
-export function getContract(
-  address: string,
-  ABI: any,
-  library: Web3Provider,
-  account?: string
-): Contract {
-  if (!isAddress(address) || address === AddressZero) {
-    throw Error(`Invalid 'address' parameter '${address}'.`);
-  }
+// // account is optional
+// export function getContract(
+//   address: string,
+//   ABI: any,
+//   library: Web3Provider,
+//   account?: string
+// ): Contract {
+//   if (!isAddress(address) || address === AddressZero) {
+//     throw Error(`Invalid 'address' parameter '${address}'.`);
+//   }
 
-  return new Contract(
-    address,
-    ABI,
-    getProviderOrSigner(library, account) as any
-  );
-}
+//   return new Contract(
+//     address,
+//     ABI,
+//     getProviderOrSigner(library, account) as any
+//   );
+// }
