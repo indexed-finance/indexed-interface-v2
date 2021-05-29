@@ -150,6 +150,7 @@ function UniswapMintInteraction({ indexPool }: Props) {
     getBestMintRouteForAmountIn,
     getBestMintRouteForAmountOut,
     executeRoutedMint,
+    loading
   } = useMintRouterCallbacks(indexPool.id);
 
   const assets = [...COMMON_BASE_TOKENS];
@@ -257,6 +258,7 @@ function UniswapMintInteraction({ indexPool }: Props) {
           id: string;
         }[]
       }
+      loading={loading}
       spender={MINT_ROUTER_ADDRESS}
       onSubmit={handleSubmit}
       onChange={handleChange}

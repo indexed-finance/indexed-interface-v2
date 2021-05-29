@@ -37,6 +37,7 @@ interface Props {
   requiresApproval?: boolean;
   onSubmit(values: SingleInteractionValues): void;
   onChange(values: SingleInteractionValues): void | string;
+  loading?: boolean;
 }
 
 // #endregion
@@ -69,6 +70,7 @@ export function SingleInteraction({
   disableInputSelect,
   disableOutputSelect,
   requiresApproval = true,
+  loading
 }: Props) {
   const interactionRef = useRef<null | HTMLDivElement>(null);
 
@@ -86,6 +88,7 @@ export function SingleInteraction({
         {(props) => (
           <SingleInteractionInner
             {...props}
+            loading={loading}
             assets={assets}
             spender={spender}
             extra={extra}
@@ -123,6 +126,7 @@ function SingleInteractionInner({
   disableInputSelect,
   disableOutputSelect,
   requiresApproval,
+  loading
 }: InnerSingleProps) {
   const tx = useTranslator();
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
@@ -235,6 +239,7 @@ function SingleInteractionInner({
     <Row>
       <Col span={12}>
         <TokenSelector
+          loading={loading}
           isInput
           autoFocus={true}
           label={tx("FROM")}
@@ -251,6 +256,7 @@ function SingleInteractionInner({
         <Flipper disabled={disableFlip} onFlip={handleFlip} />
 
         <TokenSelector
+          loading={loading}
           label={tx("TO")}
           assets={outputOptions}
           value={{
@@ -269,6 +275,7 @@ function SingleInteractionInner({
 
         {requiresApproval && status === "approval needed" ? (
           <Button
+            loading={loading}
             type="primary"
             style={{ width: "100%" }}
             disabled={!isValid}
@@ -278,6 +285,7 @@ function SingleInteractionInner({
           </Button>
         ) : (
           <Button
+            loading={loading}
             type="primary"
             style={{ width: "100%" }}
             disabled={!isValid || (requiresApproval && status === "unknown")}
