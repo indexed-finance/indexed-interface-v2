@@ -1,3 +1,4 @@
+import { BatchUpdater } from "features/Updater";
 import { BrowserRouter, Route, useLocation } from "react-router-dom";
 import {
   DEBUG,
@@ -31,6 +32,7 @@ export function App() {
       <Provider store={store}>
         <ErrorBoundary>
           <Web3ReactProvider getLibrary={getLibrary}>
+            <BatchUpdater />
             <TooltipProvider>
               <DrawerProvider>
                 <AppLayout />
