@@ -35,6 +35,10 @@ export function useIPoolInitializerContract(address: string) {
 	return useContractWithSigner(address, "IPoolInitializer");
 }
 
+export function useMultiCall2Contract(address: string) {
+	return useContractWithSigner(address, "MultiCall2");
+}
+
 export function useMultiTokenStakingContract() {
 	return useContractWithSigner(MULTI_TOKEN_STAKING_ADDRESS, "MultiTokenStaking");
 }
