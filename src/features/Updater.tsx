@@ -1,15 +1,14 @@
 import { AppState } from "features/store";
 import { RegisteredCall, deserializeOnChainCall } from "helpers";
-import { actions, useProvider, useSigner } from "features";
+import { actions, useProvider } from "features";
 import { debugConsole } from "helpers/logger";
 import { fetchIndexPoolTransactions, fetchIndexPoolUpdates } from "./indexPools";
 import { fetchInitialData } from "./requests";
-import { fetchMulticallData, normalizeMulticallData } from "./batcher/requests";
+import { fetchMulticallData } from "./batcher/requests";
 import { fetchTokenPriceData } from "./tokens";
-import { multicall } from "ethereum";
 import { selectors } from "./selectors";
 import { useCachedValue, useDebounce } from "hooks/use-debounce";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 export function activeListeningKeys(
@@ -55,50 +54,45 @@ function normalizeCallBatch(outdatedCallKeys: string[]) {
   );
 }
 
-export function BlockUpdater() {
-  const dispatch = useDispatch();
-  const [provider,] = useProvider();
-  const [blockNumber, setBlockNumber] = useState<number | null>(null);
-  const debouncedBlockNumber = useDebounce(blockNumber, 100);
-
-  const blockNumberCallback = useCallback(
-    (newBlockNumber: number) => {
-      setBlockNumber(oldBlockNumber => {
-        if (typeof newBlockNumber !== 'number') return oldBlockNumber;
-        debugConsole.log(`Got block number! ${newBlockNumber}`)
-        return Math.max(newBlockNumber, (oldBlockNumber || 0))
-      })
-    },
-    [setBlockNumber]
-  );
-
-  useEffect(() => {
-    if (!provider) return undefined
-
-    provider
-      .getBlockNumber()
-      .then(blockNumberCallback)
-      .catch(error => debugConsole.error(`Failed to get block number`, error))
-
-    provider.on('block', blockNumberCallback)
-    return () => {
-      provider.removeListener('block', blockNumberCallback)
-    }
-  }, [dispatch, provider, blockNumberCallback])
-
-  useEffect(() => {
-    if (!debouncedBlockNumber) return
-    dispatch(actions.blockNumberChanged(debouncedBlockNumber))
-  }, [debouncedBlockNumber, dispatch]);
-
-  return null;
-}
-
 export function BatchUpdater() {
   const dispatch = useDispatch();
   const [provider,] = useProvider();
   const activeOutdatedCalls = useSelector((state: AppState) => selectors.selectActiveOutdatedCalls(state));
   const debouncedCalls = useCachedValue(activeOutdatedCalls);
+
+  const [blockNumber, setBlockNumber] = useState<number | null>(null);
+  const debouncedBlockNumber = useDebounce(blockNumber, 100);
+  const blockNumberCallback = useCallback(
+    (newBlockNumber: number) => {
+      if (typeof newBlockNumber !== 'number') {
+      } else if (newBlockNumber && newBlockNumber > (blockNumber || 0)) {
+        setBlockNumber(newBlockNumber)
+      }
+    },
+    [blockNumber, setBlockNumber]
+  );
+
+  useEffect(() => {
+    
+    if (!provider) {
+      return undefined;
+    }
+
+    provider
+      .getBlockNumber()
+      .then((n) => blockNumberCallback(n))
+      .catch(error => debugConsole.error(`Failed to get block number`, error))
+
+    provider.on('block', (n: number) => blockNumberCallback(n))
+    return () => {
+      if (provider) provider.removeListener('block', blockNumberCallback)
+    }
+  }, [dispatch, provider, blockNumberCallback, provider?.network?.name])
+
+  useEffect(() => {
+    if (!debouncedBlockNumber) return
+    dispatch(actions.blockNumberChanged(debouncedBlockNumber))
+  }, [debouncedBlockNumber, dispatch]);
 
   useEffect(() => {
     if (!provider) return undefined;
