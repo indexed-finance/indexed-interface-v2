@@ -271,6 +271,10 @@ function UniswapMintInteraction({ indexPool }: Props) {
 
 function MultiTokenMintInteraction({ indexPool }: Props) {
   const { executeMint } = useMultiTokenMintCallbacks(indexPool.id);
+
+  const tokenIds = usePoolTokenAddresses(indexPool.id);
+  useBalanceAndApprovalRegistrar(indexPool.id, tokenIds);
+
   const handleSubmit = useCallback(
     (values: MultiInteractionValues) =>
       executeMint(values.fromAmount.toString()),
