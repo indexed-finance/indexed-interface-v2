@@ -8,9 +8,10 @@ import {
 } from "@uniswap/sdk";
 import { BigNumber } from "bignumber.js";
 import { COMMON_BASE_TOKENS, UNISWAP_FACTORY_ADDRESS } from "config";
+import { constants, BigNumberish as eBigNumberish } from "ethers";
 import { convert } from "./convert";
 import { dedupe } from "./dedupe";
-import { BigNumberish as eBigNumberish } from "ethers";
+import { flatMap } from 'lodash';
 import { getCreate2Address, keccak256 } from "ethers/lib/utils";
 
 type BigNumberish = BigNumber | eBigNumberish;
@@ -74,18 +75,20 @@ export const bigNumberishToBigInt = (amount: BigNumberish): BigInt =>
 export const bestTradeExactIn = Trade.bestTradeExactIn;
 export const bestTradeExactOut = Trade.bestTradeExactOut;
 
-export function buildCommonTokenPairs(tokens: string[]) {
-  const common = COMMON_BASE_TOKENS;
-  const allTokens = dedupe(
-    [...tokens, ...common.map((c) => c.id)].map((s) => s.toLowerCase())
+export function buildCommonTokenPairs(_tokens: string[]) {
+  const bases = COMMON_BASE_TOKENS.map(t => t.id).filter(t => t !== constants.AddressZero);
+  const tokens = _tokens.filter(t => t !== constants.AddressZero && !bases.includes(t));
+  const basePairs = flatMap(
+    bases, (base): [string, string][] => bases.map(otherBase => [base.toLowerCase(), otherBase.toLowerCase()])
   );
-  const pairs: [string, string][] = [];
-  for (let i = 0; i < allTokens.length; i++) {
-    const tokenA = allTokens[i];
-    for (let j = i + 1; j < allTokens.length; j++) {
-      const tokenB = allTokens[j];
-      pairs.push([tokenA, tokenB]);
-    }
-  }
+  const tokensToBases = flatMap(
+    tokens, (token): [string, string][] => bases.map(base => [base.toLowerCase(), token.toLowerCase()])
+  );
+  const pairs = [
+    ...basePairs,
+    ...tokensToBases
+  ].filter(
+    ([t0, t1]) => t0 !== t1
+  );
   return pairs;
 }
