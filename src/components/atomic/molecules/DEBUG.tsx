@@ -19,6 +19,7 @@ export function DEBUG() {
   const blockNumber = useSelector(selectors.selectBlockNumber);
   const batcherStatus = useSelector(selectors.selectBatcherStatus);
   const cacheSize = useSelector(selectors.selectCacheSize);
+  const fetchingCount = useSelector(selectors.selectFetchingCount)
   const initialBlockNumber = useRef(blockNumber);
 
   // Effect:
@@ -80,9 +81,10 @@ export function DEBUG() {
       <div>
         <legend>Batcher Status</legend>
         <ul>
-          <li>Status: {batcherStatus.status}</li>
+          {/* <li>Status: {batcherStatus.status}</li> */}
           <li>On-Chain Calls: {batcherStatus.onChainCalls}</li>
           <li>Off-Chain Calls: {batcherStatus.offChainCalls}</li>
+          <li>Fetching: {fetchingCount}</li>
         </ul>
       </div>
       <div>
