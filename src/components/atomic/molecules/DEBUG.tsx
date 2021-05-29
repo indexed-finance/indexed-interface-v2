@@ -69,10 +69,10 @@ export function DEBUG() {
       </div>
       <div>
         <legend>Block Number</legend>
-        <Typography.Text type="secondary">
-          {initialBlockNumber.current}
-        </Typography.Text>
-        <div>{blockNumber}</div>
+        <ul>
+          <li>INIT: {initialBlockNumber.current}</li>
+          <li>CUR: {blockNumber}</li>
+        </ul>
       </div>
       <div>
         <legend>Cache Size</legend>
