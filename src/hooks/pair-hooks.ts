@@ -35,7 +35,7 @@ export const usePairExistsLookup = (pairIds: string[]): Record<string, boolean> 
 export function createPairDataCalls(pairs: RegisteredPair[]): RegisteredCall[] {
   return pairs.map((pair) => ({
     caller: PAIR_DATA_CALLER,
-    interfaceKind: "Pair_ABI",
+    interfaceKind: "Pair",
     target: pair.id,
     function: "getReserves",
   }));

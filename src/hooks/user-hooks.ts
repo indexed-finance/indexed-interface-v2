@@ -42,7 +42,7 @@ export const USER_CALLER = "User";
 
 export function useUserDataRegistrar(poolTokens: Record<string, string[]>) {
   const userAddress = useUserAddress();
-  const interfaceKind = "IERC20_ABI";
+  const interfaceKind = "IERC20";
   const userDataCalls: RegisteredCall[] = userAddress
     ? Object.entries(poolTokens).flatMap(([pool, tokens]) =>
         tokens.flatMap((token) => [
@@ -83,7 +83,7 @@ export function useBalanceAndApprovalRegistrar(
 ) {
   const tokens = Array.isArray(_tokens) ? _tokens : [_tokens];
   const userAddress = useUserAddress();
-  const interfaceKind = "IERC20_ABI";
+  const interfaceKind = "IERC20";
   const userDataCalls: RegisteredCall[] = userAddress
     ? tokens.reduce(
         (calls, token) => [
@@ -122,7 +122,7 @@ export function useBalanceAndApprovalRegistrar(
 
 export function useBalancesRegistrar(tokenIds: string[]) {
   const userAddress = useUserAddress();
-  const interfaceKind = "IERC20_ABI";
+  const interfaceKind = "IERC20";
   const userDataCalls: RegisteredCall[] = useMemo(() => {
     return userAddress
       ? tokenIds.map((tokenId) => ({

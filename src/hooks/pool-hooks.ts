@@ -56,7 +56,7 @@ export const usePoolQuickswapLink = (poolAddress: string) => {
 
 export function createPoolDetailCalls(poolAddress: string, tokenIds: string[]) {
   const target = poolAddress;
-  const interfaceKind = "IPool_ABI";
+  const interfaceKind = "IPool";
   const tokenCalls = tokenIds.reduce((prev, next) => {
     prev.push(
       {

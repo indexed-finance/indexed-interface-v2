@@ -138,27 +138,27 @@ export function createStakingCalls(
 } {
   const onChainCalls: RegisteredCall[] = [
     {
-      interfaceKind: "StakingRewards_ABI",
+      interfaceKind: "StakingRewards",
       target: stakingPool,
       function: "rewardsDuration",
     },
     {
-      interfaceKind: "StakingRewards_ABI",
+      interfaceKind: "StakingRewards",
       target: stakingPool,
       function: "periodFinish",
     },
     {
-      interfaceKind: "StakingRewards_ABI",
+      interfaceKind: "StakingRewards",
       target: stakingPool,
       function: "rewardRate",
     },
     {
-      interfaceKind: "StakingRewards_ABI",
+      interfaceKind: "StakingRewards",
       target: stakingPool,
       function: "rewardPerToken",
     },
     {
-      interfaceKind: "StakingRewards_ABI",
+      interfaceKind: "StakingRewards",
       target: stakingPool,
       function: "totalSupply",
     },
@@ -167,13 +167,13 @@ export function createStakingCalls(
   if (userAddress) {
     onChainCalls.push(
       {
-        interfaceKind: "StakingRewards_ABI",
+        interfaceKind: "StakingRewards",
         target: stakingPool,
         function: "balanceOf",
         args: [userAddress],
       },
       {
-        interfaceKind: "StakingRewards_ABI",
+        interfaceKind: "StakingRewards",
         target: stakingPool,
         function: "earned",
         args: [userAddress],

@@ -126,7 +126,7 @@ export function createNewStakingCalls(
 } {
   const onChainCalls: RegisteredCall[] = [
     {
-      interfaceKind: "IERC20_ABI",
+      interfaceKind: "IERC20",
       target: stakingToken,
       function: "balanceOf",
       args: [multiTokenStaking],
@@ -139,13 +139,13 @@ export function createNewStakingCalls(
         target: multiTokenStaking,
         function: "userInfo",
         args: [pid, userAddress],
-        interfaceKind: "MultiTokenStaking_ABI",
+        interfaceKind: "MultiTokenStaking",
       },
       {
         target: multiTokenStaking,
         function: "pendingRewards",
         args: [pid, userAddress],
-        interfaceKind: "MultiTokenStaking_ABI",
+        interfaceKind: "MultiTokenStaking",
       }
     );
   }
@@ -192,7 +192,7 @@ export function useNewStakingRegistrar() {
           {
             target: meta.rewardsSchedule,
             function: "getRewardsForBlockRange",
-            interfaceKind: "RewardsSchedule_ABI",
+            interfaceKind: "RewardsSchedule",
             args: [
               fromBlock.toString(),
               Math.floor(fromBlock + BLOCKS_PER_DAY).toString(),

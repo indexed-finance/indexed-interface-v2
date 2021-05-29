@@ -277,7 +277,7 @@ export const TOTAL_SUPPLIES_CALLER = "Total Supplies";
 export function createTotalSuppliesCalls(tokenIds: string[]): RegisteredCall[] {
   return tokenIds.map((id) => ({
     caller: TOTAL_SUPPLIES_CALLER,
-    interfaceKind: "IERC20_ABI",
+    interfaceKind: "IERC20",
     target: id,
     function: "totalSupply",
   }));
