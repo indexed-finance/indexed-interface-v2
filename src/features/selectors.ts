@@ -151,6 +151,8 @@ export const selectors = {
                   ),
                   from,
                   to,
+                  fromAddress: swap.tokenIn.toLowerCase(),
+                  toAddress: swap.tokenOut.toLowerCase(),
                   transactionHash,
                 };
               }),
@@ -172,6 +174,8 @@ export const selectors = {
                   ),
                   from: tokenIn.symbol,
                   to: tokenOut.symbol,
+                  fromAddress: tokenIn.id.toLowerCase(),
+                  toAddress: tokenOut.id.toLowerCase(),
                   amount: convert.toCurrency(parseFloat(trade.amountUSD)),
                   kind:
                     tokenIn.symbol.toLowerCase() === pool.symbol.toLowerCase()

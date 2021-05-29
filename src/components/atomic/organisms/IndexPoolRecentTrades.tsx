@@ -36,13 +36,13 @@ export function IndexPoolRecentTrades({
               }}
             >
               <Space style={{ width: "100%" }}>
-                <Token name="" symbol={trade.from} address={id} />
+                <Token name="" symbol={trade.from} address={trade.fromAddress} />
                 <Typography.Text
                   type={trade.kind === "buy" ? "success" : "danger"}
                 >
                   sold for
                 </Typography.Text>
-                <Token name="" symbol={trade.to} address={id} />
+                <Token name="" symbol={trade.to} address={trade.toAddress} />
               </Space>
 
               <div>

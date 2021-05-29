@@ -64,6 +64,8 @@ export interface FormattedIndexPool {
       when: string;
       from: string;
       to: string;
+      fromAddress: string;
+      toAddress: string;
       transactionHash: string;
     }>;
     trades: Array<{
@@ -72,6 +74,8 @@ export interface FormattedIndexPool {
       when: string;
       from: string;
       to: string;
+      fromAddress: string;
+      toAddress: string;
       transactionHash: string;
     }>;
   };
