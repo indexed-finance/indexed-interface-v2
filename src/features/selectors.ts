@@ -5,7 +5,10 @@ import {
   formatPoolAsset,
   indexPoolsSelectors,
 } from "./indexPools";
-import { FormattedNewStakingData, FormattedNewStakingDetail } from "./newStaking/types"
+import {
+  FormattedNewStakingData,
+  FormattedNewStakingDetail,
+} from "./newStaking/types";
 import { FormattedPair, pairsSelectors } from "./pairs";
 import { FormattedPortfolioData, userSelectors } from "./user";
 import {
@@ -22,7 +25,7 @@ import { convert } from "helpers";
 import { createSelector } from "reselect";
 import { dailySnapshotsSelectors } from "./dailySnapshots";
 import { formatDistance } from "date-fns";
-import { newStakingSelectors } from "./newStaking"
+import { newStakingSelectors } from "./newStaking";
 import { settingsSelectors } from "./settings";
 import S from "string";
 import type { AppState } from "./store";
@@ -152,12 +155,16 @@ export const selectors = {
                 };
               }),
               trades: (pool.transactions.trades ?? []).map((trade) => {
-                const zeroForOne = +(trade.amount0In) > 0;
+                const zeroForOne = +trade.amount0In > 0;
                 const { token0, token1 } = trade.pair;
-                const [tokenIn, tokenOut] = zeroForOne ? [token0, token1] : [token1, token0]
+                const [tokenIn, tokenOut] = zeroForOne
+                  ? [token0, token1]
+                  : [token1, token0];
                 return {
                   when: formatDistance(
-                    new Date(parseInt(trade.timestamp) * MILLISECONDS_PER_SECOND),
+                    new Date(
+                      parseInt(trade.timestamp) * MILLISECONDS_PER_SECOND
+                    ),
                     new Date(),
                     {
                       addSuffix: true,
@@ -167,12 +174,11 @@ export const selectors = {
                   to: tokenOut.symbol,
                   amount: convert.toCurrency(parseFloat(trade.amountUSD)),
                   kind:
-                  tokenIn.symbol.toLowerCase() ===
-                    pool.symbol.toLowerCase()
+                    tokenIn.symbol.toLowerCase() === pool.symbol.toLowerCase()
                       ? "sell"
                       : "buy",
                   transactionHash: trade.transaction.id,
-                }
+                };
               }),
             },
             assets: tokenIds
@@ -209,7 +215,12 @@ export const selectors = {
           userRewardsEarned: "0",
         };
         const expired = stakingPool.periodFinish < Date.now() / 1000;
-        const totalStaked = convert.toBalance(stakingPool.totalSupply ?? "0", 18, true, 2);
+        const totalStaked = convert.toBalance(
+          stakingPool.totalSupply ?? "0",
+          18,
+          true,
+          2
+        );
         const staked = convert.toBalance(userData.userStakedBalance, 18);
         const earned = convert.toBalance(userData.userRewardsEarned, 18);
         const rate =
@@ -234,7 +245,7 @@ export const selectors = {
           stakingToken: stakingPool.stakingToken,
           earned: `${earned} NDX`,
           rate,
-          expired
+          expired,
         };
       })
       .filter((each): each is FormattedStakingData => Boolean(each))
@@ -268,7 +279,10 @@ export const selectors = {
       .map((stakingPool) => {
         let indexPoolAddress: string;
         if (stakingPool.isWethPair) {
-          if (stakingPool.token0?.toLowerCase() === WETH_CONTRACT_ADDRESS.toLowerCase()) {
+          if (
+            stakingPool.token0?.toLowerCase() ===
+            WETH_CONTRACT_ADDRESS.toLowerCase()
+          ) {
             indexPoolAddress = stakingPool.token1 as string;
           } else {
             indexPoolAddress = stakingPool.token0 as string;
@@ -283,9 +297,20 @@ export const selectors = {
         }
 
         const { name, symbol } = stakingPool;
-        const totalStaked = convert.toBalance(stakingPool.totalStaked ?? "0", 18, true, 2);
-        const staked = convert.toBalance(stakingPool.userStakedBalance ?? "0", 18);
-        const earned = convert.toBalance(stakingPool.userEarnedRewards ?? "0", 18);
+        const totalStaked = convert.toBalance(
+          stakingPool.totalStaked ?? "0",
+          18,
+          true,
+          2
+        );
+        const staked = convert.toBalance(
+          stakingPool.userStakedBalance ?? "0",
+          18
+        );
+        const earned = convert.toBalance(
+          stakingPool.userEarnedRewards ?? "0",
+          18
+        );
 
         const rewardsPerDay = convert.toBalance(stakingPool.rewardsPerDay, 18);
         return {

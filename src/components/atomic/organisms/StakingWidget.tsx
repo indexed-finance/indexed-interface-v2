@@ -1,4 +1,4 @@
-import { Badge, Button, Col, Row, Space, Statistic } from "antd";
+import { Badge, Button, Divider, Space, Statistic } from "antd";
 import { FaTractor } from "react-icons/fa";
 import { FormattedStakingData } from "features";
 import { Link, useHistory } from "react-router-dom";
@@ -27,47 +27,41 @@ export function StakingWidget(props: FormattedStakingData) {
             : push(props.slug)
         }
         stats={
-          <Space direction="vertical" style={{ width: "100%" }}>
-            <Statistic
-              style={{ width: "100%" }}
-              title="Total Staked"
-              value={`${props.totalStaked} ${symbol}`}
-            />
-            <Row style={{ width: "100%" }} justify="center">
-              <Col span={12}>
-                <Statistic
-                  style={{ width: "100%" }}
-                  title={tx("STAKED")}
-                  value={`${props.staked} ${symbol}`}
-                />
-              </Col>
-              <Col span={12}>
-                <Statistic
-                  style={{ width: "100%" }}
-                  title={tx("EARNED")}
-                  value={props.earned}
-                />
-              </Col>
-            </Row>
-
-            <Statistic
-              title={tx("APY")}
-              value={apy ?? "Expired"}
-              valueStyle={{ color: isExpired ? "#333" : "inherit" }}
-            />
-            <Statistic
-              title={tx("RATE")}
-              value={isExpired ? "Expired" : props.rate}
-              valueStyle={{ color: isExpired ? "#333" : "inherit" }}
-            />
-          </Space>
-        }
-        actions={
           <>
+            <Space direction="vertical" style={{ width: "100%" }}>
+              <Statistic
+                style={{ width: "100%" }}
+                title="Total Staked"
+                value={`${props.totalStaked} ${symbol}`}
+              />
+              <Statistic
+                style={{ width: "100%" }}
+                title={tx("STAKED")}
+                value={`${props.staked} ${symbol}`}
+              />
+              <Statistic
+                style={{ width: "100%" }}
+                title={tx("EARNED")}
+                value={props.earned}
+              />
+
+              <Statistic
+                title={tx("APY")}
+                value={apy ?? "Expired"}
+                valueStyle={{ color: isExpired ? "#333" : "inherit" }}
+              />
+              <Statistic
+                title={tx("RATE")}
+                value={isExpired ? "Expired" : props.rate}
+                valueStyle={{ color: isExpired ? "#333" : "inherit" }}
+              />
+            </Space>
+            <Divider />
             <Button
               type={isExpired ? "ghost" : "primary"}
               size="large"
               onClick={(event) => event.stopPropagation()}
+              block={true}
             >
               <Link to={`/staking/${props.id}`}>
                 <Space>

@@ -171,6 +171,8 @@ const selectPoolBySymbol = (state: AppState, symbol: string) => {
   return pools.find((pool) => pool.symbol === symbol) ?? null;
 };
 
+const selectPoolCount = (state: AppState) => state.indexPools.ids.length;
+
 export const indexPoolsSelectors = {
   selectAllPools,
   selectPool,
@@ -192,4 +194,5 @@ export const indexPoolsSelectors = {
   selectTokenWeights,
   selectNormalizedUnderlyingPoolTokens,
   selectPoolBySymbol,
+  selectPoolCount,
 };

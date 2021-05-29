@@ -1,17 +1,14 @@
-import { Button, Card, Divider, Steps, Typography } from "antd";
+import { Button, Divider, Typography } from "antd";
 import { ExternalLink, IndexPoolWidgetGroup, Page } from "components/atomic";
 import { FEATURE_FLAGS } from "feature-flags";
 import { Link } from "react-router-dom";
+import { selectors } from "features";
 import { useBreakpoints, useTranslator } from "hooks";
-import { useEffect, useState } from "react";
-
-const { Step } = Steps;
-const STEP_COUNT = 3;
-const STEP_PROGRESSION_DURATION = 7500;
+import { useSelector } from "react-redux";
 
 export default function Splash() {
   const tx = useTranslator();
-  const [step, setStep] = useState(0);
+  const poolsExist = useSelector(selectors.selectPoolCount) > 0;
   const { isMobile } = useBreakpoints();
   const docsButton = (
     <Button
@@ -33,32 +30,6 @@ export default function Splash() {
         {docsButton}
       </ExternalLink>
     );
-
-  // Effect:
-  // Continuously progress through the steps on the splash page.
-  useEffect(() => {
-    let progressingThroughSteps: NodeJS.Timeout;
-
-    const progress = () => {
-      setStep((prevStep) => {
-        let nextStep = prevStep + 1;
-
-        if (nextStep >= STEP_COUNT) {
-          nextStep = 0;
-        }
-
-        return nextStep;
-      });
-
-      progressingThroughSteps = setTimeout(progress, STEP_PROGRESSION_DURATION);
-    };
-
-    progress();
-
-    return () => {
-      clearTimeout(progressingThroughSteps);
-    };
-  }, []);
 
   return (
     <Page hasPageHeader={false}>
@@ -96,25 +67,20 @@ export default function Splash() {
             )}
           </Button.Group>
         </Typography.Title>
-        {!isMobile && (
-          <video autoPlay={true}>
-            <source src="/splash.mp4" type="video/mp4"></source>
-          </video>
-        )}
+        <video autoPlay={true} width="100%" style={{ marginTop: 24 }}>
+          <source src="/splash.mp4" type="video/mp4"></source>
+        </video>
       </div>
-      <Card style={{ marginTop: "2rem" }}>
-        <Steps current={step} responsive={true} type="navigation">
-          <Step title="Foo" description="Lorem ipsum dolor sit amet" />
-          <Step title="Bar" description="Lorem ipsum dolor sit amet" />
-          <Step title="Baz" description="Lorem ipsum dolor sit amet" />
-        </Steps>
-      </Card>
-      <Divider orientation="left" style={{ marginBottom: 24 }}>
-        <Typography.Title level={2} style={{ margin: 0 }}>
-          Index Pools
-        </Typography.Title>
-      </Divider>
-      <IndexPoolWidgetGroup />
+      {poolsExist && (
+        <>
+          <Divider orientation="left" style={{ marginBottom: 24 }}>
+            <Typography.Title level={2} style={{ margin: 0 }}>
+              Index Pools
+            </Typography.Title>
+          </Divider>
+          <IndexPoolWidgetGroup />
+        </>
+      )}
     </Page>
   );
 }
