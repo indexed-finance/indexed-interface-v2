@@ -1,3 +1,4 @@
+import { debugConsole } from "helpers/logger";
 import { interfaceLookup } from "ethereum/abi";
 import type { InterfaceKind } from "ethereum/abi";
 
@@ -36,6 +37,9 @@ export function deserializeOnChainCall(callId: string): null | RegisteredCall {
   try {
     const [interfaceKind, target, fn, args] = callId.split("/");
     const abi = interfaceLookup[interfaceKind as InterfaceKind];
+    if (!abi) {
+      return null;
+    }
     const common = {
       target,
       interface: abi,
@@ -51,7 +55,7 @@ export function deserializeOnChainCall(callId: string): null | RegisteredCall {
       return common;
     }
   } catch (error) {
-    console.error("Bad on-chain call ID", callId, error);
+    debugConsole.error("Bad on-chain call ID", callId, error);
     return null;
   }
 }
