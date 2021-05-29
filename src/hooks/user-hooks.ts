@@ -1,5 +1,6 @@
-import { NDX_ADDRESS } from "config";
+import { ETH_BALANCE_GETTER, NDX_ADDRESS } from "config";
 import { RegisteredCall } from "helpers";
+import { constants } from "ethers";
 import { selectors } from "features";
 import { useCallRegistrar } from "./use-call-registrar";
 import { useMemo } from "react";
@@ -40,79 +41,45 @@ export const useNdxBalance = () => useSelector(selectors.selectNdxBalance);
 
 export const USER_CALLER = "User";
 
-export function useUserDataRegistrar(poolTokens: Record<string, string[]>) {
-  const userAddress = useUserAddress();
+function buildBalanceCalls(
+  userAddress: string,
+  tokens: string[]
+): RegisteredCall[] {
   const interfaceKind = "IERC20";
-  const userDataCalls: RegisteredCall[] = userAddress
-    ? Object.entries(poolTokens).flatMap(([pool, tokens]) =>
-        tokens.flatMap((token) => [
-          {
-            interfaceKind,
-            target: token,
-            function: "allowance",
-            args: [userAddress, pool],
-          },
-          {
-            interfaceKind,
-            target: token,
-            function: "balanceOf",
-            args: [userAddress],
-          },
-        ])
-      )
-    : [];
+  return tokens.map((tokenId) => ({
+    interfaceKind,
+    target: tokenId === constants.AddressZero ? ETH_BALANCE_GETTER : tokenId,
+    function: "balanceOf",
+    args: [userAddress],
+  }))
+}
 
-  if (userAddress) {
-    userDataCalls.push({
-      interfaceKind,
-      target: NDX_ADDRESS,
-      function: "balanceOf",
-      args: [userAddress],
-    });
-  }
-
-  useCallRegistrar({
-    caller: USER_CALLER,
-    onChainCalls: userDataCalls,
-  });
+function buildAllowanceCalls(
+  userAddress: string,
+  spender: string,
+  tokens: string[]
+): RegisteredCall[] {
+  const interfaceKind = "IERC20";
+  return tokens.filter(t => t !== constants.AddressZero).map((tokenId) => ({
+    interfaceKind,
+    target: tokenId,
+    function: "allowance",
+    args: [userAddress, spender],
+  }))
 }
 
 export function useBalanceAndApprovalRegistrar(
   spender: string,
   _tokens: string | string[]
 ) {
-  const tokens = Array.isArray(_tokens) ? _tokens : [_tokens];
   const userAddress = useUserAddress();
-  const interfaceKind = "IERC20";
-  const userDataCalls: RegisteredCall[] = userAddress
-    ? tokens.reduce(
-        (calls, token) => [
-          ...calls,
-          {
-            interfaceKind,
-            target: token.toLowerCase(),
-            function: "allowance",
-            args: [userAddress.toLowerCase(), spender.toLowerCase()],
-          },
-          {
-            interfaceKind,
-            target: token.toLowerCase(),
-            function: "balanceOf",
-            args: [userAddress.toLowerCase()],
-          },
-        ],
-        [] as RegisteredCall[]
-      )
-    : [];
-
-  if (userAddress) {
-    userDataCalls.push({
-      interfaceKind,
-      target: NDX_ADDRESS,
-      function: "balanceOf",
-      args: [userAddress],
-    });
-  }
+  const userDataCalls: RegisteredCall[] = useMemo(() => {
+    const tokens = Array.isArray(_tokens) ? _tokens : [_tokens];
+    return userAddress ? [
+      ...buildBalanceCalls(userAddress, [...tokens, NDX_ADDRESS]),
+      ...buildAllowanceCalls(userAddress, spender, tokens)
+    ] : []
+  }, [userAddress, spender, _tokens]);
 
   useCallRegistrar({
     caller: USER_CALLER,
@@ -122,16 +89,9 @@ export function useBalanceAndApprovalRegistrar(
 
 export function useBalancesRegistrar(tokenIds: string[]) {
   const userAddress = useUserAddress();
-  const interfaceKind = "IERC20";
   const userDataCalls: RegisteredCall[] = useMemo(() => {
     return userAddress
-      ? tokenIds.map((tokenId) => ({
-          interfaceKind,
-          target: tokenId,
-          function: "balanceOf",
-          args: [userAddress],
-        }))
-      : [];
+      ? buildBalanceCalls(userAddress, tokenIds) : [];
   }, [userAddress, tokenIds]);
 
   useCallRegistrar({
