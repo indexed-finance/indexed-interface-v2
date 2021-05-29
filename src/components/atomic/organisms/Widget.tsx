@@ -2,6 +2,7 @@ import { Card, Col, Divider, Row, Typography } from "antd";
 import { HTMLProps, ReactNode } from "react";
 import { Quote } from "components/atomic/molecules";
 import { Token } from "components/atomic/atoms";
+import { convert } from "helpers";
 import noop from "lodash.noop";
 
 interface Props extends HTMLProps<HTMLDivElement> {
@@ -30,6 +31,8 @@ export function Widget({
   onClick = noop,
   ...rest
 }: Props) {
+  const formattedPrice = convert.toCurrency(parseFloat(price));
+
   return (
     <div
       onClick={onClick}
@@ -66,7 +69,7 @@ export function Widget({
             <div style={{ textAlign: "right" }}>
               <Quote
                 inline={true}
-                price={price}
+                price={formattedPrice === "$NaN" ? price : formattedPrice}
                 netChangePercent={priceChange}
                 textSize="small"
               />

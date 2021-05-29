@@ -33,7 +33,8 @@ export function Token({
   try {
     image = require(`images/${symbol.toLowerCase()}.png`).default;
   } catch {
-    if (address) image = `https://tokens.1inch.exchange/${address.toLowerCase()}.png`;
+    if (address)
+      image = `https://tokens.1inch.exchange/${address.toLowerCase()}.png`;
   }
 
   return (
