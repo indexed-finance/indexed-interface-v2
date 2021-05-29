@@ -4,14 +4,11 @@ import {
   Interface,
   JsonFragment,
   ParamType,
-  defaultAbiCoder,
 } from "@ethersproject/abi";
-import { Provider } from "@ethersproject/providers";
-import {
-  MultiCall as bytecode,
-  MultiCallStrict as bytecodeStrict,
-} from "./bytecode.json";
+import { JsonRpcProvider, JsonRpcSigner } from "@ethersproject/providers";
+import { MULTICALL2_ADDRESS } from "../../config";
 import { chunk } from "lodash";
+import { getContract } from "ethereum/abi";
 import type { Call, MulticallResults } from "./types";
 
 interface CondensedCall {
@@ -21,7 +18,7 @@ interface CondensedCall {
 }
 
 // Ensure we don't surpass the 25kb limit.
-const CHUNK_CALL_COUNT = 30;
+const CHUNK_CALL_COUNT = 150;
 
 const toInterface = (_interface: Interface | JsonFragment[]) =>
   Array.isArray(_interface) ? new Interface(_interface) : _interface;
@@ -81,27 +78,27 @@ function getDefaultResultForFunction(fn: FunctionFragment): any[] {
 }
 
 async function executeChunk(
-  _provider: Provider,
+  _provider: JsonRpcProvider | JsonRpcSigner,
   _calls: CondensedCall[],
   _strict?: boolean
 ) {
-  const inputData = defaultAbiCoder.encode(
-    ["address[]", "bytes[]"],
-    [_calls.map((c) => c.target), _calls.map((c) => c.callData)]
+try {
+  const multicallContract = getContract(MULTICALL2_ADDRESS, 'MultiCall2', _provider);
+  // new Contract(MULTICALL2_ADDRESS, MULTICALL_ABI, _provider);
+  const { blockNumber, returnData } = await multicallContract.callStatic.tryBlockAndAggregate(
+    false, _calls.map(c => ({ target: c.target, callData: c.callData }))
   );
-  const bytecodeToUse = _strict ? bytecodeStrict : bytecode;
-  const without0x = inputData.slice(2);
-  const data = bytecodeToUse.concat(without0x);
-  const encodedResult = await _provider.call({ data });
-  const [blockNumber, decodedResult] = defaultAbiCoder.decode(
-    ["uint256", "bytes[]"],
-    encodedResult
-  );
-  return { blockNumber, decodedResult };
+  const decodedResult = returnData.map((r) => r.success ? r.returnData : "0x");
+  return { blockNumber: blockNumber.toNumber(), decodedResult };
+} catch (err) {
+  console.log('Got mC err')
+  console.log(err)
+  throw err;
+}
 }
 
 export async function multicall(
-  _provider: Provider,
+  _provider: JsonRpcProvider | JsonRpcSigner,
   _calls: Call[],
   _interface?: Interface,
   _strict?: boolean
@@ -128,7 +125,7 @@ export async function multicall(
   });
 
   return {
-    blockNumber,
+    blockNumber: blockNumber,
     results: formattedResults,
   };
 }
