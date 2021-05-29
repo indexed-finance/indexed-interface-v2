@@ -1,4 +1,5 @@
 import { Avatar, Space } from "antd";
+import { PLACEHOLDER_TOKEN_IMAGE } from "config";
 
 interface Props {
   symbol: string;
@@ -8,6 +9,7 @@ interface Props {
   size?: "tiny" | "small" | "medium" | "large";
   style?: any;
   amount?: string;
+  isPair?: boolean;
 }
 
 export function Token({
@@ -31,10 +33,13 @@ export function Token({
   let image = "";
 
   try {
-    image = require(`images/${symbol.toLowerCase()}.png`).default;
+    if (address) {
+      image = `https://tokens.dharma.io/assets/${address.toLowerCase()}/icon.png`;
+    } else {
+      image = require(`images/${symbol.toLowerCase()}.png`).default;
+    }
   } catch {
-    if (address)
-      image = `https://tokens.1inch.exchange/${address.toLowerCase()}.png`;
+    image = PLACEHOLDER_TOKEN_IMAGE;
   }
 
   return (
