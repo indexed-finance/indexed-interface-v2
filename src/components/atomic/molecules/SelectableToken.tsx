@@ -2,6 +2,7 @@ import { List, Typography } from "antd";
 import { Token } from "components/atomic/atoms";
 
 type Asset = {
+  id: string;
   name: string;
   symbol: string;
 };
@@ -22,7 +23,7 @@ export function SelectableToken({ asset, onClick }: Props) {
     >
       <Item.Meta
         style={{ alignItems: "center" }}
-        avatar={<Token symbol={asset.symbol} name={asset.symbol} />}
+        avatar={<Token address={asset.id} symbol={asset.symbol} name={asset.symbol} />}
         title={
           <Typography.Title
             level={5}
