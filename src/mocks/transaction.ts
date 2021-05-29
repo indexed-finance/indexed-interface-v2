@@ -3,8 +3,9 @@ import {
   TransactionReceipt,
   TransactionResponse,
 } from "@ethersproject/abstract-provider";
+import { abbreviateAddress, sleep } from "helpers";
 import { actions, store } from "features";
-import { sleep } from "helpers";
+import { notification } from "antd";
 
 const availableHashes = [
   "0xb26d07fba6d6f661d5eba72cbf3f390438abc81fb36a30c7b8c5f9d59a080a60",
@@ -56,6 +57,11 @@ async function sendTransaction(status: number, time = 4000) {
       extra: {},
     })
   );
+
+  notification.info({
+    message: "Transaction sent",
+    description: `${abbreviateAddress(transactionHash)} was sent.`,
+  });
 
   await sleep(time);
 

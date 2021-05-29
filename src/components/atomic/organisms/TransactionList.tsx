@@ -1,6 +1,6 @@
 import { BaseType } from "antd/lib/typography/Base";
 import { BiLinkExternal } from "react-icons/bi";
-import { Button, Space, Typography } from "antd";
+import { Button, Space, Typography, notification } from "antd";
 import { ExternalLink } from "components/atomic/atoms";
 import { abbreviateAddress } from "helpers";
 import { actions, selectors } from "features";
@@ -27,6 +27,13 @@ export function TransactionList() {
         if (tx.status === "confirmed") {
           hiding.current[tx.hash] = true;
 
+          notification.success({
+            message: "Transaction confirmed",
+            description: `${abbreviateAddress(
+              tx.hash
+            )} was confirmed after X seconds.`,
+          });
+
           setTimeout(() => {
             delete hiding.current[tx.hash];
 
@@ -37,6 +44,13 @@ export function TransactionList() {
           }, 5000);
         } else if (tx.status === "reverted") {
           hiding.current[tx.hash] = true;
+
+          notification.error({
+            message: "Transaction rejected",
+            description: `${abbreviateAddress(
+              tx.hash
+            )} was rejected after X seconds.`,
+          });
 
           setTimeout(() => {
             delete hiding.current[tx.hash];

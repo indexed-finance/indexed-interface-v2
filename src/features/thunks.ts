@@ -1,5 +1,5 @@
 import * as topLevelActions from "./actions";
-import { RegisteredCall } from "helpers";
+import { RegisteredCall, abbreviateAddress } from "helpers";
 import { SocketClient } from "sockets/client";
 import { TransactionExtra, transactionsActions } from "./transactions";
 import { TransactionResponse } from "@ethersproject/abstract-provider";
@@ -9,6 +9,7 @@ import { fetchInitialData } from "./requests";
 import { fetchNewStakingData } from "./newStaking";
 import { fetchStakingData, stakingActions } from "./staking";
 import { indexPoolsActions } from "./indexPools";
+import { notification } from "antd";
 import { pairsActions } from "./pairs";
 import { providers } from "ethers";
 import { settingsActions } from "./settings";
@@ -36,7 +37,8 @@ export const disconnectFromProvider = () => {
 };
 
 export function useProvider(): [
-  Provider | null, providers.JsonRpcSigner | null
+  Provider | null,
+  providers.JsonRpcSigner | null
 ] {
   return [provider, signer];
 }
@@ -98,9 +100,9 @@ export const thunks = {
       );
       dispatch(
         fetchNewStakingData({
-          provider
+          provider,
         })
-      )
+      );
 
       if (selectedAddress) {
         dispatch(actions.userAddressSelected(selectedAddress));
@@ -115,12 +117,19 @@ export const thunks = {
       _tx: TransactionResponse | Promise<TransactionResponse>,
       extra: TransactionExtra = {}
     ): AppThunk =>
-    async (dispatch, getState) => {
+    async (dispatch) => {
       const tx = await Promise.resolve(_tx);
       const _provider = provider as Provider;
 
       dispatch(actions.transactionStarted({ tx, extra }));
+
+      notification.info({
+        message: "Transaction sent",
+        description: `${abbreviateAddress(tx.hash)} was sent.`,
+      });
+
       const receipt = await _provider.waitForTransaction(tx.hash);
+
       dispatch(actions.transactionFinalized(receipt));
     },
 };
