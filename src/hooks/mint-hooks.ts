@@ -186,6 +186,7 @@ export function useMintRouterCallbacks(poolId: string) {
   const {
     calculateBestTradeForExactInput,
     calculateBestTradeForExactOutput,
+    loading
   } = useUniswapTradingPairs(tokenIds);
   const getBestMintRouteForAmountOut = useCallback(
     (tokenInSymbol: string, typedPoolAmountOut: string) => {
@@ -353,6 +354,7 @@ export function useMintRouterCallbacks(poolId: string) {
     getBestMintRouteForAmountIn,
     getBestMintRouteForAmountOut,
     executeRoutedMint,
+    loading
   };
 }
 // #endregion
