@@ -10,7 +10,6 @@ import { BigNumber } from "bignumber.js";
 import { COMMON_BASE_TOKENS, UNISWAP_FACTORY_ADDRESS } from "config";
 import { constants, BigNumberish as eBigNumberish } from "ethers";
 import { convert } from "./convert";
-import { dedupe } from "./dedupe";
 import { flatMap } from 'lodash';
 import { getCreate2Address, keccak256 } from "ethers/lib/utils";
 

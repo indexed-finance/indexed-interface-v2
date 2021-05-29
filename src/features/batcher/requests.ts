@@ -1,5 +1,4 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { debugConsole } from "helpers/logger";
 import { ethers } from "ethers";
 import { multicall } from "ethereum";
 import type { NormalizedMulticallData, SelectedBatch } from "./types";

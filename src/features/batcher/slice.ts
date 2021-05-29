@@ -1,8 +1,6 @@
 import {
   CallRegistration,
   RegisteredCall,
-  dedupe,
-  deserializeOnChainCall,
   serializeOffChainCall,
   serializeOnChainCall,
 } from "helpers";
@@ -13,7 +11,6 @@ import { mirroredServerState, restartedDueToError } from "../actions";
 import { settingsActions } from "../settings";
 import { userActions } from "../user";
 import type { AppState } from "../store";
-import type { SelectedBatch } from "./types";
 
 const MAX_AGE_IN_BLOCKS = 4; // How old can data be in the cache?
 
@@ -71,9 +68,6 @@ const slice = createSlice({
       if (blockNumber > 0) {
         state.blockNumber = blockNumber;
       }
-
-      state.onChainCalls = dedupe(state.onChainCalls);
-      state.offChainCalls = dedupe(state.offChainCalls);
     },
     callsRegistered(
       state,
