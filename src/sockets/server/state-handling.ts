@@ -133,7 +133,7 @@ function setupRegistrants() {
         {
           target: newStakingMeta.rewardsSchedule,
           function: 'getRewardsForBlockRange',
-          interfaceKind: 'RewardsSchedule_ABI',
+          interfaceKind: 'RewardsSchedule',
           args: [fromBlock.toString(), Math.floor(fromBlock + BLOCKS_PER_DAY).toString()]
         }
       ],
