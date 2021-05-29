@@ -1,4 +1,4 @@
-import { abiLookup } from "ethereum/abi";
+import { interfaceLookup } from "ethereum/abi";
 import type { InterfaceKind } from "ethereum/abi";
 
 export type CallRegistration = {
@@ -35,7 +35,7 @@ export function serializeOnChainCall(call: RegisteredCall): string {
 export function deserializeOnChainCall(callId: string): null | RegisteredCall {
   try {
     const [interfaceKind, target, fn, args] = callId.split("/");
-    const abi = abiLookup[interfaceKind as InterfaceKind];
+    const abi = interfaceLookup[interfaceKind as InterfaceKind];
     const common = {
       target,
       interface: abi,
