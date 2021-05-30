@@ -8,7 +8,7 @@ export const FEATURE_FLAGS = {
   useColorThief: false,
   useInternalDocs: false,
   usePlainLanguageTransaction: false,
-  useProductionServerLocally: false,
+  useProductionServerLocally: true,
   useSessionSaving: true,
   useFortmatic: false,
   useHomepageSteps: false,
