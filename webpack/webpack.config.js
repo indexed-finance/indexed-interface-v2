@@ -27,6 +27,9 @@ module.exports = {
       window: path.resolve(__dirname, "./window.js"),
     }),
   ],
+  externals: {
+    "node-fetch": "commonjs2 node-fetch",
+  },
   module: {
     rules: [
       {

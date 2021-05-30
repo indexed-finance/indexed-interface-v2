@@ -6,7 +6,9 @@ const noop = require("lodash.noop");
     global.window.addEventListener = noop;
   }
 
-  global.navigator = null;
+  global.navigator = {
+    product: null
+  };
 
   return {
     ...global,
