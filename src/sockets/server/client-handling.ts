@@ -43,6 +43,7 @@ export const connections: WebSocket[] = [];
  */
 export function setupClientHandling() {
   if (process.env.NODE_ENV === "development") {
+    process.exit(1);
     const socketServer = new WebSocket.Server(
       {
         port: WEBSOCKET_SERVER_PORT,
