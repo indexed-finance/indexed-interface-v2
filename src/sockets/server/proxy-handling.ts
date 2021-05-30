@@ -16,7 +16,6 @@ export function setupProxy() {
     key: fs.readFileSync(API_KEY_PATH, "utf8"),
     cert: fs.readFileSync(API_CERT_PATH, "utf8"),
   };
-  console.log("credentials are ", credentials);
   const proxy = httpProxy.createProxyServer({
     ssl: credentials,
     secure: true,

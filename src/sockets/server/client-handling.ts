@@ -80,7 +80,7 @@ export function setupClientHandling() {
     socketServer.on("close", handleClose);
     socketServer.on("error", handleError);
 
-    server.listen(443, () => "Server listening...");
+    server.listen(443, () => "Server listening on 443...");
   }
 
   continuouslyCheckForInactivity();
