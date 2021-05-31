@@ -10,5 +10,5 @@ log("SocketServer has started up!");
 setupClientHandling();
 setupStateHandling();
 setupLogHandling();
-// setupProxy();
+setupProxy();
 setupHealthChecks();
