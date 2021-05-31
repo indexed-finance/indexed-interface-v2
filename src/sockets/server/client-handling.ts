@@ -1,7 +1,6 @@
 import {
   CLIENT_STATISTICS_REPORTING_RATE,
   WEBSOCKET_SERVER_PING_RATE,
-  WEBSOCKET_SERVER_PORT,
 } from "config";
 import { IncomingMessage } from "http";
 import { createServer } from "https";
@@ -45,7 +44,7 @@ export function setupClientHandling() {
   if (false) {
     const socketServer = new WebSocket.Server(
       {
-        port: WEBSOCKET_SERVER_PORT,
+        port: 13337,
         perMessageDeflate: DEFLATION_OPTIONS,
       },
       () => log("Local socket server listening...")

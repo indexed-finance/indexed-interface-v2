@@ -14,10 +14,8 @@ export const SLIPPAGE_RATE = 0.01;
 export const TRADE_PRICE_INPUT_MODIFIER = 0.99;
 export const TRADE_PRICE_OUTPUT_MODIFIER = 1.02;
 export const GATEWAY_URL = "https://gateway.temporal.cloud/ipfs/";
-export const SOCKET_PORT = 13337;
 export const WEBSOCKET_SERVER_PING_RATE = 2000;
 export const WEBSOCKET_SERVER_UPDATE_RATE = 10000;
-export const WEBSOCKET_SERVER_PORT = 13337;
 export const QUIKNODE_WEBSOCKET_PROVIDER =
   "wss://bold-old-pond.quiknode.pro/7876affe5a6bb6688c659b452fe9d81d4125d21f/";
 
@@ -128,17 +126,19 @@ export const WETH_CONTRACT_ADDRESS =
   "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2";
 export const MINT_ROUTER_ADDRESS = "0xfb6ac20d38a1f0c4f90747ca0745e140bc17e4c3";
 export const BURN_ROUTER_ADDRESS = "0x348ab9b021fff6016d3eb07d3171bdef0022cfa8";
-export const MULTI_TOKEN_STAKING_ADDRESS = "0xc46e0e7ecb3efcc417f6f89b940ffaff72556382";
-export const REWARDS_SCHEDULE_ADDDRESS = "0x131ba0fc3e4e866e5daf3d16526846fdd3e67623";
-export const ETH_BALANCE_GETTER = '0xfF1c691C3DB6fA065B6499A5c93264a6e5cb8ed2';
-export const MULTICALL2_ADDRESS = '0x5BA1e12693Dc8F9c48aAD8770482f4739bEeD696'
+export const MULTI_TOKEN_STAKING_ADDRESS =
+  "0xc46e0e7ecb3efcc417f6f89b940ffaff72556382";
+export const REWARDS_SCHEDULE_ADDDRESS =
+  "0x131ba0fc3e4e866e5daf3d16526846fdd3e67623";
+export const ETH_BALANCE_GETTER = "0xfF1c691C3DB6fA065B6499A5c93264a6e5cb8ed2";
+export const MULTICALL2_ADDRESS = "0x5BA1e12693Dc8F9c48aAD8770482f4739bEeD696";
 
 export const COMMON_BASE_TOKENS = [
   {
     id: "0x0000000000000000000000000000000000000000",
     symbol: "ETH",
     name: "Ether",
-    decimals: 18
+    decimals: 18,
   },
   {
     id: "0x6b175474e89094c44da98b954eedeac495271d0f",
@@ -156,8 +156,8 @@ export const COMMON_BASE_TOKENS = [
     id: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
     symbol: "USDC",
     name: "USD Coin",
-    decimals: 6
-  }
+    decimals: 6,
+  },
 ];
 
 export const EXTERNAL_IP = "143.198.78.205";
