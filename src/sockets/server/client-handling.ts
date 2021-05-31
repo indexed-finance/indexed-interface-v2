@@ -41,7 +41,6 @@ export const connections: WebSocket[] = [];
  * Creates a WebSocket server that provides quick updates to connected clients.
  */
 export function setupClientHandling() {
-  console.log(1);
   const API_CERT_PATH = process.env.API_CERT_PATH;
   const API_KEY_PATH = process.env.API_KEY_PATH;
 
@@ -50,7 +49,7 @@ export function setupClientHandling() {
       "Server requires environment variables API_CERT_PATH and API_KEY_PATH"
     );
   }
-  console.log(2);
+
   const key = fs.readFileSync(API_KEY_PATH, "utf8");
   const cert = fs.readFileSync(API_CERT_PATH, "utf8");
   const credentials = { key, cert };
@@ -66,10 +65,8 @@ export function setupClientHandling() {
   socketServer.on("connection", handleConnection);
   socketServer.on("close", handleClose);
   socketServer.on("error", handleError);
-  console.log(3);
 
-  server.listen(443, () => "Server listening on 443...");
-  console.log(4);
+  server.listen(13337, () => "Server listening on 13337...");
 
   continuouslyCheckForInactivity();
   continuouslyReportStatistics();
