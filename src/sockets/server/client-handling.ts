@@ -1,6 +1,7 @@
 import {
   CLIENT_STATISTICS_REPORTING_RATE,
   WEBSOCKET_SERVER_PING_RATE,
+  WEBSOCKET_SERVER_PORT,
 } from "config";
 import { IncomingMessage } from "http";
 import { createServer } from "https";
@@ -41,32 +42,46 @@ export const connections: WebSocket[] = [];
  * Creates a WebSocket server that provides quick updates to connected clients.
  */
 export function setupClientHandling() {
-  const API_CERT_PATH = process.env.API_CERT_PATH;
-  const API_KEY_PATH = process.env.API_KEY_PATH;
-
-  if (!(API_CERT_PATH && API_KEY_PATH)) {
-    throw new Error(
-      "Server requires environment variables API_CERT_PATH and API_KEY_PATH"
+  if (false) {
+    const socketServer = new WebSocket.Server(
+      {
+        port: WEBSOCKET_SERVER_PORT,
+        perMessageDeflate: DEFLATION_OPTIONS,
+      },
+      () => log("Local socket server listening...")
     );
+
+    socketServer.on("connection", handleConnection);
+    socketServer.on("close", handleClose);
+    socketServer.on("error", handleError);
+  } else {
+    const API_CERT_PATH = process.env.API_CERT_PATH;
+    const API_KEY_PATH = process.env.API_KEY_PATH;
+
+    if (!(API_CERT_PATH && API_KEY_PATH)) {
+      throw new Error(
+        "Server requires environment variables API_CERT_PATH and API_KEY_PATH"
+      );
+    }
+
+    const key = fs.readFileSync(API_KEY_PATH, "utf8");
+    const cert = fs.readFileSync(API_CERT_PATH, "utf8");
+    const credentials = { key, cert };
+    const server = createServer(credentials);
+    const socketServer = new WebSocket.Server(
+      {
+        server,
+        perMessageDeflate: DEFLATION_OPTIONS,
+      },
+      () => log("Production socket server listening...")
+    );
+
+    socketServer.on("connection", handleConnection);
+    socketServer.on("close", handleClose);
+    socketServer.on("error", handleError);
+
+    server.listen(443, () => "Server listening on 443...");
   }
-
-  const key = fs.readFileSync(API_KEY_PATH, "utf8");
-  const cert = fs.readFileSync(API_CERT_PATH, "utf8");
-  const credentials = { key, cert };
-  const server = createServer(credentials);
-  const socketServer = new WebSocket.Server(
-    {
-      server,
-      perMessageDeflate: DEFLATION_OPTIONS,
-    },
-    () => log("Production socket server listening...")
-  );
-
-  socketServer.on("connection", handleConnection);
-  socketServer.on("close", handleClose);
-  socketServer.on("error", handleError);
-
-  server.listen(13337, () => "Server listening on 13337...");
 
   continuouslyCheckForInactivity();
   continuouslyReportStatistics();
