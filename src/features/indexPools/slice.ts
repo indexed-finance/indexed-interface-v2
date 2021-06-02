@@ -131,7 +131,9 @@ export const poolMulticallDataParser = createMulticallDataParser(
 
               handler();
             }
-          } catch {}
+          } catch {
+            console.error("Some weird error.");
+          }
 
           return poolEntry;
         },
