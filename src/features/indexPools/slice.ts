@@ -17,7 +17,7 @@ export const adapter = createEntityAdapter<NormalizedIndexPool>({
   selectId: (entry) => entry.id.toLowerCase(),
 });
 
-export const POOL_CALLER = "Pool Detail";
+export const POOL_CALLER = "Pool Data";
 
 const slice = createSlice({
   name: "indexPools",
