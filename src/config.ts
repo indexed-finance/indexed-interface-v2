@@ -128,17 +128,19 @@ export const WETH_CONTRACT_ADDRESS =
   "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2";
 export const MINT_ROUTER_ADDRESS = "0xfb6ac20d38a1f0c4f90747ca0745e140bc17e4c3";
 export const BURN_ROUTER_ADDRESS = "0x348ab9b021fff6016d3eb07d3171bdef0022cfa8";
-export const MULTI_TOKEN_STAKING_ADDRESS = "0xc46e0e7ecb3efcc417f6f89b940ffaff72556382";
-export const REWARDS_SCHEDULE_ADDDRESS = "0x131ba0fc3e4e866e5daf3d16526846fdd3e67623";
-export const ETH_BALANCE_GETTER = '0xfF1c691C3DB6fA065B6499A5c93264a6e5cb8ed2';
-export const MULTICALL2_ADDRESS = '0x5BA1e12693Dc8F9c48aAD8770482f4739bEeD696'
+export const MULTI_TOKEN_STAKING_ADDRESS =
+  "0xc46e0e7ecb3efcc417f6f89b940ffaff72556382";
+export const REWARDS_SCHEDULE_ADDDRESS =
+  "0x131ba0fc3e4e866e5daf3d16526846fdd3e67623";
+export const ETH_BALANCE_GETTER = "0xfF1c691C3DB6fA065B6499A5c93264a6e5cb8ed2";
+export const MULTICALL2_ADDRESS = "0x5BA1e12693Dc8F9c48aAD8770482f4739bEeD696";
 
 export const COMMON_BASE_TOKENS = [
   {
     id: "0x0000000000000000000000000000000000000000",
     symbol: "ETH",
     name: "Ether",
-    decimals: 18
+    decimals: 18,
   },
   {
     id: "0x6b175474e89094c44da98b954eedeac495271d0f",
@@ -156,8 +158,8 @@ export const COMMON_BASE_TOKENS = [
     id: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
     symbol: "USDC",
     name: "USD Coin",
-    decimals: 6
-  }
+    decimals: 6,
+  },
 ];
 
 export const EXTERNAL_IP = "143.198.78.205";
@@ -181,4 +183,7 @@ export const INDEX_POOL_TAGLINES: Record<string, string> = {
   // ERROR
   "0xd3deff001ef67e39212f4973b617c2e684fa436c":
     "A barbell-weighted fund tracking the favoured projects of 0xb1.484, one of the largest capital providers in DeFi.",
+  // FFF
+  "0xabafa52d3d5a2c18a4c1ae24480d22b831fc0413":
+    "A new-to-crypto-investing option, providing 20% exposure to both BTC and ETH, with the remainder spread across large-mid cap DeFi protocols and smaller growth shots via the DEFI5, CC10 and DEGEN indices.",
 };

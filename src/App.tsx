@@ -1,5 +1,5 @@
+import { BrowserRouter, Route, useLocation } from "react-router-dom";
 import {
-  BatchUpdater,
   DEBUG,
   DrawerProvider,
   ErrorBoundary,
@@ -11,7 +11,6 @@ import {
   TransactionList,
   useTooltips,
 } from "components";
-import { BrowserRouter, Route, useLocation } from "react-router-dom";
 import { FEATURE_FLAGS } from "feature-flags";
 import { Layout, message, notification } from "antd";
 import { Provider } from "react-redux";
@@ -26,21 +25,12 @@ export function getLibrary(_provider?: any, _connector?: any) {
   return new ethers.providers.Web3Provider(_provider);
 }
 
-function Updaters() {
-  return (
-    <>
-      <BatchUpdater />
-    </>
-  );
-}
-
 export function App() {
   return (
     <BrowserRouter>
       <Provider store={store}>
         <ErrorBoundary>
           <Web3ReactProvider getLibrary={getLibrary}>
-            <Updaters />
             <TooltipProvider>
               <DrawerProvider>
                 <AppLayout />
