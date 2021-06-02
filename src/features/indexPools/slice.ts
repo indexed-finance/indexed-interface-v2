@@ -55,6 +55,8 @@ const slice = createSlice({
               }
             }
           }
+        } else {
+          console.log("No relevant pool multicall data on ", action.payload);
         }
 
         return state;
