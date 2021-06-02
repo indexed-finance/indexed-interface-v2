@@ -15,6 +15,7 @@ export * from './token-hooks';
 export * from './transaction-hooks';
 export * from './use-breakpoints';
 export * from './use-call-registrar';
+export * from './use-debounce';
 export * from './use-history-change-callback';
 export * from './use-previous';
 export * from './use-query';
