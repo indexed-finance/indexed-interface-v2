@@ -7,6 +7,7 @@ Level 10
     * SocialMediaList
     * TransactionList
     * Screen Footer
+    * WarningBar
 
 Level 1 /
     * Screen Actions

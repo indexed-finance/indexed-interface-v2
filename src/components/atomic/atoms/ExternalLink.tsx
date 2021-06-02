@@ -23,7 +23,8 @@ export function ExternalLink({
         justifyContent: "space-between",
       }}
     >
-      <div>{children}</div> {withIcon && <BiLinkExternal />}
+      <div>{children}</div>{" "}
+      {withIcon && <BiLinkExternal style={{ marginLeft: 4 }} />}
     </a>
   );
 }

@@ -9,6 +9,7 @@ import {
   SocialMediaList,
   TooltipProvider,
   TransactionList,
+  WarningBar,
   useTooltips,
 } from "components";
 import { FEATURE_FLAGS } from "feature-flags";
@@ -51,6 +52,7 @@ export function AppLayout() {
   const inner = (
     <>
       <LayoutHeader />
+      <WarningBar />
       <SocialMediaList />
       <Layout.Content
         className="with-background"

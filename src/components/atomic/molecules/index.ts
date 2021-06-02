@@ -15,3 +15,4 @@ export * from './ServerConnection';
 export * from './SocialMediaList';
 export * from './TokenExchangeRate';
 export * from './WalletConnector';
+export * from './WarningBar';

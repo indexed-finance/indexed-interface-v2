@@ -3,6 +3,7 @@ import { FEATURE_FLAGS } from "feature-flags";
 import { LOCALSTORAGE_KEY } from "config";
 import { ThunkAction } from "redux-thunk";
 import { configureStore } from "@reduxjs/toolkit";
+import { debounce } from "lodash";
 import { middleware } from "./middleware";
 import { rootReducer } from "./reducer";
 
@@ -18,7 +19,7 @@ const store = configureStore({
     : undefined,
 });
 
-store.subscribe(() => {
+const persistState = debounce(() => {
   try {
     const { batcher, ...toSave } = store.getState();
     const saved = {
@@ -30,7 +31,9 @@ store.subscribe(() => {
   } catch {
     // Persistence not available.
   }
-});
+}, 250);
+
+store.subscribe(persistState);
 
 export { store };
 
