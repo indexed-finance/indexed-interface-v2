@@ -11,6 +11,8 @@ import { fetchTokenPriceData } from "./tokens";
 import { selectors } from "./selectors";
 import { userActions } from "./user";
 import debounce from "lodash.debounce";
+import isEqual from "lodash.isequal";
+import noop from "lodash.noop";
 import type { AppState } from "./store";
 
 export function userDisconnectionMiddleware() {
@@ -71,14 +73,28 @@ if (process.env.NODE_ENV === "development") {
 }
 
 // #region Batch Stuff
-let blockNumber = -1;
+let dispatch: any = noop;
+let getState: any = noop;
+let lastActiveOutdatedCalls: any = null;
 let hasAttachedListener = false;
 
 function handleBlockNumberChange(newBlockNumber: number) {
-  if (typeof newBlockNumber === "number" && newBlockNumber > blockNumber) {
-    blockNumber = newBlockNumber;
+  if (typeof newBlockNumber === "number") {
+    console.info("Received new block: ", newBlockNumber);
+
+    const state = getState();
+    const currentBlockNumber = selectors.selectBlockNumber(state);
+
+    if (newBlockNumber > currentBlockNumber) {
+      console.info("New block number is different, changing.");
+
+      dispatch(actions.blockNumberChanged(newBlockNumber));
+      debouncedHandleBatchUpdate();
+    }
   }
 }
+
+const debouncedHandleBlockNumberChange = debounce(handleBlockNumberChange, 100);
 
 function normalizeCallBatch(outdatedCallKeys: string[]) {
   return outdatedCallKeys.reduce(
@@ -115,79 +131,92 @@ function normalizeCallBatch(outdatedCallKeys: string[]) {
   );
 }
 
-function handleBatchUpdate(dispatch: any, getState: any) {
+function handleBatchUpdate() {
   const state = getState() as AppState;
   const activeOutdatedCalls = selectors.selectActiveOutdatedCalls(state);
 
-  if (provider) {
-    if (!hasAttachedListener) {
-      // Manually request the first block number.
-      provider
-        .getBlockNumber()
-        .then(handleBlockNumberChange)
-        .catch((error) =>
-          debugConsole.error(`Failed to get block number`, error)
-        );
+  console.info("Handling batch update!");
 
-      // Then, get automatic updates later.
-      provider.on("block", handleBlockNumberChange);
+  if (!isEqual(activeOutdatedCalls, lastActiveOutdatedCalls)) {
+    console.info("Different calls, lets send em off.");
 
-      // This only runs once.
-      hasAttachedListener = true;
-    }
+    lastActiveOutdatedCalls = activeOutdatedCalls;
 
-    const { callers, onChainCalls, offChainCalls } = activeOutdatedCalls;
-
-    if ([onChainCalls, offChainCalls].some(({ length }) => length > 0)) {
-      debugConsole.log(
-        `Preparing to execute ${onChainCalls.length} on-chain calls and ${offChainCalls.length} off-chain calls`
-      );
-
-      // On-Chain
-      const normalizedOnChainCalls = normalizeCallBatch(onChainCalls);
-
-      dispatch(
-        fetchMulticallData({
-          provider,
-          arg: { onChainCalls: normalizedOnChainCalls, callers },
-        })
-      );
-
-      // Off-Chain
-      dispatch(actions.fetchingOffChainCalls(offChainCalls));
-
-      for (const call of offChainCalls) {
-        const [fn, args] = call.split("/");
-        const request = {
-          fetchInitialData,
-          fetchIndexPoolTransactions,
-          fetchIndexPoolUpdates,
-          fetchTokenPriceData,
-        }[fn] as any;
-
-        if (request) {
-          dispatch(
-            request({
-              provider,
-              arg: [...args.split("_")],
-            })
+    if (provider) {
+      if (!hasAttachedListener) {
+        // Manually request the first block number.
+        provider
+          .getBlockNumber()
+          .then(debouncedHandleBlockNumberChange)
+          .catch((error) =>
+            debugConsole.error(`Failed to get block number`, error)
           );
-        }
+
+        // Then, get automatic updates later.
+        provider.on("block", debouncedHandleBlockNumberChange);
+
+        // This only runs once.
+        hasAttachedListener = true;
       }
 
-      // Done.
-      debugConsole.log(
-        `Did execute ${onChainCalls.length} on-chain calls and ${offChainCalls.length} off-chain calls`
-      );
+      // Now, fire any calls that were registered in between blocks.
+      const { callers, onChainCalls, offChainCalls } = activeOutdatedCalls;
+
+      if ([onChainCalls, offChainCalls].some(({ length }) => length > 0)) {
+        debugConsole.log(
+          `Preparing to execute ${onChainCalls.length} on-chain calls and ${offChainCalls.length} off-chain calls`
+        );
+
+        // On-Chain
+        const normalizedOnChainCalls = normalizeCallBatch(onChainCalls);
+
+        dispatch(
+          fetchMulticallData({
+            provider,
+            arg: { onChainCalls: normalizedOnChainCalls, callers },
+          })
+        );
+
+        // Off-Chain
+        dispatch(actions.fetchingOffChainCalls(offChainCalls));
+
+        for (const call of offChainCalls) {
+          const [fn, args] = call.split("/");
+          const request = {
+            fetchInitialData,
+            fetchIndexPoolTransactions,
+            fetchIndexPoolUpdates,
+            fetchTokenPriceData,
+          }[fn] as any;
+
+          if (request) {
+            dispatch(
+              request({
+                provider,
+                arg: [...args.split("_")],
+              })
+            );
+          }
+        }
+
+        // Done.
+        debugConsole.log(
+          `Did execute ${onChainCalls.length} on-chain calls and ${offChainCalls.length} off-chain calls`
+        );
+      }
     }
   }
 }
 
 const debouncedHandleBatchUpdate = debounce(handleBatchUpdate, 100);
 
-export function batchMiddleware({ dispatch, getState }: any) {
+export function batchMiddleware(storeApi: any) {
   return (next: any) => (action: any) => {
-    debouncedHandleBatchUpdate(dispatch, getState);
+    dispatch = storeApi.dispatch;
+    getState = storeApi.getState;
+
+    debouncedHandleBatchUpdate();
+
     return next(action);
   };
 }

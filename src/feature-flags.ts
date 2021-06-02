@@ -14,7 +14,7 @@ export const FEATURE_FLAGS = {
   useHomepageSteps: false,
   useActionLogging: process.env.IS_SERVER === "true",
   useEnglishLogging: true,
-  useDEBUG: false,
+  useDEBUG: process.env.NODE_ENV === "development",
   useServerConnection: true,
   useMolassesMode: false,
 };
