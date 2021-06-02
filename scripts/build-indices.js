@@ -2,11 +2,22 @@ const fs = require("fs");
 const path = require("path");
 
 const sourceDirectory = path.join(__dirname, "../src");
+const ignoreDirs =   [
+  "images",
+  "i18n",
+  "theme",
+  "theme/fonts",
+  "theme/images",
+  "sockets",
+  "sockets/server",
+  "ethereum/abi"
+].map((dir) => path.join(sourceDirectory, dir));
 const isSpecFile = (file) => file.includes("spec");
 const isTypescriptFile = (file) => path.extname(file).includes("ts");
 const isIndexFile = (file) => path.parse(file).name === "index";
 const isValidFile = (file) =>
   isTypescriptFile(file) && ![isSpecFile, isIndexFile].some((fn) => fn(file));
+const shouldBuildIndex = (_path) => !ignoreDirs.includes(_path);
 const isBadExport = (_export) =>
   ["export * from './translations';", "export * from './local-data';"].includes(
     _export
@@ -29,7 +40,7 @@ const createIndex = (directory) => {
           prev.push(exportStatement);
         }
 
-        if (isDirectory) {
+        if (isDirectory && shouldBuildIndex(fullPath)) {
           createIndex(fullPath);
         }
 
@@ -44,24 +55,11 @@ const createIndex = (directory) => {
   directory !== sourceDirectory &&
     fs.writeFileSync(`${directory}/index.ts`, indexFileEntries.join("\n"));
 };
-const removeBadIndices = () =>
-  [
-    "images",
-    "i18n",
-    "theme",
-    "theme/fonts",
-    "theme/images",
-    "sockets",
-    "sockets/server",
-  ].forEach((illegalPath) =>
-    fs.unlinkSync(path.join(sourceDirectory, `${illegalPath}/index.ts`))
-  );
 
 try {
   console.info(`Creating index files for ${sourceDirectory}...`);
 
   createIndex(sourceDirectory);
-  removeBadIndices();
 
   console.info(`All done.`);
 } catch (error) {
