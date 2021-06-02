@@ -80,14 +80,10 @@ let hasAttachedListener = false;
 
 function handleBlockNumberChange(newBlockNumber: number) {
   if (typeof newBlockNumber === "number") {
-    console.info("Received new block: ", newBlockNumber);
-
     const state = getState();
     const currentBlockNumber = selectors.selectBlockNumber(state);
 
     if (newBlockNumber > currentBlockNumber) {
-      console.info("New block number is different, changing.");
-
       dispatch(actions.blockNumberChanged(newBlockNumber));
       debouncedHandleBatchUpdate();
     }
@@ -135,11 +131,7 @@ function handleBatchUpdate() {
   const state = getState() as AppState;
   const activeOutdatedCalls = selectors.selectActiveOutdatedCalls(state);
 
-  console.info("Handling batch update!");
-
   if (!isEqual(activeOutdatedCalls, lastActiveOutdatedCalls)) {
-    console.info("Different calls, lets send em off.");
-
     lastActiveOutdatedCalls = activeOutdatedCalls;
 
     if (provider) {

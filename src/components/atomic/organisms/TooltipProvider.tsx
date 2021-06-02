@@ -26,7 +26,9 @@ export function TooltipProvider({ children }: { children: ReactNode }) {
     );
 
     for (const tooltip of withTooltips) {
-      // console.log(tooltip);
+      if (tooltip) {
+        // Pass
+      }
     }
   }, []);
   const value = useMemo(
