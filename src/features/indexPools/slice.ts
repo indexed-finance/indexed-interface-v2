@@ -49,6 +49,8 @@ const slice = createSlice({
                 tokenEntry.usedDenorm = token.usedDenorm;
                 tokenEntry.usedWeight = token.usedWeight;
               }
+            } else {
+              console.log({ entry, results });
             }
           }
         }

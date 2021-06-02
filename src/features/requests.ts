@@ -1,8 +1,8 @@
-import * as batcherRequests from './batcher/requests';
-import * as indexPoolsRequests from './indexPools/requests';
-import * as newStakingRequests from './newStaking/requests';
-import * as stakingRequests from './staking/requests';
-import * as tokensRequests from './tokens/requests';
+import * as batcherRequests from "./batcher/requests";
+import * as indexPoolsRequests from "./indexPools/requests";
+import * as newStakingRequests from "./newStaking/requests";
+import * as stakingRequests from "./staking/requests";
+import * as tokensRequests from "./tokens/requests";
 import { MIN_WEIGHT } from "ethereum";
 import { NDX_ADDRESS, WETH_CONTRACT_ADDRESS } from "config";
 import { createAsyncThunk } from "@reduxjs/toolkit";
@@ -177,7 +177,7 @@ export function normalizeInitialData(categories: Category[]) {
           prev.dailySnapshots.ids.push(snapshot.id);
           prev.dailySnapshots.entities[snapshot.id] = {
             ...snapshot,
-            value: parseFloat(snapshot.value)
+            value: parseFloat(snapshot.value),
           };
         }
 
@@ -304,5 +304,5 @@ export const requests = {
   ...stakingRequests,
   ...newStakingRequests,
   ...tokensRequests,
-  fetchInitialData
-}
+  fetchInitialData,
+};
