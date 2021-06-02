@@ -100,7 +100,7 @@ function handleConnection(client: WebSocket, incoming: IncomingMessage) {
 
     clientToIpLookup.set(client, ip);
 
-    // // Prune previous clients with the same IP.
+    // Prune previous clients with the same IP.
     for (const connection of connections) {
       const connectionIp = clientToIpLookup.get(connection);
 
@@ -158,7 +158,9 @@ function continuouslyCheckForInactivity() {
 
       try {
         if (connection.readyState === connection.OPEN) {
+          log(`Checking for inactivity for ${connection.url}`);
           await ping();
+          log("All good.");
         }
       } catch (error) {
         log(

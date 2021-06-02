@@ -16,4 +16,5 @@ export * from './StakingWidgetNew';
 export * from './TokenSelector';
 export * from './TooltipProvider';
 export * from './TransactionList';
+export * from './Updater';
 export * from './Widget';

@@ -65,7 +65,7 @@ export const thunks = {
    */
   initialize:
     (options: InitialzeOptions): AppThunk =>
-    async (dispatch, getState) => {
+    async (dispatch) => {
       let selectedAddress = "";
 
       provider = options.provider;

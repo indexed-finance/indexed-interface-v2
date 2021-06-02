@@ -2,21 +2,25 @@ import { AppState } from "features/store";
 import { RegisteredCall, deserializeOnChainCall } from "helpers";
 import { actions, useProvider } from "features";
 import { debugConsole } from "helpers/logger";
-import { fetchIndexPoolTransactions, fetchIndexPoolUpdates } from "./indexPools";
-import { fetchInitialData } from "./requests";
-import { fetchMulticallData } from "./batcher/requests";
-import { fetchTokenPriceData } from "./tokens";
-import { selectors } from "./selectors";
+
+import {
+  fetchIndexPoolTransactions,
+  fetchIndexPoolUpdates,
+  fetchInitialData,
+  fetchMulticallData,
+  fetchTokenPriceData,
+  selectors,
+} from "features";
 import { useCachedValue, useDebounce } from "hooks/use-debounce";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 export function activeListeningKeys(
-  listeners: AppState['batcher']['listenerCounts'],
+  listeners: AppState["batcher"]["listenerCounts"]
 ): string[] {
   if (!listeners) return [];
 
-  return Object.keys(listeners).filter((callKey) => listeners[callKey] > 0)
+  return Object.keys(listeners).filter((callKey) => listeners[callKey] > 0);
 }
 
 function normalizeCallBatch(outdatedCallKeys: string[]) {
@@ -56,24 +60,25 @@ function normalizeCallBatch(outdatedCallKeys: string[]) {
 
 export function BatchUpdater() {
   const dispatch = useDispatch();
-  const [provider,] = useProvider();
-  const activeOutdatedCalls = useSelector((state: AppState) => selectors.selectActiveOutdatedCalls(state));
+  const [provider] = useProvider();
+  const activeOutdatedCalls = useSelector((state: AppState) =>
+    selectors.selectActiveOutdatedCalls(state)
+  );
   const debouncedCalls = useCachedValue(activeOutdatedCalls);
 
   const [blockNumber, setBlockNumber] = useState<number | null>(null);
   const debouncedBlockNumber = useDebounce(blockNumber, 100);
   const blockNumberCallback = useCallback(
     (newBlockNumber: number) => {
-      if (typeof newBlockNumber !== 'number') {
+      if (typeof newBlockNumber !== "number") {
       } else if (newBlockNumber && newBlockNumber > (blockNumber || 0)) {
-        setBlockNumber(newBlockNumber)
+        setBlockNumber(newBlockNumber);
       }
     },
     [blockNumber, setBlockNumber]
   );
 
   useEffect(() => {
-    
     if (!provider) {
       return undefined;
     }
@@ -81,40 +86,39 @@ export function BatchUpdater() {
     provider
       .getBlockNumber()
       .then((n) => blockNumberCallback(n))
-      .catch(error => debugConsole.error(`Failed to get block number`, error))
+      .catch((error) =>
+        debugConsole.error(`Failed to get block number`, error)
+      );
 
-    provider.on('block', (n: number) => blockNumberCallback(n))
+    provider.on("block", (n: number) => blockNumberCallback(n));
     return () => {
-      if (provider) provider.removeListener('block', blockNumberCallback)
-    }
-  }, [dispatch, provider, blockNumberCallback, provider?.network?.name])
+      if (provider) provider.removeListener("block", blockNumberCallback);
+    };
+  }, [dispatch, provider, blockNumberCallback, provider?.network?.name]);
 
   useEffect(() => {
-    if (!debouncedBlockNumber) return
-    dispatch(actions.blockNumberChanged(debouncedBlockNumber))
+    if (!debouncedBlockNumber) return;
+    dispatch(actions.blockNumberChanged(debouncedBlockNumber));
   }, [debouncedBlockNumber, dispatch]);
 
   useEffect(() => {
     if (!provider) return undefined;
-    const {
-      callers,
-      onChainCalls,
-      offChainCalls
-    } = debouncedCalls;
-    if (
-      onChainCalls.length === 0 &&
-      offChainCalls.length === 0
-    ) {
+    const { callers, onChainCalls, offChainCalls } = debouncedCalls;
+    if (onChainCalls.length === 0 && offChainCalls.length === 0) {
       return;
     }
-    debugConsole.log(`Preparing to execute ${onChainCalls.length} on-chain calls and ${offChainCalls.length} off-chain calls`)
+    debugConsole.log(
+      `Preparing to execute ${onChainCalls.length} on-chain calls and ${offChainCalls.length} off-chain calls`
+    );
     dispatch(actions.fetchingOffChainCalls(offChainCalls));
 
     const _batch = normalizeCallBatch(onChainCalls);
-    dispatch(fetchMulticallData({
-      provider,
-      arg: { onChainCalls: _batch, callers }
-    }))
+    dispatch(
+      fetchMulticallData({
+        provider,
+        arg: { onChainCalls: _batch, callers },
+      })
+    );
     for (const call of offChainCalls) {
       const [fn, args] = call.split("/");
       const request = {
@@ -133,8 +137,10 @@ export function BatchUpdater() {
         );
       }
     }
-    debugConsole.log(`Did execute ${onChainCalls.length} on-chain calls and ${offChainCalls.length} off-chain calls`)
+    debugConsole.log(
+      `Did execute ${onChainCalls.length} on-chain calls and ${offChainCalls.length} off-chain calls`
+    );
   }, [dispatch, debouncedCalls, provider]);
-  
+
   return null;
 }

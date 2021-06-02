@@ -1,7 +1,6 @@
 // This file was generated via a script in `scripts/`.
 // Do not manually modify this (or any) index files.
 
-export * from './Updater';
 export * from './actions';
 export * from './batcher';
 export * from './categories';

@@ -67,7 +67,12 @@ export default function Splash() {
             )}
           </Button.Group>
         </Typography.Title>
-        <video autoPlay={true} width="100%" style={{ marginTop: 24 }}>
+        <video
+          autoPlay={true}
+          width="100%"
+          style={{ marginTop: 24 }}
+          loop={true}
+        >
           <source src="/splash.mp4" type="video/mp4"></source>
         </video>
       </div>
