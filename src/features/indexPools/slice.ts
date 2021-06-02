@@ -34,6 +34,10 @@ const slice = createSlice({
           )) {
             const entry = state.entities[poolAddress];
 
+            console.log("-----", "\n\n\n");
+            console.log("Pool: Multicall:", poolAddress, results);
+            console.log("-----", "\n\n\n");
+
             if (entry && results && Object.entries(results).length > 0) {
               entry.swapFee = results.swapFee;
               entry.totalDenorm = results.totalDenorm;
@@ -49,8 +53,6 @@ const slice = createSlice({
                 tokenEntry.usedDenorm = token.usedDenorm;
                 tokenEntry.usedWeight = token.usedWeight;
               }
-            } else {
-              console.log({ entry, results });
             }
           }
         }
