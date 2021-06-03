@@ -51,11 +51,7 @@ export function StakingWidgetNew(props: FormattedNewStakingData) {
                 />
               </Col>
             </Row>
-            <Statistic
-              title={tx("APY")}
-              value={apy ?? ""}
-              valueRender={(value) => <div className="colorful">{value}</div>}
-            />
+            <Statistic title={tx("APY")} value={apy ?? ""} />
             <Statistic title={tx("RATE")} value={props.rewardsPerDay} />
           </Space>
         }
