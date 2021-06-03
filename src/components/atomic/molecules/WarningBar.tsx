@@ -35,9 +35,11 @@ export function WarningBar() {
             Legacy site
           </ExternalLink>
           <Button.Group>
-            <Button type="default" danger={true} style={{ marginRight: 24 }}>
-              Report an issue
-            </Button>
+            <a href="mailto://contact@indexed.finance">
+              <Button type="default" danger={true} style={{ marginRight: 24 }}>
+                Report an issue
+              </Button>
+            </a>
           </Button.Group>
         </Space>
       }
