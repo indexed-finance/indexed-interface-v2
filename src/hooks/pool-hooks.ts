@@ -1,4 +1,4 @@
-import { AppState, FormattedIndexPool, selectors } from "features";
+import { AppState, FormattedIndexPool, POOL_CALLER, selectors } from "features";
 import { useCallRegistrar } from "./use-call-registrar";
 import { useMemo } from "react";
 import { useSelector } from "react-redux";
@@ -129,7 +129,7 @@ export function usePoolDetailRegistrar(
   poolAddress: string,
   tokenIds: string[]
 ) {
-  const caller = "Pool Detail";
+  const caller = POOL_CALLER;
   const { onChainCalls, offChainCalls } = useMemo(
     () =>
       poolAddress
