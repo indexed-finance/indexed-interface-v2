@@ -1,4 +1,4 @@
-import { Button, Divider, Typography } from "antd";
+import { Button, Divider, Statistic, Typography } from "antd";
 import { ExternalLink, IndexPoolWidgetGroup, Page } from "components/atomic";
 import { FEATURE_FLAGS } from "feature-flags";
 import { Link } from "react-router-dom";
@@ -9,6 +9,9 @@ import { useSelector } from "react-redux";
 export default function Splash() {
   const tx = useTranslator();
   const poolsExist = useSelector(selectors.selectPoolCount) > 0;
+  const assetsUnderManagement = useSelector(
+    selectors.selectTotalAssetsUnderManagement
+  );
   const { isMobile } = useBreakpoints();
   const docsButton = (
     <Button
@@ -40,8 +43,13 @@ export default function Splash() {
         <Typography.Title level={2}>
           {tx("PASSIVELY_MANAGED_...")}
         </Typography.Title>
+        <Statistic
+          className="prominent-stat"
+          title="Total Protocol Assets Under Management "
+          value={assetsUnderManagement}
+        />
         <Typography.Title level={3}>
-          <div style={{ marginBottom: 25 }}>{tx("GET_STARTED_TODAY")}</div>
+          <Divider>{tx("GET_STARTED_TODAY")}</Divider>
           <Button.Group style={{ flexDirection: isMobile ? "column" : "row" }}>
             <Link to="/index-pools">
               <Button

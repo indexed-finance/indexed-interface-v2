@@ -507,4 +507,13 @@ export const selectors = {
       (t) => t.from.toLowerCase() === user.toLowerCase()
     );
   },
+  selectTotalAssetsUnderManagement: (state: AppState) =>
+    convert.toCurrency(
+      selectors
+        .selectAllFormattedIndexPools(state)
+        .map((pool) =>
+          parseFloat(pool.totalValueLocked.replace(/\$/g, "").replace(/,/g, ""))
+        )
+        .reduce((prev, next) => prev + next, 0)
+    ),
 };

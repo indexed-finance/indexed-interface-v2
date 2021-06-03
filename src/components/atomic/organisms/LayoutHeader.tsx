@@ -1,7 +1,6 @@
 import { FaCaretDown, FaCaretUp } from "react-icons/fa";
 import {
   JazzIcon,
-  LanguageSelector,
   Logo,
   ModeSwitch,
   ServerConnection,
@@ -25,7 +24,6 @@ export function LayoutHeader() {
   );
   const userControls = (
     <>
-      <LanguageSelector />
       <ModeSwitch />
       <ServerConnection showText={true} />
     </>

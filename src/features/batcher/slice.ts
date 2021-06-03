@@ -8,8 +8,6 @@ import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { debugConsole } from "helpers/logger";
 import { fetchMulticallData } from "./requests";
 import { mirroredServerState, restartedDueToError } from "../actions";
-import { settingsActions } from "../settings";
-import { userActions } from "../user";
 import type { AppState } from "../store";
 
 const MAX_AGE_IN_BLOCKS = 4; // How old can data be in the cache?
@@ -77,7 +75,9 @@ const slice = createSlice({
 
       for (const callRegistration of values) {
         const { caller, onChainCalls, offChainCalls } = callRegistration;
-        debugConsole.log(`REGISTER :: ${caller} : Registering ${onChainCalls.length} on-chain calls for ${caller}`)
+        debugConsole.log(
+          `REGISTER :: ${caller} : Registering ${onChainCalls.length} on-chain calls for ${caller}`
+        );
 
         const existingEntry = state.callers[caller];
         const callerEntry = {
@@ -217,7 +217,7 @@ const slice = createSlice({
             state.fetching[call] = false;
           }
         }
-      )
+      ),
 });
 
 export const { actions: batcherActions, reducer: batcherReducer } = slice;
@@ -234,29 +234,29 @@ export const batcherSelectors = {
       offChainCalls,
       callers,
       listenerCounts,
-      fetching
+      fetching,
     } = state.batcher;
     function mergeOffChainCalls() {
       const { toMerge, toKeep } = offChainCalls
-      .filter(k => listenerCounts[k] > 0)
-      .reduce(
-        (prev, next) => {
-          const [call, args, canBeMerged] = next.split("/");
-          if (canBeMerged) {
-            if (!prev.toMerge[call]) {
-              prev.toMerge[call] = [];
+        .filter((k) => listenerCounts[k] > 0)
+        .reduce(
+          (prev, next) => {
+            const [call, args, canBeMerged] = next.split("/");
+            if (canBeMerged) {
+              if (!prev.toMerge[call]) {
+                prev.toMerge[call] = [];
+              }
+              prev.toMerge[call].push(args);
+            } else {
+              prev.toKeep.push(next);
             }
-            prev.toMerge[call].push(args);
-          } else {
-            prev.toKeep.push(next);
+            return prev;
+          },
+          {
+            toMerge: {} as Record<string, string[]>,
+            toKeep: [] as string[],
           }
-          return prev;
-        },
-        {
-          toMerge: {} as Record<string, string[]>,
-          toKeep: [] as string[],
-        }
-      );
+        );
       const merged = Object.entries(toMerge).map(
         ([key, value]) => `${key}/${value.join("_")}`
       );
@@ -269,11 +269,11 @@ export const batcherSelectors = {
     };
     return {
       callers,
-      onChainCalls: onChainCalls.filter(k => activeAndOutdated(k)),
+      onChainCalls: onChainCalls.filter((k) => activeAndOutdated(k)),
       offChainCalls: mergeOffChainCalls()
-        .filter(k => !fetching[k])
-        .filter(k => !cache[k] || cache[k].fromBlockNumber < blockNumber)
-    }
+        .filter((k) => !fetching[k])
+        .filter((k) => !cache[k] || cache[k].fromBlockNumber < blockNumber),
+    };
   },
   selectBatcherStatus(state: AppState) {
     const { status, onChainCalls, offChainCalls } = state.batcher;
@@ -288,7 +288,9 @@ export const batcherSelectors = {
     return Object.keys(state.batcher.cache).length;
   },
   selectFetchingCount(state: AppState) {
-    return Object.keys(state.batcher.fetching).filter(k => state.batcher.fetching[k]).length;
+    return Object.keys(state.batcher.fetching).filter(
+      (k) => state.batcher.fetching[k]
+    ).length;
   },
   selectCacheEntry(state: AppState, callId: string) {
     const { blockNumber, cache } = state.batcher;
