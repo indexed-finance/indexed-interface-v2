@@ -21,12 +21,24 @@ import { ethers } from "ethers";
 import { routes } from "routes";
 import { store } from "features";
 import { useBreakpoints, useWalletConnection } from "hooks";
+import ReactGA from "react-ga";
+
+const GOOGLE_ANALYTICS_TRACKING_CODE = "G-MHCR3CSH7C";
 
 export function getLibrary(_provider?: any, _connector?: any) {
   return new ethers.providers.Web3Provider(_provider);
 }
 
+// Effect:
+// Run Google Analytics when user loads the production site.
 export function App() {
+  useEffect(() => {
+    if (process.env.NODE_ENV === "production") {
+      ReactGA.initialize(GOOGLE_ANALYTICS_TRACKING_CODE);
+      ReactGA.pageview(window.location.pathname + window.location.search);
+    }
+  }, []);
+
   return (
     <BrowserRouter>
       <Provider store={store}>
