@@ -20,15 +20,16 @@ export function IndexPoolPerformance({
       }}
     >
       <Statistic
-        title={tx("TOTAL_VALUE_LOCKED")}
-        value={totalValueLocked}
+        title={tx("VOLUME")}
+        value={volume}
         style={{ flex: 1, textAlign: "center" }}
       />
       {!isMobile && separator}
       <Statistic
-        title={tx("VOLUME")}
-        value={volume}
+        title={tx("TOTAL_VALUE_LOCKED")}
+        value={totalValueLocked}
         style={{ flex: 1, textAlign: "center" }}
+        valueRender={(value) => <div className="colorful">{value}</div>}
       />
     </Space>
   );

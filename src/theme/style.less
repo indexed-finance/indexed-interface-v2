@@ -18,12 +18,20 @@
   letter-spacing: 0.2ch !important;
 }
 
+.colorful {
+  background: -webkit-linear-gradient(45deg, #03b6ff, #0ed155 80%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: jumping 4s ease-in-out forwards infinite;
+}
+
 @keyframes jumping {
   0% {
     transform: scale(1);
   }
   50% {
-    transform: scale(1.2);
+    transform: scale(1.1);
   }
   100% {
     transform: scale(1);
@@ -40,19 +48,16 @@
 
 .prominent-stat {
   .fancy;
+
   margin: 48px 0;
 
   .ant-statistic-title {
     font-size: 20px !important;
   }
   .ant-statistic-content {
+    .colorful;
+
     font-size: 36px !important;
-    text-transform: uppercase !important;
-    letter-spacing: 0.2ch !important;
-    background: -webkit-linear-gradient(45deg, #09009f, #00ff95 80%);
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
     animation: jumping 4s ease-in-out forwards infinite;
   }
 }
