@@ -10,7 +10,7 @@ export function PortfolioWidget(props: FormattedPortfolioAsset) {
   const isNdx = props.symbol === "NDX";
   const { isMobile } = useBreakpoints();
   const tokenIds = useSelector((state: AppState) =>
-    selectors.selectPoolTokenIds(state, props.address)
+    selectors.selectPoolTokenAddresses(state, props.address)
   );
   const fontSize = isMobile ? 16 : 20;
 

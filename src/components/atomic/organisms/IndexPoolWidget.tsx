@@ -22,7 +22,7 @@ export function IndexPoolWidgetGroup() {
 
 export function IndexPoolWidget(props: FormattedIndexPool) {
   const tokenIds = useSelector((state: AppState) =>
-    selectors.selectPoolTokenIds(state, props.id)
+    selectors.selectPoolTokenAddresses(state, props.id)
   );
   const { push } = useHistory();
 
