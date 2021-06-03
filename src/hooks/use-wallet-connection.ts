@@ -172,13 +172,13 @@ try {
   SUPPORTED_WALLETS[SupportedWallet.Injected].icon =
     require("images/injected.svg").default;
   SUPPORTED_WALLETS[SupportedWallet.MetaMask].icon =
-    require("images/metamask.png").default;
+    require("images/metamask_cyan.png").default;
   SUPPORTED_WALLETS[SupportedWallet.CoinbaseWallet].icon =
-    require("images/coinbase.svg").default;
+    require("images/coinbase_cyan.png").default;
   SUPPORTED_WALLETS[SupportedWallet.Fortmatic].icon =
-    require("images/fortmatic.png").default;
+    require("images/fortmatic_cyan.png").default;
   SUPPORTED_WALLETS[SupportedWallet.Portis].icon =
-    require("images/portis.png").default;
+    require("images/portis_cyan.png").default;
 } catch {
   console.info("Unable to import icons; probably because this is the server.");
 }

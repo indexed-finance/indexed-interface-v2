@@ -1,8 +1,9 @@
 import { AiOutlineUser } from "react-icons/ai";
-import { Button, Menu, Space, Typography } from "antd";
 import { ExternalLink } from "components/atomic";
-import { FaEthereum, FaGavel, FaSwimmingPool } from "react-icons/fa";
+import { FaGavel, FaSwimmingPool } from "react-icons/fa";
 import { Link, useLocation } from "react-router-dom";
+import { Menu, Space } from "antd";
+import { RiSafe2Line } from "react-icons/ri";
 import { useBreakpoints, useTranslator } from "hooks";
 import { useMemo } from "react";
 
@@ -52,7 +53,7 @@ export function Navigation() {
       <Menu.Item key="staking">
         <Link to="/staking">
           <Space>
-            <FaEthereum style={{ position: "relative", top: 2 }} />{" "}
+            <RiSafe2Line style={{ position: "relative", top: 2 }} />{" "}
             {!isMobile && <span>{tx("STAKE")}</span>}
           </Space>
         </Link>
@@ -61,90 +62,10 @@ export function Navigation() {
         <ExternalLink to="https://vote.indexed.finance/" withIcon={false}>
           <Space size="small">
             <FaGavel style={{ position: "relative", top: 2 }} />{" "}
-            {!isMobile && <span>Govern</span>}
+            {!isMobile && <span>Vote</span>}
           </Space>
         </ExternalLink>
       </Menu.Item>
     </Menu>
-  );
-
-  return (
-    <Space
-      style={{
-        justifyContent: "space-evenly",
-        width: "100%",
-        height: "100%",
-      }}
-    >
-      {[
-        {
-          key: "portfolio",
-          title: tx("PORTFOLIO"),
-          icon: <AiOutlineUser />,
-          path: "/portfolio",
-        },
-        {
-          key: "staking",
-          title: tx("STAKE"),
-          icon: <FaEthereum />,
-          path: "/staking",
-        },
-        {
-          key: "index-pools",
-          title: tx("INDEX_POOLS"),
-          icon: <FaSwimmingPool />,
-          path: "/index-pools",
-        },
-        {
-          key: "govern",
-          title: "GOVERN",
-          icon: <FaGavel />,
-          path: "",
-        },
-      ].map((link) => {
-        const isActive = pathname.includes(link.key);
-        const inner = (
-          <Typography.Title level={3}>
-            <Space
-              style={{
-                color: isActive ? "#FB1ECD" : "rgba(255,255,255,0.85)",
-              }}
-            >
-              <span style={{ position: "relative", top: 3 }}>{link.icon}</span>
-              <span>{link.title}</span>
-            </Space>
-          </Typography.Title>
-        );
-
-        return (
-          <Button
-            key={link.key}
-            size="large"
-            type="text"
-            style={{
-              textTransform: "uppercase",
-              padding: "6px 10px",
-              height: "auto",
-              borderLeft: isActive ? "2px solid #FB1ECD" : "none",
-            }}
-          >
-            {link.path.includes("://") ? (
-              <a
-                style={{ position: "relative", top: 4 }}
-                href={link.path}
-                rel="noopener noreferrer"
-                target="_blank"
-              >
-                {inner}
-              </a>
-            ) : (
-              <Link style={{ position: "relative", top: 4 }} to={link.path}>
-                {inner}
-              </Link>
-            )}
-          </Button>
-        );
-      })}
-    </Space>
   );
 }

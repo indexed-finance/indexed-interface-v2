@@ -19,7 +19,7 @@ export function DEBUG() {
   const blockNumber = useSelector(selectors.selectBlockNumber);
   const batcherStatus = useSelector(selectors.selectBatcherStatus);
   const cacheSize = useSelector(selectors.selectCacheSize);
-  const fetchingCount = useSelector(selectors.selectFetchingCount)
+  const fetchingCount = useSelector(selectors.selectFetchingCount);
   const initialBlockNumber = useRef(blockNumber);
 
   // Effect:
@@ -41,6 +41,7 @@ export function DEBUG() {
         background: "rgba(0,0,0,0.8)",
         color: "#fafafa",
         padding: "1rem",
+        zIndex: 1000,
       }}
     >
       <div>

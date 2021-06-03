@@ -1,3 +1,6 @@
+Level 1000
+    * DEBUG
+
 Level 100
     * BackTop
     * Drawer

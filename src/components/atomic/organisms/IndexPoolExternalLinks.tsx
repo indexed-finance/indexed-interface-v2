@@ -2,22 +2,21 @@ import { Button, Card, Divider, Space } from "antd";
 import { ExternalLink } from "components/atomic";
 import { FormattedIndexPool } from "features";
 import { Fragment, useMemo } from "react";
-import { usePoolQuickswapLink, useTranslator } from "hooks";
-import type { TranslatedTerm } from "helpers";
+import { usePoolQuickswapLink } from "hooks";
 
 const USEFUL_LINKS: Array<{
-  text: TranslatedTerm;
+  text: string;
   image: string;
   makeLink(address: string): string;
 }> = [
   {
-    text: "VIEW_ON_ETHERSCAN",
+    text: "View on Etherscan",
     image: require("images/etherscan-link.png").default,
     makeLink: (address) =>
       `https://etherscan.io/address/${address.toLowerCase()}#code`,
   },
   {
-    text: "TRADE_WITH_UNISWAP",
+    text: "Buy on Uniswap",
     image: require("images/uniswap-link.png").default,
     makeLink: (address) =>
       `https://v2.uniswap.org/token/${address.toLowerCase()}`,
@@ -25,13 +24,12 @@ const USEFUL_LINKS: Array<{
 ];
 
 export function IndexPoolExternalLinks({ id }: FormattedIndexPool) {
-  const tx = useTranslator();
   const quickswapLink = usePoolQuickswapLink(id);
   const links = useMemo(
     () =>
       quickswapLink
         ? USEFUL_LINKS.concat({
-            text: "SWAP_WITH_QUICKSWAP",
+            text: "Buy on Quickswap",
             image: require("images/quickswap.png").default,
             makeLink: (_) => quickswapLink,
           })
@@ -69,7 +67,7 @@ export function IndexPoolExternalLinks({ id }: FormattedIndexPool) {
                     top: -2,
                   }}
                 />
-                <span style={{ flex: 1, fontSize: 16 }}>{tx(text)}</span>
+                <span style={{ flex: 1, fontSize: 16 }}>{text}</span>
               </Space>
             </ExternalLink>
           </Button>
