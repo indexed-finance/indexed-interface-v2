@@ -130,7 +130,7 @@ export const SUPPORTED_WALLETS = {
     connector: injected,
     name: "MetaMask",
     icon: "",
-    description: "Open using the MetaMask browser extension..",
+    description: "Open using the MetaMask extension.",
   },
   [SupportedWallet.CoinbaseWallet]: {
     kind: SupportedWallet.CoinbaseWallet,

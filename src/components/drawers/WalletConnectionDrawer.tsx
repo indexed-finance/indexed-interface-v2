@@ -1,12 +1,12 @@
 import { AbstractConnector } from "@web3-react/abstract-connector";
-import { Avatar, Menu, Space, Typography, notification } from "antd";
 import { BaseDrawer, useDrawer } from "./Drawer";
+import { Divider, Space, Typography, notification } from "antd";
+import { Fragment, useCallback, useEffect, useState } from "react";
 import { OVERLAY_READY, fortmatic } from "ethereum";
 import { UnsupportedChainIdError, useWeb3React } from "@web3-react/core";
 import { WalletConnectConnector } from "@web3-react/walletconnect-connector";
 import { actions } from "features";
 import { ethers } from "ethers";
-import { useCallback, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { usePrevious, useWalletOptions } from "hooks";
 import { useTranslator } from "hooks";
@@ -100,31 +100,48 @@ export function WalletConnectionDrawer() {
 
   return (
     <BaseDrawer title={tx("CONNECT_YOUR_WALLET")} onClose={close}>
-      <Menu mode="inline">
-        {walletOptions.map((option) => (
-          <Menu.Item
-            key={option.name}
-            onClick={() => attemptActivation(option.connector)}
-          >
-            <Space style={{ justifyContent: "space-between", width: "100%" }}>
-              <div style={{ flex: 1 }}>
-                <Avatar
-                  shape="circle"
-                  src={option.icon}
-                  style={{ marginRight: 12 }}
-                />
-                <Typography.Text>{option.name}</Typography.Text>
+      <Space
+        direction="vertical"
+        style={{
+          width: "100%",
+          padding: 24,
+        }}
+      >
+        {walletOptions.map((option, index, array) => (
+          <Fragment key={option.name}>
+            <div
+              onClick={() => attemptActivation(option.connector)}
+              className="wallet-option"
+              style={{
+                height: 130,
+                position: "relative",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
+              <img
+                src={option.icon}
+                style={{
+                  flex: 1,
+                  width: 128,
+                  height: 128,
+                }}
+                alt={option.name}
+              />
+              <div style={{ textAlign: "right", flex: 2 }}>
+                <Typography.Title className="fancy" level={3}>
+                  {option.name}
+                </Typography.Title>
+                <Typography.Text type="secondary">
+                  {option.description}
+                </Typography.Text>
               </div>
-              <Typography.Text
-                type="secondary"
-                style={{ flex: 1, textAlign: "right" }}
-              >
-                {option.description}
-              </Typography.Text>
-            </Space>
-          </Menu.Item>
+            </div>
+            {index !== array.length - 1 && <Divider />}
+          </Fragment>
         ))}
-      </Menu>
+      </Space>
     </BaseDrawer>
   );
 }
