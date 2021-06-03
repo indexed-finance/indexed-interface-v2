@@ -190,6 +190,7 @@ export function useMintRouterCallbacks(poolId: string) {
   } = useUniswapTradingPairs(tokenIds);
   const getBestMintRouteForAmountOut = useCallback(
     (tokenInSymbol: string, typedPoolAmountOut: string) => {
+      if (loading) return null;
       const normalizedInput = tokenLookupBySymbol[tokenInSymbol.toLowerCase()];
       const allResults = poolTokens
         .map((token) => {
@@ -239,6 +240,7 @@ export function useMintRouterCallbacks(poolId: string) {
       return bestResult;
     },
     [
+      loading,
       tokenLookupBySymbol,
       poolTokens,
       calculateAmountIn,
@@ -247,6 +249,7 @@ export function useMintRouterCallbacks(poolId: string) {
   );
   const getBestMintRouteForAmountIn = useCallback(
     (tokenInSymbol: string, typedTokenAmountIn: string) => {
+      if (loading) return null;
       const normalizedInput = tokenLookupBySymbol[tokenInSymbol.toLowerCase()];
       const exactAmountIn = convert
         .toToken(typedTokenAmountIn, normalizedInput.decimals)
@@ -299,6 +302,7 @@ export function useMintRouterCallbacks(poolId: string) {
       return bestResult;
     },
     [
+      loading,
       tokenLookupBySymbol,
       poolTokens,
       calculateAmountOut,

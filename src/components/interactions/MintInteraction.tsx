@@ -192,6 +192,8 @@ function UniswapMintInteraction({ indexPool }: Props) {
               )
             );
           }
+        } else {
+          values.toAmount = 0;
         }
       } else {
         if (!toAmount || isNaN(toAmount) || toAmount < 0) {
@@ -221,6 +223,8 @@ function UniswapMintInteraction({ indexPool }: Props) {
               )
             );
           }
+        } else {
+          values.fromAmount = 0;
         }
       }
     },

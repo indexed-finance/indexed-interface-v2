@@ -131,26 +131,28 @@ function handleBatchUpdate() {
   const state = getState() as AppState;
   const activeOutdatedCalls = selectors.selectActiveOutdatedCalls(state);
 
+  if (provider) {
+    if (!hasAttachedListener) {
+      // Manually request the first block number.
+      provider
+        .getBlockNumber()
+        .then(debouncedHandleBlockNumberChange)
+        .catch((error) =>
+          debugConsole.error(`Failed to get block number`, error)
+        );
+
+      // Then, get automatic updates later.
+      provider.on("block", debouncedHandleBlockNumberChange);
+
+      // This only runs once.
+      hasAttachedListener = true;
+    }
+  }
+
   if (!isEqual(activeOutdatedCalls, lastActiveOutdatedCalls)) {
     lastActiveOutdatedCalls = activeOutdatedCalls;
 
     if (provider) {
-      if (!hasAttachedListener) {
-        // Manually request the first block number.
-        provider
-          .getBlockNumber()
-          .then(debouncedHandleBlockNumberChange)
-          .catch((error) =>
-            debugConsole.error(`Failed to get block number`, error)
-          );
-
-        // Then, get automatic updates later.
-        provider.on("block", debouncedHandleBlockNumberChange);
-
-        // This only runs once.
-        hasAttachedListener = true;
-      }
-
       // Now, fire any calls that were registered in between blocks.
       const { callers, onChainCalls, offChainCalls } = activeOutdatedCalls;
 
@@ -158,6 +160,9 @@ function handleBatchUpdate() {
         debugConsole.log(
           `Preparing to execute ${onChainCalls.length} on-chain calls and ${offChainCalls.length} off-chain calls`
         );
+
+        // Off-Chain
+        dispatch(actions.fetchingOffChainCalls(offChainCalls));
 
         // On-Chain
         const normalizedOnChainCalls = normalizeCallBatch(onChainCalls);
@@ -168,9 +173,6 @@ function handleBatchUpdate() {
             arg: { onChainCalls: normalizedOnChainCalls, callers },
           })
         );
-
-        // Off-Chain
-        dispatch(actions.fetchingOffChainCalls(offChainCalls));
 
         for (const call of offChainCalls) {
           const [fn, args] = call.split("/");

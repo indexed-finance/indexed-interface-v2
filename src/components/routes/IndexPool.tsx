@@ -24,7 +24,7 @@ import { useSelector } from "react-redux";
 function LoadedIndexPool(props: FormattedIndexPool) {
   const { isMobile } = useBreakpoints();
   const tokenIds = useSelector((state: AppState) =>
-    selectors.selectPoolTokenIds(state, props.id)
+    selectors.selectPoolTokenAddresses(state, props.id)
   );
 
   usePoolDetailRegistrar(props.id, tokenIds);

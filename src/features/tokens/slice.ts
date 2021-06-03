@@ -99,7 +99,27 @@ const slice = createSlice({
           }
         }
       })
-      .addCase(mirroredServerState, (_, action) => action.payload.tokens)
+      .addCase(mirroredServerState, (state, action) => {
+        // action.payload.tokens
+        for (const id of action.payload.tokens.ids) {
+          const token: NormalizedToken = action.payload.tokens.entities[id];
+          const entry = state.entities[id.toLowerCase()];
+          if (entry) {
+            if (token.priceData) {
+              entry.priceData = {
+                ...(entry.priceData || {}),
+                ...token.priceData
+              }
+            }
+            
+            if (token.totalSupply) {
+              entry.totalSupply = token.totalSupply;
+            }
+          } else {
+            tokensAdapter.addOne(state, token);
+          }
+        }
+      })
       .addCase(restartedDueToError, () => tokensAdapter.getInitialState()),
 });
 

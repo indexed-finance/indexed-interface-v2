@@ -62,7 +62,7 @@ export function useTokenApproval({
     )
   );
   const approve = useCallback(() => {
-    if (contract && spender && status !== "approval needed") {
+    if (contract && spender && status === "approval needed") {
       const tx = contract.approve(
         spender,
         convert.toHex(convert.toBigNumber(rawAmount))

@@ -1,4 +1,4 @@
-import { BURN_ROUTER_ADDRESS, MINT_ROUTER_ADDRESS, MULTI_TOKEN_STAKING_ADDRESS, UNISWAP_ROUTER_ADDRESS } from "config";
+import { BURN_ROUTER_ADDRESS, MINT_ROUTER_ADDRESS, MULTICALL2_ADDRESS, MULTI_TOKEN_STAKING_ADDRESS, UNISWAP_ROUTER_ADDRESS } from "config";
 
 import { ContractTypeLookup, InterfaceKind, getContract } from "ethereum";
 
@@ -35,8 +35,8 @@ export function useIPoolInitializerContract(address: string) {
 	return useContractWithSigner(address, "IPoolInitializer");
 }
 
-export function useMultiCall2Contract(address: string) {
-	return useContractWithSigner(address, "MultiCall2");
+export function useMultiCall2Contract() {
+	return useContractWithSigner(MULTICALL2_ADDRESS, "MultiCall2");
 }
 
 export function useMultiTokenStakingContract() {

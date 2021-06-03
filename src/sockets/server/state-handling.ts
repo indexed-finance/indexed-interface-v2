@@ -1,12 +1,13 @@
 import { INFURA_ID } from "config";
-import { actions, requests, selectors, store } from "features";
 import {
+  TOKEN_PRICES_CALLER,
   buildUniswapPairs,
   createPairDataCalls,
   createPoolDetailCalls,
   createStakingCalls,
   createTotalSuppliesCalls,
 } from "hooks";
+import { actions, requests, selectors, store } from "features";
 import { createNewStakingCalls } from "hooks/new-staking-hooks";
 import { log } from "./helpers";
 import { providers } from "ethers";
@@ -58,14 +59,32 @@ function setupRegistrants() {
   const stakingPools = selectors.selectAllStakingPools(state);
   const newStakingPools = selectors.selectAllNewStakingPools(state);
   const newStakingMeta = selectors.selectNewStakingMeta(state);
-  const { pairDataCalls, poolDetailCalls, totalSuppliesCalls } =
+  const allTokens = selectors.selectAllTokens(state);
+  const allTokenIds = allTokens.map(t => t.id);
+  const pairs = buildUniswapPairs(allTokenIds);
+  dispatch(actions.uniswapPairsRegistered(pairs));
+  const pairDataCalls = {
+    caller: "Pair Data",
+    onChainCalls: createPairDataCalls(pairs),
+    offChainCalls: [],
+  };
+  const tokenPriceCalls = {
+    caller: TOKEN_PRICES_CALLER,
+    onChainCalls: [],
+    offChainCalls: [
+      {
+        target: "",
+        function: "fetchTokenPriceData",
+        args: allTokenIds,
+        canBeMerged: true,
+      },
+    ],
+  }
+  const { poolDetailCalls, totalSuppliesCalls } =
     indexPools.reduce(
       (prev, next) => {
         const { id } = next;
         const tokenIds = selectors.selectPoolTokenIds(state, id);
-        const pairs = buildUniswapPairs(tokenIds);
-        const pairDataCalls = createPairDataCalls(pairs);
-        prev.pairDataCalls.onChainCalls.push(...pairDataCalls);
 
         const poolDetailCalls = createPoolDetailCalls(id, tokenIds);
         prev.poolDetailCalls.onChainCalls.push(...poolDetailCalls.onChainCalls);
@@ -73,17 +92,12 @@ function setupRegistrants() {
           ...(poolDetailCalls.offChainCalls as RegisteredCall[])
         );
 
-        const totalSuppliesCalls = createTotalSuppliesCalls(tokenIds);
+        const totalSuppliesCalls = createTotalSuppliesCalls(allTokenIds);
         prev.totalSuppliesCalls.onChainCalls.push(...totalSuppliesCalls);
 
         return prev;
       },
-      {
-        pairDataCalls: {
-          caller: "Pair Data",
-          onChainCalls: [],
-          offChainCalls: [],
-        },
+    {
         poolDetailCalls: {
           caller: "Pool Data",
           onChainCalls: [],
@@ -95,7 +109,6 @@ function setupRegistrants() {
           offChainCalls: [],
         },
       } as {
-        pairDataCalls: RegisteredCaller;
         poolDetailCalls: RegisteredCaller;
         totalSuppliesCalls: RegisteredCaller;
       }
@@ -147,7 +160,8 @@ function setupRegistrants() {
       poolDetailCalls,
       totalSuppliesCalls,
       stakingCalls,
-      newStakingCalls
+      newStakingCalls,
+      tokenPriceCalls
     ])
   );
   dispatch(

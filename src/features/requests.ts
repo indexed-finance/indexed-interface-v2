@@ -5,8 +5,8 @@ import * as stakingRequests from "./staking/requests";
 import * as tokensRequests from "./tokens/requests";
 import { MIN_WEIGHT } from "ethereum";
 import { NDX_ADDRESS, WETH_CONTRACT_ADDRESS } from "config";
+import { convert, dedupe } from "helpers";
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { dedupe } from "helpers";
 import { ethers } from "ethers";
 import { getIndexedUrl, sendQuery } from "helpers";
 import type { Category, PoolUnderlyingToken, Token } from "indexed-types";
@@ -167,7 +167,7 @@ export function normalizeInitialData(categories: Category[]) {
       // Pool data.
       const categoryIndexPoolIds: string[] = [];
       for (const indexPool of category.indexPools) {
-        const { dailySnapshots, tokens } = indexPool;
+        const { dailySnapshots, tokens, totalSupply, totalWeight } = indexPool;
 
         categoryIndexPoolIds.push(indexPool.id);
 
@@ -227,9 +227,9 @@ export function normalizeInitialData(categories: Category[]) {
             swaps: [],
             trades: [],
           },
-          totalDenorm: "0",
-          totalSupply: "0",
-          swapFee: "0",
+          totalDenorm: totalWeight,
+          totalSupply,
+          swapFee: convert.toToken('0.025', 18).toString(10),
         };
 
         if (indexPool.initialized) {

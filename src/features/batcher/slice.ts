@@ -218,28 +218,6 @@ const slice = createSlice({
           }
         }
       )
-      // Losing connection.
-      .addMatcher(
-        (action) => [settingsActions.connectionLost.type].includes(action.type),
-        (state, action) => {
-          if (action.type === settingsActions.connectionLost.type) {
-            state.status = "idle";
-          }
-        }
-      )
-      // Resetting when connecting to server or disconnecting wallet.
-      .addMatcher(
-        (action) =>
-          [
-            userActions.userDisconnected.type,
-            settingsActions.connectionEstablished.type,
-          ].includes(action.type),
-        (state) => {
-          state.onChainCalls = [];
-          state.offChainCalls = [];
-          state.listenerCounts = {};
-        }
-      ),
 });
 
 export const { actions: batcherActions, reducer: batcherReducer } = slice;
