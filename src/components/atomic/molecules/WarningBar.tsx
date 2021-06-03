@@ -1,5 +1,5 @@
-import { Alert, Button, Space } from "antd";
-import { ExternalLink } from "../atoms";
+import { Alert, Space } from "antd";
+import { ExternalLink } from "components/atomic/atoms";
 import { useEffect, useState } from "react";
 
 const LOCAL_STORAGE_KEY = "WarningBar_01: Dismissed";
@@ -29,18 +29,13 @@ export function WarningBar() {
       type="info"
       onClose={() => setShowing(false)}
       message={
-        <Space>
-          Indexed 2.0 is finally out, but there may still be some bugs.{" "}
+        <Space style={{ width: "100%", justifyContent: "space-between" }}>
+          <div>
+            The new UI is finally out, but there may still be some bugs.{" "}
+          </div>
           <ExternalLink to="https://legacy.indexed.finance/">
             Legacy site
           </ExternalLink>
-          <Button.Group>
-            <a href="mailto://contact@indexed.finance">
-              <Button type="default" danger={true} style={{ marginRight: 24 }}>
-                Report an issue
-              </Button>
-            </a>
-          </Button.Group>
         </Space>
       }
     />

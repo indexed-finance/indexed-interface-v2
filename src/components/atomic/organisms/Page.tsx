@@ -1,5 +1,7 @@
-import { Card, PageHeader, Typography } from "antd";
+import { BugReportLink } from "components/atomic/atoms";
+import { Card, PageHeader, Space, Typography } from "antd";
 import { ReactNode } from "react";
+import { RiCopyrightLine } from "react-icons/ri";
 import { useBreakpoints } from "hooks";
 import { useHistory } from "react-router-dom";
 
@@ -32,6 +34,7 @@ export function Page({
         margin: isMobile ? "6rem auto 8rem auto" : "8rem auto 8rem auto",
         paddingBottom: "8rem",
         background: "#151515",
+        position: "relative",
       }}
     >
       <Card
@@ -103,6 +106,22 @@ export function Page({
           </div>
         )}
       </Card>
+      <Space
+        size="large"
+        style={{
+          position: "absolute",
+          bottom: 8,
+          right: 8,
+        }}
+      >
+        <div>
+          <RiCopyrightLine
+            style={{ position: "relative", top: 2, textTransform: "uppercase" }}
+          />{" "}
+          Indexed 2021
+        </div>
+        <BugReportLink />
+      </Space>
     </div>
   );
 }
