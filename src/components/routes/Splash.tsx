@@ -1,6 +1,5 @@
 import { Button, Divider, Statistic, Typography } from "antd";
 import { ExternalLink, IndexPoolWidgetGroup, Page } from "components/atomic";
-import { FEATURE_FLAGS } from "feature-flags";
 import { Link } from "react-router-dom";
 import { selectors } from "features";
 import { useBreakpoints, useTranslator } from "hooks";
@@ -13,26 +12,6 @@ export default function Splash() {
     selectors.selectTotalAssetsUnderManagement
   );
   const { isMobile } = useBreakpoints();
-  const docsButton = (
-    <Button
-      type="default"
-      style={{
-        fontSize: isMobile ? 16 : 24,
-        height: "auto",
-        textTransform: "uppercase",
-      }}
-    >
-      {tx("READ_THE_DOCUMENTATION")}
-    </Button>
-  );
-  const DocsButton = () =>
-    FEATURE_FLAGS.useInternalDocs ? (
-      <Link to="/docs">{docsButton}</Link>
-    ) : (
-      <ExternalLink to="https://docs.indexed.finance/" withIcon={false}>
-        {docsButton}
-      </ExternalLink>
-    );
 
   return (
     <Page hasPageHeader={false}>
@@ -41,7 +20,8 @@ export default function Splash() {
           {tx("DECENTRALIZED_INDEX_PROTOCOL")}
         </Typography.Title>
         <Typography.Title level={2}>
-          {tx("PASSIVELY_MANAGED_...")}
+          Gain exposure to passively-managed crypto index portfolios represented
+          by a single token.
         </Typography.Title>
         <Statistic
           className="prominent-stat"
@@ -65,14 +45,18 @@ export default function Splash() {
                 {tx("VIEW_INDEX_POOLS")}
               </Button>
             </Link>
-            <DocsButton />
-            {FEATURE_FLAGS.useFaqLink && (
-              <Link to="/faq">
-                <Button type="default" style={{ fontSize: 24 }}>
-                  {tx("FREQUENTLY_ASKED_QUESTIONS")}
-                </Button>
-              </Link>
-            )}
+            <ExternalLink to="https://docs.indexed.finance/" withIcon={false}>
+              <Button
+                type="default"
+                style={{
+                  fontSize: isMobile ? 16 : 24,
+                  height: "auto",
+                  textTransform: "uppercase",
+                }}
+              >
+                {tx("READ_THE_DOCUMENTATION")}
+              </Button>
+            </ExternalLink>
           </Button.Group>
         </Typography.Title>
         <video
