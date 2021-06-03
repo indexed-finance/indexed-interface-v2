@@ -1,5 +1,5 @@
 import { Alert, Space } from "antd";
-import { ExternalLink } from "components/atomic/atoms";
+import { LegacySiteLink } from "components/atomic/molecules";
 import { useEffect, useState } from "react";
 
 const LOCAL_STORAGE_KEY = "WarningBar_01: Dismissed";
@@ -33,9 +33,7 @@ export function WarningBar() {
           <div>
             The new UI is finally out, but there may still be some bugs.{" "}
           </div>
-          <ExternalLink to="https://legacy.indexed.finance/">
-            Legacy site
-          </ExternalLink>
+          <LegacySiteLink />
         </Space>
       }
     />

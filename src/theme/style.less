@@ -13,13 +13,29 @@
 }
 
 // -- Customs
+.fancy {
+  text-transform: uppercase !important;
+  letter-spacing: 0.2ch !important;
+}
+
+@keyframes jumping {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
 .prominent-stat {
+  .fancy;
   margin: 48px 0;
 
   .ant-statistic-title {
     font-size: 20px !important;
-    text-transform: uppercase !important;
-    letter-spacing: 0.2ch !important;
   }
   .ant-statistic-content {
     font-size: 36px !important;
@@ -29,6 +45,7 @@
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+    animation: jumping 4s ease-in-out forwards infinite;
   }
 }
 

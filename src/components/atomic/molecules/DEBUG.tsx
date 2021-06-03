@@ -2,7 +2,7 @@ import { Button, Space, Typography } from "antd";
 import { selectors } from "features";
 import { sendMockBadTransaction, sendMockGoodTransaction } from "mocks";
 import { useBreakpoints } from "hooks";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 
 export function DEBUG() {
@@ -21,6 +21,7 @@ export function DEBUG() {
   const cacheSize = useSelector(selectors.selectCacheSize);
   const fetchingCount = useSelector(selectors.selectFetchingCount);
   const initialBlockNumber = useRef(blockNumber);
+  const [show, setShow] = useState(true);
 
   // Effect:
   // Keep track of the block number from when the page was initially loaded.
@@ -30,7 +31,7 @@ export function DEBUG() {
     }
   }, [blockNumber]);
 
-  return (
+  return show ? (
     <Space
       align="start"
       size="large"
@@ -108,6 +109,19 @@ export function DEBUG() {
           </Button>
         </Space>
       </div>
+      <Button onClick={() => setShow(false)}>Hide DEBUG</Button>
     </Space>
+  ) : (
+    <Button
+      onClick={() => setShow(true)}
+      style={{
+        position: "fixed",
+        right: 0,
+        bottom: 0,
+        zIndex: 1000,
+      }}
+    >
+      Show DEBUG
+    </Button>
   );
 }

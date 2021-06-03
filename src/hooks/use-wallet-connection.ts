@@ -5,7 +5,7 @@ import { ethers } from "ethers";
 import { fortmatic, injected, portis } from "ethereum";
 import { isMobile } from "react-device-detect";
 import { selectors } from "features";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useWeb3React } from "@web3-react/core";
 import noop from "lodash.noop";
@@ -102,23 +102,11 @@ export function useEagerConnect() {
 }
 
 export function useWalletOptions() {
-  const { ethereum } = window as InjectedWindow;
-  const { isMetaMask = false } = ethereum ?? {};
   const relevantWallets = isMobile
     ? MOBILE_SUPPORTED_WALLETS
     : DESKTOP_SUPPORTED_WALLETS;
-  const options = useMemo(
-    () =>
-      relevantWallets.filter(({ name }) => {
-        const isMetaMaskMismatch = name === "MetaMask" && !isMetaMask;
-        const isInjectedMismatch = name === "Injected" && isMetaMask;
 
-        return !(isMetaMaskMismatch || isInjectedMismatch);
-      }),
-    [isMetaMask, relevantWallets]
-  );
-
-  return options;
+  return relevantWallets;
 }
 
 export enum SupportedWallet {
@@ -142,14 +130,14 @@ export const SUPPORTED_WALLETS = {
     connector: injected,
     name: "MetaMask",
     icon: "",
-    description: "Easy-to-use browser extension.",
+    description: "Open using the MetaMask browser extension..",
   },
   [SupportedWallet.CoinbaseWallet]: {
     kind: SupportedWallet.CoinbaseWallet,
     connector: null,
     name: "Open in Coinbase Wallet",
     icon: "",
-    description: "Open in Coinbase Wallet app.",
+    description: "Open in the Coinbase Wallet app.",
     link: "https://go.cb-w.com/mtUDhEZPy1",
   },
   [SupportedWallet.Fortmatic]: {

@@ -29,35 +29,39 @@ export default function Splash() {
           value={assetsUnderManagement}
         />
         <Typography.Title level={3}>
-          <Divider>{tx("GET_STARTED_TODAY")}</Divider>
-          <Button.Group style={{ flexDirection: isMobile ? "column" : "row" }}>
-            <Link to="/index-pools">
-              <Button
-                type="primary"
-                style={{
-                  textTransform: "uppercase",
-                  fontSize: isMobile ? 16 : 24,
-                  height: "auto",
-                  marginRight: isMobile ? 0 : 10,
-                  marginBottom: isMobile ? 10 : 0,
-                }}
-              >
-                {tx("VIEW_INDEX_POOLS")}
-              </Button>
-            </Link>
-            <ExternalLink to="https://docs.indexed.finance/" withIcon={false}>
-              <Button
-                type="default"
-                style={{
-                  fontSize: isMobile ? 16 : 24,
-                  height: "auto",
-                  textTransform: "uppercase",
-                }}
-              >
-                {tx("READ_THE_DOCUMENTATION")}
-              </Button>
-            </ExternalLink>
-          </Button.Group>
+          <div>
+            <Divider className="fancy">Dive in today</Divider>
+            <Button.Group
+              style={{ flexDirection: isMobile ? "column" : "row" }}
+            >
+              <Link to="/index-pools">
+                <Button
+                  type="primary"
+                  style={{
+                    textTransform: "uppercase",
+                    fontSize: isMobile ? 16 : 24,
+                    height: "auto",
+                    marginRight: isMobile ? 0 : 10,
+                    marginBottom: isMobile ? 10 : 0,
+                  }}
+                >
+                  Buy an index
+                </Button>
+              </Link>
+              <ExternalLink to="https://docs.indexed.finance/" withIcon={false}>
+                <Button
+                  type="default"
+                  style={{
+                    fontSize: isMobile ? 16 : 24,
+                    height: "auto",
+                    textTransform: "uppercase",
+                  }}
+                >
+                  Learn more
+                </Button>
+              </ExternalLink>
+            </Button.Group>
+          </div>
         </Typography.Title>
         <video
           autoPlay={true}

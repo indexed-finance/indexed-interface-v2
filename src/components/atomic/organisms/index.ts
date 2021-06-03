@@ -17,4 +17,5 @@ export * from './TokenSelector';
 export * from './TooltipProvider';
 export * from './TransactionList';
 export * from './Updater';
+export * from './WarningBar';
 export * from './Widget';

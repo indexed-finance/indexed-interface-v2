@@ -1,5 +1,6 @@
 import { BugReportLink } from "components/atomic/atoms";
-import { Card, PageHeader, Space, Typography } from "antd";
+import { Button, Card, PageHeader, Space, Typography } from "antd";
+import { LegacySiteLink } from "components/atomic/molecules";
 import { ReactNode } from "react";
 import { RiCopyrightLine } from "react-icons/ri";
 import { useBreakpoints } from "hooks";
@@ -120,7 +121,10 @@ export function Page({
           />{" "}
           Indexed 2021
         </div>
-        <BugReportLink />
+        <Button.Group>
+          <LegacySiteLink />
+          <BugReportLink />
+        </Button.Group>
       </Space>
     </div>
   );
