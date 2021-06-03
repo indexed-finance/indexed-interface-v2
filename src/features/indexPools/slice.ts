@@ -32,22 +32,23 @@ const slice = createSlice({
           for (const [poolAddress, results] of Object.entries(
             relevantMulticallData
           )) {
-            const entry = state.entities[poolAddress];
+            const entry = state.entities[poolAddress.toLowerCase()];
 
             if (entry && results && Object.entries(results).length > 0) {
-              entry.swapFee = results.swapFee;
-              entry.totalDenorm = results.totalDenorm;
-              entry.totalSupply = results.totalSupply;
+              if (results.swapFee) entry.swapFee = results.swapFee;
+              if (results.totalDenorm) entry.totalDenorm = results.totalDenorm;
+              if (results.totalSupply) entry.totalSupply = results.totalSupply;
 
               for (const token of results.tokens) {
-                const tokenEntry = entry.tokens.entities[token.address];
-
-                tokenEntry.balance = token.balance;
-                tokenEntry.denorm = token.denorm;
-                tokenEntry.minimumBalance = token.minimumBalance;
-                tokenEntry.usedBalance = token.usedBalance;
-                tokenEntry.usedDenorm = token.usedDenorm;
-                tokenEntry.usedWeight = token.usedWeight;
+                const tokenEntry = entry.tokens.entities[token.address.toLowerCase()];
+                if (tokenEntry) {
+                  if (token.balance) tokenEntry.balance = token.balance;
+                  if (token.denorm) tokenEntry.denorm = token.denorm;
+                  if (token.minimumBalance) tokenEntry.minimumBalance = token.minimumBalance;
+                  if (token.usedBalance) tokenEntry.usedBalance = token.usedBalance;
+                  if (token.usedDenorm) tokenEntry.usedDenorm = token.usedDenorm;
+                  if (token.usedWeight) tokenEntry.usedWeight = token.usedWeight;
+                }
               }
             }
           }
