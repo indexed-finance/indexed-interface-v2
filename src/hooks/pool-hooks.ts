@@ -50,7 +50,7 @@ export const usePoolQuickswapLink = (poolAddress: string) => {
   const quickswapToken = poolAddressToQuickswapToken[poolAddress];
 
   return quickswapToken
-    ? `https://info.quickswap.exchange/token/${quickswapToken}`
+    ? `https://quickswap.exchange/#/swap?outputCurrency=${quickswapToken}`
     : "";
 };
 

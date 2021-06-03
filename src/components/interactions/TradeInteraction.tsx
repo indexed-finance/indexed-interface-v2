@@ -125,12 +125,6 @@ export function TradeInteraction({ indexPool }: Props) {
         }
         if (trade) {
           handleTrade(trade);
-          /*     .then(() => {
-              // Display success notification and begin tracking transaction.
-            })
-            .catch(() => {
-              // Display error notification informing of failed transaction.
-            }); */
         }
       }
     },

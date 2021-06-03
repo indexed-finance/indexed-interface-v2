@@ -103,6 +103,9 @@ export function InteractionDrawer({
     }
   }, [activeInteraction]);
   const stakingApy = useStakingApy(indexPoolAddress);
+  const title = S(
+    activeInteraction === "trade" ? "buy" : activeInteraction
+  ).humanize().s;
 
   useEffect(() => {
     if (pathname !== previousLocation.current) {
@@ -159,7 +162,7 @@ export function InteractionDrawer({
                 justifyContent: "space-between",
               }}
             >
-              Trade
+              Buy
             </Menu.Item>
             <Menu.Divider />
             <Menu.SubMenu
@@ -310,7 +313,7 @@ export function InteractionDrawer({
             bodyStyle={{ overflow: "hidden" }}
             title={
               <Typography.Title level={3} style={{ margin: 0 }}>
-                {S(activeInteraction).humanize().s}
+                {title} {formattedIndexPool?.symbol}
               </Typography.Title>
             }
           >

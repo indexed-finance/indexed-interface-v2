@@ -14,7 +14,7 @@ export function useIndexPoolInteractions(indexPoolAddress: string) {
   return useMemo(() => {
     const baseInteractions = [
       {
-        title: "Trade",
+        title: "Buy",
         icon: <FaCoins />,
         onClick: () => open("trade"),
       },
@@ -61,7 +61,6 @@ export function IndexPoolInteractionBar({
       {!isMobile && (
         <>
           <Typography.Title level={4} type="secondary" style={{ margin: 0 }}>
-            Interact with{" "}
             <Token
               name={indexPool.name}
               address={indexPool.id}
