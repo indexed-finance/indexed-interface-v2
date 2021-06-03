@@ -49,7 +49,6 @@ const slice = createSlice({
             { exists, reserves0, reserves1 },
           ] of Object.entries(relevantMulticallData)) {
             const id = pairAddress.toLowerCase();
-
             if (!state.entities[id]) {
               state.ids.push(id);
               state.entities[id] = { id };
@@ -63,7 +62,30 @@ const slice = createSlice({
           }
         }
       })
-      .addCase(mirroredServerState, (_, action) => action.payload.pairs)
+      .addCase(mirroredServerState, (state, action) => {
+        for (const id of action.payload.pairs.ids) {
+          const pair: NormalizedPair = action.payload.pairs.entities[id];
+          const entry = state.entities[id.toLowerCase()];
+          if (pair.id !== pair.id.toLowerCase()) {
+            console.log(`Got non-lowercase pair from server`)
+          }
+          if (entry) {
+            if (pair.exists !== undefined) {
+              if (pair.exists && pair.reserves0 && pair.reserves1) {
+                entry.exists = true;
+                entry.reserves0 = pair.reserves0
+                entry.reserves1 = pair.reserves1
+              } else {
+                entry.exists = false;
+              }
+            }
+          } else {
+            pair.id = pair.id.toLowerCase();
+            adapter.addOne(state, pair);
+          }
+        }
+        // return action.payload.pairs
+      })
       .addCase(restartedDueToError, () => adapter.getInitialState()),
 });
 
@@ -144,7 +166,7 @@ const pairMulticallDataParser = createMulticallDataParser(
           if (pair.result) {
             const [reserves0, reserves1] = pair.result;
             const exists = [reserves0, reserves1].every((value) =>
-              convert.toBigNumber(value).isPositive()
+              convert.toBigNumber(value).isGreaterThan(0)
             );
 
             prev[pairAddress] = {
