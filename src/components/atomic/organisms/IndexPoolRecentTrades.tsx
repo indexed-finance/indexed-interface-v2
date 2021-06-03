@@ -1,3 +1,4 @@
+import { AiOutlineArrowRight } from "react-icons/ai";
 import { Card, List, Space, Typography } from "antd";
 import { FormattedIndexPool } from "features";
 import { Token } from "components/atomic";
@@ -20,7 +21,7 @@ export function IndexPoolRecentTrades({
         </Typography.Title>
       }
     >
-      <List size="small" style={{ maxWidth: 580 }}>
+      <List size="small">
         {trades.map((trade, index) => (
           <List.Item key={index}>
             <a
@@ -35,12 +36,17 @@ export function IndexPoolRecentTrades({
                 flex: 1,
               }}
             >
-              <Space style={{ width: "100%" }}>
-                <Token name="" symbol={trade.from} address={trade.fromAddress} />
+              <Space>
+                <Token
+                  name=""
+                  symbol={trade.from}
+                  address={trade.fromAddress}
+                />
                 <Typography.Text
+                  style={{ fontSize: 20 }}
                   type={trade.kind === "buy" ? "success" : "danger"}
                 >
-                  sold for
+                  <AiOutlineArrowRight />
                 </Typography.Text>
                 <Token name="" symbol={trade.to} address={trade.toAddress} />
               </Space>
@@ -48,6 +54,7 @@ export function IndexPoolRecentTrades({
               <div>
                 {trade.when} for{" "}
                 <Typography.Text
+                  style={{ marginLeft: 12 }}
                   type={trade.kind === "buy" ? "success" : "danger"}
                 >
                   {trade.amount}
