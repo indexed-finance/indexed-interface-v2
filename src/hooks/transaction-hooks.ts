@@ -2,6 +2,7 @@ import { BigNumber } from "ethereum/utils/balancer-math";
 import { ContractTransaction } from "@ethersproject/contracts";
 import { JSBI, Percent, Router, Trade, /* WETH, ETHER */ } from "@uniswap/sdk";
 import { TransactionExtra } from "features";
+import { constants } from "ethers";
 import { convert } from "helpers";
 import { thunks } from "features/thunks";
 import {
@@ -205,17 +206,26 @@ export function useRoutedMintTransactionCallbacks(indexPool: string) {
   const contract = useMintRouterContract();
   const addTransaction = useAddTransactionCallback();
   const poolSymbol = usePoolSymbol(indexPool);
-
   const mintExactAmountIn = useCallback(
-    (amountIn: BigNumber, path: string[], minPoolAmountOut: BigNumber) => {
+    (amountIn: BigNumber, path: string[], minPoolAmountOut: BigNumber, ethInput: boolean) => {
       // @todo Figure out a better way to handle this
       if (!contract) throw new Error();
-      const tx = contract.swapExactTokensForTokensAndMint(
-        convert.toHex(amountIn),
-        path,
-        indexPool,
-        convert.toHex(minPoolAmountOut),
-      );
+      let tx: Promise<ContractTransaction>;
+      if (ethInput) {
+        tx = contract.swapExactETHForTokensAndMint(
+          path,
+          indexPool,
+          convert.toHex(minPoolAmountOut),
+          { value: convert.toHex(amountIn) }
+        )
+      } else {
+        tx = contract.swapExactTokensForTokensAndMint(
+          convert.toHex(amountIn),
+          path,
+          indexPool,
+          convert.toHex(minPoolAmountOut),
+        );
+      }
       const displayAmount = convert.toBalance(minPoolAmountOut, 18, true, 3);
       const summary = `Mint at least ${displayAmount} ${poolSymbol}`;
       addTransaction(tx, { summary });
@@ -224,15 +234,26 @@ export function useRoutedMintTransactionCallbacks(indexPool: string) {
   );
 
   const mintExactAmountOut = useCallback(
-    (maxAmountIn: BigNumber, path: string[], poolAmountOut: BigNumber) => {
+    (maxAmountIn: BigNumber, path: string[], poolAmountOut: BigNumber, ethInput: boolean) => {
       // @todo Figure out a better way to handle this
       if (!contract) throw new Error();
-      const tx = contract.swapTokensForTokensAndMintExact(
-        convert.toHex(maxAmountIn),
-        path,
-        indexPool,
-        convert.toHex(poolAmountOut),
-      );
+      let tx: Promise<ContractTransaction>;
+
+      if (ethInput) {
+        tx = contract.swapETHForTokensAndMintExact(
+          path,
+          indexPool,
+          convert.toHex(poolAmountOut),
+          { value: convert.toHex(maxAmountIn) }
+        )
+      } else {
+        tx = contract.swapTokensForTokensAndMintExact(
+          convert.toHex(maxAmountIn),
+          path,
+          indexPool,
+          convert.toHex(poolAmountOut),
+        );
+      }
       const displayAmount = convert.toBalance(poolAmountOut, 18, true, 3);
       const summary = `Mint ${displayAmount} ${poolSymbol}`;
       addTransaction(tx, { summary });

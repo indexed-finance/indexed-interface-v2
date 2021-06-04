@@ -5,11 +5,10 @@ import {
   calcPoolOutGivenSingleIn,
   calcSingleInGivenPoolOut,
   downwardSlippage,
-  // swapExactTokensForTokensAndMint,
-  // swapTokensForTokensAndMintExact,
   upwardSlippage
 } from "ethereum";
 import { COMMON_BASE_TOKENS, SLIPPAGE_RATE } from "config";
+import { Currency, Trade } from "@uniswap/sdk";
 import { convert } from "helpers";
 import { useCallback, useMemo } from "react";
 import {
@@ -21,7 +20,6 @@ import { usePoolTokenAddresses, usePoolUnderlyingTokens } from "./pool-hooks";
 import { useSelector } from "react-redux";
 import { useTokenLookupBySymbol } from "./token-hooks";
 import { useUniswapTradingPairs } from "./pair-hooks";
-import type { Trade } from "@uniswap/sdk";
 
 // #region Token
 export function useSingleTokenMintCallbacks(poolId: string) {
@@ -327,7 +325,8 @@ export function useMintRouterCallbacks(poolId: string) {
               result.uniswapResult.inputAmount.raw.toString(10)
             ),
             result.uniswapResult.route.path.map((p) => p.address),
-            downwardSlippage(result.poolResult.poolAmountOut, SLIPPAGE_RATE)
+            downwardSlippage(result.poolResult.poolAmountOut, SLIPPAGE_RATE),
+            result.uniswapResult.inputAmount.currency === Currency.ETHER
           )
         }
       } else {
@@ -344,7 +343,8 @@ export function useMintRouterCallbacks(poolId: string) {
               SLIPPAGE_RATE
             ),
             result.uniswapResult.route.path.map((p) => p.address),
-            result.poolResult.amountOut
+            result.poolResult.amountOut,
+            result.uniswapResult.inputAmount.currency === Currency.ETHER
           )
         }
       }
