@@ -3,7 +3,7 @@ import { useTranslator } from "hooks";
 
 type Props = {
   showBalance: boolean;
-  balance: number;
+  balance: string;
   error?: string;
   onClickMax?: () => void;
   balanceLabel?: string;
@@ -26,7 +26,7 @@ export function TokenInputDecorator({
         <Typography.Text type="danger" style={{ textAlign: "left" }}> {error} </Typography.Text>
       ) : (
         <Typography.Text type="secondary" style={{ textAlign: "left" }}>
-          {balance > 0 ? (
+          {parseFloat(balance) > 0 ? (
             <>
               {balanceLabel}: <AbbreviatedBalance balance={balance} />{" "}
               {!error && onClickMax && (
@@ -49,8 +49,8 @@ export function TokenInputDecorator({
 }
 
 // #region Helpers
-function AbbreviatedBalance({ balance }: { balance: number }) {
-  const short = balance.toFixed(4);
+function AbbreviatedBalance({ balance }: { balance: string }) {
+  const short = parseFloat(balance).toFixed(4);
   const full = balance.toString();
 
   return (
