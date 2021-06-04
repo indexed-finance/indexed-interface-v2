@@ -64,7 +64,7 @@ export function molassesModeMiddleware() {
 // --
 export const middleware = [userDisconnectionMiddleware, batchMiddleware];
 
-if (process.env.NODE_ENV === "development") {
+if (process.env.NODE_ENV === "development" || process.env.IS_SERVER) {
   middleware.push(trackActionMiddleware);
 
   if (FEATURE_FLAGS.useMolassesMode) {
