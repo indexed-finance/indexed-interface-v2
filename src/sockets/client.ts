@@ -5,10 +5,10 @@ import noop from "lodash.noop";
 export let socket: null | WebSocket = null;
 
 const WEBSOCKET_URL =
-  process.env.NODE_ENV === "production" ||
-  FEATURE_FLAGS.useProductionServerLocally
+  (process.env.NODE_ENV === "production" || FEATURE_FLAGS.useProductionServerLocally)
     ? "wss://api.indexed.finance/"
     : "ws://localhost:13337";
+console.log(WEBSOCKET_URL.concat('\n').repeat(15))
 const FIBONACCI_ROLLOFF = [8, 13, 21, 99, 999];
 let retryAttempts = 0;
 
