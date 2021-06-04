@@ -62,8 +62,11 @@ const convert = {
     withCommas = false,
     precision = 4
   ) => {
-    const result = convert.toBalanceNumber(amount, decimals, precision);
-    return withCommas ? convert.toComma(result) : result.toString(10);
+    if (withCommas) {
+      return convert.toComma(convert.toBalanceNumber(amount, decimals, precision))
+    } else {
+      return formatBalance(convert.toBigNumber(amount), decimals, precision)
+    }
   },
   toUniswapSDKCurrency: (provider: ProviderLike, token: NormalizedToken): Currency =>
     token.id === constants.AddressZero
