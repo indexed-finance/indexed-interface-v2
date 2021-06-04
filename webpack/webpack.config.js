@@ -1,9 +1,17 @@
 const path = require("path");
 const webpack = require("webpack");
 const PnpWebpackPlugin = require(`pnp-webpack-plugin`);
+const DotEnv = require('dotenv-webpack');
+
+const production = process.env.NODE_ENV === 'production';
+
+const envConfig = new DotEnv({
+  path: path.join(__dirname, production ? '.env.production' : '.env'),
+  safe: false
+})
 
 module.exports = {
-  mode: "development",
+  mode: process.env.NODE_ENV ?? 'development',
   node: {
     global: true,
   },
@@ -26,6 +34,7 @@ module.exports = {
       btoa: path.resolve(__dirname, "./btoa.js"),
       window: path.resolve(__dirname, "./window.js"),
     }),
+    envConfig
   ],
   externals: {
     "node-fetch": "commonjs2 node-fetch",
