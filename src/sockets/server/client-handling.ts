@@ -42,7 +42,7 @@ export const connections: WebSocket[] = [];
  * Creates a WebSocket server that provides quick updates to connected clients.
  */
 export function setupClientHandling() {
-  if (false) {
+  if (process.env.NODE_ENV === "development") {
     const socketServer = new WebSocket.Server(
       {
         port: WEBSOCKET_SERVER_PORT,

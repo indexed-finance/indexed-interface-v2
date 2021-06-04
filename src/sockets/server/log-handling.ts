@@ -39,7 +39,7 @@ export function setupLogHandling() {
   });
 
   if (process.env.NODE_ENV === "development") {
-    app.listen(411, () => console.info("Local logger listening..."));
+    // app.listen(411, () => console.info("Local logger listening..."));
   } else {
     const LOG_CERT_PATH = process.env.LOG_CERT_PATH;
     const LOG_KEY_PATH = process.env.LOG_KEY_PATH;
