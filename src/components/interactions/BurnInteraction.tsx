@@ -1,4 +1,4 @@
-import { BURN_ROUTER_ADDRESS, COMMON_BASE_TOKENS, SLIPPAGE_RATE } from "config";
+import { BURN_ROUTER_ADDRESS, DISPLAYED_COMMON_BASE_TOKENS, SLIPPAGE_RATE } from "config";
 import { FormattedIndexPool, selectors } from "features";
 import {
   MultiInteraction,
@@ -170,7 +170,7 @@ function UniswapBurnInteraction({ indexPool }: Props) {
     executeRoutedBurn,
   } = useBurnRouterCallbacks(poolId);
 
-  const assets = [...COMMON_BASE_TOKENS];
+  const assets = [...DISPLAYED_COMMON_BASE_TOKENS];
 
   useBalancesRegistrar([poolId]);
 

@@ -1,5 +1,5 @@
 import { AppState, FormattedIndexPool, selectors } from "features";
-import { COMMON_BASE_TOKENS, UNISWAP_ROUTER_ADDRESS } from "config";
+import { DISPLAYED_COMMON_BASE_TOKENS, UNISWAP_ROUTER_ADDRESS } from "config";
 import { SingleInteraction, SingleInteractionValues } from "./BaseInteraction";
 import { Trade } from "@uniswap/sdk";
 import { convert } from "helpers";
@@ -19,7 +19,7 @@ export function TradeInteraction({ indexPool }: Props) {
   const handleTrade = useUniswapTransactionCallback();
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
   const tokenIds = useMemo(
-    () => [indexPool.id, ...COMMON_BASE_TOKENS.map(({ id }) => id)],
+    () => [indexPool.id, ...DISPLAYED_COMMON_BASE_TOKENS.map(({ id }) => id)],
     [indexPool.id]
   );
   const assets = useSelector((state: AppState) =>
@@ -140,7 +140,7 @@ export function TradeInteraction({ indexPool }: Props) {
     <SingleInteraction
       assets={assets as any}
       spender={UNISWAP_ROUTER_ADDRESS}
-      defaultInputSymbol={COMMON_BASE_TOKENS[0].symbol}
+      defaultInputSymbol={DISPLAYED_COMMON_BASE_TOKENS[0].symbol}
       defaultOutputSymbol={indexPool.symbol}
       onSubmit={handleSubmit}
       onChange={handleChange}

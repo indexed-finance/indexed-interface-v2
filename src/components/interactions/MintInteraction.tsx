@@ -1,4 +1,4 @@
-import { COMMON_BASE_TOKENS, MINT_ROUTER_ADDRESS, SLIPPAGE_RATE } from "config";
+import { DISPLAYED_COMMON_BASE_TOKENS, MINT_ROUTER_ADDRESS, SLIPPAGE_RATE } from "config";
 import { FormattedIndexPool, selectors } from "features";
 import {
   MultiInteraction,
@@ -144,7 +144,7 @@ function UniswapMintInteraction({ indexPool }: Props) {
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
 
   useBalanceAndApprovalRegistrar(MINT_ROUTER_ADDRESS.toLowerCase(), [
-    ...COMMON_BASE_TOKENS.map(({ id }) => id),
+    ...DISPLAYED_COMMON_BASE_TOKENS.map(({ id }) => id),
   ]);
   const {
     getBestMintRouteForAmountIn,
@@ -153,7 +153,7 @@ function UniswapMintInteraction({ indexPool }: Props) {
     loading
   } = useMintRouterCallbacks(indexPool.id);
 
-  const assets = [...COMMON_BASE_TOKENS];
+  const assets = [...DISPLAYED_COMMON_BASE_TOKENS];
 
   const handleChange = useCallback(
     (values: SingleInteractionValues) => {
