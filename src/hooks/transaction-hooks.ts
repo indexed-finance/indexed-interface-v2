@@ -1,6 +1,6 @@
 import { BigNumber } from "ethereum/utils/balancer-math";
 import { ContractTransaction } from "@ethersproject/contracts";
-import { JSBI, Percent, Router, Trade } from "@uniswap/sdk";
+import { JSBI, Percent, Router, Trade, /* WETH, ETHER */ } from "@uniswap/sdk";
 import { TransactionExtra } from "features";
 import { convert } from "helpers";
 import { thunks } from "features/thunks";

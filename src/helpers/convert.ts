@@ -5,7 +5,7 @@ import {
   toHex,
   toTokenAmount,
 } from "@indexed-finance/indexed.js";
-import { ChainId, Pair, Token, TokenAmount, WETH } from "@uniswap/sdk";
+import { ChainId, Currency, CurrencyAmount, Pair, Token, TokenAmount, WETH } from "@uniswap/sdk";
 import { DEFAULT_DECIMAL_COUNT } from "config";
 import { constants } from "ethers";
 import { getAddress } from "@ethersproject/address";
@@ -65,6 +65,24 @@ const convert = {
     const result = convert.toBalanceNumber(amount, decimals, precision);
     return withCommas ? convert.toComma(result) : result.toString(10);
   },
+  toUniswapSDKCurrency: (provider: ProviderLike, token: NormalizedToken): Currency =>
+    token.id === constants.AddressZero
+    ? Currency.ETHER
+    : new Token(
+      provider.network.chainId,
+      convert.toChecksumAddress(token.id),
+      token.decimals,
+      token.symbol,
+      token.name
+    ),
+  toUniswapSDKCurrencyAmount: (
+    provider: ProviderLike,
+    token: NormalizedToken,
+    amount: string
+  ): CurrencyAmount =>
+    token.id === constants.AddressZero
+      ? CurrencyAmount.ether(amount)
+      : new TokenAmount(convert.toUniswapSDKToken(provider, token), amount),
   // Uniswap SDK
   toUniswapSDKToken: (provider: ProviderLike, token: NormalizedToken) =>
     token.id === constants.AddressZero

@@ -130,12 +130,12 @@ export function useUniswapTradingPairs(baseTokens: string[]) {
       if (provider && !loading) {
         const [bestTrade] = bestTradeExactIn(
           pairs as Pair[],
-          convert.toUniswapSDKTokenAmount(
+          convert.toUniswapSDKCurrencyAmount(
             provider,
             tokenIn,
             amountIn
           ) as TokenAmount,
-          convert.toUniswapSDKToken(provider, tokenOut) as Token,
+          convert.toUniswapSDKCurrency(provider, tokenOut) as Token,
           opts ?? { maxHops: 3, maxNumResults: 1 }
         );
 
@@ -154,8 +154,8 @@ export function useUniswapTradingPairs(baseTokens: string[]) {
       if (provider && !loading) {
         const [bestTrade] = bestTradeExactOut(
           pairs as Pair[],
-          convert.toUniswapSDKToken(provider, tokenIn) as Token,
-          convert.toUniswapSDKTokenAmount(
+          convert.toUniswapSDKCurrency(provider, tokenIn) as Token,
+          convert.toUniswapSDKCurrencyAmount(
             provider,
             tokenOut,
             amountOut
