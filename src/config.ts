@@ -162,6 +162,8 @@ export const COMMON_BASE_TOKENS = [
   },
 ];
 
+export const DISPLAYED_COMMON_BASE_TOKENS = COMMON_BASE_TOKENS.filter(t => t.id.toLowerCase() !== WETH_CONTRACT_ADDRESS.toLowerCase());
+
 export const EXTERNAL_IP = "143.198.78.205";
 
 export const INDEX_POOL_TAGLINES: Record<string, string> = {
