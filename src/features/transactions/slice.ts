@@ -1,36 +1,12 @@
+import { TransactionExtra, transactionFinalized, transactionStarted } from "./actions"
 import {
-  PayloadAction,
   createEntityAdapter,
   createSlice,
 } from "@reduxjs/toolkit";
-import {
-  TransactionReceipt,
-  TransactionResponse,
-} from "@ethersproject/abstract-provider";
 import { restartedDueToError } from "../actions";
 import type { AppState } from "../store";
 
 export type TransactionStatus = "pending" | "confirmed" | "reverted";
-
-export type TransactionExtra = {
-  /** @param summary - Text summary of what the transaction does */
-  summary?: string;
-} & (
-  | {
-      /** @param type - Type identifier for icon selection */
-      type: "ERC20.approve";
-      /** @param approval - Uses to display loading icon for pending approval */
-      approval: { tokenAddress: string; spender: string; amount: string };
-    }
-  | {
-      type: "StakingRewards.claim";
-      claim: { recipient: string };
-    }
-  | {
-      /** @param type - Type identifier for icon selection */
-      type?: undefined;
-    }
-);
 
 export type NormalizedTransaction = {
   /** @param hash - Transaction hash used for provider queries & EtherScan link */
@@ -65,44 +41,45 @@ const slice = createSlice({
   name: "transactions",
   initialState: adapter.getInitialState(),
   reducers: {
-    transactionStarted(
-      state,
-      action: PayloadAction<{
-        tx: TransactionResponse;
-        extra?: TransactionExtra;
-      }>
-    ) {
-      const { tx, extra = {} } = action.payload;
-      adapter.addOne(state, {
-        hash: tx.hash,
-        addedTime: Date.now(),
-        from: tx.from,
-        to: tx.to,
-        gasPrice: tx.gasPrice.toNumber(),
-        gasLimit: tx.gasLimit.toNumber(),
-        status: "pending",
-        ...extra,
-      });
-    },
     transactionsCleared() {
       return adapter.getInitialState();
     },
-    transactionFinalized(state, action: PayloadAction<TransactionReceipt>) {
-      const { transactionHash, status, gasUsed } = action.payload;
-      const entry = state.entities[transactionHash.toLowerCase()];
-      if (entry) {
-        entry.status = status === 1 ? "confirmed" : "reverted";
-        entry.gasUsed = gasUsed.toNumber();
-        entry.confirmedTime = Date.now();
-      }
-    },
   },
   extraReducers: (builder) =>
-    builder.addCase(restartedDueToError, () => adapter.getInitialState()),
+    builder
+      .addCase(transactionStarted, (state, action) => {
+        const { tx, extra = {} } = action.payload;
+        adapter.addOne(state, {
+          hash: tx.hash,
+          addedTime: Date.now(),
+          from: tx.from,
+          to: tx.to,
+          gasPrice: tx.gasPrice.toNumber(),
+          gasLimit: tx.gasLimit.toNumber(),
+          status: "pending",
+          ...extra,
+        });
+      })
+      .addCase(transactionFinalized, (state, action) => {
+        const { receipt: { transactionHash, status, gasUsed } } = action.payload;
+        const entry = state.entities[transactionHash.toLowerCase()];
+        if (entry) {
+          entry.status = status === 1 ? "confirmed" : "reverted";
+          entry.gasUsed = gasUsed.toNumber();
+          entry.confirmedTime = Date.now();
+        }
+      })
+      .addCase(restartedDueToError, () => adapter.getInitialState()),
 });
 
-export const { actions: transactionsActions, reducer: transactionsReducer } =
-  slice;
+const { actions, reducer: transactionsReducer } = slice;
+
+export { transactionsReducer }
+export const transactionsActions = {
+  ...actions,
+  transactionFinalized,
+  transactionStarted
+};
 
 export const transactionsSelectors = {
   ...adapter.getSelectors((state: AppState) => state.transactions),
