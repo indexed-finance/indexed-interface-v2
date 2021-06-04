@@ -8,6 +8,7 @@ import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { debugConsole } from "helpers/logger";
 import { fetchMulticallData } from "./requests";
 import { mirroredServerState, restartedDueToError } from "../actions";
+import { transactionFinalized } from "../transactions/actions";
 import type { AppState } from "../store";
 
 const MAX_AGE_IN_BLOCKS = 4; // How old can data be in the cache?
@@ -139,6 +140,12 @@ const slice = createSlice({
   },
   extraReducers: (builder) =>
     builder
+      .addCase(transactionFinalized, (state, action) => {
+        const { blockNumber } = action.payload.receipt;
+        if (blockNumber > state.blockNumber) {
+          state.blockNumber = blockNumber;
+        }
+      })
       .addCase(fetchMulticallData.pending, (state, action) => {
         state.status = "loading";
         const onChainCalls = action.meta.arg.arg.onChainCalls.serializedCalls;
