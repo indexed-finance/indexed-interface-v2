@@ -65,7 +65,7 @@ async function sendTransaction(status: number, time = 4000) {
 
   await sleep(time);
 
-  store.dispatch(actions.transactionFinalized(receipt));
+  store.dispatch(actions.transactionFinalized({ receipt }));
 
   hashCounter--;
 }
