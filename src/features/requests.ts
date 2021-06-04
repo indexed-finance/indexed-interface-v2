@@ -140,18 +140,7 @@ export function normalizeInitialData(categories: Category[]) {
       };
 
       // Token data.
-      if (category.tokens.length === 0) {
-        // "Borrow" the token data from the pools in the category.
-        const tokensFromPools = category.indexPools
-          .map(({ tokens }) => tokens)
-          .filter((each): each is PoolUnderlyingToken[] => Boolean(each))
-          .flat();
-
-        for (const token of tokensFromPools) {
-          normalizedTokensForCategory.ids.push(token.id);
-          normalizedTokensForCategory.entities[token.id] = token.token;
-        }
-      } else {
+      if (category.tokens.length > 0) {
         for (const categoryToken of category.tokens) {
           const { id: tokenId, symbol, name, decimals } = categoryToken;
           normalizedTokensForCategory.ids.push(tokenId);
@@ -195,6 +184,7 @@ export function normalizeInitialData(categories: Category[]) {
               decimals: 18,
               symbol: "",
               ...token,
+              id: tokenId
             };
           }
 
