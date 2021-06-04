@@ -5,6 +5,7 @@ import { convert, createMulticallDataParser } from "helpers";
 import { fetchMulticallData } from "../batcher/requests";
 import { stakingMulticallDataParser } from "../staking";
 import { tokensSelectors } from "../tokens";
+import { transactionFinalized } from '../transactions/actions';
 import type { AppState } from "../store";
 import type { NormalizedUser } from "./types";
 
@@ -34,7 +35,8 @@ const slice = createSlice({
     },
   },
   extraReducers: (builder) =>
-    builder.addCase(fetchMulticallData.fulfilled, (state, action) => {
+    builder
+    .addCase(fetchMulticallData.fulfilled, (state, action) => {
       const userData = userMulticallDataParser(action.payload);
       const stakingData = stakingMulticallDataParser(action.payload);
 
@@ -63,7 +65,15 @@ const slice = createSlice({
       }
 
       return state;
-    }),
+    })
+    .addCase(transactionFinalized, (state, action) => {
+      const { extra } = action.payload;
+      if (extra && extra.type === 'ERC20.approve') {
+        const { tokenAddress, spender, amount } = extra.approval;
+        state.allowances[`user${spender}-user${tokenAddress}`.toLowerCase()] = amount;
+      }
+    })
+
 });
 
 export const { actions: userActions, reducer: userReducer } = slice;
