@@ -88,12 +88,12 @@ export function TokenSelector({
   const rawBalance = useTokenBalance(selectedToken?.id ?? "");
   const balance = useMemo(() => {
     if (balanceOverride) {
-      return parseFloat(balanceOverride);
+      return balanceOverride;
     }
     if (rawBalance && selectedToken) {
-      return convert.toBalanceNumber(rawBalance, selectedToken.decimals, 18);
+      return convert.toBalance(rawBalance, selectedToken.decimals, false, 18);
     }
-    return 0;
+    return '0';
   }, [rawBalance, selectedToken, balanceOverride]);
 
   const triggerChange = useCallback(
@@ -110,7 +110,7 @@ export function TokenSelector({
     [onChange, amount, token, value]
   );
   const haveInsufficientBalance = useMemo(() => {
-    return isInput && balance < (value.amount || 0);
+    return isInput && parseFloat(balance) < (value.amount || 0);
   }, [isInput, value.amount, balance]);
 
   const onAmountChange = useCallback(
@@ -131,7 +131,7 @@ export function TokenSelector({
 
       let error: string | undefined = undefined;
       if (isInput && amountToUse > 0) {
-        if (amountToUse > balance) {
+        if (amountToUse > parseFloat(balance)) {
           error = "Insufficient balance";
         }
       }
@@ -155,7 +155,13 @@ export function TokenSelector({
     }
   }, []);
   const handleMaxOut = useCallback(() => {
-    onAmountChange(balance);
+    // @todo - JavaScript is not accurate for fractions with more than 52 bits.
+    // Replace all number values with bignumbers or strings.
+    let amount = parseFloat(balance);
+    if (amount.toString() !== balance) {
+      amount -= 0.000000000000001;
+    }
+    onAmountChange(amount);
   }, [onAmountChange, balance]);
   const handleOpenTokenSelection = useCallback(() => {
     if (selectable) {
