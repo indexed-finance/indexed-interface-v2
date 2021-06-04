@@ -11,6 +11,7 @@ import {
 } from "./staking-hooks";
 import { useTokenBalances } from "./user-hooks";
 import { useTokenPricesLookup } from "./token-hooks";
+import S from "string";
 
 export function usePortfolioData(): {
   tokens: FormattedPortfolioAsset[];
@@ -104,11 +105,17 @@ export function usePortfolioData(): {
         const value = (staked + balance) * price;
 
         totalValue += value;
+        const link = isUniswapPair
+          ? `https://v2.info.uniswap.org/pair/${id.toLowerCase()}`
+          : id.toLowerCase() === NDX_ADDRESS.toLowerCase()
+            ? ''
+            : `/index-pools/${S(name).slugify().s}`;
 
         return {
           address: id,
           name,
           symbol,
+          link,
           image: symbol,
           isUniswapPair,
           hasStakingPool: Boolean(stakingPool),

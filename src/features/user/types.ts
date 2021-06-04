@@ -45,4 +45,5 @@ export interface FormattedPortfolioAsset {
   price: string;
   value: string;
   weight: string;
+  link: string;
 }
