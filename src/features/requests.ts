@@ -181,9 +181,7 @@ export function normalizeInitialData(categories: Category[]) {
           if (!normalizedTokensForCategory.ids.includes(tokenId)) {
             normalizedTokensForCategory.ids.push(tokenId);
             normalizedTokensForCategory.entities[tokenId] = {
-              decimals: 18,
-              symbol: "",
-              ...token,
+              ...(token.token),
               id: tokenId
             };
           }
