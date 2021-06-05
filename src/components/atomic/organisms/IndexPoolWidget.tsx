@@ -33,7 +33,6 @@ export function IndexPoolWidget(props: FormattedIndexPool) {
       symbol={props.symbol}
       address={props.id}
       price={props.priceUsd}
-      priceChange={props.netChangePercent}
       stats={<Statistic title="TVL" value={props.totalValueLocked} />}
       actions={
         <Button type="primary" onClick={(event) => event.stopPropagation()}>
@@ -42,7 +41,7 @@ export function IndexPoolWidget(props: FormattedIndexPool) {
       }
       onClick={() => push(props.slug)}
     >
-      {INDEX_POOL_TAGLINES[props.id] ?? ""}
+      <div style={{ height: 120 }}>{INDEX_POOL_TAGLINES[props.id] ?? ""}</div>
     </Widget>
   );
 }

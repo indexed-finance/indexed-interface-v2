@@ -1,4 +1,4 @@
-import { actions, provider, selectors } from "features";
+import { actions, selectors } from "features";
 import {
   bestTradeExactIn,
   bestTradeExactOut,
@@ -29,8 +29,12 @@ export type RegisteredPair = {
   exists?: boolean;
 };
 
-export const usePairExistsLookup = (pairIds: string[]): Record<string, boolean> =>
-  useSelector((state: AppState) => selectors.selectPairExistsLookup(state, pairIds));
+export const usePairExistsLookup = (
+  pairIds: string[]
+): Record<string, boolean> =>
+  useSelector((state: AppState) =>
+    selectors.selectPairExistsLookup(state, pairIds)
+  );
 
 export function createPairDataCalls(pairs: RegisteredPair[]): RegisteredCall[] {
   return pairs.map((pair) => ({
@@ -86,10 +90,8 @@ export function useUniswapPairs(
   usePairDataRegistrar(pairs);
 
   const isLoading = useMemo(() => {
-    return pairDatas.some(
-      (p) => !p || typeof p.exists === "undefined"
-    );
-  }, [ pairDatas ])
+    return pairDatas.some((p) => !p || typeof p.exists === "undefined");
+  }, [pairDatas]);
 
   return useMemo(() => {
     try {
@@ -135,7 +137,10 @@ export function useUniswapTradingPairs(baseTokens: string[]) {
             tokenIn,
             amountIn
           ) as TokenAmount,
-          convert.toUniswapSDKCurrency({ network: { chainId: 1 } }, tokenOut) as Token,
+          convert.toUniswapSDKCurrency(
+            { network: { chainId: 1 } },
+            tokenOut
+          ) as Token,
           opts ?? { maxHops: 3, maxNumResults: 1 }
         );
 
@@ -154,7 +159,10 @@ export function useUniswapTradingPairs(baseTokens: string[]) {
       if (!loading) {
         const [bestTrade] = bestTradeExactOut(
           pairs as Pair[],
-          convert.toUniswapSDKCurrency({ network: { chainId: 1 } }, tokenIn) as Token,
+          convert.toUniswapSDKCurrency(
+            { network: { chainId: 1 } },
+            tokenIn
+          ) as Token,
           convert.toUniswapSDKCurrencyAmount(
             { network: { chainId: 1 } },
             tokenOut,
@@ -172,7 +180,7 @@ export function useUniswapTradingPairs(baseTokens: string[]) {
   return {
     calculateBestTradeForExactInput,
     calculateBestTradeForExactOutput,
-    loading
+    loading,
   };
 }
 // #endregion

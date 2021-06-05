@@ -6,7 +6,7 @@ import {
   ServerConnection,
   WalletConnector,
 } from "components/atomic";
-import { Layout, Space, Typography } from "antd";
+import { Layout, Space } from "antd";
 import { Navigation } from "components/atomic/molecules";
 import { selectors } from "features";
 import { useBreakpoints } from "hooks";
@@ -25,14 +25,7 @@ export function LayoutHeader() {
   const userControls = (
     <>
       <ModeSwitch />
-      {/* <Typography.Title
-        level={5}
-        type='secondary'
-        style={{ textTransform: "uppercase", marginBottom: 0 }}
-      >
-        CONNECT WALLET
-      </Typography.Title> */}
-      {<ServerConnection showText={true} />}
+      <ServerConnection showText={true} />
     </>
   );
   const UserControlCaret = showingUserControls ? FaCaretUp : FaCaretDown;

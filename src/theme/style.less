@@ -9,7 +9,7 @@
 // -- Fonts
 @font-face {
   font-family: "Main";
-  src: url("./fonts/Futura.ttc");
+  src: url("./fonts/aux-mono.otf");
 }
 
 // -- Customs
@@ -63,11 +63,14 @@
 }
 
 .with-background {
-  background: url(./images/background.png) no-repeat center center fixed !important;
-  -webkit-background-size: cover;
-  -moz-background-size: cover;
-  -o-background-size: cover;
-  background-size: cover;
+  background: rgb(0, 174, 175);
+  background: radial-gradient(
+    circle,
+    rgba(0, 174, 175, 1) 9%,
+    rgba(101, 42, 181, 1) 28%,
+    rgba(0, 174, 175, 1) 59%,
+    rgba(101, 42, 181, 1) 98%
+  );
 }
 
 .fake-flex-gap {
@@ -127,6 +130,8 @@
 }
 
 // -- Ant Overrides
+@font-family: "Main";
+
 .ant-page-header-heading-title {
   line-height: 1 !important;
 }

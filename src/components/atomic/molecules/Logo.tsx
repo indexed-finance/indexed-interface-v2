@@ -37,6 +37,8 @@ export function Logo({
             width: spinning ? 48 : 24,
             height: spinning ? 48 : 24,
             marginRight: spinning ? 12 : 8,
+            position: "relative",
+            top: -3,
           }}
         />
         {withTitle && (

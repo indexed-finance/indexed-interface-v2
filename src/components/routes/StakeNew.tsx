@@ -6,7 +6,7 @@ import {
   selectors,
 } from "features";
 import { BiLinkExternal } from "react-icons/bi";
-import { ExternalLink, Label, Page, TokenSelector } from "components/atomic";
+import { ExternalLink, Page, TokenSelector } from "components/atomic";
 import { Formik, useFormikContext } from "formik";
 import { Link, useParams } from "react-router-dom";
 import { MULTI_TOKEN_STAKING_ADDRESS } from "config";
@@ -17,7 +17,7 @@ import {
   useNewStakingTransactionCallbacks,
   usePortfolioData,
   useTokenApproval,
-  useTokenBalance
+  useTokenBalance,
 } from "hooks";
 import { useMemo } from "react";
 import { useSelector } from "react-redux";
@@ -35,11 +35,11 @@ function StakingForm({
     inputType: "stake" | "unstake";
   }>();
 
-  const { stake, withdraw, exit, claim } = useNewStakingTransactionCallbacks(
+  const { stake, withdraw } = useNewStakingTransactionCallbacks(
     stakingToken.id
   );
 
-  const [staked, earned] = useMemo(() => {
+  const [staked] = useMemo(() => {
     let staked = stakingToken.userStakedBalance;
     let earned = stakingToken.userEarnedRewards;
     staked = staked ? convert.toBalance(staked, 18) : "0";
@@ -77,20 +77,24 @@ function StakingForm({
     else withdraw(convert.toToken(values.amount.toString(), 18).toString());
   };
 
-  useBalanceAndApprovalRegistrar(MULTI_TOKEN_STAKING_ADDRESS, [stakingToken.token])
+  useBalanceAndApprovalRegistrar(MULTI_TOKEN_STAKING_ADDRESS, [
+    stakingToken.token,
+  ]);
   const balance = useTokenBalance(stakingToken.token);
   const [amount, rawAmount] = useMemo(() => {
     return [
       values.amount.toString(),
-      convert.toToken(values.amount.toString(), stakingToken.decimals).toString()
-    ]
-  }, [values, stakingToken])
+      convert
+        .toToken(values.amount.toString(), stakingToken.decimals)
+        .toString(),
+    ];
+  }, [values, stakingToken]);
   const { status, approve } = useTokenApproval({
     spender: MULTI_TOKEN_STAKING_ADDRESS,
     tokenId: stakingToken.token,
     amount,
     rawAmount,
-    symbol: stakingToken.symbol
+    symbol: stakingToken.symbol,
   });
 
   return (
@@ -110,7 +114,9 @@ function StakingForm({
                 values.inputType === "unstake" ? "Staked" : undefined
               }
               balanceOverride={
-                values.inputType === "unstake" ? staked : convert.toBalance(balance, stakingToken.decimals)
+                values.inputType === "unstake"
+                  ? staked
+                  : convert.toBalance(balance, stakingToken.decimals)
               }
               selectable={false}
               onChange={(value) => setFieldValue("amount", value.amount)}
@@ -143,9 +149,8 @@ function StakingForm({
           style={{ textAlign: "center", width: "100%" }}
         >
           <Col span={12} style={{ textAlign: "center", alignSelf: "center" }}>
-            {
-              (values.inputType === "stake" && status === "approval needed")
-              ? <Button
+            {values.inputType === "stake" && status === "approval needed" ? (
+              <Button
                 type="primary"
                 block={true}
                 onClick={approve}
@@ -153,7 +158,8 @@ function StakingForm({
               >
                 Approve
               </Button>
-              : <Button
+            ) : (
+              <Button
                 type="primary"
                 danger={values.inputType === "unstake"}
                 block={true}
@@ -162,8 +168,7 @@ function StakingForm({
               >
                 {values.inputType === "stake" ? "Deposit" : "Withdraw"}
               </Button>
-            }
-            
+            )}
           </Col>
           <Col span={4}>
             <Button
@@ -203,29 +208,26 @@ function StakingStats({
     return [staked, earned];
   }, [stakingToken]);
 
-  const { exit, claim } = useNewStakingTransactionCallbacks(
-    stakingToken.id
-  );
+  const { exit, claim } = useNewStakingTransactionCallbacks(stakingToken.id);
 
   return (
     <Descriptions bordered={true} column={1}>
       {/* Left Column */}
-      {
-        parseFloat(staked) > 0 &&
+      {parseFloat(staked) > 0 && (
         <Descriptions.Item label="Staked">
-        <Row>
-          <Col span={14}>{staked} {symbol}</Col>
-          <Col span={8}>
-            <Button danger type="primary" block={true} onClick={exit}>
-              Exit
-            </Button>
-          </Col>
-        </Row>
-        
+          <Row>
+            <Col span={14}>
+              {staked} {symbol}
+            </Col>
+            <Col span={8}>
+              <Button danger type="primary" block={true} onClick={exit}>
+                Exit
+              </Button>
+            </Col>
+          </Row>
         </Descriptions.Item>
-      }
-      {
-        parseFloat(earned) > 0 &&
+      )}
+      {parseFloat(earned) > 0 && (
         <Descriptions.Item label="Earned Rewards">
           <Row>
             <Col span={14}>{earned} NDX</Col>
@@ -236,8 +238,7 @@ function StakingStats({
             </Col>
           </Row>
         </Descriptions.Item>
-      }
-      
+      )}
 
       <Descriptions.Item label="Reward Rate per Day">
         {`${convert.toBalance(stakingToken.rewardsPerDay, 18)} NDX`}
@@ -256,13 +257,17 @@ function StakingStats({
         {convert.toBalance(stakingToken.totalStaked, 18, true)} {symbol}
       </Descriptions.Item>
       <Descriptions.Item label="Staking Token">
-        {
-          stakingToken.isWethPair ? <ExternalLink to={`https://v2.info.uniswap.org/pair/${stakingToken.id}`}>
+        {stakingToken.isWethPair ? (
+          <ExternalLink
+            to={`https://v2.info.uniswap.org/pair/${stakingToken.id}`}
+          >
             {symbol}
-          </ExternalLink> : <Link to={`/index-pools/${S(stakingToken.name).slugify().s}`}>
+          </ExternalLink>
+        ) : (
+          <Link to={`/index-pools/${S(stakingToken.name).slugify().s}`}>
             {symbol}
           </Link>
-        }
+        )}
       </Descriptions.Item>
     </Descriptions>
   );
@@ -312,7 +317,9 @@ export default function StakeNew() {
                 const maximum =
                   values.inputType === "stake"
                     ? parseFloat(relevantPortfolioToken.balance)
-                    : parseFloat(convert.toBalance(toStake.userStakedBalance ?? "0"));
+                    : parseFloat(
+                        convert.toBalance(toStake.userStakedBalance ?? "0")
+                      );
                 if (values.amount > maximum) {
                   errors.amount = "Insufficient balance.";
                 }

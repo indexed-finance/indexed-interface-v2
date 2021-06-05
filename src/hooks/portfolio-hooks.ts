@@ -108,8 +108,8 @@ export function usePortfolioData(): {
         const link = isUniswapPair
           ? `https://v2.info.uniswap.org/pair/${id.toLowerCase()}`
           : id.toLowerCase() === NDX_ADDRESS.toLowerCase()
-            ? ''
-            : `/index-pools/${S(name).slugify().s}`;
+          ? ""
+          : `/index-pools/${S(name).slugify().s}`;
 
         return {
           address: id,

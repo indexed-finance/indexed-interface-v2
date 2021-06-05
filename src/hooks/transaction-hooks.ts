@@ -1,8 +1,7 @@
 import { BigNumber } from "ethereum/utils/balancer-math";
 import { ContractTransaction } from "@ethersproject/contracts";
-import { JSBI, Percent, Router, Trade, /* WETH, ETHER */ } from "@uniswap/sdk";
+import { JSBI, Percent, Router, Trade } from "@uniswap/sdk";
 import { TransactionExtra } from "features";
-import { constants } from "ethers";
 import { convert } from "helpers";
 import { thunks } from "features/thunks";
 import {
@@ -23,7 +22,10 @@ import { useUserAddress } from "./user-hooks";
 export function useAddTransactionCallback() {
   const dispatch = useDispatch();
   return useCallback(
-    (tx: ContractTransaction | Promise<ContractTransaction>, extra: TransactionExtra = {}) => {
+    (
+      tx: ContractTransaction | Promise<ContractTransaction>,
+      extra: TransactionExtra = {}
+    ) => {
       return dispatch(thunks.addTransaction(tx, extra));
     },
     [dispatch]
@@ -49,7 +51,7 @@ export function useSwapTransactionCallbacks(poolAddress: string) {
         convert.toHex(amountIn),
         outputTokenAddress,
         convert.toHex(minimumAmountOut),
-        convert.toHex(maximumPrice),
+        convert.toHex(maximumPrice)
       );
       addTransaction(tx);
     },
@@ -71,7 +73,7 @@ export function useSwapTransactionCallbacks(poolAddress: string) {
         convert.toHex(maxAmountIn),
         outputTokenAddress,
         convert.toHex(amountOut),
-        convert.toHex(maximumPrice),
+        convert.toHex(maximumPrice)
       );
       addTransaction(tx);
     },
@@ -152,7 +154,7 @@ export function useMintSingleTransactionCallbacks(poolAddress: string) {
       const tx = contract.joinswapExternAmountIn(
         inputTokenAddress,
         convert.toHex(tokenAmountIn),
-        convert.toHex(minPoolAmountOut),
+        convert.toHex(minPoolAmountOut)
       );
       addTransaction(tx);
     },
@@ -170,7 +172,7 @@ export function useMintSingleTransactionCallbacks(poolAddress: string) {
       const tx = contract.joinswapPoolAmountOut(
         inputTokenAddress,
         convert.toHex(poolAmountOut),
-        convert.toHex(maxAmountIn),
+        convert.toHex(maxAmountIn)
       );
       addTransaction(tx);
     },
@@ -207,7 +209,12 @@ export function useRoutedMintTransactionCallbacks(indexPool: string) {
   const addTransaction = useAddTransactionCallback();
   const poolSymbol = usePoolSymbol(indexPool);
   const mintExactAmountIn = useCallback(
-    (amountIn: BigNumber, path: string[], minPoolAmountOut: BigNumber, ethInput: boolean) => {
+    (
+      amountIn: BigNumber,
+      path: string[],
+      minPoolAmountOut: BigNumber,
+      ethInput: boolean
+    ) => {
       // @todo Figure out a better way to handle this
       if (!contract) throw new Error();
       let tx: Promise<ContractTransaction>;
@@ -217,13 +224,13 @@ export function useRoutedMintTransactionCallbacks(indexPool: string) {
           indexPool,
           convert.toHex(minPoolAmountOut),
           { value: convert.toHex(amountIn) }
-        )
+        );
       } else {
         tx = contract.swapExactTokensForTokensAndMint(
           convert.toHex(amountIn),
           path,
           indexPool,
-          convert.toHex(minPoolAmountOut),
+          convert.toHex(minPoolAmountOut)
         );
       }
       const displayAmount = convert.toBalance(minPoolAmountOut, 18, true, 3);
@@ -234,7 +241,12 @@ export function useRoutedMintTransactionCallbacks(indexPool: string) {
   );
 
   const mintExactAmountOut = useCallback(
-    (maxAmountIn: BigNumber, path: string[], poolAmountOut: BigNumber, ethInput: boolean) => {
+    (
+      maxAmountIn: BigNumber,
+      path: string[],
+      poolAmountOut: BigNumber,
+      ethInput: boolean
+    ) => {
       // @todo Figure out a better way to handle this
       if (!contract) throw new Error();
       let tx: Promise<ContractTransaction>;
@@ -245,13 +257,13 @@ export function useRoutedMintTransactionCallbacks(indexPool: string) {
           indexPool,
           convert.toHex(poolAmountOut),
           { value: convert.toHex(maxAmountIn) }
-        )
+        );
       } else {
         tx = contract.swapTokensForTokensAndMintExact(
           convert.toHex(maxAmountIn),
           path,
           indexPool,
-          convert.toHex(poolAmountOut),
+          convert.toHex(poolAmountOut)
         );
       }
       const displayAmount = convert.toBalance(poolAmountOut, 18, true, 3);
@@ -293,7 +305,7 @@ export function useRoutedBurnTransactionCallbacks(
         indexPool,
         convert.toHex(poolAmountIn),
         path,
-        convert.toHex(minAmountOut),
+        convert.toHex(minAmountOut)
       );
       const displayAmount = convert.toBalance(poolAmountIn, 18, true, 3);
       const summary = `Burn ${displayAmount} ${poolSymbol}`;
@@ -310,7 +322,7 @@ export function useRoutedBurnTransactionCallbacks(
         indexPool,
         convert.toHex(poolAmountInMax),
         path,
-        convert.toHex(tokenAmountOut),
+        convert.toHex(tokenAmountOut)
       );
       const displayAmount = convert.toBalance(poolAmountInMax, 18, true, 3);
       const summary = `Burn up to ${displayAmount} ${poolSymbol}`;
@@ -353,7 +365,7 @@ export function useBurnSingleTransactionCallbacks(
       const tx = contract.exitswapPoolAmountIn(
         outputTokenAddress,
         convert.toHex(poolAmountIn),
-        convert.toHex(minAmountOut),
+        convert.toHex(minAmountOut)
       );
       addTransaction(tx);
     },
@@ -371,7 +383,7 @@ export function useBurnSingleTransactionCallbacks(
       const tx = contract.exitswapExternAmountOut(
         outputTokenAddress,
         convert.toHex(tokenAmountOut),
-        convert.toHex(maxPoolAmountIn),
+        convert.toHex(maxPoolAmountIn)
       );
       addTransaction(tx);
     },

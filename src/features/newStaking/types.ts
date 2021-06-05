@@ -13,28 +13,27 @@ export type NewStakingPool = {
   userCount: number;
   updatedAt: number;
   rewardsPerDay: string;
-
   userStakedBalance?: string;
   userEarnedRewards?: string;
-}
+};
 
 export type NewStakingPoolUpdate = {
   id: string;
   totalStaked: string;
   userStakedBalance?: string;
   userEarnedRewards?: string;
-}
+};
 
 export type NewStakingPoolUserUpdate = {
   userStakedBalance?: string;
   userEarnedRewards?: string;
-}
+};
 
 export type NewStakingUpdate = {
   totalStakedByToken: Record<string, string>;
-  userDataByPool: Record<string, NewStakingPoolUserUpdate>
+  userDataByPool: Record<string, NewStakingPoolUserUpdate>;
   totalRewardsPerDay: string;
-}
+};
 
 export type NewStakingMeta = {
   id: string;
@@ -46,7 +45,7 @@ export type NewStakingMeta = {
   totalAllocPoint: number;
   poolCount: number;
   totalRewardsPerDay?: string;
-}
+};
 
 export interface FormattedNewStakingData {
   id: string;

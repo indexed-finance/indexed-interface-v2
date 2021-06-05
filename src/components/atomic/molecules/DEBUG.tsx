@@ -21,7 +21,9 @@ export function DEBUG() {
   const cacheSize = useSelector(selectors.selectCacheSize);
   const fetchingCount = useSelector(selectors.selectFetchingCount);
   const initialBlockNumber = useRef(blockNumber);
-  const [show, setShow] = useState(true);
+  const [show, setShow] = useState(
+    window.localStorage.getItem("Show Debug?") === "true"
+  );
 
   // Effect:
   // Keep track of the block number from when the page was initially loaded.
@@ -30,6 +32,10 @@ export function DEBUG() {
       initialBlockNumber.current = blockNumber;
     }
   }, [blockNumber]);
+
+  useEffect(() => {
+    window.localStorage.setItem("Show Debug?", show.toString());
+  }, [show]);
 
   return show ? (
     <Space

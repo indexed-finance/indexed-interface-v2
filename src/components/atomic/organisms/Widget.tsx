@@ -61,6 +61,11 @@ export function Widget({
             name={symbol}
             address={address}
             symbol={symbol}
+            symbolOverride={
+              symbol.startsWith("UNIV2:")
+                ? symbol.split("UNIV2:")[1].replace(/-/g, "/")
+                : symbol
+            }
             size="medium"
             style={{ marginRight: 24 }}
           />

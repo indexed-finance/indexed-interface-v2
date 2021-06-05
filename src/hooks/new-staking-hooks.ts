@@ -20,6 +20,14 @@ export const useNewStakedBalance = (id: string) =>
 export const useNewStakingPool = (id: string) =>
   useSelector((state: AppState) => selectors.selectNewStakingPool(state, id));
 
+export const useNewStakingPoolsForTokens = (stakingTokens: string[]) =>
+  useSelector((state: AppState) =>
+    selectors.selectNewStakingPoolsByStakingTokens(state, stakingTokens)
+  );
+
+// export const useNewStakingInfoLookup = () =>
+//   useSelector((state: AppState) => selectors.selectNewStakingInfoLookup(state));
+
 export function useNewStakingTokenPrice(id: string) {
   const stakingPool = useNewStakingPool(id);
   const [supplyTokens, _pairs, indexPool] = useMemo(() => {

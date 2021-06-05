@@ -5,7 +5,7 @@ import { convert, createMulticallDataParser } from "helpers";
 import { fetchMulticallData } from "../batcher/requests";
 import { stakingMulticallDataParser } from "../staking";
 import { tokensSelectors } from "../tokens";
-import { transactionFinalized } from '../transactions/actions';
+import { transactionFinalized } from "../transactions/actions";
 import type { AppState } from "../store";
 import type { NormalizedUser } from "./types";
 
@@ -36,44 +36,44 @@ const slice = createSlice({
   },
   extraReducers: (builder) =>
     builder
-    .addCase(fetchMulticallData.fulfilled, (state, action) => {
-      const userData = userMulticallDataParser(action.payload);
-      const stakingData = stakingMulticallDataParser(action.payload);
+      .addCase(fetchMulticallData.fulfilled, (state, action) => {
+        const userData = userMulticallDataParser(action.payload);
+        const stakingData = stakingMulticallDataParser(action.payload);
 
-      if (userData) {
-        const { allowances, balances, ndx } = userData;
-        for (const key of Object.keys(balances)) {
-          state.balances[key.toLowerCase()] = balances[key];
+        if (userData) {
+          const { allowances, balances, ndx } = userData;
+          for (const key of Object.keys(balances)) {
+            state.balances[key.toLowerCase()] = balances[key];
+          }
+          for (const key of Object.keys(allowances)) {
+            state.allowances[key.toLowerCase()] = allowances[key];
+          }
+          state.ndx = ndx;
         }
-        for (const key of Object.keys(allowances)) {
-          state.allowances[key.toLowerCase()] = allowances[key];
-        }
-        state.ndx = ndx;
-      }
 
-      if (stakingData) {
-        for (const [stakingPoolAddress, update] of Object.entries(
-          stakingData
-        )) {
-          if (update.userData) {
-            state.staking[stakingPoolAddress] = {
-              balance: update.userData.userStakedBalance,
-              earned: update.userData.userRewardsEarned,
-            };
+        if (stakingData) {
+          for (const [stakingPoolAddress, update] of Object.entries(
+            stakingData
+          )) {
+            if (update.userData) {
+              state.staking[stakingPoolAddress] = {
+                balance: update.userData.userStakedBalance,
+                earned: update.userData.userRewardsEarned,
+              };
+            }
           }
         }
-      }
 
-      return state;
-    })
-    .addCase(transactionFinalized, (state, action) => {
-      const { extra } = action.payload;
-      if (extra && extra.type === 'ERC20.approve') {
-        const { tokenAddress, spender, amount } = extra.approval;
-        state.allowances[`user${spender}-user${tokenAddress}`.toLowerCase()] = amount;
-      }
-    })
-
+        return state;
+      })
+      .addCase(transactionFinalized, (state, action) => {
+        const { extra } = action.payload;
+        if (extra && extra.type === "ERC20.approve") {
+          const { tokenAddress, spender, amount } = extra.approval;
+          state.allowances[`user${spender}-user${tokenAddress}`.toLowerCase()] =
+            amount;
+        }
+      }),
 });
 
 export const { actions: userActions, reducer: userReducer } = slice;

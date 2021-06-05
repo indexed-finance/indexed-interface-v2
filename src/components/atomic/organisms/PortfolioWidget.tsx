@@ -21,13 +21,13 @@ export function PortfolioWidget(props: FormattedPortfolioAsset) {
 
   function FormattedLink({ children }: { children: ReactNode }) {
     if (props.isUniswapPair) {
-      return <ExternalLink to={props.link}>
-        {children}
-      </ExternalLink>
+      return (
+        <ExternalLink to={props.link} withIcon={false}>
+          {children}
+        </ExternalLink>
+      );
     }
-    return <Link to={props.link}>
-      {children}
-    </Link>
+    return <Link to={props.link}>{children}</Link>;
   }
 
   return (
@@ -81,6 +81,7 @@ export function PortfolioWidget(props: FormattedPortfolioAsset) {
               symbol={props.symbol}
               amount={props.balance}
               size="small"
+              onlyImage={true}
             />
             <Typography.Text
               type="success"
