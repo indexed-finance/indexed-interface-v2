@@ -119,13 +119,21 @@ export const newStakingSelectors = {
         const { userStakedBalance = "0", userEarnedRewards = "0" } = pool;
 
         prev[pool.token] = {
-          balance: userStakedBalance.toString(),
-          rewards: userEarnedRewards.toString(),
+          balance: convert.toBalanceNumber(
+            userStakedBalance.toString(),
+            pool.decimals,
+            6
+          ),
+          rewards: convert.toBalanceNumber(
+            userEarnedRewards.toString(),
+            pool.decimals,
+            6
+          ),
         };
       }
 
       return prev;
-    }, {} as Record<string, { balance: string; rewards: string }>);
+    }, {} as Record<string, { balance: number; rewards: number }>);
   },
 };
 

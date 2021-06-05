@@ -8,15 +8,25 @@ import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useMemo, useRef, useState } from "react";
 import cx from "classnames";
 
+const LOCALSTORAGE_KEY = "Hidden Tx";
+
 export function TransactionList() {
   const transactions = useSelector(selectors.selectTransactions);
   const hiding = useRef<Record<string, true>>({});
-  const [hidden, setHidden] = useState<Record<string, true>>({});
+  const [hidden, setHidden] = useState<Record<string, true>>(
+    JSON.parse(window.localStorage.getItem(LOCALSTORAGE_KEY) || "{}")
+  );
   const displayedTransactions = useMemo(
     () => transactions.filter((tx) => !hidden[tx.hash]),
     [transactions, hidden]
   );
   const dispatch = useDispatch();
+
+  // Effect:
+  // When a transaction is hidden, persist it so it doesn't continually show.
+  useEffect(() => {
+    window.localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(hidden));
+  }, [hidden]);
 
   // Effect:
   // - 5 seconds after a transaction is confirmed, add it to the "hide" list.
@@ -29,9 +39,7 @@ export function TransactionList() {
 
           notification.success({
             message: "Transaction confirmed",
-            description: `${abbreviateAddress(
-              tx.hash
-            )} was confirmed after X seconds.`,
+            description: `${abbreviateAddress(tx.hash)} was confirmed.`,
           });
 
           setTimeout(() => {
@@ -47,9 +55,7 @@ export function TransactionList() {
 
           notification.error({
             message: "Transaction rejected",
-            description: `${abbreviateAddress(
-              tx.hash
-            )} was rejected after X seconds.`,
+            description: `${abbreviateAddress(tx.hash)} was rejected.`,
           });
 
           setTimeout(() => {

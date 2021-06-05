@@ -111,16 +111,8 @@ export function usePortfolioData(): {
         }
 
         if (newStakingPoolUserInfo) {
-          ndxEarned += convert.toBalanceNumber(
-            newStakingPoolUserInfo.rewards,
-            decimals,
-            6
-          );
-          staked += convert.toBalanceNumber(
-            newStakingPoolUserInfo.balance,
-            decimals,
-            6
-          );
+          ndxEarned += newStakingPoolUserInfo.rewards;
+          staked += newStakingPoolUserInfo.balance;
         }
 
         totalNdxEarned += ndxEarned;
