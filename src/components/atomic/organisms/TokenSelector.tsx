@@ -70,7 +70,7 @@ export function TokenSelector({
   autoFocus = false,
   onChange,
   isInput,
-  loading
+  loading,
 }: Props) {
   const tx = useTranslator();
   const { setTouched } = useFormikContext<any>();
@@ -93,7 +93,7 @@ export function TokenSelector({
     if (rawBalance && selectedToken) {
       return convert.toBalance(rawBalance, selectedToken.decimals, false, 18);
     }
-    return '0';
+    return "0";
   }, [rawBalance, selectedToken, balanceOverride]);
 
   const triggerChange = useCallback(
@@ -222,7 +222,6 @@ export function TokenSelector({
             />
             <InputNumber
               autoFocus={autoFocus}
-              bordered={false}
               ref={input}
               min={0}
               max={max}

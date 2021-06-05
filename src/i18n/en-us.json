@@ -106,7 +106,7 @@
   "TOOLTIP:_PORTFOLIO-WIDGET-EARNED": "Foo bar baz.",
   "TOTAL_SWAP_FEES_IN_USD": "Total swap fees (in USD)",
   "TOTAL_SWAP_VOLUME_IN_USD": "Total swap volume (in USD)",
-  "TOTAL_VALUE": "Portfolio value",
+  "TOTAL_VALUE": "Portfolio value: ",
   "TOTAL_VALUE_LOCKED": "Total value locked",
   "TOTAL_VALUE_LOCKED_IN_USD": "Total value locked (in USD)",
   "TRADE": "Trade",
