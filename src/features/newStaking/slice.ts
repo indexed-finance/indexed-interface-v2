@@ -104,16 +104,28 @@ export const newStakingSelectors = {
       .selectAllNewStakingPools(state)
       .find(({ token }) => token.toLowerCase() === id.toLowerCase());
   },
-  selectNewStakingPoolsByStakingTokens(state: AppState, ids: string[]) {
-    const allPools = newStakingSelectors.selectAllNewStakingPools(state);
-
-    return ids.map((id) =>
-      allPools.find((p) => p.token.toLowerCase() === id.toLowerCase())
-    );
-  },
   selectNewUserStakedBalance(state: AppState, id: string) {
     return newStakingSelectors.selectNewStakingPool(state, id)
       ?.userStakedBalance;
+  },
+  selectNewStakingInfoLookup(state: AppState, ids: string[]) {
+    return ids.reduce((prev, next) => {
+      const pool = newStakingSelectors.selectNewStakingPoolByStakingToken(
+        state,
+        next
+      );
+
+      if (pool) {
+        const { userStakedBalance = "0", userEarnedRewards = "0" } = pool;
+
+        prev[pool.token] = {
+          balance: userStakedBalance.toString(),
+          rewards: userEarnedRewards.toString(),
+        };
+      }
+
+      return prev;
+    }, {} as Record<string, { balance: string; rewards: string }>);
   },
 };
 
