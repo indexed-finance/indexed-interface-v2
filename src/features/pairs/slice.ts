@@ -70,7 +70,7 @@ const slice = createSlice({
             console.log(`Got non-lowercase pair from server`)
           }
           if (entry) {
-            if (pair.exists !== undefined) {
+            if (typeof pair.exists !== "undefined") {
               if (pair.exists && pair.reserves0 && pair.reserves1) {
                 entry.exists = true;
                 entry.reserves0 = pair.reserves0
