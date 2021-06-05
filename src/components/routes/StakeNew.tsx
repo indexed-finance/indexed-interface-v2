@@ -6,8 +6,8 @@ import {
   selectors,
 } from "features";
 import { BiLinkExternal } from "react-icons/bi";
+import { ExternalLink, Label, Page, TokenSelector } from "components/atomic";
 import { Formik, useFormikContext } from "formik";
-import { Label, Page, TokenSelector } from "components/atomic";
 import { Link, useParams } from "react-router-dom";
 import { MULTI_TOKEN_STAKING_ADDRESS } from "config";
 import { abbreviateAddress, convert } from "helpers";
@@ -16,8 +16,10 @@ import {
   useNewStakingRegistrar,
   useNewStakingTransactionCallbacks,
   usePortfolioData,
+  useTokenBalances,
 } from "hooks";
 import { useSelector } from "react-redux";
+import S from "string";
 
 function StakingForm({
   token,
@@ -73,6 +75,8 @@ function StakingForm({
     else withdraw(convert.toToken(values.amount.toString(), 18).toString());
   };
 
+  const [balance] = useTokenBalances([stakingToken.token])
+
   return (
     <>
       <Space direction="vertical" size="large" style={{ width: "100%" }}>
@@ -90,7 +94,7 @@ function StakingForm({
                 values.inputType === "unstake" ? "Staked" : undefined
               }
               balanceOverride={
-                values.inputType === "unstake" ? staked : undefined
+                values.inputType === "unstake" ? staked : convert.toBalance(balance, stakingToken.decimals)
               }
               selectable={false}
               onChange={(value) => setFieldValue("amount", value.amount)}
@@ -234,7 +238,13 @@ function StakingStats({
         {convert.toBalance(stakingToken.totalStaked, 18, true)} {symbol}
       </Descriptions.Item>
       <Descriptions.Item label="Staking Token">
-        {symbol} <BiLinkExternal />
+        {
+          stakingToken.isWethPair ? <ExternalLink to={`https://v2.info.uniswap.org/pair/${stakingToken.id}`}>
+            {symbol}
+          </ExternalLink> : <Link to={`/index-pools/${S(stakingToken.name).slugify().s}`}>
+            {symbol}
+          </Link>
+        }
       </Descriptions.Item>
     </Descriptions>
   );
@@ -245,7 +255,6 @@ export default function StakeNew() {
 
   useNewStakingRegistrar();
   const data = usePortfolioData();
-  // console.log(data)
   const toStake = useSelector((state: AppState) =>
     selectors.selectNewStakingPool(state, id)
   );
@@ -284,12 +293,8 @@ export default function StakeNew() {
                 const errors: Record<string, string> = {};
                 const maximum =
                   values.inputType === "stake"
-                    ? parseFloat(
-                        convert.toBalance(relevantPortfolioToken.balance)
-                      )
-                    : parseFloat(
-                        convert.toBalance(toStake.userStakedBalance ?? "0")
-                      );
+                    ? parseFloat(relevantPortfolioToken.balance)
+                    : parseFloat(convert.toBalance(toStake.userStakedBalance ?? "0"));
                 if (values.amount > maximum) {
                   errors.amount = "Insufficient balance.";
                 }
