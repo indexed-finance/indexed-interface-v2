@@ -252,7 +252,7 @@ export const selectors = {
         return {
           id: stakingPool.id,
           isWethPair: stakingPool.isWethPair,
-          slug: S(indexPool.name).slugify().s,
+          slug: `/index-pools/${S(indexPool.name).slugify().s}`,
           name,
           symbol,
           totalStaked,
@@ -333,7 +333,7 @@ export const selectors = {
           id: stakingPool.id,
           indexPool: indexPool.id,
           isWethPair: stakingPool.isWethPair,
-          slug: S(indexPool.name).slugify().s,
+          slug: `/index-pools/${S(indexPool.name).slugify().s}`,
           name,
           symbol,
           totalStaked,
