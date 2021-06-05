@@ -1,11 +1,10 @@
 import { BiCoin } from "react-icons/bi";
-import { Button, Divider, Space, Typography } from "antd";
+import { Button, Space, Typography } from "antd";
 import { FaCoins, FaFireAlt, FaTractor } from "react-icons/fa";
 import { FormattedIndexPool } from "features";
-import { Token } from "components/atomic";
-import { useBreakpoints, useStakingApy } from "hooks";
 import { useInteractionDrawer } from "components/drawers";
 import { useMemo } from "react";
+import { useStakingApy } from "hooks";
 
 export function useIndexPoolInteractions(indexPoolAddress: string) {
   const { open } = useInteractionDrawer(indexPoolAddress);
@@ -47,62 +46,22 @@ export function IndexPoolInteractionBar({
 }: {
   indexPool: FormattedIndexPool;
 }) {
-  const { isMobile } = useBreakpoints();
   const indexPoolInteractions = useIndexPoolInteractions(indexPool.id);
 
   return (
-    <Space
-      style={{
-        width: "100%",
-        justifyContent: "flex-end",
-        margin: "0 8rem",
-      }}
-    >
-      {!isMobile && (
-        <>
-          <Typography.Title level={4} type="secondary" style={{ margin: 0 }}>
-            <Token
-              name={indexPool.name}
-              address={indexPool.id}
-              symbol={indexPool.symbol}
-            />
+    <Button.Group style={{ width: "100%", marginBottom: 24 }}>
+      {indexPoolInteractions.map((interaction) => (
+        <Button key={interaction.title} size="large" block={true}>
+          <Typography.Title level={4} onClick={interaction.onClick}>
+            <Space>
+              <span style={{ position: "relative", top: 3 }}>
+                {interaction.icon}
+              </span>
+              <span>{interaction.title}</span>
+            </Space>
           </Typography.Title>
-          <Divider type="vertical" />
-        </>
-      )}
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "space-evenly",
-          flex: 1,
-        }}
-      >
-        {indexPoolInteractions.map((link) => {
-          const inner = (
-            <Typography.Title level={4} onClick={link.onClick}>
-              <Space>
-                <span style={{ position: "relative", top: 3 }}>
-                  {link.icon}
-                </span>
-                <span>{link.title}</span>
-              </Space>
-            </Typography.Title>
-          );
-
-          return (
-            <Button
-              key={link.title}
-              size="large"
-              type="text"
-              style={{ textTransform: "uppercase" }}
-            >
-              {inner}
-            </Button>
-          );
-        })}
-      </div>
-    </Space>
+        </Button>
+      ))}
+    </Button.Group>
   );
 }

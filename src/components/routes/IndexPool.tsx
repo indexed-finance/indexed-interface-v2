@@ -31,6 +31,7 @@ function LoadedIndexPool(props: FormattedIndexPool) {
 
   return (
     <div style={{ paddingTop: 12 }}>
+      <IndexPoolInteractionBar indexPool={props} />
       <Row
         align="stretch"
         gutter={{
@@ -101,7 +102,6 @@ export default function IndexPool() {
   return (
     <Page
       extra={indexPool ? <IndexPoolPerformance {...indexPool} /> : <Spin />}
-      actions={indexPool && <IndexPoolInteractionBar indexPool={indexPool} />}
       title={
         indexPool ? (
           <Space>
