@@ -4,6 +4,7 @@
   "private": true,
   "proxy": "https://api.thegraph.com",
   "dependencies": {
+    "@ant-design/icons": "^4.6.2",
     "@indexed-finance/indexed.js": "^1.0.45",
     "@indexed-finance/subgraph-clients": "0.0.7",
     "@metamask/jazzicon": "^2.0.0",
