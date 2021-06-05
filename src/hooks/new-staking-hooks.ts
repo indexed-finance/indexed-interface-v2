@@ -25,7 +25,7 @@ export function useNewStakingTokenPrice(id: string) {
   const [supplyTokens, _pairs, indexPool] = useMemo(() => {
     if (!stakingPool) return [[], [], ""];
     if (!stakingPool.isWethPair) {
-      return [[stakingPool.token], [], stakingPool.token];
+      return [[], [], stakingPool.token];
     }
     const [token0, token1] = [
       stakingPool.token0 as string,
