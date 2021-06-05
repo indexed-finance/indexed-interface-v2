@@ -36,6 +36,7 @@ export default function Splash() {
             >
               <Link to="/index-pools">
                 <Button
+                  className="plus"
                   type="primary"
                   style={{
                     textTransform: "uppercase",

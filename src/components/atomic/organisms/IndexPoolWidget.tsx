@@ -35,7 +35,7 @@ export function IndexPoolWidget(props: FormattedIndexPool) {
       price={props.priceUsd}
       stats={
         <Statistic
-          title="TVL"
+          title="Total Value Locked"
           value={props.totalValueLocked}
           valueRender={(value) => <div className="colorful">{value}</div>}
         />
