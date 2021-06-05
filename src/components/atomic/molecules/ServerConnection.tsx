@@ -40,7 +40,7 @@ export function ServerConnection({ showText = false }: Props) {
     ) : (
       connectionStatus.text
     );
-
+  if (!isUserConnected) return <></>
   return (
     <Typography.Title
       level={5}
