@@ -11,13 +11,15 @@ import { Formik, useFormikContext } from "formik";
 import { Link, useParams } from "react-router-dom";
 import { MULTI_TOKEN_STAKING_ADDRESS } from "config";
 import { abbreviateAddress, convert } from "helpers";
-import { useMemo } from "react";
 import {
+  useBalanceAndApprovalRegistrar,
   useNewStakingRegistrar,
   useNewStakingTransactionCallbacks,
   usePortfolioData,
-  useTokenBalances,
+  useTokenApproval,
+  useTokenBalance
 } from "hooks";
+import { useMemo } from "react";
 import { useSelector } from "react-redux";
 import S from "string";
 
@@ -75,7 +77,21 @@ function StakingForm({
     else withdraw(convert.toToken(values.amount.toString(), 18).toString());
   };
 
-  const [balance] = useTokenBalances([stakingToken.token])
+  useBalanceAndApprovalRegistrar(MULTI_TOKEN_STAKING_ADDRESS, [stakingToken.token])
+  const balance = useTokenBalance(stakingToken.token);
+  const [amount, rawAmount] = useMemo(() => {
+    return [
+      values.amount.toString(),
+      convert.toToken(values.amount.toString(), stakingToken.decimals).toString()
+    ]
+  }, [values, stakingToken])
+  const { status, approve } = useTokenApproval({
+    spender: MULTI_TOKEN_STAKING_ADDRESS,
+    tokenId: stakingToken.token,
+    amount,
+    rawAmount,
+    symbol: stakingToken.symbol
+  });
 
   return (
     <>
@@ -127,17 +143,27 @@ function StakingForm({
           style={{ textAlign: "center", width: "100%" }}
         >
           <Col span={12} style={{ textAlign: "center", alignSelf: "center" }}>
-            <Button
-              type="primary"
-              danger={values.inputType === "unstake"}
-              block={true}
-              onClick={handleSubmit}
-              disabled={
-                values.inputType === "unstake" && parseFloat(staked || "0") <= 0
-              }
-            >
-              {values.inputType === "stake" ? "Deposit" : "Withdraw"}
-            </Button>
+            {
+              (values.inputType === "stake" && status === "approval needed")
+              ? <Button
+                type="primary"
+                block={true}
+                onClick={approve}
+                disabled={!!errors.amount}
+              >
+                Approve
+              </Button>
+              : <Button
+                type="primary"
+                danger={values.inputType === "unstake"}
+                block={true}
+                onClick={handleSubmit}
+                disabled={!!errors.amount}
+              >
+                {values.inputType === "stake" ? "Deposit" : "Withdraw"}
+              </Button>
+            }
+            
           </Col>
           <Col span={4}>
             <Button
@@ -155,28 +181,6 @@ function StakingForm({
             </Button>
           </Col>
         </Row>
-
-        <Space direction="vertical" style={{ width: "100%" }}>
-          <Label>Actions</Label>
-          <Button
-            type="default"
-            block={true}
-            disabled={parseFloat(earned || "0") <= 0}
-            onClick={claim}
-            title="Claim NDX rewards"
-          >
-            Claim
-          </Button>
-          <Button
-            type="default"
-            block={true}
-            disabled={parseFloat(staked || "0") <= 0}
-            title="Withdraw all staked tokens and rewards."
-            onClick={exit}
-          >
-            Exit
-          </Button>
-        </Space>
       </Space>
     </>
   );
@@ -199,38 +203,52 @@ function StakingStats({
     return [staked, earned];
   }, [stakingToken]);
 
+  const { exit, claim } = useNewStakingTransactionCallbacks(
+    stakingToken.id
+  );
+
   return (
     <Descriptions bordered={true} column={1}>
       {/* Left Column */}
-      <Descriptions.Item label="Earned Rewards">
-        {parseFloat(earned) > 0 ? (
-          <Row style={{ textAlign: "center" }}>
-            <Col span={12}>{earned} NDX</Col>
-            <Col span={12}>
-              <Button type="primary" block={true}>
+      {
+        parseFloat(staked) > 0 &&
+        <Descriptions.Item label="Staked">
+        <Row>
+          <Col span={14}>{staked} {symbol}</Col>
+          <Col span={8}>
+            <Button danger type="primary" block={true} onClick={exit}>
+              Exit
+            </Button>
+          </Col>
+        </Row>
+        
+        </Descriptions.Item>
+      }
+      {
+        parseFloat(earned) > 0 &&
+        <Descriptions.Item label="Earned Rewards">
+          <Row>
+            <Col span={14}>{earned} NDX</Col>
+            <Col span={8}>
+              <Button type="primary" block={true} onClick={claim}>
                 Claim
               </Button>
             </Col>
           </Row>
-        ) : (
-          <>{earned} NDX</>
-        )}
-      </Descriptions.Item>
-
-      <Descriptions.Item label="Currently Staking">
-        {staked} {symbol}
-      </Descriptions.Item>
+        </Descriptions.Item>
+      }
+      
 
       <Descriptions.Item label="Reward Rate per Day">
         {`${convert.toBalance(stakingToken.rewardsPerDay, 18)} NDX`}
       </Descriptions.Item>
 
       <Descriptions.Item label="Rewards Pool">
-        <Link
+        <ExternalLink
           to={`https://etherscan.io/address/${MULTI_TOKEN_STAKING_ADDRESS}`}
         >
           {abbreviateAddress(MULTI_TOKEN_STAKING_ADDRESS)} <BiLinkExternal />
-        </Link>
+        </ExternalLink>
       </Descriptions.Item>
 
       {/* Right Column */}
