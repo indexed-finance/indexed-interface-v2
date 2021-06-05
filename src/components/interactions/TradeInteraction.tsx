@@ -49,39 +49,40 @@ export function TradeInteraction({ indexPool }: Props) {
 
       const inputToken = tokenLookup[fromToken.toLowerCase()];
       const outputToken = tokenLookup[toToken.toLowerCase()];
-
-      if (lastTouchedField === "from") {
-        if (!fromAmount || isNaN(fromAmount)) {
-          values.fromAmount = 0;
-          values.toAmount = 0;
-          return;
+      if (inputToken && outputToken) {
+        if (lastTouchedField === "from") {
+          if (!fromAmount || isNaN(fromAmount)) {
+            values.fromAmount = 0;
+            values.toAmount = 0;
+            return;
+          }
+          const amountIn = convert
+            .toToken(fromAmount.toString(), inputToken.decimals)
+            .toString(10);
+          const bestTrade = calculateBestTradeForExactInput(
+            inputToken,
+            outputToken,
+            amountIn
+          );
+          values.toAmount = parseFloat(bestTrade?.outputAmount.toFixed(4) ?? "0");
+        } else {
+          if (!toAmount || isNaN(toAmount)) {
+            values.fromAmount = 0;
+            values.toAmount = 0;
+            return;
+          }
+          const amountOut = convert
+            .toToken(toAmount.toString(), outputToken.decimals)
+            .toString(10);
+          const bestTrade = calculateBestTradeForExactOutput(
+            inputToken,
+            outputToken,
+            amountOut
+          );
+          values.fromAmount = parseFloat(
+            bestTrade?.inputAmount.toFixed(4) ?? "0"
+          );
         }
-        const amountIn = convert
-          .toToken(fromAmount.toString(), inputToken.decimals)
-          .toString(10);
-        const bestTrade = calculateBestTradeForExactInput(
-          inputToken,
-          outputToken,
-          amountIn
-        );
-        values.toAmount = parseFloat(bestTrade?.outputAmount.toFixed(4) ?? "0");
-      } else {
-        if (!toAmount || isNaN(toAmount)) {
-          values.fromAmount = 0;
-          values.toAmount = 0;
-          return;
-        }
-        const amountOut = convert
-          .toToken(toAmount.toString(), outputToken.decimals)
-          .toString(10);
-        const bestTrade = calculateBestTradeForExactOutput(
-          inputToken,
-          outputToken,
-          amountOut
-        );
-        values.fromAmount = parseFloat(
-          bestTrade?.inputAmount.toFixed(4) ?? "0"
-        );
       }
     },
     [
