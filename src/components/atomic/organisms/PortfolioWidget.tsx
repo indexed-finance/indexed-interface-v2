@@ -22,7 +22,11 @@ export function PortfolioWidget(props: FormattedPortfolioAsset) {
   function FormattedLink({ children }: { children: ReactNode }) {
     if (isNdx || props.isUniswapPair) {
       return (
-        <ExternalLink to={props.link} withIcon={false}>
+        <ExternalLink
+          to={props.link}
+          withIcon={false}
+          style={{ display: "block" }}
+        >
           {children}
         </ExternalLink>
       );

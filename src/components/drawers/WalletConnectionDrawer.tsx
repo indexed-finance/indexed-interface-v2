@@ -113,22 +113,23 @@ export function WalletConnectionDrawer() {
               onClick={() => attemptActivation(option.connector)}
               className="wallet-option"
               style={{
-                height: 130,
+                height: 66,
                 position: "relative",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
               }}
             >
-              <img
-                src={option.icon}
-                style={{
-                  flex: 1,
-                  width: 128,
-                  height: 128,
-                }}
-                alt={option.name}
-              />
+              <div style={{ flex: 1 }}>
+                <img
+                  src={option.icon}
+                  style={{
+                    width: 64,
+                    height: 64,
+                  }}
+                  alt={option.name}
+                />
+              </div>
               <div style={{ textAlign: "right", flex: 2 }}>
                 <Typography.Title className="fancy" level={3}>
                   {option.name}

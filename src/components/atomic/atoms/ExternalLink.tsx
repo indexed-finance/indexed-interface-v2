@@ -5,10 +5,12 @@ export function ExternalLink({
   to,
   children,
   withIcon = true,
+  style = {},
   ...rest
 }: {
   to: string;
   children: ReactNode;
+  style?: any;
   withIcon?: boolean;
 }) {
   return (
@@ -21,6 +23,7 @@ export function ExternalLink({
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
+        ...style,
       }}
     >
       <div>{children}</div>{" "}
