@@ -59,7 +59,7 @@ export function Navigation() {
         </Link>
       </Menu.Item>
       <Menu.Item>
-        <ExternalLink to="https://vote.indexed.finance/" withIcon={false}>
+        <ExternalLink to="https://legacy.indexed.finance/governance" withIcon={false}>
           <Space size="small">
             <FaGavel style={{ position: "relative", top: 2 }} />{" "}
             {!isMobile && <span>Vote</span>}
