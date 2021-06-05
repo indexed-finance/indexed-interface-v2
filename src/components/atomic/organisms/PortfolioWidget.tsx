@@ -20,7 +20,7 @@ export function PortfolioWidget(props: FormattedPortfolioAsset) {
   usePoolDetailRegistrar(isNdx ? "" : props.address, tokenIds);
 
   function FormattedLink({ children }: { children: ReactNode }) {
-    if (props.isUniswapPair) {
+    if (isNdx || props.isUniswapPair) {
       return (
         <ExternalLink to={props.link} withIcon={false}>
           {children}

@@ -3,6 +3,7 @@ import { NDX_ADDRESS, WETH_CONTRACT_ADDRESS } from "config";
 import { computeUniswapPairAddress, convert } from "helpers";
 import { useAllPools } from "./pool-hooks";
 import { useMemo } from "react";
+import { useNewStakingInfoLookup } from "./new-staking-hooks";
 import { usePairExistsLookup } from "./pair-hooks";
 import { useSelector } from "react-redux";
 import {
@@ -10,7 +11,7 @@ import {
   useStakingPoolsForTokens,
 } from "./staking-hooks";
 import { useTokenBalances } from "./user-hooks";
-import { useTokenPricesLookup } from "./token-hooks";
+import { useTokenLookup, useTokenPricesLookup } from "./token-hooks";
 import S from "string";
 
 export function usePortfolioData(): {
@@ -74,10 +75,11 @@ export function usePortfolioData(): {
     const assetIds = assets.map((asset) => asset.id);
     return [assets, assetIds];
   }, [assetsRaw, pairExistsLookup]);
-
   const balances = useTokenBalances(assetIds);
   const stakingPoolsByTokens = useStakingPoolsForTokens(assetIds);
   const stakingInfoLookup = useStakingInfoLookup();
+  const newStakingInfoLookup = useNewStakingInfoLookup(assetIds);
+  const tokenLookup = useTokenLookup();
 
   return useMemo(() => {
     let totalNdxEarned = 0;
@@ -89,26 +91,44 @@ export function usePortfolioData(): {
         const stakingPoolUserInfo = stakingPool
           ? stakingInfoLookup[stakingPool.id]
           : undefined;
+        const newStakingPoolUserInfo = newStakingInfoLookup[id];
+        const decimals = tokenLookup[id]?.decimals ?? 18;
+
         let ndxEarned = 0;
         let staked = 0;
+
         if (stakingPoolUserInfo) {
           const earned = convert.toBalanceNumber(
             stakingPoolUserInfo.earned,
-            18
+            decimals
           );
-          ndxEarned = earned;
-          staked = convert.toBalanceNumber(stakingPoolUserInfo.balance, 18, 6);
+          ndxEarned += earned;
+          staked += convert.toBalanceNumber(
+            stakingPoolUserInfo.balance,
+            decimals,
+            6
+          );
         }
+
+        if (newStakingPoolUserInfo) {
+          ndxEarned += newStakingPoolUserInfo.rewards;
+          staked += newStakingPoolUserInfo.balance;
+        }
+
         totalNdxEarned += ndxEarned;
         const price = priceLookup[id] ?? 0;
-        const balance = convert.toBalanceNumber(balances[i] ?? "0", 18, 6);
+        const balance = convert.toBalanceNumber(
+          balances[i] ?? "0",
+          decimals,
+          6
+        );
         const value = (staked + balance) * price;
 
         totalValue += value;
         const link = isUniswapPair
           ? `https://v2.info.uniswap.org/pair/${id.toLowerCase()}`
           : id.toLowerCase() === NDX_ADDRESS.toLowerCase()
-          ? ""
+          ? "https://v2.info.uniswap.org/token/0X86772B1409B61C639EAAC9BA0ACFBB6E238E5F83"
           : `/index-pools/${S(name).slugify().s}`;
 
         return {
@@ -157,5 +177,7 @@ export function usePortfolioData(): {
     theme,
     stakingPoolsByTokens,
     priceLookup,
+    newStakingInfoLookup,
+    tokenLookup,
   ]);
 }
