@@ -93,12 +93,12 @@ export function useUniswapPairs(
 
   return useMemo(() => {
     try {
-      if (provider && !isLoading) {
+      if (!isLoading) {
         const goodPairs = (pairDatas as FormattedPair[]).filter(
           ({ exists }) => exists
         );
         const uniSdkPairs = goodPairs.map((entry) =>
-          convert.toUniswapSDKPair(provider!, entry)
+          convert.toUniswapSDKPair({ network: { chainId: 1 } }, entry)
         ) as Pair[];
 
         return [uniSdkPairs, false];
@@ -127,15 +127,15 @@ export function useUniswapTradingPairs(baseTokens: string[]) {
       amountIn: string, // Should be formatted as a token amount in base 10 or hex
       opts?: BestTradeOptions
     ): Trade | undefined => {
-      if (provider && !loading) {
+      if (!loading) {
         const [bestTrade] = bestTradeExactIn(
           pairs as Pair[],
           convert.toUniswapSDKCurrencyAmount(
-            provider,
+            { network: { chainId: 1 } },
             tokenIn,
             amountIn
           ) as TokenAmount,
-          convert.toUniswapSDKCurrency(provider, tokenOut) as Token,
+          convert.toUniswapSDKCurrency({ network: { chainId: 1 } }, tokenOut) as Token,
           opts ?? { maxHops: 3, maxNumResults: 1 }
         );
 
@@ -151,12 +151,12 @@ export function useUniswapTradingPairs(baseTokens: string[]) {
       amountOut: string, // Should be formatted as a token amount
       opts?: BestTradeOptions
     ): Trade | undefined => {
-      if (provider && !loading) {
+      if (!loading) {
         const [bestTrade] = bestTradeExactOut(
           pairs as Pair[],
-          convert.toUniswapSDKCurrency(provider, tokenIn) as Token,
+          convert.toUniswapSDKCurrency({ network: { chainId: 1 } }, tokenIn) as Token,
           convert.toUniswapSDKCurrencyAmount(
-            provider,
+            { network: { chainId: 1 } },
             tokenOut,
             amountOut
           ) as TokenAmount,
