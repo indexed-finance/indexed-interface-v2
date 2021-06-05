@@ -22,13 +22,7 @@ export function StakingWidgetNew(props: FormattedNewStakingData) {
         symbol={symbol}
         address={props.id}
         price={price ? convert.toCurrency(price) : ""}
-        onClick={() =>
-          props.isWethPair
-            ? window.open(
-                `https://v2.uniswap.org/pair/${props.stakingToken.toLowerCase()}`
-              )
-            : push(props.slug)
-        }
+        onClick={() => push(`/staking-new/${props.id}`)}
         stats={
           <Space direction="vertical" style={{ width: "100%" }}>
             <Statistic
