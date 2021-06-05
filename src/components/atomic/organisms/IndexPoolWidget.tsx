@@ -33,7 +33,13 @@ export function IndexPoolWidget(props: FormattedIndexPool) {
       symbol={props.symbol}
       address={props.id}
       price={props.priceUsd}
-      stats={<Statistic title="TVL" value={props.totalValueLocked} />}
+      stats={
+        <Statistic
+          title="TVL"
+          value={props.totalValueLocked}
+          valueRender={(value) => <div className="colorful">{value}</div>}
+        />
+      }
       actions={
         <Button type="primary" onClick={(event) => event.stopPropagation()}>
           <Link to={`${props.slug}?interaction=trade`}>Buy</Link>

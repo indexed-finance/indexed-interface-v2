@@ -42,7 +42,11 @@ export function StakingWidget(props: FormattedStakingData) {
               <Statistic
                 title={tx("APY")}
                 value={apy ?? "Expired"}
-                valueStyle={{ color: isExpired ? "#333" : "inherit" }}
+                valueRender={(value) => (
+                  <div style={{ color: isExpired ? "#333" : "inherit" }}>
+                    {value}
+                  </div>
+                )}
               />
               <Statistic
                 title={tx("RATE")}
