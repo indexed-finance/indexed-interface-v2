@@ -19,7 +19,7 @@ const USEFUL_LINKS: Array<{
     text: "Buy on Uniswap",
     image: require("images/uniswap-link.png").default,
     makeLink: (address) =>
-      `https://v2.uniswap.org/token/${address.toLowerCase()}`,
+      `https://v2.info.uniswap.org/token/${address.toLowerCase()}`,
   },
 ];
 
