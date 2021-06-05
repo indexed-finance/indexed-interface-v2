@@ -46,7 +46,7 @@ const slice = createSlice({
           action.payload
         );
         if (relevantMulticallData) {
-          console.log(`Got New Staking MultiCall Data`);
+          // console.log(`Got New Staking MultiCall Data`);
           // console.log(relevantMulticallData)
           const {
             totalRewardsPerDay,
@@ -121,42 +121,44 @@ export const newStakingMulticallDataParser = createMulticallDataParser(
       totalRewardsPerDay: ""
     };
     const handleCall = ([fn, results]: [ string, CallWithResult[] ]) => {
-      const [{ args, values, target }] = results.map((item: CallWithResult) => ({
+      const formattedResults = results.map((item: CallWithResult) => ({
         target: item.target,
         args: item.args ?? [],
         values: (item.result ?? []),
       }));
-      const [result] = values;
-      const handlers: Record<string, () => void> = {
-        userInfo() {
-          const id = args[0];
-          if (!update.userDataByPool[id]) {
-            update.userDataByPool[id] = {
-              userStakedBalance: "",
-              userEarnedRewards: ""
+      for (const { args, values, target } of formattedResults) {
+        const [result] = values;
+        const handlers: Record<string, () => void> = {
+          userInfo() {
+            const id = args[0];
+            if (!update.userDataByPool[id]) {
+              update.userDataByPool[id] = {
+                userStakedBalance: "",
+                userEarnedRewards: ""
+              }
             }
-          }
-          update.userDataByPool[id].userStakedBalance = result.toString()
-        },
-        pendingRewards() {
-          const id = args[0];
-          if (!update.userDataByPool[id]) {
-            update.userDataByPool[id] = {
-              userStakedBalance: "",
-              userEarnedRewards: ""
+            update.userDataByPool[id].userStakedBalance = result.toString()
+          },
+          pendingRewards() {
+            const id = args[0];
+            if (!update.userDataByPool[id]) {
+              update.userDataByPool[id] = {
+                userStakedBalance: "",
+                userEarnedRewards: ""
+              }
             }
+            update.userDataByPool[id].userEarnedRewards = result.toString()
+          },
+          balanceOf() {
+            update.totalStakedByToken[target] = result.toString()
+          },
+          getRewardsForBlockRange() {
+            update.totalRewardsPerDay = result.toString()
           }
-          update.userDataByPool[id].userEarnedRewards = result.toString()
-        },
-        balanceOf() {
-          update.totalStakedByToken[target] = result.toString()
-        },
-        getRewardsForBlockRange() {
-          update.totalRewardsPerDay = result.toString()
+        };
+        if (result) {
+          handlers[fn]();
         }
-      };
-      if (result) {
-        handlers[fn]();
       }
     }
 
