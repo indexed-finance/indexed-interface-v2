@@ -89,11 +89,16 @@ const slice = createSlice({
       .addCase(pairsActions.uniswapPairsRegistered, (state, action) => {
         for (const pair of action.payload) {
           if (!state.entities[pair.id.toLowerCase()]) {
+            let t0 = pair.token0 ? state.entities[pair.token0.toLowerCase()]?.symbol : "";
+            if (t0 === "WETH") t0 = "ETH";
+            let t1 = pair.token1 ? state.entities[pair.token1.toLowerCase()]?.symbol : "";
+            if (t1 === "WETH") t1 = "ETH";
+            const [symbol, name] = t0 && t1 ? [`UNIV2:${t0}-${t1}`, `UNIV2:${t0}-${t1}`] : ["UniV2", `UniswapV2 LP Token`]
             state.ids.push(pair.id.toLowerCase());
             state.entities[pair.id.toLowerCase()] = {
               id: pair.id.toLowerCase(),
-              symbol: "UniV2",
-              name: `UniswapV2 LP Token`,
+              symbol,
+              name,
               decimals: 18,
             };
           }
