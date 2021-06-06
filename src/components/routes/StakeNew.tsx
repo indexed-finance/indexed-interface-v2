@@ -5,7 +5,6 @@ import {
   NewStakingPool,
   selectors,
 } from "features";
-import { BiLinkExternal } from "react-icons/bi";
 import { ExternalLink, Page, TokenSelector } from "components/atomic";
 import { Formik, useFormikContext } from "formik";
 import { Link, useParams } from "react-router-dom";
@@ -98,92 +97,89 @@ function StakingForm({
   });
 
   return (
-    <>
-      <Space direction="vertical" size="large" style={{ width: "100%" }}>
-        <TokenSelector
-          assets={[]}
-          value={{
-            token: token.symbol,
-            amount: values.amount,
-          }}
-          isInput
-          autoFocus
-          balanceLabel={values.inputType === "unstake" ? "Staked" : undefined}
-          balanceOverride={
-            values.inputType === "unstake"
-              ? staked
-              : convert.toBalance(balance, stakingToken.decimals)
-          }
-          selectable={false}
-          onChange={(value) => setFieldValue("amount", value.amount)}
-          error={errors.amount}
-        />
+    <Space direction="vertical" size="large" style={{ width: "100%" }}>
+      <TokenSelector
+        assets={[]}
+        value={{
+          token: token.symbol,
+          amount: values.amount,
+        }}
+        isInput
+        autoFocus
+        balanceLabel={values.inputType === "unstake" ? "Staked" : undefined}
+        balanceOverride={
+          values.inputType === "unstake"
+            ? staked
+            : convert.toBalance(balance, stakingToken.decimals)
+        }
+        selectable={false}
+        onChange={(value) => setFieldValue("amount", value.amount)}
+        error={errors.amount}
+      />
 
-        <Alert
-          type="warning"
-          message={
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-              }}
-            >
-              <Statistic
-                title="Estimated Reward"
-                value={`${estimatedReward} NDX / Day`}
-              />
-              <Statistic
-                title="Pool Weight"
-                value={convert.toPercent(weight)}
-                style={{ textAlign: "right" }}
-              />
-            </div>
-          }
-        />
-        <Button.Group style={{ width: "100%" }}>
-          {values.inputType === "stake" && status === "approval needed" ? (
-            <Button
-              type="primary"
-              block={true}
-              onClick={approve}
-              disabled={!!errors.amount}
-            >
-              Approve
-            </Button>
-          ) : (
-            <Button
-              type="primary"
-              danger={values.inputType === "unstake"}
-              block={true}
-              onClick={handleSubmit}
-              disabled={!!errors.amount}
-            >
-              {values.inputType === "stake" ? "Deposit" : "Withdraw"}
-            </Button>
-          )}
+      <Alert
+        type="warning"
+        message={
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            <Statistic
+              title="Estimated Reward"
+              value={`${estimatedReward} NDX / Day`}
+            />
+            <Statistic
+              title="Pool Weight"
+              value={convert.toPercent(weight)}
+              style={{ textAlign: "right" }}
+            />
+          </div>
+        }
+      />
+      <Button.Group style={{ width: "100%" }}>
+        {values.inputType === "stake" && status === "approval needed" ? (
           <Button
             type="primary"
-            danger={values.inputType === "stake"}
             block={true}
-            onClick={() =>
-              setFieldValue(
-                "inputType",
-                values.inputType === "stake" ? "unstake" : "stake"
-              )
-            }
+            onClick={approve}
+            disabled={!!errors.amount}
           >
-            {values.inputType === "stake" ? "Withdraw" : "Deposit"}
+            Approve
           </Button>
-        </Button.Group>
-      </Space>
-    </>
+        ) : (
+          <Button
+            type="primary"
+            danger={values.inputType === "unstake"}
+            block={true}
+            onClick={handleSubmit}
+            disabled={!!errors.amount}
+          >
+            {values.inputType === "stake" ? "Deposit" : "Withdraw"}
+          </Button>
+        )}
+        <Button
+          type="primary"
+          danger={values.inputType === "stake"}
+          block={true}
+          onClick={() =>
+            setFieldValue(
+              "inputType",
+              values.inputType === "stake" ? "unstake" : "stake"
+            )
+          }
+        >
+          {values.inputType === "stake" ? "Withdraw" : "Deposit"}
+        </Button>
+      </Button.Group>
+    </Space>
   );
 }
 
 function StakingStats({
   symbol,
-  portfolioToken,
   stakingToken,
 }: {
   symbol: string;
@@ -238,7 +234,7 @@ function StakingStats({
         <ExternalLink
           to={`https://etherscan.io/address/${MULTI_TOKEN_STAKING_ADDRESS}`}
         >
-          {abbreviateAddress(MULTI_TOKEN_STAKING_ADDRESS)} <BiLinkExternal />
+          {abbreviateAddress(MULTI_TOKEN_STAKING_ADDRESS)}
         </ExternalLink>
       </Descriptions.Item>
 
