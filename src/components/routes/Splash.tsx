@@ -16,7 +16,7 @@ export default function Splash() {
   return (
     <Page hasPageHeader={false}>
       <div style={{ textAlign: "center" }}>
-        <Typography.Title style={{ fontSize: isMobile ? 40 : 64 }}>
+        <Typography.Title style={{ fontSize: isMobile ? 36 : 64 }}>
           {tx("DECENTRALIZED_INDEX_PROTOCOL")}
         </Typography.Title>
         <Typography.Title level={2}>
@@ -41,6 +41,7 @@ export default function Splash() {
                   style={{
                     textTransform: "uppercase",
                     fontSize: isMobile ? 16 : 24,
+                    width: isMobile ? 160 : "auto",
                     height: "auto",
                     marginRight: isMobile ? 0 : 10,
                     marginBottom: isMobile ? 10 : 0,
@@ -54,6 +55,7 @@ export default function Splash() {
                   type="default"
                   style={{
                     fontSize: isMobile ? 16 : 24,
+                    width: isMobile ? 160 : "auto",
                     height: "auto",
                     textTransform: "uppercase",
                   }}

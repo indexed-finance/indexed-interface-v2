@@ -23,6 +23,13 @@
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+
+  @media screen and (max-width: 480px) {
+    background: none;
+    color: #0ed155;
+    background-clip: initial;
+    -webkit-text-fill-color: initial;
+  }
 }
 
 .wallet-option {
@@ -38,13 +45,8 @@
 
   margin: 48px 0;
 
-  .ant-statistic-title {
-    font-size: 20px !important;
-  }
   .ant-statistic-content {
     .colorful;
-
-    font-size: 36px !important;
   }
 }
 

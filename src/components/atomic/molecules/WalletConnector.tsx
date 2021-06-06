@@ -1,5 +1,4 @@
 import { Button } from "antd";
-// import { MdAccountBalanceWallet } from "react-icons/md";
 
 import { WalletFilled } from "@ant-design/icons";
 import { useWalletConnectionDrawer } from "components/drawers";
@@ -13,6 +12,7 @@ export function WalletConnector() {
       onClick={open}
       icon={<WalletFilled width={24} />}
       size="large"
+      style={{ marginLeft: 12 }}
     >
       Connect Wallet
     </Button>
