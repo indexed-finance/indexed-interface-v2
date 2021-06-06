@@ -100,92 +100,82 @@ function StakingForm({
   return (
     <>
       <Space direction="vertical" size="large" style={{ width: "100%" }}>
-        <Row style={{ textAlign: "center" }}>
-          <Col span={20}>
-            <TokenSelector
-              assets={[]}
-              value={{
-                token: token.symbol,
-                amount: values.amount,
-              }}
-              isInput
-              autoFocus
-              balanceLabel={
-                values.inputType === "unstake" ? "Staked" : undefined
-              }
-              balanceOverride={
-                values.inputType === "unstake"
-                  ? staked
-                  : convert.toBalance(balance, stakingToken.decimals)
-              }
-              selectable={false}
-              onChange={(value) => setFieldValue("amount", value.amount)}
-              error={errors.amount}
-            />
-          </Col>
-        </Row>
+        <TokenSelector
+          assets={[]}
+          value={{
+            token: token.symbol,
+            amount: values.amount,
+          }}
+          isInput
+          autoFocus
+          balanceLabel={values.inputType === "unstake" ? "Staked" : undefined}
+          balanceOverride={
+            values.inputType === "unstake"
+              ? staked
+              : convert.toBalance(balance, stakingToken.decimals)
+          }
+          selectable={false}
+          onChange={(value) => setFieldValue("amount", value.amount)}
+          error={errors.amount}
+        />
 
         <Alert
           type="warning"
           message={
-            <Row style={{ textAlign: "center" }}>
-              <Col span={12}>
-                <Statistic
-                  title="Estimated Reward"
-                  value={`${estimatedReward} NDX / Day`}
-                />
-              </Col>
-              <Col span={12}>
-                <Statistic
-                  title="Pool Weight"
-                  value={convert.toPercent(weight)}
-                />
-              </Col>
-            </Row>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
+              <Statistic
+                title="Estimated Reward"
+                value={`${estimatedReward} NDX / Day`}
+              />
+              <Statistic
+                title="Pool Weight"
+                value={convert.toPercent(weight)}
+                style={{ textAlign: "right" }}
+              />
+            </div>
           }
         />
-        <Row
-          justify="space-around"
-          style={{ textAlign: "center", width: "100%" }}
-        >
-          <Col span={12} style={{ textAlign: "center", alignSelf: "center" }}>
-            {values.inputType === "stake" && status === "approval needed" ? (
-              <Button
-                type="primary"
-                block={true}
-                onClick={approve}
-                disabled={!!errors.amount}
-              >
-                Approve
-              </Button>
-            ) : (
-              <Button
-                type="primary"
-                danger={values.inputType === "unstake"}
-                block={true}
-                onClick={handleSubmit}
-                disabled={!!errors.amount}
-              >
-                {values.inputType === "stake" ? "Deposit" : "Withdraw"}
-              </Button>
-            )}
-          </Col>
-          <Col span={4}>
+        <Button.Group style={{ width: "100%" }}>
+          {values.inputType === "stake" && status === "approval needed" ? (
             <Button
               type="primary"
-              danger={values.inputType === "stake"}
               block={true}
-              onClick={() =>
-                setFieldValue(
-                  "inputType",
-                  values.inputType === "stake" ? "unstake" : "stake"
-                )
-              }
+              onClick={approve}
+              disabled={!!errors.amount}
             >
-              {values.inputType === "stake" ? "Withdraw" : "Deposit"}
+              Approve
             </Button>
-          </Col>
-        </Row>
+          ) : (
+            <Button
+              type="primary"
+              danger={values.inputType === "unstake"}
+              block={true}
+              onClick={handleSubmit}
+              disabled={!!errors.amount}
+            >
+              {values.inputType === "stake" ? "Deposit" : "Withdraw"}
+            </Button>
+          )}
+          <Button
+            type="primary"
+            danger={values.inputType === "stake"}
+            block={true}
+            onClick={() =>
+              setFieldValue(
+                "inputType",
+                values.inputType === "stake" ? "unstake" : "stake"
+              )
+            }
+          >
+            {values.inputType === "stake" ? "Withdraw" : "Deposit"}
+          </Button>
+        </Button.Group>
       </Space>
     </>
   );
