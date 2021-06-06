@@ -35,11 +35,12 @@ export function Token({
   const fontSize = size === "tiny" || size === "small" ? 16 : 24;
   const Component = asAvatar ? Avatar : "img";
   const isUniswap = symbol.startsWith("UNIV2:");
-  const isOtherPair = symbol.includes("/");
+  const isOtherPairWithSlash = symbol.includes("/");
+  const isOtherPairWithDash = symbol.includes("-");
 
   let image: string | ReactNode = "";
 
-  if (isUniswap || isOtherPair) {
+  if (isUniswap || isOtherPairWithSlash || isOtherPairWithDash) {
     let firstSymbol = "";
     let secondSymbol = "";
 
@@ -47,8 +48,10 @@ export function Token({
       const pair = symbol.split("UNIV2:")[1];
 
       [firstSymbol, secondSymbol] = pair.split("-");
-    } else if (isOtherPair) {
+    } else if (isOtherPairWithSlash) {
       [firstSymbol, secondSymbol] = symbol.split("/");
+    } else if (isOtherPairWithDash) {
+      [firstSymbol, secondSymbol] = symbol.split("-");
     }
 
     image = (
