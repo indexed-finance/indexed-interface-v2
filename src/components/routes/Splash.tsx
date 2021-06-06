@@ -23,11 +23,13 @@ export default function Splash() {
           Gain exposure to passively-managed crypto index portfolios represented
           by a single token.
         </Typography.Title>
-        <Statistic
-          className="prominent-stat"
-          title="Total Protocol Assets Under Management "
-          value={assetsUnderManagement}
-        />
+        {assetsUnderManagement !== "$0.00" && (
+          <Statistic
+            className="prominent-stat"
+            title="Total Protocol Assets Under Management "
+            value={assetsUnderManagement}
+          />
+        )}
         <Typography.Title level={3}>
           <div>
             <Divider className="fancy">Dive in today</Divider>

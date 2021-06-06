@@ -10,6 +10,7 @@ import {
   TooltipProvider,
   TransactionList,
   WarningBar,
+  useDiligenceDrawer,
   useTooltips,
 } from "components";
 import { FEATURE_FLAGS } from "feature-flags";
@@ -102,6 +103,7 @@ export function AppLayout() {
     </>
   );
 
+  useDiligenceDrawer();
   useWalletConnection();
 
   // Effect:

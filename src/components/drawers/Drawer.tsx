@@ -66,6 +66,7 @@ export function BaseDrawer({
   top = 64,
   style = {},
   bodyStyle = {},
+  mask,
   ...rest
 }: BaseDrawerProps) {
   return (
@@ -75,14 +76,16 @@ export function BaseDrawer({
       closable={true}
       onClose={onClose}
       visible={true}
-      mask={false}
+      mask={mask}
       bodyStyle={{ padding, ...bodyStyle }}
+      contentWrapperStyle={{
+        width,
+      }}
       style={{
         position: "fixed",
         top,
         right: 0,
         zIndex: 100,
-        width,
         ...style,
       }}
       {...rest}
