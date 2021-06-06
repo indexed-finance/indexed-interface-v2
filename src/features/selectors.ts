@@ -108,19 +108,22 @@ export const selectors = {
     ],
     (pool, tokens, stats) => {
       const tokenIds = pool?.tokens.ids ?? [];
-      const totalValueLocked = pool?.tokensList.reduce((total, tokenId) => {
-        if (total === undefined) return undefined;
-        const token = tokens[tokenId];
-        if (token) {
-          const price = token.priceData?.price;
-          if (price) {
-            const balance = convert.toBigNumber(pool.tokens.entities[tokenId].balance);
-            const value = convert.toBalanceNumber(balance.times(price));
-            return total + value;
+      const totalValueLocked =
+        pool?.tokensList.reduce((total, tokenId) => {
+          if (total === undefined) return undefined;
+          const token = tokens[tokenId];
+          if (token) {
+            const price = token.priceData?.price;
+            if (price) {
+              const balance = convert.toBigNumber(
+                pool.tokens.entities[tokenId].balance
+              );
+              const value = convert.toBalanceNumber(balance.times(price));
+              return total + value;
+            }
           }
-        }
-        return undefined;
-      }, 0) ?? pool?.totalValueLockedUSD;
+          return undefined;
+        }, 0) ?? pool?.totalValueLockedUSD;
       return pool && stats?.deltas
         ? ({
             category: pool.category.id,
@@ -139,7 +142,10 @@ export const selectors = {
             name: pool.name,
             slug: `/index-pools/${S(pool.name).slugify().s}`,
             volume: convert.toCurrency(stats.deltas.volume.day),
-            totalValueLocked: /* convert.toCurrency(pool?.totalValueLockedUSD),//  */convert.toCurrency(totalValueLocked),
+            totalValueLocked:
+              /* convert.toCurrency(pool?.totalValueLockedUSD),//  */ convert.toCurrency(
+                totalValueLocked
+              ),
             totalValueLockedPercent: convert.toPercent(
               stats.deltas.totalValueLockedUSD.day.percent
             ),
@@ -212,7 +218,13 @@ export const selectors = {
     return selectors
       .selectAllPools(state)
       .map((pool) => selectors.selectFormattedIndexPool(state, pool.id))
-      .filter((each): each is FormattedIndexPool => Boolean(each));
+      .filter((each): each is FormattedIndexPool => Boolean(each))
+      .sort((a, b) => {
+        const aValue = a.totalValueLocked.replace(/\$/g, "").replace(/,/g, "");
+        const bValue = b.totalValueLocked.replace(/\$/g, "").replace(/,/g, "");
+
+        return parseFloat(bValue) - parseFloat(aValue);
+      });
   },
   // Staking
   selectFormattedStaking(state: AppState): FormattedStakingDetail {

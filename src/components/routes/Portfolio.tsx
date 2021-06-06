@@ -1,6 +1,6 @@
-import { Col, Row, Space, Typography } from "antd";
+import { Checkbox, Col, Row, Space, Typography } from "antd";
 import { Page, PortfolioWidget } from "components/atomic";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import {
   useNewStakingRegistrar,
   usePortfolioData,
@@ -10,7 +10,10 @@ import {
 
 export default function Portfolio() {
   const tx = useTranslator();
-  const { ndx, tokens, totalValue } = usePortfolioData();
+  const [showOwnedAssets, setShowOwnedAssets] = useState(true);
+  const { ndx, tokens, totalValue } = usePortfolioData({
+    onlyOwnedAssets: showOwnedAssets,
+  });
   const data = useMemo(() => [ndx, ...tokens], [ndx, tokens]);
 
   useStakingRegistrar();
@@ -20,6 +23,14 @@ export default function Portfolio() {
     <Page
       hasPageHeader={true}
       title={tx("PORTFOLIO")}
+      extra={
+        <Checkbox
+          checked={showOwnedAssets}
+          onChange={(value) => setShowOwnedAssets(value.target.checked)}
+        >
+          Only show owned or staked assets
+        </Checkbox>
+      }
       actions={
         <Space
           style={{

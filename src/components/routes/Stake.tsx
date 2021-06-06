@@ -30,7 +30,6 @@ function StakingForm({
   const { stake, withdraw, exit, claim } = useStakingTransactionCallbacks(
     stakingToken.id
   );
-
   const [staked, earned] = useMemo(() => {
     let staked = stakingToken.userData?.userStakedBalance;
     let earned = stakingToken.userData?.userRewardsEarned;
@@ -38,7 +37,6 @@ function StakingForm({
     earned = earned ? convert.toBalance(earned, 18) : "0";
     return [staked, earned];
   }, [stakingToken]);
-
   const [estimatedReward, weight] = useMemo(() => {
     const stakedAmount = parseFloat(staked || "0");
     const addAmount =
@@ -309,7 +307,7 @@ function StakingStats({
 
 export default function Stake() {
   const { id } = useParams<{ id: string }>();
-  const data = usePortfolioData();
+  const data = usePortfolioData({ onlyOwnedAssets: false });
   const toStake = useSelector((state: AppState) =>
     selectors.selectStakingPool(state, id)
   );

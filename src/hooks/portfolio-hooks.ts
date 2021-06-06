@@ -14,7 +14,11 @@ import { useTokenBalances } from "./user-hooks";
 import { useTokenLookup, useTokenPricesLookup } from "./token-hooks";
 import S from "string";
 
-export function usePortfolioData(): {
+export function usePortfolioData({
+  onlyOwnedAssets,
+}: {
+  onlyOwnedAssets: boolean;
+}): {
   tokens: FormattedPortfolioAsset[];
   ndx: FormattedPortfolioAsset;
   totalValue: string;
@@ -162,11 +166,23 @@ export function usePortfolioData(): {
       token.weight = convert.toPercent(parseFloat(token.value) / totalValue);
       token.value = convert.toCurrency(parseFloat(token.value));
     });
+
+    let tokensToUse = portfolioTokens.filter(
+      (t) => t.address !== NDX_ADDRESS.toLowerCase()
+    );
+
+    if (onlyOwnedAssets) {
+      tokensToUse = tokensToUse.filter((token) => {
+        const hasBalance = token.balance !== "0.00";
+        const isStaking = token.staking !== "";
+
+        return hasBalance || isStaking;
+      });
+    }
+
     return {
       ndx,
-      tokens: portfolioTokens.filter(
-        (t) => t.address !== NDX_ADDRESS.toLowerCase()
-      ),
+      tokens: tokensToUse,
       totalValue: convert.toCurrency(totalValue.toFixed(2)),
       totalNdxEarned: totalNdxEarned.toFixed(2),
     };
@@ -179,5 +195,6 @@ export function usePortfolioData(): {
     priceLookup,
     newStakingInfoLookup,
     tokenLookup,
+    onlyOwnedAssets,
   ]);
 }

@@ -263,7 +263,7 @@ export default function StakeNew() {
   const { id } = useParams<{ id: string }>();
 
   useNewStakingRegistrar();
-  const data = usePortfolioData();
+  const data = usePortfolioData({ onlyOwnedAssets: false });
   const toStake = useSelector((state: AppState) =>
     selectors.selectNewStakingPool(state, id)
   );
