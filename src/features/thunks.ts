@@ -18,7 +18,6 @@ import { userActions } from "./user";
 import type { AppThunk } from "./store";
 
 // #region Provider
-
 type Provider =
   | providers.Web3Provider
   | providers.JsonRpcProvider

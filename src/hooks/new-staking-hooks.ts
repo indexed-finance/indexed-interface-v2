@@ -174,7 +174,6 @@ export function useNewStakingRegistrar() {
   const firstPool = stakingPools.sort(
     (a, b) => b.lastRewardBlock - a.lastRewardBlock
   )[0];
-
   const fromBlock = firstPool?.lastRewardBlock;
   const { onChainCalls, offChainCalls } = useMemo(() => {
     if (!fromBlock) return { onChainCalls: [], offChainCalls: [] };

@@ -190,13 +190,17 @@ if (FEATURE_FLAGS.useFortmatic) {
 }
 
 export function useWalletConnection() {
+  const walletConnected = useSelector(selectors.selectUserConnected);
+
   useInactiveListener();
   useEagerConnect();
 
   useEffect(() => {
-    SocketClient.connect({
-      onConnect: () => console.log("connected."),
-      onError: () => console.log("error"),
-    });
-  }, []);
+    if (!walletConnected) {
+      SocketClient.connect({
+        onConnect: () => console.log("connected."),
+        onError: () => console.log("error"),
+      });
+    }
+  }, [walletConnected]);
 }
