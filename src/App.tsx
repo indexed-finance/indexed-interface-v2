@@ -6,7 +6,6 @@ import {
   LayoutHeader,
   Navigation,
   Page,
-  SocialMediaList,
   TooltipProvider,
   TransactionList,
   WarningBar,
@@ -66,10 +65,9 @@ export function AppLayout() {
     <>
       <LayoutHeader />
       <WarningBar />
-      <SocialMediaList />
       <Layout.Content
         className="with-background"
-        style={{ minHeight: "100vh", paddingTop: 1 }}
+        style={{ minHeight: "100vh", paddingTop: 1, paddingBottom: 12 }}
       >
         <Suspense fallback={<Page hasPageHeader={false} />}>
           {routes.map((route, index) => (

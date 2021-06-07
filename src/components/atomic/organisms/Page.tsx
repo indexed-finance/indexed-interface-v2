@@ -1,6 +1,6 @@
 import { BugReportLink } from "components/atomic/atoms";
-import { Button, Card, PageHeader, Space, Typography } from "antd";
-import { LegacySiteLink } from "components/atomic/molecules";
+import { Button, Card, Col, PageHeader, Row, Space, Typography } from "antd";
+import { LegacySiteLink, SocialMediaList } from "components/atomic/molecules";
 import { ReactNode } from "react";
 import { RiCopyrightLine } from "react-icons/ri";
 import { useBreakpoints } from "hooks";
@@ -33,7 +33,6 @@ export function Page({
         maxWidth: isMobile ? "initial" : 1500,
         minHeight: "100vh",
         margin: isMobile ? "6rem auto 8rem auto" : "8rem auto 8rem auto",
-        paddingBottom: "8rem",
         background: "#151515",
         position: "relative",
         borderRadius: 3,
@@ -45,6 +44,7 @@ export function Page({
         bodyStyle={{
           padding: isMobile ? "24px 12px" : 24,
           marginTop: -9,
+          borderRadius: 3,
         }}
         title={
           hasPageHeader ? (
@@ -108,25 +108,52 @@ export function Page({
           </div>
         )}
       </Card>
-      <Space
-        size="large"
+      <Row
         style={{
-          position: "absolute",
-          bottom: 8,
-          right: 8,
+          width: "100%",
+          padding: 24,
+          paddingTop: 0,
         }}
       >
-        <div>
-          <RiCopyrightLine
-            style={{ position: "relative", top: 2, textTransform: "uppercase" }}
-          />{" "}
-          Indexed 2021
-        </div>
-        <Button.Group>
-          <LegacySiteLink />
-          <BugReportLink />
-        </Button.Group>
-      </Space>
+        <Col
+          xs={24}
+          sm={12}
+          style={{
+            display: isMobile ? "flex" : "block",
+            justifyContent: "center",
+            alignItems: "center",
+            marginBottom: isMobile ? 24 : 0,
+          }}
+        >
+          <SocialMediaList />
+        </Col>
+        <Col xs={24} sm={12}>
+          <Space
+            size="large"
+            style={{
+              width: "100%",
+              alignItems: "center",
+              justifyContent: isMobile ? "center" : "flex-end",
+            }}
+            direction={isMobile ? "vertical" : "horizontal"}
+          >
+            <Button.Group>
+              <LegacySiteLink />
+              <BugReportLink />
+            </Button.Group>
+            <div>
+              <RiCopyrightLine
+                style={{
+                  position: "relative",
+                  top: 2,
+                  textTransform: "uppercase",
+                }}
+              />{" "}
+              Indexed 2021
+            </div>
+          </Space>
+        </Col>
+      </Row>
     </div>
   );
 }
