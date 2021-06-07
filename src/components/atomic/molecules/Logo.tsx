@@ -1,4 +1,5 @@
 import { Space, Typography } from "antd";
+import { useBreakpoints } from "hooks";
 import { useHistory } from "react-router-dom";
 import cx from "classnames";
 
@@ -18,6 +19,7 @@ export function Logo({
   spinning = false,
 }: Props) {
   const history = useHistory();
+  const { isMobile } = useBreakpoints();
 
   return (
     <div onClick={() => history.push(link)} style={{ cursor: "pointer" }}>
@@ -42,7 +44,10 @@ export function Logo({
           }}
         />
         {withTitle && (
-          <Typography.Title level={1} style={{ marginBottom: 0 }}>
+          <Typography.Title
+            level={isMobile ? 3 : 1}
+            style={{ marginBottom: 0 }}
+          >
             {title}
           </Typography.Title>
         )}
