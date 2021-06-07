@@ -2,7 +2,7 @@ import { FEATURE_FLAGS } from "feature-flags";
 import { SocketClient } from "sockets/client";
 import { actions } from "features";
 import { ethers } from "ethers";
-import { fortmatic, injected, portis } from "ethereum";
+import { fortmatic, injected, portis, walletConnect } from "ethereum";
 import { isMobile } from "react-device-detect";
 import { selectors } from "features";
 import { useCallback, useEffect, useState } from "react";
@@ -112,6 +112,7 @@ export function useWalletOptions() {
 export enum SupportedWallet {
   Injected,
   MetaMask,
+  WalletConnect,
   CoinbaseWallet,
   Fortmatic,
   Portis,
@@ -130,7 +131,14 @@ export const SUPPORTED_WALLETS = {
     connector: injected,
     name: "MetaMask",
     icon: "",
-    description: "Open using the MetaMask extension.",
+    description: "Login using the MetaMask extension.",
+  },
+  [SupportedWallet.WalletConnect]: {
+    kind: SupportedWallet.WalletConnect,
+    connector: walletConnect,
+    name: "WalletConnect",
+    icon: "",
+    description: "Login using WalletConnect.",
   },
   [SupportedWallet.CoinbaseWallet]: {
     kind: SupportedWallet.CoinbaseWallet,
@@ -145,14 +153,14 @@ export const SUPPORTED_WALLETS = {
     connector: fortmatic,
     name: "Fortmatic",
     icon: "",
-    description: "Login using Fortmatic hosted wallet.",
+    description: "Login using Fortmatic.",
   },
   [SupportedWallet.Portis]: {
     kind: SupportedWallet.Portis,
     connector: portis,
     name: "Portis",
     icon: "",
-    description: "Login using Portis hosted wallet.",
+    description: "Login using Portis.",
   },
 };
 
@@ -161,6 +169,8 @@ try {
     require("images/injected.svg").default;
   SUPPORTED_WALLETS[SupportedWallet.MetaMask].icon =
     require("images/metamask_cyan.png").default;
+  SUPPORTED_WALLETS[SupportedWallet.WalletConnect].icon =
+    require("images/walletconnect_cyan.png").default;
   SUPPORTED_WALLETS[SupportedWallet.CoinbaseWallet].icon =
     require("images/coinbase_cyan.png").default;
   SUPPORTED_WALLETS[SupportedWallet.Fortmatic].icon =
@@ -173,12 +183,13 @@ try {
 
 export const MOBILE_SUPPORTED_WALLETS = [
   SupportedWallet.MetaMask,
+  SupportedWallet.WalletConnect,
   SupportedWallet.CoinbaseWallet,
 ].map((kind) => SUPPORTED_WALLETS[kind]);
 
 export const DESKTOP_SUPPORTED_WALLETS = [
-  SupportedWallet.Injected,
   SupportedWallet.MetaMask,
+  SupportedWallet.WalletConnect,
   SupportedWallet.Portis,
 ].map((kind) => SUPPORTED_WALLETS[kind]);
 
@@ -188,6 +199,9 @@ if (FEATURE_FLAGS.useFortmatic) {
   MOBILE_SUPPORTED_WALLETS.push(fortmaticEntry);
   DESKTOP_SUPPORTED_WALLETS.push(fortmaticEntry);
 }
+
+MOBILE_SUPPORTED_WALLETS.push(SUPPORTED_WALLETS[SupportedWallet.Injected]);
+DESKTOP_SUPPORTED_WALLETS.push(SUPPORTED_WALLETS[SupportedWallet.Injected]);
 
 export function useWalletConnection() {
   const walletConnected = useSelector(selectors.selectUserConnected);

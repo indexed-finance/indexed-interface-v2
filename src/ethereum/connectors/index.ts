@@ -4,3 +4,4 @@
 export * from './Fortmatic';
 export * from './Injected';
 export * from './Portis';
+export * from './WalletConnect';

@@ -1,18 +1,7 @@
 export const LOCALSTORAGE_KEY = "indexed.finance | Persisted";
 export const DEFAULT_TOKEN = "UNI";
 export const DEFAULT_DECIMAL_COUNT = 18;
-export const DEFAULT_TOAST_DISPLAY_TIME_IN_SECONDS = 3;
-export const SPOT_PRICE_MODIFIER = 1.02;
-export const SWAP_PRECISION = 10;
 export const SLIPPAGE_RATE = 0.01;
-export const TRADE_PRICE_INPUT_MODIFIER = 0.99;
-export const TRADE_PRICE_OUTPUT_MODIFIER = 1.02;
-
-export const FALLBACK_CATEGORY_LOCAL_DATA = {
-  description: "(MISSING LOCAL DATA)",
-  symbol: "(MISSING LOCAL DATA)",
-  name: "(MISSING LOCAL DATA)",
-};
 export const PLACEHOLDER_TOKEN_IMAGE = "https://via.placeholder.com/32";
 export const SOCIAL_MEDIA = [
   {

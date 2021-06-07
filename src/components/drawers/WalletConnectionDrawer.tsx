@@ -51,7 +51,7 @@ export function WalletConnectionDrawer() {
   const [attemptingActivation, setAttemptingActivation] = useState(false);
   const walletOptions = useWalletOptions();
   const attemptActivation = useCallback(
-    async (connector: null | AbstractConnector) => {
+    async (connector: null | WalletConnectConnector | AbstractConnector) => {
       if (connector && !attemptingActivation) {
         setAttemptingActivation(true);
 
@@ -90,6 +90,10 @@ export function WalletConnectionDrawer() {
                 message: tx("ERROR"),
                 description: tx("AN_UNKNOWN_ERROR_HAS_OCCURRED_..."),
               });
+
+              if (process.env.NODE_ENV === "development") {
+                console.error("Unable to connect to wallet", error);
+              }
             }
           })
           .finally(() => setAttemptingActivation(false));
