@@ -36,6 +36,7 @@ export function Page({
         paddingBottom: "8rem",
         background: "#151515",
         position: "relative",
+        borderRadius: 3,
       }}
     >
       <Card

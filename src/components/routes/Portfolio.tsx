@@ -51,7 +51,7 @@ export default function Portfolio() {
     >
       <Row gutter={[20, 20]}>
         {data.map((heldAsset) => (
-          <Col xs={24} sm={8} key={heldAsset.address}>
+          <Col xs={24} sm={6} key={heldAsset.address}>
             <PortfolioWidget {...heldAsset} />
           </Col>
         ))}

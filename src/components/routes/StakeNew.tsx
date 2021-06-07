@@ -245,7 +245,7 @@ function StakingStats({
       <Descriptions.Item label="Staking Token">
         {stakingToken.isWethPair ? (
           <ExternalLink
-            to={`https://v2.info.uniswap.org/pair/${stakingToken.id}`}
+            to={`https://v2.info.uniswap.org/pair/${stakingToken.token}`}
           >
             {symbol}
           </ExternalLink>
