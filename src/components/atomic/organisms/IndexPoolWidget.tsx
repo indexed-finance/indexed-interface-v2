@@ -12,7 +12,7 @@ export function IndexPoolWidgetGroup() {
   return (
     <Row gutter={[20, 20]}>
       {indexPools.map((pool) => (
-        <Col xs={24} sm={8} key={pool.id}>
+        <Col xs={24} sm={6} key={pool.id}>
           <IndexPoolWidget {...pool} />
         </Col>
       ))}
@@ -47,7 +47,7 @@ export function IndexPoolWidget(props: FormattedIndexPool) {
       }
       onClick={() => push(props.slug)}
     >
-      <div style={{ height: 120 }}>{INDEX_POOL_TAGLINES[props.id] ?? ""}</div>
+      <div style={{ height: 150 }}>{INDEX_POOL_TAGLINES[props.id] ?? ""}</div>
     </Widget>
   );
 }

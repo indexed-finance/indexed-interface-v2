@@ -19,17 +19,7 @@
 }
 
 .colorful {
-  background: -webkit-linear-gradient(45deg, #03b6ff, #0ed155 80%);
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-
-  @media screen and (max-width: 480px) {
-    background: none;
-    color: #0ed155;
-    background-clip: initial;
-    -webkit-text-fill-color: initial;
-  }
+  color: #0ed155;
 }
 
 .wallet-option {
@@ -169,5 +159,13 @@
   &:hover {
     background: -webkit-linear-gradient(45deg, #03b6ff, #0ed155 80%);
     border: 1px solid transparent;
+  }
+}
+
+.ant-card-hoverable {
+  transition: border 0.66s ease-in-out;
+
+  &:hover {
+    border: 1px solid @success-color;
   }
 }

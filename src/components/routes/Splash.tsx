@@ -19,7 +19,7 @@ export default function Splash() {
         <Typography.Title style={{ fontSize: isMobile ? 36 : 64 }}>
           {tx("DECENTRALIZED_INDEX_PROTOCOL")}
         </Typography.Title>
-        <Typography.Title level={2}>
+        <Typography.Title level={3}>
           Gain exposure to passively-managed crypto index portfolios represented
           by a single token.
         </Typography.Title>

@@ -30,7 +30,7 @@ export function Page({
     <div
       style={{
         width: isMobile ? "96vw" : "80vw",
-        maxWidth: isMobile ? "initial" : 1200,
+        maxWidth: isMobile ? "initial" : 1500,
         minHeight: "100vh",
         margin: isMobile ? "6rem auto 8rem auto" : "8rem auto 8rem auto",
         paddingBottom: "8rem",
