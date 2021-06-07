@@ -1,9 +1,8 @@
 import { ChainId } from "@uniswap/sdk";
+import { FORTMATIC_KEY } from "config";
 import { FortmaticConnector as FortmaticConnectorCore } from "@web3-react/fortmatic-connector";
 
 export const OVERLAY_READY = "OVERLAY_READY";
-
-const FORTMATIC_KEY = process.env.REACT_APP_FORTMATIC_KEY;
 
 type FormaticSupportedChains = Extract<
   ChainId,
@@ -26,6 +25,7 @@ class FortmaticConnector extends FortmaticConnectorCore {
 
       const { chainId } = this as any;
       if (chainId in CHAIN_ID_NETWORK_ARGUMENT) {
+        console.log("key is ", FORTMATIC_KEY);
         this.fortmatic = new Fortmatic(
           FORTMATIC_KEY,
           CHAIN_ID_NETWORK_ARGUMENT[chainId as FormaticSupportedChains]

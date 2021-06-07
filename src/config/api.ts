@@ -1,4 +1,5 @@
 export const INFURA_ID = process.env.REACT_APP_INFURA_ID;
+export const FORTMATIC_KEY = process.env.REACT_APP_FORTMATIC_KEY;
 
 export const INDEXED_SUBGRAPH_URL =
   "https://api.thegraph.com/subgraphs/name/indexed-finance/indexed";
