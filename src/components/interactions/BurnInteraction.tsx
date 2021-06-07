@@ -1,4 +1,8 @@
-import { BURN_ROUTER_ADDRESS, DISPLAYED_COMMON_BASE_TOKENS, SLIPPAGE_RATE } from "config";
+import {
+  BURN_ROUTER_ADDRESS,
+  DISPLAYED_COMMON_BASE_TOKENS,
+  SLIPPAGE_RATE,
+} from "config";
 import { FormattedIndexPool, selectors } from "features";
 import {
   MultiInteraction,
@@ -252,6 +256,7 @@ function UniswapBurnInteraction({ indexPool }: Props) {
         toAmount,
         lastTouchedField,
       } = values;
+
       if (fromAmount > 0 && toAmount > 0 && fromToken && toToken) {
         executeRoutedBurn(
           toToken,

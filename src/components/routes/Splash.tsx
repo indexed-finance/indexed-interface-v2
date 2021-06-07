@@ -15,61 +15,72 @@ export default function Splash() {
 
   return (
     <Page hasPageHeader={false}>
-      <div style={{ textAlign: "center" }}>
-        <Typography.Title style={{ fontSize: isMobile ? 36 : 64 }}>
-          {tx("DECENTRALIZED_INDEX_PROTOCOL")}
-        </Typography.Title>
-        <Typography.Title level={3}>
-          Gain exposure to passively-managed crypto index portfolios represented
-          by a single token.
-        </Typography.Title>
-        {assetsUnderManagement !== "$0.00" && (
-          <Statistic
-            className="prominent-stat"
-            title="Total Protocol Assets Under Management "
-            value={assetsUnderManagement}
-          />
-        )}
-        <Typography.Title level={3}>
-          <div>
-            <Divider className="fancy">Dive in today</Divider>
-            <Button.Group
-              style={{ flexDirection: isMobile ? "column" : "row" }}
-            >
-              <Link to="/index-pools">
-                <Button
-                  className="plus"
-                  type="primary"
-                  style={{
-                    textTransform: "uppercase",
-                    fontSize: isMobile ? 16 : 24,
-                    width: isMobile ? 160 : "auto",
-                    height: "auto",
-                    marginRight: isMobile ? 0 : 10,
-                    marginBottom: isMobile ? 10 : 0,
-                  }}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <div style={{ textAlign: "center", maxWidth: 1000, marginBottom: 48 }}>
+          <Typography.Title style={{ fontSize: isMobile ? 36 : 64 }}>
+            {tx("DECENTRALIZED_INDEX_PROTOCOL")}
+          </Typography.Title>
+          <Typography.Title level={3}>
+            Gain exposure to passively-managed crypto index portfolios
+            represented by a single token.
+          </Typography.Title>
+          {assetsUnderManagement !== "$0.00" && (
+            <Statistic
+              className="prominent-stat"
+              title="Total Protocol Assets Under Management "
+              value={assetsUnderManagement}
+              style={{ fontSize: 48 }}
+            />
+          )}
+          <Typography.Title level={3}>
+            <div>
+              <Divider className="fancy">Dive in today</Divider>
+              <Button.Group
+                style={{ flexDirection: isMobile ? "column" : "row" }}
+              >
+                <Link to="/index-pools">
+                  <Button
+                    className="plus"
+                    type="primary"
+                    style={{
+                      textTransform: "uppercase",
+                      fontSize: isMobile ? 16 : 24,
+                      width: isMobile ? 160 : "auto",
+                      height: "auto",
+                      marginRight: isMobile ? 0 : 10,
+                      marginBottom: isMobile ? 10 : 0,
+                    }}
+                  >
+                    Buy an index
+                  </Button>
+                </Link>
+                <ExternalLink
+                  to="https://docs.indexed.finance/"
+                  withIcon={false}
                 >
-                  Buy an index
-                </Button>
-              </Link>
-              <ExternalLink to="https://docs.indexed.finance/" withIcon={false}>
-                <Button
-                  type="default"
-                  style={{
-                    fontSize: isMobile ? 16 : 24,
-                    width: isMobile ? 160 : "auto",
-                    height: "auto",
-                    textTransform: "uppercase",
-                  }}
-                >
-                  Learn more
-                </Button>
-              </ExternalLink>
-            </Button.Group>
-          </div>
-        </Typography.Title>
+                  <Button
+                    type="default"
+                    style={{
+                      fontSize: isMobile ? 16 : 24,
+                      width: isMobile ? 160 : "auto",
+                      height: "auto",
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    Learn more
+                  </Button>
+                </ExternalLink>
+              </Button.Group>
+            </div>
+          </Typography.Title>
+        </div>
       </div>
-      <Divider />
       {poolsExist && <IndexPoolWidgetGroup />}
     </Page>
   );

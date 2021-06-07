@@ -70,7 +70,7 @@ export function SingleInteraction({
   disableInputSelect,
   disableOutputSelect,
   requiresApproval = true,
-  loading
+  loading,
 }: Props) {
   const interactionRef = useRef<null | HTMLDivElement>(null);
 
@@ -88,7 +88,7 @@ export function SingleInteraction({
         {(props) => (
           <SingleInteractionInner
             {...props}
-            loading={loading}
+            // loading={loading}
             assets={assets}
             spender={spender}
             extra={extra}
@@ -126,7 +126,7 @@ function SingleInteractionInner({
   disableInputSelect,
   disableOutputSelect,
   requiresApproval,
-  loading
+  loading,
 }: InnerSingleProps) {
   const tx = useTranslator();
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
@@ -289,7 +289,7 @@ function SingleInteractionInner({
             type="primary"
             style={{ width: "100%" }}
             disabled={!isValid || (requiresApproval && status === "unknown")}
-            onClick={() => handleSubmit()}
+            htmlType="submit"
           >
             Send
           </Button>
