@@ -40,11 +40,12 @@ export function Page({
     >
       <Card
         bordered={false}
-        headStyle={{ padding: 0 }}
+        headStyle={{ padding: 0, borderRadius: 3 }}
         bodyStyle={{
           padding: isMobile ? "24px 12px" : 24,
           marginTop: -9,
           borderRadius: 3,
+          minHeight: "100vh",
         }}
         title={
           hasPageHeader ? (
