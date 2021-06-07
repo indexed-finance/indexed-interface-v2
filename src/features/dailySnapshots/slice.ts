@@ -1,4 +1,6 @@
+import { DailyPoolSnapshot } from "indexed-types";
 import { createEntityAdapter, createSlice } from "@reduxjs/toolkit";
+import { fetchIndexPoolUpdates } from "../indexPools/requests";
 import { fetchInitialData } from "../requests";
 import { mirroredServerState, restartedDueToError } from "../actions";
 import type { NormalizedDailySnapshot } from "./types";
@@ -22,6 +24,10 @@ const slice = createSlice({
         );
 
         dailySnapshotsAdapter.addMany(state, fullSnapshots);
+      })
+      .addCase(fetchIndexPoolUpdates.fulfilled, (state, action) => {
+        const dailySnapshots = Object.values(action.payload).reduce((prev, { dailySnapshots }) => [...prev, ...dailySnapshots], [] as DailyPoolSnapshot[]);
+        dailySnapshotsAdapter.addMany(state, dailySnapshots);
       })
       .addCase(
         mirroredServerState,
