@@ -13,6 +13,7 @@ import {
 import { convert } from "helpers";
 import { downwardSlippage, upwardSlippage } from "ethereum";
 import {
+  useBalanceAndApprovalRegistrar,
   useBalancesRegistrar,
   useBurnRouterCallbacks,
   useMultiTokenBurnCallbacks,
@@ -174,9 +175,9 @@ function UniswapBurnInteraction({ indexPool }: Props) {
     executeRoutedBurn,
   } = useBurnRouterCallbacks(poolId);
 
-  const assets = [...DISPLAYED_COMMON_BASE_TOKENS];
+  const assets = [...DISPLAYED_COMMON_BASE_TOKENS, {id: indexPool.id, name: indexPool.name, symbol: indexPool.symbol}];
 
-  useBalancesRegistrar([poolId]);
+  useBalanceAndApprovalRegistrar(BURN_ROUTER_ADDRESS.toLowerCase(), [poolId]);
 
   const handleChange = useCallback(
     (values: SingleInteractionValues) => {
@@ -279,7 +280,7 @@ function UniswapBurnInteraction({ indexPool }: Props) {
           id: string;
         }[]
       }
-      spender={BURN_ROUTER_ADDRESS}
+      spender={BURN_ROUTER_ADDRESS.toLowerCase()}
       onSubmit={handleSubmit}
       onChange={handleChange}
       defaultInputSymbol={indexPool.symbol}
