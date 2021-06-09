@@ -88,7 +88,7 @@ export function SingleInteraction({
         {(props) => (
           <SingleInteractionInner
             {...props}
-            // loading={loading}
+            loading={loading}
             assets={assets}
             spender={spender}
             extra={extra}
@@ -289,7 +289,7 @@ function SingleInteractionInner({
             type="primary"
             style={{ width: "100%" }}
             disabled={!isValid || (requiresApproval && status === "unknown")}
-            htmlType="submit"
+            onClick={() => handleSubmit()}
           >
             Send
           </Button>
