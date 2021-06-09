@@ -111,6 +111,7 @@ export const selectors = {
       const totalValueLocked =
         pool?.tokensList.reduce((total, tokenId) => {
           if (total === undefined) return undefined;
+
           const token = tokens[tokenId];
           if (token) {
             const price = token.priceData?.price;
@@ -118,7 +119,7 @@ export const selectors = {
               const balance = convert.toBigNumber(
                 pool.tokens.entities[tokenId].balance
               );
-              const value = convert.toBalanceNumber(balance.times(price));
+              const value = convert.toBalanceNumber(balance.times(price), token.decimals);
               return total + value;
             }
           }
