@@ -8,14 +8,13 @@ export function IndexPoolAssets({ assets }: FormattedIndexPool) {
 
   return (
     <Card
-      bodyStyle={{ maxWidth: 450 }}
       title={
         <Typography.Title level={3} style={{ margin: 0 }}>
           Assets
         </Typography.Title>
       }
     >
-      <List>
+      <List style={{ width: "100%" }}>
         {assets.map((asset) => (
           <List.Item key={asset.id} style={{ width: "100%" }}>
             <Row gutter={24} align="middle" style={{ width: "100%" }}>

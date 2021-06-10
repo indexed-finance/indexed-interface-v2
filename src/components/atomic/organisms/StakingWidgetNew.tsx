@@ -45,17 +45,7 @@ export function StakingWidgetNew(props: FormattedNewStakingData) {
                 />
               </Col>
             </Row>
-            <Statistic
-              title={tx("APY")}
-              value={apy ?? ""}
-              valueRender={(value) =>
-                value && value !== "0" ? (
-                  <div className="colorful">{value}</div>
-                ) : (
-                  ""
-                )
-              }
-            />
+            <Statistic title={tx("APY")} value={apy ?? ""} />
             <Statistic title={tx("RATE")} value={props.rewardsPerDay} />
           </Space>
         }
@@ -65,6 +55,7 @@ export function StakingWidgetNew(props: FormattedNewStakingData) {
               type={"primary"}
               size="large"
               onClick={(event) => event.stopPropagation()}
+              block={true}
             >
               <Link to={`/staking-new/${props.id}`}>
                 <Space>
