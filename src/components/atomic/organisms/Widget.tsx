@@ -1,4 +1,4 @@
-import { Card, Col, Divider, Row, Typography } from "antd";
+import { Badge, Card, Col, Divider, Row, Typography } from "antd";
 import { HTMLProps, ReactNode } from "react";
 import { Quote } from "components/atomic/molecules";
 import { Token } from "components/atomic/atoms";
@@ -14,6 +14,8 @@ interface Props extends HTMLProps<HTMLDivElement> {
   children?: ReactNode;
   stats?: ReactNode;
   actions?: ReactNode;
+  badge?: string;
+  badgeColor?: string;
   onClick?(): void;
 }
 
@@ -30,12 +32,13 @@ export function Widget({
   stats = null,
   actions = null,
   onClick = noop,
+  badge = "",
+  badgeColor = "blue",
   ...rest
 }: Props) {
   const { isMobile } = useBreakpoints();
   const formattedPrice = convert.toCurrency(parseFloat(price));
-
-  return (
+  const inner = (
     <div
       onClick={onClick}
       role="button"
@@ -64,8 +67,8 @@ export function Widget({
             address={address}
             symbol={symbol}
             symbolOverride={
-              symbol.startsWith("UNIV2:")
-                ? symbol.split("UNIV2:")[1].replace(/-/g, "/")
+              ["UNIV2:", "SUSHI:"].some((prefix) => prefix.startsWith(symbol))
+                ? symbol.split(":")[1].replace(/-/g, "/")
                 : symbol
             }
             size="medium"
@@ -104,5 +107,13 @@ export function Widget({
         )}
       </Card>
     </div>
+  );
+
+  return badge ? (
+    <Badge.Ribbon text={badge} color={badgeColor}>
+      {inner}
+    </Badge.Ribbon>
+  ) : (
+    inner
   );
 }

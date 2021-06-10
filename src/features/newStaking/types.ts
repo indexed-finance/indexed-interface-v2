@@ -59,6 +59,7 @@ export interface FormattedNewStakingData {
   isWethPair: boolean;
   indexPool: string;
   totalStaked: string;
+  liquidityProvider?: string;
 }
 
 export interface FormattedNewStakingDetail {
