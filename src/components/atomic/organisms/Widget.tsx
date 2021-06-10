@@ -3,6 +3,7 @@ import { HTMLProps, ReactNode } from "react";
 import { Quote } from "components/atomic/molecules";
 import { Token } from "components/atomic/atoms";
 import { convert } from "helpers";
+import { useBreakpoints } from "hooks";
 import noop from "lodash.noop";
 
 interface Props extends HTMLProps<HTMLDivElement> {
@@ -31,6 +32,7 @@ export function Widget({
   onClick = noop,
   ...rest
 }: Props) {
+  const { isMobile } = useBreakpoints();
   const formattedPrice = convert.toCurrency(parseFloat(price));
 
   return (
@@ -90,9 +92,11 @@ export function Widget({
         {(stats || actions) && (
           <>
             <Divider style={{ marginTop: 0, marginBottom: 12 }} />
-            <Row align="bottom">
-              <Col span={18}>{stats}</Col>
-              <Col span={6} style={{ textAlign: "right" }}>
+            <Row align="bottom" gutter={20}>
+              <Col span={24} style={{ marginBottom: isMobile ? 0 : 24 }}>
+                {stats}
+              </Col>
+              <Col span={24} style={{ textAlign: "right" }}>
                 {actions}
               </Col>
             </Row>

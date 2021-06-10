@@ -5,11 +5,10 @@ import { fetchInitialData } from "../requests";
 import { mirroredServerState, restartedDueToError } from "../actions";
 import type { NormalizedDailySnapshot } from "./types";
 
-export const dailySnapshotsAdapter = createEntityAdapter<NormalizedDailySnapshot>(
-  {
+export const dailySnapshotsAdapter =
+  createEntityAdapter<NormalizedDailySnapshot>({
     selectId: (entry) => entry.id.toLowerCase(),
-  }
-);
+  });
 
 const slice = createSlice({
   name: "dailySnapshots",
@@ -26,7 +25,12 @@ const slice = createSlice({
         dailySnapshotsAdapter.addMany(state, fullSnapshots);
       })
       .addCase(fetchIndexPoolUpdates.fulfilled, (state, action) => {
-        const dailySnapshots = Object.values(action.payload).reduce((prev, { dailySnapshots }) => [...prev, ...dailySnapshots], [] as DailyPoolSnapshot[]);
+        const dailySnapshots = Object.values(action.payload)
+          .filter((each) => Boolean(each))
+          .reduce(
+            (prev, { dailySnapshots }) => [...prev, ...dailySnapshots],
+            [] as DailyPoolSnapshot[]
+          );
         dailySnapshotsAdapter.addMany(state, dailySnapshots);
       })
       .addCase(

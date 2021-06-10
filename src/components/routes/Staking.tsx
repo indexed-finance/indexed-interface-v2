@@ -1,103 +1,147 @@
-import { Alert, Col, Row, Space, Typography } from "antd";
+import { Alert, Col, Collapse, Menu, Row, Typography } from "antd";
 import { Page, StakingWidget } from "components/atomic";
 import { StakingWidgetNew } from "components/atomic/organisms/StakingWidgetNew";
 import { selectors } from "features";
 import {
+  useBreakpoints,
   useNewStakingRegistrar,
   useStakingRegistrar,
   useTranslator,
 } from "hooks";
 import { useSelector } from "react-redux";
+import { useState } from "react";
 
 export default function Stake() {
   const tx = useTranslator();
   const stakingDetail = useSelector(selectors.selectFormattedStaking);
   const newStakingDetail = useSelector(selectors.selectNewFormattedStaking);
+  const { isMobile } = useBreakpoints();
+  const [showing, setShowing] = useState<"active" | "expired">("active");
 
   useStakingRegistrar();
   useNewStakingRegistrar();
 
   return (
-    <Page hasPageHeader={true} title={tx("LIQUIDITY_MINING")}>
-      <Space direction="vertical" size="large" style={{ width: "100%" }}>
-        <Alert
-          type="info"
-          message={
-            <span style={{ fontSize: 18 }}>{tx("STAKE_INDEX_TOKENS_...")}</span>
-          }
-        />
-        {newStakingDetail.indexTokens.length > 0 && (
-          <>
-            <Typography.Title level={3}>{tx("INDEX_TOKENS")}</Typography.Title>
-            <Row gutter={[20, 20]}>
-              {newStakingDetail.indexTokens.map((stakingPool) => (
-                <Col xs={24} sm={12} key={stakingPool.id}>
-                  <StakingWidgetNew key={stakingPool.id} {...stakingPool} />
-                </Col>
-              ))}
-            </Row>
-          </>
-        )}
-        {newStakingDetail.liquidityTokens.length > 0 && (
-          <>
-            <Typography.Title level={3}>
-              {tx("LIQUIDITY_TOKENS")}
-            </Typography.Title>
-            <Row gutter={[20, 20]}>
-              {newStakingDetail.liquidityTokens.map((stakingPool) => (
-                <Col xs={24} sm={12} key={stakingPool.id}>
-                  <StakingWidgetNew key={stakingPool.id} {...stakingPool} />
-                </Col>
-              ))}
-              {stakingDetail.liquidityTokens
-                .filter((t) => !t.expired)
-                .map((stakingPool) => (
-                  <Col xs={24} sm={12} key={stakingPool.id}>
-                    <StakingWidget key={stakingPool.id} {...stakingPool} />
-                  </Col>
-                ))}
-            </Row>
-          </>
-        )}
-      </Space>
-      <Space
-        direction="vertical"
-        size="large"
-        style={{ width: "100%", marginTop: 15 }}
+    <Page
+      hasPageHeader={true}
+      title={
+        <>
+          <Typography.Title level={isMobile ? 5 : 2}>
+            {tx("LIQUIDITY_MINING")}
+          </Typography.Title>
+        </>
+      }
+    >
+      <Menu
+        mode="horizontal"
+        activeKey={showing}
+        onClick={({ key }) => setShowing(key as "active" | "expired")}
+        style={{ marginBottom: 24 }}
       >
-        <Alert
-          type="warning"
-          message={<span style={{ fontSize: 18 }}>Expired Staking Pools</span>}
-        />
-        {stakingDetail.indexTokens.length > 0 && (
-          <>
-            <Typography.Title level={3}>{tx("INDEX_TOKENS")}</Typography.Title>
-            <Row gutter={[20, 20]}>
-              {stakingDetail.indexTokens.map((stakingPool) => (
-                <Col xs={24} sm={12} key={stakingPool.id}>
-                  <StakingWidget key={stakingPool.id} {...stakingPool} />
-                </Col>
-              ))}
-            </Row>
-          </>
-        )}
-        {stakingDetail.liquidityTokens.length > 0 && (
-          <>
-            <Typography.Title level={3}>
-              {tx("LIQUIDITY_TOKENS")}
-            </Typography.Title>
-            <Row gutter={[20, 20]}>
-              {stakingDetail.liquidityTokens
-                .filter((t) => t.expired)
-                .map((stakingPool) => (
-                  <Col xs={24} sm={12} key={stakingPool.id}>
-                    <StakingWidget key={stakingPool.id} {...stakingPool} />
-                  </Col>
-                ))}
-            </Row>
-          </>
-        )}
-      </Space>
+        <Menu.Item key="active">Active</Menu.Item>
+        <Menu.Item key="expired">Expired</Menu.Item>
+      </Menu>
+      {showing === "active" && (
+        <>
+          <Alert
+            type="success"
+            showIcon={true}
+            icon={
+              <img
+                alt="NDX"
+                src={require("images/indexed.png").default}
+                style={{ width: 24, height: 24 }}
+              />
+            }
+            message="Earn NDX"
+            description="Stake index tokens or their associated liquidity tokens to earn NDX, the governance token for Indexed."
+            style={{ marginBottom: 24 }}
+          />
+          <Row gutter={20}>
+            <Col xs={24} sm={12}>
+              <Collapse defaultActiveKey="index">
+                <Collapse.Panel
+                  key="index"
+                  header={tx("INDEX_TOKENS")}
+                  style={{ marginBottom: 24 }}
+                >
+                  <Row gutter={20}>
+                    {newStakingDetail.indexTokens.map((stakingPool) => (
+                      <Col
+                        key={stakingPool.id}
+                        span={24}
+                        style={{ marginBottom: 24 }}
+                      >
+                        <StakingWidgetNew {...stakingPool} />
+                      </Col>
+                    ))}
+                  </Row>
+                </Collapse.Panel>
+              </Collapse>
+            </Col>
+            <Col xs={24} sm={12}>
+              <Collapse defaultActiveKey="liquidity">
+                <Collapse.Panel key="liquidity" header={tx("LIQUIDITY_TOKENS")}>
+                  {newStakingDetail.liquidityTokens.map((stakingPool) => (
+                    <Col
+                      key={stakingPool.id}
+                      span={24}
+                      style={{ marginBottom: 24 }}
+                    >
+                      <StakingWidgetNew {...stakingPool} />
+                    </Col>
+                  ))}
+                </Collapse.Panel>
+              </Collapse>
+            </Col>
+          </Row>
+        </>
+      )}
+      {showing === "expired" && (
+        <>
+          <Alert
+            type="error"
+            showIcon={true}
+            message="These pools have expired."
+            description="Withdraw your tokens immediately."
+            style={{ marginBottom: 24 }}
+          />
+          <Row gutter={20}>
+            <Col xs={24} md={12}>
+              <Collapse defaultActiveKey="index">
+                <Collapse.Panel key="index" header={tx("INDEX_TOKENS")}>
+                  {stakingDetail.indexTokens.map((stakingPool) => (
+                    <Col
+                      key={stakingPool.id}
+                      span={24}
+                      style={{ marginBottom: 24 }}
+                    >
+                      <StakingWidget key={stakingPool.id} {...stakingPool} />
+                    </Col>
+                  ))}
+                </Collapse.Panel>
+              </Collapse>
+            </Col>
+            <Col xs={24} md={12}>
+              <Collapse defaultActiveKey="liquid">
+                <Collapse.Panel key="liquid" header={tx("LIQUIDITY_TOKENS")}>
+                  {stakingDetail.liquidityTokens
+                    .filter((t) => !t.expired)
+                    .map((stakingPool) => (
+                      <Col
+                        key={stakingPool.id}
+                        span={24}
+                        style={{ marginBottom: 24 }}
+                      >
+                        <StakingWidget key={stakingPool.id} {...stakingPool} />
+                      </Col>
+                    ))}
+                </Collapse.Panel>
+              </Collapse>
+            </Col>
+          </Row>
+        </>
+      )}
     </Page>
   );
 }
