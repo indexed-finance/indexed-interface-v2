@@ -34,6 +34,7 @@ export interface FormattedStakingData {
   isWethPair: boolean;
   expired: boolean;
   totalStaked: string;
+  liquidityProvider?: string;
 }
 
 export interface FormattedStakingDetail {

@@ -1,4 +1,4 @@
-import { Badge, Button, Col, Row, Space, Statistic } from "antd";
+import { Button, Col, Row, Space, Statistic } from "antd";
 import { FaTractor } from "react-icons/fa";
 import { FormattedNewStakingData } from "features";
 import { Link, useHistory } from "react-router-dom";
@@ -16,9 +16,12 @@ export function StakingWidgetNew(props: FormattedNewStakingData) {
   const price = useNewStakingTokenPrice(props.id);
   const symbol = props.symbol;
   const { push } = useHistory();
-  const inner = (
+
+  return (
     <div style={{ position: "relative" }}>
       <Widget
+        badge={props.liquidityProvider || props.isWethPair ? "Uniswap" : ""}
+        badgeColor="purple"
         symbol={symbol}
         address={props.id}
         price={price ? convert.toCurrency(price) : ""}
@@ -68,13 +71,5 @@ export function StakingWidgetNew(props: FormattedNewStakingData) {
         }
       />
     </div>
-  );
-
-  return props.isWethPair ? (
-    <Badge.Ribbon text="Uniswap V2" color="purple" style={{ top: -6 }}>
-      {inner}
-    </Badge.Ribbon>
-  ) : (
-    inner
   );
 }
