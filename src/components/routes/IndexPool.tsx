@@ -43,7 +43,7 @@ function LoadedIndexPool(props: FormattedIndexPool) {
           <Space
             size="large"
             direction="vertical"
-            style={{ marginBottom: isMobile ? 24 : 0 }}
+            style={{ marginBottom: isMobile ? 24 : 0, display: "flex" }}
           >
             <IndexPoolDescription {...props} />
             <IndexPoolExternalLinks {...props} />
