@@ -14,6 +14,7 @@ import {
   useStakingRewardsContract,
   useTokenContract,
 } from "./contract-hooks";
+import { useMasterChefPoolForToken, useMasterChefStakedBalance } from "./masterchef-hooks";
 import { useNewStakedBalance } from "./new-staking-hooks";
 import { usePoolSymbol } from "./pool-hooks";
 import { useUserAddress } from "./user-hooks";
@@ -542,9 +543,8 @@ export function useNewStakingTransactionCallbacks(
   };
 }
 
-export function useMasterChefTransactionCallbacks(pid: string) {
-  const userAddress = useUserAddress();
-  const stakedBalance = useNewStakedBalance(pid);
+export function useMasterChefTransactionCallbacks(pid: string): StakingTransactionCallbacks {
+  const stakedBalance = useMasterChefStakedBalance(pid);
   const contract = useMasterChefContract();
   const addTransaction = useAddTransactionCallback();
 
@@ -557,4 +557,35 @@ export function useMasterChefTransactionCallbacks(pid: string) {
     },
     [addTransaction, contract, pid]
   );
+
+  const withdraw = useCallback(
+    (amount: string) => {
+      // @todo Figure out a better way to handle this
+      if (!contract) throw new Error();
+      const tx = contract.withdraw(pid, amount);
+      addTransaction(tx);
+    },
+    [contract, addTransaction, pid]
+  );
+
+  const exit = useCallback(() => {
+    // @todo Figure out a better way to handle this
+    if (!contract || !stakedBalance) throw new Error();
+    const tx = contract.withdraw(pid, stakedBalance);
+    addTransaction(tx);
+  }, [contract, addTransaction, pid, stakedBalance]);
+
+  const claim = useCallback(() => {
+    // @todo Figure out a better way to handle this
+    if (!contract) throw new Error();
+    const tx = contract.withdraw(pid, 1);
+    addTransaction(tx);
+  }, [contract, addTransaction, pid]);
+
+  return{
+    stake,
+    withdraw,
+    exit,
+    claim
+  }
 }
