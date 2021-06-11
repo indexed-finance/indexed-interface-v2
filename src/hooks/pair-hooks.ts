@@ -30,6 +30,10 @@ export type RegisteredPair = {
   exists?: boolean;
 };
 
+export const usePair = (pairId: string) => useSelector((state: AppState) =>
+  selectors.selectPairById(state, pairId)
+);
+
 export const usePairExistsLookup = (
   pairIds: string[]
 ): Record<string, boolean> =>
