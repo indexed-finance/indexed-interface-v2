@@ -95,6 +95,14 @@ const selectors = adapter.getSelectors((state: AppState) => state.pairs);
 
 export const pairsSelectors = {
   selectPairs: (state: AppState) => state.pairs,
+  selectAllPairs: (state: AppState) => Object.values(state.pairs.entities),
+  selectAllPairIds: (state: AppState) => state.pairs.ids.map(id => id.toString()),
+  selectPairById: (
+    state: AppState,
+    id: string
+  ): NormalizedPair | undefined => {
+    return state.pairs.entities[id.toLowerCase()];
+  },
   selectPairsById: (
     state: AppState,
     ids: string[]
