@@ -67,7 +67,7 @@ export function Widget({
             address={address}
             symbol={symbol}
             symbolOverride={
-              ["UNIV2:", "SUSHI:"].some((prefix) => prefix.startsWith(symbol))
+              ["UNIV2:", "SUSHI:"].some((prefix) => symbol.startsWith(prefix))
                 ? symbol.split(":")[1].replace(/-/g, "/")
                 : symbol
             }
