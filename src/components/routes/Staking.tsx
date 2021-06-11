@@ -1,4 +1,5 @@
 import { Alert, Col, Collapse, Menu, Row, Typography } from "antd";
+import { MasterChefStakingWidget } from "components/atomic/organisms/MasterChefWidget";
 import { Page, StakingWidget } from "components/atomic";
 import { StakingWidgetNew } from "components/atomic/organisms/StakingWidgetNew";
 import { selectors } from "features";
@@ -8,6 +9,7 @@ import {
   useStakingRegistrar,
   useTranslator,
 } from "hooks";
+import { useMasterChefRegistrar } from "hooks/masterchef-hooks";
 import { useSelector } from "react-redux";
 import { useState } from "react";
 
@@ -15,11 +17,13 @@ export default function Stake() {
   const tx = useTranslator();
   const stakingDetail = useSelector(selectors.selectFormattedStaking);
   const newStakingDetail = useSelector(selectors.selectNewFormattedStaking);
+  const masterChefDetail = useSelector(selectors.selectMasterChefFormattedStaking)
   const { isMobile } = useBreakpoints();
   const [showing, setShowing] = useState<"active" | "expired">("active");
 
   useStakingRegistrar();
   useNewStakingRegistrar();
+  useMasterChefRegistrar();
 
   return (
     <Page
@@ -91,6 +95,15 @@ export default function Stake() {
                       <StakingWidgetNew {...stakingPool} />
                     </Col>
                   ))}
+                  {masterChefDetail.map((stakingPool) =>
+                    <Col
+                    key={stakingPool.id}
+                    span={24}
+                    style={{ marginBottom: 24 }}
+                  >
+                    <MasterChefStakingWidget {...stakingPool} />
+                  </Col>
+                  )}
                 </Collapse.Panel>
               </Collapse>
             </Col>
@@ -126,7 +139,7 @@ export default function Stake() {
               <Collapse defaultActiveKey="liquid">
                 <Collapse.Panel key="liquid" header={tx("LIQUIDITY_TOKENS")}>
                   {stakingDetail.liquidityTokens
-                    .filter((t) => !t.expired)
+                    .filter((t) => t.expired)
                     .map((stakingPool) => (
                       <Col
                         key={stakingPool.id}
