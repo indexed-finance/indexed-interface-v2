@@ -5,9 +5,9 @@ import {
   Token,
   TokenAmount,
   Trade,
-} from "@uniswap/sdk";
+} from "@indexed-finance/narwhal-sdk";
 import { BigNumber } from "bignumber.js";
-import { COMMON_BASE_TOKENS, UNISWAP_FACTORY_ADDRESS } from "config";
+import { COMMON_BASE_TOKENS, SUSHISWAP_FACTORY_ADDRESS, UNISWAP_FACTORY_ADDRESS } from "config";
 import { constants, BigNumberish as eBigNumberish } from "ethers";
 import { convert } from "./convert";
 import { flatMap } from 'lodash';
@@ -24,6 +24,9 @@ export type {
   TokenAmount,
   Trade,
 };
+
+export const INIT_CODE_HASH_SUSHI = '0xe18a34eb0e04b04f7a0ac29a6e80748dca96319b42c54d679cb821dca90c6303'
+export const INIT_CODE_HASH_UNI = '0x96e8ac4277198ff8b6f785478aa9a39f403cb768dd02cbee326c3e7da348845f'
 
 export type TokenInput = {
   id?: string;
@@ -43,8 +46,7 @@ export function computeUniswapPairAddress(
   tokenA: string,
   tokenB: string
 ): string {
-  const initCodeHash =
-    "0x96e8ac4277198ff8b6f785478aa9a39f403cb768dd02cbee326c3e7da348845f";
+  const initCodeHash = INIT_CODE_HASH_UNI;
   const [token0, token1] = sortTokens(tokenA, tokenB);
   const salt = keccak256(
     Buffer.concat([
@@ -53,6 +55,21 @@ export function computeUniswapPairAddress(
     ])
   );
   return getCreate2Address(UNISWAP_FACTORY_ADDRESS, salt, initCodeHash);
+}
+
+export function computeSushiswapPairAddress(
+  tokenA: string,
+  tokenB: string
+): string {
+  const initCodeHash = INIT_CODE_HASH_SUSHI;
+  const [token0, token1] = sortTokens(tokenA, tokenB);
+  const salt = keccak256(
+    Buffer.concat([
+      convert.toAddressBuffer(token0),
+      convert.toAddressBuffer(token1),
+    ])
+  );
+  return getCreate2Address(SUSHISWAP_FACTORY_ADDRESS, salt, initCodeHash);
 }
 
 /**
