@@ -108,6 +108,15 @@ export const newStakingSelectors = {
     return newStakingSelectors.selectNewStakingPool(state, id)
       ?.userStakedBalance;
   },
+  selectNewStakingPoolsByStakingTokens(
+    state: AppState,
+    ids: string[]
+  ): Array<NewStakingPool | undefined> {
+    const allPools = newStakingSelectors.selectAllNewStakingPools(state);
+    return ids.map((id) =>
+      allPools.find((p) => p.token.toLowerCase() === id.toLowerCase())
+    );
+  },
   selectNewStakingInfoLookup(state: AppState, ids: string[]) {
     return ids.reduce((prev, next) => {
       const pool = newStakingSelectors.selectNewStakingPoolByStakingToken(
@@ -118,7 +127,7 @@ export const newStakingSelectors = {
       if (pool) {
         const { userStakedBalance = "0", userEarnedRewards = "0" } = pool;
 
-        prev[pool.token] = {
+        prev[pool.token.toLowerCase()] = {
           balance: convert.toBalanceNumber(
             userStakedBalance.toString(),
             pool.decimals,
