@@ -1,4 +1,4 @@
-import { DISPLAYED_COMMON_BASE_TOKENS, MINT_ROUTER_ADDRESS, SLIPPAGE_RATE } from "config";
+import { DISPLAYED_COMMON_BASE_TOKENS, NARWHAL_ROUTER_ADDRESS, SLIPPAGE_RATE } from "config";
 import { FormattedIndexPool, selectors } from "features";
 import {
   MultiInteraction,
@@ -143,7 +143,7 @@ function SingleTokenMintInteraction({ indexPool }: Props) {
 function UniswapMintInteraction({ indexPool }: Props) {
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
 
-  useBalanceAndApprovalRegistrar(MINT_ROUTER_ADDRESS.toLowerCase(), [
+  useBalanceAndApprovalRegistrar(NARWHAL_ROUTER_ADDRESS.toLowerCase(), [
     ...DISPLAYED_COMMON_BASE_TOKENS.map(({ id }) => id),
   ]);
   const {
@@ -263,7 +263,7 @@ function UniswapMintInteraction({ indexPool }: Props) {
         }[]
       }
       loading={loading}
-      spender={MINT_ROUTER_ADDRESS}
+      spender={NARWHAL_ROUTER_ADDRESS}
       onSubmit={handleSubmit}
       onChange={handleChange}
       defaultInputSymbol={assets[0].symbol}

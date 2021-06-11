@@ -1,6 +1,6 @@
 import {
-  BURN_ROUTER_ADDRESS,
   DISPLAYED_COMMON_BASE_TOKENS,
+  NARWHAL_ROUTER_ADDRESS,
   SLIPPAGE_RATE,
 } from "config";
 import { FormattedIndexPool, selectors } from "features";
@@ -177,7 +177,7 @@ function UniswapBurnInteraction({ indexPool }: Props) {
 
   const assets = [...DISPLAYED_COMMON_BASE_TOKENS, {id: indexPool.id, name: indexPool.name, symbol: indexPool.symbol}];
 
-  useBalanceAndApprovalRegistrar(BURN_ROUTER_ADDRESS.toLowerCase(), [poolId]);
+  useBalanceAndApprovalRegistrar(NARWHAL_ROUTER_ADDRESS.toLowerCase(), [poolId]);
 
   const handleChange = useCallback(
     (values: SingleInteractionValues) => {
@@ -280,7 +280,7 @@ function UniswapBurnInteraction({ indexPool }: Props) {
           id: string;
         }[]
       }
-      spender={BURN_ROUTER_ADDRESS.toLowerCase()}
+      spender={NARWHAL_ROUTER_ADDRESS.toLowerCase()}
       onSubmit={handleSubmit}
       onChange={handleChange}
       defaultInputSymbol={indexPool.symbol}

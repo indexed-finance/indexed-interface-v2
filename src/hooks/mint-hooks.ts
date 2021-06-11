@@ -8,7 +8,7 @@ import {
   upwardSlippage
 } from "ethereum";
 import { COMMON_BASE_TOKENS, SLIPPAGE_RATE } from "config";
-import { Currency, Trade } from "@uniswap/sdk";
+import { Currency, Trade } from "@indexed-finance/narwhal-sdk";
 import { convert } from "helpers";
 import { useCallback, useMemo } from "react";
 import {
@@ -324,7 +324,7 @@ export function useMintRouterCallbacks(poolId: string) {
             convert.toBigNumber(
               result.uniswapResult.inputAmount.raw.toString(10)
             ),
-            result.uniswapResult.route.path.map((p) => p.address),
+            result.uniswapResult.route.encodedPath,
             downwardSlippage(result.poolResult.poolAmountOut, SLIPPAGE_RATE),
             result.uniswapResult.inputAmount.currency === Currency.ETHER
           )
@@ -342,7 +342,7 @@ export function useMintRouterCallbacks(poolId: string) {
               ),
               SLIPPAGE_RATE
             ),
-            result.uniswapResult.route.path.map((p) => p.address),
+            result.uniswapResult.route.encodedPath,
             result.poolResult.amountOut,
             result.uniswapResult.inputAmount.currency === Currency.ETHER
           )
