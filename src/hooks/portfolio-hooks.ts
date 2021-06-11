@@ -3,8 +3,9 @@ import { NDX_ADDRESS, WETH_CONTRACT_ADDRESS } from "config";
 import { PricedAsset, useTokenLookup, useTokenPricesLookup } from "./token-hooks";
 import { computeSushiswapPairAddress, computeUniswapPairAddress, convert, sushiswapInfoPairLink, uniswapInfoPairLink, uniswapInfoTokenLink } from "helpers";
 import { useAllPools } from "./pool-hooks";
+import { useMasterChefInfoLookup, useMasterChefPoolsForTokens } from "./masterchef-hooks";
 import { useMemo } from "react";
-import { useNewStakingInfoLookup } from "./new-staking-hooks";
+import { useNewStakingInfoLookup, useNewStakingPoolsForTokens } from "./new-staking-hooks";
 import { usePairExistsLookup } from "./pair-hooks";
 import { useSelector } from "react-redux";
 import {
@@ -22,7 +23,7 @@ type RawAsset = {
   isSushiswapPair?: boolean;
 }
 
-const buildEthUniPair = (asset: RawAsset) => ({
+export const buildEthUniPair = (asset: RawAsset) => ({
   id: computeUniswapPairAddress(
     asset.id,
     WETH_CONTRACT_ADDRESS
@@ -32,7 +33,7 @@ const buildEthUniPair = (asset: RawAsset) => ({
   isUniswapPair: true,
 })
 
-const buildEthSushiPair = (asset: RawAsset) => ({
+export const buildEthSushiPair = (asset: RawAsset) => ({
   id: computeSushiswapPairAddress(
     asset.id,
     WETH_CONTRACT_ADDRESS
@@ -42,7 +43,7 @@ const buildEthSushiPair = (asset: RawAsset) => ({
   isSushiswapPair: true,
 })
 
-function usePortfolioTokensAndEthPairs(indexPools: NormalizedIndexPool[]): RawAsset[] {
+export function usePortfolioTokensAndEthPairs(indexPools: NormalizedIndexPool[]): RawAsset[] {
   return useMemo(() => {
     const baseTokens = [
       ...indexPools.map(({ id, name, symbol }) => ({ id: id.toLowerCase(), name, symbol })),
@@ -107,8 +108,11 @@ export function usePortfolioData({
   }, [assetsRaw, pairExistsLookup]);
   const balances = useTokenBalances(assetIds);
   const stakingPoolsByTokens = useStakingPoolsForTokens(assetIds);
+  const newStakingPoolsByTokens = useNewStakingPoolsForTokens(assetIds);
   const stakingInfoLookup = useStakingInfoLookup();
+  const masterChefPools = useMasterChefPoolsForTokens(assetIds);
   const newStakingInfoLookup = useNewStakingInfoLookup(assetIds);
+  const masterChefInfoLookup = useMasterChefInfoLookup(assetIds);
   const tokenLookup = useTokenLookup();
 
   return useMemo(() => {
@@ -118,19 +122,23 @@ export function usePortfolioData({
     const portfolioTokens: FormattedPortfolioAsset[] = assets.map(
       ({ name, symbol, id, isUniswapPair, isSushiswapPair }, i) => {
         const stakingPool = stakingPoolsByTokens[i];
+        const newStakingPool = newStakingPoolsByTokens[i];
+        const masterChefPool = masterChefPools[i];
         const stakingPoolUserInfo = stakingPool
-          ? stakingInfoLookup[stakingPool.id]
+          ? stakingInfoLookup[stakingPool.id.toLowerCase()]
           : undefined;
-        const newStakingPoolUserInfo = newStakingInfoLookup[id];
+        const newStakingPoolUserInfo = newStakingInfoLookup[id.toLowerCase()];
+        const masterchefUserInfo = masterChefInfoLookup[id.toLowerCase()]
         const decimals = tokenLookup[id]?.decimals ?? 18;
 
         let ndxEarned = 0;
         let staked = 0;
+        let sushiEarned = 0;
 
         if (stakingPoolUserInfo) {
           const earned = convert.toBalanceNumber(
             stakingPoolUserInfo.earned,
-            decimals
+            decimals,
           );
           ndxEarned += earned;
           staked += convert.toBalanceNumber(
@@ -145,12 +153,16 @@ export function usePortfolioData({
           staked += newStakingPoolUserInfo.balance;
         }
 
+        if (masterchefUserInfo) {
+          sushiEarned += masterchefUserInfo.rewards;
+          staked += masterchefUserInfo.balance;
+        }
+
         totalNdxEarned += ndxEarned;
         const price = priceLookup[id] ?? 0;
         const balance = convert.toBalanceNumber(
           balances[i] ?? "0",
           decimals,
-          6
         );
         const value = (staked + balance) * price;
 
@@ -165,19 +177,21 @@ export function usePortfolioData({
 
         return {
           address: id,
+          decimals,
           name,
           symbol,
           link,
           image: symbol,
           isUniswapPair: Boolean(isUniswapPair),
           isSushiswapPair: Boolean(isSushiswapPair),
-          hasStakingPool: Boolean(stakingPool),
+          hasStakingPool: Boolean(stakingPool || newStakingPool || masterChefPool),
           price: price.toFixed(2),
           balance: balance.toFixed(2),
           value: value.toFixed(2),
           weight: "",
           staking: staked > 0 ? staked.toFixed(2) : "",
           ndxEarned: ndxEarned.toFixed(2),
+          sushiEarned: sushiEarned.toFixed(2)
         };
       }
     );
