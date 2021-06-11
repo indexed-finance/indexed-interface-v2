@@ -30,7 +30,6 @@ export const tokensSelectors = {
     tokensSelectors.selectTokenById(state, tokenId)?.priceData?.price,
   selectTokenSupplies: (state: AppState, tokenIds: string[]) => {
     const lookup = tokensSelectors.selectTokensById(state, tokenIds);
-
     return lookup
       .filter((each): each is NormalizedToken => Boolean(each))
       .map(({ totalSupply = "" }) => totalSupply);

@@ -5,8 +5,8 @@ import {
   createSlice,
 } from "@reduxjs/toolkit";
 import { createMulticallDataParser } from "helpers";
-import { fetchInitialData } from "../requests";
-import { fetchMulticallData } from "../batcher/requests"; // Circular dependency.
+import { fetchInitialData } from "../requests"; // Circular dependency.
+import { fetchMulticallData } from "../batcher/requests";
 import { fetchTokenPriceData } from "./requests";
 import { mirroredServerState, restartedDueToError } from "../actions";
 import { pairsActions } from "../pairs";
@@ -47,7 +47,7 @@ const slice = createSlice({
             const entry = state.entities[tokenAddress];
 
             if (entry) {
-              entry.totalSupply = result;
+              if (result) entry.totalSupply = result;
             }
           }
         }
@@ -93,8 +93,8 @@ const slice = createSlice({
             if (t0 === "WETH") t0 = "ETH";
             let t1 = pair.token1 ? state.entities[pair.token1.toLowerCase()]?.symbol : "";
             if (t1 === "WETH") t1 = "ETH";
-            const [symbolPrefix, defaultName] = pair.sushiswap ? ['SUSHI', 'Sushiswap'] : ['UNIV2', 'UniswapV2']
-            const [symbol, name] = t0 && t1 ? [`${symbolPrefix}:${t0}-${t1}`, `${symbolPrefix}:${t0}-${t1}`] : [symbolPrefix, `${defaultName} LP Token`]
+            const [symbolPrefix, namePrefix] = pair.sushiswap ? ['SUSHI', 'Sushiswap'] : ['UNIV2', 'UniswapV2']
+            const [symbol, name] = t0 && t1 ? [`${t0}-${t1}`, `${namePrefix}:${t0}-${t1}`] : [symbolPrefix, `${namePrefix} LP Token`]
             state.ids.push(pair.id.toLowerCase());
             state.entities[pair.id.toLowerCase()] = {
               id: pair.id.toLowerCase(),
