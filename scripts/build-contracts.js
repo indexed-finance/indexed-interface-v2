@@ -114,14 +114,16 @@ const SingletonContracts = {
   IndexedUniswapRouterMinter: 'MINT_ROUTER_ADDRESS',
   IndexedUniswapRouterBurner: 'BURN_ROUTER_ADDRESS',
   UniswapV2Router: 'UNISWAP_ROUTER_ADDRESS',
-  MultiCall2: 'MULTICALL2_ADDRESS'
+  MultiCall2: 'MULTICALL2_ADDRESS',
+  IndexedNarwhalRouter: 'NARWHAL_ROUTER_ADDRESS',
+  MasterChef: 'MASTER_CHEF_ADDRESS'
 };
 
 const ConstantsImports = [
-  `import { `,
-  Object.values(SingletonContracts).sort().join(', '),
-  ` } from "config";`
-].join('');
+  `import {`,
+  ...Object.values(SingletonContracts).sort().map(c => `\t${c},`),
+  `} from "config";`
+].join('\n');
 
 const ContractsImports = `import { ContractTypeLookup, InterfaceKind, getContract } from "ethereum";`;
 const SignerImport = `import { useSigner } from "features";`;

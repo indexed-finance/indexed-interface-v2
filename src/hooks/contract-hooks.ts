@@ -1,4 +1,12 @@
-import { BURN_ROUTER_ADDRESS, MINT_ROUTER_ADDRESS, MULTICALL2_ADDRESS, MULTI_TOKEN_STAKING_ADDRESS, UNISWAP_ROUTER_ADDRESS } from "config";
+import {
+	BURN_ROUTER_ADDRESS,
+	MASTER_CHEF_ADDRESS,
+	MINT_ROUTER_ADDRESS,
+	MULTICALL2_ADDRESS,
+	MULTI_TOKEN_STAKING_ADDRESS,
+	NARWHAL_ROUTER_ADDRESS,
+	UNISWAP_ROUTER_ADDRESS,
+} from "config";
 
 import { ContractTypeLookup, InterfaceKind, getContract } from "ethereum";
 
@@ -19,6 +27,10 @@ export function useIIndexedUniswapV2OracleContract(address: string) {
 	return useContractWithSigner(address, "IIndexedUniswapV2Oracle");
 }
 
+export function useIndexedNarwhalRouterContract() {
+	return useContractWithSigner(NARWHAL_ROUTER_ADDRESS, "IndexedNarwhalRouter");
+}
+
 export function useBurnRouterContract() {
 	return useContractWithSigner(BURN_ROUTER_ADDRESS, "IndexedUniswapRouterBurner");
 }
@@ -33,6 +45,10 @@ export function useIndexPoolContract(address: string) {
 
 export function useIPoolInitializerContract(address: string) {
 	return useContractWithSigner(address, "IPoolInitializer");
+}
+
+export function useMasterChefContract() {
+	return useContractWithSigner(MASTER_CHEF_ADDRESS, "MasterChef");
 }
 
 export function useMultiCall2Contract() {

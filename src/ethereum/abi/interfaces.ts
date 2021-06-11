@@ -5,8 +5,10 @@ import type {
 	IIndexedUniswapV2Oracle,
 	IPool,
 	IPoolInitializer,
+	IndexedNarwhalRouter,
 	IndexedUniswapRouterBurner,
 	IndexedUniswapRouterMinter,
+	MasterChef,
 	MultiCall2,
 	MultiTokenStaking,
 	Pair,
@@ -20,8 +22,10 @@ import IERC20_ABI from "./IERC20.json";
 import IIndexedUniswapV2Oracle_ABI from "./IIndexedUniswapV2Oracle.json";
 import IPoolInitializer_ABI from "./IPoolInitializer.json";
 import IPool_ABI from "./IPool.json";
+import IndexedNarwhalRouter_ABI from "./IndexedNarwhalRouter.json";
 import IndexedUniswapRouterBurner_ABI from "./IndexedUniswapRouterBurner.json";
 import IndexedUniswapRouterMinter_ABI from "./IndexedUniswapRouterMinter.json";
+import MasterChef_ABI from "./MasterChef.json";
 import MultiCall2_ABI from "./MultiCall2.json";
 import MultiTokenStaking_ABI from "./MultiTokenStaking.json";
 import Pair_ABI from "./Pair.json";
@@ -32,10 +36,12 @@ import UniswapV2Router_ABI from "./UniswapV2Router.json";
 
 export const IERC20Interface = new Interface(IERC20_ABI) as IERC20["interface"];
 export const IIndexedUniswapV2OracleInterface = new Interface(IIndexedUniswapV2Oracle_ABI) as IIndexedUniswapV2Oracle["interface"];
+export const IndexedNarwhalRouterInterface = new Interface(IndexedNarwhalRouter_ABI) as IndexedNarwhalRouter["interface"];
 export const IndexedUniswapRouterBurnerInterface = new Interface(IndexedUniswapRouterBurner_ABI) as IndexedUniswapRouterBurner["interface"];
 export const IndexedUniswapRouterMinterInterface = new Interface(IndexedUniswapRouterMinter_ABI) as IndexedUniswapRouterMinter["interface"];
 export const IPoolInterface = new Interface(IPool_ABI) as IPool["interface"];
 export const IPoolInitializerInterface = new Interface(IPoolInitializer_ABI) as IPoolInitializer["interface"];
+export const MasterChefInterface = new Interface(MasterChef_ABI) as MasterChef["interface"];
 export const MultiCall2Interface = new Interface(MultiCall2_ABI) as MultiCall2["interface"];
 export const MultiTokenStakingInterface = new Interface(MultiTokenStaking_ABI) as MultiTokenStaking["interface"];
 export const PairInterface = new Interface(Pair_ABI) as Pair["interface"];
@@ -47,10 +53,12 @@ export const UniswapV2RouterInterface = new Interface(UniswapV2Router_ABI) as Un
 export {
 	IERC20_ABI,
 	IIndexedUniswapV2Oracle_ABI,
+	IndexedNarwhalRouter_ABI,
 	IndexedUniswapRouterBurner_ABI,
 	IndexedUniswapRouterMinter_ABI,
 	IPool_ABI,
 	IPoolInitializer_ABI,
+	MasterChef_ABI,
 	MultiCall2_ABI,
 	MultiTokenStaking_ABI,
 	Pair_ABI,
@@ -63,10 +71,12 @@ export {
 export const interfaceLookup = {
 	IERC20: IERC20Interface,
 	IIndexedUniswapV2Oracle: IIndexedUniswapV2OracleInterface,
+	IndexedNarwhalRouter: IndexedNarwhalRouterInterface,
 	IndexedUniswapRouterBurner: IndexedUniswapRouterBurnerInterface,
 	IndexedUniswapRouterMinter: IndexedUniswapRouterMinterInterface,
 	IPool: IPoolInterface,
 	IPoolInitializer: IPoolInitializerInterface,
+	MasterChef: MasterChefInterface,
 	MultiCall2: MultiCall2Interface,
 	MultiTokenStaking: MultiTokenStakingInterface,
 	Pair: PairInterface,
