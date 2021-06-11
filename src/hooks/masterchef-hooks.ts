@@ -50,11 +50,9 @@ export function useMasterChefApy(pid: string) {
   const meta = useSelector((state: AppState) => selectors.selectMasterChefMeta(state));
   const stakingPool = useMasterChefPool(pid);
   const [sushiPrice] = useTokenPrice(SUSHI_ADDRESS);
-  // console.log(`GOT SUSHI PRICE? ${sushiPrice}`)
   const tokenPrice = usePairTokenPrice(stakingPool?.token ?? "")
 
   return useMemo(() => {
-    console.log(`SUSHI PRICE ${sushiPrice} | Token Price ${tokenPrice}`)
     const hasLoaded = sushiPrice && tokenPrice;
 
     if (hasLoaded && stakingPool) {
