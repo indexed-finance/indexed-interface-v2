@@ -306,7 +306,7 @@ export const selectors = {
   },
   selectPossibleMasterChefPairs(state: AppState) {
     const indexPoolIds = selectors.selectAllPoolIds(state)
-    return [...indexPoolIds, NDX_ADDRESS, "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"].map((token) => {
+    return [...indexPoolIds, NDX_ADDRESS].map((token) => {
       const [token0, token1] = sortTokens(token, WETH_CONTRACT_ADDRESS);
       return {
         id: computeSushiswapPairAddress(token0, token1).toLowerCase(),
