@@ -10,10 +10,11 @@ import { Formik, useFormikContext } from "formik";
 import { Link, useParams } from "react-router-dom";
 import { MASTER_CHEF_ADDRESS } from "config";
 import { MasterChefPool } from "features/masterChef";
-import { abbreviateAddress, convert, sushiswapInfoPairLink } from "helpers";
+import { abbreviateAddress, convert, sushiswapAddLiquidityLink, sushiswapInfoPairLink } from "helpers";
 import {
   useBalanceAndApprovalRegistrar,
   useMasterChefTransactionCallbacks,
+  usePair,
   usePortfolioData,
   useToken,
   useTokenApproval,
@@ -194,6 +195,10 @@ function StakingStats({
   const rewardsPerDay = useMasterChefRewardsPerDay(stakingToken.id);
 
   const { exit, claim } = useMasterChefTransactionCallbacks(stakingToken.id);
+  const pair = usePair(stakingToken.token);
+  const url = (pair && pair.token0 && pair.token1)
+    ? sushiswapAddLiquidityLink(pair.token0, pair.token1)
+    : sushiswapInfoPairLink(stakingToken.token);
 
   return (
     <Descriptions bordered={true} column={1}>
@@ -242,7 +247,7 @@ function StakingStats({
         {convert.toBalance(stakingToken.totalStaked, 18, true)} {symbol}
       </Descriptions.Item>
       <Descriptions.Item label="Staking Token">
-        <ExternalLink to={sushiswapInfoPairLink(stakingToken.token)}>
+        <ExternalLink to={url}>
           {symbol}
         </ExternalLink>
       </Descriptions.Item>

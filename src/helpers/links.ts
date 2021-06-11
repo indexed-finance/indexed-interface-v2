@@ -7,3 +7,5 @@ export const uniswapInfoPairLink = (address: string) => `https://v2.info.uniswap
 
 export const sushiswapInfoTokenLink = (address: string) => `https://analytics.sushi.com/tokens/${address}`;
 export const sushiswapInfoPairLink = (address: string) => `https://analytics.sushi.com/pairs/${address}`;
+
+export const sushiswapAddLiquidityLink = (token0: string, token1: string) => `https://app.sushi.com/add/${token0}/${token1}`
