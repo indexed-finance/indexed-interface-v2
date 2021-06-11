@@ -85,16 +85,12 @@ function registerNewTokensAndPairs() {
   const state = getState();
   const allTokens = selectors.selectAllTokens(state);
   const allPairIds = Object.keys(state.pairs.entities).map((id) => id.toLowerCase());
-  const priceTokenIds = allTokens.map(t => t.id).filter((tokenId) => !tokensRegistered[tokenId.toLowerCase()]);
-  const pairTokenIds = allTokens.map(t => t.id).filter((tokenId) => !allPairIds.includes(tokenId.toLowerCase()));
-
-  let pairs = buildUniswapPairs(pairTokenIds).filter(
+  const allTokenIds = allTokens.map(t => t.id).filter(
+    (tokenId) => !tokensRegistered[tokenId.toLowerCase()] && !allPairIds.includes(tokenId.toLowerCase())
+  );
+  const pairs = buildUniswapPairs(allTokenIds).filter(
     (pair) => !pairsRegistered[pair.id.toLowerCase()]
   );
-  const mcPairs = selectors.selectPossibleMasterChefPairs(state).filter(p => {
-    return !pairs.find(p0 => p0.id.toLowerCase() === p.id.toLowerCase())
-  });
-  pairs = [ ...pairs, ...mcPairs ];
   dispatch(actions.uniswapPairsRegistered(pairs))
   const pairDataCalls = {
     caller: "Pair Data",
@@ -108,12 +104,12 @@ function registerNewTokensAndPairs() {
       {
         target: "",
         function: "fetchTokenPriceData",
-        args: priceTokenIds,
+        args: allTokenIds,
         canBeMerged: true,
       },
     ],
   };
-  priceTokenIds.forEach((tokenId) => {
+  allTokenIds.forEach((tokenId) => {
     tokensRegistered[tokenId.toLowerCase()] = true;
   });
   pairs.forEach((pair) => {
