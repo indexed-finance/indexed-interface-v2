@@ -20,7 +20,7 @@ export function PortfolioWidget(props: FormattedPortfolioAsset) {
   usePoolDetailRegistrar(isNdx ? "" : props.address, tokenIds);
 
   function FormattedLink({ children }: { children: ReactNode }) {
-    if (isNdx || props.isUniswapPair) {
+    if (isNdx || props.isUniswapPair || props.isSushiswapPair) {
       return (
         <ExternalLink
           to={props.link}
@@ -33,13 +33,16 @@ export function PortfolioWidget(props: FormattedPortfolioAsset) {
     }
     return <Link to={props.link}>{children}</Link>;
   }
-
+  const earned = props.isSushiswapPair ? `${props.sushiEarned} SUSHI` : `${props.ndxEarned} NDX`;
+  const symbol = props.symbol.replace('UNIV2:','').replace('SUSHI:', '')
   return (
     <FormattedLink>
       <Widget
-        symbol={props.symbol}
+        symbol={symbol}
         address={props.address}
         price={props.price}
+        badge={props.isUniswapPair ? "Uniswap V2" : props.isSushiswapPair ? "Sushiswap" : ""}
+        badgeColor={props.isUniswapPair ? "pink" : props.isSushiswapPair ? "violet" : ""}
         stats={
           <Space direction="vertical">
             <div data-tooltip="portfolio-widget-earned">
@@ -47,7 +50,7 @@ export function PortfolioWidget(props: FormattedPortfolioAsset) {
                 title={tx("EARNED")}
                 style={{ fontSize }}
                 valueStyle={{ fontSize }}
-                value={`${props.ndxEarned} NDX`}
+                value={earned}
               />
             </div>
             {props.hasStakingPool ? (
@@ -57,8 +60,8 @@ export function PortfolioWidget(props: FormattedPortfolioAsset) {
                 title={tx("STAKED")}
                 value={
                   props.staking
-                    ? `${props.staking} ${props.symbol}`
-                    : `0.00 ${props.symbol}`
+                    ? `${props.staking} ${symbol}`
+                    : `0.00 ${symbol}`
                 }
               />
             ) : (
