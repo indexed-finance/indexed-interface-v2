@@ -17,6 +17,12 @@ export const useNewStakedBalance = (id: string) =>
     selectors.selectNewUserStakedBalance(state, id)
   );
 
+
+export const useNewStakingPoolsForTokens = (stakingTokens: string[]) =>
+  useSelector((state: AppState) =>
+    selectors.selectNewStakingPoolsByStakingTokens(state, stakingTokens)
+  );
+
 export const useNewStakingPool = (id: string) =>
   useSelector((state: AppState) => selectors.selectNewStakingPool(state, id));
 
