@@ -16,10 +16,10 @@ import S from "string";
 
 export type IndexPoolInteraction =
   | "burn"
-  | "uniswapBurn"
+  | "routerBurn"
   | "multiBurn"
   | "mint"
-  | "uniswapMint"
+  | "routerMint"
   | "multiMint"
   | "trade"
   | "stake";
@@ -62,7 +62,7 @@ export function InteractionDrawer({
           return <TradeInteraction indexPool={formattedIndexPool} />;
         case "mint":
           return <MintInteraction indexPool={formattedIndexPool} />;
-        case "uniswapMint":
+        case "routerMint":
           return (
             <MintInteraction indexPool={formattedIndexPool} uniswap={true} />
           );
@@ -72,7 +72,7 @@ export function InteractionDrawer({
           );
         case "burn":
           return <BurnInteraction indexPool={formattedIndexPool} />;
-        case "uniswapBurn":
+        case "routerBurn":
           return (
             <BurnInteraction indexPool={formattedIndexPool} uniswap={true} />
           );
@@ -205,8 +205,8 @@ export function InteractionDrawer({
                 <span>Multi</span>
               </Menu.Item>
               <Menu.Item
-                key="uniswapMint"
-                onClick={() => open("uniswapMint")}
+                key="routerMint"
+                onClick={() => open("routerMint")}
                 style={{
                   display: "flex",
                   alignItems: "center",
@@ -215,14 +215,14 @@ export function InteractionDrawer({
                 }}
               >
                 <img
-                  alt="Uniswap"
-                  src={require("images/uniswap-link.png").default}
+                  alt="Routed"
+                  src={require("images/narwhal.png").default}
                   style={{
                     width: 20,
                     height: 20,
                   }}
                 />{" "}
-                <span>Uniswap</span>
+                <span>Router</span>
               </Menu.Item>
             </Menu.SubMenu>
             <Menu.SubMenu
@@ -266,8 +266,8 @@ export function InteractionDrawer({
                 <span>Multi</span>
               </Menu.Item>
               <Menu.Item
-                key="uniswapBurn"
-                onClick={() => open("uniswapBurn")}
+                key="routerBurn"
+                onClick={() => open("routerBurn")}
                 style={{
                   display: "flex",
                   alignItems: "center",
@@ -276,14 +276,14 @@ export function InteractionDrawer({
                 }}
               >
                 <img
-                  alt="Uniswap"
-                  src={require("images/uniswap-link.png").default}
+                  alt="Routed"
+                  src={require("images/narwhal.png").default}
                   style={{
                     width: 20,
                     height: 20,
                   }}
                 />{" "}
-                <span>Uniswap</span>
+                <span>Router</span>
               </Menu.Item>
             </Menu.SubMenu>
             {stakingApy && stakingApy !== "Expired" && (

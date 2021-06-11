@@ -1,12 +1,13 @@
 import { Checkbox, Col, Row, Typography } from "antd";
 import { Page, PortfolioWidget } from "components/atomic";
-import { useMemo, useState } from "react";
 import {
+  useMasterChefRegistrar,
   useNewStakingRegistrar,
   usePortfolioData,
   useStakingRegistrar,
   useTranslator,
 } from "hooks";
+import { useMemo, useState } from "react";
 
 export default function Portfolio() {
   const tx = useTranslator();
@@ -18,6 +19,7 @@ export default function Portfolio() {
 
   useStakingRegistrar();
   useNewStakingRegistrar();
+  useMasterChefRegistrar();
 
   return (
     <Page
