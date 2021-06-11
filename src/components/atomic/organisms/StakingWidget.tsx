@@ -75,7 +75,7 @@ export function StakingWidget(props: FormattedStakingData) {
   );
 
   return props.isWethPair ? (
-    <Badge.Ribbon text="Uniswap V2" color="purple" style={{ top: -6 }}>
+    <Badge.Ribbon text="Uniswap V2" color="pink" style={{ top: -6 }}>
       {inner}
     </Badge.Ribbon>
   ) : (
