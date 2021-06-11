@@ -104,7 +104,6 @@ export function useUniswapTransactionCallback() {
         ttl: gracePeriod
         // deadline,
       });
-      console.log({ args, value, methodName })
 
       const tx = (contract as any)[methodName](...args, { value });
       addTransaction(tx);
