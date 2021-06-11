@@ -577,7 +577,7 @@ export function useMasterChefTransactionCallbacks(pid: string): StakingTransacti
   const claim = useCallback(() => {
     // @todo Figure out a better way to handle this
     if (!contract) throw new Error();
-    const tx = contract.withdraw(pid, 1);
+    const tx = contract.deposit(pid, 0);
     addTransaction(tx);
   }, [contract, addTransaction, pid]);
 
