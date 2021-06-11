@@ -71,6 +71,7 @@ const slice = createSlice({
         return state;
       })
       .addCase(mirroredServerState, (state, action) => {
+        if (!action.payload.masterChef) return;
         for (const id of action.payload.masterChef.ids) {
           const pool = action.payload.masterChef.entities[id];
           const entry = state.entities[id.toLowerCase()];
