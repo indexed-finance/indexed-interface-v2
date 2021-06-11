@@ -43,8 +43,6 @@ const slice = createSlice({
           action.payload
         );
         if (relevantMulticallData) {
-          console.log(`Got MasterChef MultiCall Data`);
-          console.log(relevantMulticallData)
           const { allocPointsByPool, totalStakedByToken, userDataByPool, totalAllocPoint } = relevantMulticallData;
           if (totalAllocPoint) {
             state.metadata.totalAllocPoint = totalAllocPoint;
