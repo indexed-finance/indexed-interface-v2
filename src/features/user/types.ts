@@ -38,6 +38,7 @@ export interface FormattedPortfolioAsset {
   image: string;
   symbol: string;
   isUniswapPair: boolean;
+  isSushiswapPair: boolean;
   hasStakingPool: boolean;
   balance: string;
   staking: string;

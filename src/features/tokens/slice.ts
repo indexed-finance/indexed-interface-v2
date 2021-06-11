@@ -93,7 +93,8 @@ const slice = createSlice({
             if (t0 === "WETH") t0 = "ETH";
             let t1 = pair.token1 ? state.entities[pair.token1.toLowerCase()]?.symbol : "";
             if (t1 === "WETH") t1 = "ETH";
-            const [symbol, name] = t0 && t1 ? [`UNIV2:${t0}-${t1}`, `UNIV2:${t0}-${t1}`] : ["UniV2", `UniswapV2 LP Token`]
+            const [symbolPrefix, defaultName] = pair.sushiswap ? ['SUSHI', 'Sushiswap'] : ['UNIV2', 'UniswapV2']
+            const [symbol, name] = t0 && t1 ? [`${symbolPrefix}:${t0}-${t1}`, `${symbolPrefix}:${t0}-${t1}`] : [symbolPrefix, `${defaultName} LP Token`]
             state.ids.push(pair.id.toLowerCase());
             state.entities[pair.id.toLowerCase()] = {
               id: pair.id.toLowerCase(),

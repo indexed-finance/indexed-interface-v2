@@ -14,6 +14,7 @@ export interface PairReservesUpdate {
 
 export interface NormalizedPair {
   id: string; // Uniswap pair address
+  sushiswap?: boolean;
   exists?: boolean;
   token0?: string;
   token1?: string;
@@ -28,4 +29,5 @@ export interface FormattedPair {
   token1: NormalizedToken;
   reserves0: string;
   reserves1: string;
+  sushiswap?: boolean;
 }

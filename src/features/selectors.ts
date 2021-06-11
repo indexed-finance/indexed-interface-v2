@@ -474,6 +474,7 @@ export const selectors = {
           token1,
           reserves0: pair.reserves0 as string,
           reserves1: pair.reserves1 as string,
+          sushiswap: pair.sushiswap
         };
       }
 
