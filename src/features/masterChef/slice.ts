@@ -70,7 +70,19 @@ const slice = createSlice({
 
         return state;
       })
-      .addCase(mirroredServerState, (_, action) => action.payload.masterChef)
+      .addCase(mirroredServerState, (state, action) => {
+        for (const id of action.payload.masterChef.ids) {
+          const pool = action.payload.masterChef.entities[id];
+          const entry = state.entities[id.toLowerCase()];
+          if (entry) {
+            if (pool.allocPoint) {
+              entry.allocPoint = pool.allocPoint;
+            }
+          } else {
+            adapter.addOne(state, pool)
+          }
+        }
+      })
       .addCase(restartedDueToError, () =>
         adapter.getInitialState(initialState)
       ),
