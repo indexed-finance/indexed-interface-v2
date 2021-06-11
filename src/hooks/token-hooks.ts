@@ -1,8 +1,9 @@
 import { AppState, selectors } from "features";
 import { ApprovalStatus } from "features/user/slice";
-import { Pair } from "@uniswap/sdk";
+import { Pair } from "@indexed-finance/narwhal-sdk";
 import {
   RegisteredCall,
+  computeSushiswapPairAddress,
   computeUniswapPairAddress,
   convert,
   getRandomEntries,
@@ -161,7 +162,7 @@ const getLpTokenPrice = (
 
 export const last = <T>(arr: T[]): T => arr[arr.length - 1];
 
-type PricedAsset = {
+export type PricedAsset = {
   /**
    * @param id - ID of the token to look up the price for if
    * `useEthLpTokenPrice` is false, or the ID of the base token
@@ -178,6 +179,7 @@ type PricedAsset = {
    * where the caller might need to provide token0 and token1.
    */
   useEthLpTokenPrice: boolean;
+  sushiswap?: boolean;
 };
 
 export function useTokenPricesLookup(
@@ -192,10 +194,14 @@ export function useTokenPricesLookup(
       .filter((t) => t.useEthLpTokenPrice)
       .map((token) => {
         const [token0, token1] = sortTokens(token.id, WETH_CONTRACT_ADDRESS);
+        const id = token.sushiswap
+          ? computeSushiswapPairAddress(token0, token1).toLowerCase()
+          : computeUniswapPairAddress(token0, token1).toLowerCase();
         return {
-          id: computeUniswapPairAddress(token0, token1).toLowerCase(),
+          id,
           token0,
           token1,
+          sushiswap: token.sushiswap,
           exists: undefined,
         };
       });
