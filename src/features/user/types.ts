@@ -34,14 +34,17 @@ export interface FormattedPortfolioData {
 
 export interface FormattedPortfolioAsset {
   address: string;
+  decimals: number;
   name: string;
   image: string;
   symbol: string;
   isUniswapPair: boolean;
+  isSushiswapPair: boolean;
   hasStakingPool: boolean;
   balance: string;
   staking: string;
   ndxEarned: string;
+  sushiEarned: string;
   price: string;
   value: string;
   weight: string;

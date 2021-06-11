@@ -3,6 +3,7 @@ import {
   bestTradeExactIn,
   bestTradeExactOut,
   buildCommonTokenPairs,
+  computeSushiswapPairAddress,
   computeUniswapPairAddress,
   convert,
   sortTokens,
@@ -17,7 +18,7 @@ import type {
   Token,
   TokenAmount,
   Trade,
-} from "@uniswap/sdk";
+} from "@indexed-finance/narwhal-sdk";
 import type { RegisteredCall } from "helpers";
 
 export const PAIR_DATA_CALLER = "Pair Data";
@@ -28,6 +29,10 @@ export type RegisteredPair = {
   token1: string;
   exists?: boolean;
 };
+
+export const usePair = (pairId: string) => useSelector((state: AppState) =>
+  selectors.selectPairById(state, pairId)
+);
 
 export const usePairExistsLookup = (
   pairIds: string[]
@@ -58,16 +63,20 @@ type PairToken = {
   exists: boolean | undefined;
   token0: string;
   token1: string;
+  sushiswap?: boolean;
 };
 
 export function buildUniswapPairs(baseTokens: string[]) {
   const tokenPairs = buildCommonTokenPairs(baseTokens);
-  const pairs = tokenPairs.map(([tokenA, tokenB]) => {
+  const pairs: PairToken[] = tokenPairs.reduce((arr, [tokenA, tokenB]) => {
     const [token0, token1] = sortTokens(tokenA, tokenB);
-    const pair = computeUniswapPairAddress(token0, token1);
 
-    return { id: pair, exists: undefined, token0, token1 };
-  });
+    return [
+      ...arr,
+      { id: computeUniswapPairAddress(token0, token1), exists: undefined, token0, token1, sushiswap: false },
+      { id: computeSushiswapPairAddress(token0, token1), exists: undefined, token0, token1, sushiswap: true }
+    ];
+  }, [] as PairToken[]);
 
   return pairs;
 }
@@ -143,7 +152,6 @@ export function useUniswapTradingPairs(baseTokens: string[]) {
           ) as Token,
           opts ?? { maxHops: 3, maxNumResults: 1 }
         );
-
         return bestTrade;
       }
     },

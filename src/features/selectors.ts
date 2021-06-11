@@ -5,6 +5,7 @@ import {
   formatPoolAsset,
   indexPoolsSelectors,
 } from "./indexPools";
+import { FormattedMasterChefData, MasterChefPool, masterChefSelectors, totalSushiPerDay } from "./masterChef";
 import {
   FormattedNewStakingData,
   FormattedNewStakingDetail,
@@ -21,12 +22,13 @@ import { NormalizedToken, tokensSelectors } from "./tokens";
 import { NormalizedTransaction, transactionsSelectors } from "./transactions";
 import { Pair } from "uniswap-types";
 import { batcherSelectors } from "./batcher";
-import { convert } from "helpers";
+import { computeSushiswapPairAddress, convert } from "helpers";
 import { createSelector } from "reselect";
 import { dailySnapshotsSelectors } from "./dailySnapshots";
 import { formatDistance } from "date-fns";
 import { newStakingSelectors } from "./newStaking";
 import { settingsSelectors } from "./settings";
+import { sortTokens } from "@indexed-finance/indexed.js/dist/utils/address";
 import S from "string";
 import type { AppState } from "./store";
 
@@ -44,6 +46,7 @@ export const selectors = {
   ...userSelectors,
   ...pairsSelectors,
   ...transactionsSelectors,
+  ...masterChefSelectors,
   // Categories
   selectFormattedCategory: (
     state: AppState,
@@ -301,6 +304,81 @@ export const selectors = {
       } as FormattedStakingDetail
     );
   },
+  selectPossibleMasterChefPairs(state: AppState) {
+    const indexPoolIds = selectors.selectAllPoolIds(state)
+    return [...indexPoolIds, NDX_ADDRESS].map((token) => {
+      const [token0, token1] = sortTokens(token, WETH_CONTRACT_ADDRESS);
+      return {
+        id: computeSushiswapPairAddress(token0, token1).toLowerCase(),
+        token0: token0.toLowerCase(),
+        token1: token1.toLowerCase(),
+        sushiswap: true,
+        exists: undefined
+      }
+    })
+  },
+  selectMasterChefPoolsWithRecognizedPairs(state: AppState): MasterChefPool[] {
+    const pairIds = selectors.selectPossibleMasterChefPairs(state).map(p => p.id);
+    const pools = selectors.selectMasterChefPoolsByStakingTokens(state, pairIds);
+    return pools.filter(_ => Boolean(_)) as MasterChefPool[];
+  },
+  // selectNewFormattedStakingToken
+  selectMasterChefFormattedStaking(state: AppState): FormattedMasterChefData[] {
+    const meta = selectors.selectMasterChefMeta(state)
+    const stakingPools = selectors.selectMasterChefPoolsWithRecognizedPairs(state);
+    const formattedStaking = stakingPools
+      .map((stakingPool) => {
+        const pair = selectors.selectPairById(state, stakingPool.token.toLowerCase());
+
+        if (!pair || !pair.token0 || !pair.token1) {
+          return null;
+        }
+        const pairToken = selectors.selectTokenById(state, pair.id);
+        if (!pairToken) return null;
+        const { name, symbol } = pairToken;
+        const totalStaked = convert.toBalance(
+          stakingPool.totalStaked ?? "0",
+          18,
+          true,
+          2
+        );
+        const staked = convert.toBalance(
+          stakingPool.userStakedBalance ?? "0",
+          18
+        );
+        const earned = convert.toBalance(
+          stakingPool.userEarnedRewards ?? "0",
+          18
+        );
+
+        const rewardsPerDay = convert.toBalance(
+          totalSushiPerDay.times(stakingPool.allocPoint).div(meta.totalAllocPoint),
+          18
+        );
+        return {
+          id: stakingPool.id,
+          // indexPool: indexPool.id,
+          isWethPair: true,
+          // slug: `/index-pools/${S(indexPool.name).slugify().s}`,
+          name,
+          symbol,
+          totalStaked,
+          staked,
+          stakingToken: stakingPool.token,
+          earned: `${earned} SUSHI`,
+          rewardsPerDay,
+        };
+      })
+      .filter((each): each is FormattedNewStakingData => Boolean(each))
+      .sort((a, b) => +b.rewardsPerDay - +a.rewardsPerDay)
+      .map((each) => ({
+        ...each,
+        staked: convert.toComma(+each.staked),
+        rewardsPerDay: `${convert.toComma(+each.rewardsPerDay)} SUSHI/Day`,
+      }));
+
+    return formattedStaking
+  },
   // selectNewFormattedStakingToken
   selectNewFormattedStaking(state: AppState): FormattedNewStakingDetail {
     const stakingPools = selectors.selectAllNewStakingPools(state);
@@ -474,6 +552,7 @@ export const selectors = {
           token1,
           reserves0: pair.reserves0 as string,
           reserves1: pair.reserves1 as string,
+          sushiswap: pair.sushiswap
         };
       }
 

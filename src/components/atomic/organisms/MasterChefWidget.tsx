@@ -1,31 +1,31 @@
 import { Button, Col, Row, Space, Statistic } from "antd";
 import { FaTractor } from "react-icons/fa";
-import { FormattedNewStakingData } from "features";
+import { FormattedMasterChefData } from "features/masterChef";
 import { Link, useHistory } from "react-router-dom";
 import { Widget } from "./Widget";
 import { convert } from "helpers";
+import { useMasterChefApy } from "hooks/masterchef-hooks";
 import {
-  useNewStakingApy,
-  useNewStakingTokenPrice,
+  usePairTokenPrice,
   useTranslator,
 } from "hooks";
 
-export function StakingWidgetNew(props: FormattedNewStakingData) {
+export function MasterChefStakingWidget(props: FormattedMasterChefData) {
   const tx = useTranslator();
-  const apy = useNewStakingApy(props.id);
-  const price = useNewStakingTokenPrice(props.id);
+  const apy = useMasterChefApy(props.id);
+  const price = usePairTokenPrice(props.stakingToken);
   const symbol = props.symbol;
   const { push } = useHistory();
 
   return (
     <div style={{ position: "relative" }}>
       <Widget
-        badge={props.liquidityProvider || props.isWethPair ? "Uniswap V2" : ""}
-        badgeColor="pink"
+        badge={"Sushiswap"}
+        badgeColor="violet"
         symbol={symbol}
         address={props.id}
         price={price ? convert.toCurrency(price) : ""}
-        onClick={() => push(`/staking-new/${props.id}`)}
+        onClick={() => push(`/stake-sushi/${props.id}`)}
         stats={
           <Space direction="vertical" style={{ width: "100%" }}>
             <Statistic
@@ -60,7 +60,7 @@ export function StakingWidgetNew(props: FormattedNewStakingData) {
               onClick={(event) => event.stopPropagation()}
               block={true}
             >
-              <Link to={`/staking-new/${props.id}`}>
+              <Link to={`/stake-sushi/${props.id}`}>
                 <Space>
                   <FaTractor style={{ position: "relative", top: 2 }} />
                   <span>{tx("STAKE")}</span>

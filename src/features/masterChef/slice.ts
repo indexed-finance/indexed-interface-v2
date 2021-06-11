@@ -1,39 +1,36 @@
-import { MULTI_TOKEN_STAKING_ADDRESS, REWARDS_SCHEDULE_ADDDRESS } from "config";
-import { NewStakingMeta, NewStakingPool, NewStakingUpdate } from "./types"; // Circular dependency.
+import { MasterChefMeta, MasterChefPool, MasterChefUpdate } from "./types"; // Circular dependency.
 import { convert, createMulticallDataParser } from "helpers";
 import { createEntityAdapter, createSlice } from "@reduxjs/toolkit";
+import { fetchMasterChefData } from "./requests";
 import { fetchMulticallData } from "../batcher/requests";
-import { fetchNewStakingData } from "./requests";
 import { mirroredServerState, restartedDueToError } from "../actions";
 import type { AppState } from "../store";
 import type { CallWithResult } from "helpers";
 
-export const newStakingCaller = "NewStaking";
+export const masterChefCaller = "MasterChef";
 
-const adapter = createEntityAdapter<NewStakingPool>({
+const BLOCKS_PER_DAY = 86400 / 13.5;
+
+export const totalSushiPerDay = convert.toToken('100', 18).times(BLOCKS_PER_DAY);
+
+const adapter = createEntityAdapter<MasterChefPool>({
   selectId: (entry) => entry.id.toLowerCase(),
 });
 
 const initialState = {
   metadata: {
-    id: MULTI_TOKEN_STAKING_ADDRESS,
-    owner: "",
-    rewardsSchedule: REWARDS_SCHEDULE_ADDDRESS,
-    startBlock: 12454000,
-    endBlock: 17232181,
-    rewardsToken: "0x86772b1409b61c639eaac9ba0acfbb6e238e5f83",
     totalAllocPoint: 0,
     poolCount: 0,
-  } as NewStakingMeta,
+  } as MasterChefMeta,
 };
 
 const slice = createSlice({
-  name: "newStaking",
+  name: "masterChef",
   initialState: adapter.getInitialState(initialState),
   reducers: {},
   extraReducers: (builder) =>
     builder
-      .addCase(fetchNewStakingData.fulfilled, (state, action) => {
+      .addCase(fetchMasterChefData.fulfilled, (state, action) => {
         adapter.addMany(state, action.payload.pools);
         state.metadata = {
           ...state.metadata,
@@ -42,19 +39,21 @@ const slice = createSlice({
         // console.log(state.entities)
       })
       .addCase(fetchMulticallData.fulfilled, (state, action) => {
-        const relevantMulticallData = newStakingMulticallDataParser(
+        const relevantMulticallData = masterChefMulticallDataParser(
           action.payload
         );
         if (relevantMulticallData) {
-          // console.log(`Got New Staking MultiCall Data`);
-          // console.log(relevantMulticallData)
-          const { totalRewardsPerDay, totalStakedByToken, userDataByPool } =
-            relevantMulticallData;
+          const { allocPointsByPool, totalStakedByToken, userDataByPool, totalAllocPoint } = relevantMulticallData;
+          if (totalAllocPoint) {
+            state.metadata.totalAllocPoint = totalAllocPoint;
+          }
           Object.entries(totalStakedByToken).forEach(([token, staked]) => {
             const entry = Object.values(state.entities).find(
               (e) => e?.token.toLowerCase() === token.toLowerCase()
             );
-            if (entry) entry.totalStaked = staked;
+            if (entry) {
+              entry.totalStaked = staked;
+            }
           });
           Object.entries(userDataByPool).forEach(([pid, userData]) => {
             const entry = state.entities[pid];
@@ -62,64 +61,56 @@ const slice = createSlice({
             entry.userEarnedRewards = userData.userEarnedRewards;
             entry.userStakedBalance = userData.userStakedBalance;
           });
-          if (totalRewardsPerDay) {
-            state.metadata.totalRewardsPerDay = totalRewardsPerDay;
-            const totalRewards = convert.toBigNumber(totalRewardsPerDay);
-            for (const id of state.ids) {
-              const entry = state.entities[id];
-              if (entry) {
-                entry.rewardsPerDay = totalRewards
-                  .times(entry.allocPoint)
-                  .div(state.metadata.totalAllocPoint)
-                  .toString();
-              }
-            }
-          }
+          Object.entries(allocPointsByPool).forEach(([pid, allocPoint]) => {
+            const entry = state.entities[pid];
+            if (!entry) return;
+            entry.allocPoint = allocPoint;
+          })
         }
 
         return state;
       })
-      .addCase(mirroredServerState, (_, action) => action.payload.newStaking)
+      .addCase(mirroredServerState, (_, action) => action.payload.masterChef)
       .addCase(restartedDueToError, () =>
         adapter.getInitialState(initialState)
       ),
 });
 
-export const { actions: newStakingActions, reducer: newStakingReducer } = slice;
+export const { actions: masterChefActions, reducer: masterChefReducer } = slice;
 
-const selectors = adapter.getSelectors((state: AppState) => state.newStaking);
+const selectors = adapter.getSelectors((state: AppState) => state.masterChef);
 
-export const newStakingSelectors = {
-  selectAllNewStakingPools(state: AppState) {
+export const masterChefSelectors = {
+  selectAllMasterChefPools(state: AppState) {
     return selectors.selectAll(state);
   },
-  selectNewStakingMeta(state: AppState) {
-    return state.newStaking.metadata;
+  selectMasterChefMeta(state: AppState) {
+    return state.masterChef.metadata;
   },
-  selectNewStakingPool(state: AppState, id: string) {
+  selectMasterChefPool(state: AppState, id: string) {
     return selectors.selectById(state, id);
   },
-  selectNewStakingPoolByStakingToken(state: AppState, id: string) {
-    return newStakingSelectors
-      .selectAllNewStakingPools(state)
+  selectMasterChefPoolByStakingToken(state: AppState, id: string) {
+    return masterChefSelectors
+      .selectAllMasterChefPools(state)
       .find(({ token }) => token.toLowerCase() === id.toLowerCase());
   },
-  selectNewUserStakedBalance(state: AppState, id: string) {
-    return newStakingSelectors.selectNewStakingPool(state, id)
-      ?.userStakedBalance;
-  },
-  selectNewStakingPoolsByStakingTokens(
+  selectMasterChefPoolsByStakingTokens(
     state: AppState,
     ids: string[]
-  ): Array<NewStakingPool | undefined> {
-    const allPools = newStakingSelectors.selectAllNewStakingPools(state);
+  ): Array<MasterChefPool | undefined> {
+    const allPools = masterChefSelectors.selectAllMasterChefPools(state);
     return ids.map((id) =>
       allPools.find((p) => p.token.toLowerCase() === id.toLowerCase())
     );
   },
-  selectNewStakingInfoLookup(state: AppState, ids: string[]) {
+  selectMasterChefUserStakedBalance(state: AppState, id: string) {
+    return masterChefSelectors.selectMasterChefPool(state, id)
+      ?.userStakedBalance;
+  },
+  selectMasterChefInfoLookup(state: AppState, ids: string[]) {
     return ids.reduce((prev, next) => {
-      const pool = newStakingSelectors.selectNewStakingPoolByStakingToken(
+      const pool = masterChefSelectors.selectMasterChefPoolByStakingToken(
         state,
         next
       );
@@ -127,17 +118,9 @@ export const newStakingSelectors = {
       if (pool) {
         const { userStakedBalance = "0", userEarnedRewards = "0" } = pool;
 
-        prev[pool.token.toLowerCase()] = {
-          balance: convert.toBalanceNumber(
-            userStakedBalance.toString(),
-            pool.decimals,
-            6
-          ),
-          rewards: convert.toBalanceNumber(
-            userEarnedRewards.toString(),
-            pool.decimals,
-            6
-          ),
+        prev[pool.token] = {
+          balance: convert.toBalanceNumber(userStakedBalance.toString(), 18, 6),
+          rewards: convert.toBalanceNumber(userEarnedRewards.toString(), 18, 6),
         };
       }
 
@@ -146,13 +129,14 @@ export const newStakingSelectors = {
   },
 };
 
-export const newStakingMulticallDataParser = createMulticallDataParser(
-  newStakingCaller,
+export const masterChefMulticallDataParser = createMulticallDataParser(
+  masterChefCaller,
   (calls) => {
-    const update: NewStakingUpdate = {
+    const update: MasterChefUpdate = {
       totalStakedByToken: {},
       userDataByPool: {},
-      totalRewardsPerDay: "",
+      allocPointsByPool: {},
+      totalAllocPoint: 0
     };
     const handleCall = ([fn, results]: [string, CallWithResult[]]) => {
       const formattedResults = results.map((item: CallWithResult) => ({
@@ -173,7 +157,12 @@ export const newStakingMulticallDataParser = createMulticallDataParser(
             }
             update.userDataByPool[id].userStakedBalance = result.toString();
           },
-          pendingRewards() {
+          poolInfo() {
+            const id = args[0];
+            const [, allocPoint] = values;
+            update.allocPointsByPool[id] = +allocPoint.toString();
+          },
+          pendingSushi() {
             const id = args[0];
             if (!update.userDataByPool[id]) {
               update.userDataByPool[id] = {
@@ -183,11 +172,11 @@ export const newStakingMulticallDataParser = createMulticallDataParser(
             }
             update.userDataByPool[id].userEarnedRewards = result.toString();
           },
+          totalAllocPoint() {
+            update.totalAllocPoint = +result.toString()
+          },
           balanceOf() {
             update.totalStakedByToken[target] = result.toString();
-          },
-          getRewardsForBlockRange() {
-            update.totalRewardsPerDay = result.toString();
           },
         };
         if (result) {

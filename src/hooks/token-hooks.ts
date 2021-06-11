@@ -1,8 +1,9 @@
 import { AppState, selectors } from "features";
 import { ApprovalStatus } from "features/user/slice";
-import { Pair } from "@uniswap/sdk";
+import { Pair } from "@indexed-finance/narwhal-sdk";
 import {
   RegisteredCall,
+  computeSushiswapPairAddress,
   computeUniswapPairAddress,
   convert,
   getRandomEntries,
@@ -12,9 +13,9 @@ import { WETH_CONTRACT_ADDRESS } from "config";
 import { useAddTransactionCallback } from "./transaction-hooks";
 import { useCallRegistrar } from "./use-call-registrar";
 import { useCallback, useEffect, useMemo } from "react";
+import { usePair, useUniswapPairs } from "./pair-hooks";
 import { useSelector } from "react-redux";
 import { useTokenContract } from "./contract-hooks";
-import { useUniswapPairs } from "./pair-hooks";
 
 // #region General
 export const useToken = (tokenId: string) =>
@@ -161,7 +162,7 @@ const getLpTokenPrice = (
 
 export const last = <T>(arr: T[]): T => arr[arr.length - 1];
 
-type PricedAsset = {
+export type PricedAsset = {
   /**
    * @param id - ID of the token to look up the price for if
    * `useEthLpTokenPrice` is false, or the ID of the base token
@@ -178,6 +179,7 @@ type PricedAsset = {
    * where the caller might need to provide token0 and token1.
    */
   useEthLpTokenPrice: boolean;
+  sushiswap?: boolean;
 };
 
 export function useTokenPricesLookup(
@@ -192,10 +194,14 @@ export function useTokenPricesLookup(
       .filter((t) => t.useEthLpTokenPrice)
       .map((token) => {
         const [token0, token1] = sortTokens(token.id, WETH_CONTRACT_ADDRESS);
+        const id = token.sushiswap
+          ? computeSushiswapPairAddress(token0, token1).toLowerCase()
+          : computeUniswapPairAddress(token0, token1).toLowerCase();
         return {
-          id: computeUniswapPairAddress(token0, token1).toLowerCase(),
+          id,
           token0,
           token1,
+          sushiswap: token.sushiswap,
           exists: undefined,
         };
       });
@@ -252,6 +258,53 @@ export function useTokenPricesLookup(
   ]);
 }
 
+export function usePairTokenPrice(id: string) {
+  const pairInfo = usePair(id);
+  const [
+    pairArr,
+    supplyArr,
+    pricedTokenId
+  ] = useMemo(() => {
+    if (!pairInfo) return [[], [], ''];
+    const { id, exists, token0, token1, sushiswap } = pairInfo;
+    if (!token0 || !token1) return [[], [], ''];
+    let pricedTokenId: string;
+    if (token0.toLowerCase() === WETH_CONTRACT_ADDRESS.toLowerCase()) {
+      pricedTokenId = token0.toLowerCase();
+    } else {
+      pricedTokenId = token1.toLowerCase();
+    }
+    return [
+      [{ id, exists, token0, token1, sushiswap }] ,
+      [id],
+      pricedTokenId
+    ]
+  }, [pairInfo]);
+
+  const [tokenPrice, tokenPriceLoading] = useTokenPrice(pricedTokenId);
+  const [pairs, pairsLoading] = useUniswapPairs(pairArr);
+  const [supplies, suppliesLoading] = useTotalSuppliesWithLoadingIndicator(supplyArr);
+
+  return useMemo(() => {
+    // console.log(`PRICE LOADING ${tokenPriceLoading} ${tokenPrice}`);
+    // console.log(`SUPPLIES LOADING ${suppliesLoading} ${supplies}`);
+    if (pairsLoading || tokenPriceLoading || suppliesLoading) {
+      return 0;
+    }
+    const [pair] = pairs || [];
+    const [supply] = supplies || [];
+    const priceZero = pair.token0.address.toLowerCase() === pricedTokenId.toLowerCase();
+    const tokenReserve = priceZero
+      ? pair.reserve0
+      : pair.reserve1;
+    const valueOfSupplyInToken = parseFloat(tokenReserve.toExact()) * 2;
+    const tokensPerLpToken =
+      valueOfSupplyInToken /
+      parseFloat(convert.toBalance(supply, 18, false));
+    return tokensPerLpToken * (tokenPrice as number);
+  }, [tokenPrice, tokenPriceLoading, pairs, pairsLoading, supplies, suppliesLoading, pricedTokenId])
+}
+
 export const useEthPrice = () => useTokenPrice(WETH_CONTRACT_ADDRESS);
 
 export function usePricesRegistrar(tokenIds: string[]) {
@@ -275,7 +328,7 @@ export const TOTAL_SUPPLIES_CALLER = "Total Supplies";
 
 export function createTotalSuppliesCalls(tokenIds: string[]): RegisteredCall[] {
   return tokenIds.map((id) => ({
-    caller: TOTAL_SUPPLIES_CALLER,
+    // caller: TOTAL_SUPPLIES_CALLER,
     interfaceKind: "IERC20",
     target: id,
     function: "totalSupply",

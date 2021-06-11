@@ -35,17 +35,22 @@ export function Token({
   const fontSize = size === "tiny" || size === "small" ? 16 : 24;
   const Component = asAvatar ? Avatar : "img";
   const isUniswap = symbol.startsWith("UNIV2:");
+  const isSushiswap = symbol.startsWith('SUSHI:');
   const isOtherPairWithSlash = symbol.includes("/");
   const isOtherPairWithDash = symbol.includes("-");
 
   let image: string | ReactNode = "";
 
-  if (isUniswap || isOtherPairWithSlash || isOtherPairWithDash) {
+  if (isUniswap || isSushiswap || isOtherPairWithSlash || isOtherPairWithDash) {
     let firstSymbol = "";
     let secondSymbol = "";
 
     if (isUniswap) {
       const pair = symbol.split("UNIV2:")[1];
+
+      [firstSymbol, secondSymbol] = pair.split("-");
+    } else if (isSushiswap) {
+      const pair = symbol.split("SUSHI:")[1];
 
       [firstSymbol, secondSymbol] = pair.split("-");
     } else if (isOtherPairWithSlash) {

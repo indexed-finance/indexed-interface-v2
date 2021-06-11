@@ -1,4 +1,4 @@
-import { ChainId } from "@uniswap/sdk";
+import { ChainId } from "@indexed-finance/narwhal-sdk";
 import { FORTMATIC_KEY } from "config";
 import { FortmaticConnector as FortmaticConnectorCore } from "@web3-react/fortmatic-connector";
 

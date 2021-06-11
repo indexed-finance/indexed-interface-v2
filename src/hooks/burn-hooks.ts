@@ -1,5 +1,6 @@
 import { AppState, selectors } from "features";
 import { COMMON_BASE_TOKENS, SLIPPAGE_RATE } from "config";
+import { Currency, Trade } from "@indexed-finance/narwhal-sdk";
 import {
   _calcAllOutGivenPoolIn,
   calcPoolInGivenSingleOut,
@@ -19,7 +20,6 @@ import { useSelector } from "react-redux";
 import { useTokenLookupBySymbol } from "./token-hooks";
 import { useUniswapTradingPairs } from "./pair-hooks";
 import type { BigNumber } from "ethereum";
-import type { Trade } from "@uniswap/sdk";
 
 // #region Token
 export function useSingleTokenBurnCallbacks(poolId: string) {
@@ -317,13 +317,14 @@ export function useBurnRouterCallbacks(poolId: string) {
         if (result && !result.poolResult.error) {
           return burnExactAmountIn(
             result.poolResult.amountIn,
-            result.uniswapResult.route.path.map((p) => p.address),
+            result.uniswapResult.route.encodedPath,
             downwardSlippage(
               convert.toBigNumber(
                 result.uniswapResult.outputAmount.raw.toString(10)
               ),
               SLIPPAGE_RATE
-            )
+            ),
+            result.uniswapResult.outputAmount.currency === Currency.ETHER
           );
         }
       } else {
@@ -334,8 +335,9 @@ export function useBurnRouterCallbacks(poolId: string) {
         if (result && !result.poolResult.error) {
           return burnExactAmountOut(
             upwardSlippage(result.poolResult.poolAmountIn, SLIPPAGE_RATE),
-            result.uniswapResult.route.path.map((p) => p.address),
-            convert.toBigNumber(result.uniswapResult.outputAmount.raw.toString(10))
+            result.uniswapResult.route.encodedPath,
+            convert.toBigNumber(result.uniswapResult.outputAmount.raw.toString(10)),
+            result.uniswapResult.outputAmount.currency === Currency.ETHER
           );
         }
       }

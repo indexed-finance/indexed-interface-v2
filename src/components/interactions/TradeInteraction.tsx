@@ -1,7 +1,7 @@
 import { AppState, FormattedIndexPool, selectors } from "features";
-import { DISPLAYED_COMMON_BASE_TOKENS, UNISWAP_ROUTER_ADDRESS } from "config";
+import { DISPLAYED_COMMON_BASE_TOKENS, NARWHAL_ROUTER_ADDRESS } from "config";
 import { SingleInteraction, SingleInteractionValues } from "./BaseInteraction";
-import { Trade } from "@uniswap/sdk";
+import { Trade } from "@indexed-finance/narwhal-sdk";
 import { convert } from "helpers";
 import {
   useBalanceAndApprovalRegistrar,
@@ -26,7 +26,7 @@ export function TradeInteraction({ indexPool }: Props) {
     selectors.selectTokensById(state, tokenIds)
   );
 
-  useBalanceAndApprovalRegistrar(UNISWAP_ROUTER_ADDRESS, tokenIds);
+  useBalanceAndApprovalRegistrar(NARWHAL_ROUTER_ADDRESS, tokenIds);
 
   const {
     calculateBestTradeForExactInput,
@@ -140,7 +140,7 @@ export function TradeInteraction({ indexPool }: Props) {
   return (
     <SingleInteraction
       assets={assets as any}
-      spender={UNISWAP_ROUTER_ADDRESS}
+      spender={NARWHAL_ROUTER_ADDRESS}
       defaultInputSymbol={DISPLAYED_COMMON_BASE_TOKENS[0].symbol}
       defaultOutputSymbol={indexPool.symbol}
       onSubmit={handleSubmit}

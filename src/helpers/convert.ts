@@ -5,7 +5,7 @@ import {
   toHex,
   toTokenAmount,
 } from "@indexed-finance/indexed.js";
-import { ChainId, Currency, CurrencyAmount, Pair, Token, TokenAmount, WETH } from "@uniswap/sdk";
+import { ChainId, Currency, CurrencyAmount, Pair, Token, TokenAmount, WETH } from "@indexed-finance/narwhal-sdk";
 import { DEFAULT_DECIMAL_COUNT } from "config";
 import { constants } from "ethers";
 import { getAddress } from "@ethersproject/address";
@@ -115,7 +115,8 @@ const convert = {
         provider,
         pair.token1,
         pair.reserves1
-      ) as TokenAmount
+      ) as TokenAmount,
+      Boolean(pair.sushiswap)
     ),
 };
 

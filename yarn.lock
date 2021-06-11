@@ -2182,6 +2182,19 @@
   resolved "https://registry.yarnpkg.com/@indexed-finance/multicall/-/multicall-1.0.7.tgz#76c8d8f2cec9c90482491bee2e99067b00ebfa4c"
   integrity sha512-KGEgxHQplaoNdvXw3rECATHxipmxStntaeP7RhpDcBWahLKWThHbtMufL6c9R+Q1vgJUtHz/gp3MXxksdzJzVg==
 
+"@indexed-finance/narwhal-sdk@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@indexed-finance/narwhal-sdk/-/narwhal-sdk-1.0.1.tgz#c2fd94b7b244b47fd0cc8b6703f66fd0f758749b"
+  integrity sha512-msE3kSgppDkOVU9WVYSmQo1FlP/zfvNtD636YD28EnCjziUjdFFNN0jwMm4sn3evd0gOqXW6KIaB0qHuF/mbVg==
+  dependencies:
+    "@uniswap/v2-core" "^1.0.0"
+    big.js "^5.2.2"
+    decimal.js-light "^2.5.0"
+    jsbi "^3.1.1"
+    tiny-invariant "^1.1.0"
+    tiny-warning "^1.0.3"
+    toformat "^2.0.0"
+
 "@indexed-finance/subgraph-clients@0.0.6":
   version "0.0.6"
   resolved "https://registry.yarnpkg.com/@indexed-finance/subgraph-clients/-/subgraph-clients-0.0.6.tgz#257e09e722f905a8054a11afad34e0be2d6b99d9"
@@ -2194,10 +2207,10 @@
     graphql-tag "^2.12.4"
     isomorphic-fetch "^3.0.0"
 
-"@indexed-finance/subgraph-clients@0.0.7":
-  version "0.0.7"
-  resolved "https://registry.yarnpkg.com/@indexed-finance/subgraph-clients/-/subgraph-clients-0.0.7.tgz#207cefed0f36e3f500389795f32fb8eb90d4d7ed"
-  integrity sha512-20QWUgxzkbQUue/igXVsDsOusmJMxz4B4htwsNY6A5LmYh0baH1L8g8L/cxo3/390fraw1n9xWNDmeDgvAJ4Ag==
+"@indexed-finance/subgraph-clients@^0.0.8":
+  version "0.0.8"
+  resolved "https://registry.yarnpkg.com/@indexed-finance/subgraph-clients/-/subgraph-clients-0.0.8.tgz#1ff36f92f4dbc32311f58062321b40548c85a50e"
+  integrity sha512-Sv4tVIZrgYjqMho98llixrdaOnmMk2WZfcW1ELZIJrV0EOw1fFFDd/Ss//yiPlxj9xf3XbsWHhejCWwcz/x4Sw==
   dependencies:
     apollo-cache-inmemory "^1.6.6"
     apollo-client "^2.6.10"

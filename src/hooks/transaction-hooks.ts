@@ -1,20 +1,20 @@
 import { BigNumber } from "ethereum/utils/balancer-math";
 import { ContractTransaction } from "@ethersproject/contracts";
-import { JSBI, Percent, Router, Trade } from "@uniswap/sdk";
+import { JSBI, Percent, Router, Trade } from "@indexed-finance/narwhal-sdk";
 import { TransactionExtra } from "features";
 import { convert } from "helpers";
 import { thunks } from "features/thunks";
+import { useCallback } from "react";
+import { useDispatch } from "react-redux";
 import {
-  useBurnRouterContract,
   useIndexPoolContract,
-  useMintRouterContract,
+  useIndexedNarwhalRouterContract,
+  useMasterChefContract,
   useMultiTokenStakingContract,
   useStakingRewardsContract,
   useTokenContract,
-  useUniswapRouterContract,
 } from "./contract-hooks";
-import { useCallback } from "react";
-import { useDispatch } from "react-redux";
+import { useMasterChefPoolForToken, useMasterChefStakedBalance } from "./masterchef-hooks";
 import { useNewStakedBalance } from "./new-staking-hooks";
 import { usePoolSymbol } from "./pool-hooks";
 import { useUserAddress } from "./user-hooks";
@@ -85,15 +85,15 @@ export function useSwapTransactionCallbacks(poolAddress: string) {
 
 export function useUniswapTransactionCallback() {
   const user = useUserAddress();
-  const contract = useUniswapRouterContract();
+  const contract = useIndexedNarwhalRouterContract();
   const addTransaction = useAddTransactionCallback();
   return useCallback(
     (trade: Trade, allowedSlippage = 2) => {
       // @todo Figure out a better way to handle this
       if (!contract) throw new Error();
-      const timestamp = +(Date.now() / 1000).toFixed(0);
+      // const timestamp = +(Date.now() / 1000).toFixed(0);
       const gracePeriod = 1800; // add 30 minutes
-      const deadline = timestamp + gracePeriod;
+      // const deadline = timestamp + gracePeriod;
       const { args, value, methodName } = Router.swapCallParameters(trade, {
         feeOnTransfer: false,
         allowedSlippage: new Percent(
@@ -101,7 +101,8 @@ export function useUniswapTransactionCallback() {
           JSBI.BigInt(10000)
         ),
         recipient: user,
-        deadline,
+        ttl: gracePeriod
+        // deadline,
       });
 
       const tx = (contract as any)[methodName](...args, { value });
@@ -205,7 +206,7 @@ export function useMintMultiTransactionCallback(poolAddress: string) {
 }
 
 export function useRoutedMintTransactionCallbacks(indexPool: string) {
-  const contract = useMintRouterContract();
+  const contract = useIndexedNarwhalRouterContract();
   const addTransaction = useAddTransactionCallback();
   const poolSymbol = usePoolSymbol(indexPool);
   const mintExactAmountIn = useCallback(
@@ -280,33 +281,45 @@ interface RoutedBurnTransactionCallbacks {
   burnExactAmountIn: (
     poolAmountIn: BigNumber,
     path: string[],
-    minAmountOut: BigNumber
+    minAmountOut: BigNumber,
+    ethOutput: boolean
   ) => void;
 
   burnExactAmountOut: (
     poolAmountInMax: BigNumber,
     path: string[],
-    tokenAmountOut: BigNumber
+    tokenAmountOut: BigNumber,
+    ethOutput: boolean
   ) => void;
 }
 
 export function useRoutedBurnTransactionCallbacks(
   indexPool: string
 ): RoutedBurnTransactionCallbacks {
-  const contract = useBurnRouterContract();
+  const contract = useIndexedNarwhalRouterContract();
   const addTransaction = useAddTransactionCallback();
   const poolSymbol = usePoolSymbol(indexPool);
 
   const burnExactAmountIn = useCallback(
-    (poolAmountIn: BigNumber, path: string[], minAmountOut: BigNumber) => {
+    (poolAmountIn: BigNumber, path: string[], minAmountOut: BigNumber, ethOutput: boolean) => {
       // @todo Figure out a better way to handle this
       if (!contract) throw new Error();
-      const tx = contract.burnExactAndSwapForTokens(
-        indexPool,
-        convert.toHex(poolAmountIn),
-        path,
-        convert.toHex(minAmountOut)
-      );
+      let tx: Promise<ContractTransaction>;
+      if (ethOutput) {
+        tx = contract.burnExactAndSwapForETH(
+          indexPool,
+          convert.toHex(poolAmountIn),
+          path,
+          convert.toHex(minAmountOut)
+        )
+      } else {
+        tx = contract.burnExactAndSwapForTokens(
+          indexPool,
+          convert.toHex(poolAmountIn),
+          path,
+          convert.toHex(minAmountOut)
+        );
+      }
       const displayAmount = convert.toBalance(poolAmountIn, 18, true, 3);
       const summary = `Burn ${displayAmount} ${poolSymbol}`;
       addTransaction(tx, { summary });
@@ -315,15 +328,25 @@ export function useRoutedBurnTransactionCallbacks(
   );
 
   const burnExactAmountOut = useCallback(
-    (poolAmountInMax: BigNumber, path: string[], tokenAmountOut: BigNumber) => {
+    (poolAmountInMax: BigNumber, path: string[], tokenAmountOut: BigNumber, ethOutput: boolean) => {
       // @todo Figure out a better way to handle this
       if (!contract) throw new Error();
-      const tx = contract.burnAndSwapForExactTokens(
-        indexPool,
-        convert.toHex(poolAmountInMax),
-        path,
-        convert.toHex(tokenAmountOut)
-      );
+      let tx: Promise<ContractTransaction>;
+      if (ethOutput) {
+        tx = contract.burnAndSwapForExactETH(
+          indexPool,
+          convert.toHex(poolAmountInMax),
+          path,
+          convert.toHex(tokenAmountOut)
+        );
+      } else {
+        tx = contract.burnAndSwapForExactTokens(
+          indexPool,
+          convert.toHex(poolAmountInMax),
+          path,
+          convert.toHex(tokenAmountOut)
+        );
+      }
       const displayAmount = convert.toBalance(poolAmountInMax, 18, true, 3);
       const summary = `Burn up to ${displayAmount} ${poolSymbol}`;
       addTransaction(tx, { summary });
@@ -517,4 +540,51 @@ export function useNewStakingTransactionCallbacks(
     withdraw,
     claim,
   };
+}
+
+export function useMasterChefTransactionCallbacks(pid: string): StakingTransactionCallbacks {
+  const stakedBalance = useMasterChefStakedBalance(pid);
+  const contract = useMasterChefContract();
+  const addTransaction = useAddTransactionCallback();
+
+  const stake = useCallback(
+    (amount: string) => {
+      // @todo Figure out a better way to handle this
+      if (!contract) throw new Error();
+      const tx = contract.deposit(pid, amount);
+      addTransaction(tx);
+    },
+    [addTransaction, contract, pid]
+  );
+
+  const withdraw = useCallback(
+    (amount: string) => {
+      // @todo Figure out a better way to handle this
+      if (!contract) throw new Error();
+      const tx = contract.withdraw(pid, amount);
+      addTransaction(tx);
+    },
+    [contract, addTransaction, pid]
+  );
+
+  const exit = useCallback(() => {
+    // @todo Figure out a better way to handle this
+    if (!contract || !stakedBalance) throw new Error();
+    const tx = contract.withdraw(pid, stakedBalance);
+    addTransaction(tx);
+  }, [contract, addTransaction, pid, stakedBalance]);
+
+  const claim = useCallback(() => {
+    // @todo Figure out a better way to handle this
+    if (!contract) throw new Error();
+    const tx = contract.withdraw(pid, 1);
+    addTransaction(tx);
+  }, [contract, addTransaction, pid]);
+
+  return{
+    stake,
+    withdraw,
+    exit,
+    claim
+  }
 }
