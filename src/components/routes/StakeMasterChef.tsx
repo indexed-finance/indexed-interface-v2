@@ -110,7 +110,7 @@ function StakingForm({
         balanceOverride={
           values.inputType === "unstake"
             ? staked
-            : convert.toBalance(balance, token.decimals, false, 10)
+            : convert.toBalance(balance, token.decimals, false, 4)
         }
         selectable={false}
         onChange={(value) => setFieldValue("amount", value.amount)}
@@ -273,9 +273,7 @@ export default function StakeMasterChef() {
         : null,
     [data.tokens, toStake]
   );
-  // console.log(`STAKE MASTER CHEF`);
-  // console.log(relevantPortfolioToken);
-  // console.log(toStake)
+  const balance = useTokenBalance(toStake?.token ?? "");
   if (!(toStake && relevantPortfolioToken)) {
     return <div>Derp</div>;
   }
@@ -300,7 +298,9 @@ export default function StakeMasterChef() {
                 const errors: Record<string, string> = {};
                 const maximum =
                   values.inputType === "stake"
-                    ? parseFloat(relevantPortfolioToken.balance)
+                    ? parseFloat(
+                      convert.toBalance(balance ?? "0")
+                    )
                     : parseFloat(
                         convert.toBalance(toStake.userStakedBalance ?? "0")
                       );
