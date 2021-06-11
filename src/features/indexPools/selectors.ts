@@ -19,7 +19,7 @@ const selectAllPools = (state: AppState) => selectors.selectAll(state);
 const selectPool = (state: AppState, poolId: string) =>
   selectors.selectById(state, poolId);
 
-const selectAllPoolIds = (state: AppState) => selectors.selectIds(state);
+const selectAllPoolIds = (state: AppState) => selectors.selectIds(state).map(id => id.toString());
 
 const selectNameForPool = (state: AppState, poolId: string) => {
   const pool = selectPool(state, poolId);
