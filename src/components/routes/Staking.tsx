@@ -86,15 +86,6 @@ export default function Stake() {
             <Col xs={24} sm={12}>
               <Collapse defaultActiveKey="liquidity">
                 <Collapse.Panel key="liquidity" header={tx("LIQUIDITY_TOKENS")}>
-                  {newStakingDetail.liquidityTokens.map((stakingPool) => (
-                    <Col
-                      key={stakingPool.id}
-                      span={24}
-                      style={{ marginBottom: 24 }}
-                    >
-                      <StakingWidgetNew {...stakingPool} />
-                    </Col>
-                  ))}
                   {masterChefDetail.map((stakingPool) =>
                     <Col
                     key={stakingPool.id}
@@ -104,6 +95,15 @@ export default function Stake() {
                     <MasterChefStakingWidget {...stakingPool} />
                   </Col>
                   )}
+                  {newStakingDetail.liquidityTokens.map((stakingPool) => (
+                    <Col
+                      key={stakingPool.id}
+                      span={24}
+                      style={{ marginBottom: 24 }}
+                    >
+                      <StakingWidgetNew {...stakingPool} />
+                    </Col>
+                  ))}
                 </Collapse.Panel>
               </Collapse>
             </Col>
