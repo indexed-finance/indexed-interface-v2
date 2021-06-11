@@ -62,7 +62,6 @@ export function Widget({
             justifyContent: "space-between",
           }}
         >
-          {symbol}
           <Token
             name={symbol}
             address={address}
