@@ -20,8 +20,8 @@ export function StakingWidgetNew(props: FormattedNewStakingData) {
   return (
     <div style={{ position: "relative" }}>
       <Widget
-        badge={props.liquidityProvider || props.isWethPair ? "Uniswap" : ""}
-        badgeColor="purple"
+        badge={props.liquidityProvider || props.isWethPair ? "Uniswap V2" : ""}
+        badgeColor="pink"
         symbol={symbol}
         address={props.id}
         price={price ? convert.toCurrency(price) : ""}
