@@ -1,4 +1,4 @@
-import { INFURA_ID } from "config";
+import { INFURA_ID, MASTER_CHEF_ADDRESS, NDX_ADDRESS } from "config";
 import {
   TOKEN_PRICES_CALLER,
   buildUniswapPairs,
@@ -7,10 +7,13 @@ import {
   createStakingCalls,
   createTotalSuppliesCalls,
 } from "hooks";
+import {createMasterChefCalls} from "hooks/masterchef-hooks"
+
 import { Unsubscribe } from "redux";
 import { actions, requests, selectors, store } from "features";
 import { createNewStakingCalls } from "hooks/new-staking-hooks";
 import { log } from "./helpers";
+import { masterChefCaller } from "features/masterChef";
 import { providers } from "ethers";
 import type { CallRegistration, RegisteredCall, RegisteredCaller } from "helpers";
 
@@ -82,12 +85,16 @@ function registerNewTokensAndPairs() {
   const state = getState();
   const allTokens = selectors.selectAllTokens(state);
   const allPairIds = Object.keys(state.pairs.entities).map((id) => id.toLowerCase());
-  const allTokenIds = allTokens.map(t => t.id).filter(
-    (tokenId) => !tokensRegistered[tokenId.toLowerCase()] && !allPairIds.includes(tokenId.toLowerCase())
-  );
-  const pairs = buildUniswapPairs(allTokenIds).filter(
+  const priceTokenIds = allTokens.map(t => t.id).filter((tokenId) => !tokensRegistered[tokenId.toLowerCase()]);
+  const pairTokenIds = allTokens.map(t => t.id).filter((tokenId) => !allPairIds.includes(tokenId.toLowerCase()));
+
+  let pairs = buildUniswapPairs(pairTokenIds).filter(
     (pair) => !pairsRegistered[pair.id.toLowerCase()]
   );
+  const mcPairs = selectors.selectPossibleMasterChefPairs(state).filter(p => {
+    return !pairs.find(p0 => p0.id.toLowerCase() === p.id.toLowerCase())
+  });
+  pairs = [ ...pairs, ...mcPairs ];
   dispatch(actions.uniswapPairsRegistered(pairs))
   const pairDataCalls = {
     caller: "Pair Data",
@@ -101,12 +108,12 @@ function registerNewTokensAndPairs() {
       {
         target: "",
         function: "fetchTokenPriceData",
-        args: allTokenIds,
+        args: priceTokenIds,
         canBeMerged: true,
       },
     ],
   };
-  allTokenIds.forEach((tokenId) => {
+  priceTokenIds.forEach((tokenId) => {
     tokensRegistered[tokenId.toLowerCase()] = true;
   });
   pairs.forEach((pair) => {
@@ -158,6 +165,7 @@ function registerNewStakingPools() {
   const state = getState();
   const stakingPools = selectors.selectAllStakingPools(state).filter((pool) => !stakingPoolsRegistered[pool.id.toLowerCase()]);
   const newStakingPools = selectors.selectAllNewStakingPools(state).filter((pool) => !stakingPoolsRegistered[pool.id.toLowerCase()]);
+  const masterChefPairs = selectors.selectMasterChefPoolsWithRecognizedPairs(state).filter((pool) => !stakingPoolsRegistered[`MC-${pool.id}`.toLowerCase()]);
   const newStakingMeta = selectors.selectNewStakingMeta(state);
   const calls: RegisteredCaller[] = [];
   if (newStakingPools.length > 0) {
@@ -209,6 +217,34 @@ function registerNewStakingPools() {
       stakingPoolsRegistered[pool.id.toLowerCase()] = true;
     });
     calls.push(stakingCalls)
+  }
+  if (masterChefPairs.length > 0) {
+    const mcCalls = masterChefPairs.reduce(
+      (prev, next) => {
+        const poolCalls = createMasterChefCalls(
+          next.id,
+          next.token,
+        );
+        prev.onChainCalls.push(...poolCalls);
+        return prev;
+      },
+      {
+        caller: masterChefCaller,
+        onChainCalls: [
+          {
+            interfaceKind: "MasterChef",
+            target: MASTER_CHEF_ADDRESS,
+            function: "totalAllocPoint",
+          },
+        ],
+        offChainCalls: [],
+      } as RegisteredCaller
+    );
+    masterChefPairs.forEach((pool) => {
+      stakingPoolsRegistered[`MC-${pool.id}`.toLowerCase()] = true;
+    })
+    calls.push(mcCalls);
+
   }
   return calls;
 }
