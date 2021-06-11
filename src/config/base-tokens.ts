@@ -1,4 +1,4 @@
-import { WETH_CONTRACT_ADDRESS } from "./addresses";
+import { SUSHI_ADDRESS, WETH_CONTRACT_ADDRESS } from "./addresses";
 
 export const COMMON_BASE_TOKENS = [
   {
@@ -25,6 +25,16 @@ export const COMMON_BASE_TOKENS = [
     name: "USD Coin",
     decimals: 6,
   },
+  {
+    id: SUSHI_ADDRESS,
+    symbol: 'SUSHI',
+    name: 'SushiToken',
+    decimals: 18
+  }
 ];
 
-export const DISPLAYED_COMMON_BASE_TOKENS = COMMON_BASE_TOKENS.filter(t => t.id.toLowerCase() !== WETH_CONTRACT_ADDRESS.toLowerCase());
+const ignore = [WETH_CONTRACT_ADDRESS.toLowerCase(), SUSHI_ADDRESS.toLowerCase()]
+
+export const DISPLAYED_COMMON_BASE_TOKENS = COMMON_BASE_TOKENS.filter(
+  (t) => !ignore.includes(t.id.toLowerCase())
+);
