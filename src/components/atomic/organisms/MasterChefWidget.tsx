@@ -14,7 +14,10 @@ export function MasterChefStakingWidget(props: FormattedMasterChefData) {
   const tx = useTranslator();
   const apy = useMasterChefApy(props.id);
   const price = usePairTokenPrice(props.stakingToken);
-  const symbol = props.symbol;
+  let symbol = props.symbol;
+  if (props.stakingToken.toLowerCase() === '0x8911fce375a8414b1b578be66ee691a8d2d4dbf7') {
+    symbol = 'ETH-NDX';
+  }
   const { push } = useHistory();
 
   return (
@@ -23,7 +26,7 @@ export function MasterChefStakingWidget(props: FormattedMasterChefData) {
         badge={"Sushiswap"}
         badgeColor="violet"
         symbol={symbol}
-        address={props.id}
+        address={props.stakingToken}
         price={price ? convert.toCurrency(price) : ""}
         onClick={() => push(`/stake-sushi/${props.id}`)}
         stats={
