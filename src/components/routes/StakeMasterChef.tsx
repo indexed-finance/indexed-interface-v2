@@ -115,7 +115,6 @@ function StakingForm({
         onChange={(value) => setFieldValue("amount", value.amount)}
         error={errors.amount}
       />
-      {status}
       <Alert
         type="warning"
         message={
@@ -269,9 +268,9 @@ export default function StakeMasterChef() {
         : null,
     [data.tokens, toStake]
   );
-  console.log(`STAKE MASTER CHEF`);
-  console.log(relevantPortfolioToken);
-  console.log(toStake)
+  // console.log(`STAKE MASTER CHEF`);
+  // console.log(relevantPortfolioToken);
+  // console.log(toStake)
   if (!(toStake && relevantPortfolioToken)) {
     return <div>Derp</div>;
   }
