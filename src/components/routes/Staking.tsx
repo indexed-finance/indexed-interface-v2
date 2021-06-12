@@ -1,6 +1,11 @@
 import { AiOutlineWarning } from "react-icons/ai";
-import { Card, Checkbox, Col, Empty, Row, Typography } from "antd";
-import { Page, StakingCard } from "components/atomic";
+import { Alert, Card, Checkbox, Col, Empty, Row, Typography } from "antd";
+import {
+  ExpiredStakingCard,
+  Page,
+  SushiswapStakingCard,
+  UniswapStakingCard,
+} from "components/atomic";
 import { ReactNode, useCallback, useState } from "react";
 import { selectors } from "features";
 import {
@@ -60,32 +65,37 @@ export default function Stake() {
         style={{ marginTop: 24 }}
         title={
           <Row gutter={24}>
-            <Col span={9}>Asset</Col>
+            <Col span={6}>Asset</Col>
             <Col span={5}>Rewards</Col>
             <Col span={7}>Total Staked</Col>
-            <Col span={3}>APY</Col>
+            <Col span={3} style={{ textAlign: "right" }}>
+              APY
+            </Col>
           </Row>
         }
       >
         {showing.singleSided &&
           newStakingDetail.indexTokens.map((stakingPool) => (
-            <StakingCard key={stakingPool.id} {...stakingPool} />
+            <UniswapStakingCard key={stakingPool.id} {...stakingPool} />
           ))}
 
         {showing.sushiswap &&
           masterChefDetail.map((stakingPool) => (
-            <StakingCard key={stakingPool.id} {...stakingPool} />
+            <SushiswapStakingCard key={stakingPool.id} {...stakingPool} />
           ))}
 
         {showing.uniswap &&
           newStakingDetail.liquidityTokens.map((stakingPool) => (
-            <StakingCard key={stakingPool.id} {...stakingPool} />
+            <UniswapStakingCard key={stakingPool.id} {...stakingPool} />
           ))}
 
-        {showing.expired &&
-          stakingDetail.indexTokens.map((stakingPool) => (
-            <StakingCard key={stakingPool.id} {...stakingPool} />
-          ))}
+        {showing.expired && (
+          <ExpiredAlert>
+            {stakingDetail.indexTokens.map((stakingPool) => (
+              <ExpiredStakingCard key={stakingPool.id} {...stakingPool} />
+            ))}
+          </ExpiredAlert>
+        )}
         {showingNothing && <Empty />}
       </Card>
     </Page>
@@ -168,5 +178,22 @@ function StakingViewOption({
         {children}
       </Checkbox>
     </div>
+  );
+}
+
+function ExpiredAlert({ children }: { children?: ReactNode }) {
+  return (
+    <Alert
+      type="error"
+      style={{ marginTop: 24 }}
+      showIcon={true}
+      message="Expired"
+      description={
+        <>
+          These pools are no longer distributing rewards.
+          {children}
+        </>
+      }
+    />
   );
 }
