@@ -1,6 +1,6 @@
 import { AnyAction } from "redux";
 import { FEATURE_FLAGS } from "feature-flags";
-import { LOCALSTORAGE_KEY } from "config";
+import { LOCALSTORAGE_KEY, LOCALSTORAGE_VERSION_NUMBER } from "config";
 import { ThunkAction } from "redux-thunk";
 import { configureStore } from "@reduxjs/toolkit";
 import { debounce } from "lodash";
@@ -25,6 +25,7 @@ const persistState = debounce(() => {
     const saved = {
       when: Date.now(),
       what: toSave,
+      version: LOCALSTORAGE_VERSION_NUMBER,
     };
 
     window.localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(saved));
@@ -58,11 +59,12 @@ export function loadPersistedState() {
     const persistedState = window.localStorage.getItem(LOCALSTORAGE_KEY);
 
     if (persistedState) {
-      const { when, what: state } = JSON.parse(persistedState);
+      const { when, what: state, version } = JSON.parse(persistedState);
       const oneDay = 1000 * 60 * 60 * 24;
       const isFresh = Date.now() - when <= oneDay;
+      const isRightVersion = version && version === LOCALSTORAGE_VERSION_NUMBER;
 
-      return isFresh ? state : undefined;
+      return isFresh && isRightVersion ? state : undefined;
     }
   }
 }
