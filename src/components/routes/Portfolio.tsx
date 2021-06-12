@@ -40,7 +40,7 @@ export default function Portfolio() {
             padding: 12,
           }}
         >
-          <Typography.Title level={3} style={{ margin: 0 }}>
+          <Typography.Title level={3} style={{ paddingLeft: 20, margin: 0 }}>
             {tx("TOTAL_VALUE")}
           </Typography.Title>
           <Typography.Title type="success" level={3} style={{ margin: 0 }}>

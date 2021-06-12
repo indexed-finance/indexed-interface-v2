@@ -35,7 +35,10 @@ export function Page({
         margin: isMobile ? "6rem auto 8rem auto" : "8rem auto 8rem auto",
         background: "#151515",
         position: "relative",
-        borderRadius: 3,
+        borderRadius: 16,
+        border: "5px solid rgba(255, 255, 255, .8)",
+        paddingTop: isMobile ? "0" : "25px",
+        boxShadow: "0px 0px 50px 0px rgba(40, 0, 40, 0.7)",
       }}
     >
       <Card
@@ -43,7 +46,6 @@ export function Page({
         headStyle={{ padding: 0, borderRadius: 3 }}
         bodyStyle={{
           padding: isMobile ? "24px 12px" : 24,
-          marginTop: -9,
           borderRadius: 3,
           minHeight: "100vh",
         }}
