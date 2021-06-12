@@ -1,8 +1,13 @@
-import { Badge, Card, Col, Row, Typography } from "antd";
+import { Badge, Card, Col, Row, Spin, Typography } from "antd";
 import { FormattedNewStakingData } from "features";
+import { Label, Token } from "components/atomic/atoms";
 import { Link } from "react-router-dom";
-import { Token } from "components/atomic/atoms";
-import { useMasterChefApy, useNewStakingApy, useStakingApy } from "hooks";
+import {
+  useBreakpoints,
+  useMasterChefApy,
+  useNewStakingApy,
+  useStakingApy,
+} from "hooks";
 import noop from "lodash.noop";
 
 interface Props
@@ -20,6 +25,8 @@ export function StakingCard({
   id,
   name,
   symbol,
+  earned,
+  staked,
   rewardsPerDay,
   totalStaked,
   backdrop,
@@ -28,8 +35,22 @@ export function StakingCard({
   linkPath,
   useApy = noop,
 }: Props) {
+  const { lg } = useBreakpoints();
   const apy = useApy(id);
-
+  const token = (
+    <Token
+      name={symbol}
+      address={id}
+      symbol={symbol}
+      symbolOverride={
+        ["UNIV2:", "SUSHI:"].some((prefix) => symbol.startsWith(prefix))
+          ? symbol.split(":")[1].replace(/-/g, "/")
+          : symbol
+      }
+      size="medium"
+      style={{ marginRight: 24 }}
+    />
+  );
   const inner = (
     <Link to={`/${linkPath}/${id}`}>
       <Card
@@ -38,60 +59,60 @@ export function StakingCard({
         hoverable={true}
         style={{ marginTop: 24, position: "relative", overflow: "hidden" }}
         title={
-          <Row gutter={24}>
-            <Col span={6}>{name}</Col>
-            <Col span={5}>
-              <em>
-                <Typography.Text type="success">
-                  Earned 123.00 NDX
-                </Typography.Text>
-              </em>
-            </Col>
-            <Col span={5}>
-              <em>
-                <Typography.Text type="success">
-                  Staking 12.00 {symbol}
-                </Typography.Text>
-              </em>
-            </Col>
-          </Row>
+          lg ? (
+            <Row gutter={24}>
+              <Col span={6}>{name}</Col>
+              <Col span={5}>
+                {!["0.00 NDX", "0.00 SUSHI"].includes(earned) && (
+                  <em>
+                    <Typography.Text type="success">
+                      Earned {earned}
+                    </Typography.Text>
+                  </em>
+                )}
+              </Col>
+              <Col span={5}>
+                {staked !== "0" && (
+                  <em>
+                    <Typography.Text type="success">
+                      Staking {staked} {symbol}
+                    </Typography.Text>
+                  </em>
+                )}
+              </Col>
+            </Row>
+          ) : (
+            token
+          )
         }
       >
         <Row gutter={24} align="middle">
           {/* CC10 */}
-          <Col span={6}>
-            <Token
-              name={symbol}
-              address={id}
-              symbol={symbol}
-              symbolOverride={
-                ["UNIV2:", "SUSHI:"].some((prefix) => symbol.startsWith(prefix))
-                  ? symbol.split(":")[1].replace(/-/g, "/")
-                  : symbol
-              }
-              size="medium"
-              style={{ marginRight: 24 }}
-            />
+          <Col xs={24} lg={6} style={{ marginBottom: lg ? 12 : 0 }}>
+            {!lg ? name : token}
           </Col>
 
           {/* 200 NDX/Day */}
-          <Col span={5}>
+          <Col xs={24} lg={5} style={{ marginBottom: lg ? 12 : 0 }}>
+            {!lg && <Label>Rewards Per Day</Label>}
             <Typography.Title level={3} style={{ margin: 0 }}>
               {rewardsPerDay}
             </Typography.Title>
           </Col>
 
           {/* 12,000.00 UNI */}
-          <Col span={7}>
+          <Col xs={24} lg={6} style={{ marginBottom: lg ? 12 : 0 }}>
+            {!lg && <Label>Total Staked</Label>}
             <Typography.Title level={3} style={{ margin: 0 }}>
               {totalStaked} {symbol}
             </Typography.Title>
           </Col>
 
           {/* 13.37% APY */}
-          <Col span={3} style={{ textAlign: "right" }}>
+          <Col xs={24} lg={4} style={{ textAlign: lg ? "right" : "left" }}>
+            {!lg && <Label>APY</Label>}
             <Typography.Title level={2} type="success" style={{ margin: 0 }}>
-              {apy ?? "wat"}
+              {apy ?? <Spin />}
             </Typography.Title>
           </Col>
         </Row>

@@ -42,6 +42,33 @@ export default function Stake() {
     []
   );
   const showingNothing = !Object.values(showing).some(Boolean);
+  const inner = (
+    <>
+      {showing.singleSided &&
+        newStakingDetail.indexTokens.map((stakingPool) => (
+          <UniswapStakingCard key={stakingPool.id} {...stakingPool} />
+        ))}
+
+      {showing.sushiswap &&
+        masterChefDetail.map((stakingPool) => (
+          <SushiswapStakingCard key={stakingPool.id} {...stakingPool} />
+        ))}
+
+      {showing.uniswap &&
+        newStakingDetail.liquidityTokens.map((stakingPool) => (
+          <UniswapStakingCard key={stakingPool.id} {...stakingPool} />
+        ))}
+
+      {showing.expired && (
+        <ExpiredAlert>
+          {stakingDetail.indexTokens.map((stakingPool) => (
+            <ExpiredStakingCard key={stakingPool.id} {...stakingPool} />
+          ))}
+        </ExpiredAlert>
+      )}
+      {showingNothing && <Empty />}
+    </>
+  );
 
   useStakingRegistrar();
   useNewStakingRegistrar();
@@ -60,44 +87,26 @@ export default function Stake() {
     >
       <StakingViewOptions onChange={handleViewOptionsChange} />
 
-      <Card
-        bordered={true}
-        style={{ marginTop: 24 }}
-        title={
-          <Row gutter={24}>
-            <Col span={6}>Asset</Col>
-            <Col span={5}>Rewards</Col>
-            <Col span={7}>Total Staked</Col>
-            <Col span={3} style={{ textAlign: "right" }}>
-              APY
-            </Col>
-          </Row>
-        }
-      >
-        {showing.singleSided &&
-          newStakingDetail.indexTokens.map((stakingPool) => (
-            <UniswapStakingCard key={stakingPool.id} {...stakingPool} />
-          ))}
-
-        {showing.sushiswap &&
-          masterChefDetail.map((stakingPool) => (
-            <SushiswapStakingCard key={stakingPool.id} {...stakingPool} />
-          ))}
-
-        {showing.uniswap &&
-          newStakingDetail.liquidityTokens.map((stakingPool) => (
-            <UniswapStakingCard key={stakingPool.id} {...stakingPool} />
-          ))}
-
-        {showing.expired && (
-          <ExpiredAlert>
-            {stakingDetail.indexTokens.map((stakingPool) => (
-              <ExpiredStakingCard key={stakingPool.id} {...stakingPool} />
-            ))}
-          </ExpiredAlert>
-        )}
-        {showingNothing && <Empty />}
-      </Card>
+      {isMobile ? (
+        inner
+      ) : (
+        <Card
+          bordered={true}
+          style={{ marginTop: 24 }}
+          title={
+            <Row gutter={24}>
+              <Col span={6}>Asset</Col>
+              <Col span={5}>Rewards</Col>
+              <Col span={6}>Total Staked</Col>
+              <Col span={4} style={{ textAlign: "right" }}>
+                APY
+              </Col>
+            </Row>
+          }
+        >
+          {inner}
+        </Card>
+      )}
     </Page>
   );
 }
@@ -107,9 +116,16 @@ function StakingViewOptions({
 }: {
   onChange(activeKeys: (string | number | boolean)[]): void;
 }) {
+  const { lg } = useBreakpoints();
+
   return (
     <Checkbox.Group
-      style={{ width: "100%", display: "flex", alignItems: "center" }}
+      style={{
+        width: "100%",
+        display: "flex",
+        alignItems: "center",
+        flexDirection: lg ? "row" : "column",
+      }}
       defaultValue={["single-sided", "sushiswap", "uniswap"]}
       onChange={onChange}
     >
