@@ -1,15 +1,17 @@
 import { AppState, selectors } from "features";
-import { MASTER_CHEF_ADDRESS, NDX_ADDRESS, SUSHI_ADDRESS, WETH_CONTRACT_ADDRESS } from "config";
-import { MasterChefPool, masterChefCaller, totalSushiPerDay } from "features/masterChef";
-import { RegisteredCall, computeSushiswapPairAddress, convert, sortTokens } from "helpers";
-import { buildEthSushiPair } from "./portfolio-hooks";
-import { useAllPoolIds, useAllPools } from "./pool-hooks";
+import { MASTER_CHEF_ADDRESS, SUSHI_ADDRESS } from "config";
+import {
+  MasterChefPool,
+  masterChefCaller,
+  totalSushiPerDay,
+} from "features/masterChef";
+import { RegisteredCall, convert } from "helpers";
 import { useCachedValue } from "./use-debounce";
 import { useCallRegistrar } from "./use-call-registrar";
 import { useMemo } from "react";
-import { usePair, useUniswapPairs } from "./pair-hooks";
-import { usePairTokenPrice, useTokenPrice, useTokenPricesLookup, useTotalSuppliesWithLoadingIndicator } from "./token-hooks";
+import { usePairTokenPrice, useTokenPrice } from "./token-hooks";
 import { useSelector } from "react-redux";
+import { useUniswapPairs } from "./pair-hooks";
 import { useUserAddress } from "./user-hooks";
 
 export const useMasterChefStakedBalance = (id: string) =>
@@ -27,36 +29,39 @@ export const useMasterChefPoolsForTokens = (stakingTokens: string[]) =>
     selectors.selectMasterChefPoolsByStakingTokens(state, stakingTokens)
   );
 
-export const useMasterChefMeta = () => useSelector(selectors.selectMasterChefMeta);
+export const useMasterChefMeta = () =>
+  useSelector(selectors.selectMasterChefMeta);
 
-export const useMasterChefPool = (id: string) => useSelector(
-  (state: AppState) => selectors.selectMasterChefPool(state, id)
-);
+export const useMasterChefPool = (id: string) =>
+  useSelector((state: AppState) => selectors.selectMasterChefPool(state, id));
 
 export const useMasterChefRewardsPerDay = (id: string) => {
   const meta = useMasterChefMeta();
   const pool = useMasterChefPool(id);
   if (!pool) return "0";
   return totalSushiPerDay.times(pool.allocPoint).div(meta.totalAllocPoint);
-}
+};
 
 export const useMasterChefInfoLookup = (ids: string[]) =>
   useSelector((state: AppState) =>
     selectors.selectMasterChefInfoLookup(state, ids)
   );
 
-
 export function useMasterChefApy(pid: string) {
-  const meta = useSelector((state: AppState) => selectors.selectMasterChefMeta(state));
+  const meta = useSelector((state: AppState) =>
+    selectors.selectMasterChefMeta(state)
+  );
   const stakingPool = useMasterChefPool(pid);
   const [sushiPrice] = useTokenPrice(SUSHI_ADDRESS);
-  const tokenPrice = usePairTokenPrice(stakingPool?.token ?? "")
+  const tokenPrice = usePairTokenPrice(stakingPool?.token ?? "");
 
   return useMemo(() => {
     const hasLoaded = sushiPrice && tokenPrice;
 
     if (hasLoaded && stakingPool) {
-      const sushiMinedPerDay = totalSushiPerDay.times(stakingPool.allocPoint).div(meta.totalAllocPoint);
+      const sushiMinedPerDay = totalSushiPerDay
+        .times(stakingPool.allocPoint)
+        .div(meta.totalAllocPoint);
       const valueSushiPerYear = parseFloat(
         convert.toBalance(
           sushiMinedPerDay.times(365).times(sushiPrice ?? 0),
@@ -88,14 +93,12 @@ export function createMasterChefCalls(
       args: [MASTER_CHEF_ADDRESS],
     },
     {
-
       interfaceKind: "MasterChef",
       target: MASTER_CHEF_ADDRESS,
       function: "poolInfo",
-      args: [pid]
-    }
+      args: [pid],
+    },
   ];
-
 
   if (userAddress) {
     onChainCalls.push(
@@ -121,17 +124,20 @@ export const useMasterChefPoolsWithRecognizedPairs = () => {
   const debouncedPairs = useCachedValue(allPairs);
   useUniswapPairs(debouncedPairs);
   const pairIds = useMemo(() => {
-    return debouncedPairs.map(p => p.id);
-  }, [debouncedPairs])
-  const pools = useSelector((state: AppState) => selectors.selectMasterChefPoolsByStakingTokens(state, pairIds));
+    return debouncedPairs.map((p) => p.id);
+  }, [debouncedPairs]);
+  const pools = useSelector((state: AppState) =>
+    selectors.selectMasterChefPoolsByStakingTokens(state, pairIds)
+  );
   return useMemo(() => {
-    return pools.filter(_ => Boolean(_)) as MasterChefPool[];
-  }, [pools])
-}
+    return pools.filter((_) => Boolean(_)) as MasterChefPool[];
+  }, [pools]);
+};
 
 export function useMasterChefRegistrar() {
   const userAddress = useUserAddress();
-  const stakingPools: MasterChefPool[] = useMasterChefPoolsWithRecognizedPairs();
+  const stakingPools: MasterChefPool[] =
+    useMasterChefPoolsWithRecognizedPairs();
   const { onChainCalls, offChainCalls } = useMemo(() => {
     return stakingPools.reduce(
       (prev, next) => {

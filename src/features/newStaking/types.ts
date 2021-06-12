@@ -49,7 +49,7 @@ export type NewStakingMeta = {
 
 export interface FormattedNewStakingData {
   id: string;
-  slug: string;
+  slug?: string;
   name: string;
   symbol: string;
   staked: string;

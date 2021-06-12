@@ -3,6 +3,7 @@
 
 export * from './burn-hooks';
 export * from './contract-hooks';
+export * from './masterchef-hooks';
 export * from './mint-hooks';
 export * from './new-staking-hooks';
 export * from './notification-hooks';
@@ -23,4 +24,3 @@ export * from './use-scroll-prevention';
 export * from './use-storage-entry';
 export * from './use-wallet-connection';
 export * from './user-hooks';
-export * from './masterchef-hooks';

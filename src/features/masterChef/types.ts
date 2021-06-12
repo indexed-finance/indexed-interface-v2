@@ -48,7 +48,7 @@ export interface FormattedMasterChefData {
   totalStaked: string;
 }
 
-export interface FormattedNewStakingDetail {
+export interface FormattedMasterChefStakingDetail {
   indexTokens: FormattedMasterChefData[];
   liquidityTokens: FormattedMasterChefData[];
 }

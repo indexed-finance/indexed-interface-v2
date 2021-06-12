@@ -1,29 +1,30 @@
 import { Alert, Button, Col, Descriptions, Row, Space, Statistic } from "antd";
-import {
-  AppState,
-  FormattedPortfolioAsset,
-  NewStakingPool,
-  selectors,
-} from "features";
+import { AppState, FormattedPortfolioAsset, selectors } from "features";
 import { ExternalLink, Page, TokenSelector } from "components/atomic";
 import { Formik, useFormikContext } from "formik";
-import { Link, useParams } from "react-router-dom";
 import { MASTER_CHEF_ADDRESS } from "config";
 import { MasterChefPool } from "features/masterChef";
-import { abbreviateAddress, convert, sushiswapAddLiquidityLink, sushiswapInfoPairLink } from "helpers";
+import {
+  abbreviateAddress,
+  convert,
+  sushiswapAddLiquidityLink,
+  sushiswapInfoPairLink,
+} from "helpers";
 import {
   useBalanceAndApprovalRegistrar,
   useMasterChefTransactionCallbacks,
   usePair,
   usePortfolioData,
-  useToken,
   useTokenApproval,
   useTokenBalance,
 } from "hooks";
-import { useMasterChefRegistrar, useMasterChefRewardsPerDay } from "hooks/masterchef-hooks";
+import {
+  useMasterChefRegistrar,
+  useMasterChefRewardsPerDay,
+} from "hooks/masterchef-hooks";
 import { useMemo } from "react";
+import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
-import S from "string";
 
 function StakingForm({
   token,
@@ -37,7 +38,9 @@ function StakingForm({
     inputType: "stake" | "unstake";
   }>();
 
-  const { stake, withdraw } = useMasterChefTransactionCallbacks(stakingToken.id);
+  const { stake, withdraw } = useMasterChefTransactionCallbacks(
+    stakingToken.id
+  );
   const rewardsPerDay = useMasterChefRewardsPerDay(stakingToken.id);
 
   const [staked] = useMemo(() => {
@@ -75,17 +78,13 @@ function StakingForm({
     else withdraw(convert.toToken(values.amount.toString(), 18).toString());
   };
 
-  useBalanceAndApprovalRegistrar(MASTER_CHEF_ADDRESS, [
-    stakingToken.token,
-  ]);
+  useBalanceAndApprovalRegistrar(MASTER_CHEF_ADDRESS, [stakingToken.token]);
   const balance = useTokenBalance(stakingToken.token);
-  console.log(`BALANCE ${balance}`)
+  console.log(`BALANCE ${balance}`);
   const [amount, rawAmount] = useMemo(() => {
     return [
       values.amount.toString(),
-      convert
-        .toToken(values.amount.toString(), 18)
-        .toString(),
+      convert.toToken(values.amount.toString(), 18).toString(),
     ];
   }, [values]);
   const { status, approve } = useTokenApproval({
@@ -196,9 +195,10 @@ function StakingStats({
 
   const { exit, claim } = useMasterChefTransactionCallbacks(stakingToken.id);
   const pair = usePair(stakingToken.token);
-  const url = (pair && pair.token0 && pair.token1)
-    ? sushiswapAddLiquidityLink(pair.token0, pair.token1)
-    : sushiswapInfoPairLink(stakingToken.token);
+  const url =
+    pair && pair.token0 && pair.token1
+      ? sushiswapAddLiquidityLink(pair.token0, pair.token1)
+      : sushiswapInfoPairLink(stakingToken.token);
 
   return (
     <Descriptions bordered={true} column={1}>
@@ -247,9 +247,7 @@ function StakingStats({
         {convert.toBalance(stakingToken.totalStaked, 18, true)} {symbol}
       </Descriptions.Item>
       <Descriptions.Item label="Staking Token">
-        <ExternalLink to={url}>
-          {symbol}
-        </ExternalLink>
+        <ExternalLink to={url}>{symbol}</ExternalLink>
       </Descriptions.Item>
     </Descriptions>
   );
@@ -298,9 +296,7 @@ export default function StakeMasterChef() {
                 const errors: Record<string, string> = {};
                 const maximum =
                   values.inputType === "stake"
-                    ? parseFloat(
-                      convert.toBalance(balance ?? "0")
-                    )
+                    ? parseFloat(convert.toBalance(balance ?? "0"))
                     : parseFloat(
                         convert.toBalance(toStake.userStakedBalance ?? "0")
                       );

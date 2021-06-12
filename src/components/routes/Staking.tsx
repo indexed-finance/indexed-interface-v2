@@ -1,7 +1,12 @@
-import { Alert, Col, Collapse, Menu, Row, Typography } from "antd";
-import { MasterChefStakingWidget } from "components/atomic/organisms/MasterChefWidget";
-import { Page, StakingWidget } from "components/atomic";
-import { StakingWidgetNew } from "components/atomic/organisms/StakingWidgetNew";
+import { AiOutlineWarning } from "react-icons/ai";
+import { Alert, Card, Checkbox, Col, Empty, Row, Typography } from "antd";
+import {
+  ExpiredStakingCard,
+  Page,
+  SushiswapStakingCard,
+  UniswapStakingCard,
+} from "components/atomic";
+import { ReactNode, useCallback, useState } from "react";
 import { selectors } from "features";
 import {
   useBreakpoints,
@@ -11,15 +16,59 @@ import {
 } from "hooks";
 import { useMasterChefRegistrar } from "hooks/masterchef-hooks";
 import { useSelector } from "react-redux";
-import { useState } from "react";
 
 export default function Stake() {
   const tx = useTranslator();
   const stakingDetail = useSelector(selectors.selectFormattedStaking);
   const newStakingDetail = useSelector(selectors.selectNewFormattedStaking);
-  const masterChefDetail = useSelector(selectors.selectMasterChefFormattedStaking)
+  const masterChefDetail = useSelector(
+    selectors.selectMasterChefFormattedStaking
+  );
   const { isMobile } = useBreakpoints();
-  const [showing, setShowing] = useState<"active" | "expired">("active");
+  const [showing, setShowing] = useState({
+    singleSided: true,
+    sushiswap: true,
+    uniswap: true,
+    expired: false,
+  });
+  const handleViewOptionsChange = useCallback(
+    (activeKeys: (string | number | boolean)[]) =>
+      setShowing({
+        singleSided: activeKeys.includes("single-sided"),
+        sushiswap: activeKeys.includes("sushiswap"),
+        uniswap: activeKeys.includes("uniswap"),
+        expired: activeKeys.includes("expired"),
+      }),
+    []
+  );
+  const showingNothing = !Object.values(showing).some(Boolean);
+  const inner = (
+    <>
+      {showing.singleSided &&
+        newStakingDetail.indexTokens.map((stakingPool) => (
+          <UniswapStakingCard key={stakingPool.id} {...stakingPool} />
+        ))}
+
+      {showing.sushiswap &&
+        masterChefDetail.map((stakingPool) => (
+          <SushiswapStakingCard key={stakingPool.id} {...stakingPool} />
+        ))}
+
+      {showing.uniswap &&
+        newStakingDetail.liquidityTokens.map((stakingPool) => (
+          <UniswapStakingCard key={stakingPool.id} {...stakingPool} />
+        ))}
+
+      {showing.expired && (
+        <ExpiredAlert>
+          {stakingDetail.indexTokens.map((stakingPool) => (
+            <ExpiredStakingCard key={stakingPool.id} {...stakingPool} />
+          ))}
+        </ExpiredAlert>
+      )}
+      {showingNothing && <Empty />}
+    </>
+  );
 
   useStakingRegistrar();
   useNewStakingRegistrar();
@@ -36,125 +85,131 @@ export default function Stake() {
         </>
       }
     >
-      <Menu
-        mode="horizontal"
-        activeKey={showing}
-        onClick={({ key }) => setShowing(key as "active" | "expired")}
-        style={{ marginBottom: 24 }}
-      >
-        <Menu.Item key="active">Active</Menu.Item>
-        <Menu.Item key="expired">Expired</Menu.Item>
-      </Menu>
-      {showing === "active" && (
-        <>
-          <Alert
-            type="success"
-            showIcon={true}
-            icon={
-              <img
-                alt="NDX"
-                src={require("images/indexed.png").default}
-                style={{ width: 24, height: 24 }}
-              />
-            }
-            message="Earn NDX"
-            description="Stake index tokens or their associated liquidity tokens to earn NDX, the governance token for Indexed."
-            style={{ marginBottom: 24 }}
-          />
-          <Row gutter={20}>
-            <Col xs={24} sm={12}>
-              <Collapse defaultActiveKey="index">
-                <Collapse.Panel
-                  key="index"
-                  header={tx("INDEX_TOKENS")}
-                  style={{ marginBottom: 24 }}
-                >
-                  <Row gutter={20}>
-                    {newStakingDetail.indexTokens.map((stakingPool) => (
-                      <Col
-                        key={stakingPool.id}
-                        span={24}
-                        style={{ marginBottom: 24 }}
-                      >
-                        <StakingWidgetNew {...stakingPool} />
-                      </Col>
-                    ))}
-                  </Row>
-                </Collapse.Panel>
-              </Collapse>
-            </Col>
-            <Col xs={24} sm={12}>
-              <Collapse defaultActiveKey="liquidity">
-                <Collapse.Panel key="liquidity" header={tx("LIQUIDITY_TOKENS")}>
-                  {masterChefDetail.map((stakingPool) =>
-                    <Col
-                    key={stakingPool.id}
-                    span={24}
-                    style={{ marginBottom: 24 }}
-                  >
-                    <MasterChefStakingWidget {...stakingPool} />
-                  </Col>
-                  )}
-                  {newStakingDetail.liquidityTokens.map((stakingPool) => (
-                    <Col
-                      key={stakingPool.id}
-                      span={24}
-                      style={{ marginBottom: 24 }}
-                    >
-                      <StakingWidgetNew {...stakingPool} />
-                    </Col>
-                  ))}
-                </Collapse.Panel>
-              </Collapse>
-            </Col>
-          </Row>
-        </>
-      )}
-      {showing === "expired" && (
-        <>
-          <Alert
-            type="error"
-            showIcon={true}
-            message="These pools have expired."
-            description="Withdraw your tokens immediately."
-            style={{ marginBottom: 24 }}
-          />
-          <Row gutter={20}>
-            <Col xs={24} md={12}>
-              <Collapse defaultActiveKey="index">
-                <Collapse.Panel key="index" header={tx("INDEX_TOKENS")}>
-                  {stakingDetail.indexTokens.map((stakingPool) => (
-                    <Col
-                      key={stakingPool.id}
-                      span={24}
-                      style={{ marginBottom: 24 }}
-                    >
-                      <StakingWidget key={stakingPool.id} {...stakingPool} />
-                    </Col>
-                  ))}
-                </Collapse.Panel>
-              </Collapse>
-            </Col>
-            <Col xs={24} md={12}>
-              <Collapse defaultActiveKey="liquid">
-                <Collapse.Panel key="liquid" header={tx("LIQUIDITY_TOKENS")}>
-                  {stakingDetail.liquidityTokens
-                    .filter((t) => t.expired)
-                    .map((stakingPool) => (
-                      <Col
-                        key={stakingPool.id}
-                        span={24}
-                        style={{ marginBottom: 24 }}
-                      >
-                        <StakingWidget key={stakingPool.id} {...stakingPool} />
-                      </Col>
-                    ))}
-                </Collapse.Panel>
-              </Collapse>
-            </Col>
-          </Row>
-        </>
+      <StakingViewOptions onChange={handleViewOptionsChange} />
+
+      {isMobile ? (
+        inner
+      ) : (
+        <Card
+          bordered={true}
+          style={{ marginTop: 24 }}
+          title={
+            <Row gutter={24}>
+              <Col span={6}>Asset</Col>
+              <Col span={5}>Rewards</Col>
+              <Col span={6}>Total Staked</Col>
+              <Col span={4} style={{ textAlign: "right" }}>
+                APY
+              </Col>
+            </Row>
+          }
+        >
+          {inner}
+        </Card>
       )}
     </Page>
+  );
+}
+
+function StakingViewOptions({
+  onChange,
+}: {
+  onChange(activeKeys: (string | number | boolean)[]): void;
+}) {
+  const { lg } = useBreakpoints();
+
+  return (
+    <Checkbox.Group
+      style={{
+        width: "100%",
+        display: "flex",
+        alignItems: "center",
+        flexDirection: lg ? "row" : "column",
+      }}
+      defaultValue={["single-sided", "sushiswap", "uniswap"]}
+      onChange={onChange}
+    >
+      <StakingViewOption
+        name="single-sided"
+        image={require("images/indexed.png").default}
+      >
+        Show Single-Sided
+      </StakingViewOption>
+      <StakingViewOption
+        name="sushiswap"
+        image={require("images/sushi.png").default}
+      >
+        Show Sushiswap
+      </StakingViewOption>
+      <StakingViewOption
+        name="uniswap"
+        image={require("images/uni.png").default}
+      >
+        Show Uniswap
+      </StakingViewOption>
+      <StakingViewOption
+        name="expired"
+        icon={
+          <Typography.Text type="danger">
+            <AiOutlineWarning fontSize={54} />
+          </Typography.Text>
+        }
+      >
+        Show Expired
+      </StakingViewOption>
+    </Checkbox.Group>
+  );
+}
+
+function StakingViewOption({
+  name,
+  children,
+  image,
+  icon: Icon,
+}: {
+  name: string;
+  children: ReactNode;
+  image?: string;
+  icon?: any;
+}) {
+  return (
+    <div
+      style={{
+        flex: 1,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      {image && (
+        <img
+          alt={`Staking Option ${name}`}
+          src={image}
+          style={{ width: 48, height: 48, marginBottom: 12 }}
+        />
+      )}
+      {Icon}
+      <Checkbox name={name} value={name}>
+        {children}
+      </Checkbox>
+    </div>
+  );
+}
+
+function ExpiredAlert({ children }: { children?: ReactNode }) {
+  return (
+    <Alert
+      type="error"
+      style={{ marginTop: 24 }}
+      showIcon={true}
+      message="Expired"
+      description={
+        <>
+          These pools are no longer distributing rewards.
+          {children}
+        </>
+      }
+    />
   );
 }

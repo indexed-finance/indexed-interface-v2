@@ -5,7 +5,12 @@ import {
   formatPoolAsset,
   indexPoolsSelectors,
 } from "./indexPools";
-import { FormattedMasterChefData, MasterChefPool, masterChefSelectors, totalSushiPerDay } from "./masterChef";
+import {
+  FormattedMasterChefData,
+  MasterChefPool,
+  masterChefSelectors,
+  totalSushiPerDay,
+} from "./masterChef";
 import {
   FormattedNewStakingData,
   FormattedNewStakingDetail,
@@ -122,7 +127,10 @@ export const selectors = {
               const balance = convert.toBigNumber(
                 pool.tokens.entities[tokenId].balance
               );
-              const value = convert.toBalanceNumber(balance.times(price), token.decimals);
+              const value = convert.toBalanceNumber(
+                balance.times(price),
+                token.decimals
+              );
               return total + value;
             }
           }
@@ -305,7 +313,7 @@ export const selectors = {
     );
   },
   selectPossibleMasterChefPairs(state: AppState) {
-    const indexPoolIds = selectors.selectAllPoolIds(state)
+    const indexPoolIds = selectors.selectAllPoolIds(state);
     return [...indexPoolIds, NDX_ADDRESS].map((token) => {
       const [token0, token1] = sortTokens(token, WETH_CONTRACT_ADDRESS);
       return {
@@ -313,22 +321,31 @@ export const selectors = {
         token0: token0.toLowerCase(),
         token1: token1.toLowerCase(),
         sushiswap: true,
-        exists: undefined
-      }
-    })
+        exists: undefined,
+      };
+    });
   },
   selectMasterChefPoolsWithRecognizedPairs(state: AppState): MasterChefPool[] {
-    const pairIds = selectors.selectPossibleMasterChefPairs(state).map(p => p.id);
-    const pools = selectors.selectMasterChefPoolsByStakingTokens(state, pairIds);
-    return pools.filter(_ => Boolean(_)) as MasterChefPool[];
+    const pairIds = selectors
+      .selectPossibleMasterChefPairs(state)
+      .map((p) => p.id);
+    const pools = selectors.selectMasterChefPoolsByStakingTokens(
+      state,
+      pairIds
+    );
+    return pools.filter((_) => Boolean(_)) as MasterChefPool[];
   },
   // selectNewFormattedStakingToken
   selectMasterChefFormattedStaking(state: AppState): FormattedMasterChefData[] {
-    const meta = selectors.selectMasterChefMeta(state)
-    const stakingPools = selectors.selectMasterChefPoolsWithRecognizedPairs(state);
+    const meta = selectors.selectMasterChefMeta(state);
+    const stakingPools =
+      selectors.selectMasterChefPoolsWithRecognizedPairs(state);
     const formattedStaking = stakingPools
       .map((stakingPool) => {
-        const pair = selectors.selectPairById(state, stakingPool.token.toLowerCase());
+        const pair = selectors.selectPairById(
+          state,
+          stakingPool.token.toLowerCase()
+        );
 
         if (!pair || !pair.token0 || !pair.token1) {
           return null;
@@ -352,7 +369,9 @@ export const selectors = {
         );
 
         const rewardsPerDay = convert.toBalance(
-          totalSushiPerDay.times(stakingPool.allocPoint).div(meta.totalAllocPoint),
+          totalSushiPerDay
+            .times(stakingPool.allocPoint)
+            .div(meta.totalAllocPoint),
           18
         );
         return {
@@ -377,7 +396,7 @@ export const selectors = {
         rewardsPerDay: `${convert.toComma(+each.rewardsPerDay)} SUSHI/Day`,
       }));
 
-    return formattedStaking
+    return formattedStaking;
   },
   // selectNewFormattedStakingToken
   selectNewFormattedStaking(state: AppState): FormattedNewStakingDetail {
@@ -432,7 +451,7 @@ export const selectors = {
           stakingToken: stakingPool.token,
           earned: `${earned} NDX`,
           rewardsPerDay,
-        };
+        } as FormattedNewStakingData;
       })
       .filter((each): each is FormattedNewStakingData => Boolean(each))
       .sort((a, b) => +b.rewardsPerDay - +a.rewardsPerDay)
@@ -552,7 +571,7 @@ export const selectors = {
           token1,
           reserves0: pair.reserves0 as string,
           reserves1: pair.reserves1 as string,
-          sushiswap: pair.sushiswap
+          sushiswap: pair.sushiswap,
         };
       }
 

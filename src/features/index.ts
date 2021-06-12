@@ -6,6 +6,7 @@ export * from './batcher';
 export * from './categories';
 export * from './dailySnapshots';
 export * from './indexPools';
+export * from './masterChef';
 export * from './middleware';
 export * from './newStaking';
 export * from './pairs';
