@@ -1,21 +1,17 @@
+import { AiOutlineWarning } from "react-icons/ai";
 import {
   Alert,
-  Button,
   Card,
   Checkbox,
   Col,
   Collapse,
   Menu,
   Row,
-  Space,
   Typography,
 } from "antd";
-import { FaTractor } from "react-icons/fa";
-import { FcExpired } from "react-icons/fc";
 import { ImCheckmark2 } from "react-icons/im";
-import { Link } from "react-router-dom";
 import { MasterChefStakingWidget } from "components/atomic/organisms/MasterChefWidget";
-import { Page, StakingWidget, Token } from "components/atomic";
+import { Page, StakingCard, StakingWidget } from "components/atomic";
 import { StakingWidgetNew } from "components/atomic/organisms/StakingWidgetNew";
 import { selectors } from "features";
 import {
@@ -138,7 +134,7 @@ export default function Stake() {
                 }}
               >
                 <Typography.Text type="danger">
-                  <FcExpired style={{ fontSize: 54 }} />
+                  <AiOutlineWarning style={{ fontSize: 54 }} />
                 </Typography.Text>
                 <Checkbox value="expired">Show Expired</Checkbox>
               </Col>
@@ -154,84 +150,25 @@ export default function Stake() {
           <Row gutter={24}>
             <Col span={9}>Asset</Col>
             <Col span={5}>Rewards</Col>
-            <Col span={5}>Total Staked</Col>
-            <Col span={5}>APY</Col>
+            <Col span={7}>Total Staked</Col>
+            <Col span={3}>APY</Col>
           </Row>
         }
       >
         {newStakingDetail.indexTokens.map((stakingPool) => (
-          <Card
-            key={stakingPool.id}
-            bordered={true}
-            style={{ marginTop: 24 }}
-            title={
-              <Row gutter={24}>
-                <Col span={9}>{stakingPool.name}</Col>
-                <Col span={5}>
-                  <em>
-                    <Typography.Text type="success">
-                      Earned 123.00 NDX
-                    </Typography.Text>
-                  </em>
-                </Col>
-                <Col span={5}>
-                  <em>
-                    <Typography.Text type="success">
-                      Staking 12.00 {stakingPool.symbol}
-                    </Typography.Text>
-                  </em>
-                </Col>
-                <Col span={5}>13.37%</Col>
-              </Row>
-            }
-          >
-            <Row gutter={24} align="middle">
-              <Col span={9}>
-                <Token
-                  name={stakingPool.symbol}
-                  address={stakingPool.id}
-                  symbol={stakingPool.symbol}
-                  symbolOverride={
-                    ["UNIV2:", "SUSHI:"].some((prefix) =>
-                      stakingPool.symbol.startsWith(prefix)
-                    )
-                      ? stakingPool.symbol.split(":")[1].replace(/-/g, "/")
-                      : stakingPool.symbol
-                  }
-                  size="medium"
-                  style={{ marginRight: 24 }}
-                />
-              </Col>
-              <Col span={5}>{stakingPool.rewardsPerDay}</Col>
-              <Col span={5}>
-                {stakingPool.totalStaked} {stakingPool.symbol}
-              </Col>
-              <Col span={5}>
-                <Button
-                  type={"primary"}
-                  size="large"
-                  onClick={(event) => event.stopPropagation()}
-                >
-                  <Link to={`/staking-new/${stakingPool.id}`}>
-                    <Space>
-                      <FaTractor style={{ position: "relative", top: 2 }} />
-                      <span>{tx("STAKE")}</span>
-                    </Space>
-                  </Link>
-                </Button>
-              </Col>
-            </Row>
-          </Card>
+          <StakingCard key={stakingPool.id} {...stakingPool} />
         ))}
+
         {masterChefDetail.map((stakingPool) => (
-          <Col key={stakingPool.id} span={24} style={{ marginBottom: 24 }}>
-            <MasterChefStakingWidget {...stakingPool} />
-          </Col>
+          <StakingCard key={stakingPool.id} {...stakingPool} />
         ))}
+
         {newStakingDetail.liquidityTokens.map((stakingPool) => (
-          <Col key={stakingPool.id} span={24} style={{ marginBottom: 24 }}>
-            <StakingWidgetNew {...stakingPool} />
-          </Col>
+          <StakingCard key={stakingPool.id} {...stakingPool} />
+        ))}
+
+        {stakingDetail.indexTokens.map((stakingPool) => (
+          <StakingCard key={stakingPool.id} {...stakingPool} />
         ))}
       </Card>
     </Page>

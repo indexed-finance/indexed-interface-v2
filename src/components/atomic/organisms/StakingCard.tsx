@@ -1,9 +1,14 @@
-import { Button, Card, Col, Row, Space, Typography } from "antd";
-import { FaTractor } from "react-icons/fa";
+import { Card, Col, Row, Typography } from "antd";
 import { FormattedNewStakingData } from "features";
 import { Link } from "react-router-dom";
 import { Token } from "components/atomic/atoms";
-import { useTranslator } from "hooks";
+import { useNewStakingApy } from "hooks";
+
+interface Props
+  extends Omit<FormattedNewStakingData, "indexPool" | "rewardsPerDay"> {
+  indexPool?: string;
+  rewardsPerDay?: string;
+}
 
 export function StakingCard({
   id,
@@ -11,69 +16,75 @@ export function StakingCard({
   symbol,
   rewardsPerDay,
   totalStaked,
-}: FormattedNewStakingData) {
-  const tx = useTranslator();
+}: Props) {
+  const apy = useNewStakingApy(id);
 
   return (
-    <Card
-      key={id}
-      bordered={true}
-      style={{ marginTop: 24 }}
-      title={
-        <Row gutter={24}>
-          <Col span={9}>{name}</Col>
-          <Col span={5}>
-            <em>
-              <Typography.Text type="success">
-                Earned 123.00 NDX
-              </Typography.Text>
-            </em>
+    <Link to={`/staking-new/${id}`}>
+      <Card
+        key={id}
+        bordered={true}
+        hoverable={true}
+        style={{ marginTop: 24 }}
+        title={
+          <Row gutter={24}>
+            <Col span={9}>{name}</Col>
+            <Col span={5}>
+              <em>
+                <Typography.Text type="success">
+                  Earned 123.00 NDX
+                </Typography.Text>
+              </em>
+            </Col>
+            <Col span={5}>
+              <em>
+                <Typography.Text type="success">
+                  Staking 12.00 {symbol}
+                </Typography.Text>
+              </em>
+            </Col>
+          </Row>
+        }
+      >
+        <Row gutter={24} align="middle">
+          {/* CC10 */}
+          <Col span={9}>
+            <Token
+              name={symbol}
+              address={id}
+              symbol={symbol}
+              symbolOverride={
+                ["UNIV2:", "SUSHI:"].some((prefix) => symbol.startsWith(prefix))
+                  ? symbol.split(":")[1].replace(/-/g, "/")
+                  : symbol
+              }
+              size="medium"
+              style={{ marginRight: 24 }}
+            />
           </Col>
+
+          {/* 200 NDX/Day */}
           <Col span={5}>
-            <em>
-              <Typography.Text type="success">
-                Staking 12.00 {symbol}
-              </Typography.Text>
-            </em>
+            <Typography.Title level={3} style={{ margin: 0 }}>
+              {rewardsPerDay}
+            </Typography.Title>
           </Col>
-          <Col span={5}>13.37%</Col>
+
+          {/* 12,000.00 UNI */}
+          <Col span={7}>
+            <Typography.Title level={3} style={{ margin: 0 }}>
+              {totalStaked} {symbol}
+            </Typography.Title>
+          </Col>
+
+          {/* 13.37% APY */}
+          <Col span={3}>
+            <Typography.Title level={2} type="success" style={{ margin: 0 }}>
+              {apy}
+            </Typography.Title>
+          </Col>
         </Row>
-      }
-    >
-      <Row gutter={24} align="middle">
-        <Col span={9}>
-          <Token
-            name={symbol}
-            address={id}
-            symbol={symbol}
-            symbolOverride={
-              ["UNIV2:", "SUSHI:"].some((prefix) => symbol.startsWith(prefix))
-                ? symbol.split(":")[1].replace(/-/g, "/")
-                : symbol
-            }
-            size="medium"
-            style={{ marginRight: 24 }}
-          />
-        </Col>
-        <Col span={5}>{rewardsPerDay}</Col>
-        <Col span={5}>
-          {totalStaked} {symbol}
-        </Col>
-        <Col span={5}>
-          <Button
-            type={"primary"}
-            size="large"
-            onClick={(event) => event.stopPropagation()}
-          >
-            <Link to={`/staking-new/${id}`}>
-              <Space>
-                <FaTractor style={{ position: "relative", top: 2 }} />
-                <span>{tx("STAKE")}</span>
-              </Space>
-            </Link>
-          </Button>
-        </Col>
-      </Row>
-    </Card>
+      </Card>
+    </Link>
   );
 }
