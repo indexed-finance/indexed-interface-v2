@@ -14,7 +14,7 @@ import {
   useStakingRewardsContract,
   useTokenContract,
 } from "./contract-hooks";
-import { useMasterChefPoolForToken, useMasterChefStakedBalance } from "./masterchef-hooks";
+import { useMasterChefStakedBalance } from "./masterchef-hooks";
 import { useNewStakedBalance } from "./new-staking-hooks";
 import { usePoolSymbol } from "./pool-hooks";
 import { useUserAddress } from "./user-hooks";
@@ -101,7 +101,7 @@ export function useUniswapTransactionCallback() {
           JSBI.BigInt(10000)
         ),
         recipient: user,
-        ttl: gracePeriod
+        ttl: gracePeriod,
         // deadline,
       });
 
@@ -301,7 +301,12 @@ export function useRoutedBurnTransactionCallbacks(
   const poolSymbol = usePoolSymbol(indexPool);
 
   const burnExactAmountIn = useCallback(
-    (poolAmountIn: BigNumber, path: string[], minAmountOut: BigNumber, ethOutput: boolean) => {
+    (
+      poolAmountIn: BigNumber,
+      path: string[],
+      minAmountOut: BigNumber,
+      ethOutput: boolean
+    ) => {
       // @todo Figure out a better way to handle this
       if (!contract) throw new Error();
       let tx: Promise<ContractTransaction>;
@@ -311,7 +316,7 @@ export function useRoutedBurnTransactionCallbacks(
           convert.toHex(poolAmountIn),
           path,
           convert.toHex(minAmountOut)
-        )
+        );
       } else {
         tx = contract.burnExactAndSwapForTokens(
           indexPool,
@@ -328,7 +333,12 @@ export function useRoutedBurnTransactionCallbacks(
   );
 
   const burnExactAmountOut = useCallback(
-    (poolAmountInMax: BigNumber, path: string[], tokenAmountOut: BigNumber, ethOutput: boolean) => {
+    (
+      poolAmountInMax: BigNumber,
+      path: string[],
+      tokenAmountOut: BigNumber,
+      ethOutput: boolean
+    ) => {
       // @todo Figure out a better way to handle this
       if (!contract) throw new Error();
       let tx: Promise<ContractTransaction>;
@@ -542,7 +552,9 @@ export function useNewStakingTransactionCallbacks(
   };
 }
 
-export function useMasterChefTransactionCallbacks(pid: string): StakingTransactionCallbacks {
+export function useMasterChefTransactionCallbacks(
+  pid: string
+): StakingTransactionCallbacks {
   const stakedBalance = useMasterChefStakedBalance(pid);
   const contract = useMasterChefContract();
   const addTransaction = useAddTransactionCallback();
@@ -581,10 +593,10 @@ export function useMasterChefTransactionCallbacks(pid: string): StakingTransacti
     addTransaction(tx);
   }, [contract, addTransaction, pid]);
 
-  return{
+  return {
     stake,
     withdraw,
     exit,
-    claim
-  }
+    claim,
+  };
 }
