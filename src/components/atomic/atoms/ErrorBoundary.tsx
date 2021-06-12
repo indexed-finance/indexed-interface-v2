@@ -1,11 +1,8 @@
 import { Component, ReactNode, useEffect } from "react";
-import { actions } from "features";
+import { LOCALSTORAGE_KEY } from "config";
 import { message } from "antd";
-import { sleep } from "helpers";
 import { useDispatch } from "react-redux";
 import { useTranslator } from "hooks";
-
-const DURATION_ROLLOFF = [1, 1, 3, 5, 8, 13, 21, 99, 999];
 
 export class ErrorBoundary extends Component<
   {
@@ -74,14 +71,10 @@ function ErrorHandler({
   const dispatch = useDispatch();
 
   useEffect(() => {
-    const timeToWait = DURATION_ROLLOFF[errorCount] * 1000;
-
     message.error(tx("AN_UNKNOWN_ERROR_HAS_OCCURRED_..."));
 
-    sleep(timeToWait).then(() => {
-      dispatch(actions.restartedDueToError());
-      onResolved();
-    });
+    window.localStorage.removeItem(LOCALSTORAGE_KEY);
+    window.location.reload();
   }, [dispatch, onResolved, tx, errorCount]);
 
   return <>{children}</>;
