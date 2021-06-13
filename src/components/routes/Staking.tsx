@@ -3,6 +3,7 @@ import { Alert, Card, Checkbox, Col, Empty, Row, Typography } from "antd";
 import {
   ExpiredStakingCard,
   Page,
+  SingleSidedStakingCard,
   SushiswapStakingCard,
   UniswapStakingCard,
 } from "components/atomic";
@@ -46,7 +47,7 @@ export default function Stake() {
     <>
       {showing.singleSided &&
         newStakingDetail.indexTokens.map((stakingPool) => (
-          <UniswapStakingCard key={stakingPool.id} {...stakingPool} />
+          <SingleSidedStakingCard key={stakingPool.id} {...stakingPool} />
         ))}
 
       {showing.sushiswap &&
