@@ -158,6 +158,19 @@ export function UniswapStakingCard(props: Props) {
   );
 }
 
+export function SingleSidedStakingCard(props: Props) {
+  return (
+    <StakingCard
+      {...props}
+      linkPath="staking-new"
+      badge=""
+      badgeColor=""
+      // backdrop={require(`images/${props.symbol.toLowerCase()}.png`).default}
+      useApy={useNewStakingApy}
+    />
+  );
+}
+
 export function SushiswapStakingCard(props: Props) {
   return (
     <StakingCard
