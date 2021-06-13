@@ -26,13 +26,13 @@
 
 .wallet-option {
   &:hover {
-    border-left: 3px solid #D1379A;
+    border-left: 3px solid #d1379a;
     padding-left: 5px;
     cursor: pointer;
   }
 }
 
-.ant-drawer-header{
+.ant-drawer-header {
   background-color: #151515;
 }
 
@@ -47,7 +47,7 @@
 }
 
 .with-background {
-  background-image: url("/src/theme/bg/bg_purpleGreenPink.svg");
+  background-image: url("../images/bg.svg");
   background-size: cover;
 }
 
@@ -119,7 +119,7 @@
 }
 
 .ant-layout-header {
-    border-bottom: 4px solid rgba(255, 255, 255, .8) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.8) !important;
 }
 
 .ant-menu {
@@ -142,8 +142,8 @@
   z-index: 100 !important;
 }
 
-.ant-divider{
-  border-top: 1px solid rgba(255, 255, 255, .2);
+.ant-divider {
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .bordered,
@@ -173,22 +173,21 @@
 }
 
 // Buttons
-
 .ant-btn {
-  border-radius: 8px !important;
-  border: 2px solid rgba(255, 255, 255, .2);
+  border-radius: 3px !important;
+  border: 2px solid rgba(255, 255, 255, 0.2);
 
   &:hover {
-    border: 2px solid rgba(255, 255, 255, .4);
+    border: 2px solid rgba(255, 255, 255, 0.4);
   }
 }
 
 .ant-btn-default:hover {
-  color: #D1379A;
+  color: #d1379a;
 }
 
 .ant-btn-dangerous {
-  color:#da3a3a;
+  color: #da3a3a;
 
   &:hover {
     color: #f86c6c;
@@ -200,17 +199,17 @@
     darken(#ad92f7, 20%),
     darken(#44ca97, 20%) 80%
   );
-  border: 2px solid rgba(255, 255, 255, .7);
+  border: 2px solid rgba(255, 255, 255, 0.7);
 
   &:hover {
     background: -webkit-linear-gradient(55deg, #9259ec, #28ad7a 80%);
-    border: 2px solid rgba(255, 255, 255, .7) ;
+    border: 2px solid rgba(255, 255, 255, 0.7);
   }
 }
 
 .ant-card-hoverable {
   transition: border 0.2s ease-in-out;
-  border: 2px solid rgba(255, 255, 255, .2);
+  border: 2px solid rgba(255, 255, 255, 0.2);
 
   &:hover {
     border: 2px solid @success-color;

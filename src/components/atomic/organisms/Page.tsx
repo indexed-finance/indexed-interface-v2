@@ -36,7 +36,7 @@ export function Page({
         background: "#151515",
         position: "relative",
         borderRadius: 16,
-        border: "4px solid rgba(255, 255, 255, .8)",
+        border: "1px solid rgba(255, 255, 255, .8)",
         paddingTop: isMobile ? "0" : "25px",
         boxShadow: "0px 0px 50px 0px rgba(40, 0, 40, 0.7)",
       }}
