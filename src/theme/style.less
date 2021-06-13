@@ -4,7 +4,7 @@
 
 // -- Theming
 @primary-color: darken(rgb(73, 255, 255), 30%);
-@success-color: #0ed155;
+@success-color: #38ee7b;
 
 // -- Fonts
 @font-face {
@@ -16,18 +16,24 @@
 .fancy {
   text-transform: uppercase !important;
   letter-spacing: 0.1ch !important;
+  font-weight: bold;
 }
 
 .colorful {
-  color: #0ed155;
+  color: @success-color;
+  font-weight: bold;
 }
 
 .wallet-option {
   &:hover {
-    border-left: 2px solid rgb(73, 255, 255);
-    padding-left: 24px;
+    border-left: 3px solid #D1379A;
+    padding-left: 5px;
     cursor: pointer;
   }
+}
+
+.ant-drawer-header{
+  background-color: #151515;
 }
 
 .prominent-stat {
@@ -41,14 +47,8 @@
 }
 
 .with-background {
-  background: rgb(0, 174, 175);
-  background: radial-gradient(
-    circle,
-    darken(#00aeaf, 15%) 9%,
-    darken(#652ab5, 15%) 28%,
-    darken(#00aeaf, 15%) 59%,
-    darken(#652ab5, 15%) 98%
-  );
+  background-image: url("/src/theme/bg/bg_purpleGreenPink.svg");
+  background-size: cover;
 }
 
 .fake-flex-gap {
@@ -110,6 +110,26 @@
 // -- Ant Overrides
 @font-family: "Main";
 
+.ant-card {
+  border-radius: 16px;
+}
+
+.ant-page-header {
+  border: none !important;
+}
+
+.ant-layout-header {
+    border-bottom: 4px solid rgba(255, 255, 255, .8) !important;
+}
+
+.ant-menu {
+  border: none !important;
+}
+
+.ant-card-head {
+  border: none !important;
+}
+
 .ant-page-header-heading-title {
   line-height: 1 !important;
 }
@@ -122,9 +142,13 @@
   z-index: 100 !important;
 }
 
+.ant-divider{
+  border-top: 1px solid rgba(255, 255, 255, .2);
+}
+
 .bordered,
 .ant-card-bordered {
-  border-radius: 12px;
+  border-radius: 16px;
 }
 
 .ant-menu-submenu-title {
@@ -144,28 +168,51 @@
   letter-spacing: 2px;
 }
 
-.ant-btn {
-  border-radius: 3px !important;
+.ant-alert-info {
+  border-radius: 16px;
 }
 
-.ant-btn-primary.plus {
-  background: -webkit-linear-gradient(
-    45deg,
-    darken(#03b6ff, 20%),
-    darken(#0ed155, 20%) 80%
-  );
-  border: 1px solid transparent;
+// Buttons
+
+.ant-btn {
+  border-radius: 8px !important;
+  border: 2px solid rgba(255, 255, 255, .2);
 
   &:hover {
-    background: -webkit-linear-gradient(45deg, #03b6ff, #0ed155 80%);
-    border: 1px solid transparent;
+    border: 2px solid rgba(255, 255, 255, .4);
+  }
+}
+
+.ant-btn-default:hover {
+  color: #D1379A;
+}
+
+.ant-btn-dangerous {
+  color:#da3a3a;
+
+  &:hover {
+    color: #f86c6c;
+  }
+}
+.ant-btn-primary.plus {
+  background: -webkit-linear-gradient(
+    55deg,
+    darken(#ad92f7, 20%),
+    darken(#44ca97, 20%) 80%
+  );
+  border: 2px solid rgba(255, 255, 255, .7);
+
+  &:hover {
+    background: -webkit-linear-gradient(55deg, #9259ec, #28ad7a 80%);
+    border: 2px solid rgba(255, 255, 255, .7) ;
   }
 }
 
 .ant-card-hoverable {
-  transition: border 0.66s ease-in-out;
+  transition: border 0.2s ease-in-out;
+  border: 2px solid rgba(255, 255, 255, .2);
 
   &:hover {
-    border: 1px solid @success-color;
+    border: 2px solid @success-color;
   }
 }

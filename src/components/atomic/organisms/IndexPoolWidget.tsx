@@ -28,6 +28,9 @@ export function IndexPoolWidget(props: FormattedIndexPool) {
 
   usePoolDetailRegistrar(props.id, tokenIds);
 
+  let value = props.totalValueLocked;
+  value = value.substring(0, value.length - 3);
+
   return (
     <Widget
       symbol={props.symbol}
@@ -36,7 +39,7 @@ export function IndexPoolWidget(props: FormattedIndexPool) {
       stats={
         <Statistic
           title="Total Value Locked"
-          value={props.totalValueLocked}
+          value={value}
           valueRender={(value) => <div className="colorful">{value}</div>}
         />
       }
