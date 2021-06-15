@@ -3,5 +3,4 @@
 
 export * from './DiligenceDrawer';
 export * from './Drawer';
-export * from './InteractionDrawer';
 export * from './WalletConnectionDrawer';

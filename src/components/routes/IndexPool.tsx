@@ -10,14 +10,7 @@ import {
   IndexPoolRecentTrades,
   Page,
 } from "components/atomic";
-import { IndexPoolInteraction, useInteractionDrawer } from "components/drawers";
-import {
-  useBreakpoints,
-  usePoolDetailRegistrar,
-  useQuery,
-  useStakingApy,
-} from "hooks";
-import { useEffect } from "react";
+import { useBreakpoints, usePoolDetailRegistrar } from "hooks";
 import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 
@@ -78,25 +71,6 @@ export default function IndexPool() {
   const indexPool = useSelector((state: AppState) =>
     poolId ? selectors.selectFormattedIndexPool(state, poolId) : null
   );
-  const query = useQuery();
-  const { open: openInteraction } = useInteractionDrawer(poolId ?? "");
-  const stakingApy = useStakingApy(poolId ?? "");
-
-  useEffect(() => {
-    const interaction = query.get("interaction");
-
-    if (interaction && indexPool) {
-      openInteraction(interaction as IndexPoolInteraction);
-
-      if (
-        interaction !== "stake" ||
-        (interaction === "stake" && stakingApy && stakingApy !== "Expired")
-      ) {
-        openInteraction(interaction as IndexPoolInteraction);
-      }
-    }
-    // eslint-disable-next-line
-  }, []);
 
   return (
     <Page
