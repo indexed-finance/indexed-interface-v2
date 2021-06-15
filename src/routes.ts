@@ -15,11 +15,6 @@ const StakeMasterChef = lazy(
 const IndexPools = lazy(() => import("./components/routes/IndexPools"));
 const IndexPool = lazy(() => import("./components/routes/IndexPool"));
 
-// Interactions
-const Buy = lazy(() => import("./components/routes/Buy"));
-const Mint = lazy(() => import("./components/routes/Mint"));
-const Burn = lazy(() => import("./components/routes/Burn"));
-
 export const routes: RouteWithBreadcrumbs[] = [
   {
     path: "/",
@@ -67,16 +62,16 @@ export const routes: RouteWithBreadcrumbs[] = [
   {
     path: "/index-pools/:slug/buy",
     exact: true,
-    component: Buy,
+    component: IndexPool,
   },
   {
     path: "/index-pools/:slug/mint",
     exact: true,
-    component: Mint,
+    component: IndexPool,
   },
   {
     path: "/index-pools/:slug/burn",
     exact: true,
-    component: Burn,
+    component: IndexPool,
   },
 ];
