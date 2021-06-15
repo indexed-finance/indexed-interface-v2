@@ -1,4 +1,4 @@
-import { HTMLProps } from "react";
+import { HTMLProps, ReactNode } from "react";
 import { Space, Spin, Typography } from "antd";
 import { Token } from "components/atomic/atoms";
 
@@ -6,7 +6,7 @@ interface Props extends HTMLProps<HTMLDivElement> {
   address?: string;
   name?: string;
   symbol?: string;
-  price?: string;
+  price?: ReactNode;
   netChange?: string;
   netChangePercent?: string;
   inline?: boolean;
