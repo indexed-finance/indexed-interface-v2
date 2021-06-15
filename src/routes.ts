@@ -9,9 +9,16 @@ const Portfolio = lazy(() => import("./components/routes/Portfolio"));
 const Staking = lazy(() => import("./components/routes/Staking"));
 const Stake = lazy(() => import("./components/routes/Stake"));
 const StakeNew = lazy(() => import("./components/routes/StakeNew"));
-const StakeMasterChef = lazy(() => import("./components/routes/StakeMasterChef"));
+const StakeMasterChef = lazy(
+  () => import("./components/routes/StakeMasterChef")
+);
 const IndexPools = lazy(() => import("./components/routes/IndexPools"));
 const IndexPool = lazy(() => import("./components/routes/IndexPool"));
+
+// Interactions
+const Buy = lazy(() => import("./components/routes/Buy"));
+const Mint = lazy(() => import("./components/routes/Mint"));
+const Burn = lazy(() => import("./components/routes/Burn"));
 
 export const routes: RouteWithBreadcrumbs[] = [
   {
@@ -39,12 +46,12 @@ export const routes: RouteWithBreadcrumbs[] = [
   {
     path: "/staking-new/:id",
     exact: true,
-    component: StakeNew
+    component: StakeNew,
   },
   {
     path: "/stake-sushi/:id",
     exact: true,
-    component: StakeMasterChef
+    component: StakeMasterChef,
   },
   {
     path: "/index-pools",
@@ -56,5 +63,20 @@ export const routes: RouteWithBreadcrumbs[] = [
     path: "/index-pools/:slug",
     exact: true,
     component: IndexPool,
+  },
+  {
+    path: "/index-pools/:slug/buy",
+    exact: true,
+    component: Buy,
+  },
+  {
+    path: "/index-pools/:slug/mint",
+    exact: true,
+    component: Mint,
+  },
+  {
+    path: "/index-pools/:slug/burn",
+    exact: true,
+    component: Burn,
   },
 ];

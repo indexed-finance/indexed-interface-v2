@@ -1,44 +1,38 @@
+import { AppState, FormattedIndexPool, selectors } from "features";
 import { BiCoin } from "react-icons/bi";
 import { Button, Space, Typography } from "antd";
-import { FaCoins, FaFireAlt, FaTractor } from "react-icons/fa";
-import { FormattedIndexPool } from "features";
-import { useInteractionDrawer } from "components/drawers";
+import { FaCoins, FaFireAlt } from "react-icons/fa";
+import { Link } from "react-router-dom";
 import { useMemo } from "react";
-import { useStakingApy } from "hooks";
+import { useSelector } from "react-redux";
 
 export function useIndexPoolInteractions(indexPoolAddress: string) {
-  const { open } = useInteractionDrawer(indexPoolAddress);
-  const stakingApy = useStakingApy(indexPoolAddress);
+  const formattedPool = useSelector((state: AppState) =>
+    selectors.selectFormattedIndexPool(state, indexPoolAddress)
+  );
+  const slug = formattedPool?.slug ?? "";
 
   return useMemo(() => {
     const baseInteractions = [
       {
         title: "Buy",
+        link: `${slug}/buy`,
         icon: <FaCoins />,
-        onClick: () => open("trade"),
       },
       {
         title: "Mint",
+        link: `${slug}/mint`,
         icon: <BiCoin />,
-        onClick: () => open("mint"),
       },
       {
         title: "Burn",
+        link: `${slug}/burn`,
         icon: <FaFireAlt />,
-        onClick: () => open("burn"),
       },
     ];
 
-    if (stakingApy && stakingApy !== "Expired") {
-      baseInteractions.push({
-        title: "Stake",
-        icon: <FaTractor />,
-        onClick: () => open("stake"),
-      });
-    }
-
     return baseInteractions;
-  }, [open, stakingApy]);
+  }, [slug]);
 }
 
 export function IndexPoolInteractionBar({
@@ -49,18 +43,31 @@ export function IndexPoolInteractionBar({
   const indexPoolInteractions = useIndexPoolInteractions(indexPool.id);
 
   return (
-    <Button.Group style={{ width: "100%", marginBottom: 24 }}>
-      {indexPoolInteractions.map((interaction) => (
-        <Button key={interaction.title} size="large" block={true}>
-          <Typography.Title level={4} onClick={interaction.onClick}>
-            <Space>
-              <span style={{ position: "relative", top: 3 }}>
-                {interaction.icon}
-              </span>
-              <span>{interaction.title}</span>
-            </Space>
-          </Typography.Title>
-        </Button>
+    <Button.Group>
+      {indexPoolInteractions.map((interaction, index, array) => (
+        <Link
+          key={interaction.title}
+          to={{
+            pathname: interaction.link,
+            state: {
+              indexPool,
+            },
+          }}
+        >
+          <Button
+            size="large"
+            style={{ marginRight: index === array.length - 1 ? 0 : 12 }}
+          >
+            <Typography.Title level={4}>
+              <Space>
+                <span style={{ position: "relative", top: 3 }}>
+                  {interaction.icon}
+                </span>
+                <span>{interaction.title}</span>
+              </Space>
+            </Typography.Title>
+          </Button>
+        </Link>
       ))}
     </Button.Group>
   );

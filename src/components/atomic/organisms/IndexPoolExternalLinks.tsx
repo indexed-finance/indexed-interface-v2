@@ -1,4 +1,4 @@
-import { Button, Card, Divider, Space } from "antd";
+import { Button, Card, Space } from "antd";
 import { ExternalLink } from "components/atomic";
 import { FormattedIndexPool } from "features";
 import { Fragment, useMemo } from "react";
@@ -46,6 +46,7 @@ export function IndexPoolExternalLinks({ id }: FormattedIndexPool) {
             block={true}
             style={{
               padding: "0 40px",
+              marginBottom: index === links.length - 1 ? 0 : 12,
             }}
           >
             <ExternalLink to={makeLink(id)}>
@@ -71,7 +72,6 @@ export function IndexPoolExternalLinks({ id }: FormattedIndexPool) {
               </Space>
             </ExternalLink>
           </Button>
-          {index !== links.length - 1 && <Divider style={{ margin: 6 }} />}
         </Fragment>
       ))}
     </Card>

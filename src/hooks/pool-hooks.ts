@@ -46,6 +46,9 @@ export const usePoolQuickswapLink = (poolAddress: string) => {
     // DEGEN
     "0x126c121f99e1e211df2e5f8de2d96fa36647c855":
       "0x8a2870fb69a90000d6439b7adfb01d4ba383a415",
+    // FFF
+    "0xabafa52d3d5a2c18a4c1ae24480d22b831fc0413":
+      "0x9aceb6f749396d1930abc9e263efc449e5e82c13",
   };
   const quickswapToken = poolAddressToQuickswapToken[poolAddress];
 
