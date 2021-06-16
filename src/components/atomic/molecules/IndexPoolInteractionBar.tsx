@@ -57,14 +57,14 @@ export function IndexPoolInteractionBar({
     if (activeTitle === "Buy") {
       content = (
         <>
-          <Typography.Title level={2}>Buy {indexPool.name}</Typography.Title>
+          <Typography.Title level={2}>Buy {indexPool.symbol}</Typography.Title>
           <TradeInteraction indexPool={indexPool} />
         </>
       );
     } else if (activeTitle === "Mint") {
       content = (
         <Space direction="vertical" style={{ marginBottom: 24 }}>
-          <Typography.Title level={2}>Mint {indexPool.name}</Typography.Title>
+          <Typography.Title level={2}>Mint {indexPool.symbol}</Typography.Title>
           <Menu
             mode="horizontal"
             style={{ marginLeft: -12 }}
@@ -87,7 +87,7 @@ export function IndexPoolInteractionBar({
     } else if (activeTitle === "Burn")
       content = (
         <Space direction="vertical" style={{ marginBottom: 24 }}>
-          <Typography.Title level={2}>Burn {indexPool.name}</Typography.Title>
+          <Typography.Title level={2}>Burn {indexPool.symbol}</Typography.Title>
           <Menu
             mode="horizontal"
             style={{ marginLeft: -12 }}

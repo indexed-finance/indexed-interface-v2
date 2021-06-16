@@ -96,7 +96,6 @@ export default function IndexPool() {
             style={{
               display: "flex",
               flexDirection: "column",
-              alignItems: "flex-end",
             }}
           >
             <Typography.Text>{indexPool.name}</Typography.Text>
