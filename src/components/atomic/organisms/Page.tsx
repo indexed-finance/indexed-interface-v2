@@ -1,5 +1,14 @@
 import { BugReportLink } from "components/atomic/atoms";
-import { Button, Card, Col, PageHeader, Row, Space, Typography } from "antd";
+import {
+  Button,
+  Card,
+  Col,
+  Divider,
+  PageHeader,
+  Row,
+  Space,
+  Typography,
+} from "antd";
 import { LegacySiteLink, SocialMediaList } from "components/atomic/molecules";
 import { ReactNode } from "react";
 import { RiCopyrightLine } from "react-icons/ri";
@@ -111,6 +120,7 @@ export function Page({
           </div>
         )}
       </Card>
+      <Divider />
       <Row
         style={{
           width: "100%",
