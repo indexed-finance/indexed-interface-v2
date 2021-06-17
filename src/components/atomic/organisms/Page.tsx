@@ -1,4 +1,4 @@
-import { BugReportLink } from "components/atomic/atoms";
+import { BugReportLink, ExternalLink } from "components/atomic/atoms";
 import {
   Button,
   Card,
@@ -150,10 +150,13 @@ export function Page({
             }}
             direction={isMobile ? "vertical" : "horizontal"}
           >
-            <Button.Group>
-              <LegacySiteLink />
-              <BugReportLink />
-            </Button.Group>
+            <Button type="default">
+              <ExternalLink to="https://docs.indexed.finance/">
+                How it works
+              </ExternalLink>
+            </Button>
+            <LegacySiteLink />
+            <BugReportLink />
             <div>
               <RiCopyrightLine
                 style={{

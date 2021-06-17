@@ -63,7 +63,7 @@ export function IndexPoolInteractionBar({
       );
     } else if (activeTitle === "Mint") {
       content = (
-        <Space direction="vertical" style={{ marginBottom: 24 }}>
+        <Space direction="vertical" style={{ marginBottom: 24, width: "100%" }}>
           <Typography.Title level={2}>Mint {indexPool.symbol}</Typography.Title>
           <Menu
             mode="horizontal"
@@ -86,7 +86,7 @@ export function IndexPoolInteractionBar({
       );
     } else if (activeTitle === "Burn")
       content = (
-        <Space direction="vertical" style={{ marginBottom: 24 }}>
+        <Space direction="vertical" style={{ marginBottom: 24, width: "100%" }}>
           <Typography.Title level={2}>Burn {indexPool.symbol}</Typography.Title>
           <Menu
             mode="horizontal"

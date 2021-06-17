@@ -238,7 +238,7 @@ function SingleInteractionInner({
 
   return (
     <Row gutter={24}>
-      <Col xs={24} sm={12}>
+      <Col xs={24} sm={10}>
         <TokenSelector
           loading={loading}
           isInput

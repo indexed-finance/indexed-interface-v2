@@ -122,6 +122,9 @@ export function AppLayout() {
   useEffect(() => {
     if (pathname !== previousLocation.current) {
       previousLocation.current = pathname;
+      window.scrollTo({
+        top: 0,
+      });
       scan();
     }
   });
