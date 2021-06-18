@@ -96,10 +96,16 @@ export default function Stake() {
           style={{ marginTop: 24 }}
           title={
             <Row gutter={24}>
-              <Col span={6}>Asset</Col>
-              <Col span={5}>Rewards</Col>
-              <Col span={6}>Total Staked</Col>
-              <Col span={4} style={{ textAlign: "right" }}>
+              <Col xs={24} sm={6}>
+                Asset
+              </Col>
+              <Col xs={24} sm={5}>
+                Rewards
+              </Col>
+              <Col xs={24} sm={6}>
+                Total Staked
+              </Col>
+              <Col xs={24} sm={4} style={{ textAlign: "right" }}>
                 APY
               </Col>
             </Row>

@@ -206,10 +206,10 @@ function StakingStats({
       {parseFloat(staked) > 0 && (
         <Descriptions.Item label="Staked">
           <Row>
-            <Col span={14}>
+            <Col xs={24} md={14}>
               {staked} {symbol}
             </Col>
-            <Col span={8}>
+            <Col xs={24} md={8}>
               <Button danger type="primary" block={true} onClick={exit}>
                 Exit
               </Button>
@@ -220,8 +220,10 @@ function StakingStats({
       {parseFloat(earned) > 0 && (
         <Descriptions.Item label="Earned Rewards">
           <Row>
-            <Col span={14}>{earned} SUSHI</Col>
-            <Col span={8}>
+            <Col xs={24} md={14}>
+              {earned} SUSHI
+            </Col>
+            <Col xs={24} md={8}>
               <Button type="primary" block={true} onClick={claim}>
                 Claim
               </Button>
@@ -282,7 +284,7 @@ export default function StakeMasterChef() {
     <Page hasPageHeader={true} title={`Stake ${stakingToken}`}>
       <Space direction="vertical" style={{ width: "100%" }} size="large">
         <Row gutter={100}>
-          <Col span={10}>
+          <Col xs={24} md={10}>
             <Formik
               initialValues={{
                 asset: "",
@@ -312,7 +314,7 @@ export default function StakeMasterChef() {
               />
             </Formik>
           </Col>
-          <Col span={14}>
+          <Col xs={24} md={14}>
             <StakingStats
               symbol={stakingToken}
               portfolioToken={relevantPortfolioToken}
