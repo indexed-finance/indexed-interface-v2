@@ -18,7 +18,7 @@ export function IndexPoolAssets({ assets }: FormattedIndexPool) {
         {assets.map((asset) => (
           <List.Item key={asset.id} style={{ width: "100%" }}>
             <Row gutter={24} align="middle" style={{ width: "100%" }}>
-              <Col span={18}>
+              <Col xs={24} md={18}>
                 <div
                   style={{
                     flex: 1,
@@ -38,7 +38,7 @@ export function IndexPoolAssets({ assets }: FormattedIndexPool) {
                   </Typography.Text>
                 </div>
               </Col>
-              <Col span={6}>
+              <Col xs={24} md={6}>
                 <Progress
                   style={{ flex: 1, textAlign: "right" }}
                   width={isMobile ? 60 : 80}

@@ -61,8 +61,10 @@ export function StakingCard({
         title={
           lg ? (
             <Row gutter={24}>
-              <Col span={6}>{name}</Col>
-              <Col span={5}>
+              <Col xs={24} sm={6}>
+                {name}
+              </Col>
+              <Col xs={24} sm={5}>
                 {!["0.00 NDX", "0.00 SUSHI"].includes(earned) && (
                   <em>
                     <Typography.Text type="success">
@@ -71,7 +73,7 @@ export function StakingCard({
                   </em>
                 )}
               </Col>
-              <Col span={5}>
+              <Col xs={24} sm={5}>
                 {staked !== "0" && (
                   <em>
                     <Typography.Text type="success">
