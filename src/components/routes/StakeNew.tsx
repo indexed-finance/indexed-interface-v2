@@ -30,6 +30,7 @@ import {
 } from "hooks";
 import { useMemo } from "react";
 import { useSelector } from "react-redux";
+import BigNumber from "bignumber.js";
 import S from "string";
 
 function StakingForm({
@@ -40,7 +41,10 @@ function StakingForm({
   stakingToken: NewStakingPool;
 }) {
   const { setFieldValue, values, errors } = useFormikContext<{
-    amount: number;
+    amount: {
+      displayed: string;
+      exact: BigNumber;
+    };
     inputType: "stake" | "unstake";
   }>();
 
@@ -49,29 +53,32 @@ function StakingForm({
   );
 
   const [staked] = useMemo(() => {
-    let staked = stakingToken.userStakedBalance;
-    let earned = stakingToken.userEarnedRewards;
-    staked = staked ? convert.toBalance(staked, 18) : "0";
-    earned = earned ? convert.toBalance(earned, 18) : "0";
+    const staked = stakingToken.userStakedBalance;
+    const earned = stakingToken.userEarnedRewards;
+
     return [staked, earned];
   }, [stakingToken]);
 
-  const [estimatedReward, weight] = useMemo(() => {
-    const stakedAmount = parseFloat(staked || "0");
+  const [estimatedReward, weight] = useMemo<[string, BigNumber]>(() => {
+    const stakedAmount = convert.toBigNumber(staked ?? "0");
     const addAmount =
-      values.inputType === "stake" ? values.amount : -values.amount;
-    const userNewStaked = stakedAmount + addAmount;
-    if (userNewStaked < 0) {
-      return [0, 0];
+      values.inputType === "stake"
+        ? values.amount.exact
+        : values.amount.exact.negated();
+    const userNewStaked = stakedAmount.plus(addAmount);
+    if (userNewStaked.isLessThan(0)) {
+      return ["0.00", convert.toBigNumber("0.00")];
     }
-    const totalStaked = convert.toBalanceNumber(stakingToken.totalStaked, 18);
-    const newTotalStaked = totalStaked + addAmount;
+    const totalStaked = convert.toBigNumber(stakingToken.totalStaked);
+    const newTotalStaked = totalStaked.plus(addAmount);
     const dailyRewardsTotal = convert.toBalanceNumber(
       convert.toBigNumber(stakingToken.rewardsPerDay),
       18
     );
-    const weight = userNewStaked / newTotalStaked;
-    return [convert.toComma(weight * dailyRewardsTotal), weight];
+    const weight = userNewStaked.dividedBy(newTotalStaked);
+    const result = weight.multipliedBy(dailyRewardsTotal);
+
+    return [convert.toComma(result.toNumber()), weight];
   }, [
     values.amount,
     stakingToken.totalStaked,
@@ -124,7 +131,7 @@ function StakingForm({
         }
         selectable={false}
         onChange={(value) => setFieldValue("amount", value.amount)}
-        error={errors.amount}
+        error={errors.amount?.displayed}
       />
 
       <Alert
@@ -143,7 +150,7 @@ function StakingForm({
             />
             <Statistic
               title="Pool Weight"
-              value={convert.toPercent(weight)}
+              value={convert.toPercent(weight.toNumber())}
               style={{ textAlign: "right" }}
             />
           </div>

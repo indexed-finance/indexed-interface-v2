@@ -51,9 +51,15 @@ export function TradeInteraction({ indexPool }: Props) {
       const outputToken = tokenLookup[toToken.toLowerCase()];
       if (inputToken && outputToken) {
         if (lastTouchedField === "from") {
-          if (!fromAmount || isNaN(fromAmount)) {
-            values.fromAmount = 0;
-            values.toAmount = 0;
+          if (!fromAmount) {
+            values.fromAmount = {
+              displayed: "0.00",
+              exact: convert.toBigNumber("0.00"),
+            };
+            values.toAmount = {
+              displayed: "0.00",
+              exact: convert.toBigNumber("0.00"),
+            };
             return;
           }
           const amountIn = convert
@@ -64,11 +70,22 @@ export function TradeInteraction({ indexPool }: Props) {
             outputToken,
             amountIn
           );
-          values.toAmount = parseFloat(bestTrade?.outputAmount.toFixed(4) ?? "0");
+          const innerResult = bestTrade?.outputAmount.toFixed(4) ?? "0.00";
+
+          values.toAmount = {
+            displayed: innerResult,
+            exact: convert.toBigNumber(innerResult),
+          };
         } else {
-          if (!toAmount || isNaN(toAmount)) {
-            values.fromAmount = 0;
-            values.toAmount = 0;
+          if (!toAmount) {
+            values.fromAmount = {
+              displayed: "0.00",
+              exact: convert.toBigNumber("0.00"),
+            };
+            values.toAmount = {
+              displayed: "0.00",
+              exact: convert.toBigNumber("0.00"),
+            };
             return;
           }
           const amountOut = convert
@@ -79,9 +96,12 @@ export function TradeInteraction({ indexPool }: Props) {
             outputToken,
             amountOut
           );
-          values.fromAmount = parseFloat(
-            bestTrade?.inputAmount.toFixed(4) ?? "0"
-          );
+          const innerResult = bestTrade?.inputAmount.toFixed(4) ?? "0.00";
+
+          values.fromAmount = {
+            displayed: innerResult,
+            exact: convert.toBigNumber(innerResult),
+          };
         }
       }
     },
@@ -99,7 +119,12 @@ export function TradeInteraction({ indexPool }: Props) {
       toAmount,
       lastTouchedField,
     }: SingleInteractionValues) => {
-      if (fromAmount > 0 && toAmount > 0 && fromToken && toToken) {
+      if (
+        fromAmount.exact.isGreaterThan(0) &&
+        toAmount.exact.isGreaterThan(0) &&
+        fromToken &&
+        toToken
+      ) {
         const inputToken = tokenLookup[fromToken.toLowerCase()];
         const outputToken = tokenLookup[toToken.toLowerCase()];
         let trade: Trade | undefined;

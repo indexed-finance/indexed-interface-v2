@@ -1,5 +1,6 @@
 import * as yup from "yup";
 import { Alert, Button, Col, Divider, Row, Space } from "antd";
+import { BigNumber, convert } from "helpers";
 import { Flipper, TokenSelector } from "components/atomic";
 import { Formik, FormikProps, useFormikContext } from "formik";
 import {
@@ -10,7 +11,6 @@ import {
   useRef,
   useState,
 } from "react";
-import { convert } from "helpers";
 import { selectors } from "features";
 import {
   useBreakpoints,
@@ -46,9 +46,15 @@ interface Props {
 // #region Single
 const singleInitialValues = {
   fromToken: "",
-  fromAmount: 0,
+  fromAmount: {
+    displayed: "0.00",
+    exact: convert.toBigNumber("0"),
+  },
   toToken: "",
-  toAmount: 0,
+  toAmount: {
+    displayed: "0.00",
+    exact: convert.toBigNumber("0"),
+  },
   lastTouchedField: "from" as "from" | "to",
 };
 
@@ -213,7 +219,11 @@ function SingleInteractionInner({
       token,
       amount,
       error: fieldError,
-    }: { token?: string; amount?: number; error?: string }
+    }: {
+      token?: string;
+      amount?: { displayed: string; exact: BigNumber };
+      error?: string;
+    }
   ) => {
     const [tokenField, amountField] =
       field === "from" ? ["fromToken", "fromAmount"] : ["toToken", "toAmount"];
@@ -250,7 +260,7 @@ function SingleInteractionInner({
             amount: values.fromAmount,
           }}
           selectable={!disableInputSelect}
-          error={errors.fromAmount}
+          error={errors.fromAmount?.displayed}
           onChange={(newValues) => handleChange("from", newValues)}
         />
 
@@ -324,14 +334,20 @@ function InteractionErrors() {
 // #region Multi
 const multiInitialValues = {
   fromToken: "",
-  fromAmount: 0,
+  fromAmount: {
+    displayed: "0.00",
+    exact: convert.toBigNumber("0"),
+  },
 };
 
 export type MultiInteractionValues = typeof multiInitialValues;
 
 const multiInteractionSchema = yup.object().shape({
   fromToken: yup.string().min(0, "A token is required in the 'From' field."),
-  fromAmount: yup.number().min(0, "From balance must be greater than zero."),
+  fromAmount: yup.object().shape({
+    displayed: yup.number().min(0, "Balance must be greater than zero."),
+    exact: yup.string(),
+  }),
 });
 
 type MultiProps = Omit<Props, "onSubmit" | "onChange"> & {
@@ -415,7 +431,11 @@ function MultiInteractionInner({
     [spender, tokenLookup, values.fromAmount]
   );
   const handleChange = useCallback(
-    (changedValue: { token?: string; amount?: number; error?: string }) => {
+    (changedValue: {
+      token?: string;
+      amount?: { displayed: string; exact: BigNumber };
+      error?: string;
+    }) => {
       if (changedValue.token) {
         setFieldValue("fromToken", changedValue.token, false);
       }
@@ -428,7 +448,15 @@ function MultiInteractionInner({
     },
     [setFieldError, setFieldValue]
   );
-  const [lookup, setLookup] = useState<Record<string, number>>({});
+  const [lookup, setLookup] = useState<
+    Record<
+      string,
+      {
+        displayed: string;
+        exact: BigNumber;
+      }
+    >
+  >({});
   const { calculateAmountsIn } = useMultiTokenMintCallbacks(spender);
   const { tokenId, symbol, approveAmount, rawApproveAmount } = useMemo(() => {
     if (values.fromToken && values.fromAmount) {
@@ -461,9 +489,9 @@ function MultiInteractionInner({
   const tokenBalances = useTokenBalances(assets.map(({ id }) => id));
   const allApproved = assets.every((asset, index) => {
     const amount = lookup[asset.id] ?? 0;
-    const balance = parseFloat(convert.toBalance(tokenBalances[index]));
+    const balance = convert.toBigNumber(tokenBalances[index]);
 
-    return balance > amount;
+    return balance.isGreaterThan(amount.exact);
   });
   const { sm } = useBreakpoints();
 
@@ -489,7 +517,7 @@ function MultiInteractionInner({
         <Space direction="vertical" style={{ width: "100%" }}>
           <TokenSelector
             isInput={isInput}
-            error={errors.fromAmount}
+            error={errors.fromAmount?.displayed}
             assets={[]}
             label={tx("FROM")}
             selectable={false}
@@ -549,7 +577,10 @@ function MultiInteractionInner({
 function AssetEntry(
   props: Asset & {
     spender: string;
-    amount: number;
+    amount: {
+      displayed: string;
+      exact: BigNumber;
+    };
     error: string;
     kind: "mint" | "burn";
   }
@@ -565,7 +596,7 @@ function AssetEntry(
   const balance = useTokenBalance(props.id);
   const insufficientBalanceError =
     props.kind === "mint" &&
-    parseFloat(convert.toBalance(balance)) < props.amount
+    convert.toBigNumber(balance).isLessThan(props.amount.exact)
       ? "Insufficient balance"
       : "";
 

@@ -13,6 +13,7 @@ import { format } from "date-fns";
 import { useMemo } from "react";
 import { usePortfolioData, useStakingTransactionCallbacks } from "hooks";
 import { useSelector } from "react-redux";
+import BigNumber from "bignumber.js";
 
 function StakingForm({
   token,
@@ -24,35 +25,41 @@ function StakingForm({
   expired: boolean;
 }) {
   const { setFieldValue, values, errors } = useFormikContext<{
-    amount: number;
+    amount: {
+      displayed: string;
+      exact: BigNumber;
+    };
     inputType: "stake" | "unstake";
   }>();
   const { stake, withdraw, exit, claim } = useStakingTransactionCallbacks(
     stakingToken.id
   );
   const [staked, earned] = useMemo(() => {
-    let staked = stakingToken.userData?.userStakedBalance;
-    let earned = stakingToken.userData?.userRewardsEarned;
-    staked = staked ? convert.toBalance(staked, 18) : "0";
-    earned = earned ? convert.toBalance(earned, 18) : "0";
+    const staked = stakingToken.userData?.userStakedBalance;
+    const earned = stakingToken.userData?.userRewardsEarned;
+
     return [staked, earned];
   }, [stakingToken]);
-  const [estimatedReward, weight] = useMemo(() => {
-    const stakedAmount = parseFloat(staked || "0");
+  const [estimatedReward, weight] = useMemo<[string, BigNumber]>(() => {
+    const stakedAmount = convert.toBigNumber(staked ?? "0");
     const addAmount =
-      values.inputType === "stake" ? values.amount : -values.amount;
-    const userNewStaked = stakedAmount + addAmount;
-    if (userNewStaked < 0 || expired) {
-      return [0, 0];
+      values.inputType === "stake"
+        ? values.amount.exact
+        : values.amount.exact.negated();
+    const userNewStaked = stakedAmount.plus(addAmount);
+    if (userNewStaked.isLessThan(0) || expired) {
+      return ["0.00", convert.toBigNumber("0.00")];
     }
-    const totalStaked = convert.toBalanceNumber(stakingToken.totalSupply, 18);
-    const newTotalStaked = totalStaked + addAmount;
+    const totalStaked = convert.toBigNumber(stakingToken.totalSupply);
+    const newTotalStaked = totalStaked.plus(addAmount);
     const dailyRewardsTotal = convert.toBalanceNumber(
       convert.toBigNumber(stakingToken.rewardRate).times(86400),
       18
     );
-    const weight = userNewStaked / newTotalStaked;
-    return [convert.toComma(weight * dailyRewardsTotal), weight];
+    const weight = userNewStaked.dividedBy(newTotalStaked);
+    const result = weight.multipliedBy(dailyRewardsTotal);
+
+    return [convert.toComma(result.toNumber()), weight];
   }, [
     values.amount,
     stakingToken.totalSupply,
@@ -78,7 +85,7 @@ function StakingForm({
             message="This staking pool has expired. New deposits can not be made,
             and all staked tokens should be withdrawn."
           />
-          {parseFloat(staked) > 0 && (
+          {convert.toBigNumber(staked ?? "0.00").isGreaterThan(0) && (
             <>
               <Row
                 style={{ textAlign: "center", width: "100%" }}
@@ -141,7 +148,7 @@ function StakingForm({
             setFieldValue("amount", value.amount);
           }}
           balance={values.inputType === "unstake" ? staked : token.balance}
-          error={errors.amount}
+          error={errors.amount?.displayed}
         />
 
         <Alert
@@ -157,7 +164,7 @@ function StakingForm({
               <Col span={12}>
                 <Statistic
                   title="Pool Weight"
-                  value={convert.toPercent(weight)}
+                  value={convert.toPercent(weight.toNumber())}
                 />
               </Col>
             </Row>

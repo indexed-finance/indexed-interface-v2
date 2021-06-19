@@ -9,6 +9,7 @@ import {
   Space,
   Typography,
 } from "antd";
+import { BigNumber, convert } from "helpers";
 import {
   ReactNode,
   useCallback,
@@ -20,14 +21,16 @@ import {
 import { SelectableToken } from "components/atomic/molecules";
 import { Token } from "components/atomic/atoms";
 import { TokenInputDecorator } from "../atoms/TokenInputDecorator";
-import { convert } from "helpers";
 import { selectors } from "features";
 import { useBreakpoints, useTokenBalance, useTranslator } from "hooks";
 import { useFormikContext } from "formik";
 import { useSelector } from "react-redux";
 
 export type TokenSelectorValue = {
-  amount?: number;
+  amount?: {
+    displayed: string;
+    exact: BigNumber;
+  };
   token?: string;
   error?: string;
 };
@@ -70,11 +73,13 @@ export function TokenSelector({
   autoFocus = false,
   onChange,
   isInput,
-  loading,
 }: Props) {
   const tx = useTranslator();
   const { setTouched } = useFormikContext<any>();
-  const [amount, setAmount] = useState(value?.amount ?? 0);
+  const [amount, setAmount] = useState({
+    displayed: "0.00",
+    exact: convert.toBigNumber("0"),
+  });
   const [token, setToken] = useState(value?.token ?? "");
   const tokenField = `${label} Token`;
   const amountField = `${label} Amount`;
@@ -115,26 +120,40 @@ export function TokenSelector({
 
   const onAmountChange = useCallback(
     (newAmount?: number | string | null) => {
-      if (newAmount == null || Number.isNaN(amount) || amount < 0) {
-        triggerChange({ amount: 0 });
-        setAmount(0);
+      if (
+        newAmount == null ||
+        Number.isNaN(amount) ||
+        amount.exact.isLessThan(0)
+      ) {
+        triggerChange({
+          amount: {
+            displayed: "0.00",
+            exact: convert.toBigNumber("0"),
+          },
+        });
+        setAmount({
+          displayed: "0.00",
+          exact: convert.toBigNumber("0"),
+        });
         setTouched({ [amountField]: true });
         return;
       }
-
-      const amountToUse =
-        typeof newAmount === "string" ? parseFloat(newAmount) : newAmount;
+      const amountToUse = {
+        displayed: newAmount.toString(),
+        exact: convert.toBigNumber(newAmount.toString()),
+      };
 
       if (!value.hasOwnProperty("amount")) {
         setAmount(amountToUse);
       }
 
       let error: string | undefined = undefined;
-      if (isInput && amountToUse > 0) {
-        if (amountToUse > parseFloat(balance)) {
+      if (isInput && amountToUse.exact.isGreaterThan(0)) {
+        if (amountToUse.exact.isGreaterThan(parseFloat(balance))) {
           error = "Insufficient balance";
         }
       }
+
       triggerChange({ amount: amountToUse, error });
     },
     [amount, triggerChange, value, balance, isInput, amountField, setTouched]
@@ -226,7 +245,7 @@ export function TokenSelector({
               min={0}
               max={max}
               step="0.01"
-              value={value.amount ?? amount}
+              value={value.amount?.exact.toNumber() ?? amount.exact.toNumber()}
               disabled={onChange === undefined}
               onFocus={() => setTouched({ [amountField]: true })}
               onChange={onAmountChange}
