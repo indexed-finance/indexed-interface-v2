@@ -59,6 +59,11 @@ interface Props {
   loading?: boolean;
 }
 
+const DEFAULT_ENTRY = {
+  displayed: "0.00",
+  exact: convert.toBigNumber("0.00"),
+};
+
 export function TokenSelector({
   showBalance = true,
   balanceLabel,
@@ -76,10 +81,7 @@ export function TokenSelector({
 }: Props) {
   const tx = useTranslator();
   const { setTouched } = useFormikContext<any>();
-  const [amount, setAmount] = useState({
-    displayed: "0.00",
-    exact: convert.toBigNumber("0"),
-  });
+  const [amount, setAmount] = useState(DEFAULT_ENTRY);
   const [token, setToken] = useState(value?.token ?? "");
   const tokenField = `${label} Token`;
   const amountField = `${label} Amount`;
@@ -122,25 +124,20 @@ export function TokenSelector({
     (newAmount?: number | string | null) => {
       if (
         newAmount == null ||
-        Number.isNaN(amount) ||
+        Number.isNaN(parseFloat(amount.displayed)) ||
         amount.exact.isLessThan(0)
       ) {
         triggerChange({
-          amount: {
-            displayed: "0.00",
-            exact: convert.toBigNumber("0"),
-          },
+          amount: DEFAULT_ENTRY,
         });
-        setAmount({
-          displayed: "0.00",
-          exact: convert.toBigNumber("0"),
-        });
+        setAmount(DEFAULT_ENTRY);
         setTouched({ [amountField]: true });
         return;
       }
+      const asBigNumber = convert.toToken(newAmount.toString());
       const amountToUse = {
-        displayed: newAmount.toString(),
-        exact: convert.toBigNumber(newAmount.toString()),
+        displayed: convert.toBalance(asBigNumber),
+        exact: asBigNumber,
       };
 
       if (!value.hasOwnProperty("amount")) {
@@ -174,14 +171,8 @@ export function TokenSelector({
     }
   }, []);
   const handleMaxOut = useCallback(() => {
-    // @todo - JavaScript is not accurate for fractions with more than 52 bits.
-    // Replace all number values with bignumbers or strings.
-    let amount = parseFloat(balance);
-    if (amount.toString() !== balance) {
-      amount -= 0.000000000000001;
-    }
-    onAmountChange(amount);
-  }, [onAmountChange, balance]);
+    onAmountChange(rawBalance);
+  }, [onAmountChange, rawBalance]);
   const handleOpenTokenSelection = useCallback(() => {
     if (selectable) {
       setSelectingToken(true);
@@ -245,7 +236,11 @@ export function TokenSelector({
               min={0}
               max={max}
               step="0.01"
-              value={value.amount?.exact.toNumber() ?? amount.exact.toNumber()}
+              value={
+                value.amount?.displayed
+                  ? parseFloat(value.amount?.displayed)
+                  : parseFloat(amount.displayed)
+              }
               disabled={onChange === undefined}
               onFocus={() => setTouched({ [amountField]: true })}
               onChange={onAmountChange}

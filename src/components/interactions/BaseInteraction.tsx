@@ -24,6 +24,11 @@ import {
 import { useSelector } from "react-redux";
 import noop from "lodash.noop";
 
+const DEFAULT_ENTRY = {
+  displayed: "0.00",
+  exact: convert.toBigNumber("0.00"),
+};
+
 // #region Common
 type Asset = { name: string; symbol: string; id: string };
 
@@ -144,9 +149,9 @@ function SingleInteractionInner({
         return {
           tokenId: tokenIn.id,
           symbol: values.fromToken.toLowerCase(),
-          approveAmount: values.fromAmount.toString(),
+          approveAmount: values.fromAmount.displayed,
           rawApproveAmount: convert
-            .toToken(values.fromAmount.toString(), tokenIn.decimals)
+            .toToken(values.fromAmount.displayed, tokenIn.decimals)
             .toString(10),
         };
       }
@@ -192,9 +197,9 @@ function SingleInteractionInner({
           (newValues.lastTouchedField === "from" && !error.includes("Output"));
 
         if (inputErr) {
-          setFieldError("fromAmount", error);
+          setFieldError("fromAmount.displayed", error);
         } else {
-          setFieldError("toAmount", error);
+          setFieldError("toAmount.displayed", error);
         }
       }
       setValues(newValues);
@@ -230,18 +235,20 @@ function SingleInteractionInner({
     const newValues = {
       ...values,
       [tokenField]: token || "",
-      [amountField]: amount || 0,
+      [amountField]: amount || DEFAULT_ENTRY,
       lastTouchedField: field,
     } as SingleInteractionValues;
     const calcError = onChange(newValues);
+
     setValues(newValues, false);
+
     if (fieldError) {
       setFieldError(amountField, fieldError);
     } else if (calcError) {
       if (calcError.includes("Input")) {
-        setFieldError("fromAmount", calcError);
+        setFieldError("fromAmount.displayed", calcError);
       } else if (calcError.includes("Output")) {
-        setFieldError("toAmount", calcError);
+        setFieldError("toAmount.displayed", calcError);
       }
     }
   };
@@ -334,10 +341,7 @@ function InteractionErrors() {
 // #region Multi
 const multiInitialValues = {
   fromToken: "",
-  fromAmount: {
-    displayed: "0.00",
-    exact: convert.toBigNumber("0"),
-  },
+  fromAmount: DEFAULT_ENTRY,
 };
 
 export type MultiInteractionValues = typeof multiInitialValues;
@@ -443,7 +447,7 @@ function MultiInteractionInner({
         setFieldValue("fromAmount", changedValue.amount, false);
       }
       if (changedValue.error) {
-        setFieldError("fromAmount", changedValue.error);
+        setFieldError("fromAmount.displayed", changedValue.error);
       }
     },
     [setFieldError, setFieldValue]
@@ -461,13 +465,14 @@ function MultiInteractionInner({
   const { tokenId, symbol, approveAmount, rawApproveAmount } = useMemo(() => {
     if (values.fromToken && values.fromAmount) {
       const tokenIn = tokenLookup[values.fromToken.toLowerCase()];
+
       if (tokenIn) {
         return {
           tokenId: tokenIn.id,
           symbol: values.fromToken.toLowerCase(),
-          approveAmount: values.fromAmount.toString(),
+          approveAmount: values.fromAmount.displayed,
           rawApproveAmount: convert
-            .toToken(values.fromAmount.toString(), tokenIn.decimals)
+            .toToken(values.fromAmount.displayed, tokenIn.decimals)
             .toString(10),
         };
       }
@@ -498,7 +503,7 @@ function MultiInteractionInner({
   // Effect:
   // When the form changes, re-calculate what goes into each field.
   useEffect(() => {
-    const result = calculateAmountsIn(values.fromAmount.toString());
+    const result = calculateAmountsIn(values.fromAmount.displayed);
 
     if (result) {
       const { tokens, amountsIn } = result;
@@ -588,8 +593,8 @@ function AssetEntry(
   const { status, approve } = useTokenApproval({
     spender: props.spender,
     tokenId: props.id,
-    amount: props.amount.toString(),
-    rawAmount: convert.toToken(props.amount.toString()).toString(),
+    amount: props.amount.displayed,
+    rawAmount: props.amount?.exact?.toString() ?? "",
     symbol: props.symbol,
   });
   const needsApproval = props.kind === "mint" && status !== "approved";

@@ -29,6 +29,11 @@ interface Props {
   multi?: boolean;
 }
 
+const DEFAULT_ENTRY = {
+  displayed: "0.00",
+  exact: convert.toBigNumber("0.00"),
+};
+
 export function MintInteraction({ indexPool, uniswap, multi }: Props) {
   if (uniswap) {
     return <UniswapMintInteraction indexPool={indexPool} />;
@@ -59,64 +64,56 @@ function SingleTokenMintInteraction({ indexPool }: Props) {
       if (!toToken || !fromToken) {
         return;
       }
+
       if (lastTouchedField === "from") {
+        // Reset both values.
         if (!fromAmount || fromAmount.exact.isLessThan(0)) {
-          values.fromAmount = {
-            displayed: "0.00",
-            exact: convert.toBigNumber("0.00"),
-          };
-          values.toAmount = {
-            displayed: "0.00",
-            exact: convert.toBigNumber("0.00"),
-          };
+          values.fromAmount = DEFAULT_ENTRY;
+          values.toAmount = DEFAULT_ENTRY;
+
           return;
         }
-        const output = calculateAmountOut(fromToken, fromAmount.toString());
+
+        const output = calculateAmountOut(fromToken, fromAmount.displayed);
+
         if (output) {
           if (output.error) {
             return output.error;
           } else {
             const { decimals } = tokenLookup[toToken.toLowerCase()];
-            const innerResult = convert.toBalance(
-              downwardSlippage(
-                output.poolAmountOut as BigNumber,
-                SLIPPAGE_RATE
-              ),
-              decimals
+            const asBigNumber = downwardSlippage(
+              output.poolAmountOut as BigNumber,
+              SLIPPAGE_RATE
             );
+
             values.toAmount = {
-              displayed: innerResult,
-              exact: convert.toBigNumber(innerResult),
+              displayed: convert.toBalance(asBigNumber, decimals),
+              exact: asBigNumber,
             };
           }
         }
       } else {
         if (!toAmount || toAmount.exact.isLessThan(0)) {
-          values.fromAmount = {
-            displayed: "0.00",
-            exact: convert.toBigNumber("0.00"),
-          };
-          values.toAmount = {
-            displayed: "0.00",
-            exact: convert.toBigNumber("0.00"),
-          };
+          values.fromAmount = DEFAULT_ENTRY;
+          values.toAmount = DEFAULT_ENTRY;
           return;
         }
 
-        const input = calculateAmountIn(fromToken, toAmount.toString());
+        const input = calculateAmountIn(fromToken, toAmount.displayed);
+
         if (input) {
           if (input.error) {
             return input.error;
           } else {
             const { decimals } = tokenLookup[fromToken.toLowerCase()];
-            const innerResult = convert.toBalance(
-              upwardSlippage(input.tokenAmountIn as BigNumber, SLIPPAGE_RATE),
-              decimals
+            const asBigNumber = upwardSlippage(
+              input.tokenAmountIn as BigNumber,
+              SLIPPAGE_RATE
             );
 
             values.fromAmount = {
-              displayed: innerResult,
-              exact: convert.toBigNumber(innerResult),
+              displayed: convert.toBalance(asBigNumber, decimals),
+              exact: asBigNumber,
             };
           }
         }
@@ -143,8 +140,8 @@ function SingleTokenMintInteraction({ indexPool }: Props) {
           fromToken,
           lastTouchedField,
           lastTouchedField === "from"
-            ? fromAmount.toString()
-            : toAmount.toString()
+            ? fromAmount.displayed
+            : toAmount.displayed
         );
       }
     },
@@ -195,86 +192,66 @@ function UniswapMintInteraction({ indexPool }: Props) {
       }
       if (lastTouchedField === "from") {
         if (!fromAmount || fromAmount.exact.isLessThan(0)) {
-          values.fromAmount = {
-            displayed: "0.00",
-            exact: convert.toBigNumber("0.00"),
-          };
-          values.toAmount = {
-            displayed: "0.00",
-            exact: convert.toBigNumber("0.00"),
-          };
+          values.fromAmount = DEFAULT_ENTRY;
+          values.toAmount = DEFAULT_ENTRY;
+
           return;
         }
+
         const result = getBestMintRouteForAmountIn(
           fromToken,
-          fromAmount.toString()
+          fromAmount.displayed
         );
+
         if (result) {
           if (result.poolResult?.error) {
             return result.poolResult.error;
           } else {
             const { decimals } = tokenLookup[toToken.toLowerCase()];
-            const innerResult = convert.toBalance(
-              downwardSlippage(
-                result.poolResult.poolAmountOut as BigNumber,
-                SLIPPAGE_RATE
-              ),
-              decimals
+            const asBigNumber = downwardSlippage(
+              result.poolResult.poolAmountOut as BigNumber,
+              SLIPPAGE_RATE
             );
 
             values.toAmount = {
-              displayed: innerResult,
-              exact: convert.toBigNumber(innerResult),
+              displayed: convert.toBalance(asBigNumber, decimals),
+              exact: asBigNumber,
             };
           }
         } else {
-          values.toAmount = {
-            displayed: "0.00",
-            exact: convert.toBigNumber("0.00"),
-          };
+          values.toAmount = DEFAULT_ENTRY;
         }
       } else {
         if (!toAmount || toAmount.exact.isLessThan(0)) {
-          values.fromAmount = {
-            displayed: "0.00",
-            exact: convert.toBigNumber("0.00"),
-          };
-          values.toAmount = {
-            displayed: "0.00",
-            exact: convert.toBigNumber("0.00"),
-          };
+          values.fromAmount = DEFAULT_ENTRY;
+          values.toAmount = DEFAULT_ENTRY;
+
           return;
         }
 
         const result = getBestMintRouteForAmountOut(
           fromToken,
-          toAmount.toString()
+          toAmount.displayed
         );
         if (result) {
           if (result.poolResult?.error) {
             return result.poolResult.error;
           } else {
             const { decimals } = tokenLookup[fromToken.toLowerCase()];
-            const innerResult = convert.toBalance(
-              upwardSlippage(
-                convert.toBigNumber(
-                  result.uniswapResult.inputAmount.raw.toString(10)
-                ),
-                SLIPPAGE_RATE
+            const asBigNumber = upwardSlippage(
+              convert.toBigNumber(
+                result.uniswapResult.inputAmount.raw.toString(10)
               ),
-              decimals
+              SLIPPAGE_RATE
             );
 
             values.fromAmount = {
-              displayed: innerResult,
-              exact: convert.toBigNumber(innerResult),
+              displayed: convert.toBalance(asBigNumber, decimals),
+              exact: asBigNumber,
             };
           }
         } else {
-          values.fromAmount = {
-            displayed: "0.00",
-            exact: convert.toBigNumber("0.00"),
-          };
+          values.fromAmount = DEFAULT_ENTRY;
         }
       }
     },
@@ -300,8 +277,8 @@ function UniswapMintInteraction({ indexPool }: Props) {
           fromToken,
           lastTouchedField,
           lastTouchedField === "from"
-            ? fromAmount.toString()
-            : toAmount.toString()
+            ? fromAmount.displayed
+            : toAmount.displayed
         );
       }
     },
@@ -336,7 +313,7 @@ function MultiTokenMintInteraction({ indexPool }: Props) {
 
   const handleSubmit = useCallback(
     (values: MultiInteractionValues) =>
-      executeMint(values.fromAmount.toString()),
+      executeMint(values.fromAmount.displayed),
     [executeMint]
   );
 

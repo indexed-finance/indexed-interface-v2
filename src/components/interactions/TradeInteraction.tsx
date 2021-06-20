@@ -15,6 +15,11 @@ interface Props {
   indexPool: FormattedIndexPool;
 }
 
+const DEFAULT_ENTRY = {
+  displayed: "0.00",
+  exact: convert.toBigNumber("0.00"),
+};
+
 export function TradeInteraction({ indexPool }: Props) {
   const handleTrade = useUniswapTransactionCallback();
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
@@ -52,18 +57,13 @@ export function TradeInteraction({ indexPool }: Props) {
       if (inputToken && outputToken) {
         if (lastTouchedField === "from") {
           if (!fromAmount) {
-            values.fromAmount = {
-              displayed: "0.00",
-              exact: convert.toBigNumber("0.00"),
-            };
-            values.toAmount = {
-              displayed: "0.00",
-              exact: convert.toBigNumber("0.00"),
-            };
+            values.fromAmount = DEFAULT_ENTRY;
+            values.toAmount = DEFAULT_ENTRY;
+
             return;
           }
           const amountIn = convert
-            .toToken(fromAmount.toString(), inputToken.decimals)
+            .toToken(fromAmount.displayed, inputToken.decimals)
             .toString(10);
           const bestTrade = calculateBestTradeForExactInput(
             inputToken,
@@ -78,18 +78,13 @@ export function TradeInteraction({ indexPool }: Props) {
           };
         } else {
           if (!toAmount) {
-            values.fromAmount = {
-              displayed: "0.00",
-              exact: convert.toBigNumber("0.00"),
-            };
-            values.toAmount = {
-              displayed: "0.00",
-              exact: convert.toBigNumber("0.00"),
-            };
+            values.fromAmount = DEFAULT_ENTRY;
+            values.toAmount = DEFAULT_ENTRY;
+
             return;
           }
           const amountOut = convert
-            .toToken(toAmount.toString(), outputToken.decimals)
+            .toToken(toAmount.displayed, outputToken.decimals)
             .toString(10);
           const bestTrade = calculateBestTradeForExactOutput(
             inputToken,
@@ -130,7 +125,7 @@ export function TradeInteraction({ indexPool }: Props) {
         let trade: Trade | undefined;
         if (lastTouchedField === "from") {
           const amountIn = convert
-            .toToken(fromAmount.toString(), inputToken.decimals)
+            .toToken(fromAmount.displayed, inputToken.decimals)
             .toString(10);
 
           trade = calculateBestTradeForExactInput(
@@ -140,7 +135,7 @@ export function TradeInteraction({ indexPool }: Props) {
           );
         } else {
           const amountOut = convert
-            .toToken(toAmount.toString(), outputToken.decimals)
+            .toToken(toAmount.displayed, outputToken.decimals)
             .toString(10);
 
           trade = calculateBestTradeForExactOutput(
