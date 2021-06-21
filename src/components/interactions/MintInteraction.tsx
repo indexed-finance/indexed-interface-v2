@@ -165,19 +165,13 @@ function SingleTokenMintInteraction({ indexPool }: Props) {
 
 function UniswapMintInteraction({ indexPool }: Props) {
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
-
-  useBalanceAndApprovalRegistrar(NARWHAL_ROUTER_ADDRESS.toLowerCase(), [
-    ...DISPLAYED_COMMON_BASE_TOKENS.map(({ id }) => id),
-  ]);
+  const assets = [...DISPLAYED_COMMON_BASE_TOKENS];
   const {
     getBestMintRouteForAmountIn,
     getBestMintRouteForAmountOut,
     executeRoutedMint,
     loading,
   } = useMintRouterCallbacks(indexPool.id);
-
-  const assets = [...DISPLAYED_COMMON_BASE_TOKENS];
-
   const handleChange = useCallback(
     (values: SingleInteractionValues) => {
       const {
@@ -190,7 +184,10 @@ function UniswapMintInteraction({ indexPool }: Props) {
       if (!toToken || !fromToken) {
         return;
       }
+
       if (lastTouchedField === "from") {
+        // AMOUNT IN.
+
         if (!fromAmount || fromAmount.exact.isLessThan(0)) {
           values.fromAmount = DEFAULT_ENTRY;
           values.toAmount = DEFAULT_ENTRY;
@@ -222,6 +219,7 @@ function UniswapMintInteraction({ indexPool }: Props) {
           values.toAmount = DEFAULT_ENTRY;
         }
       } else {
+        // AMOUNT OUT.
         if (!toAmount || toAmount.exact.isLessThan(0)) {
           values.fromAmount = DEFAULT_ENTRY;
           values.toAmount = DEFAULT_ENTRY;
@@ -233,6 +231,7 @@ function UniswapMintInteraction({ indexPool }: Props) {
           fromToken,
           toAmount.displayed
         );
+
         if (result) {
           if (result.poolResult?.error) {
             return result.poolResult.error;
@@ -257,7 +256,6 @@ function UniswapMintInteraction({ indexPool }: Props) {
     },
     [getBestMintRouteForAmountIn, getBestMintRouteForAmountOut, tokenLookup]
   );
-
   const handleSubmit = useCallback(
     (values: SingleInteractionValues) => {
       const {
@@ -284,6 +282,10 @@ function UniswapMintInteraction({ indexPool }: Props) {
     },
     [executeRoutedMint]
   );
+
+  useBalanceAndApprovalRegistrar(NARWHAL_ROUTER_ADDRESS.toLowerCase(), [
+    ...DISPLAYED_COMMON_BASE_TOKENS.map(({ id }) => id),
+  ]);
 
   return (
     <SingleInteraction
