@@ -493,7 +493,7 @@ function MultiInteractionInner({
   });
   const tokenBalances = useTokenBalances(assets.map(({ id }) => id));
   const allApproved = assets.every((asset, index) => {
-    const amount = lookup[asset.id] ?? 0;
+    const amount = lookup[asset.id] ?? DEFAULT_ENTRY;
     const balance = convert.toBigNumber(tokenBalances[index]);
 
     return balance.isGreaterThan(amount.exact);
@@ -507,10 +507,24 @@ function MultiInteractionInner({
 
     if (result) {
       const { tokens, amountsIn } = result;
-      const formatted = tokens.reduce((prev, next, index) => {
-        prev[next] = parseFloat(convert.toBalance(amountsIn[index]));
-        return prev;
-      }, {} as Record<string, number>);
+      const formatted = tokens.reduce(
+        (prev, next, index) => {
+          const amount = amountsIn[index];
+
+          prev[next] = {
+            displayed: convert.toBalance(amount),
+            exact: convert.toBigNumber(amount),
+          };
+          return prev;
+        },
+        {} as Record<
+          string,
+          {
+            displayed: string;
+            exact: BigNumber;
+          }
+        >
+      );
 
       setLookup(formatted);
     }
@@ -570,7 +584,7 @@ function MultiInteractionInner({
             {...asset}
             kind={kind}
             spender={spender}
-            amount={lookup[asset.id] ?? 0}
+            amount={lookup[asset.id] ?? DEFAULT_ENTRY}
             error={(errors as any)[asset.id]}
           />
         ))}
