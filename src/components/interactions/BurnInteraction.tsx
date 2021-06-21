@@ -76,7 +76,7 @@ function SingleTokenBurnInteraction({ indexPool }: Props) {
           return;
         }
 
-        const output = calculateAmountOut(toToken, fromAmount.displayed);
+        const output = calculateAmountOut(toToken, fromAmount.exact);
 
         if (output) {
           if (output.error) {
@@ -102,7 +102,7 @@ function SingleTokenBurnInteraction({ indexPool }: Props) {
           return;
         }
 
-        const input = calculateAmountIn(toToken, toAmount.displayed);
+        const input = calculateAmountIn(toToken, toAmount.exact);
 
         if (input) {
           if (input.error) {
@@ -143,9 +143,7 @@ function SingleTokenBurnInteraction({ indexPool }: Props) {
         executeBurn(
           toToken,
           lastTouchedField,
-          lastTouchedField === "from"
-            ? fromAmount.displayed
-            : toAmount.displayed
+          lastTouchedField === "from" ? fromAmount.exact : toAmount.exact
         );
       }
     },
@@ -223,10 +221,7 @@ function UniswapBurnInteraction({ indexPool }: Props) {
 
           return;
         }
-        const result = getBestBurnRouteForAmountIn(
-          toToken,
-          fromAmount.displayed
-        );
+        const result = getBestBurnRouteForAmountIn(toToken, fromAmount.exact);
         if (result) {
           if (result.poolResult?.error) {
             return result.poolResult.error;
@@ -253,10 +248,7 @@ function UniswapBurnInteraction({ indexPool }: Props) {
           return;
         }
 
-        const result = getBestBurnRouteForAmountOut(
-          toToken,
-          toAmount.displayed
-        );
+        const result = getBestBurnRouteForAmountOut(toToken, toAmount.exact);
 
         if (result) {
           if (result.poolResult?.error) {
@@ -298,9 +290,7 @@ function UniswapBurnInteraction({ indexPool }: Props) {
         executeRoutedBurn(
           toToken,
           lastTouchedField,
-          lastTouchedField === "from"
-            ? fromAmount.displayed
-            : toAmount.displayed
+          lastTouchedField === "from" ? fromAmount.exact : toAmount.exact
         );
       }
     },

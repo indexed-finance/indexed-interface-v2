@@ -5,7 +5,15 @@ import {
   toHex,
   toTokenAmount,
 } from "@indexed-finance/indexed.js";
-import { ChainId, Currency, CurrencyAmount, Pair, Token, TokenAmount, WETH } from "@indexed-finance/narwhal-sdk";
+import {
+  ChainId,
+  Currency,
+  CurrencyAmount,
+  Pair,
+  Token,
+  TokenAmount,
+  WETH,
+} from "@indexed-finance/narwhal-sdk";
 import { DEFAULT_DECIMAL_COUNT } from "config";
 import { constants } from "ethers";
 import { getAddress } from "@ethersproject/address";
@@ -54,7 +62,9 @@ const convert = {
     decimals: number = DEFAULT_DECIMAL_COUNT,
     precision = 4
   ) => {
-    return parseFloat(formatBalance(convert.toBigNumber(amount), decimals, precision));
+    return parseFloat(
+      formatBalance(convert.toBigNumber(amount), decimals, precision)
+    );
   },
   toBalance: (
     amount: string | BigNumber,
@@ -63,40 +73,48 @@ const convert = {
     precision = 4
   ) => {
     if (withCommas) {
-      return convert.toComma(convert.toBalanceNumber(amount, decimals, precision))
+      return convert.toComma(
+        convert.toBalanceNumber(amount, decimals, precision)
+      );
     } else {
-      return formatBalance(convert.toBigNumber(amount), decimals, precision)
+      return formatBalance(convert.toBigNumber(amount), decimals, precision);
     }
   },
-  toUniswapSDKCurrency: (provider: ProviderLike, token: NormalizedToken): Currency =>
+  toUniswapSDKCurrency: (
+    provider: ProviderLike,
+    token: NormalizedToken
+  ): Currency =>
     token.id === constants.AddressZero
-    ? Currency.ETHER
-    : new Token(
-      provider.network.chainId,
-      convert.toChecksumAddress(token.id),
-      token.decimals,
-      token.symbol,
-      token.name
-    ),
+      ? Currency.ETHER
+      : new Token(
+          provider.network.chainId,
+          convert.toChecksumAddress(token.id),
+          token.decimals,
+          token.symbol,
+          token.name
+        ),
   toUniswapSDKCurrencyAmount: (
     provider: ProviderLike,
     token: NormalizedToken,
-    amount: string
+    amount: BigNumber
   ): CurrencyAmount =>
     token.id === constants.AddressZero
-      ? CurrencyAmount.ether(amount)
-      : new TokenAmount(convert.toUniswapSDKToken(provider, token), amount),
+      ? CurrencyAmount.ether(amount.toString())
+      : new TokenAmount(
+          convert.toUniswapSDKToken(provider, token),
+          amount.toString()
+        ),
   // Uniswap SDK
   toUniswapSDKToken: (provider: ProviderLike, token: NormalizedToken) =>
     token.id === constants.AddressZero
-    ? WETH[provider.network.chainId]
-    : new Token(
-      provider.network.chainId,
-      convert.toChecksumAddress(token.id),
-      token.decimals,
-      token.symbol,
-      token.name
-    ),
+      ? WETH[provider.network.chainId]
+      : new Token(
+          provider.network.chainId,
+          convert.toChecksumAddress(token.id),
+          token.decimals,
+          token.symbol,
+          token.name
+        ),
 
   toUniswapSDKTokenAmount: (
     provider: ProviderLike,

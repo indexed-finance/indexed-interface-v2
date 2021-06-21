@@ -74,7 +74,7 @@ function SingleTokenMintInteraction({ indexPool }: Props) {
           return;
         }
 
-        const output = calculateAmountOut(fromToken, fromAmount.displayed);
+        const output = calculateAmountOut(fromToken, fromAmount.exact);
 
         if (output) {
           if (output.error) {
@@ -99,7 +99,7 @@ function SingleTokenMintInteraction({ indexPool }: Props) {
           return;
         }
 
-        const input = calculateAmountIn(fromToken, toAmount.displayed);
+        const input = calculateAmountIn(fromToken, toAmount.exact);
 
         if (input) {
           if (input.error) {
@@ -139,9 +139,7 @@ function SingleTokenMintInteraction({ indexPool }: Props) {
         executeMint(
           fromToken,
           lastTouchedField,
-          lastTouchedField === "from"
-            ? fromAmount.displayed
-            : toAmount.displayed
+          lastTouchedField === "from" ? fromAmount.exact : toAmount.exact
         );
       }
     },
@@ -195,10 +193,7 @@ function UniswapMintInteraction({ indexPool }: Props) {
           return;
         }
 
-        const result = getBestMintRouteForAmountIn(
-          fromToken,
-          fromAmount.displayed
-        );
+        const result = getBestMintRouteForAmountIn(fromToken, fromAmount.exact);
 
         if (result) {
           if (result.poolResult?.error) {
@@ -227,10 +222,9 @@ function UniswapMintInteraction({ indexPool }: Props) {
           return;
         }
 
-        const result = getBestMintRouteForAmountOut(
-          fromToken,
-          toAmount.displayed
-        );
+        const result = getBestMintRouteForAmountOut(fromToken, toAmount.exact);
+
+        console.log({ result }, "out");
 
         if (result) {
           if (result.poolResult?.error) {
@@ -274,9 +268,7 @@ function UniswapMintInteraction({ indexPool }: Props) {
         executeRoutedMint(
           fromToken,
           lastTouchedField,
-          lastTouchedField === "from"
-            ? fromAmount.displayed
-            : toAmount.displayed
+          lastTouchedField === "from" ? fromAmount.exact : toAmount.exact
         );
       }
     },

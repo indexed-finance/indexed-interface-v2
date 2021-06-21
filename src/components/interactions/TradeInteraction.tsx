@@ -1,7 +1,6 @@
 import { AppState, FormattedIndexPool, selectors } from "features";
 import { DISPLAYED_COMMON_BASE_TOKENS, NARWHAL_ROUTER_ADDRESS } from "config";
 import { SingleInteraction, SingleInteractionValues } from "./BaseInteraction";
-import { Trade } from "@indexed-finance/narwhal-sdk";
 import { convert } from "helpers";
 import {
   useBalanceAndApprovalRegistrar,
@@ -62,13 +61,10 @@ export function TradeInteraction({ indexPool }: Props) {
 
             return;
           }
-          const amountIn = convert
-            .toToken(fromAmount.displayed, inputToken.decimals)
-            .toString(10);
           const bestTrade = calculateBestTradeForExactInput(
             inputToken,
             outputToken,
-            amountIn
+            fromAmount.exact
           );
           const innerResult = bestTrade?.outputAmount.toFixed(4) ?? "0.00";
 
@@ -83,13 +79,10 @@ export function TradeInteraction({ indexPool }: Props) {
 
             return;
           }
-          const amountOut = convert
-            .toToken(toAmount.displayed, outputToken.decimals)
-            .toString(10);
           const bestTrade = calculateBestTradeForExactOutput(
             inputToken,
             outputToken,
-            amountOut
+            toAmount.exact
           );
           const innerResult = bestTrade?.inputAmount.toFixed(4) ?? "0.00";
 
@@ -122,28 +115,12 @@ export function TradeInteraction({ indexPool }: Props) {
       ) {
         const inputToken = tokenLookup[fromToken.toLowerCase()];
         const outputToken = tokenLookup[toToken.toLowerCase()];
-        let trade: Trade | undefined;
-        if (lastTouchedField === "from") {
-          const amountIn = convert
-            .toToken(fromAmount.displayed, inputToken.decimals)
-            .toString(10);
+        const tradeFn =
+          lastTouchedField === "from"
+            ? calculateBestTradeForExactInput
+            : calculateBestTradeForExactOutput;
+        const trade = tradeFn(inputToken, outputToken, fromAmount.exact);
 
-          trade = calculateBestTradeForExactInput(
-            inputToken,
-            outputToken,
-            amountIn
-          );
-        } else {
-          const amountOut = convert
-            .toToken(toAmount.displayed, outputToken.decimals)
-            .toString(10);
-
-          trade = calculateBestTradeForExactOutput(
-            inputToken,
-            outputToken,
-            amountOut
-          );
-        }
         if (trade) {
           handleTrade(trade);
         }

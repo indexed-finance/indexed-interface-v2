@@ -1,14 +1,13 @@
 import { AppState, selectors, useSigner } from "features";
+import { COMMON_BASE_TOKENS, SLIPPAGE_RATE } from "config";
+import { Currency, Trade } from "@indexed-finance/narwhal-sdk";
 import {
-  BigNumber,
   _calcAllInGivenPoolOut,
   calcPoolOutGivenSingleIn,
   calcSingleInGivenPoolOut,
   downwardSlippage,
   upwardSlippage,
 } from "ethereum";
-import { COMMON_BASE_TOKENS, SLIPPAGE_RATE } from "config";
-import { Currency, Trade } from "@indexed-finance/narwhal-sdk";
 import { convert } from "helpers";
 import { useCallback, useMemo } from "react";
 import {
@@ -20,6 +19,7 @@ import { usePoolTokenAddresses, usePoolUnderlyingTokens } from "./pool-hooks";
 import { useSelector } from "react-redux";
 import { useTokenLookupBySymbol } from "./token-hooks";
 import { useUniswapTradingPairs } from "./pair-hooks";
+import BigNumber from "bignumber.js";
 
 // #region Token
 export function useSingleTokenMintCallbacks(poolId: string) {
@@ -31,14 +31,13 @@ export function useSingleTokenMintCallbacks(poolId: string) {
     useMintSingleTransactionCallbacks(poolId);
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
   const calculateAmountIn = useCallback(
-    (tokenInSymbol: string, typedAmountOut: string) => {
+    (tokenInSymbol: string, amountOut: BigNumber) => {
       if (pool) {
         const inputToken =
           pool.tokens.entities[
             tokenLookup[tokenInSymbol.toLowerCase()].id.toLowerCase()
           ];
         if (inputToken) {
-          const amountOut = convert.toToken(typedAmountOut, 18);
           const tokenIn = inputToken.token.id;
           const result = calcSingleInGivenPoolOut(pool, inputToken, amountOut);
           return {
@@ -53,7 +52,7 @@ export function useSingleTokenMintCallbacks(poolId: string) {
     [pool, tokenLookup]
   );
   const calculateAmountOut = useCallback(
-    (tokenInSymbol: string, typedAmountIn: string) => {
+    (tokenInSymbol: string, amountIn: BigNumber) => {
       if (pool) {
         const inputToken =
           pool.tokens.entities[
@@ -61,7 +60,6 @@ export function useSingleTokenMintCallbacks(poolId: string) {
           ];
 
         if (inputToken) {
-          const amountIn = convert.toToken(typedAmountIn, 18);
           const tokenIn = inputToken.token.id;
           const result = calcPoolOutGivenSingleIn(pool, inputToken, amountIn);
 
@@ -80,11 +78,12 @@ export function useSingleTokenMintCallbacks(poolId: string) {
     (
       tokenInSymbol: string,
       specifiedField: "from" | "to",
-      typedAmount: string
+      amount: BigNumber
     ) => {
       if (signer) {
         if (specifiedField === "from") {
-          const result = calculateAmountOut(tokenInSymbol, typedAmount);
+          const result = calculateAmountOut(tokenInSymbol, amount);
+
           if (result && !result.error) {
             joinswapExternAmountIn(
               result.tokenIn,
@@ -95,7 +94,8 @@ export function useSingleTokenMintCallbacks(poolId: string) {
             Promise.reject();
           }
         } else {
-          const result = calculateAmountIn(tokenInSymbol, typedAmount);
+          const result = calculateAmountIn(tokenInSymbol, amount);
+
           if (result && !result.error) {
             joinswapPoolAmountOut(
               result.tokenIn,
@@ -193,8 +193,9 @@ export function useMintRouterCallbacks(poolId: string) {
     loading,
   } = useUniswapTradingPairs(tokenIds);
   const getBestMintRouteForAmountOut = useCallback(
-    (tokenInSymbol: string, typedPoolAmountOut: string) => {
+    (tokenInSymbol: string, amountOut: BigNumber) => {
       if (loading) return null;
+      console.log("here!");
       const normalizedInput = tokenLookupBySymbol[tokenInSymbol.toLowerCase()];
       const allResults = poolTokens
         .map((token) => {
@@ -203,7 +204,7 @@ export function useMintRouterCallbacks(poolId: string) {
           if (!normalizedOutput) return null;
           const poolResult = calculateAmountIn(
             normalizedOutput.symbol,
-            typedPoolAmountOut
+            amountOut
           );
           if (poolResult) {
             if (poolResult.error) {
@@ -213,7 +214,7 @@ export function useMintRouterCallbacks(poolId: string) {
               const uniswapResult = calculateBestTradeForExactOutput(
                 normalizedInput,
                 normalizedOutput,
-                poolResult.tokenAmountIn.toString(10),
+                poolResult.tokenAmountIn,
                 { maxHops: 2, maxNumResults: 1 }
               );
               if (uniswapResult) {
@@ -252,30 +253,30 @@ export function useMintRouterCallbacks(poolId: string) {
     ]
   );
   const getBestMintRouteForAmountIn = useCallback(
-    (tokenInSymbol: string, typedTokenAmountIn: string) => {
+    (tokenInSymbol: string, amountIn: BigNumber) => {
       if (loading) return null;
-      const normalizedInput = tokenLookupBySymbol[tokenInSymbol.toLowerCase()];
-      const exactAmountIn = convert
-        .toToken(typedTokenAmountIn, normalizedInput.decimals)
-        .toString(10);
 
+      const normalizedInput = tokenLookupBySymbol[tokenInSymbol.toLowerCase()];
       const allResults = poolTokens
         .map((token) => {
           const normalizedOutput =
             tokenLookupBySymbol[token.token.symbol.toLowerCase()];
+
           if (!normalizedOutput) return null;
+
           const uniswapResult = calculateBestTradeForExactInput(
             normalizedInput,
             normalizedOutput,
-            exactAmountIn,
+            amountIn,
             { maxHops: 2, maxNumResults: 1 }
           );
 
           if (uniswapResult) {
             const poolResult = calculateAmountOut(
               normalizedOutput.symbol,
-              uniswapResult.outputAmount.toExact()
+              uniswapResult.outputAmount as unknown as any
             );
+
             if (poolResult) {
               if (poolResult.error) {
                 return { poolResult };
@@ -317,10 +318,10 @@ export function useMintRouterCallbacks(poolId: string) {
     (
       tokenInSymbol: string,
       specifiedField: "from" | "to",
-      typedAmount: string
+      amount: BigNumber
     ) => {
       if (specifiedField === "from") {
-        const result = getBestMintRouteForAmountIn(tokenInSymbol, typedAmount);
+        const result = getBestMintRouteForAmountIn(tokenInSymbol, amount);
 
         if (result && !result.poolResult.error) {
           return mintExactAmountIn(
@@ -333,7 +334,7 @@ export function useMintRouterCallbacks(poolId: string) {
           );
         }
       } else {
-        const result = getBestMintRouteForAmountOut(tokenInSymbol, typedAmount);
+        const result = getBestMintRouteForAmountOut(tokenInSymbol, amount);
         if (result && !result.poolResult.error) {
           return mintExactAmountOut(
             upwardSlippage(
