@@ -1,5 +1,18 @@
 # Indexed.Finance
 
+## Decentralized Index Protocol
+
+|         |                                                                        |
+| ------- | ---------------------------------------------------------------------- |
+| Site    | https://indexed.finance/                                               |
+| Docs    | https://docs.indexed.finance/                                          |
+| Forum   | https://forum.indexed.finance/                                         |
+| Twitter | https://twitter.com/ndxfi                                              |
+| Discord | [Click here](https://discord.gg/jaeSTNPNt9)                            |
+| Medium  | https://ndxfi.medium.com/                                              |
+| Reddit  | https://reddit.com/r/indexedfinance                                    |
+| YouTube | [Click here](https://www.youtube.com/channel/UCdbua6FtaiD0emvvBerKRMw) |
+
 ## Repo Structure
 
 ### .storybook
