@@ -33,3 +33,20 @@ Contains all of the source logic for the dapp.
 ## webpack
 
 Contains the configuration logic for the socket server's webpack build, as well as the minified output of the build script.
+
+## High-Level Concepts
+
+### Tools of Choice
+
+| TOOL             | LEARN MORE                      | WHAT IT'S FOR                                                                            |
+| ---------------- | ------------------------------- | ---------------------------------------------------------------------------------------- |
+| Create-React-App | https://create-react-app.dev/   | React is a view library for creating components.                                         |
+| Redux            | https://redux.js.org/           | Redux is a library for handling state managements.                                       |
+| React-Redux      | https://react-redux.js.org/     | React-Redux connects a React app with a Redux data store.                                |
+| Redux Toolkit    | https://redux-toolkit.js.org/   | Redux Toolkit is an opinion toolset and pattern for Redux.                               |
+| Ant Design       | https://ant.design/             | Ant Design is a UI framework that contains React components.                             |
+| Storybook        | https://storybook.js.org/       | Storybook allows developers to view components in isolation.                             |
+| Cypress          | https://cypress.io/             | Cypress is an end-to-end test engine that automates quality assurance testing in Chrome. |
+| Typescript       | https://www.typescriptlang.org/ | TypeScript is a superset of ECMAScript that provides a robust build-time type solution.  |
+| Formik           | https://formik.org/             | Formik is a form solution to make forms easier in React.                                 |
+| Ethers           | https://docs.ethers.io/v5/      | Ethers is an all-in-one library for interacting with the Ethereum blockchain.            |
