@@ -1,5 +1,14 @@
+import {
+  Alert,
+  Button,
+  Col,
+  Divider,
+  Row,
+  Space,
+  Spin,
+  Typography,
+} from "antd";
 import { AppState, FormattedIndexPool, selectors } from "features";
-import { Col, Divider, Row, Space, Spin, Typography } from "antd";
 import {
   IndexPoolAssets,
   IndexPoolChart,
@@ -26,54 +35,72 @@ export function LoadedIndexPool(
   usePoolDetailRegistrar(props.id, tokenIds);
 
   return (
-    <div style={{ paddingTop: 12 }}>
-      {props.interaction && (
-        <div
-          style={{
-            borderLeft: "2px solid #38EE7A",
-            paddingLeft: 24,
-            marginBottom: 24,
+    <>
+      <Alert
+        showIcon={true}
+        icon={
+          <img
+            alt="Uniswap"
+            style={{ width: 32, height: 32 }}
+            src={require("images/uniswap-link.png").default}
+          />
+        }
+        message="Add Uniswap Liquidity"
+        description={
+          <>
+            Foo bar baz. <Button type="primary">Blah</Button>
+          </>
+        }
+      />
+      <div style={{ paddingTop: 12 }}>
+        {props.interaction && (
+          <div
+            style={{
+              borderLeft: "2px solid #38EE7A",
+              paddingLeft: 24,
+              marginBottom: 24,
+            }}
+          >
+            {props.interaction}
+          </div>
+        )}
+        <Row
+          align="stretch"
+          gutter={{
+            xs: 12,
+            sm: 24,
           }}
         >
-          {props.interaction}
-        </div>
-      )}
-      <Row
-        align="stretch"
-        gutter={{
-          xs: 12,
-          sm: 24,
-        }}
-      >
-        <Col xs={24} md={8}>
-          <Space
-            size="large"
-            direction="vertical"
-            style={{ marginBottom: isMobile ? 24 : 0, display: "flex" }}
-          >
-            <IndexPoolDescription {...props} />
-            <IndexPoolExternalLinks {...props} />
-          </Space>
-        </Col>
-        <Col xs={24} md={16}>
-          <IndexPoolChart poolId={props.id} />
-        </Col>
-      </Row>
-      <Divider />
-      <Row
-        gutter={{
-          xs: 12,
-          sm: 24,
-        }}
-      >
-        <Col xs={24} md={10}>
-          <IndexPoolAssets {...props} />
-        </Col>
-        <Col xs={24} md={14}>
-          <IndexPoolRecentTrades {...props} />
-        </Col>
-      </Row>
-    </div>
+          <Col xs={24} md={8}>
+            <Space
+              size="large"
+              direction="vertical"
+              style={{ marginBottom: isMobile ? 24 : 0, display: "flex" }}
+            >
+              <IndexPoolDescription {...props} />
+              <IndexPoolExternalLinks {...props} />
+            </Space>
+          </Col>
+          <Col xs={24} md={16}>
+            <IndexPoolChart poolId={props.id} />
+          </Col>
+        </Row>
+        <Divider />
+        <Row
+          gutter={{
+            xs: 12,
+            sm: 24,
+          }}
+        >
+          <Col xs={24} md={10}>
+            <IndexPoolAssets {...props} />
+          </Col>
+          <Col xs={24} md={14}>
+            <IndexPoolRecentTrades {...props} />
+          </Col>
+        </Row>
+      </div>
+    </>
   );
 }
 

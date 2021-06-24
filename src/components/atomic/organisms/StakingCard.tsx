@@ -167,7 +167,6 @@ export function SingleSidedStakingCard(props: Props) {
       linkPath="staking-new"
       badge=""
       badgeColor=""
-      // backdrop={require(`images/${props.symbol.toLowerCase()}.png`).default}
       useApy={useNewStakingApy}
     />
   );
