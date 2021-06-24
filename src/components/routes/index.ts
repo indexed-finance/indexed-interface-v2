@@ -9,4 +9,5 @@ export * from './Stake';
 export * from './StakeMasterChef';
 export * from './StakeNew';
 export * from './Staking';
+export * from './Vault';
 export * from './Vaults';

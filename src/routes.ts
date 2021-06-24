@@ -15,6 +15,7 @@ const StakeMasterChef = lazy(
 const IndexPools = lazy(() => import("./components/routes/IndexPools"));
 const IndexPool = lazy(() => import("./components/routes/IndexPool"));
 const Vaults = lazy(() => import("./components/routes/Vaults"));
+const Vault = lazy(() => import("./components/routes/Vault"));
 
 export const routes: RouteWithBreadcrumbs[] = [
   {
@@ -79,5 +80,10 @@ export const routes: RouteWithBreadcrumbs[] = [
     path: "/vaults",
     exact: true,
     component: Vaults,
+  },
+  {
+    path: "/vault/:slug",
+    exact: true,
+    component: Vault,
   },
 ];
