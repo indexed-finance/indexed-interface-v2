@@ -1,5 +1,14 @@
-import { BugReportLink } from "components/atomic/atoms";
-import { Button, Card, Col, PageHeader, Row, Space, Typography } from "antd";
+import { BugReportLink, ExternalLink } from "components/atomic/atoms";
+import {
+  Button,
+  Card,
+  Col,
+  Divider,
+  PageHeader,
+  Row,
+  Space,
+  Typography,
+} from "antd";
 import { LegacySiteLink, SocialMediaList } from "components/atomic/molecules";
 import { ReactNode } from "react";
 import { RiCopyrightLine } from "react-icons/ri";
@@ -35,7 +44,10 @@ export function Page({
         margin: isMobile ? "6rem auto 8rem auto" : "8rem auto 8rem auto",
         background: "#151515",
         position: "relative",
-        borderRadius: 3,
+        borderRadius: 16,
+        border: "1px solid rgba(255, 255, 255, .8)",
+        paddingTop: isMobile ? "0" : "25px",
+        boxShadow: "0px 0px 50px 0px rgba(40, 0, 40, 0.7)",
       }}
     >
       <Card
@@ -43,7 +55,6 @@ export function Page({
         headStyle={{ padding: 0, borderRadius: 3 }}
         bodyStyle={{
           padding: isMobile ? "24px 12px" : 24,
-          marginTop: -9,
           borderRadius: 3,
           minHeight: "100vh",
         }}
@@ -109,6 +120,7 @@ export function Page({
           </div>
         )}
       </Card>
+      <Divider />
       <Row
         style={{
           width: "100%",
@@ -138,10 +150,13 @@ export function Page({
             }}
             direction={isMobile ? "vertical" : "horizontal"}
           >
-            <Button.Group>
-              <LegacySiteLink />
-              <BugReportLink />
-            </Button.Group>
+            <Button type="default">
+              <ExternalLink to="https://docs.indexed.finance/">
+                How it works
+              </ExternalLink>
+            </Button>
+            <LegacySiteLink />
+            <BugReportLink />
             <div>
               <RiCopyrightLine
                 style={{

@@ -1,4 +1,13 @@
-import { Alert, Button, Col, Descriptions, Row, Space, Statistic } from "antd";
+import {
+  Alert,
+  Button,
+  Col,
+  Descriptions,
+  Divider,
+  Row,
+  Space,
+  Statistic,
+} from "antd";
 import {
   AppState,
   FormattedPortfolioAsset,
@@ -12,6 +21,7 @@ import { MULTI_TOKEN_STAKING_ADDRESS } from "config";
 import { abbreviateAddress, convert } from "helpers";
 import {
   useBalanceAndApprovalRegistrar,
+  useBreakpoints,
   useNewStakingRegistrar,
   useNewStakingTransactionCallbacks,
   usePortfolioData,
@@ -202,10 +212,10 @@ function StakingStats({
       {parseFloat(staked) > 0 && (
         <Descriptions.Item label="Staked">
           <Row>
-            <Col span={14}>
+            <Col xs={24} md={14}>
               {staked} {symbol}
             </Col>
-            <Col span={8}>
+            <Col xs={24} md={8}>
               <Button danger type="primary" block={true} onClick={exit}>
                 Exit
               </Button>
@@ -216,8 +226,10 @@ function StakingStats({
       {parseFloat(earned) > 0 && (
         <Descriptions.Item label="Earned Rewards">
           <Row>
-            <Col span={14}>{earned} NDX</Col>
-            <Col span={8}>
+            <Col xs={24} md={14}>
+              {earned} NDX
+            </Col>
+            <Col xs={24} md={8}>
               <Button type="primary" block={true} onClick={claim}>
                 Claim
               </Button>
@@ -260,9 +272,10 @@ function StakingStats({
 }
 
 export default function StakeNew() {
-  const { id } = useParams<{ id: string }>();
-
   useNewStakingRegistrar();
+
+  const { isMobile } = useBreakpoints();
+  const { id } = useParams<{ id: string }>();
   const data = usePortfolioData({ onlyOwnedAssets: false });
   const toStake = useSelector((state: AppState) =>
     selectors.selectNewStakingPool(state, id)
@@ -288,7 +301,7 @@ export default function StakeNew() {
     <Page hasPageHeader={true} title={`Stake ${stakingToken}`}>
       <Space direction="vertical" style={{ width: "100%" }} size="large">
         <Row gutter={100}>
-          <Col span={10}>
+          <Col xs={24} md={10}>
             <Formik
               initialValues={{
                 asset: "",
@@ -318,7 +331,8 @@ export default function StakeNew() {
               />
             </Formik>
           </Col>
-          <Col span={14}>
+          <Col xs={24} md={14}>
+            {isMobile && <Divider />}
             <StakingStats
               symbol={stakingToken}
               portfolioToken={relevantPortfolioToken}

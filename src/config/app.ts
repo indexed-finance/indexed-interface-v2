@@ -34,6 +34,16 @@ export const SOCIAL_MEDIA = [
     image: "github",
     link: "https://github.com/indexed-finance",
   },
+  {
+    name: "Reddit",
+    image: "reddit",
+    link: "https://reddit.com/r/indexedfinance",
+  },
+  {
+    name: "YouTube",
+    image: "youtube",
+    link: "https://www.youtube.com/channel/UCdbua6FtaiD0emvvBerKRMw",
+  },
 ];
 export const INDEX_POOL_TAGLINES: Record<string, string> = {
   // CC10

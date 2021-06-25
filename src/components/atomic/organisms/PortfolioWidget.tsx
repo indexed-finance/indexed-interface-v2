@@ -1,11 +1,10 @@
 import { AppState, FormattedPortfolioAsset, selectors } from "features";
-import { Card, Space, Statistic, Typography } from "antd";
+import { Card, Statistic, Typography } from "antd";
 import { ExternalLink } from "../atoms";
 import { Link } from "react-router-dom";
 import { Progress, Token } from "components/atomic";
 import { Quote } from "../molecules";
 import { ReactNode } from "react";
-import { Widget } from "./Widget";
 import { convert } from "helpers";
 import { useBreakpoints, usePoolDetailRegistrar, useTranslator } from "hooks";
 import { useSelector } from "react-redux";
@@ -24,21 +23,6 @@ export function PortfolioWidget(props: FormattedPortfolioAsset) {
   const symbol = props.symbol.replace("UNIV2:", "").replace("SUSHI:", "");
 
   usePoolDetailRegistrar(isNdx ? "" : props.address, tokenIds);
-
-  function FormattedLink({ children }: { children: ReactNode }) {
-    if (isNdx || props.isUniswapPair || props.isSushiswapPair) {
-      return (
-        <ExternalLink
-          to={props.link}
-          withIcon={false}
-          style={{ display: "block" }}
-        >
-          {children}
-        </ExternalLink>
-      );
-    }
-    return <Link to={props.link}>{children}</Link>;
-  }
 
   const actions = [
     <Statistic
@@ -62,7 +46,12 @@ export function PortfolioWidget(props: FormattedPortfolioAsset) {
   }
 
   return (
-    <FormattedLink>
+    <FormattedLink
+      link={props.link}
+      isNdx={isNdx}
+      isUniswapPair={props.isUniswapPair}
+      isSushiswapPair={props.isSushiswapPair}
+    >
       <Card
         title={<Token size="medium" symbol={props.symbol} name={props.name} />}
         actions={actions}
@@ -115,91 +104,28 @@ export function PortfolioWidget(props: FormattedPortfolioAsset) {
       </Card>
     </FormattedLink>
   );
+}
 
-  return (
-    <FormattedLink>
-      <Widget
-        symbol={symbol}
-        address={props.address}
-        price={props.price}
-        badge={
-          props.isUniswapPair
-            ? "Uniswap V2"
-            : props.isSushiswapPair
-            ? "Sushiswap"
-            : ""
-        }
-        badgeColor={
-          props.isUniswapPair ? "pink" : props.isSushiswapPair ? "violet" : ""
-        }
-        stats={
-          <Space direction="vertical">
-            <div data-tooltip="portfolio-widget-earned">
-              <Statistic
-                title={tx("EARNED")}
-                style={{ fontSize }}
-                valueStyle={{ fontSize }}
-                value={earned}
-              />
-            </div>
-            {props.hasStakingPool ? (
-              <Statistic
-                style={{ fontSize }}
-                valueStyle={{ fontSize }}
-                title={tx("STAKED")}
-                value={
-                  props.staking
-                    ? `${props.staking} ${symbol}`
-                    : `0.00 ${symbol}`
-                }
-              />
-            ) : (
-              <Statistic
-                style={{ visibility: "hidden" }}
-                title="Foo"
-                value="Bar"
-              />
-            )}
-          </Space>
-        }
-      >
-        <div
-          style={{
-            width: "100%",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <Space direction="vertical" style={{ marginRight: 24 }}>
-            <Token
-              name={props.name}
-              symbol={props.symbol}
-              amount={props.balance}
-              size="small"
-              onlyImage={true}
-            />
-            <Typography.Text
-              type="success"
-              style={{ flex: 1, fontSize: isMobile ? 16 : 24 }}
-            >
-              {props.value}
-            </Typography.Text>
-          </Space>
-          <Progress
-            style={{
-              fontSize: 24,
-              textAlign: "right",
-              position: "relative",
-              top: 5,
-            }}
-            width={90}
-            status="active"
-            type="dashboard"
-            percent={parseFloat(props.weight.replace(/%/g, ""))}
-          />
-        </div>
-      </Widget>
-    </FormattedLink>
-  );
+function FormattedLink({
+  link,
+  isNdx,
+  isUniswapPair,
+  isSushiswapPair,
+  children,
+}: {
+  children: ReactNode;
+  link: string;
+  isNdx: boolean;
+  isUniswapPair: boolean;
+  isSushiswapPair: boolean;
+}) {
+  if (isNdx || isUniswapPair || isSushiswapPair) {
+    return (
+      <ExternalLink to={link} withIcon={false} style={{ display: "block" }}>
+        {children}
+      </ExternalLink>
+    );
+  }
+
+  return <Link to={link}>{children}</Link>;
 }

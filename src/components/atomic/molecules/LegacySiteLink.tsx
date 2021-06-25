@@ -3,7 +3,7 @@ import { ExternalLink } from "components/atomic/atoms";
 
 export function LegacySiteLink() {
   return (
-    <Button>
+    <Button type="default">
       <ExternalLink to="https://legacy.indexed.finance/">
         Legacy site
       </ExternalLink>

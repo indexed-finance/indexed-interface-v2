@@ -13,6 +13,7 @@ import {
 import { convert } from "helpers";
 import { selectors } from "features";
 import {
+  useBreakpoints,
   useMultiTokenMintCallbacks,
   useTokenApproval,
   useTokenBalance,
@@ -236,8 +237,8 @@ function SingleInteractionInner({
   };
 
   return (
-    <Row>
-      <Col span={12}>
+    <Row gutter={24}>
+      <Col xs={24} sm={10}>
         <TokenSelector
           loading={loading}
           isInput
@@ -287,15 +288,14 @@ function SingleInteractionInner({
           <Button
             loading={loading}
             type="primary"
-            style={{ width: "100%" }}
             disabled={!isValid || (requiresApproval && status === "unknown")}
             onClick={() => handleSubmit()}
+            style={{ width: 336 }}
           >
             Send
           </Button>
         )}
       </Col>
-      <Col span={12}></Col>
     </Row>
   );
 }
@@ -465,6 +465,7 @@ function MultiInteractionInner({
 
     return balance > amount;
   });
+  const { sm } = useBreakpoints();
 
   // Effect:
   // When the form changes, re-calculate what goes into each field.
@@ -484,8 +485,8 @@ function MultiInteractionInner({
 
   return (
     <Row gutter={12}>
-      <Col span={12}>
-        <Space direction="vertical">
+      <Col xs={24} sm={12}>
+        <Space direction="vertical" style={{ width: "100%" }}>
           <TokenSelector
             isInput={isInput}
             error={errors.fromAmount}
@@ -508,7 +509,7 @@ function MultiInteractionInner({
           ) : (
             <Button
               type="primary"
-              style={{ width: "100%" }}
+              style={{ width: 336 }}
               disabled={
                 (kind === "mint" && !allApproved) ||
                 !isValid ||
@@ -528,19 +529,18 @@ function MultiInteractionInner({
           )}
         </Space>
       </Col>
-      <Col span={12}>
-        <div style={{ height: 400, paddingBottom: 100, overflow: "auto" }}>
-          {assets.map((asset) => (
-            <AssetEntry
-              key={asset.id}
-              {...asset}
-              kind={kind}
-              spender={spender}
-              amount={lookup[asset.id] ?? 0}
-              error={(errors as any)[asset.id]}
-            />
-          ))}
-        </div>
+      <Col xs={24} sm={12}>
+        {!sm && <Divider />}
+        {assets.map((asset) => (
+          <AssetEntry
+            key={asset.id}
+            {...asset}
+            kind={kind}
+            spender={spender}
+            amount={lookup[asset.id] ?? 0}
+            error={(errors as any)[asset.id]}
+          />
+        ))}
       </Col>
     </Row>
   );

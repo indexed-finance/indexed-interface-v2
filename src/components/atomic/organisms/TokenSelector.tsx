@@ -245,6 +245,7 @@ export function TokenSelector({
             <Button
               type={value.token ? "text" : "primary"}
               onClick={handleOpenTokenSelection}
+              disabled={!selectable}
             >
               <Space style={{ position: "relative", top: -4 }}>
                 {value.token ? (

@@ -1,5 +1,6 @@
 import { BaseDrawer, useDrawer } from "./Drawer";
 import { Button, Typography } from "antd";
+import { useBreakpoints } from "hooks";
 import { useCallback, useEffect } from "react";
 
 const LOCALSTORAGE_KEY = "Dismissed Diligence Warning?";
@@ -23,12 +24,13 @@ export function DiligenceDrawer() {
     close();
     window.localStorage.setItem(LOCALSTORAGE_KEY, "true");
   }, [close]);
+  const { isMobile } = useBreakpoints();
 
   return (
     <BaseDrawer
       title="Disclaimer"
       onClose={handleClose}
-      width={600}
+      width={isMobile ? "100vw" : 600}
       maskClosable={false}
       maskStyle={{ position: "fixed", top: 0, left: 0, width: "100vw" }}
     >

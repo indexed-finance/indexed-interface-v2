@@ -10,18 +10,14 @@ import {
   IndexPoolRecentTrades,
   Page,
 } from "components/atomic";
-import { IndexPoolInteraction, useInteractionDrawer } from "components/drawers";
-import {
-  useBreakpoints,
-  usePoolDetailRegistrar,
-  useQuery,
-  useStakingApy,
-} from "hooks";
-import { useEffect } from "react";
+import { ReactNode, useState } from "react";
+import { useBreakpoints, usePoolDetailRegistrar } from "hooks";
 import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 
-function LoadedIndexPool(props: FormattedIndexPool) {
+export function LoadedIndexPool(
+  props: FormattedIndexPool & { interaction?: ReactNode }
+) {
   const { isMobile } = useBreakpoints();
   const tokenIds = useSelector((state: AppState) =>
     selectors.selectPoolTokenAddresses(state, props.id)
@@ -31,7 +27,17 @@ function LoadedIndexPool(props: FormattedIndexPool) {
 
   return (
     <div style={{ paddingTop: 12 }}>
-      <IndexPoolInteractionBar indexPool={props} />
+      {props.interaction && (
+        <div
+          style={{
+            borderLeft: "2px solid #38EE7A",
+            paddingLeft: 24,
+            marginBottom: 24,
+          }}
+        >
+          {props.interaction}
+        </div>
+      )}
       <Row
         align="stretch"
         gutter={{
@@ -79,41 +85,36 @@ export default function IndexPool() {
   const indexPool = useSelector((state: AppState) =>
     poolId ? selectors.selectFormattedIndexPool(state, poolId) : null
   );
-  const query = useQuery();
-  const { open: openInteraction } = useInteractionDrawer(poolId ?? "");
-  const stakingApy = useStakingApy(poolId ?? "");
-
-  useEffect(() => {
-    const interaction = query.get("interaction");
-
-    if (interaction && indexPool) {
-      openInteraction(interaction as IndexPoolInteraction);
-
-      if (
-        interaction !== "stake" ||
-        (interaction === "stake" && stakingApy && stakingApy !== "Expired")
-      ) {
-        openInteraction(interaction as IndexPoolInteraction);
-      }
-    }
-    // eslint-disable-next-line
-  }, []);
+  const [interaction, setInteraction] = useState<ReactNode>(null);
 
   return (
     <Page
       extra={indexPool ? <IndexPoolPerformance {...indexPool} /> : <Spin />}
       title={
         indexPool ? (
-          <Space>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
             <Typography.Text>{indexPool.name}</Typography.Text>
-          </Space>
+            <IndexPoolInteractionBar
+              indexPool={indexPool}
+              onChange={setInteraction}
+            />
+          </div>
         ) : (
           <Spin />
         )
       }
       hasPageHeader={true}
     >
-      {indexPool ? <LoadedIndexPool {...indexPool} /> : <Spin />}
+      {indexPool ? (
+        <LoadedIndexPool interaction={interaction} {...indexPool} />
+      ) : (
+        <Spin />
+      )}
     </Page>
   );
 }

@@ -13,7 +13,7 @@ export function IndexPoolWidgetGroup() {
   return (
     <Row gutter={[20, 20]}>
       {indexPools.map((pool) => (
-        <Col xs={24} sm={6} key={pool.id}>
+        <Col xs={24} sm={8} key={pool.id}>
           <IndexPoolWidget {...pool} />
         </Col>
       ))}
@@ -29,6 +29,9 @@ export function IndexPoolWidget(props: FormattedIndexPool) {
 
   usePoolDetailRegistrar(props.id, tokenIds);
 
+  let value = props.totalValueLocked;
+  value = value.substring(0, value.length - 3);
+
   return (
     <Card
       title={<Token size="medium" symbol={props.symbol} name={props.name} />}
@@ -37,7 +40,7 @@ export function IndexPoolWidget(props: FormattedIndexPool) {
         <Statistic
           key="tvl"
           title="Total Value Locked"
-          value={props.totalValueLocked}
+          value={value}
           valueRender={(value) => <div className="colorful">{value}</div>}
         />,
       ]}

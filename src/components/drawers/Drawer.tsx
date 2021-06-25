@@ -50,7 +50,7 @@ export interface BaseDrawerProps extends DrawerProps {
   title: ReactNode;
   children: ReactNode;
   padding?: number;
-  width?: number;
+  width?: number | string;
   top?: number;
   style?: DrawerProps["style"];
   bodyStyle?: DrawerProps["style"];

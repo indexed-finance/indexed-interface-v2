@@ -61,8 +61,10 @@ export function StakingCard({
         title={
           lg ? (
             <Row gutter={24}>
-              <Col span={6}>{name}</Col>
-              <Col span={5}>
+              <Col xs={24} sm={6}>
+                {name}
+              </Col>
+              <Col xs={24} sm={5}>
                 {!["0.00 NDX", "0.00 SUSHI"].includes(earned) && (
                   <em>
                     <Typography.Text type="success">
@@ -71,7 +73,7 @@ export function StakingCard({
                   </em>
                 )}
               </Col>
-              <Col span={5}>
+              <Col xs={24} sm={5}>
                 {staked !== "0" && (
                   <em>
                     <Typography.Text type="success">
@@ -153,6 +155,19 @@ export function UniswapStakingCard(props: Props) {
       badge="Uniswap LP"
       badgeColor="pink"
       backdrop={require("images/uni.png").default}
+      useApy={useNewStakingApy}
+    />
+  );
+}
+
+export function SingleSidedStakingCard(props: Props) {
+  return (
+    <StakingCard
+      {...props}
+      linkPath="staking-new"
+      badge=""
+      badgeColor=""
+      // backdrop={require(`images/${props.symbol.toLowerCase()}.png`).default}
       useApy={useNewStakingApy}
     />
   );

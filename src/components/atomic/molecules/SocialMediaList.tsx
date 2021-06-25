@@ -23,28 +23,4 @@ export function SocialMediaList() {
       ))}
     </Space>
   );
-
-  // return (
-  //   <div
-  //     style={{
-  //       position: "fixed",
-  //       top: 165,
-  //       left: 0,
-  //       width: 45,
-  //       background: "rgba(0, 0, 0, 0.65)",
-  //       borderTop: "1px solid rgba(255, 255, 255, 0.65)",
-  //       borderRight: "1px solid rgba(255, 255, 255, 0.65)",
-  //       borderBottom: "1px solid rgba(255, 255, 255, 0.65)",
-  //       borderTopRightRadius: 12,
-  //       borderBottomRightRadius: 12,
-  //       justifyContent: "space-evenly",
-  //       padding: "1rem 0.25rem",
-  //       display: "flex",
-  //       flexDirection: "column",
-  //       zIndex: 10,
-  //     }}
-  //   >
-
-  //   </div>
-  // );
 }

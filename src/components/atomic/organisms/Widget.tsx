@@ -9,7 +9,7 @@ import noop from "lodash.noop";
 interface Props extends HTMLProps<HTMLDivElement> {
   symbol: string;
   address: string;
-  price?: string;
+  price?: ReactNode;
   priceChange?: string;
   children?: ReactNode;
   stats?: ReactNode;
@@ -37,7 +37,8 @@ export function Widget({
   ...rest
 }: Props) {
   const { isMobile } = useBreakpoints();
-  const formattedPrice = convert.toCurrency(parseFloat(price));
+  const formattedPrice =
+    typeof price === "string" ? convert.toCurrency(parseFloat(price)) : price;
   const inner = (
     <div
       onClick={onClick}
@@ -51,14 +52,13 @@ export function Widget({
         hoverable={true}
         style={{
           borderRadius: "1.4rem",
-          padding: "1rem",
         }}
       >
         <div
           style={{
             display: "flex",
             flexDirection: "row",
-            alignItems: "center",
+            alignItems: "flex-end",
             justifyContent: "space-between",
           }}
         >
@@ -88,13 +88,12 @@ export function Widget({
         </div>
         {children && (
           <>
-            <Divider style={{ marginTop: 5, marginBottom: 10 }} />
             <Typography.Paragraph>{children}</Typography.Paragraph>
           </>
         )}
         {(stats || actions) && (
           <>
-            <Divider style={{ marginTop: 0, marginBottom: 12 }} />
+            <Divider style={{ marginTop: 12, marginBottom: 12 }} />
             <Row align="bottom" gutter={20}>
               <Col span={24} style={{ marginBottom: isMobile ? 0 : 24 }}>
                 {stats}
