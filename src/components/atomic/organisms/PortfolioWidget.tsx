@@ -21,9 +21,6 @@ export function PortfolioWidget(props: FormattedPortfolioAsset) {
     ? `${props.sushiEarned} SUSHI`
     : `${props.ndxEarned} NDX`;
   const symbol = props.symbol.replace("UNIV2:", "").replace("SUSHI:", "");
-
-  usePoolDetailRegistrar(isNdx ? "" : props.address, tokenIds);
-
   const actions = [
     <Statistic
       key="earned"
@@ -33,6 +30,8 @@ export function PortfolioWidget(props: FormattedPortfolioAsset) {
       value={earned}
     />,
   ];
+
+  usePoolDetailRegistrar(isNdx ? "" : props.address, tokenIds);
 
   if (props.hasStakingPool) {
     actions.push(
