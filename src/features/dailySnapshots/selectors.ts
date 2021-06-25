@@ -45,11 +45,12 @@ export const dailySnapshotsSelectors = {
     key: SnapshotKey
   ) => {
     const maxAgeInSeconds = timeframe === "Day" ? 86400 : 604800;
-    const snapshots = dailySnapshotsSelectors.selectSortedSnapshotsOfPoolInTimeframe(
-      state,
-      poolId,
-      maxAgeInSeconds
-    );
+    const snapshots =
+      dailySnapshotsSelectors.selectSortedSnapshotsOfPoolInTimeframe(
+        state,
+        poolId,
+        maxAgeInSeconds
+      );
     const timeSeriesData = snapshots.map((snapshot) => ({
       time: snapshot.date,
       value: snapshot[key],
@@ -66,15 +67,14 @@ export const dailySnapshotsSelectors = {
     return mostRecent;
   },
   selectSnapshotPeriodsForPool: (state: AppState, poolId: string) => {
-    const allSnapshots = dailySnapshotsSelectors.selectSortedSnapshotsOfPoolInTimeframe(
-      state,
-      poolId,
-      86400 // one day
-    );
-    const mostRecentSnapshot = dailySnapshotsSelectors.selectMostRecentSnapshotOfPool(
-      state,
-      poolId
-    );
+    const allSnapshots =
+      dailySnapshotsSelectors.selectSortedSnapshotsOfPoolInTimeframe(
+        state,
+        poolId,
+        86400 // one day
+      );
+    const mostRecentSnapshot =
+      dailySnapshotsSelectors.selectMostRecentSnapshotOfPool(state, poolId);
     const fromLast24Hours = allSnapshots.filter(
       (snapshot) => snapshot.date >= mostRecentSnapshot.date - SECONDS_PER_DAY
     );
@@ -88,14 +88,10 @@ export const dailySnapshotsSelectors = {
     };
   },
   selectPoolDeltas: (state: AppState, poolId: string) => {
-    const mostRecentSnapshot = dailySnapshotsSelectors.selectMostRecentSnapshotOfPool(
-      state,
-      poolId
-    );
-    const {
-      last24Hours,
-      lastWeek,
-    } = dailySnapshotsSelectors.selectSnapshotPeriodsForPool(state, poolId);
+    const mostRecentSnapshot =
+      dailySnapshotsSelectors.selectMostRecentSnapshotOfPool(state, poolId);
+    const { last24Hours, lastWeek } =
+      dailySnapshotsSelectors.selectSnapshotPeriodsForPool(state, poolId);
 
     if (mostRecentSnapshot?.totalVolumeUSD && last24Hours[0]?.totalVolumeUSD) {
       const volumeLast24Hours =
@@ -148,10 +144,8 @@ export const dailySnapshotsSelectors = {
     }
   },
   selectPoolStats: (state: AppState, poolId: string) => {
-    const mostRecentSnapshot = dailySnapshotsSelectors.selectMostRecentSnapshotOfPool(
-      state,
-      poolId
-    );
+    const mostRecentSnapshot =
+      dailySnapshotsSelectors.selectMostRecentSnapshotOfPool(state, poolId);
 
     if (mostRecentSnapshot) {
       const deltas = dailySnapshotsSelectors.selectPoolDeltas(state, poolId);
