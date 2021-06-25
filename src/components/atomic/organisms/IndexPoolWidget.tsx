@@ -31,6 +31,7 @@ export function IndexPoolWidget(props: FormattedIndexPool) {
 
   return (
     <Card
+      title={<Token size="medium" symbol={props.symbol} name={props.name} />}
       className="IndexPoolWidget"
       actions={[
         <Statistic
@@ -44,10 +45,7 @@ export function IndexPoolWidget(props: FormattedIndexPool) {
       extra={<Quote address={props.id} price={props.priceUsd} inline={true} />}
       onClick={() => push(props.slug)}
     >
-      <Card.Meta
-        title={<Token size="large" symbol={props.symbol} name={props.name} />}
-        description={INDEX_POOL_TAGLINES[props.id] ?? ""}
-      />
+      <Card.Meta description={INDEX_POOL_TAGLINES[props.id] ?? ""} />
     </Card>
   );
 }
