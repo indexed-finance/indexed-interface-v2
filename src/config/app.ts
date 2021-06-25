@@ -51,7 +51,7 @@ export const INDEX_POOL_TAGLINES: Record<string, string> = {
     "An index covering the most popular medium/large-cap Ethereum protocols, primarily drawn from decentralized finance.",
   // DEFI5
   "0xfa6de2697d59e88ed7fc4dfe5a33dac43565ea41":
-    "A hyper-focused index of the most successful large-cap decentralized finance protocols across Ethereum.",
+    "A hyper-focused index of the most successful large-cap decentralized finance protocols across the Ethereum ecosystem.",
   // ORCL5
   "0xd6cb2adf47655b1babddc214d79257348cbc39a7":
     "An index representing the current market leaders in protocols designed to bring external/real-world data onto the blockchain.",
@@ -66,5 +66,5 @@ export const INDEX_POOL_TAGLINES: Record<string, string> = {
     "A barbell-weighted fund tracking the favoured projects of 0xb1.484, one of the largest capital providers in DeFi.",
   // FFF
   "0xabafa52d3d5a2c18a4c1ae24480d22b831fc0413":
-    "A new-to-crypto-investing option, providing 20% exposure to both BTC and ETH, with the remainder spread across large-mid cap DeFi protocols and smaller growth shots via the DEFI5, CC10 and DEGEN indices.",
+    "A new-to-crypto-investing option, providing 20% exposure to both BTC and ETH, as well as large-mid cap DeFi protocols.",
 };
