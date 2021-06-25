@@ -5,6 +5,7 @@ import { useWalletConnectionDrawer } from "components/drawers";
 
 export function WalletConnector() {
   const { open } = useWalletConnectionDrawer();
+
   return (
     <Button
       className="plus"
