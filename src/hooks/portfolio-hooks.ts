@@ -127,16 +127,16 @@ export function usePortfolioData({
       .map((a) => a.id);
   }, [assetsRaw]);
   const priceLookupArgs = usePriceLookupArgs(indexPools);
-
   const priceLookup = useTokenPricesLookup(priceLookupArgs);
   const pairExistsLookup = usePairExistsLookup(pairIds);
   const [assets, assetIds] = useMemo(() => {
     const assets = assetsRaw.filter(
       (asset) =>
-        (!asset.isUniswapPair && !asset.isSushiswapPair) ||
-        pairExistsLookup[asset.id]
+        pairExistsLookup[asset.id] ||
+        !(asset.isUniswapPair || asset.isSushiswapPair)
     );
     const assetIds = assets.map((asset) => asset.id);
+
     return [assets, assetIds];
   }, [assetsRaw, pairExistsLookup]);
   const balances = useTokenBalances(assetIds);

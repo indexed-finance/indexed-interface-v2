@@ -39,7 +39,6 @@ const slice = createSlice({
           ...state.metadata,
           ...action.payload.meta,
         };
-        // console.log(state.entities)
       })
       .addCase(fetchMulticallData.fulfilled, (state, action) => {
         const relevantMulticallData = newStakingMulticallDataParser(
@@ -113,6 +112,7 @@ export const newStakingSelectors = {
     ids: string[]
   ): Array<NewStakingPool | undefined> {
     const allPools = newStakingSelectors.selectAllNewStakingPools(state);
+
     return ids.map((id) =>
       allPools.find((p) => p.token.toLowerCase() === id.toLowerCase())
     );
