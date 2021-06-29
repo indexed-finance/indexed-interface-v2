@@ -23,7 +23,9 @@ export const useStakingInfoLookup = () =>
 
 export const useStakingPoolsForTokens = (stakingTokens: string[]) =>
   useSelector((state: AppState) =>
-    selectors.selectStakingPoolsByStakingTokens(state, stakingTokens)
+    selectors
+      .selectStakingPoolsByStakingTokens(state, stakingTokens)
+      .filter(Boolean)
   );
 
 export function useStakingTokenPrice(stakingPoolAddress: string) {
@@ -52,9 +54,8 @@ export function useStakingTokenPrice(stakingPoolAddress: string) {
     stakingPool?.stakingToken,
     stakingPool?.indexPool,
   ]);
-  const [supplies, suppliesLoading] = useTotalSuppliesWithLoadingIndicator(
-    supplyTokens
-  );
+  const [supplies, suppliesLoading] =
+    useTotalSuppliesWithLoadingIndicator(supplyTokens);
   const [pairs, pairsLoading] = useUniswapPairs(_pairs);
   const [tokenPrice, tokenPriceLoading] = useTokenPrice(
     stakingPool?.indexPool ?? ""
