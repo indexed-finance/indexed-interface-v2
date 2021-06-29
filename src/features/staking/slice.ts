@@ -72,15 +72,9 @@ export const stakingSelectors = {
   selectStakingPoolByStakingToken(state: AppState, id: string) {
     return stakingSelectors
       .selectAllStakingPools(state)
-      .find(({ stakingToken, ...rest }) => {
-        const derp = stakingToken.toLowerCase() === id.toLowerCase();
-
-        if (!derp) {
-          console.log("uh oh", rest);
-        }
-
-        return derp;
-      });
+      .find(
+        ({ stakingToken }) => stakingToken.toLowerCase() === id.toLowerCase()
+      );
   },
   selectStakingPoolsByStakingTokens(
     state: AppState,
