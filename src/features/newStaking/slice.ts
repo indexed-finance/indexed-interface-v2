@@ -114,7 +114,13 @@ export const newStakingSelectors = {
     const allPools = newStakingSelectors.selectAllNewStakingPools(state);
 
     return ids.map((id) =>
-      allPools.find((p) => p.token.toLowerCase() === id.toLowerCase())
+      allPools.find(
+        (p) =>
+          p.token.toLowerCase() === id.toLowerCase() ||
+          // Sometimes the address of the index pool is used instead of the staking pool.
+          p.token0?.toLowerCase() === id.toLowerCase() ||
+          p.token1?.toLowerCase() === id.toLowerCase()
+      )
     );
   },
   selectNewStakingInfoLookup(state: AppState, ids: string[]) {

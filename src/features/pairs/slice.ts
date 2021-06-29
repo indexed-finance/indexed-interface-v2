@@ -25,7 +25,9 @@ const slice = createSlice({
   initialState: adapter.getInitialState(),
   reducers: {
     uniswapPairsRegistered(state, action: PayloadAction<NormalizedPair[]>) {
-      const filtered = action.payload.filter(({ id }) => !state.entities[id.toLowerCase()]);
+      const filtered = action.payload.filter(
+        ({ id }) => !state.entities[id.toLowerCase()]
+      );
       const formatted = filtered.map(
         ({ id, token0 = "", token1 = "", ...rest }) => ({
           ...rest,
@@ -67,14 +69,14 @@ const slice = createSlice({
           const pair: NormalizedPair = action.payload.pairs.entities[id];
           const entry = state.entities[id.toLowerCase()];
           if (pair.id !== pair.id.toLowerCase()) {
-            console.log(`Got non-lowercase pair from server`)
+            console.log(`Got non-lowercase pair from server`);
           }
           if (entry) {
             if (typeof pair.exists !== "undefined") {
               if (pair.exists && pair.reserves0 && pair.reserves1) {
                 entry.exists = true;
-                entry.reserves0 = pair.reserves0
-                entry.reserves1 = pair.reserves1
+                entry.reserves0 = pair.reserves0;
+                entry.reserves1 = pair.reserves1;
               } else {
                 entry.exists = false;
               }
@@ -96,11 +98,9 @@ const selectors = adapter.getSelectors((state: AppState) => state.pairs);
 export const pairsSelectors = {
   selectPairs: (state: AppState) => state.pairs,
   selectAllPairs: (state: AppState) => Object.values(state.pairs.entities),
-  selectAllPairIds: (state: AppState) => state.pairs.ids.map(id => id.toString()),
-  selectPairById: (
-    state: AppState,
-    id: string
-  ): NormalizedPair | undefined => {
+  selectAllPairIds: (state: AppState) =>
+    state.pairs.ids.map((id) => id.toString()),
+  selectPairById: (state: AppState, id: string): NormalizedPair | undefined => {
     return state.pairs.entities[id.toLowerCase()];
   },
   selectPairsById: (

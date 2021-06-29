@@ -45,6 +45,8 @@ type RawAsset = {
   isSushiswapPair?: boolean;
 };
 
+const NFT_INDEX_POOL_ADDRESS = "0x68bb81b3f67f7aab5fd1390ecb0b8e1a806f2465";
+
 export const buildEthUniPair = (asset: RawAsset) => ({
   id: computeUniswapPairAddress(asset.id, WETH_CONTRACT_ADDRESS).toLowerCase(),
   symbol: `UNIV2:ETH-${asset.symbol}`,
@@ -147,6 +149,9 @@ export function usePortfolioData({
   const newStakingInfoLookup = useNewStakingInfoLookup(assetIds);
   const masterChefInfoLookup = useMasterChefInfoLookup(assetIds);
   const tokenLookup = useTokenLookup();
+  const nftStakingPool = useSelector((state: AppState) =>
+    selectors.selectStakingPoolByIndexPool(state, NFT_INDEX_POOL_ADDRESS)
+  );
 
   return useMemo(() => {
     let totalNdxEarned = 0;
@@ -163,6 +168,8 @@ export function usePortfolioData({
         const newStakingPoolUserInfo = newStakingInfoLookup[id.toLowerCase()];
         const masterchefUserInfo = masterChefInfoLookup[id.toLowerCase()];
         const decimals = tokenLookup[id]?.decimals ?? 18;
+        const isNftStakingPool =
+          id.toLowerCase() === NFT_INDEX_POOL_ADDRESS.toLowerCase();
 
         let ndxEarned = 0;
         let staked = 0;
@@ -179,6 +186,32 @@ export function usePortfolioData({
             decimals,
             6
           );
+        }
+
+        if (isNftStakingPool) {
+          // TODO: Temporary; NFT is an exception.
+          const balanceString = nftStakingPool?.userData?.userStakedBalance;
+
+          if (balanceString) {
+            const balanceValue = convert.toBalanceNumber(
+              balanceString,
+              decimals ?? 18
+            );
+
+            staked += balanceValue;
+          }
+
+          const ndxEarnedFromNftString =
+            nftStakingPool?.userData?.userRewardsEarned;
+
+          if (ndxEarnedFromNftString) {
+            const ndxEarnedFromNftValue = convert.toBalanceNumber(
+              ndxEarnedFromNftString,
+              decimals ?? 18
+            );
+
+            ndxEarned += ndxEarnedFromNftValue;
+          }
         }
 
         if (newStakingPoolUserInfo) {
@@ -215,7 +248,7 @@ export function usePortfolioData({
           isUniswapPair: Boolean(isUniswapPair),
           isSushiswapPair: Boolean(isSushiswapPair),
           hasStakingPool: Boolean(
-            stakingPool || newStakingPool || masterChefPool
+            stakingPool || newStakingPool || masterChefPool || isNftStakingPool
           ),
           price: price.toFixed(2),
           balance: balance.toFixed(2),
@@ -273,6 +306,7 @@ export function usePortfolioData({
     masterChefInfoLookup,
     masterChefPools,
     newStakingPoolsByTokens,
+    nftStakingPool,
     onlyOwnedAssets,
   ]);
 }

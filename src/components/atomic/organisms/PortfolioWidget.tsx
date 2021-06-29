@@ -16,6 +16,7 @@ export function PortfolioWidget(props: FormattedPortfolioAsset) {
   const tokenIds = useSelector((state: AppState) =>
     selectors.selectPoolTokenAddresses(state, props.address)
   );
+
   const fontSize = isMobile ? 16 : 20;
   const earned = props.isSushiswapPair
     ? `${props.sushiEarned} SUSHI`

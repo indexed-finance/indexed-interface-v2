@@ -72,9 +72,15 @@ export const stakingSelectors = {
   selectStakingPoolByStakingToken(state: AppState, id: string) {
     return stakingSelectors
       .selectAllStakingPools(state)
-      .find(
-        ({ stakingToken }) => stakingToken.toLowerCase() === id.toLowerCase()
-      );
+      .find(({ stakingToken, ...rest }) => {
+        const derp = stakingToken.toLowerCase() === id.toLowerCase();
+
+        if (!derp) {
+          console.log("uh oh", rest);
+        }
+
+        return derp;
+      });
   },
   selectStakingPoolsByStakingTokens(
     state: AppState,
@@ -85,6 +91,11 @@ export const stakingSelectors = {
     return ids.map((id) =>
       allPools.find((p) => p.stakingToken.toLowerCase() === id.toLowerCase())
     );
+  },
+  selectStakingPoolByIndexPool(state: AppState, indexPoolAddress: string) {
+    const allPools = stakingSelectors.selectAllStakingPools(state);
+
+    return allPools.find((pool) => pool.indexPool === indexPoolAddress) ?? null;
   },
 };
 
