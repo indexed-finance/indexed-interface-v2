@@ -34,10 +34,12 @@ const slice = createSlice({
             const entry = state.entities[stakingPoolAddress];
 
             if (entry) {
-              if (update.rewardsDuration) entry.rewardsDuration = update.rewardsDuration;
+              if (update.rewardsDuration)
+                entry.rewardsDuration = update.rewardsDuration;
               if (update.periodFinish) entry.periodFinish = update.periodFinish;
               if (update.rewardRate) entry.rewardRate = update.rewardRate;
-              if (update.rewardPerTokenStored) entry.rewardPerTokenStored = update.rewardPerTokenStored;
+              if (update.rewardPerTokenStored)
+                entry.rewardPerTokenStored = update.rewardPerTokenStored;
               if (update.totalSupply) entry.totalSupply = update.totalSupply;
 
               if (update.userData) {
@@ -79,9 +81,15 @@ export const stakingSelectors = {
     ids: string[]
   ): Array<NormalizedStakingPool | undefined> {
     const allPools = stakingSelectors.selectAllStakingPools(state);
+
     return ids.map((id) =>
       allPools.find((p) => p.stakingToken.toLowerCase() === id.toLowerCase())
     );
+  },
+  selectStakingPoolByIndexPool(state: AppState, indexPoolAddress: string) {
+    const allPools = stakingSelectors.selectAllStakingPools(state);
+
+    return allPools.find((pool) => pool.indexPool === indexPoolAddress) ?? null;
   },
 };
 

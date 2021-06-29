@@ -77,6 +77,30 @@ const categoriesInitialState = adapter.addMany(initialState, [
     },
     indexPools: [],
   },
+  {
+    id: "sigma-v10x3",
+    name: "484 Fund",
+    symbol: "ERROR",
+    brief: "FIXME",
+    description: "FIXME",
+    tokens: {
+      ids: [],
+      entities: {},
+    },
+    indexPools: [],
+  },
+  {
+    id: "sigma-v10x4",
+    name: "Future of Finance Fund",
+    symbol: "FFF",
+    brief: "FIXME",
+    description: "FIXME",
+    tokens: {
+      ids: [],
+      entities: {},
+    },
+    indexPools: [],
+  },
 ]);
 
 const slice = createSlice({
