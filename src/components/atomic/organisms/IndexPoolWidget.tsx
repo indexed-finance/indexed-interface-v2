@@ -1,8 +1,9 @@
 import { AppState, FormattedIndexPool, selectors } from "features";
-import { Button, Col, Row, Statistic } from "antd";
+import { Card, Col, Row, Statistic } from "antd";
 import { INDEX_POOL_TAGLINES } from "config";
-import { Link, useHistory } from "react-router-dom";
-import { Widget } from "./Widget";
+import { Quote } from "../molecules";
+import { Token } from "../atoms";
+import { useHistory } from "react-router-dom";
 import { usePoolDetailRegistrar } from "hooks";
 import { useSelector } from "react-redux";
 
@@ -32,25 +33,22 @@ export function IndexPoolWidget(props: FormattedIndexPool) {
   value = value.substring(0, value.length - 3);
 
   return (
-    <Widget
-      symbol={props.symbol}
-      address={props.id}
-      price={props.priceUsd}
-      stats={
+    <Card
+      title={<Token size="medium" symbol={props.symbol} name={props.name} />}
+      className="IndexPoolWidget"
+      actions={[
         <Statistic
+          key="tvl"
           title="Total Value Locked"
           value={value}
           valueRender={(value) => <div className="colorful">{value}</div>}
-        />
-      }
-      actions={
-        <Button type="primary" onClick={(event) => event.stopPropagation()}>
-          <Link to={`${props.slug}?interaction=trade`}>Buy</Link>
-        </Button>
-      }
+        />,
+      ]}
+      hoverable={true}
+      extra={<Quote address={props.id} price={props.priceUsd} inline={true} />}
       onClick={() => push(props.slug)}
     >
-      <div style={{ height: 150 }}>{INDEX_POOL_TAGLINES[props.id] ?? ""}</div>
-    </Widget>
+      <Card.Meta description={INDEX_POOL_TAGLINES[props.id] ?? ""} />
+    </Card>
   );
 }

@@ -11,7 +11,9 @@ export const masterChefCaller = "MasterChef";
 
 const BLOCKS_PER_DAY = 86400 / 13.5;
 
-export const totalSushiPerDay = convert.toToken('100', 18).times(BLOCKS_PER_DAY);
+export const totalSushiPerDay = convert
+  .toToken("100", 18)
+  .times(BLOCKS_PER_DAY);
 
 const adapter = createEntityAdapter<MasterChefPool>({
   selectId: (entry) => entry.id.toLowerCase(),
@@ -36,14 +38,18 @@ const slice = createSlice({
           ...state.metadata,
           ...action.payload.meta,
         };
-        // console.log(state.entities)
       })
       .addCase(fetchMulticallData.fulfilled, (state, action) => {
         const relevantMulticallData = masterChefMulticallDataParser(
           action.payload
         );
         if (relevantMulticallData) {
-          const { allocPointsByPool, totalStakedByToken, userDataByPool, totalAllocPoint } = relevantMulticallData;
+          const {
+            allocPointsByPool,
+            totalStakedByToken,
+            userDataByPool,
+            totalAllocPoint,
+          } = relevantMulticallData;
           if (totalAllocPoint) {
             state.metadata.totalAllocPoint = totalAllocPoint;
           }
@@ -65,7 +71,7 @@ const slice = createSlice({
             const entry = state.entities[pid];
             if (!entry) return;
             entry.allocPoint = allocPoint;
-          })
+          });
         }
 
         return state;
@@ -80,7 +86,7 @@ const slice = createSlice({
               entry.allocPoint = pool.allocPoint;
             }
           } else {
-            adapter.addOne(state, pool)
+            adapter.addOne(state, pool);
           }
         }
       })
@@ -149,7 +155,7 @@ export const masterChefMulticallDataParser = createMulticallDataParser(
       totalStakedByToken: {},
       userDataByPool: {},
       allocPointsByPool: {},
-      totalAllocPoint: 0
+      totalAllocPoint: 0,
     };
     const handleCall = ([fn, results]: [string, CallWithResult[]]) => {
       const formattedResults = results.map((item: CallWithResult) => ({
@@ -186,7 +192,7 @@ export const masterChefMulticallDataParser = createMulticallDataParser(
             update.userDataByPool[id].userEarnedRewards = result.toString();
           },
           totalAllocPoint() {
-            update.totalAllocPoint = +result.toString()
+            update.totalAllocPoint = +result.toString();
           },
           balanceOf() {
             update.totalStakedByToken[target] = result.toString();
