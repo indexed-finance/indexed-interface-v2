@@ -104,7 +104,6 @@ export function useNewStakingApy(pid: string) {
     const hasLoaded = ndxPrice && tokenPrice && stakingPool;
 
     if (hasLoaded) {
-      console.log("loaded", stakingPool?.name);
       const ndxMinedPerDay = convert.toBigNumber(
         stakingPool?.rewardsPerDay ?? "0"
       );
@@ -121,8 +120,6 @@ export function useNewStakingApy(pid: string) {
       const totalStakedValue = stakedAmount * (tokenPrice ?? 0);
       return convert.toPercent(valueNdxPerYear / totalStakedValue);
     } else {
-      console.log("has not loaded", stakingPool?.name);
-      console.log({ ndxPrice, tokenPrice, stakingPool });
       return null;
     }
   }, [tokenPrice, ndxPrice, stakingPool]);

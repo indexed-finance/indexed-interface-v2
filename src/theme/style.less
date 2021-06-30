@@ -13,6 +13,13 @@
 }
 
 // -- Customs
+.IndexPoolWidget {
+  .ant-card-meta-description {
+    padding-left: 12px !important;
+    border-left: 2px solid rgb(73, 255, 255);
+  }
+}
+
 .fancy {
   text-transform: uppercase !important;
   letter-spacing: 0.1ch !important;
@@ -110,10 +117,6 @@
 // -- Ant Overrides
 @font-family: "Main";
 
-.ant-card {
-  border-radius: 16px;
-}
-
 .ant-page-header {
   border: none !important;
 }
@@ -148,7 +151,8 @@
 
 .bordered,
 .ant-card-bordered {
-  border-radius: 16px;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
 }
 
 .ant-progress-circle .ant-progress-text {

@@ -82,19 +82,26 @@ async function executeChunk(
   _calls: CondensedCall[],
   _strict?: boolean
 ) {
-try {
-  const multicallContract = getContract(MULTICALL2_ADDRESS, 'MultiCall2', _provider);
-  // new Contract(MULTICALL2_ADDRESS, MULTICALL_ABI, _provider);
-  const { blockNumber, returnData } = await multicallContract.callStatic.tryBlockAndAggregate(
-    false, _calls.map(c => ({ target: c.target, callData: c.callData }))
-  );
-  const decodedResult = returnData.map((r) => r.success ? r.returnData : "0x");
-  return { blockNumber: blockNumber.toNumber(), decodedResult };
-} catch (err) {
-  console.log('Got mC err')
-  console.log(err)
-  throw err;
-}
+  try {
+    const multicallContract = getContract(
+      MULTICALL2_ADDRESS,
+      "MultiCall2",
+      _provider
+    );
+    const { blockNumber, returnData } =
+      await multicallContract.callStatic.tryBlockAndAggregate(
+        false,
+        _calls.map((c) => ({ target: c.target, callData: c.callData }))
+      );
+    const decodedResult = returnData.map((r) =>
+      r.success ? r.returnData : "0x"
+    );
+    return { blockNumber: blockNumber.toNumber(), decodedResult };
+  } catch (err) {
+    console.log("Got mC err");
+    console.log(err);
+    throw err;
+  }
 }
 
 export async function multicall(

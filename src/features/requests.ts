@@ -181,8 +181,8 @@ export function normalizeInitialData(categories: Category[]) {
           if (!normalizedTokensForCategory.ids.includes(tokenId)) {
             normalizedTokensForCategory.ids.push(tokenId);
             normalizedTokensForCategory.entities[tokenId] = {
-              ...(token.token),
-              id: tokenId
+              ...token.token,
+              id: tokenId,
             };
           }
 
@@ -217,7 +217,7 @@ export function normalizeInitialData(categories: Category[]) {
           },
           totalDenorm: totalWeight,
           totalSupply,
-          swapFee: convert.toToken('0.025', 18).toString(10),
+          swapFee: convert.toToken("0.025", 18).toString(10),
         };
 
         if (indexPool.initialized) {
