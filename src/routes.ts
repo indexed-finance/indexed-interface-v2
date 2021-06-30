@@ -82,7 +82,7 @@ export const routes: RouteWithBreadcrumbs[] = [
     component: Vaults,
   },
   {
-    path: "/vault/:slug",
+    path: "/vaults/:slug",
     exact: true,
     component: Vault,
   },
