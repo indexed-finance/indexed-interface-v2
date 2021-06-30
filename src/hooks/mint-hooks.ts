@@ -1,4 +1,5 @@
 import { AppState, selectors, useSigner } from "features";
+import { BigNumber } from "ethereum";
 import { COMMON_BASE_TOKENS, SLIPPAGE_RATE } from "config";
 import { Currency, Trade } from "@indexed-finance/narwhal-sdk";
 import {
@@ -19,7 +20,6 @@ import { usePoolTokenAddresses, usePoolUnderlyingTokens } from "./pool-hooks";
 import { useSelector } from "react-redux";
 import { useTokenLookupBySymbol } from "./token-hooks";
 import { useUniswapTradingPairs } from "./pair-hooks";
-import BigNumber from "bignumber.js";
 
 // #region Token
 export function useSingleTokenMintCallbacks(poolId: string) {
@@ -39,6 +39,7 @@ export function useSingleTokenMintCallbacks(poolId: string) {
           ];
         if (inputToken) {
           const tokenIn = inputToken.token.id;
+
           const result = calcSingleInGivenPoolOut(pool, inputToken, amountOut);
           return {
             tokenIn,
@@ -195,7 +196,6 @@ export function useMintRouterCallbacks(poolId: string) {
   const getBestMintRouteForAmountOut = useCallback(
     (tokenInSymbol: string, amountOut: BigNumber) => {
       if (loading) return null;
-      console.log("here!");
       const normalizedInput = tokenLookupBySymbol[tokenInSymbol.toLowerCase()];
       const allResults = poolTokens
         .map((token) => {
@@ -267,14 +267,14 @@ export function useMintRouterCallbacks(poolId: string) {
           const uniswapResult = calculateBestTradeForExactInput(
             normalizedInput,
             normalizedOutput,
-            amountIn,
+            convert.toBigNumber(amountIn),
             { maxHops: 2, maxNumResults: 1 }
           );
 
           if (uniswapResult) {
             const poolResult = calculateAmountOut(
               normalizedOutput.symbol,
-              uniswapResult.outputAmount as unknown as any
+              convert.toBigNumber(uniswapResult.outputAmount.raw.toString())
             );
 
             if (poolResult) {

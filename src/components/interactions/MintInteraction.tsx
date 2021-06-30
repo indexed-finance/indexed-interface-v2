@@ -224,8 +224,6 @@ function UniswapMintInteraction({ indexPool }: Props) {
 
         const result = getBestMintRouteForAmountOut(fromToken, toAmount.exact);
 
-        console.log({ result }, "out");
-
         if (result) {
           if (result.poolResult?.error) {
             return result.poolResult.error;

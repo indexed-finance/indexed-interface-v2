@@ -202,7 +202,7 @@ export function useBurnRouterCallbacks(poolId: string) {
           if (uniswapResult) {
             const poolResult = calculateAmountIn(
               normalizedPoolTokenOut.symbol,
-              uniswapResult.inputAmount as unknown as any
+              convert.toBigNumber(uniswapResult.inputAmount.raw.toString())
             );
             if (poolResult) {
               if (poolResult.error) {
