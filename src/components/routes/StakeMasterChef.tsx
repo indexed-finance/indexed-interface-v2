@@ -41,19 +41,16 @@ function StakingForm({
     };
     inputType: "stake" | "unstake";
   }>();
-
   const { stake, withdraw } = useMasterChefTransactionCallbacks(
     stakingToken.id
   );
   const rewardsPerDay = useMasterChefRewardsPerDay(stakingToken.id);
-
   const [staked] = useMemo(() => {
     const staked = stakingToken.userStakedBalance;
     const earned = stakingToken.userEarnedRewards;
 
     return [staked, earned];
   }, [stakingToken]);
-
   const [estimatedReward, weight] = useMemo<[string, BigNumber]>(() => {
     const stakedAmount = convert.toBigNumber(staked ?? "0");
     const addAmount =
@@ -78,29 +75,21 @@ function StakingForm({
     staked,
     values.inputType,
   ]);
-
   const handleSubmit = () => {
-    if (values.inputType === "stake")
-      stake(convert.toToken(values.amount.toString(), 18).toString());
-    else withdraw(convert.toToken(values.amount.toString(), 18).toString());
-  };
+    const fn = values.inputType === "stake" ? stake : withdraw;
 
-  useBalanceAndApprovalRegistrar(MASTER_CHEF_ADDRESS, [stakingToken.token]);
+    fn(values.amount.exact.toString());
+  };
   const balance = useTokenBalance(stakingToken.token);
-  console.log(`BALANCE ${balance}`);
-  const [amount, rawAmount] = useMemo(() => {
-    return [
-      values.amount.toString(),
-      convert.toToken(values.amount.toString(), 18).toString(),
-    ];
-  }, [values]);
   const { status, approve } = useTokenApproval({
     spender: MASTER_CHEF_ADDRESS,
     tokenId: stakingToken.token,
-    amount,
-    rawAmount,
+    amount: values.amount.displayed,
+    rawAmount: values.amount.exact.toString(),
     symbol: token.symbol,
   });
+
+  useBalanceAndApprovalRegistrar(MASTER_CHEF_ADDRESS, [stakingToken.token]);
 
   return (
     <Space direction="vertical" size="large" style={{ width: "100%" }}>
@@ -295,23 +284,26 @@ export default function StakeMasterChef() {
             <Formik
               initialValues={{
                 asset: "",
-                amount: 0,
+                amount: {
+                  displayed: "0.00",
+                  exact: convert.toBigNumber("0.00"),
+                },
                 inputType: "stake",
               }}
-              onSubmit={console.log}
+              onSubmit={console.info}
               validateOnChange={true}
               validateOnBlur={true}
               validate={(values) => {
                 const errors: Record<string, string> = {};
                 const maximum =
                   values.inputType === "stake"
-                    ? parseFloat(convert.toBalance(balance ?? "0"))
-                    : parseFloat(
-                        convert.toBalance(toStake.userStakedBalance ?? "0")
-                      );
-                if (values.amount > maximum) {
+                    ? convert.toBigNumber(balance)
+                    : convert.toBigNumber(toStake.userStakedBalance ?? "0.00");
+
+                if (values.amount.exact.isGreaterThan(maximum)) {
                   errors.amount = "Insufficient balance.";
                 }
+
                 return errors;
               }}
             >

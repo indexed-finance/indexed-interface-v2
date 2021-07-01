@@ -38,6 +38,8 @@ const convert = {
   toComma: (number: number, options: Intl.NumberFormatOptions = {}) =>
     templateConvert(number, {
       useGrouping: true,
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
       ...options,
     }),
   toHex: (amount: string | BigNumber) => toHex(convert.toBigNumber(amount)),

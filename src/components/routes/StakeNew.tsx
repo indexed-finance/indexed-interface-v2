@@ -58,7 +58,6 @@ function StakingForm({
 
     return [staked, earned];
   }, [stakingToken]);
-
   const [estimatedReward, weight] = useMemo<[string, BigNumber]>(() => {
     const stakedAmount = convert.toBigNumber(staked ?? "0");
     const addAmount =
@@ -86,32 +85,23 @@ function StakingForm({
     staked,
     values.inputType,
   ]);
-
   const handleSubmit = () => {
-    if (values.inputType === "stake")
-      stake(convert.toToken(values.amount.toString(), 18).toString());
-    else withdraw(convert.toToken(values.amount.toString(), 18).toString());
+    const fn = values.inputType === "stake" ? stake : withdraw;
+
+    fn(values.amount.exact.toString());
   };
+  const balance = useTokenBalance(stakingToken.token);
+  const { status, approve } = useTokenApproval({
+    spender: MULTI_TOKEN_STAKING_ADDRESS,
+    tokenId: stakingToken.token,
+    amount: values.amount.displayed,
+    rawAmount: values.amount.exact.toString(),
+    symbol: stakingToken.symbol,
+  });
 
   useBalanceAndApprovalRegistrar(MULTI_TOKEN_STAKING_ADDRESS, [
     stakingToken.token,
   ]);
-  const balance = useTokenBalance(stakingToken.token);
-  const [amount, rawAmount] = useMemo(() => {
-    return [
-      values.amount.toString(),
-      convert
-        .toToken(values.amount.toString(), stakingToken.decimals)
-        .toString(),
-    ];
-  }, [values, stakingToken]);
-  const { status, approve } = useTokenApproval({
-    spender: MULTI_TOKEN_STAKING_ADDRESS,
-    tokenId: stakingToken.token,
-    amount,
-    rawAmount,
-    symbol: stakingToken.symbol,
-  });
 
   return (
     <Space direction="vertical" size="large" style={{ width: "100%" }}>
