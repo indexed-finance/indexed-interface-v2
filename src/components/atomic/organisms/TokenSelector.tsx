@@ -61,7 +61,7 @@ interface Props {
 
 const DEFAULT_ENTRY = {
   displayed: "0.00",
-  exact: convert.toBigNumber("0.00"),
+  exact: convert.toBigNumber("0"),
 };
 
 export function TokenSelector({
@@ -110,7 +110,6 @@ export function TokenSelector({
       exact: convert.toBigNumber("0"),
     };
   }, [rawBalance, selectedToken, balanceOverride]);
-
   const triggerChange = useCallback(
     (changedValue: TokenSelectorValue) => {
       if (onChange) {
@@ -175,7 +174,7 @@ export function TokenSelector({
     }
   }, []);
   const handleMaxOut = useCallback(
-    () => onAmountChange(parseFloat(balance.displayed)),
+    () => onAmountChange(parseFloat(balance.displayed ?? "0.00")),
     [onAmountChange, balance]
   );
   const handleOpenTokenSelection = useCallback(() => {

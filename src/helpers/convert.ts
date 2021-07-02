@@ -98,14 +98,18 @@ const convert = {
   toUniswapSDKCurrencyAmount: (
     provider: ProviderLike,
     token: NormalizedToken,
-    amount: BigNumber
-  ): CurrencyAmount =>
-    token.id === constants.AddressZero
-      ? CurrencyAmount.ether(amount.toString())
+    amount: BigNumber,
+    decimals: number
+  ): CurrencyAmount => {
+    const value = convert.toToken(amount.toString(), decimals);
+
+    return token.id === constants.AddressZero
+      ? CurrencyAmount.ether(value.toString())
       : new TokenAmount(
           convert.toUniswapSDKToken(provider, token),
-          amount.toString()
-        ),
+          value.toString()
+        );
+  },
   // Uniswap SDK
   toUniswapSDKToken: (provider: ProviderLike, token: NormalizedToken) =>
     token.id === constants.AddressZero

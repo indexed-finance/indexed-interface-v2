@@ -267,7 +267,7 @@ export function useMintRouterCallbacks(poolId: string) {
           const uniswapResult = calculateBestTradeForExactInput(
             normalizedInput,
             normalizedOutput,
-            convert.toBigNumber(amountIn),
+            amountIn,
             { maxHops: 2, maxNumResults: 1 }
           );
 
