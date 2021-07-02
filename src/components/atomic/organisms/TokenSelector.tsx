@@ -45,12 +45,12 @@ interface Props {
   max?: number | undefined;
   showBalance?: boolean;
   balanceLabel?: string;
-  balanceOverride?: string;
+  balanceOverride?: { displayed: string; exact: BigNumber };
   label?: ReactNode;
   assets: Asset[];
   value?: TokenSelectorValue;
   selectable?: boolean;
-  balance?: string;
+  balance?: { displayed: string; exact: BigNumber };
   error?: string;
   reversed?: boolean;
   autoFocus?: boolean;
@@ -97,10 +97,18 @@ export function TokenSelector({
     if (balanceOverride) {
       return balanceOverride;
     }
+
     if (rawBalance && selectedToken) {
-      return convert.toBalance(rawBalance, selectedToken.decimals, false, 18);
+      return {
+        displayed: convert.toBalance(rawBalance),
+        exact: convert.toBigNumber(rawBalance),
+      };
     }
-    return "0";
+
+    return {
+      displayed: "0.00",
+      exact: convert.toBigNumber("0"),
+    };
   }, [rawBalance, selectedToken, balanceOverride]);
 
   const triggerChange = useCallback(
@@ -116,17 +124,13 @@ export function TokenSelector({
     },
     [onChange, amount, token, value]
   );
-  const haveInsufficientBalance = useMemo(() => {
-    return isInput && parseFloat(balance) < (value.amount || 0);
-  }, [isInput, value.amount, balance]);
-
+  const haveInsufficientBalance = useMemo(
+    () => isInput && balance.exact.isLessThan(value.amount?.exact ?? 0),
+    [isInput, value.amount, balance]
+  );
   const onAmountChange = useCallback(
-    (newAmount?: number | string | null) => {
-      if (
-        newAmount == null ||
-        Number.isNaN(parseFloat(amount.displayed)) ||
-        amount.exact.isLessThan(0)
-      ) {
+    (newAmountNumber: number) => {
+      if (newAmountNumber == null || amount.exact.isLessThan(0)) {
         triggerChange({
           amount: DEFAULT_ENTRY,
         });
@@ -134,24 +138,24 @@ export function TokenSelector({
         setTouched({ [amountField]: true });
         return;
       }
-      const asBigNumber = convert.toToken(newAmount.toString());
-      const amountToUse = {
-        displayed: convert.toBalance(asBigNumber),
-        exact: asBigNumber,
+
+      const nextAmount = {
+        displayed: newAmountNumber.toString(),
+        exact: convert.toBigNumber(newAmountNumber.toString()),
       };
 
       if (!value.hasOwnProperty("amount")) {
-        setAmount(amountToUse);
+        setAmount(nextAmount);
       }
 
       let error: string | undefined = undefined;
-      if (isInput && amountToUse.exact.isGreaterThan(0)) {
-        if (amountToUse.exact.isGreaterThan(parseFloat(balance))) {
+      if (isInput && nextAmount.exact.isGreaterThan(0)) {
+        if (nextAmount.exact.isGreaterThan(balance.exact)) {
           error = "Insufficient balance";
         }
       }
 
-      triggerChange({ amount: amountToUse, error });
+      triggerChange({ amount: nextAmount, error });
     },
     [amount, triggerChange, value, balance, isInput, amountField, setTouched]
   );
@@ -170,9 +174,10 @@ export function TokenSelector({
       input.current.focus();
     }
   }, []);
-  const handleMaxOut = useCallback(() => {
-    onAmountChange(rawBalance);
-  }, [onAmountChange, rawBalance]);
+  const handleMaxOut = useCallback(
+    () => onAmountChange(parseFloat(balance.displayed)),
+    [onAmountChange, balance]
+  );
   const handleOpenTokenSelection = useCallback(() => {
     if (selectable) {
       setSelectingToken(true);
@@ -227,7 +232,7 @@ export function TokenSelector({
               balanceLabel={balanceLabel}
               error={haveInsufficientBalance ? "Insufficient balance" : error}
               showBalance={showBalance}
-              balance={balance}
+              balance={balanceOverride ?? balance}
               onClickMax={isInput ? handleMaxOut : undefined}
             />
             <InputNumber
@@ -236,11 +241,7 @@ export function TokenSelector({
               min={0}
               max={max}
               step="0.01"
-              value={
-                value.amount?.displayed
-                  ? parseFloat(value.amount?.displayed)
-                  : parseFloat(amount.displayed)
-              }
+              value={parseFloat(value.amount?.displayed || amount.displayed)}
               disabled={onChange === undefined}
               onFocus={() => setTouched({ [amountField]: true })}
               onChange={onAmountChange}

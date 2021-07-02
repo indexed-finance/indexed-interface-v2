@@ -86,9 +86,9 @@ function StakingForm({
     values.inputType,
   ]);
   const handleSubmit = () => {
-    const fn = values.inputType === "stake" ? stake : withdraw;
-
-    fn(values.amount.exact.toString());
+    (values.inputType === "stake" ? stake : withdraw)(
+      values.amount.exact.toString()
+    );
   };
   const balance = useTokenBalance(stakingToken.token);
   const { status, approve } = useTokenApproval({
@@ -116,8 +116,14 @@ function StakingForm({
         balanceLabel={values.inputType === "unstake" ? "Staked" : undefined}
         balanceOverride={
           values.inputType === "unstake"
-            ? staked
-            : convert.toBalance(balance, stakingToken.decimals)
+            ? {
+                displayed: staked ?? "0.00",
+                exact: convert.toBigNumber(staked ?? "0"),
+              }
+            : {
+                displayed: balance ?? "0.00",
+                exact: convert.toBigNumber(balance ?? "0"),
+              }
         }
         selectable={false}
         onChange={(value) => setFieldValue("amount", value.amount)}
@@ -200,7 +206,6 @@ function StakingStats({
     earned = earned ? convert.toBalance(earned, 18) : "0";
     return [staked, earned];
   }, [stakingToken]);
-
   const { exit, claim } = useNewStakingTransactionCallbacks(stakingToken.id);
 
   return (
@@ -289,7 +294,7 @@ export default function StakeNew() {
   );
 
   if (!(toStake && relevantPortfolioToken)) {
-    return <div>Derp</div>;
+    return null;
   }
 
   const stakingToken = relevantPortfolioToken.symbol;
@@ -302,7 +307,10 @@ export default function StakeNew() {
             <Formik
               initialValues={{
                 asset: "",
-                amount: 0,
+                amount: {
+                  displayed: "0.00",
+                  exact: convert.toBigNumber("0.00"),
+                },
                 inputType: "stake",
               }}
               onSubmit={console.log}
@@ -310,15 +318,16 @@ export default function StakeNew() {
               validateOnBlur={true}
               validate={(values) => {
                 const errors: Record<string, string> = {};
-                const maximum =
+                const maximum = parseFloat(
                   values.inputType === "stake"
-                    ? parseFloat(relevantPortfolioToken.balance)
-                    : parseFloat(
-                        convert.toBalance(toStake.userStakedBalance ?? "0")
-                      );
-                if (values.amount > maximum) {
+                    ? relevantPortfolioToken.balance
+                    : convert.toBalance(toStake.userStakedBalance ?? "0")
+                );
+
+                if (values.amount.exact.isGreaterThan(maximum)) {
                   errors.amount = "Insufficient balance.";
                 }
+
                 return errors;
               }}
             >

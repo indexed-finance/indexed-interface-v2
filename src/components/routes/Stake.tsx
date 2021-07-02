@@ -68,7 +68,6 @@ function StakingForm({
     expired,
     values.inputType,
   ]);
-
   const handleSubmit = () => {
     if (values.inputType === "stake")
       stake(convert.toToken(values.amount.toString(), 18).toString());
@@ -140,17 +139,33 @@ function StakingForm({
             amount: values.amount,
           }}
           balanceLabel={values.inputType === "unstake" ? "Staked" : undefined}
-          balanceOverride={values.inputType === "unstake" ? staked : undefined}
+          balanceOverride={
+            values.inputType === "unstake"
+              ? {
+                  displayed: staked ?? "0.00",
+                  exact: convert.toBigNumber(staked ?? "0"),
+                }
+              : undefined
+          }
           isInput={true}
           autoFocus={true}
           selectable={false}
           onChange={(value) => {
             setFieldValue("amount", value.amount);
           }}
-          balance={values.inputType === "unstake" ? staked : token.balance}
+          balance={
+            values.inputType === "unstake"
+              ? {
+                  displayed: staked ?? "0.00",
+                  exact: convert.toBigNumber(staked ?? "0"),
+                }
+              : {
+                  displayed: token.balance ?? "0.00",
+                  exact: convert.toBigNumber(token.balance ?? "0"),
+                }
+          }
           error={errors.amount?.displayed}
         />
-
         <Alert
           type="warning"
           message={
@@ -170,7 +185,6 @@ function StakingForm({
             </Row>
           }
         />
-
         <Button.Group style={{ width: "100%" }}>
           <Button
             type="primary"
@@ -199,7 +213,6 @@ function StakingForm({
             {values.inputType === "stake" ? "Withdraw" : "Deposit"}
           </Button>
         </Button.Group>
-
         <Space direction="vertical" style={{ width: "100%" }}>
           <Label>Actions</Label>
           <Button
