@@ -69,9 +69,9 @@ function StakingForm({
     values.inputType,
   ]);
   const handleSubmit = () => {
-    if (values.inputType === "stake")
-      stake(convert.toToken(values.amount.toString(), 18).toString());
-    else withdraw(convert.toToken(values.amount.toString(), 18).toString());
+    (values.inputType === "stake" ? stake : withdraw)(
+      convert.toToken(values.amount.exact, token.decimals).toString()
+    );
   };
 
   if (expired) {
@@ -142,7 +142,11 @@ function StakingForm({
           balanceOverride={
             values.inputType === "unstake"
               ? {
-                  displayed: staked ?? "0.00",
+                  displayed:
+                    convert.toBalance(
+                      convert.toBigNumber(staked ?? "0"),
+                      token.decimals
+                    ) ?? "0.00",
                   exact: convert.toBigNumber(staked ?? "0"),
                 }
               : undefined

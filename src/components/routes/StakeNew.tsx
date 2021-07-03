@@ -58,21 +58,26 @@ function StakingForm({
 
     return [staked, earned];
   }, [stakingToken]);
+
   const [estimatedReward, weight] = useMemo<[string, BigNumber]>(() => {
     const stakedAmount = convert.toBigNumber(staked ?? "0");
+
     const addAmount =
       values.inputType === "stake"
         ? values.amount.exact
         : values.amount.exact.negated();
+
     const userNewStaked = stakedAmount.plus(addAmount);
+
     if (userNewStaked.isLessThan(0)) {
       return ["0.00", convert.toBigNumber("0.00")];
     }
+
     const totalStaked = convert.toBigNumber(stakingToken.totalStaked);
     const newTotalStaked = totalStaked.plus(addAmount);
     const dailyRewardsTotal = convert.toBalanceNumber(
       convert.toBigNumber(stakingToken.rewardsPerDay),
-      18
+      stakingToken.decimals
     );
     const weight = userNewStaked.dividedBy(newTotalStaked);
     const result = weight.multipliedBy(dailyRewardsTotal);
@@ -80,14 +85,16 @@ function StakingForm({
     return [convert.toComma(result.toNumber()), weight];
   }, [
     values.amount,
+    stakingToken.decimals,
     stakingToken.totalStaked,
     stakingToken.rewardsPerDay,
     staked,
     values.inputType,
   ]);
+
   const handleSubmit = () => {
     (values.inputType === "stake" ? stake : withdraw)(
-      values.amount.exact.toString()
+      convert.toToken(values.amount.exact, token.decimals).toString()
     );
   };
   const balance = useTokenBalance(stakingToken.token);
@@ -117,11 +124,15 @@ function StakingForm({
         balanceOverride={
           values.inputType === "unstake"
             ? {
-                displayed: staked ?? "0.00",
+                displayed:
+                  convert.toBalance(
+                    convert.toBigNumber(staked ?? "0"),
+                    token.decimals
+                  ) ?? "0.00",
                 exact: convert.toBigNumber(staked ?? "0"),
               }
             : {
-                displayed: balance ?? "0.00",
+                displayed: convert.toBalance(balance, token.decimals) ?? "0.00",
                 exact: convert.toBigNumber(balance ?? "0"),
               }
         }
@@ -158,7 +169,7 @@ function StakingForm({
             type="primary"
             block={true}
             onClick={approve}
-            disabled={!!errors.amount}
+            disabled={Boolean(errors.amount?.displayed)}
           >
             Approve
           </Button>
@@ -168,7 +179,7 @@ function StakingForm({
             danger={values.inputType === "unstake"}
             block={true}
             onClick={handleSubmit}
-            disabled={!!errors.amount}
+            disabled={Boolean(errors.amount?.displayed)}
           >
             {values.inputType === "stake" ? "Deposit" : "Withdraw"}
           </Button>
@@ -193,6 +204,7 @@ function StakingForm({
 
 function StakingStats({
   symbol,
+  portfolioToken,
   stakingToken,
 }: {
   symbol: string;
@@ -202,10 +214,15 @@ function StakingStats({
   const [staked, earned] = useMemo(() => {
     let staked = stakingToken.userStakedBalance;
     let earned = stakingToken.userEarnedRewards;
-    staked = staked ? convert.toBalance(staked, 18) : "0";
-    earned = earned ? convert.toBalance(earned, 18) : "0";
+    staked = staked
+      ? convert.toBalance(staked, portfolioToken.decimals, false, 10)
+      : "0";
+    earned = earned
+      ? convert.toBalance(earned, portfolioToken.decimals, false, 10)
+      : "0";
+
     return [staked, earned];
-  }, [stakingToken]);
+  }, [stakingToken, portfolioToken.decimals]);
   const { exit, claim } = useNewStakingTransactionCallbacks(stakingToken.id);
 
   return (

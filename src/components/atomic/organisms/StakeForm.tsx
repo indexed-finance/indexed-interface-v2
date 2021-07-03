@@ -1,39 +1,59 @@
-import { Alert, Button, Col, Descriptions, Row, Space, Statistic } from "antd";
-import { AppState, FormattedPortfolioAsset, selectors } from "features";
+import {
+  Alert,
+  Button,
+  Col,
+  Descriptions,
+  Divider,
+  Row,
+  Space,
+  Statistic,
+} from "antd";
+import {
+  AppState,
+  ApprovalStatus,
+  FormattedPortfolioAsset,
+  MasterChefPool,
+  NewStakingPool,
+  selectors,
+} from "features";
+import { BigNumber } from "ethereum";
 import { ExternalLink, Page, TokenSelector } from "components/atomic";
 import { Formik, useFormikContext } from "formik";
-import { MASTER_CHEF_ADDRESS } from "config";
-import { MasterChefPool } from "features/masterChef";
-import {
-  abbreviateAddress,
-  convert,
-  sushiswapAddLiquidityLink,
-  sushiswapInfoPairLink,
-} from "helpers";
+import { Link, useParams } from "react-router-dom";
+import { MASTER_CHEF_ADDRESS, MULTI_TOKEN_STAKING_ADDRESS } from "config";
+import { ReactNode, useMemo } from "react";
+import { abbreviateAddress, convert } from "helpers";
 import {
   useBalanceAndApprovalRegistrar,
+  useBreakpoints,
+  useMasterChefRegistrar,
+  useMasterChefRewardsPerDay,
   useMasterChefTransactionCallbacks,
-  usePair,
+  useNewStakingRegistrar,
+  useNewStakingTransactionCallbacks,
   usePortfolioData,
   useTokenApproval,
   useTokenBalance,
 } from "hooks";
-import {
-  useMasterChefRegistrar,
-  useMasterChefRewardsPerDay,
-} from "hooks/masterchef-hooks";
-import { useMemo } from "react";
-import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
-import BigNumber from "bignumber.js";
+import S from "string";
 
 function StakingForm({
   token,
   stakingToken,
+  protocol,
+  spender,
+  onStake,
+  onWithdraw,
 }: {
   token: FormattedPortfolioAsset;
-  stakingToken: MasterChefPool;
+  stakingToken: NewStakingPool | MasterChefPool;
+  protocol: "uniswap" | "sushiswap";
+  spender: string;
+  onStake(amount: string): void;
+  onWithdraw(amount: string): void;
 }) {
+  const isSushiswap = protocol === "sushiswap";
   const { setFieldValue, values, errors } = useFormikContext<{
     amount: {
       displayed: string;
@@ -41,56 +61,60 @@ function StakingForm({
     };
     inputType: "stake" | "unstake";
   }>();
-  const { stake, withdraw } = useMasterChefTransactionCallbacks(
-    stakingToken.id
-  );
-  const rewardsPerDay = useMasterChefRewardsPerDay(stakingToken.id);
   const [staked] = useMemo(() => {
     const staked = stakingToken.userStakedBalance;
     const earned = stakingToken.userEarnedRewards;
 
     return [staked, earned];
   }, [stakingToken]);
+  const sushiRewardsPerDay = useMasterChefRewardsPerDay(stakingToken.id);
+  const rewardsPerDayToUse = isSushiswap
+    ? sushiRewardsPerDay
+    : (stakingToken as NewStakingPool).rewardsPerDay;
   const [estimatedReward, weight] = useMemo<[string, BigNumber]>(() => {
     const stakedAmount = convert.toBigNumber(staked ?? "0");
     const addAmount =
       values.inputType === "stake"
         ? values.amount.exact
         : values.amount.exact.negated();
-
     const userNewStaked = stakedAmount.plus(addAmount);
+
     if (userNewStaked.isLessThan(0)) {
       return ["0.00", convert.toBigNumber("0.00")];
     }
+
     const totalStaked = convert.toBigNumber(stakingToken.totalStaked);
     const newTotalStaked = totalStaked.plus(addAmount);
     const weight = userNewStaked.dividedBy(newTotalStaked);
-    const dailyRewardsTotal = convert.toBalanceNumber(rewardsPerDay);
+    const dailyRewardsTotal = convert.toBalanceNumber(rewardsPerDayToUse);
     const result = weight.multipliedBy(dailyRewardsTotal);
 
     return [convert.toComma(result.toNumber()), weight];
   }, [
     values.amount,
-    stakingToken.totalStaked,
-    rewardsPerDay,
+    stakingToken,
     staked,
     values.inputType,
+    rewardsPerDayToUse,
   ]);
   const handleSubmit = () => {
-    (values.inputType === "stake" ? stake : withdraw)(
+    (values.inputType === "stake" ? onStake : onWithdraw)(
       convert.toToken(values.amount.exact, token.decimals).toString()
     );
   };
   const balance = useTokenBalance(stakingToken.token);
   const { status, approve } = useTokenApproval({
-    spender: MASTER_CHEF_ADDRESS,
+    spender,
     tokenId: stakingToken.token,
     amount: values.amount.displayed,
     rawAmount: values.amount.exact.toString(),
-    symbol: token.symbol,
+    symbol: isSushiswap
+      ? token.symbol
+      : (stakingToken as NewStakingPool).symbol,
   });
-
-  useBalanceAndApprovalRegistrar(MASTER_CHEF_ADDRESS, [stakingToken.token]);
+  const estimatedRewardAssetText = `${estimatedReward} ${
+    isSushiswap ? "SUSHI / Day" : "NDX / Day"
+  }`;
 
   return (
     <Space direction="vertical" size="large" style={{ width: "100%" }}>
@@ -100,7 +124,7 @@ function StakingForm({
           token: token.symbol,
           amount: values.amount,
         }}
-        isInput={true}
+        isInput
         autoFocus
         balanceLabel={values.inputType === "unstake" ? "Staked" : undefined}
         balanceOverride={
@@ -122,6 +146,7 @@ function StakingForm({
         onChange={(value) => setFieldValue("amount", value.amount)}
         error={errors.amount?.displayed}
       />
+
       <Alert
         type="warning"
         message={
@@ -134,7 +159,7 @@ function StakingForm({
           >
             <Statistic
               title="Estimated Reward"
-              value={`${estimatedReward} SUSHI / Day`}
+              value={estimatedRewardAssetText}
             />
             <Statistic
               title="Pool Weight"
@@ -184,13 +209,25 @@ function StakingForm({
 }
 
 function StakingStats({
+  decimals,
   symbol,
   portfolioToken,
   stakingToken,
+  poolLink,
+  stakingTokenLink,
+  rewardsPerDay,
+  onExit,
+  onClaim,
 }: {
+  decimals: number;
   symbol: string;
   portfolioToken: FormattedPortfolioAsset;
-  stakingToken: MasterChefPool;
+  stakingToken: NewStakingPool | MasterChefPool;
+  poolLink: ReactNode;
+  stakingTokenLink: string;
+  rewardsPerDay: string;
+  onExit(): void;
+  onClaim(): void;
 }) {
   const [staked, earned] = useMemo(() => {
     let staked = stakingToken.userStakedBalance;
@@ -204,15 +241,6 @@ function StakingStats({
 
     return [staked, earned];
   }, [stakingToken, portfolioToken.decimals]);
-  const rewardsPerDay = useMasterChefRewardsPerDay(stakingToken.id);
-
-  const { exit, claim } = useMasterChefTransactionCallbacks(stakingToken.id);
-
-  const pair = usePair(stakingToken.token);
-  const url =
-    pair && pair.token0 && pair.token1
-      ? sushiswapAddLiquidityLink(pair.token0, pair.token1)
-      : sushiswapInfoPairLink(stakingToken.token);
 
   return (
     <Descriptions bordered={true} column={1}>
@@ -224,7 +252,7 @@ function StakingStats({
               {staked} {symbol}
             </Col>
             <Col xs={24} md={8}>
-              <Button danger type="primary" block={true} onClick={exit}>
+              <Button danger type="primary" block={true} onClick={onExit}>
                 Exit
               </Button>
             </Col>
@@ -235,10 +263,10 @@ function StakingStats({
         <Descriptions.Item label="Earned Rewards">
           <Row>
             <Col xs={24} md={14}>
-              {earned} SUSHI
+              {earned} NDX
             </Col>
             <Col xs={24} md={8}>
-              <Button type="primary" block={true} onClick={claim}>
+              <Button type="primary" block={true} onClick={onClaim}>
                 Claim
               </Button>
             </Col>
@@ -247,35 +275,56 @@ function StakingStats({
       )}
 
       <Descriptions.Item label="Reward Rate per Day">
-        {`${convert.toBalance(rewardsPerDay, 18)} SUSHI`}
+        {`${convert.toBalance(rewardsPerDay, 18)} NDX`}
       </Descriptions.Item>
 
-      <Descriptions.Item label="Rewards Pool">
-        <ExternalLink
-          to={`https://etherscan.io/address/${MASTER_CHEF_ADDRESS}`}
-        >
-          {abbreviateAddress(MASTER_CHEF_ADDRESS)}
-        </ExternalLink>
-      </Descriptions.Item>
+      <Descriptions.Item label="Rewards Pool">{poolLink}</Descriptions.Item>
 
       {/* Right Column */}
       <Descriptions.Item label="Total Staked">
-        {convert.toBalance(stakingToken.totalStaked, 18, true)} {symbol}
+        {convert.toBalance(stakingToken.totalStaked, decimals, true)} {symbol}
       </Descriptions.Item>
+
       <Descriptions.Item label="Staking Token">
-        <ExternalLink to={url}>{symbol}</ExternalLink>
+        <ExternalLink to={stakingTokenLink}>{symbol}</ExternalLink>
       </Descriptions.Item>
     </Descriptions>
   );
 }
 
-export default function StakeMasterChef() {
+export function StakeForm({
+  decimals,
+  protocol,
+  spender,
+  poolLink,
+  stakingTokenLink,
+  rewardsPerDay,
+  stakingPoolSelector,
+  onStake,
+  onWithdraw,
+  onExit,
+  onClaim,
+}: {
+  decimals: number;
+  protocol: "uniswap" | "sushiswap";
+  spender: string;
+  poolLink: ReactNode;
+  stakingTokenLink: string;
+  rewardsPerDay: string;
+  stakingPoolSelector(
+    state: AppState,
+    id: string
+  ): NewStakingPool | MasterChefPool | undefined;
+  onStake(amount: string): void;
+  onWithdraw(amount: string): void;
+  onExit(): void;
+  onClaim(): void;
+}) {
+  const { isMobile } = useBreakpoints();
   const { id } = useParams<{ id: string }>();
-
-  useMasterChefRegistrar();
   const data = usePortfolioData({ onlyOwnedAssets: false });
   const toStake = useSelector((state: AppState) =>
-    selectors.selectMasterChefPool(state, id)
+    stakingPoolSelector(state, id)
   );
   const relevantPortfolioToken = useMemo(
     () =>
@@ -292,7 +341,6 @@ export default function StakeMasterChef() {
   if (!(toStake && relevantPortfolioToken)) {
     return null;
   }
-
   const stakingToken = relevantPortfolioToken.symbol;
 
   return (
@@ -330,18 +378,86 @@ export default function StakeMasterChef() {
               <StakingForm
                 token={relevantPortfolioToken}
                 stakingToken={toStake}
+                protocol={protocol}
+                spender={spender}
+                onWithdraw={onWithdraw}
+                onStake={onStake}
               />
             </Formik>
           </Col>
           <Col xs={24} md={14}>
+            {isMobile && <Divider />}
             <StakingStats
               symbol={stakingToken}
               portfolioToken={relevantPortfolioToken}
               stakingToken={toStake}
+              onExit={onExit}
+              onClaim={onClaim}
+              poolLink={poolLink}
+              stakingTokenLink={stakingTokenLink}
+              decimals={decimals}
+              rewardsPerDay={rewardsPerDay}
             />
           </Col>
         </Row>
       </Space>
     </Page>
+  );
+}
+
+export function UniswapStakeForm() {
+  const { id } = useParams<{ id: string }>();
+  const { stake, withdraw, exit, claim } = useNewStakingTransactionCallbacks(
+    id
+  );
+  const toStake = useSelector((state: AppState) =>
+    selectors.selectNewStakingPool(state, id)
+  );
+
+  useNewStakingRegistrar();
+
+  return (
+    <StakeForm
+      protocol="sushiswap"
+      spender={MASTER_CHEF_ADDRESS}
+      onStake={stake}
+      onWithdraw={withdraw}
+      onExit={exit}
+      onClaim={claim}
+      stakingPoolSelector={selectors.selectNewStakingPool}
+      poolLink="https://google.com/"
+      stakingTokenLink="https://google.com/"
+      rewardsPerDay={toStake?.rewardsPerDay ?? "0.00"}
+      decimals={toStake?.decimals ?? 18}
+    />
+  );
+}
+
+export function SushiswapStakeForm() {
+  const { id } = useParams<{ id: string }>();
+  const { stake, withdraw, exit, claim } = useMasterChefTransactionCallbacks(
+    id
+  );
+  const rewardsPerDay = useMasterChefRewardsPerDay(id);
+  const toStake = useSelector((state: AppState) =>
+    selectors.selectMasterChefPool(state, id)
+  );
+
+  useMasterChefRegistrar();
+
+  return (
+    <StakeForm
+      protocol="sushiswap"
+      spender={MASTER_CHEF_ADDRESS}
+      onStake={stake}
+      onWithdraw={withdraw}
+      onExit={exit}
+      onClaim={claim}
+      stakingPoolSelector={selectors.selectMasterChefPool}
+      poolLink="https://google.com/"
+      stakingTokenLink="https://google.com/"
+      rewardsPerDay={rewardsPerDay.toString()}
+      decimals={18}
+    />
   );
 }
