@@ -11,6 +11,8 @@ export * from './IndexPoolWidget';
 export * from './LayoutHeader';
 export * from './Page';
 export * from './PortfolioWidget';
+export * from './StakeForm';
+export * from './StakeStats';
 export * from './StakingCard';
 export * from './TokenSelector';
 export * from './TooltipProvider';

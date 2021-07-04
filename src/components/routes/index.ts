@@ -6,6 +6,6 @@ export * from './IndexPools';
 export * from './Portfolio';
 export * from './Splash';
 export * from './Stake';
-export * from './StakeMasterChef';
-export * from './StakeNew';
 export * from './Staking';
+export * from './SushiswapStakeForm';
+export * from './UniswapStakeForm';
