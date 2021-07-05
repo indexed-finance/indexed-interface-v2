@@ -9,15 +9,11 @@ import { Formik, useFormikContext } from "formik";
 import { Page, StakingStats, TokenSelector } from "components/atomic/organisms";
 import { ReactNode, useMemo } from "react";
 import { convert } from "helpers";
-import {
-  useBreakpoints,
-  usePortfolioData,
-  useTokenApproval,
-  useTokenBalance,
-} from "hooks";
+import { useBreakpoints, useTokenApproval, useTokenBalance } from "hooks";
 
 export function StakeForm({
   stakingPool,
+  portfolioToken,
   rewardsPerDay,
   decimals,
   spender,
@@ -30,6 +26,7 @@ export function StakeForm({
   formatAssetText,
 }: {
   stakingPool: NewStakingPool | MasterChefPool;
+  portfolioToken: FormattedPortfolioAsset;
   rewardsPerDay: string;
   decimals: number;
   spender: string;
@@ -42,86 +39,69 @@ export function StakeForm({
   formatAssetText(amount: string): string;
 }) {
   const { isMobile } = useBreakpoints();
-  const data = usePortfolioData({ onlyOwnedAssets: false });
-  const portfolioToken = useMemo(
-    () =>
-      stakingPool
-        ? data.tokens.find(
-            (token) =>
-              token.address.toLowerCase() === stakingPool.token.toLowerCase()
-          )
-        : null,
-    [data.tokens, stakingPool]
-  );
   const balance = useTokenBalance(stakingPool?.token ?? "");
 
-  if (stakingPool && portfolioToken) {
-    const stakingToken = stakingPool.token;
+  return (
+    <Page hasPageHeader={true} title={`Stake ${portfolioToken.symbol}`}>
+      <Space direction="vertical" style={{ width: "100%" }} size="large">
+        <Row gutter={100}>
+          <Col xs={24} md={10}>
+            <Formik
+              initialValues={{
+                asset: "",
+                amount: {
+                  displayed: "0.00",
+                  exact: convert.toBigNumber("0.00"),
+                },
+                inputType: "stake",
+              }}
+              onSubmit={console.info}
+              validateOnChange={true}
+              validateOnBlur={true}
+              validate={(values) => {
+                const errors: Record<string, string> = {};
+                const maximum = parseFloat(
+                  values.inputType === "stake"
+                    ? balance
+                    : convert.toBalance(stakingPool.userStakedBalance ?? "0")
+                );
 
-    return (
-      <Page hasPageHeader={true} title={`Stake ${stakingToken}`}>
-        <Space direction="vertical" style={{ width: "100%" }} size="large">
-          <Row gutter={100}>
-            <Col xs={24} md={10}>
-              <Formik
-                initialValues={{
-                  asset: "",
-                  amount: {
-                    displayed: "0.00",
-                    exact: convert.toBigNumber("0.00"),
-                  },
-                  inputType: "stake",
-                }}
-                onSubmit={console.info}
-                validateOnChange={true}
-                validateOnBlur={true}
-                validate={(values) => {
-                  const errors: Record<string, string> = {};
-                  const maximum = parseFloat(
-                    values.inputType === "stake"
-                      ? balance
-                      : convert.toBalance(stakingPool.userStakedBalance ?? "0")
-                  );
+                if (values.amount.exact.isGreaterThan(maximum)) {
+                  errors.amount = "Insufficient balance.";
+                }
 
-                  if (values.amount.exact.isGreaterThan(maximum)) {
-                    errors.amount = "Insufficient balance.";
-                  }
-
-                  return errors;
-                }}
-              >
-                <StakeFormInner
-                  rewardsPerDay={rewardsPerDay}
-                  token={portfolioToken}
-                  stakingPool={stakingPool}
-                  spender={spender}
-                  onWithdraw={onWithdraw}
-                  onStake={onStake}
-                  formatAssetText={formatAssetText}
-                />
-              </Formik>
-            </Col>
-            <Col xs={24} md={14}>
-              {isMobile && <Divider />}
-              <StakingStats
-                symbol={stakingToken}
-                portfolioToken={portfolioToken}
-                stakingPool={stakingPool}
-                onExit={onExit}
-                onClaim={onClaim}
-                poolLink={poolLink}
-                stakingPoolLink={stakingTokenLink}
-                decimals={decimals}
+                return errors;
+              }}
+            >
+              <StakeFormInner
                 rewardsPerDay={rewardsPerDay}
+                token={portfolioToken}
+                stakingPool={stakingPool}
+                spender={spender}
+                onWithdraw={onWithdraw}
+                onStake={onStake}
+                formatAssetText={formatAssetText}
               />
-            </Col>
-          </Row>
-        </Space>
-      </Page>
-    );
-  } else {
-    return null;
-  }
+            </Formik>
+          </Col>
+          <Col xs={24} md={14}>
+            {isMobile && <Divider />}
+            <StakingStats
+              symbol={portfolioToken.symbol}
+              portfolioToken={portfolioToken}
+              stakingPool={stakingPool}
+              onExit={onExit}
+              onClaim={onClaim}
+              poolLink={poolLink}
+              stakingPoolLink={stakingTokenLink}
+              decimals={decimals}
+              rewardsPerDay={rewardsPerDay}
+            />
+          </Col>
+        </Row>
+      </Space>
+    </Page>
+  );
 }
 
 function StakeFormInner({
