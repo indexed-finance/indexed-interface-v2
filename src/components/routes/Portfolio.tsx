@@ -69,11 +69,13 @@ export default function Portfolio() {
     >
       {isUserConnected ? (
         <Row gutter={[20, 20]}>
-          {data.map((heldAsset) => (
-            <Col xs={24} sm={8} key={heldAsset.address}>
-              <PortfolioWidget {...heldAsset} />
-            </Col>
-          ))}
+          {data
+            .filter((heldAsset) => !heldAsset.symbol.includes("ERROR"))
+            .map((heldAsset) => (
+              <Col xs={24} sm={8} key={heldAsset.address}>
+                <PortfolioWidget {...heldAsset} />
+              </Col>
+            ))}
         </Row>
       ) : (
         <Space direction="vertical" align="center" style={{ width: "100%" }}>
