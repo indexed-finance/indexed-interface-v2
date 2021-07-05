@@ -221,7 +221,10 @@ function UniswapBurnInteraction({ indexPool }: Props) {
 
           return;
         }
-        const result = getBestBurnRouteForAmountIn(toToken, fromAmount.exact);
+        const result = getBestBurnRouteForAmountIn(
+          toToken,
+          convert.toToken(fromAmount.exact, 18)
+        );
         if (result) {
           if (result.poolResult?.error) {
             return result.poolResult.error;
@@ -248,7 +251,10 @@ function UniswapBurnInteraction({ indexPool }: Props) {
           return;
         }
 
-        const result = getBestBurnRouteForAmountOut(toToken, toAmount.exact);
+        const result = getBestBurnRouteForAmountOut(
+          toToken,
+          convert.toToken(toAmount.exact, 18)
+        );
 
         if (result) {
           if (result.poolResult?.error) {

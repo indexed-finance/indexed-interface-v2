@@ -65,7 +65,6 @@ const singleInitialValues = {
 
 const singleInteractionSchema = yup.object().shape({
   fromToken: yup.string().min(0, "A token is required in the 'From' field."),
-  fromAmount: yup.number().min(0, "From balance must be greater than zero."),
   toToken: yup.string().min(1, "A token is required in the 'To' field."),
 });
 
@@ -350,7 +349,6 @@ const multiInteractionSchema = yup.object().shape({
   fromToken: yup.string().min(0, "A token is required in the 'From' field."),
   fromAmount: yup.object().shape({
     displayed: yup.number().min(0, "Balance must be greater than zero."),
-    exact: yup.string(),
   }),
 });
 
