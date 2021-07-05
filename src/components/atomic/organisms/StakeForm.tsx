@@ -136,10 +136,12 @@ function StakeFormInner({
   }, [stakingPool]);
   const [estimatedReward, weight] = useMemo<[string, BigNumber]>(() => {
     const stakedAmount = convert.toBigNumber(staked ?? "0");
-    const addAmount =
+    const addAmount = convert.toToken(
       values.inputType === "stake"
         ? values.amount.exact
-        : values.amount.exact.negated();
+        : values.amount.exact.negated(),
+      18
+    );
     const userNewStaked = stakedAmount.plus(addAmount);
 
     if (userNewStaked.isLessThan(0)) {
@@ -177,8 +179,8 @@ function StakeFormInner({
           token: token.symbol,
           amount: values.amount,
         }}
-        isInput
-        autoFocus
+        isInput={true}
+        autoFocus={true}
         balanceLabel={values.inputType === "unstake" ? "Staked" : undefined}
         balanceOverride={
           values.inputType === "unstake"

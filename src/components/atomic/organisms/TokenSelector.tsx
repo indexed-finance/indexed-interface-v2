@@ -124,7 +124,9 @@ export function TokenSelector({
     [onChange, amount, token, value]
   );
   const haveInsufficientBalance = useMemo(
-    () => isInput && balance.exact.isLessThan(value.amount?.exact ?? 0),
+    () =>
+      isInput &&
+      balance.exact.isLessThan(convert.toToken(value.amount?.exact ?? "0")),
     [isInput, value.amount, balance]
   );
   const onAmountChange = useCallback(

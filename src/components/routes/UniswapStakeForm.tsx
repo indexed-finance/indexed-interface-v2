@@ -61,7 +61,7 @@ export default function UniswapStakeForm() {
           <ExternalLink
             to={`https://v2.info.uniswap.org/pair/${portfolioToken.symbol}`}
           >
-            {stakingPool.token}
+            {portfolioToken.symbol}
           </ExternalLink>
         ) : (
           <Link to={`/index-pools/${S(stakingPool.name).slugify().s}`}>
