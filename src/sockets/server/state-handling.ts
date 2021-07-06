@@ -1,4 +1,4 @@
-import { INFURA_ID, MASTER_CHEF_ADDRESS, NDX_ADDRESS } from "config";
+import { INFURA_ID, MASTER_CHEF_ADDRESS } from "config";
 import {
   TOKEN_PRICES_CALLER,
   buildUniswapPairs,
@@ -7,19 +7,21 @@ import {
   createStakingCalls,
   createTotalSuppliesCalls,
 } from "hooks";
-import {createMasterChefCalls} from "hooks/masterchef-hooks"
+import { createMasterChefCalls } from "hooks/masterchef-hooks";
 
 import { Unsubscribe } from "redux";
-import { actions, requests, selectors, store } from "features";
+import { actions, externallySetProvider, selectors, store } from "features";
 import { createNewStakingCalls } from "hooks/new-staking-hooks";
 import { log } from "./helpers";
 import { masterChefCaller } from "features/masterChef";
 import { providers } from "ethers";
-import type { CallRegistration, RegisteredCall, RegisteredCaller } from "helpers";
+import type { RegisteredCall, RegisteredCaller } from "helpers";
 
 // The same provider is used for the lifetime of the server.
 const { dispatch, getState, subscribe } = store;
 const provider = new providers.InfuraProvider("mainnet", INFURA_ID);
+
+externallySetProvider(provider);
 
 const poolsRegistered: Record<string, boolean> = {};
 const tokensRegistered: Record<string, boolean> = {};
@@ -45,9 +47,9 @@ function setSubscription() {
         ...registerNewPools(),
         ...registerNewTokensAndPairs(),
         ...registerNewStakingPools(),
-      ].filter(c => c.offChainCalls.length > 0 || c.onChainCalls.length > 0)
+      ].filter((c) => c.offChainCalls.length > 0 || c.onChainCalls.length > 0);
       if (allCalls.length > 0) {
-        dispatch(actions.callsRegistered(allCalls))
+        dispatch(actions.callsRegistered(allCalls));
       }
       subbed = false;
     }
@@ -58,8 +60,7 @@ setInterval(() => {
   if (!subbed) {
     setSubscription();
   }
-}, NEW_SUBSCRIBER_DELAY_SECONDS * 1000)
-
+}, NEW_SUBSCRIBER_DELAY_SECONDS * 1000);
 
 /**
  * After creating the connection, allow it to update before initializing the store.
@@ -84,14 +85,20 @@ const BLOCKS_PER_DAY = 86400 / 13.5;
 function registerNewTokensAndPairs() {
   const state = getState();
   const allTokens = selectors.selectAllTokens(state);
-  const allPairIds = Object.keys(state.pairs.entities).map((id) => id.toLowerCase());
-  const allTokenIds = allTokens.map(t => t.id).filter(
-    (tokenId) => !tokensRegistered[tokenId.toLowerCase()] && !allPairIds.includes(tokenId.toLowerCase())
+  const allPairIds = Object.keys(state.pairs.entities).map((id) =>
+    id.toLowerCase()
   );
+  const allTokenIds = allTokens
+    .map((t) => t.id)
+    .filter(
+      (tokenId) =>
+        !tokensRegistered[tokenId.toLowerCase()] &&
+        !allPairIds.includes(tokenId.toLowerCase())
+    );
   const pairs = buildUniswapPairs(allTokenIds).filter(
     (pair) => !pairsRegistered[pair.id.toLowerCase()]
   );
-  dispatch(actions.uniswapPairsRegistered(pairs))
+  dispatch(actions.uniswapPairsRegistered(pairs));
   const pairDataCalls = {
     caller: "Pair Data",
     onChainCalls: createPairDataCalls(pairs),
@@ -118,20 +125,20 @@ function registerNewTokensAndPairs() {
 
   const totalSuppliesCalls = {
     caller: "Total Supplies",
-    onChainCalls: createTotalSuppliesCalls(pairs.map((pair) => pair.id.toLowerCase())),
+    onChainCalls: createTotalSuppliesCalls(
+      pairs.map((pair) => pair.id.toLowerCase())
+    ),
     offChainCalls: [],
   };
 
-  return [
-    pairDataCalls,
-    tokenPriceCalls,
-    totalSuppliesCalls
-  ];
+  return [pairDataCalls, tokenPriceCalls, totalSuppliesCalls];
 }
 
 function registerNewPools() {
   const state = getState();
-  const indexPools = selectors.selectAllPools(state).filter(pool => !poolsRegistered[pool.id.toLowerCase()]);
+  const indexPools = selectors
+    .selectAllPools(state)
+    .filter((pool) => !poolsRegistered[pool.id.toLowerCase()]);
   const { poolDetailCalls } = indexPools.reduce(
     (prev, next) => {
       const { id } = next;
@@ -144,7 +151,7 @@ function registerNewPools() {
       );
       return prev;
     },
-  {
+    {
       poolDetailCalls: {
         caller: "Pool Data",
         onChainCalls: [],
@@ -159,17 +166,29 @@ function registerNewPools() {
 
 function registerNewStakingPools() {
   const state = getState();
-  const stakingPools = selectors.selectAllStakingPools(state).filter((pool) => !stakingPoolsRegistered[pool.id.toLowerCase()]);
-  const newStakingPools = selectors.selectAllNewStakingPools(state).filter((pool) => !stakingPoolsRegistered[pool.id.toLowerCase()]);
-  const masterChefPairs = selectors.selectMasterChefPoolsWithRecognizedPairs(state).filter((pool) => !stakingPoolsRegistered[`MC-${pool.id}`.toLowerCase()]);
+  const stakingPools = selectors
+    .selectAllStakingPools(state)
+    .filter((pool) => !stakingPoolsRegistered[pool.id.toLowerCase()]);
+  const newStakingPools = selectors
+    .selectAllNewStakingPools(state)
+    .filter((pool) => !stakingPoolsRegistered[pool.id.toLowerCase()]);
+  const masterChefPairs = selectors
+    .selectMasterChefPoolsWithRecognizedPairs(state)
+    .filter((pool) => !stakingPoolsRegistered[`MC-${pool.id}`.toLowerCase()]);
   const newStakingMeta = selectors.selectNewStakingMeta(state);
   const calls: RegisteredCaller[] = [];
   if (newStakingPools.length > 0) {
-    const fromBlock = newStakingPools.sort((a, b) => b.lastRewardBlock - a.lastRewardBlock)[0].lastRewardBlock;
+    const fromBlock = newStakingPools.sort(
+      (a, b) => b.lastRewardBlock - a.lastRewardBlock
+    )[0].lastRewardBlock;
     const newStakingCalls = newStakingPools.reduce(
       (prev, next) => {
         const { id, token } = next;
-        const newStakingCalls = createNewStakingCalls(newStakingMeta.id, id, token);
+        const newStakingCalls = createNewStakingCalls(
+          newStakingMeta.id,
+          id,
+          token
+        );
         prev.onChainCalls.push(...newStakingCalls.offChainCalls);
         prev.offChainCalls.push(...newStakingCalls.offChainCalls);
         return prev;
@@ -179,10 +198,13 @@ function registerNewStakingPools() {
         onChainCalls: [
           {
             target: newStakingMeta.rewardsSchedule,
-            function: 'getRewardsForBlockRange',
-            interfaceKind: 'RewardsSchedule',
-            args: [fromBlock.toString(), Math.floor(fromBlock + BLOCKS_PER_DAY).toString()]
-          }
+            function: "getRewardsForBlockRange",
+            interfaceKind: "RewardsSchedule",
+            args: [
+              fromBlock.toString(),
+              Math.floor(fromBlock + BLOCKS_PER_DAY).toString(),
+            ],
+          },
         ],
         offChainCalls: [],
       } as RegisteredCaller
@@ -198,9 +220,9 @@ function registerNewStakingPools() {
       (prev, next) => {
         const { id, stakingToken } = next;
         const stakingCalls = createStakingCalls(id, stakingToken);
-  
+
         prev.onChainCalls.push(...stakingCalls.onChainCalls);
-  
+
         return prev;
       },
       {
@@ -212,15 +234,12 @@ function registerNewStakingPools() {
     stakingPools.forEach((pool) => {
       stakingPoolsRegistered[pool.id.toLowerCase()] = true;
     });
-    calls.push(stakingCalls)
+    calls.push(stakingCalls);
   }
   if (masterChefPairs.length > 0) {
     const mcCalls = masterChefPairs.reduce(
       (prev, next) => {
-        const poolCalls = createMasterChefCalls(
-          next.id,
-          next.token,
-        );
+        const poolCalls = createMasterChefCalls(next.id, next.token);
         prev.onChainCalls.push(...poolCalls);
         return prev;
       },
@@ -238,9 +257,8 @@ function registerNewStakingPools() {
     );
     masterChefPairs.forEach((pool) => {
       stakingPoolsRegistered[`MC-${pool.id}`.toLowerCase()] = true;
-    })
+    });
     calls.push(mcCalls);
-
   }
   return calls;
 }

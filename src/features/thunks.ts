@@ -37,6 +37,10 @@ export const disconnectFromProvider = () => {
   signer = null;
 };
 
+export const externallySetProvider = (_provider: Provider) => {
+  provider = _provider;
+};
+
 export function useProvider(): [
   Provider | null,
   providers.JsonRpcSigner | null
@@ -104,9 +108,7 @@ export const thunks = {
           provider,
         })
       );
-      dispatch(
-        fetchMasterChefData({ provider })
-      )
+      dispatch(fetchMasterChefData({ provider }));
 
       if (selectedAddress) {
         dispatch(actions.userAddressSelected(selectedAddress));
