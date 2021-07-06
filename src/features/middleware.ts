@@ -77,18 +77,14 @@ let dispatch: any = noop;
 let getState: any = noop;
 let lastActiveOutdatedCalls: any = null;
 let hasAttachedListener = false;
-const alreadyHandledBlockNumbers: any = {};
+// const alreadyHandledBlockNumbers: any = {};
 
 function handleBlockNumberChange(newBlockNumber: number) {
-  if (
-    typeof newBlockNumber === "number" &&
-    !alreadyHandledBlockNumbers[newBlockNumber]
-  ) {
+  if (typeof newBlockNumber === "number") {
     const state = getState();
     const currentBlockNumber = selectors.selectBlockNumber(state);
 
     if (newBlockNumber > currentBlockNumber) {
-      alreadyHandledBlockNumbers[newBlockNumber] = true;
       lastActiveOutdatedCalls = [];
       dispatch(actions.blockNumberChanged(newBlockNumber));
       debouncedHandleBatchUpdate();
@@ -133,7 +129,7 @@ function normalizeCallBatch(outdatedCallKeys: string[]) {
   );
 }
 
-function handleBatchUpdate() {
+export function handleBatchUpdate() {
   const state = getState() as AppState;
   const activeOutdatedCalls = selectors.selectActiveOutdatedCalls(state);
 
@@ -154,6 +150,7 @@ function handleBatchUpdate() {
       hasAttachedListener = true;
     }
   }
+
   if (!isEqual(activeOutdatedCalls, lastActiveOutdatedCalls)) {
     lastActiveOutdatedCalls = activeOutdatedCalls;
 
@@ -218,9 +215,7 @@ export function batchMiddleware(storeApi: any) {
     dispatch = storeApi.dispatch;
     getState = storeApi.getState;
 
-    if (action.type === "batcher/callsRegistered") {
-      debouncedHandleBatchUpdate();
-    }
+    debouncedHandleBatchUpdate();
 
     return next(action);
   };

@@ -7,21 +7,18 @@ import {
   createStakingCalls,
   createTotalSuppliesCalls,
 } from "hooks";
+import { actions, selectors, store } from "features";
 import { createMasterChefCalls } from "hooks/masterchef-hooks";
-
-import { Unsubscribe } from "redux";
-import { actions, externallySetProvider, selectors, store } from "features";
 import { createNewStakingCalls } from "hooks/new-staking-hooks";
 import { log } from "./helpers";
 import { masterChefCaller } from "features/masterChef";
 import { providers } from "ethers";
 import type { RegisteredCall, RegisteredCaller } from "helpers";
+import type { Unsubscribe } from "redux";
 
 // The same provider is used for the lifetime of the server.
 const { dispatch, getState, subscribe } = store;
 const provider = new providers.InfuraProvider("mainnet", INFURA_ID);
-
-externallySetProvider(provider);
 
 const poolsRegistered: Record<string, boolean> = {};
 const tokensRegistered: Record<string, boolean> = {};
