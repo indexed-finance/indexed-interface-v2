@@ -1,8 +1,11 @@
 import { NirnVaultData } from "./types";
+import { convert, createMulticallDataParser } from "helpers";
 import { createEntityAdapter, createSlice } from "@reduxjs/toolkit";
+import { fetchMulticallData } from "../batcher/requests"; // Circular dependency.
+import { mirroredServerState, restartedDueToError } from "../actions";
 import type { AppState } from "../store";
 
-export const vaultsCaller = "Vaults";
+export const VAULTS_CALLER = "Vaults";
 
 const adapter = createEntityAdapter<NirnVaultData>({
   selectId: (entry) => entry.id.toLowerCase(),
@@ -12,6 +15,32 @@ const slice = createSlice({
   name: "vaults",
   initialState: adapter.getInitialState(),
   reducers: {},
+  extraReducers: (builder) =>
+    builder
+      .addCase(fetchMulticallData.fulfilled, (state, action) => {
+        const relevantMulticallData = vaultsMulticallDataParser(action.payload);
+
+        if (relevantMulticallData) {
+          // TODO: Fill me.
+        } else {
+          adapter.upsertMany(state, [
+            {
+              id: "123",
+              symbol: "FAKE",
+              name: "Fake Vault",
+              underlying: "0x6b175474e89094c44da98b954eedeac495271d0f", // DAI
+              adapters: [],
+              weights: ["5e17", "5e17"],
+              balances: ["0"],
+              netAPR: 0.05,
+              performanceFee: 0.1,
+              pricePerShare: convert.toToken("200").toString(),
+            },
+          ] as NirnVaultData[]);
+        }
+      })
+      .addCase(mirroredServerState, (_, action) => action.payload.vaults)
+      .addCase(restartedDueToError, () => adapter.getInitialState()),
 });
 
 export const { actions: vaultsActions, reducer: vaultsReducer } = slice;
@@ -26,3 +55,11 @@ export const vaultsSelectors = {
     return selectors.selectById(state, id);
   },
 };
+
+// #region Helpers
+const vaultsMulticallDataParser = createMulticallDataParser(
+  VAULTS_CALLER,
+  (calls) => {
+    // TODO: Fill me.
+  }
+);
