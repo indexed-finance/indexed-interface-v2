@@ -172,7 +172,7 @@ const slice = createSlice({
         );
 
         state.status = "idle";
-        state.blockNumber = action.payload.blockNumber;
+        state.blockNumber = action.payload.blockNumber ?? state.blockNumber;
       })
       .addCase(mirroredServerState, (state, action) => {
         state.blockNumber = action.payload.batcher.blockNumber;

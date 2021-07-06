@@ -11,83 +11,6 @@ import type { NormalizedIndexPoolTransactions } from "./types";
 import type { OffChainRequest } from "../requests";
 import type { Swap as PoolTrade } from "uniswap-types";
 
-// #region Index Pools
-export async function queryIndexPools(url: string, poolAddresses: string[]) {
-  const createPoolCall = (address: string) => `
-          ${removeLeadingZero(address)}: indexPool(id: "${address}") {
-              id
-              category {
-                  id
-              }
-              size
-              name
-              symbol
-              isPublic
-              initialized
-              totalSupply
-              totalWeight
-              maxTotalSupply
-              swapFee
-              feesTotalUSD
-              totalValueLockedUSD
-              totalVolumeUSD
-              totalSwapVolumeUSD
-              tokensList
-              poolInitializer {
-                  id
-                  totalCreditedWETH
-                  tokens {
-                  token {
-                      id
-                      address
-                      decimals
-                      name
-                      symbol
-                      priceUSD
-                  }
-                  balance
-                  targetBalance
-                  amountRemaining
-                  }
-              }
-              tokens {
-                  id
-                  token {
-                  id
-                  address
-                  decimals
-                  name
-                  symbol
-                  priceUSD
-                  }
-                  ready
-                  balance
-                  denorm
-                  desiredDenorm
-                  minimumBalance
-              }
-              dailySnapshots(orderBy: date, orderDirection: desc, first: 90) {
-                  id
-                  date
-                  value
-                  totalSupply
-                  feesTotalUSD
-                  totalValueLockedUSD
-                  totalSwapVolumeUSD
-                  totalVolumeUSD
-              }
-          }
-      `;
-  const groupedCalls = `
-      {
-        ${poolAddresses.map(createPoolCall).join("\n")}
-      }
-    `;
-  const indexPools = await sendQuery(url, groupedCalls);
-
-  return indexPools;
-}
-
 export function normalizeIndexPools(response: Record<string, IndexPool>) {
   return Object.entries(response).reduce((prev, [key, value]) => {
     prev[addLeadingZero(key)] = value;
@@ -95,16 +18,6 @@ export function normalizeIndexPools(response: Record<string, IndexPool>) {
   }, {} as Record<string, IndexPool>);
 }
 
-export const fetchIndexPools = createAsyncThunk(
-  "indexPools/fetch",
-  async ({ provider, arg: poolAddresses = [] }: OffChainRequest) => {
-    const { chainId } = await provider.getNetwork();
-    const url = getIndexedUrl(chainId);
-    const response = await queryIndexPools(url, poolAddresses);
-
-    return normalizeIndexPools(response);
-  }
-);
 // #endregion
 
 // #region Updates

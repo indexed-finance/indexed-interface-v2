@@ -77,13 +77,19 @@ let dispatch: any = noop;
 let getState: any = noop;
 let lastActiveOutdatedCalls: any = null;
 let hasAttachedListener = false;
+const alreadyHandledBlockNumbers: any = {};
 
 function handleBlockNumberChange(newBlockNumber: number) {
-  if (typeof newBlockNumber === "number") {
+  if (
+    typeof newBlockNumber === "number" &&
+    !alreadyHandledBlockNumbers[newBlockNumber]
+  ) {
     const state = getState();
     const currentBlockNumber = selectors.selectBlockNumber(state);
 
     if (newBlockNumber > currentBlockNumber) {
+      alreadyHandledBlockNumbers[newBlockNumber] = true;
+      lastActiveOutdatedCalls = [];
       dispatch(actions.blockNumberChanged(newBlockNumber));
       debouncedHandleBatchUpdate();
     }
@@ -148,7 +154,6 @@ function handleBatchUpdate() {
       hasAttachedListener = true;
     }
   }
-
   if (!isEqual(activeOutdatedCalls, lastActiveOutdatedCalls)) {
     lastActiveOutdatedCalls = activeOutdatedCalls;
 
@@ -193,6 +198,10 @@ function handleBatchUpdate() {
           }
         }
 
+        setTimeout(() => {
+          dispatch(actions.finishedFetchingOffChainCalls(offChainCalls));
+        }, 2000);
+
         // Done.
         debugConsole.log(
           `Did execute ${onChainCalls.length} on-chain calls and ${offChainCalls.length} off-chain calls`
@@ -202,14 +211,16 @@ function handleBatchUpdate() {
   }
 }
 
-const debouncedHandleBatchUpdate = debounce(handleBatchUpdate, 100);
+const debouncedHandleBatchUpdate = debounce(handleBatchUpdate, 2000);
 
 export function batchMiddleware(storeApi: any) {
   return (next: any) => (action: any) => {
     dispatch = storeApi.dispatch;
     getState = storeApi.getState;
 
-    debouncedHandleBatchUpdate();
+    if (action.type === "batcher/callsRegistered") {
+      debouncedHandleBatchUpdate();
+    }
 
     return next(action);
   };
