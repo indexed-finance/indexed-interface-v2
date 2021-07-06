@@ -15,8 +15,8 @@ import { pairsActions } from "./pairs";
 import { providers } from "ethers";
 import { settingsActions } from "./settings";
 import { tokensActions } from "./tokens";
-
 import { userActions } from "./user";
+import { vaultsActions } from "./vaults";
 import type { AppThunk } from "./store";
 
 // #region Provider
@@ -104,9 +104,7 @@ export const thunks = {
           provider,
         })
       );
-      dispatch(
-        fetchMasterChefData({ provider })
-      )
+      dispatch(fetchMasterChefData({ provider }));
 
       if (selectedAddress) {
         dispatch(actions.userAddressSelected(selectedAddress));
@@ -148,6 +146,7 @@ export const actions = {
   ...tokensActions,
   ...transactionsActions,
   ...userActions,
+  ...vaultsActions,
   ...topLevelActions,
   ...masterChefActions,
   ...thunks,

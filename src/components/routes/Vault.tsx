@@ -1,4 +1,4 @@
-import { Card, Col, Divider, Row, Typography } from "antd";
+import { Col, Divider, Row } from "antd";
 import { Page, VaultCard } from "components/atomic";
 
 interface FormattedVault {

@@ -1,4 +1,4 @@
-import { Card, Col, Divider, Row, Tooltip, Typography } from "antd";
+import { Card, Col, Row, Tooltip, Typography } from "antd";
 import { Token } from "components/atomic";
 import { useHistory } from "react-router";
 

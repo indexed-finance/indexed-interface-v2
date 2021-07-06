@@ -34,6 +34,7 @@ import { formatDistance } from "date-fns";
 import { newStakingSelectors } from "./newStaking";
 import { settingsSelectors } from "./settings";
 import { sortTokens } from "@indexed-finance/indexed.js/dist/utils/address";
+import { vaultsSelectors } from "./vaults";
 import S from "string";
 import type { AppState } from "./store";
 
@@ -51,6 +52,7 @@ export const selectors = {
   ...userSelectors,
   ...pairsSelectors,
   ...transactionsSelectors,
+  ...vaultsSelectors,
   ...masterChefSelectors,
   // Categories
   selectFormattedCategory: (
