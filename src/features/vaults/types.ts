@@ -41,6 +41,9 @@ export type NirnVaultData = {
   // BN value representing amount of underlying each vault token is worth as a fraction of 1e18
   // irrespective of token decimals, e.g. (pricePerShare * balance) / 1e18 = value of balance underlying
   pricePerShare: string;
+  //   d1ll0n — Today at 4:54 PM
+  // just add a totalValueLocked field to the type I gave you for the vault
+  totalValueLocked: string;
 };
 // Can use user balance with the standard erc20 balance checks to see user's balance in the vault tokens.
 // NOT the same as the value of the user's balance in terms of `underlying`.

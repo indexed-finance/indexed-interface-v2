@@ -5,6 +5,21 @@ import { fetchMulticallData } from "../batcher/requests"; // Circular dependency
 import { mirroredServerState, restartedDueToError } from "../actions";
 import type { AppState } from "../store";
 
+export interface FormattedVault {
+  id: string;
+  symbol: string;
+  name: string;
+  totalValueLocked: string;
+  annualPercentageRate: string;
+  percentageOfVaultAssets: string;
+  amountOfTokensInProtocol: string;
+  adapters: Array<{
+    protocol: string;
+    annualPercentageRate: string;
+    percentage: string;
+  }>;
+}
+
 export const VAULTS_CALLER = "Vaults";
 
 const adapter = createEntityAdapter<NirnVaultData>({
@@ -52,6 +67,7 @@ const slice = createSlice({
               netAPR: 0.05,
               performanceFee: 0.1,
               pricePerShare: convert.toToken("200").toString(),
+              totalValueLocked: "USD $50.2M",
             },
           ] as NirnVaultData[]);
         }
@@ -69,7 +85,9 @@ export const vaultsSelectors = {
     return selectors.selectAll(state);
   },
   selectVault(state: AppState, id: string) {
-    return selectors.selectById(state, id);
+    const vault = selectors.selectById(state, id);
+
+    return vault ?? null;
   },
 };
 

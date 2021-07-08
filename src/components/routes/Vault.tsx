@@ -1,38 +1,70 @@
-import { Col, Divider, Row } from "antd";
-import { Page, VaultCard } from "components/atomic";
-
-interface FormattedVault {
-  symbol: string;
-  name: string;
-  totalValueLocked: string;
-  annualPercentageRate: string;
-  percentageOfVaultAssets: string;
-  amountOfTokensInProtocol: string;
-}
+import { Card, Col, Divider, Progress, Row, Typography } from "antd";
+import { Label, Page, VaultCard } from "components/atomic";
+import { useParams } from "react-router";
+import { useVault } from "hooks";
+import type { FormattedVault } from "features";
 
 export function LoadedVault(props: FormattedVault) {
   return (
     <Page hasPageHeader={true} title="Vault">
-      <VaultCard withTitle={true} bordered={false} hoverable={false} />
+      <VaultCard
+        vaultId={props.id}
+        withTitle={true}
+        bordered={false}
+        hoverable={false}
+        {...props}
+      />
       <Divider />
-      <Row>
-        <Col xs={24}>
-          <h1>The breakdown of protocols go here</h1>
-        </Col>
+      <Row gutter={24}>
+        {props.adapters.map((adapter) => (
+          <Col key={adapter.protocol} xs={24} md={8}>
+            <Card className="large-progress">
+              <Card.Meta
+                avatar={
+                  <Progress
+                    style={{
+                      marginTop: 12,
+                      fontSize: 48,
+                      textAlign: "center",
+                    }}
+                    width={120}
+                    status="active"
+                    type="dashboard"
+                    percent={parseFloat(adapter.percentage.replace(/%/g, ""))}
+                  />
+                }
+                title={
+                  <Typography.Title level={2}>
+                    {adapter.protocol.toUpperCase()}
+                  </Typography.Title>
+                }
+                description={
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "flex-end",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Label>APR</Label>
+                    <Typography.Title level={3} type="success">
+                      {adapter.annualPercentageRate}
+                    </Typography.Title>
+                  </div>
+                }
+              />
+            </Card>
+          </Col>
+        ))}
       </Row>
     </Page>
   );
 }
 
 export default function Vault() {
-  const formattedVault: FormattedVault = {
-    symbol: "UNI",
-    name: "Uniswap",
-    totalValueLocked: "$52.2M",
-    annualPercentageRate: "43.0%",
-    percentageOfVaultAssets: "100.0%",
-    amountOfTokensInProtocol: "42,069",
-  };
+  const { slug } = useParams<{ slug: string }>();
+  const vault = useVault(slug);
 
-  return <LoadedVault {...formattedVault} />;
+  return vault ? <LoadedVault {...vault} /> : null;
 }

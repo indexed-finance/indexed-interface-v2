@@ -1,25 +1,31 @@
-import { Card, Col, Row, Tooltip, Typography } from "antd";
-import { Token } from "components/atomic";
+import { Card, CardProps, Col, Row, Tooltip, Typography } from "antd";
+import { FormattedVault } from "features";
 import { useHistory } from "react-router";
 
 export function VaultCard({
+  vaultId,
   withTitle,
-  ...rest
-}: { withTitle?: boolean } & any) {
+  name,
+  annualPercentageRate,
+  adapters,
+  totalValueLocked,
+  bordered,
+  hoverable,
+}: { vaultId: string; withTitle?: boolean } & CardProps & FormattedVault) {
   const { push } = useHistory();
+
+  console.log({ totalValueLocked });
 
   return (
     <Card
-      hoverable={true}
+      hoverable={hoverable}
+      bordered={bordered}
       style={{ position: "relative", overflow: "hidden" }}
-      onClick={() => push("/vaults/1")}
-      {...rest}
+      onClick={() => push(`/vaults/${vaultId}`)}
     >
       {withTitle && (
         <Row>
-          <Col xs={24} md={6} style={{ textAlign: "left" }}>
-            <Typography.Title level={2}>Uniswap</Typography.Title>
-          </Col>
+          <Col xs={24} md={6} style={{ textAlign: "left" }}></Col>
           <Col xs={24} md={6} style={{ textAlign: "center" }}>
             <Typography.Title level={2}>TVL</Typography.Title>
           </Col>
@@ -31,29 +37,20 @@ export function VaultCard({
       <Row align="middle">
         <Col xs={24} md={6}>
           <Typography.Title level={2} style={{ margin: 0 }}>
-            <Token symbol="UNI" name="Uniswap" size="large" />
+            {name}
           </Typography.Title>
         </Col>
         <Col xs={24} md={6} style={{ textAlign: "center" }}>
           <Typography.Title level={2} style={{ margin: 0 }}>
-            $50.2M
+            {totalValueLocked}
           </Typography.Title>
         </Col>
         <Col xs={24} md={6} style={{ textAlign: "center" }}>
           <Tooltip title="Annualized based on the current interest rate.">
             <Typography.Title level={3} style={{ margin: 0 }} type="success">
-              43.0%
+              {annualPercentageRate}
             </Typography.Title>
           </Tooltip>
-        </Col>
-        <Col xs={24} md={6} style={{ textAlign: "center" }}>
-          <Token
-            symbol="SUSHI"
-            name="Sushiswap"
-            showSymbol={false}
-            showName={false}
-            size="large"
-          />
         </Col>
       </Row>
     </Card>
