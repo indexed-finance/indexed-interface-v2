@@ -118,9 +118,10 @@ export function calcPoolOutGivenSingleIn(
     pool.swapFee,
   ].map(convert.toBigNumber);
 
-  if (tokenAmountIn.eq(0)) {
+  if (tokenAmountIn.isEqualTo(0)) {
     return { error: "Input cannot be zero." };
   }
+
   if (tokenAmountIn.isGreaterThan(balanceIn.div(2))) {
     return { error: "Input must be less than 1/2 the pool's balance." };
   }

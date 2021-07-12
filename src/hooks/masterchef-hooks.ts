@@ -38,7 +38,7 @@ export const useMasterChefPool = (id: string) =>
 export const useMasterChefRewardsPerDay = (id: string) => {
   const meta = useMasterChefMeta();
   const pool = useMasterChefPool(id);
-  if (!pool) return "0";
+  if (!pool) return convert.toBigNumber("0.00");
   return totalSushiPerDay.times(pool.allocPoint).div(meta.totalAllocPoint);
 };
 

@@ -1,9 +1,13 @@
+import { BigNumber } from "ethereum";
 import { Button, Popover, Typography } from "antd";
 import { useTranslator } from "hooks";
 
 type Props = {
   showBalance: boolean;
-  balance: string;
+  balance: {
+    displayed: string;
+    exact: BigNumber;
+  };
   error?: string;
   onClickMax?: () => void;
   balanceLabel?: string;
@@ -23,12 +27,15 @@ export function TokenInputDecorator({
   return (
     <>
       {error ? (
-        <Typography.Text type="danger" style={{ textAlign: "left" }}> {error} </Typography.Text>
+        <Typography.Text type="danger" style={{ textAlign: "left" }}>
+          {" "}
+          {error}{" "}
+        </Typography.Text>
       ) : (
         <Typography.Text type="secondary" style={{ textAlign: "left" }}>
-          {parseFloat(balance) > 0 ? (
+          {balance.exact.isGreaterThan(0) ? (
             <>
-              {balanceLabel}: <AbbreviatedBalance balance={balance} />{" "}
+              {balanceLabel}: <AbbreviatedBalance balance={balance.displayed} />{" "}
               {!error && onClickMax && (
                 <Button
                   type="text"

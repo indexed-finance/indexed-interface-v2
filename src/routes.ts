@@ -8,9 +8,11 @@ const Splash = lazy(() => import("./components/routes/Splash"));
 const Portfolio = lazy(() => import("./components/routes/Portfolio"));
 const Staking = lazy(() => import("./components/routes/Staking"));
 const Stake = lazy(() => import("./components/routes/Stake"));
-const StakeNew = lazy(() => import("./components/routes/StakeNew"));
-const StakeMasterChef = lazy(
-  () => import("./components/routes/StakeMasterChef")
+const UniswapStakeForm = lazy(
+  () => import("./components/routes/UniswapStakeForm")
+);
+const SushiswapStakeForm = lazy(
+  () => import("./components/routes/SushiswapStakeForm")
 );
 const IndexPools = lazy(() => import("./components/routes/IndexPools"));
 const IndexPool = lazy(() => import("./components/routes/IndexPool"));
@@ -41,12 +43,12 @@ export const routes: RouteWithBreadcrumbs[] = [
   {
     path: "/staking-new/:id",
     exact: true,
-    component: StakeNew,
+    component: UniswapStakeForm,
   },
   {
     path: "/stake-sushi/:id",
     exact: true,
-    component: StakeMasterChef,
+    component: SushiswapStakeForm,
   },
   {
     path: "/index-pools",

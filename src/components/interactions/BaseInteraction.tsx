@@ -1,5 +1,6 @@
 import * as yup from "yup";
 import { Alert, Button, Col, Divider, Row, Space } from "antd";
+import { BigNumber, convert } from "helpers";
 import { Flipper, TokenSelector } from "components/atomic";
 import { Formik, FormikProps, useFormikContext } from "formik";
 import {
@@ -10,7 +11,6 @@ import {
   useRef,
   useState,
 } from "react";
-import { convert } from "helpers";
 import { selectors } from "features";
 import {
   useBreakpoints,
@@ -23,6 +23,11 @@ import {
 } from "hooks";
 import { useSelector } from "react-redux";
 import noop from "lodash.noop";
+
+const DEFAULT_ENTRY = {
+  displayed: "0.00",
+  exact: convert.toBigNumber("0.00"),
+};
 
 // #region Common
 type Asset = { name: string; symbol: string; id: string };
@@ -46,15 +51,20 @@ interface Props {
 // #region Single
 const singleInitialValues = {
   fromToken: "",
-  fromAmount: 0,
+  fromAmount: {
+    displayed: "0.00",
+    exact: convert.toBigNumber("0"),
+  },
   toToken: "",
-  toAmount: 0,
+  toAmount: {
+    displayed: "0.00",
+    exact: convert.toBigNumber("0"),
+  },
   lastTouchedField: "from" as "from" | "to",
 };
 
 const singleInteractionSchema = yup.object().shape({
   fromToken: yup.string().min(0, "A token is required in the 'From' field."),
-  fromAmount: yup.number().min(0, "From balance must be greater than zero."),
   toToken: yup.string().min(1, "A token is required in the 'To' field."),
 });
 
@@ -138,9 +148,9 @@ function SingleInteractionInner({
         return {
           tokenId: tokenIn.id,
           symbol: values.fromToken.toLowerCase(),
-          approveAmount: values.fromAmount.toString(),
+          approveAmount: values.fromAmount.displayed,
           rawApproveAmount: convert
-            .toToken(values.fromAmount.toString(), tokenIn.decimals)
+            .toToken(values.fromAmount.displayed, tokenIn.decimals)
             .toString(10),
         };
       }
@@ -186,9 +196,9 @@ function SingleInteractionInner({
           (newValues.lastTouchedField === "from" && !error.includes("Output"));
 
         if (inputErr) {
-          setFieldError("fromAmount", error);
+          setFieldError("fromAmount.displayed", error);
         } else {
-          setFieldError("toAmount", error);
+          setFieldError("toAmount.displayed", error);
         }
       }
       setValues(newValues);
@@ -213,25 +223,31 @@ function SingleInteractionInner({
       token,
       amount,
       error: fieldError,
-    }: { token?: string; amount?: number; error?: string }
+    }: {
+      token?: string;
+      amount?: { displayed: string; exact: BigNumber };
+      error?: string;
+    }
   ) => {
     const [tokenField, amountField] =
       field === "from" ? ["fromToken", "fromAmount"] : ["toToken", "toAmount"];
     const newValues = {
       ...values,
       [tokenField]: token || "",
-      [amountField]: amount || 0,
+      [amountField]: amount || DEFAULT_ENTRY,
       lastTouchedField: field,
     } as SingleInteractionValues;
     const calcError = onChange(newValues);
+
     setValues(newValues, false);
+
     if (fieldError) {
       setFieldError(amountField, fieldError);
     } else if (calcError) {
       if (calcError.includes("Input")) {
-        setFieldError("fromAmount", calcError);
+        setFieldError("fromAmount.displayed", calcError);
       } else if (calcError.includes("Output")) {
-        setFieldError("toAmount", calcError);
+        setFieldError("toAmount.displayed", calcError);
       }
     }
   };
@@ -250,7 +266,7 @@ function SingleInteractionInner({
             amount: values.fromAmount,
           }}
           selectable={!disableInputSelect}
-          error={errors.fromAmount}
+          error={errors.fromAmount?.displayed}
           onChange={(newValues) => handleChange("from", newValues)}
         />
 
@@ -324,14 +340,16 @@ function InteractionErrors() {
 // #region Multi
 const multiInitialValues = {
   fromToken: "",
-  fromAmount: 0,
+  fromAmount: DEFAULT_ENTRY,
 };
 
 export type MultiInteractionValues = typeof multiInitialValues;
 
 const multiInteractionSchema = yup.object().shape({
   fromToken: yup.string().min(0, "A token is required in the 'From' field."),
-  fromAmount: yup.number().min(0, "From balance must be greater than zero."),
+  fromAmount: yup.object().shape({
+    displayed: yup.number().min(0, "Balance must be greater than zero."),
+  }),
 });
 
 type MultiProps = Omit<Props, "onSubmit" | "onChange"> & {
@@ -415,7 +433,11 @@ function MultiInteractionInner({
     [spender, tokenLookup, values.fromAmount]
   );
   const handleChange = useCallback(
-    (changedValue: { token?: string; amount?: number; error?: string }) => {
+    (changedValue: {
+      token?: string;
+      amount?: { displayed: string; exact: BigNumber };
+      error?: string;
+    }) => {
       if (changedValue.token) {
         setFieldValue("fromToken", changedValue.token, false);
       }
@@ -423,23 +445,32 @@ function MultiInteractionInner({
         setFieldValue("fromAmount", changedValue.amount, false);
       }
       if (changedValue.error) {
-        setFieldError("fromAmount", changedValue.error);
+        setFieldError("fromAmount.displayed", changedValue.error);
       }
     },
     [setFieldError, setFieldValue]
   );
-  const [lookup, setLookup] = useState<Record<string, number>>({});
+  const [lookup, setLookup] = useState<
+    Record<
+      string,
+      {
+        displayed: string;
+        exact: BigNumber;
+      }
+    >
+  >({});
   const { calculateAmountsIn } = useMultiTokenMintCallbacks(spender);
   const { tokenId, symbol, approveAmount, rawApproveAmount } = useMemo(() => {
     if (values.fromToken && values.fromAmount) {
       const tokenIn = tokenLookup[values.fromToken.toLowerCase()];
+
       if (tokenIn) {
         return {
           tokenId: tokenIn.id,
           symbol: values.fromToken.toLowerCase(),
-          approveAmount: values.fromAmount.toString(),
+          approveAmount: values.fromAmount.displayed,
           rawApproveAmount: convert
-            .toToken(values.fromAmount.toString(), tokenIn.decimals)
+            .toToken(values.fromAmount.displayed, tokenIn.decimals)
             .toString(10),
         };
       }
@@ -460,24 +491,38 @@ function MultiInteractionInner({
   });
   const tokenBalances = useTokenBalances(assets.map(({ id }) => id));
   const allApproved = assets.every((asset, index) => {
-    const amount = lookup[asset.id] ?? 0;
-    const balance = parseFloat(convert.toBalance(tokenBalances[index]));
+    const amount = lookup[asset.id] ?? DEFAULT_ENTRY;
+    const balance = convert.toBigNumber(tokenBalances[index]);
 
-    return balance > amount;
+    return balance.isGreaterThan(amount.exact);
   });
   const { sm } = useBreakpoints();
 
   // Effect:
   // When the form changes, re-calculate what goes into each field.
   useEffect(() => {
-    const result = calculateAmountsIn(values.fromAmount.toString());
+    const result = calculateAmountsIn(values.fromAmount.displayed);
 
     if (result) {
       const { tokens, amountsIn } = result;
-      const formatted = tokens.reduce((prev, next, index) => {
-        prev[next] = parseFloat(convert.toBalance(amountsIn[index]));
-        return prev;
-      }, {} as Record<string, number>);
+      const formatted = tokens.reduce(
+        (prev, next, index) => {
+          const amount = amountsIn[index];
+
+          prev[next] = {
+            displayed: convert.toBalance(amount),
+            exact: convert.toBigNumber(amount),
+          };
+          return prev;
+        },
+        {} as Record<
+          string,
+          {
+            displayed: string;
+            exact: BigNumber;
+          }
+        >
+      );
 
       setLookup(formatted);
     }
@@ -489,7 +534,7 @@ function MultiInteractionInner({
         <Space direction="vertical" style={{ width: "100%" }}>
           <TokenSelector
             isInput={isInput}
-            error={errors.fromAmount}
+            error={errors.fromAmount?.displayed}
             assets={[]}
             label={tx("FROM")}
             selectable={false}
@@ -537,7 +582,7 @@ function MultiInteractionInner({
             {...asset}
             kind={kind}
             spender={spender}
-            amount={lookup[asset.id] ?? 0}
+            amount={lookup[asset.id] ?? DEFAULT_ENTRY}
             error={(errors as any)[asset.id]}
           />
         ))}
@@ -549,7 +594,10 @@ function MultiInteractionInner({
 function AssetEntry(
   props: Asset & {
     spender: string;
-    amount: number;
+    amount: {
+      displayed: string;
+      exact: BigNumber;
+    };
     error: string;
     kind: "mint" | "burn";
   }
@@ -557,15 +605,15 @@ function AssetEntry(
   const { status, approve } = useTokenApproval({
     spender: props.spender,
     tokenId: props.id,
-    amount: props.amount.toString(),
-    rawAmount: convert.toToken(props.amount.toString()).toString(),
+    amount: props.amount.displayed,
+    rawAmount: props.amount?.exact?.toString() ?? "",
     symbol: props.symbol,
   });
   const needsApproval = props.kind === "mint" && status !== "approved";
   const balance = useTokenBalance(props.id);
   const insufficientBalanceError =
     props.kind === "mint" &&
-    parseFloat(convert.toBalance(balance)) < props.amount
+    convert.toBigNumber(balance).isLessThan(props.amount.exact)
       ? "Insufficient balance"
       : "";
 
