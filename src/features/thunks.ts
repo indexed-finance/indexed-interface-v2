@@ -104,9 +104,7 @@ export const thunks = {
           provider,
         })
       );
-      dispatch(
-        fetchMasterChefData({ provider })
-      )
+      dispatch(fetchMasterChefData({ provider }));
 
       if (selectedAddress) {
         dispatch(actions.userAddressSelected(selectedAddress));
