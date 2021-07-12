@@ -29,6 +29,11 @@ interface Props {
   multi?: boolean;
 }
 
+const DEFAULT_ENTRY = {
+  displayed: "0.00",
+  exact: convert.toBigNumber("0.00"),
+};
+
 export function BurnInteraction({ indexPool, uniswap, multi }: Props) {
   if (uniswap) {
     return <UniswapBurnInteraction indexPool={indexPool} />;
@@ -64,53 +69,62 @@ function SingleTokenBurnInteraction({ indexPool }: Props) {
         return;
       }
       if (lastTouchedField === "from") {
-        if (!fromAmount || isNaN(fromAmount) || fromAmount < 0) {
-          values.fromAmount = 0;
-          values.toAmount = 0;
+        if (!fromAmount || fromAmount.exact.isLessThan(0)) {
+          values.fromAmount = DEFAULT_ENTRY;
+          values.toAmount = DEFAULT_ENTRY;
+
           return;
         }
-        const output = calculateAmountOut(toToken, fromAmount.toString());
+
+        const output = calculateAmountOut(toToken, fromAmount.exact);
+
         if (output) {
           if (output.error) {
             return output.error;
           } else {
             const { decimals } = tokenLookup[toToken.toLowerCase()];
-            values.toAmount = parseFloat(
-              convert.toBalance(
-                downwardSlippage(
-                  output.tokenAmountOut as BigNumber,
-                  SLIPPAGE_RATE
-                ),
-                decimals
-              )
+            const asBigNumber = downwardSlippage(
+              output.tokenAmountOut as BigNumber,
+              SLIPPAGE_RATE
             );
+
+            values.toAmount = {
+              displayed: convert.toBalance(asBigNumber, decimals),
+              exact: asBigNumber,
+            };
           }
         }
       } else {
-        if (!toAmount || isNaN(toAmount) || toAmount < 0) {
-          values.fromAmount = 0;
-          values.toAmount = 0;
+        if (!toAmount || toAmount.exact.isLessThan(0)) {
+          values.fromAmount = DEFAULT_ENTRY;
+          values.toAmount = DEFAULT_ENTRY;
+
           return;
         }
 
-        const input = calculateAmountIn(toToken, toAmount.toString());
+        const input = calculateAmountIn(toToken, toAmount.exact);
+
         if (input) {
           if (input.error) {
             return input.error;
           } else {
             const { decimals } = tokenLookup[fromToken.toLowerCase()];
-            values.fromAmount = parseFloat(
-              convert.toBalance(
-                upwardSlippage(input.poolAmountIn as BigNumber, SLIPPAGE_RATE),
-                decimals
-              )
+            const asBigNumber = upwardSlippage(
+              input.poolAmountIn as BigNumber,
+              SLIPPAGE_RATE
             );
+
+            values.fromAmount = {
+              displayed: convert.toBalance(asBigNumber, decimals),
+              exact: asBigNumber,
+            };
           }
         }
       }
     },
     [calculateAmountIn, calculateAmountOut, tokenLookup]
   );
+
   const handleSubmit = useCallback(
     (values: SingleInteractionValues) => {
       const {
@@ -120,13 +134,16 @@ function SingleTokenBurnInteraction({ indexPool }: Props) {
         toAmount,
         lastTouchedField,
       } = values;
-      if (fromAmount > 0 && toAmount > 0 && fromToken && toToken) {
+      if (
+        fromAmount.exact.isGreaterThan(0) &&
+        toAmount.exact.isGreaterThan(0) &&
+        fromToken &&
+        toToken
+      ) {
         executeBurn(
           toToken,
           lastTouchedField,
-          lastTouchedField === "from"
-            ? fromAmount.toString()
-            : toAmount.toString()
+          lastTouchedField === "from" ? fromAmount.exact : toAmount.exact
         );
       }
     },
@@ -150,7 +167,7 @@ function MultiTokenBurnInteraction({ indexPool }: Props) {
   const { executeBurn } = useMultiTokenBurnCallbacks(indexPool.id);
   const handleSubmit = useCallback(
     (values: MultiInteractionValues) =>
-      executeBurn(values.fromAmount.toString()),
+      executeBurn(values.fromAmount.displayed),
     [executeBurn]
   );
 
@@ -175,9 +192,14 @@ function UniswapBurnInteraction({ indexPool }: Props) {
     executeRoutedBurn,
   } = useBurnRouterCallbacks(poolId);
 
-  const assets = [...DISPLAYED_COMMON_BASE_TOKENS, {id: indexPool.id, name: indexPool.name, symbol: indexPool.symbol}];
+  const assets = [
+    ...DISPLAYED_COMMON_BASE_TOKENS,
+    { id: indexPool.id, name: indexPool.name, symbol: indexPool.symbol },
+  ];
 
-  useBalanceAndApprovalRegistrar(NARWHAL_ROUTER_ADDRESS.toLowerCase(), [poolId]);
+  useBalanceAndApprovalRegistrar(NARWHAL_ROUTER_ADDRESS.toLowerCase(), [
+    poolId,
+  ]);
 
   const handleChange = useCallback(
     (values: SingleInteractionValues) => {
@@ -193,54 +215,61 @@ function UniswapBurnInteraction({ indexPool }: Props) {
         return;
       }
       if (lastTouchedField === "from") {
-        if (!fromAmount || isNaN(fromAmount) || fromAmount < 0) {
-          values.fromAmount = 0;
-          values.toAmount = 0;
+        if (!fromAmount || fromAmount.exact.isLessThan(0)) {
+          values.fromAmount = DEFAULT_ENTRY;
+          values.toAmount = DEFAULT_ENTRY;
+
           return;
         }
         const result = getBestBurnRouteForAmountIn(
           toToken,
-          fromAmount.toString()
+          convert.toToken(fromAmount.exact, 18)
         );
         if (result) {
           if (result.poolResult?.error) {
             return result.poolResult.error;
           } else {
             const { decimals } = tokenLookup[toToken.toLowerCase()];
-            values.toAmount = parseFloat(
-              convert.toBalance(
-                downwardSlippage(
-                  convert.toBigNumber(
-                    result.uniswapResult.outputAmount.raw.toString(10)
-                  ),
-                  SLIPPAGE_RATE
-                ),
-                decimals
-              )
+            const asBigNumber = downwardSlippage(
+              convert.toBigNumber(
+                result.uniswapResult.outputAmount.raw.toString(10)
+              ),
+              SLIPPAGE_RATE
             );
+
+            values.toAmount = {
+              displayed: convert.toBalance(asBigNumber, decimals),
+              exact: asBigNumber,
+            };
           }
         }
       } else {
-        if (!toAmount || isNaN(toAmount) || toAmount < 0) {
-          values.fromAmount = 0;
-          values.toAmount = 0;
+        if (!toAmount || toAmount.exact.isLessThan(0)) {
+          values.fromAmount = DEFAULT_ENTRY;
+          values.toAmount = DEFAULT_ENTRY;
+
           return;
         }
 
         const result = getBestBurnRouteForAmountOut(
           toToken,
-          toAmount.toString()
+          convert.toToken(toAmount.exact, 18)
         );
+
         if (result) {
           if (result.poolResult?.error) {
             return result.poolResult.error;
           } else {
-            values.fromAmount = parseFloat(
-              convert.toBalance(
-                upwardSlippage(result.poolResult.poolAmountIn, SLIPPAGE_RATE),
-                18
-              )
+            const { decimals } = tokenLookup[toToken.toLowerCase()];
+            const asBigNumber = upwardSlippage(
+              result.poolResult.poolAmountIn,
+              SLIPPAGE_RATE
             );
+
+            values.fromAmount = {
+              displayed: convert.toBalance(asBigNumber, decimals),
+              exact: asBigNumber,
+            };
           }
         }
       }
@@ -258,13 +287,16 @@ function UniswapBurnInteraction({ indexPool }: Props) {
         lastTouchedField,
       } = values;
 
-      if (fromAmount > 0 && toAmount > 0 && fromToken && toToken) {
+      if (
+        fromAmount.exact.isGreaterThan(0) &&
+        toAmount.exact.isGreaterThan(0) &&
+        fromToken &&
+        toToken
+      ) {
         executeRoutedBurn(
           toToken,
           lastTouchedField,
-          lastTouchedField === "from"
-            ? fromAmount.toString()
-            : toAmount.toString()
+          lastTouchedField === "from" ? fromAmount.exact : toAmount.exact
         );
       }
     },

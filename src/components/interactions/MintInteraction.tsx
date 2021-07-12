@@ -1,4 +1,8 @@
-import { DISPLAYED_COMMON_BASE_TOKENS, NARWHAL_ROUTER_ADDRESS, SLIPPAGE_RATE } from "config";
+import {
+  DISPLAYED_COMMON_BASE_TOKENS,
+  NARWHAL_ROUTER_ADDRESS,
+  SLIPPAGE_RATE,
+} from "config";
 import { FormattedIndexPool, selectors } from "features";
 import {
   MultiInteraction,
@@ -24,6 +28,11 @@ interface Props {
   uniswap?: boolean;
   multi?: boolean;
 }
+
+const DEFAULT_ENTRY = {
+  displayed: "0.00",
+  exact: convert.toBigNumber("0.00"),
+};
 
 export function MintInteraction({ indexPool, uniswap, multi }: Props) {
   if (uniswap) {
@@ -55,48 +64,60 @@ function SingleTokenMintInteraction({ indexPool }: Props) {
       if (!toToken || !fromToken) {
         return;
       }
+
       if (lastTouchedField === "from") {
-        if (!fromAmount || isNaN(fromAmount) || fromAmount < 0) {
-          values.fromAmount = 0;
-          values.toAmount = 0;
+        // Reset both values.
+        if (!fromAmount || fromAmount.exact.isLessThan(0)) {
+          values.fromAmount = DEFAULT_ENTRY;
+          values.toAmount = DEFAULT_ENTRY;
+
           return;
         }
-        const output = calculateAmountOut(fromToken, fromAmount.toString());
+
+        const output = calculateAmountOut(
+          fromToken,
+          convert.toToken(fromAmount.exact, 18)
+        );
+
         if (output) {
           if (output.error) {
             return output.error;
           } else {
             const { decimals } = tokenLookup[toToken.toLowerCase()];
-            values.toAmount = parseFloat(
-              convert.toBalance(
-                downwardSlippage(
-                  output.poolAmountOut as BigNumber,
-                  SLIPPAGE_RATE
-                ),
-                decimals
-              )
+            const asBigNumber = downwardSlippage(
+              output.poolAmountOut as BigNumber,
+              SLIPPAGE_RATE
             );
+
+            values.toAmount = {
+              displayed: convert.toBalance(asBigNumber, decimals),
+              exact: asBigNumber,
+            };
           }
         }
       } else {
-        if (!toAmount || isNaN(toAmount) || toAmount < 0) {
-          values.fromAmount = 0;
-          values.toAmount = 0;
+        if (!toAmount || toAmount.exact.isLessThan(0)) {
+          values.fromAmount = DEFAULT_ENTRY;
+          values.toAmount = DEFAULT_ENTRY;
           return;
         }
 
-        const input = calculateAmountIn(fromToken, toAmount.toString());
+        const input = calculateAmountIn(fromToken, toAmount.exact);
+
         if (input) {
           if (input.error) {
             return input.error;
           } else {
             const { decimals } = tokenLookup[fromToken.toLowerCase()];
-            values.fromAmount = parseFloat(
-              convert.toBalance(
-                upwardSlippage(input.tokenAmountIn as BigNumber, SLIPPAGE_RATE),
-                decimals
-              )
+            const asBigNumber = upwardSlippage(
+              input.tokenAmountIn as BigNumber,
+              SLIPPAGE_RATE
             );
+
+            values.fromAmount = {
+              displayed: convert.toBalance(asBigNumber, decimals),
+              exact: asBigNumber,
+            };
           }
         }
       }
@@ -112,13 +133,16 @@ function SingleTokenMintInteraction({ indexPool }: Props) {
         toAmount,
         lastTouchedField,
       } = values;
-      if (fromAmount > 0 && toAmount > 0 && fromToken && toToken) {
+      if (
+        fromAmount.exact.isGreaterThan(0) &&
+        toAmount.exact.isGreaterThan(0) &&
+        fromToken &&
+        toToken
+      ) {
         executeMint(
           fromToken,
           lastTouchedField,
-          lastTouchedField === "from"
-            ? fromAmount.toString()
-            : toAmount.toString()
+          lastTouchedField === "from" ? fromAmount.exact : toAmount.exact
         );
       }
     },
@@ -142,19 +166,13 @@ function SingleTokenMintInteraction({ indexPool }: Props) {
 
 function UniswapMintInteraction({ indexPool }: Props) {
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
-
-  useBalanceAndApprovalRegistrar(NARWHAL_ROUTER_ADDRESS.toLowerCase(), [
-    ...DISPLAYED_COMMON_BASE_TOKENS.map(({ id }) => id),
-  ]);
+  const assets = [...DISPLAYED_COMMON_BASE_TOKENS];
   const {
     getBestMintRouteForAmountIn,
     getBestMintRouteForAmountOut,
     executeRoutedMint,
-    loading
+    loading,
   } = useMintRouterCallbacks(indexPool.id);
-
-  const assets = [...DISPLAYED_COMMON_BASE_TOKENS];
-
   const handleChange = useCallback(
     (values: SingleInteractionValues) => {
       const {
@@ -167,70 +185,72 @@ function UniswapMintInteraction({ indexPool }: Props) {
       if (!toToken || !fromToken) {
         return;
       }
+
       if (lastTouchedField === "from") {
-        if (!fromAmount || isNaN(fromAmount) || fromAmount < 0) {
-          values.fromAmount = 0;
-          values.toAmount = 0;
+        // AMOUNT IN.
+
+        if (!fromAmount || fromAmount.exact.isLessThan(0)) {
+          values.fromAmount = DEFAULT_ENTRY;
+          values.toAmount = DEFAULT_ENTRY;
+
           return;
         }
-        const result = getBestMintRouteForAmountIn(
-          fromToken,
-          fromAmount.toString()
-        );
+
+        const result = getBestMintRouteForAmountIn(fromToken, fromAmount.exact);
+
         if (result) {
           if (result.poolResult?.error) {
             return result.poolResult.error;
           } else {
             const { decimals } = tokenLookup[toToken.toLowerCase()];
-            values.toAmount = parseFloat(
-              convert.toBalance(
-                downwardSlippage(
-                  result.poolResult.poolAmountOut as BigNumber,
-                  SLIPPAGE_RATE
-                ),
-                decimals
-              )
+            const asBigNumber = downwardSlippage(
+              result.poolResult.poolAmountOut as BigNumber,
+              SLIPPAGE_RATE
             );
+
+            values.toAmount = {
+              displayed: convert.toBalance(asBigNumber, decimals),
+              exact: asBigNumber,
+            };
           }
         } else {
-          values.toAmount = 0;
+          values.toAmount = DEFAULT_ENTRY;
         }
       } else {
-        if (!toAmount || isNaN(toAmount) || toAmount < 0) {
-          values.fromAmount = 0;
-          values.toAmount = 0;
+        // AMOUNT OUT.
+        if (!toAmount || toAmount.exact.isLessThan(0)) {
+          values.fromAmount = DEFAULT_ENTRY;
+          values.toAmount = DEFAULT_ENTRY;
+
           return;
         }
 
-        const result = getBestMintRouteForAmountOut(
-          fromToken,
-          toAmount.toString()
-        );
+        const result = getBestMintRouteForAmountOut(fromToken, toAmount.exact);
+
         if (result) {
           if (result.poolResult?.error) {
             return result.poolResult.error;
           } else {
             const { decimals } = tokenLookup[fromToken.toLowerCase()];
-            values.fromAmount = parseFloat(
-              convert.toBalance(
-                upwardSlippage(
-                  convert.toBigNumber(
-                    result.uniswapResult.inputAmount.raw.toString(10)
-                  ),
-                  SLIPPAGE_RATE
-                ),
-                decimals
-              )
+            const asBigNumber = upwardSlippage(
+              convert.toBigNumber(
+                result.uniswapResult.inputAmount.raw.toString(10)
+              ),
+              SLIPPAGE_RATE
             );
+
+            values.fromAmount = {
+              displayed: convert.toBalance(asBigNumber, decimals),
+              exact: asBigNumber,
+            };
           }
         } else {
-          values.fromAmount = 0;
+          values.fromAmount = DEFAULT_ENTRY;
         }
       }
     },
     [getBestMintRouteForAmountIn, getBestMintRouteForAmountOut, tokenLookup]
   );
-
   const handleSubmit = useCallback(
     (values: SingleInteractionValues) => {
       const {
@@ -240,18 +260,25 @@ function UniswapMintInteraction({ indexPool }: Props) {
         toAmount,
         lastTouchedField,
       } = values;
-      if (fromAmount > 0 && toAmount > 0 && fromToken && toToken) {
+      if (
+        fromAmount.exact.isGreaterThan(0) &&
+        toAmount.exact.isGreaterThan(0) &&
+        fromToken &&
+        toToken
+      ) {
         executeRoutedMint(
           fromToken,
           lastTouchedField,
-          lastTouchedField === "from"
-            ? fromAmount.toString()
-            : toAmount.toString()
+          lastTouchedField === "from" ? fromAmount.exact : toAmount.exact
         );
       }
     },
     [executeRoutedMint]
   );
+
+  useBalanceAndApprovalRegistrar(NARWHAL_ROUTER_ADDRESS.toLowerCase(), [
+    ...DISPLAYED_COMMON_BASE_TOKENS.map(({ id }) => id),
+  ]);
 
   return (
     <SingleInteraction
@@ -281,7 +308,7 @@ function MultiTokenMintInteraction({ indexPool }: Props) {
 
   const handleSubmit = useCallback(
     (values: MultiInteractionValues) =>
-      executeMint(values.fromAmount.toString()),
+      executeMint(values.fromAmount.displayed),
     [executeMint]
   );
 

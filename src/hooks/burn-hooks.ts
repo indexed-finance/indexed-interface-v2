@@ -12,7 +12,7 @@ import { convert } from "helpers";
 import {
   useBurnMultiTransactionCallback,
   useBurnSingleTransactionCallbacks,
-  useRoutedBurnTransactionCallbacks
+  useRoutedBurnTransactionCallbacks,
 } from "./transaction-hooks";
 import { useCallback, useMemo } from "react";
 import { usePoolTokenAddresses, usePoolUnderlyingTokens } from "./pool-hooks";
@@ -26,17 +26,17 @@ export function useSingleTokenBurnCallbacks(poolId: string) {
   const pool = useSelector((state: AppState) =>
     selectors.selectPool(state, poolId)
   );
-  const { burnExactAmountIn, burnExactAmountOut } = useBurnSingleTransactionCallbacks(poolId);
+  const { burnExactAmountIn, burnExactAmountOut } =
+    useBurnSingleTransactionCallbacks(poolId);
   const tokenLookup = useTokenLookupBySymbol();
   const calculateAmountIn = useCallback(
-    (tokenOutSymbol: string, typedAmountOut: string) => {
+    (tokenOutSymbol: string, amountOut: BigNumber) => {
       if (pool) {
         const outputToken =
           pool.tokens.entities[
             tokenLookup[tokenOutSymbol.toLowerCase()].id.toLowerCase()
           ];
         if (outputToken) {
-          const amountOut = convert.toToken(typedAmountOut, 18);
           const tokenOut = outputToken.token.id;
           const result = calcPoolInGivenSingleOut(pool, outputToken, amountOut);
           return {
@@ -51,14 +51,13 @@ export function useSingleTokenBurnCallbacks(poolId: string) {
     [pool, tokenLookup]
   );
   const calculateAmountOut = useCallback(
-    (tokenOutSymbol: string, typedAmountIn: string) => {
+    (tokenOutSymbol: string, amountIn: BigNumber) => {
       if (pool) {
         const outputToken =
           pool.tokens.entities[
             tokenLookup[tokenOutSymbol.toLowerCase()].id.toLowerCase()
           ];
         if (outputToken) {
-          const amountIn = convert.toToken(typedAmountIn, 18);
           const tokenOut = outputToken.token.id;
           const result = calcSingleOutGivenPoolIn(pool, outputToken, amountIn);
           return {
@@ -76,22 +75,21 @@ export function useSingleTokenBurnCallbacks(poolId: string) {
     (
       tokenOutSymbol: string,
       specifiedField: "from" | "to",
-      typedAmount: string
+      amount: BigNumber
     ) => {
       if (specifiedField === "from") {
-        const result = calculateAmountOut(tokenOutSymbol, typedAmount);
+        const result = calculateAmountOut(tokenOutSymbol, amount);
+
         if (result && !result.error) {
           return burnExactAmountIn(
             result.tokenOut,
             result.amountIn,
-            downwardSlippage(
-              result.tokenAmountOut as BigNumber,
-              SLIPPAGE_RATE
-            )
+            downwardSlippage(result.tokenAmountOut as BigNumber, SLIPPAGE_RATE)
           );
         }
       } else {
-        const result = calculateAmountIn(tokenOutSymbol, typedAmount);
+        const result = calculateAmountIn(tokenOutSymbol, amount);
+
         if (result && !result.error) {
           return burnExactAmountOut(
             result.tokenOut,
@@ -102,7 +100,12 @@ export function useSingleTokenBurnCallbacks(poolId: string) {
       }
       return Promise.reject();
     },
-    [calculateAmountIn, calculateAmountOut, burnExactAmountIn, burnExactAmountOut]
+    [
+      calculateAmountIn,
+      calculateAmountOut,
+      burnExactAmountIn,
+      burnExactAmountOut,
+    ]
   );
 
   return {
@@ -153,9 +156,9 @@ export function useMultiTokenBurnCallbacks(poolId: string) {
           result.amountsOut.map((amount) =>
             downwardSlippage(amount, SLIPPAGE_RATE)
           )
-        )
+        );
       } else {
-        Promise.reject()
+        Promise.reject();
       }
     },
     [exitPool, calculateAmountsOut]
@@ -173,22 +176,16 @@ export function useBurnRouterCallbacks(poolId: string) {
     () => [...poolTokenIds, ...COMMON_BASE_TOKENS.map(({ id }) => id)],
     [poolTokenIds]
   );
-  const { calculateAmountIn, calculateAmountOut } = useSingleTokenBurnCallbacks(
-    poolId
-  );
-  const { burnExactAmountIn, burnExactAmountOut } = useRoutedBurnTransactionCallbacks(poolId);
-  const {
-    calculateBestTradeForExactInput,
-    calculateBestTradeForExactOutput,
-  } = useUniswapTradingPairs(tokenIds);
+  const { calculateAmountIn, calculateAmountOut } =
+    useSingleTokenBurnCallbacks(poolId);
+  const { burnExactAmountIn, burnExactAmountOut } =
+    useRoutedBurnTransactionCallbacks(poolId);
+  const { calculateBestTradeForExactInput, calculateBestTradeForExactOutput } =
+    useUniswapTradingPairs(tokenIds);
   const getBestBurnRouteForAmountOut = useCallback(
-    (tokenOutSymbol: string, typedTokenAmountOut: string) => {
+    (tokenOutSymbol: string, amountOut: BigNumber) => {
       const normalizedOutput =
         tokenLookupBySymbol[tokenOutSymbol.toLowerCase()];
-      const exactAmountOut = convert.toToken(
-        typedTokenAmountOut,
-        normalizedOutput.decimals
-      );
       const allResults = poolTokens
         .map((token) => {
           if (!token.ready) return null;
@@ -199,13 +196,13 @@ export function useBurnRouterCallbacks(poolId: string) {
           const uniswapResult = calculateBestTradeForExactOutput(
             normalizedPoolTokenOut,
             normalizedOutput,
-            exactAmountOut.toString(10),
+            amountOut,
             { maxHops: 2, maxNumResults: 1 }
           );
           if (uniswapResult) {
             const poolResult = calculateAmountIn(
               normalizedPoolTokenOut.symbol,
-              uniswapResult.inputAmount.toExact()
+              convert.toBigNumber(uniswapResult.inputAmount.raw.toString())
             );
             if (poolResult) {
               if (poolResult.error) {
@@ -244,7 +241,7 @@ export function useBurnRouterCallbacks(poolId: string) {
     ]
   );
   const getBestBurnRouteForAmountIn = useCallback(
-    (tokenOutSymbol: string, typedPoolAmountIn: string) => {
+    (tokenOutSymbol: string, amountIn: BigNumber) => {
       const normalizedOutput =
         tokenLookupBySymbol[tokenOutSymbol.toLowerCase()];
 
@@ -256,7 +253,7 @@ export function useBurnRouterCallbacks(poolId: string) {
           if (!normalizedPoolTokenOut) return null;
           const poolResult = calculateAmountOut(
             normalizedPoolTokenOut.symbol,
-            typedPoolAmountIn
+            amountIn
           );
           if (poolResult) {
             if (poolResult.error) {
@@ -266,7 +263,7 @@ export function useBurnRouterCallbacks(poolId: string) {
               const uniswapResult = calculateBestTradeForExactInput(
                 normalizedPoolTokenOut,
                 normalizedOutput,
-                poolResult.tokenAmountOut.toString(10),
+                poolResult.tokenAmountOut,
                 { maxHops: 2, maxNumResults: 1 }
               );
               if (uniswapResult) {
@@ -307,13 +304,10 @@ export function useBurnRouterCallbacks(poolId: string) {
     (
       tokenOutSymbol: string,
       specifiedField: "from" | "to",
-      typedAmount: string
+      amount: BigNumber
     ) => {
       if (specifiedField === "from") {
-        const result = getBestBurnRouteForAmountIn(
-          tokenOutSymbol,
-          typedAmount
-        );
+        const result = getBestBurnRouteForAmountIn(tokenOutSymbol, amount);
         if (result && !result.poolResult.error) {
           return burnExactAmountIn(
             result.poolResult.amountIn,
@@ -328,22 +322,26 @@ export function useBurnRouterCallbacks(poolId: string) {
           );
         }
       } else {
-        const result = getBestBurnRouteForAmountOut(
-          tokenOutSymbol,
-          typedAmount
-        );
+        const result = getBestBurnRouteForAmountOut(tokenOutSymbol, amount);
         if (result && !result.poolResult.error) {
           return burnExactAmountOut(
             upwardSlippage(result.poolResult.poolAmountIn, SLIPPAGE_RATE),
             result.uniswapResult.route.encodedPath,
-            convert.toBigNumber(result.uniswapResult.outputAmount.raw.toString(10)),
+            convert.toBigNumber(
+              result.uniswapResult.outputAmount.raw.toString(10)
+            ),
             result.uniswapResult.outputAmount.currency === Currency.ETHER
           );
         }
       }
       Promise.reject();
     },
-    [getBestBurnRouteForAmountIn, getBestBurnRouteForAmountOut, burnExactAmountIn, burnExactAmountOut]
+    [
+      getBestBurnRouteForAmountIn,
+      getBestBurnRouteForAmountOut,
+      burnExactAmountIn,
+      burnExactAmountOut,
+    ]
   );
 
   return {

@@ -1,5 +1,5 @@
 import { AppState, FormattedPortfolioAsset, selectors } from "features";
-import { Card, Statistic, Typography } from "antd";
+import { Card, Space, Statistic, Typography } from "antd";
 import { ExternalLink } from "../atoms";
 import { Link } from "react-router-dom";
 import { Progress, Token } from "components/atomic";
@@ -16,7 +16,6 @@ export function PortfolioWidget(props: FormattedPortfolioAsset) {
   const tokenIds = useSelector((state: AppState) =>
     selectors.selectPoolTokenAddresses(state, props.address)
   );
-
   const fontSize = isMobile ? 16 : 20;
   const earned = props.isSushiswapPair
     ? `${props.sushiEarned} SUSHI`
@@ -53,6 +52,7 @@ export function PortfolioWidget(props: FormattedPortfolioAsset) {
       isSushiswapPair={props.isSushiswapPair}
     >
       <Card
+        hoverable={true}
         title={<Token size="medium" symbol={props.symbol} name={props.name} />}
         actions={actions}
         extra={
@@ -81,25 +81,49 @@ export function PortfolioWidget(props: FormattedPortfolioAsset) {
             type="dashboard"
             percent={parseFloat(props.weight.replace(/%/g, ""))}
           />
-          <Typography.Text
-            key="foo"
-            type="success"
-            style={{
-              flex: 1,
-              fontSize: isMobile ? 16 : 24,
-              marginBottom: 0,
-              textAlign: "right",
-            }}
-          >
-            <Typography.Title
-              type="secondary"
-              style={{ fontSize: 12 }}
-              level={5}
+
+          <Space direction="vertical">
+            <Typography.Text
+              key="foo"
+              style={{
+                flex: 1,
+                fontSize: isMobile ? 16 : 24,
+                marginBottom: 0,
+                textAlign: "right",
+              }}
             >
-              Currently worth
-            </Typography.Title>
-            {props.value}
-          </Typography.Text>
+              <Typography.Title
+                type="secondary"
+                style={{ fontSize: 12 }}
+                level={5}
+              >
+                Balance
+              </Typography.Title>
+              <div style={{ fontSize: 16 }}>
+                {convert.toComma(parseFloat(props.balance))}
+              </div>
+            </Typography.Text>
+
+            <Typography.Text
+              key="bar"
+              type="success"
+              style={{
+                flex: 1,
+                fontSize: isMobile ? 16 : 24,
+                marginBottom: 0,
+                textAlign: "right",
+              }}
+            >
+              <Typography.Title
+                type="secondary"
+                style={{ fontSize: 12 }}
+                level={5}
+              >
+                Currently worth
+              </Typography.Title>
+              <div>{props.value}</div>
+            </Typography.Text>
+          </Space>
         </div>
       </Card>
     </FormattedLink>

@@ -1,7 +1,6 @@
 import { AppState, FormattedIndexPool, selectors } from "features";
 import { DISPLAYED_COMMON_BASE_TOKENS, NARWHAL_ROUTER_ADDRESS } from "config";
 import { SingleInteraction, SingleInteractionValues } from "./BaseInteraction";
-import { Trade } from "@indexed-finance/narwhal-sdk";
 import { convert } from "helpers";
 import {
   useBalanceAndApprovalRegistrar,
@@ -14,6 +13,11 @@ import { useSelector } from "react-redux";
 interface Props {
   indexPool: FormattedIndexPool;
 }
+
+const DEFAULT_ENTRY = {
+  displayed: "0.00",
+  exact: convert.toBigNumber("0.00"),
+};
 
 export function TradeInteraction({ indexPool }: Props) {
   const handleTrade = useUniswapTransactionCallback();
@@ -51,37 +55,41 @@ export function TradeInteraction({ indexPool }: Props) {
       const outputToken = tokenLookup[toToken.toLowerCase()];
       if (inputToken && outputToken) {
         if (lastTouchedField === "from") {
-          if (!fromAmount || isNaN(fromAmount)) {
-            values.fromAmount = 0;
-            values.toAmount = 0;
+          if (!fromAmount) {
+            values.fromAmount = DEFAULT_ENTRY;
+            values.toAmount = DEFAULT_ENTRY;
+
             return;
           }
-          const amountIn = convert
-            .toToken(fromAmount.toString(), inputToken.decimals)
-            .toString(10);
           const bestTrade = calculateBestTradeForExactInput(
             inputToken,
             outputToken,
-            amountIn
+            fromAmount.exact
           );
-          values.toAmount = parseFloat(bestTrade?.outputAmount.toFixed(4) ?? "0");
+          const innerResult = bestTrade?.outputAmount.toFixed(4) ?? "0.00";
+
+          values.toAmount = {
+            displayed: innerResult,
+            exact: convert.toBigNumber(innerResult),
+          };
         } else {
-          if (!toAmount || isNaN(toAmount)) {
-            values.fromAmount = 0;
-            values.toAmount = 0;
+          if (!toAmount) {
+            values.fromAmount = DEFAULT_ENTRY;
+            values.toAmount = DEFAULT_ENTRY;
+
             return;
           }
-          const amountOut = convert
-            .toToken(toAmount.toString(), outputToken.decimals)
-            .toString(10);
           const bestTrade = calculateBestTradeForExactOutput(
             inputToken,
             outputToken,
-            amountOut
+            toAmount.exact
           );
-          values.fromAmount = parseFloat(
-            bestTrade?.inputAmount.toFixed(4) ?? "0"
-          );
+          const innerResult = bestTrade?.inputAmount.toFixed(4) ?? "0.00";
+
+          values.fromAmount = {
+            displayed: innerResult,
+            exact: convert.toBigNumber(innerResult),
+          };
         }
       }
     },
@@ -99,31 +107,20 @@ export function TradeInteraction({ indexPool }: Props) {
       toAmount,
       lastTouchedField,
     }: SingleInteractionValues) => {
-      if (fromAmount > 0 && toAmount > 0 && fromToken && toToken) {
+      if (
+        fromAmount.exact.isGreaterThan(0) &&
+        toAmount.exact.isGreaterThan(0) &&
+        fromToken &&
+        toToken
+      ) {
         const inputToken = tokenLookup[fromToken.toLowerCase()];
         const outputToken = tokenLookup[toToken.toLowerCase()];
-        let trade: Trade | undefined;
-        if (lastTouchedField === "from") {
-          const amountIn = convert
-            .toToken(fromAmount.toString(), inputToken.decimals)
-            .toString(10);
+        const tradeFn =
+          lastTouchedField === "from"
+            ? calculateBestTradeForExactInput
+            : calculateBestTradeForExactOutput;
+        const trade = tradeFn(inputToken, outputToken, fromAmount.exact);
 
-          trade = calculateBestTradeForExactInput(
-            inputToken,
-            outputToken,
-            amountIn
-          );
-        } else {
-          const amountOut = convert
-            .toToken(toAmount.toString(), outputToken.decimals)
-            .toString(10);
-
-          trade = calculateBestTradeForExactOutput(
-            inputToken,
-            outputToken,
-            amountOut
-          );
-        }
         if (trade) {
           handleTrade(trade);
         }

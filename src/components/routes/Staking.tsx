@@ -65,6 +65,9 @@ export default function Stake() {
           {stakingDetail.indexTokens.map((stakingPool) => (
             <ExpiredStakingCard key={stakingPool.id} {...stakingPool} />
           ))}
+          {stakingDetail.liquidityTokens.map((stakingPool) => (
+            <ExpiredStakingCard key={stakingPool.id} {...stakingPool} />
+          ))}
         </ExpiredAlert>
       )}
       {showingNothing && <Empty />}

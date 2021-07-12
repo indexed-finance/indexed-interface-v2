@@ -74,7 +74,7 @@ export function StakingCard({
                 )}
               </Col>
               <Col xs={24} sm={5}>
-                {staked !== "0" && (
+                {staked !== "0.00" && (
                   <em>
                     <Typography.Text type="success">
                       Staking {staked} {symbol}

@@ -11,6 +11,7 @@ import {
 import { useCallRegistrar } from "./use-call-registrar";
 import { useCallback, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import BigNumber from "bignumber.js";
 import type { AppState, FormattedPair, NormalizedToken } from "features";
 import type {
   BestTradeOptions,
@@ -30,9 +31,8 @@ export type RegisteredPair = {
   exists?: boolean;
 };
 
-export const usePair = (pairId: string) => useSelector((state: AppState) =>
-  selectors.selectPairById(state, pairId)
-);
+export const usePair = (pairId: string) =>
+  useSelector((state: AppState) => selectors.selectPairById(state, pairId));
 
 export const usePairExistsLookup = (
   pairIds: string[]
@@ -73,8 +73,20 @@ export function buildUniswapPairs(baseTokens: string[]) {
 
     return [
       ...arr,
-      { id: computeUniswapPairAddress(token0, token1), exists: undefined, token0, token1, sushiswap: false },
-      { id: computeSushiswapPairAddress(token0, token1), exists: undefined, token0, token1, sushiswap: true }
+      {
+        id: computeUniswapPairAddress(token0, token1),
+        exists: undefined,
+        token0,
+        token1,
+        sushiswap: false,
+      },
+      {
+        id: computeSushiswapPairAddress(token0, token1),
+        exists: undefined,
+        token0,
+        token1,
+        sushiswap: true,
+      },
     ];
   }, [] as PairToken[]);
 
@@ -135,7 +147,7 @@ export function useUniswapTradingPairs(baseTokens: string[]) {
     (
       tokenIn: NormalizedToken,
       tokenOut: NormalizedToken,
-      amountIn: string, // Should be formatted as a token amount in base 10 or hex
+      amountIn: BigNumber,
       opts?: BestTradeOptions
     ): Trade | undefined => {
       if (!loading) {
@@ -144,7 +156,8 @@ export function useUniswapTradingPairs(baseTokens: string[]) {
           convert.toUniswapSDKCurrencyAmount(
             { network: { chainId: 1 } },
             tokenIn,
-            amountIn
+            amountIn,
+            18
           ) as TokenAmount,
           convert.toUniswapSDKCurrency(
             { network: { chainId: 1 } },
@@ -161,7 +174,7 @@ export function useUniswapTradingPairs(baseTokens: string[]) {
     (
       tokenIn: NormalizedToken,
       tokenOut: NormalizedToken,
-      amountOut: string, // Should be formatted as a token amount
+      amountOut: BigNumber,
       opts?: BestTradeOptions
     ): Trade | undefined => {
       if (!loading) {
@@ -174,7 +187,8 @@ export function useUniswapTradingPairs(baseTokens: string[]) {
           convert.toUniswapSDKCurrencyAmount(
             { network: { chainId: 1 } },
             tokenOut,
-            amountOut
+            amountOut,
+            18
           ) as TokenAmount,
           opts ?? { maxHops: 3, maxNumResults: 1 }
         );
