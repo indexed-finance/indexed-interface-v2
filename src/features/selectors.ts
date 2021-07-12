@@ -602,12 +602,13 @@ export const selectors = {
           const percentAsNumber = convert
             .toBigNumber(percentAsFraction)
             .dividedBy(convert.toBigNumber("1e18"))
+            .times(100)
             .toNumber();
 
           return {
             protocol: adapter.protocolID,
             annualPercentageRate: convert.toPercent(adapter.apr),
-            percentage: convert.toPercent(percentAsNumber),
+            percentage: percentAsNumber,
           };
         }),
       };

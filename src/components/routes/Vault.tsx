@@ -1,10 +1,24 @@
 import { Card, Col, Divider, Progress, Row, Typography } from "antd";
-import { Label, Page, VaultCard } from "components/atomic";
+import {
+  Label,
+  Page,
+  VaultAdapterPieChart,
+  VaultCard,
+} from "components/atomic";
+import { Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 import { useParams } from "react-router";
 import { useVault } from "hooks";
 import type { FormattedVault } from "features";
 
 export function LoadedVault(props: FormattedVault) {
+  const chartData = props.adapters.map(
+    ({ protocol, percentage, annualPercentageRate }) => ({
+      name: protocol,
+      value: percentage,
+      apr: annualPercentageRate,
+    })
+  );
+
   return (
     <Page hasPageHeader={true} title="Vault">
       <VaultCard
@@ -15,49 +29,9 @@ export function LoadedVault(props: FormattedVault) {
         {...props}
       />
       <Divider />
-      <Row gutter={24}>
-        {props.adapters.map((adapter) => (
-          <Col key={adapter.protocol} xs={24} md={8}>
-            <Card className="large-progress">
-              <Card.Meta
-                avatar={
-                  <Progress
-                    style={{
-                      marginTop: 12,
-                      fontSize: 48,
-                      textAlign: "center",
-                    }}
-                    width={120}
-                    status="active"
-                    type="dashboard"
-                    percent={parseFloat(adapter.percentage.replace(/%/g, ""))}
-                  />
-                }
-                title={
-                  <Typography.Title level={2}>
-                    {adapter.protocol.toUpperCase()}
-                  </Typography.Title>
-                }
-                description={
-                  <div
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "flex-end",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <Label>APR</Label>
-                    <Typography.Title level={3} type="success">
-                      {adapter.annualPercentageRate}
-                    </Typography.Title>
-                  </div>
-                }
-              />
-            </Card>
-          </Col>
-        ))}
-      </Row>
+      <div style={{ width: 600, height: 300, textTransform: "uppercase" }}>
+        <VaultAdapterPieChart data={chartData} />
+      </div>
     </Page>
   );
 }

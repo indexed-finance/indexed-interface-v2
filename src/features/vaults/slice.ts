@@ -16,7 +16,7 @@ export interface FormattedVault {
   adapters: Array<{
     protocol: string;
     annualPercentageRate: string;
-    percentage: string;
+    percentage: number;
   }>;
 }
 

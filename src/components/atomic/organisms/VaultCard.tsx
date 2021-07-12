@@ -7,14 +7,11 @@ export function VaultCard({
   withTitle,
   name,
   annualPercentageRate,
-  adapters,
   totalValueLocked,
   bordered,
   hoverable,
 }: { vaultId: string; withTitle?: boolean } & CardProps & FormattedVault) {
   const { push } = useHistory();
-
-  console.log({ totalValueLocked });
 
   return (
     <Card
