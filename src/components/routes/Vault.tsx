@@ -1,14 +1,74 @@
-import { Card, Col, Divider, Progress, Row, Typography } from "antd";
 import {
-  Label,
+  Alert,
+  Button,
+  Card,
+  Col,
+  Divider,
+  Row,
+  Space,
+  Typography,
+} from "antd";
+import { Formik } from "formik";
+import {
   Page,
+  TokenSelector,
   VaultAdapterPieChart,
   VaultCard,
 } from "components/atomic";
-import { Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
+import { convert } from "helpers";
 import { useParams } from "react-router";
 import { useVault } from "hooks";
 import type { FormattedVault } from "features";
+
+function VaultFormInner() {
+  return (
+    <Card
+      bordered={true}
+      title={
+        <Row gutter={24} align="middle">
+          <Col span={10}>
+            <Button block={true} size="large" type="primary">
+              Deposit
+            </Button>
+          </Col>
+          <Col span={4}>
+            <Divider>or</Divider>
+          </Col>
+          <Col span={10}>
+            <Button block={true} size="large">
+              Redeem
+            </Button>
+          </Col>
+        </Row>
+      }
+    >
+      <Space direction="vertical" size="large" style={{ width: "100%" }}>
+        <TokenSelector
+          assets={[]}
+          value={{
+            token: "FOO",
+            amount: {
+              displayed: "0.00",
+              exact: convert.toBigNumber("0"),
+            },
+          }}
+          isInput={true}
+        />
+        <Alert showIcon={true} type="info" message="Performance Fee: 13.37%" />
+        <Typography.Title level={4} style={{ textAlign: "right" }}>
+          Total: 1,337.00
+        </Typography.Title>
+        <Button
+          type="primary"
+          block={true}
+          style={{ fontSize: 30, height: 60 }}
+        >
+          Send Transaction
+        </Button>
+      </Space>
+    </Card>
+  );
+}
 
 export function LoadedVault(props: FormattedVault) {
   const chartData = props.adapters.map(
@@ -29,9 +89,41 @@ export function LoadedVault(props: FormattedVault) {
         {...props}
       />
       <Divider />
-      <div style={{ width: 600, height: 300, textTransform: "uppercase" }}>
-        <VaultAdapterPieChart data={chartData} />
-      </div>
+      <Row gutter={24}>
+        <Col span={12}>
+          <Typography.Title level={2}>Protocol Breakdown</Typography.Title>
+          <div
+            style={{
+              width: 600,
+              height: 500,
+              textTransform: "uppercase",
+              transform: "scale(1.6)",
+            }}
+          >
+            <VaultAdapterPieChart data={chartData} />
+          </div>
+        </Col>
+        <Col span={12}>
+          <Typography.Title level={2}>
+            Interact With {props.name}
+          </Typography.Title>
+          <Formik
+            initialValues={{
+              asset: "",
+              amount: {
+                displayed: "0.00",
+                exact: convert.toBigNumber("0.00"),
+              },
+              inputType: "stake",
+            }}
+            onSubmit={console.info}
+            validateOnChange={true}
+            validateOnBlur={true}
+          >
+            <VaultFormInner />
+          </Formik>
+        </Col>
+      </Row>
     </Page>
   );
 }
