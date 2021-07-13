@@ -4,7 +4,7 @@ import articles from "data/learn";
 
 export default function Learn() {
   return (
-    <Page hasPageHeader={true} title="Foo">
+    <Page hasPageHeader={true} title="Learn">
       <Typography.Text>There are {articles.length} articles.</Typography.Text>
     </Page>
   );

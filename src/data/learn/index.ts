@@ -1,1 +1,1 @@
-export default ["foo.md"];
+export default ["sample.md"];
