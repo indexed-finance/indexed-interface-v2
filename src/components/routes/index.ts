@@ -4,6 +4,7 @@
 export * from './IndexPool';
 export * from './IndexPools';
 export * from './Learn';
+export * from './LearnArticle';
 export * from './Portfolio';
 export * from './Splash';
 export * from './Stake';
