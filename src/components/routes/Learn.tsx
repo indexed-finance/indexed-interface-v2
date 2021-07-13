@@ -1,25 +1,11 @@
 import { Page } from "components/atomic";
-import { useEffect, useState } from "react";
-import Markdown from "react-markdown";
+import { Typography } from "antd";
+import articles from "data/learn";
 
 export default function Learn() {
-  const [text, setText] = useState("");
-
-  useEffect(() => {
-    fetch("/data/learn/foo.md")
-      .then((response) => response.text())
-      .then(setText);
-  }, []);
-
-  useEffect(() => {
-    fetch("/data/learn")
-      // .then((response) => response.text())
-      .then(console.log);
-  }, []);
-
   return (
     <Page hasPageHeader={true} title="Foo">
-      {text ? <Markdown>{text}</Markdown> : <p>Loading...</p>}
+      <Typography.Text>There are {articles.length} articles.</Typography.Text>
     </Page>
   );
 }
