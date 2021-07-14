@@ -9,6 +9,7 @@ import {
   Typography,
 } from "antd";
 import { Label, LearnArticleCard, Page } from "components/atomic";
+import { openDataPullRequest } from "helpers";
 import { useCallback, useState } from "react";
 import MDEditor from "@uiw/react-md-editor";
 import articles from "data/learn";
@@ -25,6 +26,7 @@ export default function Learn() {
   const handleSubmit = useCallback(() => {
     const result = formatMarkdown({
       author,
+      video,
       avatar,
       blurb,
       slug,
@@ -32,8 +34,8 @@ export default function Learn() {
       content,
     });
 
-    // Handle.
-  }, [author, avatar, blurb, slug, title, content]);
+    openDataPullRequest(title, slug, result);
+  }, [author, video, avatar, blurb, slug, title, content]);
 
   return (
     <Page

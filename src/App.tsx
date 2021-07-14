@@ -18,7 +18,6 @@ import { Provider } from "react-redux";
 import { Suspense, useEffect, useRef } from "react";
 import { Web3ReactProvider } from "@web3-react/core";
 import { ethers } from "ethers";
-import { openDataPullRequest } from "helpers";
 import { routes } from "routes";
 import { store } from "features";
 import { useBreakpoints, useWalletConnection } from "hooks";
@@ -38,8 +37,6 @@ export function App() {
       ReactGA.initialize(GOOGLE_ANALYTICS_TRACKING_CODE);
       ReactGA.pageview(window.location.pathname + window.location.search);
     }
-
-    openDataPullRequest();
   }, []);
 
   return (
