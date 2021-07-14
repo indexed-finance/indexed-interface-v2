@@ -1,1 +1,1 @@
-export const DATA_PULL_REQUEST_BRANCH = "contribute";
+export const GITHUB_KEY = process.env.REACT_APP_GITHUB_KEY;
