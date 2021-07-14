@@ -9,3 +9,5 @@ export const UNISWAP_SUBGRAPH_URL =
   "https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2";
 export const UNISWAP_SUBGRAPH_URL_RINKEBY =
   "https://api.thegraph.com/subgraphs/name/samgos/uniswap-v2-rinkeby";
+
+export const GITHUB_KEY = process.env.REACT_APP_GITHUB_KEY;

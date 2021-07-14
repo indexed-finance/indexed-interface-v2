@@ -9,6 +9,7 @@
     "@indexed-finance/narwhal-sdk": "^1.0.1",
     "@indexed-finance/subgraph-clients": "^0.0.8",
     "@metamask/jazzicon": "^2.0.0",
+    "@octokit/core": "^3.5.1",
     "@reduxjs/toolkit": "^1.5.0",
     "@uiw/react-md-editor": "^3.4.9",
     "@walletconnect/web3-provider": "^1.4.1",
