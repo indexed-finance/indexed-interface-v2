@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 
 export function useMarkdownData(file: string) {
+  const [author, setAuthor] = useState("");
+  const [video, setVideo] = useState("");
+  const [avatar, setAvatar] = useState("");
   const [blurb, setBlurb] = useState("");
+  const [slug, setSlug] = useState("");
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [avatar, setAvatar] = useState("");
-  const [slug, setSlug] = useState("");
 
   useEffect(() => {
     fetch(require(`data/learn/${file}.md`).default)
@@ -14,6 +16,8 @@ export function useMarkdownData(file: string) {
       .then((result) => {
         const parsed = parseMarkdown(result);
 
+        setAuthor(parsed.author);
+        setVideo(parsed.video);
         setBlurb(parsed.blurb);
         setTitle(parsed.title);
         setContent(parsed.content);
@@ -22,7 +26,7 @@ export function useMarkdownData(file: string) {
       });
   }, [file]);
 
-  return { blurb, title, content, avatar, slug };
+  return { author, video, blurb, title, content, avatar, slug };
 }
 
 // #region Helpers
@@ -48,11 +52,13 @@ function parseMarkdown(raw: string) {
     .replace(/\\n/g, "  \n");
 
   return {
-    blurb: metadata.blurb ?? "",
-    title: metadata.title,
-    content,
+    author: metadata.author,
+    video: metadata.video,
     avatar: metadata.avatar,
+    blurb: metadata.blurb,
+    title: metadata.title,
     slug: metadata.slug,
+    content,
   };
 }
 

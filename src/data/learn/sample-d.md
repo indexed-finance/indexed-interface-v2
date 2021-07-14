@@ -1,8 +1,8 @@
 ---
 - avatar: sample
-- slug: sample-c
-- title: Sample Article C
-- blurb: Lorem ipsum dolor sit amet C
+- slug: burn
+- title: How To Burn
+- blurb: Blah
 ---
 
 # Sample C

@@ -16,13 +16,14 @@ import articles from "data/learn";
 export default function Learn() {
   const [editing, setEditing] = useState(true);
   const [author, setAuthor] = useState("");
+  const [video, setVideo] = useState("");
   const [avatar, setAvatar] = useState("");
   const [blurb, setBlurb] = useState("");
   const [slug, setSlug] = useState("");
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const handleSubmit = useCallback(() => {
-    console.log({
+    const result = formatMarkdown({
       author,
       avatar,
       blurb,
@@ -30,6 +31,8 @@ export default function Learn() {
       title,
       content,
     });
+
+    // Handle.
   }, [author, avatar, blurb, slug, title, content]);
 
   return (
@@ -64,6 +67,14 @@ export default function Learn() {
                 type="text"
                 value={author}
                 onChange={(e) => setAuthor(e.target.value)}
+              />
+            </Card>
+            <Card>
+              <Label>Video</Label>
+              <Input
+                type="text"
+                value={video}
+                onChange={(e) => setVideo(e.target.value)}
               />
             </Card>
             <Card>
@@ -122,3 +133,37 @@ export default function Learn() {
     </Page>
   );
 }
+
+// #region Helpers
+
+// ---
+// - avatar: sample
+// - slug: burn
+// - title: How To Burn
+// - blurb: Blah
+// ---
+
+// # Sample C
+
+// ## This is the third sample.
+
+function formatMarkdown({
+  author,
+  video,
+  avatar,
+  blurb,
+  slug,
+  title,
+  content,
+}: Record<string, string>) {
+  const lines = ["---  \n"];
+
+  [author, video, avatar, blurb, slug, title].forEach((metadata) =>
+    lines.push(`- ${metadata}  \n`)
+  );
+
+  lines.push("---  \n");
+
+  return `${lines.join("")}\n${content}`;
+}
+// #endregion

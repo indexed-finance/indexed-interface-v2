@@ -1,1 +1,1 @@
-export default ["sample-a.md", "sample-b.md", "sample-c.md", "sample-d.md"];
+export default ["burn.md", "sample-a.md", "sample-b.md", "sample-c.md", "sample-d.md"];
