@@ -15,7 +15,7 @@ import MDEditor from "@uiw/react-md-editor";
 import articles from "data/learn";
 
 export default function Learn() {
-  const [editing, setEditing] = useState(true);
+  const [editing /*, setEditing*/] = useState(true);
   const [author, setAuthor] = useState("");
   const [video, setVideo] = useState("");
   const [avatar, setAvatar] = useState("");
