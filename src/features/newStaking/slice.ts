@@ -34,11 +34,13 @@ const slice = createSlice({
   extraReducers: (builder) =>
     builder
       .addCase(fetchNewStakingData.fulfilled, (state, action) => {
-        adapter.addMany(state, action.payload.pools);
-        state.metadata = {
-          ...state.metadata,
-          ...action.payload.meta,
-        };
+        if (action.payload) {
+          adapter.addMany(state, action.payload.pools);
+          state.metadata = {
+            ...state.metadata,
+            ...action.payload.meta,
+          };
+        }
       })
       .addCase(fetchMulticallData.fulfilled, (state, action) => {
         const relevantMulticallData = newStakingMulticallDataParser(

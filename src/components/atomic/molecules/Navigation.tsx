@@ -1,6 +1,8 @@
 import { AiOutlineUser } from "react-icons/ai";
 import { ExternalLink } from "components/atomic";
+import { FEATURE_FLAGS } from "feature-flags";
 import { FaGavel, FaSwimmingPool } from "react-icons/fa";
+import { GoLightBulb } from "react-icons/go";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, Space } from "antd";
 import { RiSafe2Line } from "react-icons/ri";
@@ -59,13 +61,26 @@ export function Navigation() {
         </Link>
       </Menu.Item>
       <Menu.Item>
-        <ExternalLink to="https://legacy.indexed.finance/governance" withIcon={false}>
+        <ExternalLink
+          to="https://legacy.indexed.finance/governance"
+          withIcon={false}
+        >
           <Space size="small">
             <FaGavel style={{ position: "relative", top: 2 }} />{" "}
             {!isMobile && <span>Vote</span>}
           </Space>
         </ExternalLink>
       </Menu.Item>
+      {FEATURE_FLAGS.useAcademy && (
+        <Menu.Item key="learn">
+          <Link to="/learn">
+            <Space>
+              <GoLightBulb style={{ position: "relative", top: 2 }} />{" "}
+              {!isMobile && <span>Learn</span>}
+            </Space>
+          </Link>
+        </Menu.Item>
+      )}
     </Menu>
   );
 }

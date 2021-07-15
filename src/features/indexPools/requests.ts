@@ -53,9 +53,14 @@ export async function queryIndexPoolUpdates(
         ${poolAddresses.map(createUpdateCall).join("\n")}
       }
     `;
-  const updates = await sendQuery(url, groupedCalls);
 
-  return updates;
+  try {
+    const updates = await sendQuery(url, groupedCalls);
+
+    return updates;
+  } catch (error) {
+    return {};
+  }
 }
 
 export function normalizeIndexPoolUpdates(response: Record<string, IndexPool>) {
@@ -124,10 +129,15 @@ export async function queryIndexPoolTransactions(
     `;
   const swapCall = `{${poolAddresses.map(createSingleSwapCall).join("\n")}}`;
   const tradeCall = `{${poolAddresses.map(createSingleTradeCall).join("\n")}}`;
-  const swaps = await sendQuery(indexedUrl, swapCall);
-  const trades = await sendQuery(uniswapUrl, tradeCall);
 
-  return { swaps, trades };
+  try {
+    const swaps = await sendQuery(indexedUrl, swapCall);
+    const trades = await sendQuery(uniswapUrl, tradeCall);
+
+    return { swaps, trades };
+  } catch (error) {
+    return { swaps: [], trades: [] };
+  }
 }
 
 export function normalizeIndexPoolTransactions(
@@ -151,16 +161,20 @@ export function normalizeIndexPoolTransactions(
 export const fetchIndexPoolTransactions = createAsyncThunk(
   "indexPools/fetchTransactions",
   async ({ provider, arg: poolAddresses = [] }: OffChainRequest) => {
-    const { chainId } = await provider.getNetwork();
-    const { swaps, trades } = await queryIndexPoolTransactions(
-      {
-        indexedUrl: getIndexedUrl(chainId),
-        uniswapUrl: getUniswapUrl(chainId),
-      },
-      poolAddresses
-    );
+    try {
+      const { chainId } = await provider.getNetwork();
+      const { swaps, trades } = await queryIndexPoolTransactions(
+        {
+          indexedUrl: getIndexedUrl(chainId),
+          uniswapUrl: getUniswapUrl(chainId),
+        },
+        poolAddresses
+      );
 
-    return normalizeIndexPoolTransactions(poolAddresses, swaps, trades);
+      return normalizeIndexPoolTransactions(poolAddresses, swaps, trades);
+    } catch (error) {
+      return {};
+    }
   }
 );
 // #endregion

@@ -4,8 +4,12 @@ import CoinGecko from "coingecko-api";
 export const fetchTokenPriceData = createAsyncThunk(
   "tokens/fetchPriceData",
   async ({ arg: tokenAddresses }: { arg: string[] }) => {
-    const tokens = await getTokenPriceData(tokenAddresses);
-    return tokens;
+    try {
+      const tokens = await getTokenPriceData(tokenAddresses);
+      return tokens;
+    } catch (error) {
+      return [];
+    }
   }
 );
 
@@ -57,7 +61,7 @@ export const getTokenPriceData = async (tokenAddresses: string[]) => {
 
     return formattedStats;
   } catch (error) {
-    console.error(error);
+    return {};
   }
 };
 // #endregion
