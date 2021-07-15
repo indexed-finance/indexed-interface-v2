@@ -1,3 +1,4 @@
+import { FEATURE_FLAGS } from "feature-flags";
 import { RouteProps } from "react-router-dom";
 import { TranslatedTerm } from "helpers";
 import { lazy } from "react";
@@ -53,16 +54,6 @@ export const routes: RouteWithBreadcrumbs[] = [
     component: SushiswapStakeForm,
   },
   {
-    path: "/learn",
-    exact: true,
-    component: Learn,
-  },
-  {
-    path: "/learn/:slug",
-    exact: true,
-    component: LearnArticle,
-  },
-  {
     path: "/index-pools",
     breadcrumbName: "INDEX_POOLS",
     exact: true,
@@ -89,3 +80,20 @@ export const routes: RouteWithBreadcrumbs[] = [
     component: IndexPool,
   },
 ];
+
+if (FEATURE_FLAGS.useAcademy) {
+  routes.push(
+    ...[
+      {
+        path: "/learn",
+        exact: true,
+        component: Learn,
+      },
+      {
+        path: "/learn/:slug",
+        exact: true,
+        component: LearnArticle,
+      },
+    ]
+  );
+}
