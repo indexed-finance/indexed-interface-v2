@@ -19,27 +19,32 @@ export const fetchNewStakingData = createAsyncThunk(
     const { chainId } = provider.network;
     const name = chainId === 1 ? "mainnet" : "rinkeby";
     const client = IndexedStakingSubgraphClient.forNetwork(name);
-    const data = await client.getStakingInfo();
-    const { pools, ...meta } = data;
-    const pairTokens = pools
-      .filter((p) => p.isPairToken)
-      .map(({ token: id, token0, token1 }) => ({
-        id,
-        exists: true,
-        token0,
-        token1,
-      }));
 
-    dispatch(pairsActions.uniswapPairsRegistered(pairTokens));
+    try {
+      const data = await client.getStakingInfo();
+      const { pools, ...meta } = data;
+      const pairTokens = pools
+        .filter((p) => p.isPairToken)
+        .map(({ token: id, token0, token1 }) => ({
+          id,
+          exists: true,
+          token0,
+          token1,
+        }));
 
-    return {
-      meta,
-      pools: pools.map(({ balance, isPairToken, ...pool }) => ({
-        ...pool,
-        totalStaked: balance,
-        isWethPair: isPairToken,
-        rewardsPerDay: "0",
-      })),
-    };
+      dispatch(pairsActions.uniswapPairsRegistered(pairTokens));
+
+      return {
+        meta,
+        pools: pools.map(({ balance, isPairToken, ...pool }) => ({
+          ...pool,
+          totalStaked: balance,
+          isWethPair: isPairToken,
+          rewardsPerDay: "0",
+        })),
+      };
+    } catch (error) {
+      return null;
+    }
   }
 );

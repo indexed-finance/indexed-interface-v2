@@ -17,12 +17,14 @@ const slice = createSlice({
   extraReducers: (builder) =>
     builder
       .addCase(fetchInitialData.fulfilled, (state, action) => {
-        const { dailySnapshots } = action.payload;
-        const fullSnapshots = dailySnapshots.ids.map(
-          (id) => dailySnapshots.entities[id]
-        );
+        if (action.payload) {
+          const { dailySnapshots } = action.payload;
+          const fullSnapshots = dailySnapshots.ids.map(
+            (id) => dailySnapshots.entities[id]
+          );
 
-        dailySnapshotsAdapter.addMany(state, fullSnapshots);
+          dailySnapshotsAdapter.addMany(state, fullSnapshots);
+        }
       })
       .addCase(fetchIndexPoolUpdates.fulfilled, (state, action) => {
         const dailySnapshots = Object.values(action.payload)

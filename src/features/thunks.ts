@@ -70,54 +70,48 @@ export const thunks = {
 
       provider = options.provider;
 
-      const networkId = parseInt(await provider.send("net_version", []));
-
-      if (networkId === 1) {
-        if (provider.blockNumber !== -1) {
-          dispatch(actions.blockNumberChanged(provider.blockNumber));
-        }
-
-        if (options.withSigner) {
-          signer = provider.getSigner();
-
-          if (options.selectedAddress) {
-            selectedAddress = options.selectedAddress;
-          } else if (provider.connection.url === "metamask") {
-            selectedAddress = (provider as any).provider.selectedAddress;
-          } else {
-            throw new Error("Unable to initialize without a selected address.");
-          }
-        }
-
-        await provider.ready;
-
-        dispatch(
-          fetchInitialData({
-            provider,
-          })
-        );
-        dispatch(
-          fetchStakingData({
-            provider,
-          })
-        );
-        dispatch(
-          fetchNewStakingData({
-            provider,
-          })
-        );
-        dispatch(fetchMasterChefData({ provider }));
-
-        if (selectedAddress) {
-          dispatch(actions.userAddressSelected(selectedAddress));
-        }
-
-        dispatch(actions.walletConnected());
-
-        SocketClient.disconnect();
-      } else {
-        window.alert("No.");
+      if (provider.blockNumber !== -1) {
+        dispatch(actions.blockNumberChanged(provider.blockNumber));
       }
+
+      if (options.withSigner) {
+        signer = provider.getSigner();
+
+        if (options.selectedAddress) {
+          selectedAddress = options.selectedAddress;
+        } else if (provider.connection.url === "metamask") {
+          selectedAddress = (provider as any).provider.selectedAddress;
+        } else {
+          throw new Error("Unable to initialize without a selected address.");
+        }
+      }
+
+      await provider.ready;
+
+      dispatch(
+        fetchInitialData({
+          provider,
+        })
+      );
+      dispatch(
+        fetchStakingData({
+          provider,
+        })
+      );
+      dispatch(
+        fetchNewStakingData({
+          provider,
+        })
+      );
+      dispatch(fetchMasterChefData({ provider }));
+
+      if (selectedAddress) {
+        dispatch(actions.userAddressSelected(selectedAddress));
+      }
+
+      dispatch(actions.walletConnected());
+
+      SocketClient.disconnect();
     },
   addTransaction:
     (

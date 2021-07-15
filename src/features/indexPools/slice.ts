@@ -40,14 +40,19 @@ const slice = createSlice({
               if (results.totalSupply) entry.totalSupply = results.totalSupply;
 
               for (const token of results.tokens) {
-                const tokenEntry = entry.tokens.entities[token.address.toLowerCase()];
+                const tokenEntry =
+                  entry.tokens.entities[token.address.toLowerCase()];
                 if (tokenEntry) {
                   if (token.balance) tokenEntry.balance = token.balance;
                   if (token.denorm) tokenEntry.denorm = token.denorm;
-                  if (token.minimumBalance) tokenEntry.minimumBalance = token.minimumBalance;
-                  if (token.usedBalance) tokenEntry.usedBalance = token.usedBalance;
-                  if (token.usedDenorm) tokenEntry.usedDenorm = token.usedDenorm;
-                  if (token.usedWeight) tokenEntry.usedWeight = token.usedWeight;
+                  if (token.minimumBalance)
+                    tokenEntry.minimumBalance = token.minimumBalance;
+                  if (token.usedBalance)
+                    tokenEntry.usedBalance = token.usedBalance;
+                  if (token.usedDenorm)
+                    tokenEntry.usedDenorm = token.usedDenorm;
+                  if (token.usedWeight)
+                    tokenEntry.usedWeight = token.usedWeight;
                 }
               }
             }
@@ -57,24 +62,26 @@ const slice = createSlice({
         return state;
       })
       .addCase(fetchInitialData.fulfilled, (state, action) => {
-        const { indexPools } = action.payload;
-        const fullPools = indexPools.ids.map((id) => indexPools.entities[id]);
+        if (action.payload) {
+          const { indexPools } = action.payload;
+          const fullPools = indexPools.ids.map((id) => indexPools.entities[id]);
 
-        for (const { tokens } of fullPools) {
-          for (const tokenId of tokens.ids) {
-            const token = tokens.entities[tokenId];
+          for (const { tokens } of fullPools) {
+            for (const tokenId of tokens.ids) {
+              const token = tokens.entities[tokenId];
 
-            if (token.ready) {
-              token.usedDenorm = token.denorm;
-              token.usedBalance = token.balance;
-            } else {
-              token.usedDenorm = token.desiredDenorm;
-              token.usedBalance = token.minimumBalance;
+              if (token.ready) {
+                token.usedDenorm = token.denorm;
+                token.usedBalance = token.balance;
+              } else {
+                token.usedDenorm = token.desiredDenorm;
+                token.usedBalance = token.minimumBalance;
+              }
             }
           }
-        }
 
-        adapter.addMany(state, fullPools);
+          adapter.addMany(state, fullPools);
+        }
       })
       .addCase(fetchIndexPoolTransactions.fulfilled, (state, action) => {
         for (const [pool, transactions] of Object.entries(action.payload)) {

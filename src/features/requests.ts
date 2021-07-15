@@ -41,81 +41,85 @@ export interface OffChainRequest {
 }
 
 export async function queryInitialData(url: string): Promise<Category[]> {
-  const { categories } = await sendQuery(
-    url,
-    `
-    {
-      categories (first: 1000) {
-        id
-        tokens {
+  try {
+    const { categories } = await sendQuery(
+      url,
+      `
+      {
+        categories (first: 1000) {
           id
-          decimals
-          name
-          symbol
-          priceUSD
-        }
-        indexPools {
-          id
-          category {
+          tokens {
             id
+            decimals
+            name
+            symbol
+            priceUSD
           }
-          size
-          name
-          symbol
-          isPublic
-          initialized
-          totalSupply
-          totalWeight
-          maxTotalSupply
-          swapFee
-          feesTotalUSD
-          totalValueLockedUSD
-          totalVolumeUSD
-          totalSwapVolumeUSD
-          tokensList
-          poolInitializer {
+          indexPools {
             id
-            totalCreditedWETH
+            category {
+              id
+            }
+            size
+            name
+            symbol
+            isPublic
+            initialized
+            totalSupply
+            totalWeight
+            maxTotalSupply
+            swapFee
+            feesTotalUSD
+            totalValueLockedUSD
+            totalVolumeUSD
+            totalSwapVolumeUSD
+            tokensList
+            poolInitializer {
+              id
+              totalCreditedWETH
+              tokens {
+                id
+                token {
+                  id
+                }
+                balance
+                targetBalance
+                amountRemaining
+              }
+            }
             tokens {
               id
               token {
                 id
+                symbol
+                decimals
               }
+              ready
               balance
-              targetBalance
-              amountRemaining
+              minimumBalance
+              denorm
+              desiredDenorm
             }
-          }
-          tokens {
-            id
-            token {
+            dailySnapshots(orderBy: date, orderDirection: desc, first: 168) {
               id
-              symbol
-              decimals
+              date
+              value
+              totalSupply
+              feesTotalUSD
+              totalValueLockedUSD
+              totalSwapVolumeUSD
+              totalVolumeUSD
             }
-            ready
-            balance
-            minimumBalance
-            denorm
-            desiredDenorm
-          }
-          dailySnapshots(orderBy: date, orderDirection: desc, first: 168) {
-            id
-            date
-            value
-            totalSupply
-            feesTotalUSD
-            totalValueLockedUSD
-            totalSwapVolumeUSD
-            totalVolumeUSD
           }
         }
       }
-    }
-  `
-  );
+    `
+    );
 
-  return categories;
+    return categories;
+  } catch (error) {
+    return [];
+  }
 }
 
 export function normalizeInitialData(categories: Category[]) {
@@ -280,9 +284,14 @@ export const fetchInitialData = createAsyncThunk(
   async ({ provider }: OffChainRequest) => {
     const { chainId } = provider.network;
     const url = getIndexedUrl(chainId);
-    const initial = await queryInitialData(url);
 
-    return normalizeInitialData(initial);
+    try {
+      const initial = await queryInitialData(url);
+
+      return normalizeInitialData(initial);
+    } catch (error) {
+      return null;
+    }
   }
 );
 
