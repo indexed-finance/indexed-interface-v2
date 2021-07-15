@@ -10,6 +10,7 @@ import {
   sortTokens,
 } from "helpers";
 import { WETH_CONTRACT_ADDRESS } from "config";
+import { constants } from "ethers";
 import { useAddTransactionCallback } from "./transaction-hooks";
 import { useCallRegistrar } from "./use-call-registrar";
 import { useCallback, useEffect, useMemo } from "react";
@@ -64,13 +65,14 @@ export function useTokenApproval({
   );
   const approve = useCallback(() => {
     if (contract && spender && status === "approval needed") {
+      const approveAmount = constants.MaxUint256;
       const tx = contract.approve(
         spender,
-        convert.toHex(convert.toBigNumber(rawAmount))
+        approveAmount// convert.toHex(convert.toBigNumber(rawAmount))
       );
       addTransaction(tx, {
         type: "ERC20.approve",
-        approval: { spender, tokenAddress: tokenId, amount: rawAmount },
+        approval: { spender, tokenAddress: tokenId, amount: approveAmount.toString() },
         summary: `Approve: ${amount} ${symbol}`,
       });
     } else {
@@ -80,7 +82,7 @@ export function useTokenApproval({
     status,
     spender,
     amount,
-    rawAmount,
+    // rawAmount,
     addTransaction,
     symbol,
     contract,

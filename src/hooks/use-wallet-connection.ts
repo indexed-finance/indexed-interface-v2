@@ -4,7 +4,7 @@ import { actions } from "features";
 import { ethers } from "ethers";
 import { fortmatic, injected, portis, walletConnect } from "ethereum";
 import { isMobile } from "react-device-detect";
-import { selectors } from "features";
+import { provider, selectors } from "features";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useWeb3React } from "@web3-react/core";
@@ -13,16 +13,25 @@ import noop from "lodash.noop";
 export type InjectedWindow = typeof window & { ethereum?: any; web3?: any };
 
 export function useInactiveListener(suppress = false) {
+  const dispatch = useDispatch();
   const { active, error, activate } = useWeb3React();
 
   useEffect(() => {
     const { ethereum } = window as InjectedWindow;
 
     if (ethereum && ethereum.on && !active && !error && !suppress) {
-      const handleChainChanged = () => {
-        activate(injected, noop, true).catch((error) => {
-          console.error("Failed to activate after chain changed", error);
-        });
+      const handleChainChanged = async () => {
+        if (provider) {
+          const networkId = parseInt(await provider.send("net_version", []));
+
+          if (networkId === 1) {
+            activate(injected, noop, true).catch((error) => {
+              console.error("Failed to activate after chain changed", error);
+            });
+          } else {
+            dispatch(actions.connectedToBadNetwork());
+          }
+        }
       };
 
       const handleAccountsChanged = (accounts: string[]) => {
@@ -43,7 +52,7 @@ export function useInactiveListener(suppress = false) {
         }
       };
     }
-  }, [active, error, suppress, activate]);
+  }, [active, error, suppress, activate, dispatch]);
 }
 
 export function useEagerConnect() {
@@ -55,14 +64,19 @@ export function useEagerConnect() {
     if (connector) {
       const _provider = await connector.getProvider();
       const provider = new ethers.providers.Web3Provider(_provider, 1);
+      const networkId = parseInt(await provider.send("net_version", []));
 
-      dispatch(
-        actions.initialize({
-          provider,
-          withSigner: true,
-          selectedAddress: account ?? "",
-        })
-      );
+      if (networkId === 1) {
+        dispatch(
+          actions.initialize({
+            provider,
+            withSigner: true,
+            selectedAddress: account ?? "",
+          })
+        );
+      } else {
+        dispatch(actions.connectedToBadNetwork());
+      }
     }
   }, [dispatch, account, connector]);
 

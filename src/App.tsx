@@ -1,5 +1,5 @@
-import { BrowserRouter, Route, useLocation } from "react-router-dom";
 import {
+  BadNetworkDrawer,
   DEBUG,
   DrawerProvider,
   ErrorBoundary,
@@ -12,14 +12,15 @@ import {
   useDiligenceDrawer,
   useTooltips,
 } from "components";
+import { BrowserRouter, Route, useLocation } from "react-router-dom";
 import { FEATURE_FLAGS } from "feature-flags";
 import { Layout, message, notification } from "antd";
-import { Provider } from "react-redux";
+import { Provider, useSelector } from "react-redux";
 import { Suspense, useEffect, useRef } from "react";
 import { Web3ReactProvider } from "@web3-react/core";
 import { ethers } from "ethers";
 import { routes } from "routes";
-import { store } from "features";
+import { selectors, store } from "features";
 import { useBreakpoints, useWalletConnection } from "hooks";
 import ReactGA from "react-ga";
 
@@ -61,6 +62,7 @@ export function AppLayout() {
   const { pathname } = useLocation();
   const previousLocation = useRef(pathname);
   const { isMobile } = useBreakpoints();
+  const onBadNetwork = useSelector(selectors.selectBadNetwork);
   const inner = (
     <>
       <LayoutHeader />
@@ -69,16 +71,22 @@ export function AppLayout() {
         className="with-background"
         style={{ minHeight: "100vh", paddingTop: 1, paddingBottom: 12 }}
       >
-        <Suspense fallback={<Page hasPageHeader={false} />}>
-          {routes.map((route, index) => (
-            <Route
-              key={index}
-              path={route.path}
-              exact={route.exact}
-              component={route.component}
-            />
-          ))}
-        </Suspense>
+        {onBadNetwork ? (
+          <Page hasPageHeader={false}>
+            <BadNetworkDrawer />
+          </Page>
+        ) : (
+          <Suspense fallback={<Page hasPageHeader={false} />}>
+            {routes.map((route, index) => (
+              <Route
+                key={index}
+                path={route.path}
+                exact={route.exact}
+                component={route.component}
+              />
+            ))}
+          </Suspense>
+        )}
       </Layout.Content>
       <TransactionList />
       {isMobile && (
