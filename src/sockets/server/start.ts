@@ -1,6 +1,6 @@
-import "./repo-handling";
 import { log } from "./helpers";
 import { setupClientHandling } from "./client-handling";
+import { setupErrorHandling } from "./error-handling";
 import { setupLogHandling } from "./log-handling";
 import { setupStateHandling } from "./state-handling";
 
@@ -16,5 +16,6 @@ let hasStarted = false;
 
 if (!hasStarted) {
   hasStarted = true;
+  setupErrorHandling();
   start();
 }
