@@ -15,7 +15,6 @@ import { pairsActions } from "./pairs";
 import { providers } from "ethers";
 import { settingsActions } from "./settings";
 import { tokensActions } from "./tokens";
-
 import { userActions } from "./user";
 import type { AppThunk } from "./store";
 

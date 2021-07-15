@@ -72,7 +72,9 @@ export function AppLayout() {
         style={{ minHeight: "100vh", paddingTop: 1, paddingBottom: 12 }}
       >
         {onBadNetwork ? (
-          <BadNetworkDrawer />
+          <Page hasPageHeader={false}>
+            <BadNetworkDrawer />
+          </Page>
         ) : (
           <Suspense fallback={<Page hasPageHeader={false} />}>
             {routes.map((route, index) => (

@@ -16,8 +16,9 @@ export function ServerConnection({ showText = false }: Props) {
   const userAddress = useSelector(selectors.selectUserAddress);
   const isUserConnected = useSelector(selectors.selectUserConnected);
   const isServerConnected = useSelector(selectors.selectConnected);
-  const connectionStatus = useMemo(
-    () => ({
+  const onBadNetwork = useSelector(selectors.selectBadNetwork);
+  const connectionStatus = useMemo(() => {
+    const firstPass = {
       type: (isUserConnected || isServerConnected
         ? "success"
         : "danger") as any,
@@ -26,9 +27,14 @@ export function ServerConnection({ showText = false }: Props) {
         : tx("NOT_CONNECTED_TO_SERVER"),
       bottom: tx("DISABLE_SERVER_CONNECTION"),
       text: isServerConnected ? tx("CONNECTED") : tx("NOT_CONNECTED"),
-    }),
-    [tx, isUserConnected, isServerConnected]
-  );
+    };
+
+    if (onBadNetwork) {
+      firstPass.type = "danger";
+    }
+
+    return firstPass;
+  }, [tx, isUserConnected, isServerConnected, onBadNetwork]);
   const ConnectionIcon = isUserConnected
     ? MdAccountBalanceWallet
     : ImConnection;
@@ -40,7 +46,7 @@ export function ServerConnection({ showText = false }: Props) {
     ) : (
       connectionStatus.text
     );
-  if (!isUserConnected) return <></>
+  if (!isUserConnected) return <></>;
   return (
     <Typography.Title
       level={5}
