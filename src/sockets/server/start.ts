@@ -6,6 +6,15 @@ import { setupStateHandling } from "./state-handling";
 
 log("SocketServer has started up!");
 
-setupClientHandling();
-setupStateHandling();
-setupLogHandling();
+export function start() {
+  setupClientHandling();
+  setupStateHandling();
+  setupLogHandling();
+}
+
+let hasStarted = false;
+
+if (!hasStarted) {
+  hasStarted = true;
+  start();
+}
