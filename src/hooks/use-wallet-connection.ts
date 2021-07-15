@@ -55,14 +55,19 @@ export function useEagerConnect() {
     if (connector) {
       const _provider = await connector.getProvider();
       const provider = new ethers.providers.Web3Provider(_provider, 1);
+      const networkId = parseInt(await provider.send("net_version", []));
 
-      dispatch(
-        actions.initialize({
-          provider,
-          withSigner: true,
-          selectedAddress: account ?? "",
-        })
-      );
+      if (networkId === 1) {
+        dispatch(
+          actions.initialize({
+            provider,
+            withSigner: true,
+            selectedAddress: account ?? "",
+          })
+        );
+      } else {
+        dispatch(actions.connectedToBadNetwork());
+      }
     }
   }, [dispatch, account, connector]);
 
