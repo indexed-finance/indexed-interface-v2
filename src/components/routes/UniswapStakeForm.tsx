@@ -59,7 +59,7 @@ export default function UniswapStakeForm() {
       stakingTokenLink={
         stakingPool.isWethPair ? (
           <ExternalLink
-            to={`https://v2.info.uniswap.org/pair/${portfolioToken.symbol}`}
+            to={`https://v2.info.uniswap.org/pair/${portfolioToken.address}`}
           >
             {portfolioToken.symbol}
           </ExternalLink>
