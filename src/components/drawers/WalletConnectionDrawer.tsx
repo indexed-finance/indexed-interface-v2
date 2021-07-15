@@ -68,19 +68,24 @@ export function WalletConnectionDrawer() {
             const _account = await connector.getAccount();
             const _provider = await connector.getProvider();
             const provider = new ethers.providers.Web3Provider(_provider, 1);
+            const networkId = parseInt(await provider.send("net_version", []));
 
-            dispatch(
-              actions.initialize({
-                provider,
-                withSigner: true,
-                selectedAddress: account ?? _account ?? "",
-              })
-            );
+            if (networkId === 1) {
+              dispatch(
+                actions.initialize({
+                  provider,
+                  withSigner: true,
+                  selectedAddress: account ?? _account ?? "",
+                })
+              );
 
-            notification.success({
-              message: tx("CONNECTED"),
-              description: tx("YOU_HAVE_SUCCESSFULLY_CONNECTED_YOUR_WALLET"),
-            });
+              notification.success({
+                message: tx("CONNECTED"),
+                description: tx("YOU_HAVE_SUCCESSFULLY_CONNECTED_YOUR_WALLET"),
+              });
+            } else {
+              dispatch(actions.connectedToBadNetwork());
+            }
           })
           .catch((error) => {
             if (error instanceof UnsupportedChainIdError) {
