@@ -7,7 +7,8 @@ import {
   SushiswapStakingCard,
   UniswapStakingCard,
 } from "components/atomic";
-import { ReactNode, useCallback, useState } from "react";
+import { Fade } from "components/animations";
+import { ReactNode, useCallback, useEffect, useState } from "react";
 import { selectors } from "features";
 import {
   useBreakpoints,
@@ -43,30 +44,41 @@ export default function Stake() {
     []
   );
   const showingNothing = !Object.values(showing).some(Boolean);
+  const [fadedCard, setFadedCard] = useState(-1);
   const inner = (
     <>
       {showing.singleSided &&
-        newStakingDetail.indexTokens.map((stakingPool) => (
-          <SingleSidedStakingCard key={stakingPool.id} {...stakingPool} />
+        newStakingDetail.indexTokens.map((stakingPool, index) => (
+          <Fade key={stakingPool.id} in={fadedCard >= index}>
+            <SingleSidedStakingCard {...stakingPool} />
+          </Fade>
         ))}
 
       {showing.sushiswap &&
-        masterChefDetail.map((stakingPool) => (
-          <SushiswapStakingCard key={stakingPool.id} {...stakingPool} />
+        masterChefDetail.map((stakingPool, index) => (
+          <Fade key={stakingPool.id} in={fadedCard >= index}>
+            <SushiswapStakingCard key={stakingPool.id} {...stakingPool} />
+          </Fade>
         ))}
 
       {showing.uniswap &&
-        newStakingDetail.liquidityTokens.map((stakingPool) => (
-          <UniswapStakingCard key={stakingPool.id} {...stakingPool} />
+        newStakingDetail.liquidityTokens.map((stakingPool, index) => (
+          <Fade key={stakingPool.id} in={fadedCard >= index}>
+            <UniswapStakingCard key={stakingPool.id} {...stakingPool} />
+          </Fade>
         ))}
 
       {showing.expired && (
         <ExpiredAlert>
-          {stakingDetail.indexTokens.map((stakingPool) => (
-            <ExpiredStakingCard key={stakingPool.id} {...stakingPool} />
+          {stakingDetail.indexTokens.map((stakingPool, index) => (
+            <Fade key={stakingPool.id} in={fadedCard >= index}>
+              <ExpiredStakingCard key={stakingPool.id} {...stakingPool} />
+            </Fade>
           ))}
-          {stakingDetail.liquidityTokens.map((stakingPool) => (
-            <ExpiredStakingCard key={stakingPool.id} {...stakingPool} />
+          {stakingDetail.liquidityTokens.map((stakingPool, index) => (
+            <Fade key={stakingPool.id} in={fadedCard >= index}>
+              <ExpiredStakingCard key={stakingPool.id} {...stakingPool} />
+            </Fade>
           ))}
         </ExpiredAlert>
       )}
@@ -77,6 +89,14 @@ export default function Stake() {
   useStakingRegistrar();
   useNewStakingRegistrar();
   useMasterChefRegistrar();
+
+  useEffect(() => {
+    if (fadedCard < 50) {
+      setTimeout(() => {
+        setFadedCard((prev) => prev + 1);
+      }, 200);
+    }
+  }, [fadedCard]);
 
   return (
     <Page
