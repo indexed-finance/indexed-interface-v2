@@ -167,9 +167,7 @@ function continuouslyCheckForInactivity() {
 
       try {
         if (connection.readyState === connection.OPEN) {
-          log(`Checking for inactivity for ${connection.url}`);
           await ping();
-          log("All good.");
         }
       } catch (error) {
         log(
