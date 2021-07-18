@@ -136,31 +136,37 @@ export const selectors = {
           }
           return undefined;
         }, 0) ?? pool?.totalValueLockedUSD;
-      return pool && stats?.deltas
+
+      return pool && pool.symbol !== "ERROR"
         ? ({
             category: pool.category.id,
             canStake: false,
             id: pool.id,
             symbol: pool.symbol,
-            priceUsd: convert.toCurrency(stats.price),
-            netChange: convert.toCurrency(stats.deltas.price.day.value, {
-              signDisplay: "always",
-            }),
-            netChangePercent: convert.toPercent(
-              stats.deltas.price.day.percent,
-              { signDisplay: "always" }
-            ),
-            isNegative: stats.deltas.price.day.value < 0,
+            priceUsd: stats ? convert.toCurrency(stats.price) : "",
+            netChange: stats?.deltas
+              ? convert.toCurrency(stats.deltas.price.day.value, {
+                  signDisplay: "always",
+                })
+              : "",
+            netChangePercent: stats?.deltas
+              ? convert.toPercent(stats.deltas.price.day.percent, {
+                  signDisplay: "always",
+                })
+              : "",
+            isNegative: stats?.deltas && stats.deltas.price.day.value < 0,
             name: pool.name,
             slug: `/index-pools/${S(pool.name).slugify().s}`,
-            volume: convert.toCurrency(stats.deltas.volume.day),
+            volume: stats?.deltas
+              ? convert.toCurrency(stats.deltas.volume.day)
+              : "",
             totalValueLocked:
               /* convert.toCurrency(pool?.totalValueLockedUSD),//  */ convert.toCurrency(
                 totalValueLocked
               ),
-            totalValueLockedPercent: convert.toPercent(
-              stats.deltas.totalValueLockedUSD.day.percent
-            ),
+            totalValueLockedPercent: stats?.deltas
+              ? convert.toPercent(stats.deltas.totalValueLockedUSD.day.percent)
+              : "",
             swapFee: convert.toPercent(
               parseFloat(convert.toBalance(pool.swapFee))
             ),
