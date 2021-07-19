@@ -44,6 +44,7 @@ export default function UniswapStakeForm() {
       stakingPool={stakingPool}
       portfolioToken={portfolioToken}
       rewardsPerDay={stakingPool?.rewardsPerDay ?? "0.00"}
+      rewardsAsset="NDX"
       spender={MULTI_TOKEN_STAKING_ADDRESS}
       onStake={stake}
       onWithdraw={withdraw}

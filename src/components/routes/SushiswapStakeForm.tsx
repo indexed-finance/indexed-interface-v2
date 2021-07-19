@@ -70,6 +70,7 @@ export default function SushiswapStakeForm() {
         <ExternalLink to={url}>{portfolioToken.symbol}</ExternalLink>
       }
       rewardsPerDay={rewardsPerDay.toString()}
+      rewardsAsset="SUSHI"
       decimals={18} // TODO
       formatAssetText={(amount: string) => `${amount} SUSHI / Day`}
     />
