@@ -1,6 +1,6 @@
 import { Alert, Checkbox, Col, Empty, Row, Space, Typography } from "antd";
-import { Page, PortfolioWidget } from "components/atomic";
-import { WalletConnector } from "components/atomic";
+import { Fade } from "components/animations";
+import { Page, PortfolioWidget, WalletConnector } from "components/atomic";
 import { selectors } from "features";
 import {
   useBreakpoints,
@@ -10,7 +10,7 @@ import {
   useStakingRegistrar,
   useTranslator,
 } from "hooks";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 
 export default function Portfolio() {
@@ -22,10 +22,19 @@ export default function Portfolio() {
   const data = useMemo(() => [ndx, ...tokens], [ndx, tokens]);
   const { isMobile } = useBreakpoints();
   const isUserConnected = useSelector(selectors.selectUserConnected);
+  const [fadedWidget, setFadedWidget] = useState(-1);
 
   useStakingRegistrar();
   useNewStakingRegistrar();
   useMasterChefRegistrar();
+
+  useEffect(() => {
+    if (fadedWidget < data.length - 1) {
+      setTimeout(() => {
+        setFadedWidget((prev) => prev + 1);
+      }, 200);
+    }
+  }, [fadedWidget, data.length]);
 
   return (
     <Page
@@ -71,9 +80,11 @@ export default function Portfolio() {
         <Row gutter={[20, 20]}>
           {data
             .filter((heldAsset) => !heldAsset.symbol.includes("ERROR"))
-            .map((heldAsset) => (
-              <Col xs={24} sm={8} key={heldAsset.address}>
-                <PortfolioWidget {...heldAsset} />
+            .map((heldAsset, index) => (
+              <Col xs={24} sm={8}>
+                <Fade key={heldAsset.address} in={fadedWidget >= index}>
+                  <PortfolioWidget {...heldAsset} />
+                </Fade>
               </Col>
             ))}
         </Row>
