@@ -27,6 +27,7 @@ export default function Splash() {
             {tx("DECENTRALIZED_INDEX_PROTOCOL")}
           </Typography.Title>
           <Typography.Title level={3}>
+            {/* GAIN_EXPOSURE_TO */}
             Gain exposure to passively-managed crypto index portfolios
             represented by a single token.
           </Typography.Title>
@@ -40,6 +41,7 @@ export default function Splash() {
           )}
           <Typography.Title level={3}>
             <div>
+              {/* DIVE_IN_TODAY */}
               <Divider className="fancy">Dive in today</Divider>
               <Button.Group
                 style={{ flexDirection: isMobile ? "column" : "row" }}
@@ -57,6 +59,7 @@ export default function Splash() {
                       marginBottom: isMobile ? 10 : 0,
                     }}
                   >
+                    {/* BUY_AN_INDEX */}
                     Buy an index
                   </Button>
                 </Link>
@@ -73,6 +76,7 @@ export default function Splash() {
                       textTransform: "uppercase",
                     }}
                   >
+                    {/* LEARN_MORE */}
                     Learn more
                   </Button>
                 </ExternalLink>
