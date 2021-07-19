@@ -16,15 +16,20 @@ export const fetchMasterChefData = createAsyncThunk(
 
     const name = chainId === 1 ? "mainnet" : "rinkeby";
     const client = MasterChefSubgraphClient.forNetwork(name);
-    const data = await client.getStakingInfo();
-    const { pools, ...meta } = data;
 
-    return {
-      meta,
-      pools: pools.map(({ balance, ...pool }) => ({
-        ...pool,
-        totalStaked: balance,
-      })),
-    };
+    try {
+      const data = await client.getStakingInfo();
+      const { pools, ...meta } = data;
+
+      return {
+        meta,
+        pools: pools.map(({ balance, ...pool }) => ({
+          ...pool,
+          totalStaked: balance,
+        })),
+      };
+    } catch (error) {
+      return null;
+    }
   }
 );

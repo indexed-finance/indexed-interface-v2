@@ -9,6 +9,12 @@ const filterWarningsPlugin = (config) => {
       exclude: /mini-css-extract-plugin/,
     })
   );
+
+  config.module.rules.push({
+    test: /\.md$/,
+    use: "raw-loader",
+  });
+
   return config;
 };
 

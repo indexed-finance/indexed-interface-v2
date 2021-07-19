@@ -5,6 +5,7 @@ export * from './DEBUG';
 export * from './IndexPoolInteractionBar';
 export * from './JazzIcon';
 export * from './LanguageSelector';
+export * from './LearnArticleCard';
 export * from './LegacySiteLink';
 export * from './LineSeriesChart';
 export * from './Logo';

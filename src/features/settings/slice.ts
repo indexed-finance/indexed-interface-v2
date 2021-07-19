@@ -1,5 +1,6 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { SupportedLanguageCode, createTranslator } from "helpers";
+import { userActions } from "../user";
 import type { AppState } from "features/store";
 
 type Theme = "dark" | "light" | "outrun";
@@ -12,6 +13,7 @@ interface SettingsState {
     title: string;
     value: SupportedLanguageCode;
   }>;
+  badNetwork: boolean;
 }
 
 const settingsInitialState: SettingsState = {
@@ -32,6 +34,7 @@ const settingsInitialState: SettingsState = {
       value: "zh-cn",
     },
   ],
+  badNetwork: false,
 };
 
 const slice = createSlice({
@@ -64,7 +67,14 @@ const slice = createSlice({
     connectionLost: (state) => {
       state.connected = false;
     },
+    connectedToBadNetwork: (state) => {
+      state.badNetwork = true;
+    },
   },
+  extraReducers: (builder) =>
+    builder.addCase(userActions.userDisconnected.type, (state) => {
+      state.badNetwork = false;
+    }),
 });
 
 export const { actions: settingsActions, reducer: settingsReducer } = slice;
@@ -95,5 +105,8 @@ export const settingsSelectors = {
   },
   selectSupportedLanguages(state: AppState) {
     return settingsSelectors.selectSettings(state).supportedLanguages;
+  },
+  selectBadNetwork(state: AppState) {
+    return settingsSelectors.selectSettings(state).badNetwork;
   },
 };

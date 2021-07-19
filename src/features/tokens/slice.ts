@@ -55,16 +55,21 @@ const slice = createSlice({
         return state;
       })
       .addCase(fetchInitialData.fulfilled, (state, action) => {
-        const { tokens } = action.payload;
-        const fullTokens = tokens.ids.map((id) => tokens.entities[id]);
+        if (action.payload) {
+          const { tokens } = action.payload;
+          const fullTokens = tokens.ids.map((id) => tokens.entities[id]);
 
-        for (const commonToken of COMMON_BASE_TOKENS) {
-          if (!tokens.entities[commonToken.id.toLowerCase()]) {
-            fullTokens.push({ ...commonToken, id: commonToken.id.toLowerCase() });
+          for (const commonToken of COMMON_BASE_TOKENS) {
+            if (!tokens.entities[commonToken.id.toLowerCase()]) {
+              fullTokens.push({
+                ...commonToken,
+                id: commonToken.id.toLowerCase(),
+              });
+            }
           }
-        }
 
-        tokensAdapter.upsertMany(state, fullTokens);
+          tokensAdapter.upsertMany(state, fullTokens);
+        }
       })
       .addCase(fetchTokenPriceData.fulfilled, (state, action) => {
         if (action.payload) {
@@ -89,16 +94,28 @@ const slice = createSlice({
       .addCase(pairsActions.uniswapPairsRegistered, (state, action) => {
         for (const pair of action.payload) {
           if (!state.entities[pair.id.toLowerCase()]) {
-            let t0 = pair.token0 ? state.entities[pair.token0.toLowerCase()]?.symbol : "";
+            let t0 = pair.token0
+              ? state.entities[pair.token0.toLowerCase()]?.symbol
+              : "";
             if (t0 === "WETH") t0 = "ETH";
-            let t1 = pair.token1 ? state.entities[pair.token1.toLowerCase()]?.symbol : "";
+            let t1 = pair.token1
+              ? state.entities[pair.token1.toLowerCase()]?.symbol
+              : "";
             if (t1 === "WETH") t1 = "ETH";
-            if (pair.id.toLowerCase() === '0x8911fce375a8414b1b578be66ee691a8d2d4dbf7') {
-             t0 = 'NDX';
-             t1 = 'ETH';
+            if (
+              pair.id.toLowerCase() ===
+              "0x8911fce375a8414b1b578be66ee691a8d2d4dbf7"
+            ) {
+              t0 = "NDX";
+              t1 = "ETH";
             }
-            const [symbolPrefix, namePrefix] = pair.sushiswap ? ['SUSHI', 'Sushiswap'] : ['UNIV2', 'UniswapV2']
-            const [symbol, name] = (t0 && t1) ? [`${t0}-${t1}`, `${namePrefix}:${t0}-${t1}`] : [symbolPrefix, `${namePrefix} LP Token`]
+            const [symbolPrefix, namePrefix] = pair.sushiswap
+              ? ["SUSHI", "Sushiswap"]
+              : ["UNIV2", "UniswapV2"];
+            const [symbol, name] =
+              t0 && t1
+                ? [`${t0}-${t1}`, `${namePrefix}:${t0}-${t1}`]
+                : [symbolPrefix, `${namePrefix} LP Token`];
             state.ids.push(pair.id.toLowerCase());
             state.entities[pair.id.toLowerCase()] = {
               id: pair.id.toLowerCase(),
@@ -118,10 +135,10 @@ const slice = createSlice({
             if (token.priceData) {
               entry.priceData = {
                 ...(entry.priceData || {}),
-                ...token.priceData
-              }
+                ...token.priceData,
+              };
             }
-            
+
             if (token.totalSupply) {
               entry.totalSupply = token.totalSupply;
             }

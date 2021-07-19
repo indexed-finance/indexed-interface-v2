@@ -61,9 +61,14 @@ export const fetchStakingData = createAsyncThunk(
   }) => {
     const { chainId } = provider.network;
     const url = getIndexedUrl(chainId);
-    const staking = await queryStaking(url);
-    const formattedStakingData = normalizeStakingData(staking);
 
-    return formattedStakingData;
+    try {
+      const staking = await queryStaking(url);
+      const formattedStakingData = normalizeStakingData(staking);
+
+      return formattedStakingData;
+    } catch (error) {
+      return [];
+    }
   }
 );

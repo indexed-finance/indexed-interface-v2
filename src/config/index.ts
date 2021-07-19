@@ -6,5 +6,6 @@ export * from './api';
 export * from './app';
 export * from './base-tokens';
 export * from './client';
+export * from './github';
 export * from './network';
 export * from './versioning';

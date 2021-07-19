@@ -110,15 +110,17 @@ const slice = createSlice({
   extraReducers: (builder) =>
     builder
       .addCase(fetchInitialData.fulfilled, (state, action) => {
-        const { categories } = action.payload;
-        const mapped = selectors
-          .selectAll({ categories: state } as AppState)
-          .map((existing) => ({
-            ...existing,
-            ...categories.entities[existing.id],
-          }));
+        if (action.payload) {
+          const { categories } = action.payload;
+          const mapped = selectors
+            .selectAll({ categories: state } as AppState)
+            .map((existing) => ({
+              ...existing,
+              ...categories.entities[existing.id],
+            }));
 
-        adapter.upsertMany(state, mapped);
+          adapter.upsertMany(state, mapped);
+        }
       })
       .addCase(mirroredServerState, (_, action) => action.payload.categories)
       .addCase(restartedDueToError, () => categoriesInitialState),

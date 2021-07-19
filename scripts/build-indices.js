@@ -2,7 +2,7 @@ const fs = require("fs");
 const path = require("path");
 
 const sourceDirectory = path.join(__dirname, "../src");
-const ignoreDirs =   [
+const ignoreDirs = [
   "images",
   "i18n",
   "theme",
@@ -10,7 +10,9 @@ const ignoreDirs =   [
   "theme/images",
   "sockets",
   "sockets/server",
-  "ethereum/abi"
+  "ethereum/abi",
+  "data",
+  "data/learn",
 ].map((dir) => path.join(sourceDirectory, dir));
 const isSpecFile = (file) => file.includes("spec");
 const isTypescriptFile = (file) => path.extname(file).includes("ts");

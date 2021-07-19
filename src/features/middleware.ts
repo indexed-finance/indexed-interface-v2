@@ -62,7 +62,11 @@ export function molassesModeMiddleware() {
 }
 
 // --
-export const middleware = [userDisconnectionMiddleware, batchMiddleware];
+export const middleware = [
+  userDisconnectionMiddleware,
+  batchMiddleware,
+  badNetworkMiddleware,
+];
 
 if (process.env.NODE_ENV === "development" || process.env.IS_SERVER) {
   middleware.push(trackActionMiddleware);
@@ -71,6 +75,30 @@ if (process.env.NODE_ENV === "development" || process.env.IS_SERVER) {
     middleware.push(molassesModeMiddleware);
   }
 }
+
+// #region Bad Network
+export function badNetworkMiddleware({ dispatch, getState }: any) {
+  return (next: any) => (action: any) => {
+    const {
+      settings: { badNetwork },
+    } = getState();
+
+    if (
+      action.type !== actions.userDisconnected.type &&
+      !badNetwork &&
+      provider
+    ) {
+      provider.send("net_version", []).then((rawNetworkId) => {
+        if (parseInt(rawNetworkId) !== 1) {
+          dispatch(actions.connectedToBadNetwork());
+        }
+      });
+    }
+
+    return next(action);
+  };
+}
+// #endregion
 
 // #region Batch Stuff
 let dispatch: any = noop;
