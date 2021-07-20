@@ -76,7 +76,10 @@ function SingleTokenBurnInteraction({ indexPool }: Props) {
           return;
         }
 
-        const output = calculateAmountOut(toToken, fromAmount.exact);
+        const output = calculateAmountOut(
+          toToken,
+          convert.toToken(fromAmount.exact)
+        );
 
         if (output) {
           if (output.error) {

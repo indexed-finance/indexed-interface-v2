@@ -15,6 +15,7 @@ export function StakingStats({
   poolLink,
   stakingPoolLink,
   rewardsPerDay,
+  rewardsAsset,
   onExit,
   onClaim,
 }: {
@@ -25,6 +26,7 @@ export function StakingStats({
   poolLink: ReactNode;
   stakingPoolLink: ReactNode;
   rewardsPerDay: string;
+  rewardsAsset: string;
   onExit(): void;
   onClaim(): void;
 }) {
@@ -74,7 +76,7 @@ export function StakingStats({
       )}
 
       <Descriptions.Item label="Reward Rate per Day">
-        {`${convert.toBalance(rewardsPerDay, 18)} NDX`}
+        {`${convert.toBalance(rewardsPerDay, 18)} ${rewardsAsset}`}
       </Descriptions.Item>
 
       <Descriptions.Item label="Rewards Pool">{poolLink}</Descriptions.Item>
