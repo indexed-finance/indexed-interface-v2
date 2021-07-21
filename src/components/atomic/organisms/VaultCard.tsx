@@ -1,5 +1,6 @@
 import { Card, CardProps, Col, Row, Tooltip, Typography } from "antd";
 import { FormattedVault } from "features";
+import { useAllVaults } from "hooks";
 import { useHistory } from "react-router";
 
 export function VaultCard({
@@ -51,5 +52,24 @@ export function VaultCard({
         </Col>
       </Row>
     </Card>
+  );
+}
+
+export function VaultGroup({ withTitle = false }: { withTitle?: boolean }) {
+  const vaults = useAllVaults();
+
+  return (
+    <>
+      {vaults.map((vault) => (
+        <VaultCard
+          key={vault.name}
+          vaultId={vault.id}
+          hoverable={true}
+          bordered={true}
+          withTitle={withTitle}
+          {...vault}
+        />
+      ))}
+    </>
   );
 }

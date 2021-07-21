@@ -1,10 +1,9 @@
 import { Col, Row, Typography } from "antd";
-import { Page, VaultCard } from "components/atomic";
-import { useAllVaults, useBreakpoints } from "hooks";
+import { Page, VaultGroup } from "components/atomic";
+import { useBreakpoints } from "hooks";
 
 export default function Vaults() {
   const { isMobile } = useBreakpoints();
-  const vaults = useAllVaults();
 
   return (
     <Page hasPageHeader={true} title="Vaults">
@@ -18,16 +17,7 @@ export default function Vaults() {
           </Col>
         </Row>
       )}
-      {vaults.map((vault) => (
-        <VaultCard
-          key={vault.name}
-          vaultId={vault.id}
-          hoverable={true}
-          bordered={true}
-          withTitle={false}
-          {...vault}
-        />
-      ))}
+      <VaultGroup />
     </Page>
   );
 }

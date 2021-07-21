@@ -1,8 +1,13 @@
-import { Button, Divider, Statistic, Typography } from "antd";
-import { ExternalLink, IndexPoolWidgetGroup, Page } from "components/atomic";
-import { Link } from "react-router-dom";
+import {
+  IndexPoolWidgetGroup,
+  Page,
+  SplashSection,
+  VaultGroup,
+} from "components/atomic";
+import { Statistic, Typography } from "antd";
 import { selectors } from "features";
 import { useBreakpoints, useTranslator } from "hooks";
+import { useHistory } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 export default function Splash() {
@@ -12,6 +17,7 @@ export default function Splash() {
     selectors.selectTotalAssetsUnderManagement
   );
   const { isMobile } = useBreakpoints();
+  const history = useHistory();
 
   return (
     <Page hasPageHeader={false}>
@@ -27,7 +33,6 @@ export default function Splash() {
             {tx("DECENTRALIZED_INDEX_PROTOCOL")}
           </Typography.Title>
           <Typography.Title level={3}>
-            {/* GAIN_EXPOSURE_TO */}
             Gain exposure to passively-managed crypto index portfolios
             represented by a single token.
           </Typography.Title>
@@ -39,53 +44,37 @@ export default function Splash() {
               style={{ fontSize: 48 }}
             />
           )}
-          <Typography.Title level={3}>
-            <div>
-              {/* DIVE_IN_TODAY */}
-              <Divider className="fancy">Dive in today</Divider>
-              <Button.Group
-                style={{ flexDirection: isMobile ? "column" : "row" }}
-              >
-                <Link to="/index-pools">
-                  <Button
-                    className="plus"
-                    type="primary"
-                    style={{
-                      textTransform: "uppercase",
-                      fontSize: isMobile ? 16 : 24,
-                      width: isMobile ? 160 : "auto",
-                      height: "auto",
-                      marginRight: isMobile ? 0 : 10,
-                      marginBottom: isMobile ? 10 : 0,
-                    }}
-                  >
-                    {/* BUY_AN_INDEX */}
-                    Buy an index
-                  </Button>
-                </Link>
-                <ExternalLink
-                  to="https://docs.indexed.finance/"
-                  withIcon={false}
-                >
-                  <Button
-                    type="default"
-                    style={{
-                      fontSize: isMobile ? 16 : 24,
-                      width: isMobile ? 160 : "auto",
-                      height: "auto",
-                      textTransform: "uppercase",
-                    }}
-                  >
-                    {/* LEARN_MORE */}
-                    Learn more
-                  </Button>
-                </ExternalLink>
-              </Button.Group>
-            </div>
-          </Typography.Title>
         </div>
       </div>
-      {poolsExist && <IndexPoolWidgetGroup />}
+
+      <SplashSection
+        title="VAULTS"
+        description="Lorem ipsum dolor sit amet consectetur adipisicing elit. Quaerat
+        quas minima dolor libero hic eum doloribus, quasi mollitia placeat.
+        Recusandae mollitia veniam quaerat minima quibusdam error similique
+        nisi, labore facilis!"
+        catchphrase="Catchy phrase for vaults"
+        actionText="Explore Vaults"
+        infoText="How it works"
+        onAction={() => history.push("/vaults")}
+        onInfo={() => (window.location.href = "https://docs.indexed.finance/")}
+      >
+        <VaultGroup withTitle={true} />
+      </SplashSection>
+      <SplashSection
+        title="INDEX POOLS"
+        description="Lorem ipsum dolor sit amet consectetur adipisicing elit. Quaerat
+        quas minima dolor libero hic eum doloribus, quasi mollitia placeat.
+        Recusandae mollitia veniam quaerat minima quibusdam error similique
+        nisi, labore facilis!"
+        catchphrase="Dive in today"
+        actionText="Buy an index"
+        infoText="Learn more"
+        onAction={() => history.push("/index-pools")}
+        onInfo={() => (window.location.href = "https://docs.indexed.finance/")}
+      >
+        {poolsExist && <IndexPoolWidgetGroup />}
+      </SplashSection>
     </Page>
   );
 }

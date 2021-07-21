@@ -15,5 +15,6 @@ export * from './Quote';
 export * from './SelectableToken';
 export * from './ServerConnection';
 export * from './SocialMediaList';
+export * from './SplashSection';
 export * from './TokenExchangeRate';
 export * from './WalletConnector';
