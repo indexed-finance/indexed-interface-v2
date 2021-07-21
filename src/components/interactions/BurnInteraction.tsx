@@ -160,7 +160,7 @@ function SingleTokenBurnInteraction({ indexPool }: Props) {
       onSubmit={handleSubmit}
       onChange={handleChange}
       defaultInputSymbol={indexPool.symbol}
-      disableInputSelect
+      disableInputSelect={true}
       requiresApproval={false}
     />
   );
