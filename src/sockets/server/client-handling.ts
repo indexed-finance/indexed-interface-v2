@@ -41,17 +41,9 @@ export const connections: WebSocket[] = [];
 /**
  * Creates a WebSocket server that provides quick updates to connected clients.
  */
-let runningServer: WebSocket.Server;
-
 export function setupClientHandling() {
-  if (runningServer) {
-    log("Restarting client handling.");
-
-    runningServer.close();
-  }
-
   if (process.env.NODE_ENV === "development") {
-    runningServer = new WebSocket.Server(
+    const server = new WebSocket.Server(
       {
         port: WEBSOCKET_SERVER_PORT,
         perMessageDeflate: DEFLATION_OPTIONS,
@@ -59,9 +51,9 @@ export function setupClientHandling() {
       () => log("Local socket server listening...")
     );
 
-    runningServer.on("connection", handleConnection);
-    runningServer.on("close", handleClose);
-    runningServer.on("error", handleError);
+    server.on("connection", handleConnection);
+    server.on("close", handleClose);
+    server.on("error", handleError);
   } else {
     const API_CERT_PATH = process.env.API_CERT_PATH;
     const API_KEY_PATH = process.env.API_KEY_PATH;
@@ -76,8 +68,7 @@ export function setupClientHandling() {
     const cert = fs.readFileSync(API_CERT_PATH, "utf8");
     const credentials = { key, cert };
     const server = createServer(credentials);
-
-    runningServer = new WebSocket.Server(
+    const wrappedServer = new WebSocket.Server(
       {
         server,
         perMessageDeflate: DEFLATION_OPTIONS,
@@ -85,9 +76,9 @@ export function setupClientHandling() {
       () => log("Production socket server listening...")
     );
 
-    runningServer.on("connection", handleConnection);
-    runningServer.on("close", handleClose);
-    runningServer.on("error", handleError);
+    wrappedServer.on("connection", handleConnection);
+    wrappedServer.on("close", handleClose);
+    wrappedServer.on("error", handleError);
 
     server.listen(443, () => "Server listening on 443...");
   }
