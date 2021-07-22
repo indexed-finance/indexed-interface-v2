@@ -1,6 +1,5 @@
 import * as topLevelActions from "./actions";
 import { RegisteredCall, abbreviateAddress } from "helpers";
-import { SocketClient } from "sockets/client";
 import { TransactionExtra, transactionsActions } from "./transactions";
 import { TransactionResponse } from "@ethersproject/abstract-provider";
 import { batcherActions } from "./batcher";
@@ -110,8 +109,6 @@ export const thunks = {
       }
 
       dispatch(actions.walletConnected());
-
-      SocketClient.disconnect();
     },
   addTransaction:
     (

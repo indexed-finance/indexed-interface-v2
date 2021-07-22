@@ -6,8 +6,10 @@ import {
   NewStakingPool,
 } from "features";
 import { Formik, useFormikContext } from "formik";
-import { Page, StakingStats, TokenSelector } from "components/atomic/organisms";
+import { Page } from "./Page";
 import { ReactNode, useMemo } from "react";
+import { StakingStats } from "./StakeStats";
+import { TokenSelector } from "./TokenSelector";
 import { convert } from "helpers";
 import { useBreakpoints, useTokenApproval, useTokenBalance } from "hooks";
 

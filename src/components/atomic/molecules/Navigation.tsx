@@ -1,5 +1,5 @@
 import { AiOutlineUser } from "react-icons/ai";
-import { ExternalLink } from "components/atomic";
+import { ExternalLink } from "components/atomic/atoms";
 import { FEATURE_FLAGS } from "feature-flags";
 import { FaGavel, FaSwimmingPool } from "react-icons/fa";
 import { GoLightBulb } from "react-icons/go";

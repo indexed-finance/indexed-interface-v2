@@ -1,5 +1,5 @@
 import { Button, Card, Space } from "antd";
-import { ExternalLink } from "components/atomic";
+import { ExternalLink } from "components/atomic/atoms";
 import { FormattedIndexPool } from "features";
 import { Fragment, useMemo } from "react";
 import { usePoolQuickswapLink } from "hooks";

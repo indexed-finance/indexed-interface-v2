@@ -1,6 +1,6 @@
 import { SOCIAL_MEDIA } from "config";
 import { Space } from "antd";
-import { Token } from "components/atomic";
+import { Token } from "components/atomic/atoms";
 
 export function SocialMediaList() {
   return (
