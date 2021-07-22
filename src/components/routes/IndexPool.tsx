@@ -1,14 +1,5 @@
-import {
-  Alert,
-  Button,
-  Col,
-  Divider,
-  Row,
-  Space,
-  Spin,
-  Typography,
-} from "antd";
 import { AppState, FormattedIndexPool, selectors } from "features";
+import { Col, Divider, Row, Space, Spin, Typography } from "antd";
 import {
   IndexPoolAssets,
   IndexPoolChart,
@@ -36,33 +27,37 @@ export function LoadedIndexPool(
 
   return (
     <>
-      <Alert
-        showIcon={true}
-        icon={
-          <img
-            alt="Uniswap"
-            style={{ width: 32, height: 32 }}
-            src={require("images/uniswap-link.png").default}
-          />
-        }
-        message="Add Uniswap Liquidity"
-        description={
-          <>
-            Foo bar baz. <Button type="primary">Blah</Button>
-          </>
-        }
-      />
       <div style={{ paddingTop: 12 }}>
         {props.interaction && (
-          <div
-            style={{
-              borderLeft: "2px solid #38EE7A",
-              paddingLeft: 24,
-              marginBottom: 24,
-            }}
-          >
-            {props.interaction}
-          </div>
+          <Row gutter={12}>
+            <Col span={8}>
+              <div
+                style={{
+                  borderLeft: "2px solid #38EE7A",
+                  paddingLeft: 24,
+                  marginBottom: 24,
+                }}
+              >
+                {props.interaction}
+              </div>
+            </Col>
+            <Col
+              span={16}
+              style={{
+                boxShadow: "inset 0px 0px 20px 10px rgba(220,220,220,0.4)",
+                background: "#000",
+                marginBottom: 24,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <img
+                alt="nothing"
+                src="http://placehold.it/750x375/000000/ffffff"
+              />
+            </Col>
+          </Row>
         )}
         <Row
           align="stretch"
