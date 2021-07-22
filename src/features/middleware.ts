@@ -62,11 +62,7 @@ export function molassesModeMiddleware() {
 }
 
 // --
-export const middleware = [
-  userDisconnectionMiddleware,
-  batchMiddleware,
-  badNetworkMiddleware,
-];
+export const middleware = [userDisconnectionMiddleware, batchMiddleware];
 
 if (process.env.NODE_ENV === "development" || process.env.IS_SERVER) {
   middleware.push(trackActionMiddleware);
@@ -74,6 +70,10 @@ if (process.env.NODE_ENV === "development" || process.env.IS_SERVER) {
   if (FEATURE_FLAGS.useMolassesMode) {
     middleware.push(molassesModeMiddleware);
   }
+}
+
+if (!process.env.IS_SERVER) {
+  middleware.push(badNetworkMiddleware);
 }
 
 // #region Bad Network
