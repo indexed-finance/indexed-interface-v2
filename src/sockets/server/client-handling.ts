@@ -43,7 +43,7 @@ export const connections: WebSocket[] = [];
  */
 export function setupClientHandling() {
   if (process.env.NODE_ENV === "development") {
-    const server = new WebSocket.Server(
+    const socketServer = new WebSocket.Server(
       {
         port: WEBSOCKET_SERVER_PORT,
         perMessageDeflate: DEFLATION_OPTIONS,
@@ -51,9 +51,9 @@ export function setupClientHandling() {
       () => log("Local socket server listening...")
     );
 
-    server.on("connection", handleConnection);
-    server.on("close", handleClose);
-    server.on("error", handleError);
+    socketServer.on("connection", handleConnection);
+    socketServer.on("close", handleClose);
+    socketServer.on("error", handleError);
   } else {
     const API_CERT_PATH = process.env.API_CERT_PATH;
     const API_KEY_PATH = process.env.API_KEY_PATH;
@@ -68,7 +68,7 @@ export function setupClientHandling() {
     const cert = fs.readFileSync(API_CERT_PATH, "utf8");
     const credentials = { key, cert };
     const server = createServer(credentials);
-    const wrappedServer = new WebSocket.Server(
+    const socketServer = new WebSocket.Server(
       {
         server,
         perMessageDeflate: DEFLATION_OPTIONS,
@@ -76,9 +76,9 @@ export function setupClientHandling() {
       () => log("Production socket server listening...")
     );
 
-    wrappedServer.on("connection", handleConnection);
-    wrappedServer.on("close", handleClose);
-    wrappedServer.on("error", handleError);
+    socketServer.on("connection", handleConnection);
+    socketServer.on("close", handleClose);
+    socketServer.on("error", handleError);
 
     server.listen(443, () => "Server listening on 443...");
   }
@@ -158,7 +158,9 @@ function continuouslyCheckForInactivity() {
 
       try {
         if (connection.readyState === connection.OPEN) {
+          log(`Checking for inactivity for ${connection.url}`);
           await ping();
+          log("All good.");
         }
       } catch (error) {
         log(
