@@ -2,7 +2,7 @@ import { AppState, actions, selectors, store } from "features";
 import { FEATURE_FLAGS } from "feature-flags";
 import noop from "lodash.noop";
 
-export let socket: null | WebSocket = null;
+// export let socket: null | WebSocket = null;
 
 const WEBSOCKET_URL =
   process.env.NODE_ENV === "production" ||
@@ -22,7 +22,7 @@ export class SocketClient {
     onConnect = noop,
     onError = noop,
   }: SocketClientConfig) {
-    socket = new WebSocket(WEBSOCKET_URL);
+    const socket = new WebSocket(WEBSOCKET_URL);
 
     socket.onopen = () => {
       retryAttempts = 0;
@@ -64,9 +64,5 @@ export class SocketClient {
         store.dispatch(actions.connectionLost());
       }
     };
-  }
-
-  public static disconnect() {
-    socket?.close(1000);
   }
 }

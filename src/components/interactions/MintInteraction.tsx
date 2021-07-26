@@ -74,10 +74,7 @@ function SingleTokenMintInteraction({ indexPool }: Props) {
           return;
         }
 
-        const output = calculateAmountOut(
-          fromToken,
-          convert.toToken(fromAmount.exact, 18)
-        );
+        const output = calculateAmountOut(fromToken, fromAmount.exact);
 
         if (output) {
           if (output.error) {
