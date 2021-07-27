@@ -36,14 +36,6 @@ export function Navigation() {
         justifyContent: "space-around",
       }}
     >
-      <Menu.Item key="index-pools">
-        <Link to="/index-pools">
-          <Space size="small">
-            <FaSwimmingPool style={{ position: "relative", top: 2 }} />{" "}
-            {!isMobile && <span>Indexes</span>}
-          </Space>
-        </Link>
-      </Menu.Item>
       <Menu.Item key="vaults">
         <Link to="/vaults">
           <Space size="small">
@@ -52,11 +44,11 @@ export function Navigation() {
           </Space>
         </Link>
       </Menu.Item>
-      <Menu.Item key="portfolio">
-        <Link to="/portfolio">
+      <Menu.Item key="index-pools">
+        <Link to="/index-pools">
           <Space size="small">
-            <AiOutlineUser style={{ position: "relative", top: 2 }} />{" "}
-            {!isMobile && <span>{tx("PORTFOLIO")}</span>}
+            <FaSwimmingPool style={{ position: "relative", top: 2 }} />{" "}
+            {!isMobile && <span>Indexes</span>}
           </Space>
         </Link>
       </Menu.Item>
@@ -64,7 +56,15 @@ export function Navigation() {
         <Link to="/staking">
           <Space>
             <RiSafe2Line style={{ position: "relative", top: 2 }} />{" "}
-            {!isMobile && <span>{tx("STAKE")}</span>}
+            {!isMobile && <span>Staking</span>}
+          </Space>
+        </Link>
+      </Menu.Item>
+      <Menu.Item key="portfolio">
+        <Link to="/portfolio">
+          <Space size="small">
+            <AiOutlineUser style={{ position: "relative", top: 2 }} />{" "}
+            {!isMobile && <span>{tx("PORTFOLIO")}</span>}
           </Space>
         </Link>
       </Menu.Item>

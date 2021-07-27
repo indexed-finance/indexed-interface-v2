@@ -3,6 +3,7 @@ import { ReactNode } from "react";
 import { useBreakpoints } from "hooks";
 
 interface Props {
+  banner: string;
   title: string;
   catchphrase: string;
   description: string;
@@ -14,6 +15,7 @@ interface Props {
 }
 
 export function SplashSection({
+  banner,
   title,
   description,
   catchphrase,
@@ -26,15 +28,31 @@ export function SplashSection({
   const { isMobile } = useBreakpoints();
 
   return (
-    <Space direction="vertical" style={{ width: "100%", marginBottom: 64 }}>
-      <Row align="bottom" justify="space-between">
-        <Col span={12}>
+    <Space
+      direction="vertical"
+      style={{
+        width: "100%",
+        marginBottom: 64,
+        background: "#111",
+      }}
+    >
+      <Row
+        align="stretch"
+        justify="space-between"
+        style={{
+          background: `url(${banner})`,
+          padding: "1rem",
+        }}
+      >
+        <Col
+          span={12}
+          style={{ background: "rgba(10, 10, 10, 0.8)", padding: "1rem" }}
+        >
           <Typography.Title
             level={1}
             style={{
               textAlign: "left",
               margin: 0,
-              color: "rgba(180,180,180,0.4)",
               fontSize: 48,
             }}
           >
@@ -53,7 +71,16 @@ export function SplashSection({
             {description}
           </div>
         </Col>
-        <Col span={12}>
+        <Col
+          span={12}
+          style={{
+            background: "rgba(10, 10, 10, 0.8)",
+            padding: "1rem",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
           <Typography.Title level={3} style={{ textAlign: "center" }}>
             <div>
               <Divider className="fancy">{catchphrase}</Divider>

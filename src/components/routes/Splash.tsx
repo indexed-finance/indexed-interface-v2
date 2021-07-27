@@ -1,22 +1,20 @@
+import { Divider, Statistic, Typography } from "antd";
 import {
   IndexPoolWidgetGroup,
+  Logo,
   Page,
   SplashSection,
   VaultGroup,
 } from "components/atomic";
-import { Statistic, Typography } from "antd";
 import { selectors } from "features";
-import { useBreakpoints, useTranslator } from "hooks";
 import { useHistory } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 export default function Splash() {
-  const tx = useTranslator();
   const poolsExist = useSelector(selectors.selectPoolCount) > 0;
   const assetsUnderManagement = useSelector(
     selectors.selectTotalAssetsUnderManagement
   );
-  const { isMobile } = useBreakpoints();
   const history = useHistory();
 
   return (
@@ -28,26 +26,27 @@ export default function Splash() {
           justifyContent: "center",
         }}
       >
-        <div style={{ textAlign: "center", maxWidth: 1000, marginBottom: 48 }}>
-          <Typography.Title style={{ fontSize: isMobile ? 36 : 64 }}>
-            {tx("DECENTRALIZED_INDEX_PROTOCOL")}
-          </Typography.Title>
-          <Typography.Title level={3}>
+        <div style={{ textAlign: "center", maxWidth: 1000 }}>
+          <Logo size="large" />
+          <Typography.Title level={3} style={{ marginTop: 12 }}>
             Gain exposure to passively-managed crypto index portfolios
             represented by a single token.
           </Typography.Title>
-          {assetsUnderManagement !== "$0.00" && (
-            <Statistic
-              className="prominent-stat"
-              title="Total Protocol Assets Under Management "
-              value={assetsUnderManagement}
-              style={{ fontSize: 48 }}
-            />
-          )}
+          <Divider>
+            {assetsUnderManagement !== "$0.00" && (
+              <Statistic
+                className="prominent-stat"
+                title="Total Protocol Assets Under Management "
+                value={assetsUnderManagement}
+                style={{ marginRight: 12, marginLeft: 12 }}
+              />
+            )}
+          </Divider>
         </div>
       </div>
-
+      <Divider />
       <SplashSection
+        banner={require("images/vaults_banner.png").default}
         title="VAULTS"
         description="Lorem ipsum dolor sit amet consectetur adipisicing elit. Quaerat
         quas minima dolor libero hic eum doloribus, quasi mollitia placeat.
@@ -61,7 +60,9 @@ export default function Splash() {
       >
         <VaultGroup withTitle={true} />
       </SplashSection>
+      <Divider />
       <SplashSection
+        banner={require("images/indexpools_banner.png").default}
         title="INDEX POOLS"
         description="Lorem ipsum dolor sit amet consectetur adipisicing elit. Quaerat
         quas minima dolor libero hic eum doloribus, quasi mollitia placeat.

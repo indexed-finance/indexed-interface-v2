@@ -46,7 +46,7 @@ function VaultFormInner() {
         <TokenSelector
           assets={[]}
           value={{
-            token: "FOO",
+            token: "NDX",
             amount: {
               displayed: "0.00",
               exact: convert.toBigNumber("0"),

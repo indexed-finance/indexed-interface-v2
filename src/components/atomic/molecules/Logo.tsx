@@ -16,10 +16,27 @@ export function Logo({
   link = "/",
   withTitle = true,
   title = "INDEXED",
+  size = "small",
   spinning = false,
 }: Props) {
   const history = useHistory();
   const { isMobile } = useBreakpoints();
+  const imageProps =
+    size === "large"
+      ? {
+          width: spinning ? 128 : 64,
+          height: spinning ? 128 : 64,
+          marginRight: spinning ? 12 : 8,
+          position: "relative",
+          top: -3,
+        }
+      : {
+          width: spinning ? 48 : 24,
+          height: spinning ? 48 : 24,
+          marginRight: spinning ? 12 : 8,
+          position: "relative",
+          top: -3,
+        };
 
   return (
     <div onClick={() => history.push(link)} style={{ cursor: "pointer" }}>
@@ -35,18 +52,15 @@ export function Logo({
           })}
           alt=""
           src={require(`images/indexed.png`).default}
-          style={{
-            width: spinning ? 48 : 24,
-            height: spinning ? 48 : 24,
-            marginRight: spinning ? 12 : 8,
-            position: "relative",
-            top: -3,
-          }}
+          style={imageProps as any}
         />
         {withTitle && (
           <Typography.Title
             level={isMobile ? 3 : 1}
-            style={{ marginBottom: 0 }}
+            style={{
+              marginBottom: 0,
+              fontSize: size === "large" ? 72 : "initial",
+            }}
           >
             {title}
           </Typography.Title>
