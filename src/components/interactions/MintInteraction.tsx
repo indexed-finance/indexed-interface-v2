@@ -74,10 +74,7 @@ function SingleTokenMintInteraction({ indexPool }: Props) {
           return;
         }
 
-        const output = calculateAmountOut(
-          fromToken,
-          convert.toToken(fromAmount.exact, 18)
-        );
+        const output = calculateAmountOut(fromToken, fromAmount.exact);
 
         if (output) {
           if (output.error) {
@@ -196,16 +193,13 @@ function UniswapMintInteraction({ indexPool }: Props) {
           return;
         }
 
-        const { decimals } = tokenLookup[toToken.toLowerCase()];
-        const result = getBestMintRouteForAmountIn(
-          fromToken,
-          convert.toToken(fromAmount.exact, decimals)
-        );
+        const result = getBestMintRouteForAmountIn(fromToken, fromAmount.exact);
 
         if (result) {
           if (result.poolResult?.error) {
             return result.poolResult.error;
           } else {
+            const { decimals } = tokenLookup[toToken.toLowerCase()];
             const asBigNumber = downwardSlippage(
               result.poolResult.poolAmountOut as BigNumber,
               SLIPPAGE_RATE
@@ -228,11 +222,7 @@ function UniswapMintInteraction({ indexPool }: Props) {
           return;
         }
 
-        const { decimals } = tokenLookup[fromToken.toLowerCase()];
-        const result = getBestMintRouteForAmountOut(
-          fromToken,
-          convert.toToken(toAmount.exact, decimals)
-        );
+        const result = getBestMintRouteForAmountOut(fromToken, toAmount.exact);
 
         if (result) {
           if (result.poolResult?.error) {

@@ -20,10 +20,10 @@ import type { Unsubscribe } from "redux";
 const { dispatch, getState, subscribe } = store;
 const provider = new providers.InfuraProvider("mainnet", INFURA_ID);
 
-let poolsRegistered: Record<string, boolean> = {};
-let tokensRegistered: Record<string, boolean> = {};
-let pairsRegistered: Record<string, boolean> = {};
-let stakingPoolsRegistered: Record<string, boolean> = {};
+const poolsRegistered: Record<string, boolean> = {};
+const tokensRegistered: Record<string, boolean> = {};
+const pairsRegistered: Record<string, boolean> = {};
+const stakingPoolsRegistered: Record<string, boolean> = {};
 
 const NEW_SUBSCRIBER_DELAY_SECONDS = 15;
 
@@ -63,16 +63,6 @@ setInterval(() => {
  * After creating the connection, allow it to update before initializing the store.
  */
 export async function setupStateHandling() {
-  if (subbed) {
-    log("Restarting state handling.");
-
-    subbed = false;
-    poolsRegistered = {};
-    tokensRegistered = {};
-    pairsRegistered = {};
-    stakingPoolsRegistered = {};
-  }
-
   log("Waiting for provider.");
 
   await provider.ready;

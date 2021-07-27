@@ -1,7 +1,7 @@
 import { AiOutlineArrowRight } from "react-icons/ai";
 import { Card, List, Space, Typography } from "antd";
 import { FormattedIndexPool } from "features";
-import { Token } from "components/atomic";
+import { Token } from "components/atomic/atoms";
 import { useBreakpoints } from "hooks";
 
 const MAXIMUM_DISPLAYED_TRADES = 8;

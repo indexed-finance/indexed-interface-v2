@@ -3,11 +3,11 @@ import {
   JazzIcon,
   Logo,
   ModeSwitch,
+  Navigation,
   ServerConnection,
   WalletConnector,
-} from "components/atomic";
+} from "components/atomic/molecules";
 import { Layout, Space } from "antd";
-import { Navigation } from "components/atomic/molecules";
 import { selectors } from "features";
 import { useBreakpoints } from "hooks";
 import { useEffect, useState } from "react";

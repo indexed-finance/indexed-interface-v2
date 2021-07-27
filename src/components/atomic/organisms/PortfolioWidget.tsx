@@ -1,8 +1,7 @@
 import { AppState, FormattedPortfolioAsset, selectors } from "features";
 import { Card, Space, Statistic, Typography } from "antd";
-import { ExternalLink } from "../atoms";
+import { ExternalLink, Progress, Token } from "../atoms";
 import { Link } from "react-router-dom";
-import { Progress, Token } from "components/atomic";
 import { Quote } from "../molecules";
 import { ReactNode } from "react";
 import { convert } from "helpers";

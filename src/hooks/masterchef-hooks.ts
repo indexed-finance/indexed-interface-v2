@@ -6,9 +6,14 @@ import {
   totalSushiPerDay,
 } from "features/masterChef";
 import { RegisteredCall, convert } from "helpers";
+import {
+  StakingTransactionCallbacks,
+  useAddTransactionCallback,
+} from "./transaction-hooks";
 import { useCachedValue } from "./use-debounce";
 import { useCallRegistrar } from "./use-call-registrar";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
+import { useMasterChefContract } from "./contract-hooks";
 import { usePairTokenPrice, useTokenPrice } from "./token-hooks";
 import { useSelector } from "react-redux";
 import { useUniswapPairs } from "./pair-hooks";
@@ -170,4 +175,53 @@ export function useMasterChefRegistrar() {
     onChainCalls,
     offChainCalls,
   });
+}
+
+export function useMasterChefTransactionCallbacks(
+  pid: string
+): StakingTransactionCallbacks {
+  const stakedBalance = useMasterChefStakedBalance(pid);
+  const contract = useMasterChefContract();
+  const addTransaction = useAddTransactionCallback();
+
+  const stake = useCallback(
+    (amount: string) => {
+      // @todo Figure out a better way to handle this
+      if (!contract) throw new Error();
+      const tx = contract.deposit(pid, amount);
+      addTransaction(tx);
+    },
+    [addTransaction, contract, pid]
+  );
+
+  const withdraw = useCallback(
+    (amount: string) => {
+      // @todo Figure out a better way to handle this
+      if (!contract) throw new Error();
+      const tx = contract.withdraw(pid, amount);
+      addTransaction(tx);
+    },
+    [contract, addTransaction, pid]
+  );
+
+  const exit = useCallback(() => {
+    // @todo Figure out a better way to handle this
+    if (!contract || !stakedBalance) throw new Error();
+    const tx = contract.withdraw(pid, stakedBalance);
+    addTransaction(tx);
+  }, [contract, addTransaction, pid, stakedBalance]);
+
+  const claim = useCallback(() => {
+    // @todo Figure out a better way to handle this
+    if (!contract) throw new Error();
+    const tx = contract.deposit(pid, 0);
+    addTransaction(tx);
+  }, [contract, addTransaction, pid]);
+
+  return {
+    stake,
+    withdraw,
+    exit,
+    claim,
+  };
 }

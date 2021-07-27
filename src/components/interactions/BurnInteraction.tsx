@@ -76,10 +76,7 @@ function SingleTokenBurnInteraction({ indexPool }: Props) {
           return;
         }
 
-        const output = calculateAmountOut(
-          toToken,
-          convert.toToken(fromAmount.exact)
-        );
+        const output = calculateAmountOut(toToken, fromAmount.exact);
 
         if (output) {
           if (output.error) {
@@ -224,10 +221,7 @@ function UniswapBurnInteraction({ indexPool }: Props) {
 
           return;
         }
-        const result = getBestBurnRouteForAmountIn(
-          toToken,
-          convert.toToken(fromAmount.exact, 18)
-        );
+        const result = getBestBurnRouteForAmountIn(toToken, fromAmount.exact);
         if (result) {
           if (result.poolResult?.error) {
             return result.poolResult.error;
@@ -254,10 +248,7 @@ function UniswapBurnInteraction({ indexPool }: Props) {
           return;
         }
 
-        const result = getBestBurnRouteForAmountOut(
-          toToken,
-          convert.toToken(toAmount.exact, 18)
-        );
+        const result = getBestBurnRouteForAmountOut(toToken, toAmount.exact);
 
         if (result) {
           if (result.poolResult?.error) {

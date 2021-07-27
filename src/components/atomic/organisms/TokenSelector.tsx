@@ -18,8 +18,8 @@ import {
   useRef,
   useState,
 } from "react";
-import { SelectableToken } from "components/atomic/molecules";
-import { Token } from "components/atomic/atoms";
+import { SelectableToken } from "components/atomic/molecules/SelectableToken"; // Circular dependency.
+import { Token } from "components/atomic/atoms/Token"; // Circular dependency.
 import { TokenInputDecorator } from "../atoms/TokenInputDecorator";
 import { selectors } from "features";
 import { useBreakpoints, useTokenBalance, useTranslator } from "hooks";

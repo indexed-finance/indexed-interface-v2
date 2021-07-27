@@ -1,6 +1,6 @@
 import { Card, Col, List, Row, Typography } from "antd";
 import { FormattedIndexPool } from "features";
-import { Progress, Token } from "components/atomic";
+import { Progress, Token } from "components/atomic/atoms";
 import { useBreakpoints } from "hooks";
 
 export function IndexPoolAssets({ assets }: FormattedIndexPool) {
