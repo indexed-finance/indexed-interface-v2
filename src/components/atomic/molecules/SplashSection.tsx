@@ -45,7 +45,8 @@ export function SplashSection({
         }}
       >
         <Col
-          span={12}
+          xs={24}
+          md={12}
           style={{ background: "rgba(10, 10, 10, 0.8)", padding: "1rem" }}
         >
           <Typography.Title
@@ -72,7 +73,8 @@ export function SplashSection({
           </div>
         </Col>
         <Col
-          span={12}
+          xs={24}
+          md={12}
           style={{
             background: "rgba(10, 10, 10, 0.8)",
             padding: "1rem",
@@ -94,7 +96,6 @@ export function SplashSection({
                   style={{
                     textTransform: "uppercase",
                     fontSize: isMobile ? 16 : 24,
-                    width: isMobile ? 160 : "auto",
                     height: "auto",
                     marginRight: isMobile ? 0 : 10,
                     marginBottom: isMobile ? 10 : 0,
@@ -107,7 +108,6 @@ export function SplashSection({
                   onClick={onInfo}
                   style={{
                     fontSize: isMobile ? 16 : 24,
-                    width: isMobile ? 160 : "auto",
                     height: "auto",
                     textTransform: "uppercase",
                   }}

@@ -7,6 +7,7 @@ import {
   VaultGroup,
 } from "components/atomic";
 import { selectors } from "features";
+import { useBreakpoints } from "hooks";
 import { useHistory } from "react-router-dom";
 import { useSelector } from "react-redux";
 
@@ -16,6 +17,7 @@ export default function Splash() {
     selectors.selectTotalAssetsUnderManagement
   );
   const history = useHistory();
+  const { isMobile } = useBreakpoints();
 
   return (
     <Page hasPageHeader={false}>
@@ -26,7 +28,7 @@ export default function Splash() {
           justifyContent: "center",
         }}
       >
-        <div style={{ textAlign: "center", maxWidth: 1000 }}>
+        <div style={{ textAlign: "center", maxWidth: isMobile ? 300 : 1000 }}>
           <Logo size="large" />
           <Typography.Title level={3} style={{ marginTop: 12 }}>
             Gain exposure to passively-managed crypto index portfolios
@@ -36,7 +38,15 @@ export default function Splash() {
             {assetsUnderManagement !== "$0.00" && (
               <Statistic
                 className="prominent-stat"
-                title="Total Protocol Assets Under Management "
+                title={
+                  isMobile ? (
+                    <>
+                      Total Protocol Assets <br /> Under Management
+                    </>
+                  ) : (
+                    "Total Protocol Assets Under Management"
+                  )
+                }
                 value={assetsUnderManagement}
                 style={{ marginRight: 12, marginLeft: 12 }}
               />

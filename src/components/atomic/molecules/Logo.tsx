@@ -59,7 +59,7 @@ export function Logo({
             level={isMobile ? 3 : 1}
             style={{
               marginBottom: 0,
-              fontSize: size === "large" ? 72 : "initial",
+              fontSize: size === "large" ? (isMobile ? 48 : 72) : "initial",
             }}
           >
             {title}
