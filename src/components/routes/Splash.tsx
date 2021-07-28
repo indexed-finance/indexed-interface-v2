@@ -76,6 +76,22 @@ export default function Splash() {
       >
         {poolsExist && <IndexPoolWidgetGroup />}
       </SplashSection>
+      <Divider />
+      <SplashSection
+        banner={require("images/staking_banner.png").default}
+        title="STAKING"
+        description="Lorem ipsum dolor sit amet consectetur adipisicing elit. Quaerat
+        quas minima dolor libero hic eum doloribus, quasi mollitia placeat.
+        Recusandae mollitia veniam quaerat minima quibusdam error similique
+        nisi, labore facilis!"
+        catchphrase="Catchy phrase for staking"
+        actionText="Stake Now"
+        infoText="Read up"
+        onAction={() => history.push("/staking")}
+        onInfo={() => (window.location.href = "https://docs.indexed.finance/")}
+      >
+        {null}
+      </SplashSection>
     </Page>
   );
 }

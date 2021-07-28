@@ -485,6 +485,13 @@ export const selectors = {
       } as FormattedNewStakingDetail
     );
   },
+  selectStakingForSplash(state: AppState) {
+    const basic = selectors.selectFormattedStaking(state);
+    const uniswap = selectors.selectNewFormattedStaking(state);
+    const sushi = selectors.selectMasterChefFormattedStaking(state);
+
+    console.log({ basic, uniswap, sushi });
+  },
   // User
   selectFormattedPortfolio(
     state: AppState,
