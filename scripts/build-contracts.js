@@ -116,7 +116,8 @@ const SingletonContracts = {
   UniswapV2Router: 'UNISWAP_ROUTER_ADDRESS',
   MultiCall2: 'MULTICALL2_ADDRESS',
   IndexedNarwhalRouter: 'NARWHAL_ROUTER_ADDRESS',
-  MasterChef: 'MASTER_CHEF_ADDRESS'
+  MasterChef: 'MASTER_CHEF_ADDRESS',
+  AdapterRegistry: 'ADAPTER_REGISTRY_ADDRESS'
 };
 
 const ConstantsImports = [
