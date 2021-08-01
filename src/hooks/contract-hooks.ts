@@ -1,4 +1,5 @@
 import {
+	ADAPTER_REGISTRY_ADDRESS,
 	BURN_ROUTER_ADDRESS,
 	MASTER_CHEF_ADDRESS,
 	MINT_ROUTER_ADDRESS,
@@ -17,6 +18,14 @@ export function useContractWithSigner<T extends InterfaceKind>(address: string, 
   if (signer && address) {
     return getContract(address, name, signer);
   }
+}
+
+export function useAdapterRegistryContract() {
+	return useContractWithSigner(ADAPTER_REGISTRY_ADDRESS, "AdapterRegistry");
+}
+
+export function useErc20AdapterContract(address: string) {
+	return useContractWithSigner(address, "Erc20Adapter");
 }
 
 export function useTokenContract(address: string) {
@@ -57,6 +66,10 @@ export function useMultiCall2Contract() {
 
 export function useMultiTokenStakingContract() {
 	return useContractWithSigner(MULTI_TOKEN_STAKING_ADDRESS, "MultiTokenStaking");
+}
+
+export function useNirnVaultContract(address: string) {
+	return useContractWithSigner(address, "NirnVault");
 }
 
 export function usePairContract(address: string) {
