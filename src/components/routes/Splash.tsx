@@ -26,9 +26,18 @@ export default function Splash() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
+          paddingTop: 12,
+          background: `url(${
+            require("images/header_splash_background.png").default
+          })`,
         }}
       >
-        <div style={{ textAlign: "center", maxWidth: isMobile ? 300 : 1000 }}>
+        <div
+          style={{
+            textAlign: "center",
+            maxWidth: isMobile ? 300 : 1000,
+          }}
+        >
           <Logo size="large" />
           <Typography.Title level={3} style={{ marginTop: 12 }}>
             Gain exposure to passively-managed crypto index portfolios

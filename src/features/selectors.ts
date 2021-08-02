@@ -619,6 +619,7 @@ export const selectors = {
             .toNumber();
 
           return {
+            underlying: adapter.underlying,
             protocol: adapter.protocolID,
             annualPercentageRate: convert.toPercent(adapter.apr),
             percentage: percentAsNumber,

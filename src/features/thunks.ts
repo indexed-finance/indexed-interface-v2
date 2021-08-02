@@ -8,6 +8,7 @@ import { fetchInitialData } from "./requests";
 import { fetchMasterChefData, masterChefActions } from "./masterChef";
 import { fetchNewStakingData } from "./newStaking";
 import { fetchStakingData, stakingActions } from "./staking";
+import { fetchVaultsData, vaultsActions } from "./vaults";
 import { indexPoolsActions } from "./indexPools";
 import { notification } from "antd";
 import { pairsActions } from "./pairs";
@@ -15,7 +16,6 @@ import { providers } from "ethers";
 import { settingsActions } from "./settings";
 import { tokensActions } from "./tokens";
 import { userActions } from "./user";
-import { vaultsActions } from "./vaults";
 import type { AppThunk } from "./store";
 
 // #region Provider
@@ -104,6 +104,7 @@ export const thunks = {
         })
       );
       dispatch(fetchMasterChefData({ provider }));
+      dispatch(fetchVaultsData({ provider }));
 
       if (selectedAddress) {
         dispatch(actions.userAddressSelected(selectedAddress));
