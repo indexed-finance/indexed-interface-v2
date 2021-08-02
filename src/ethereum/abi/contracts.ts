@@ -1,4 +1,6 @@
 import type {
+	AdapterRegistry,
+	Erc20Adapter,
 	IERC20,
 	IIndexedUniswapV2Oracle,
 	IPool,
@@ -9,6 +11,7 @@ import type {
 	MasterChef,
 	MultiCall2,
 	MultiTokenStaking,
+	NirnVault,
 	Pair,
 	RewardsSchedule,
 	StakingRewards,
@@ -23,6 +26,8 @@ import { InterfaceKind, interfaceLookup } from "./interfaces";
 import { JsonRpcProvider, JsonRpcSigner } from "@ethersproject/providers";
 
 export type ContractTypeLookup = {
+	AdapterRegistry: AdapterRegistry,
+	Erc20Adapter: Erc20Adapter,
 	IERC20: IERC20,
 	IIndexedUniswapV2Oracle: IIndexedUniswapV2Oracle,
 	IndexedNarwhalRouter: IndexedNarwhalRouter,
@@ -33,6 +38,7 @@ export type ContractTypeLookup = {
 	MasterChef: MasterChef,
 	MultiCall2: MultiCall2,
 	MultiTokenStaking: MultiTokenStaking,
+	NirnVault: NirnVault,
 	Pair: Pair,
 	RewardsSchedule: RewardsSchedule,
 	StakingRewards: StakingRewards,
