@@ -103,7 +103,7 @@ const renderCustomizedLabel = ({
 };
 
 interface Props {
-  data: Array<{ name: string; value: number; apr: string }>;
+  data: Array<{ name: string; value: string; apr: string }>;
 }
 
 export class VaultAdapterPieChart extends PureComponent<Props> {

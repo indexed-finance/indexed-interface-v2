@@ -8,7 +8,6 @@ import {
   Page,
   TooltipProvider,
   TransactionList,
-  WarningBar,
   useDiligenceDrawer,
   useTooltips,
 } from "components";
@@ -66,7 +65,6 @@ export function AppLayout() {
   const inner = (
     <>
       <LayoutHeader />
-      <WarningBar />
       <Layout.Content
         className="with-background"
         style={{ minHeight: "100vh", paddingTop: 1, paddingBottom: 12 }}

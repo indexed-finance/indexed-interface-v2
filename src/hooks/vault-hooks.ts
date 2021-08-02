@@ -1,15 +1,18 @@
-import { AppState, selectors } from "features";
+import { AppState, VAULTS_CALLER, selectors } from "features";
+import { RegisteredCall } from "helpers";
+import { useCallRegistrar } from "./use-call-registrar";
+import { useMemo } from "react";
 import { useSelector } from "react-redux";
 
 export function useAllVaults() {
-  const vaults = useSelector(selectors.selectAllFormattedVaults);
+  const vaults = useSelector(selectors.selectAllVaults);
 
   return vaults;
 }
 
 export function useVault(id: string) {
   const vault = useSelector((state: AppState) =>
-    selectors.selectFormattedVault(state, id)
+    selectors.selectVault(state, id)
   );
 
   return vault;
@@ -32,7 +35,8 @@ export function useVaultTvl(id: string) {
   const vault = useVault(id);
 
   if (vault) {
-    return vault.totalValueLocked;
+    // return vault.;
+    return "";
   } else {
     return null;
   }
@@ -46,4 +50,71 @@ export function useVaultTokens(id: string) {
   } else {
     return null;
   }
+}
+
+export function createVaultCalls(id: string, adapterIds: string[]) {
+  const target = id;
+  const interfaceKind = "NirnVault";
+  const baseCalls: RegisteredCall[] = [
+    {
+      interfaceKind,
+      target,
+      function: "getAdaptersAndWeights",
+    },
+    {
+      interfaceKind,
+      target,
+      function: "balance",
+    },
+    {
+      interfaceKind,
+      target,
+      function: "getPricePerFullShareWithFee",
+    },
+  ];
+  const adapterCalls = adapterIds.reduce((prev, next) => {
+    prev.push({
+      interfaceKind: "Erc20Adapter",
+      target,
+      function: "getRevenueBreakdown",
+    });
+
+    prev.push({
+      interfaceKind: "IERC20",
+      target: next,
+      function: "totalSupply",
+    });
+
+    return prev;
+  }, [] as RegisteredCall[]);
+
+  // TheGraph calls go here as off-chain calls.
+  return {
+    onChainCalls: [...baseCalls, ...adapterCalls],
+    offChainCalls: [],
+  };
+}
+
+export function useVaultRegistrar(id: string) {
+  const vault = useVault(id);
+  const caller = VAULTS_CALLER;
+  const { onChainCalls, offChainCalls } = useMemo(
+    () =>
+      id
+        ? createVaultCalls(
+            id,
+            vault!.adapters.map((each) => each.id)
+          )
+        : {
+            onChainCalls: [],
+            offChainCalls: [],
+          },
+    [id, vault]
+  );
+
+  useCallRegistrar({
+    caller,
+    onChainCalls,
+    offChainCalls,
+  });
 }

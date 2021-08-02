@@ -71,13 +71,11 @@ function VaultFormInner() {
 }
 
 export function LoadedVault(props: FormattedVault) {
-  const chartData = props.adapters.map(
-    ({ protocol, percentage, annualPercentageRate }) => ({
-      name: protocol,
-      value: percentage,
-      apr: annualPercentageRate,
-    })
-  );
+  const chartData = props.adapters.map(({ protocol }) => ({
+    name: protocol.name,
+    value: "",
+    apr: "",
+  }));
 
   return (
     <Page hasPageHeader={true} title="Vault">

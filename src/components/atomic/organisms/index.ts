@@ -19,5 +19,4 @@ export * from './TooltipProvider';
 export * from './TransactionList';
 export * from './VaultAdapterPieChart';
 export * from './VaultCard';
-export * from './WarningBar';
 export * from './Widget';

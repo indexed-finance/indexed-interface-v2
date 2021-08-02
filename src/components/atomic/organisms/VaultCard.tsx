@@ -1,5 +1,4 @@
-import { Card, CardProps, Col, Row, Tooltip, Typography } from "antd";
-import { FormattedVault } from "features";
+import { Card, Col, Row, Tooltip, Typography } from "antd";
 import { useAllVaults } from "hooks";
 import { useHistory } from "react-router";
 
@@ -7,11 +6,9 @@ export function VaultCard({
   vaultId,
   withTitle,
   name,
-  annualPercentageRate,
-  totalValueLocked,
   bordered,
   hoverable,
-}: { vaultId: string; withTitle?: boolean } & CardProps & FormattedVault) {
+}: any) {
   const { push } = useHistory();
 
   return (
@@ -40,13 +37,14 @@ export function VaultCard({
         </Col>
         <Col xs={24} md={6} style={{ textAlign: "center" }}>
           <Typography.Title level={2} style={{ margin: 0 }}>
-            {totalValueLocked}
+            {/* {totalValueLocked} */}
+            (TVL)
           </Typography.Title>
         </Col>
         <Col xs={24} md={6} style={{ textAlign: "center" }}>
           <Tooltip title="Annualized based on the current interest rate.">
             <Typography.Title level={3} style={{ margin: 0 }} type="success">
-              {annualPercentageRate}
+              (APR)
             </Typography.Title>
           </Tooltip>
         </Col>
@@ -68,6 +66,7 @@ export function VaultGroup({ withTitle = false }: { withTitle?: boolean }) {
           bordered={true}
           withTitle={withTitle}
           {...vault}
+          underlying={vault?.underlying ?? ""}
         />
       ))}
     </>

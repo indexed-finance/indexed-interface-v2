@@ -1,6 +1,11 @@
-import { NirnVaultData } from "./types";
-import { convert, createMulticallDataParser } from "helpers";
+import {
+  TokenAdapter,
+  TokenData,
+  VaultData,
+  VaultSnapshot,
+} from "@indexed-finance/subgraph-clients/dist/nirn/types";
 import { createEntityAdapter, createSlice } from "@reduxjs/toolkit";
+import { createMulticallDataParser } from "helpers";
 import { fetchMulticallData } from "../batcher/requests"; // Circular dependency.
 import { mirroredServerState, restartedDueToError } from "../actions";
 import type { AppState } from "../store";
@@ -9,20 +14,21 @@ export interface FormattedVault {
   id: string;
   symbol: string;
   name: string;
-  totalValueLocked: string;
-  annualPercentageRate: string;
-  percentageOfVaultAssets: string;
-  amountOfTokensInProtocol: string;
-  adapters: Array<{
-    protocol: string;
-    annualPercentageRate: string;
-    percentage: number;
-  }>;
+  decimals: number;
+  totalFeesClaimed: string;
+  underlying: TokenData;
+  feeRecipient: string;
+  rewardsSeller: string;
+  performanceFee: number;
+  reserveRatio: number;
+  adapters: TokenAdapter[];
+  weights: number[];
+  snapshots: VaultSnapshot[];
 }
 
 export const VAULTS_CALLER = "Vaults";
 
-const adapter = createEntityAdapter<NirnVaultData>({
+const adapter = createEntityAdapter<VaultData>({
   selectId: (entry) => entry.id.toLowerCase(),
 });
 
@@ -37,39 +43,6 @@ const slice = createSlice({
 
         if (relevantMulticallData) {
           // TODO: Fill me.
-        } else {
-          adapter.upsertMany(state, [
-            {
-              id: "0x6b175474e89094c44da98b954eedeac495271d0f",
-              symbol: "USDC",
-              name: "USDC Vault",
-              underlying: "0x6b175474e89094c44da98b954eedeac495271d0f", // DAI
-              adapters: [
-                {
-                  id: "0x6b175474e89094c44da98b954eedeac495271d0f",
-                  underlying: "0x6b175474e89094c44da98b954eedeac495271d0f",
-                  token: "0x6b175474e89094c44da98b954eedeac495271d0f",
-                  name: "DYDX Adapter",
-                  apr: 0.1,
-                  protocolID: "dydx",
-                },
-                {
-                  id: "0x6b175474e89094c44da98b954eedeac495271d0f",
-                  underlying: "0x6b175474e89094c44da98b954eedeac495271d0f",
-                  token: "0x6b175474e89094c44da98b954eedeac495271d0f",
-                  name: "AAVE Adapter",
-                  apr: 0.1,
-                  protocolID: "aave",
-                },
-              ],
-              weights: ["5e17", "5e17"],
-              balances: ["0"],
-              netAPR: 0.1,
-              performanceFee: 0.1,
-              pricePerShare: convert.toToken("200").toString(),
-              totalValueLocked: "USD $50.2M",
-            },
-          ] as NirnVaultData[]);
         }
       })
       .addCase(mirroredServerState, (_, action) => action.payload.vaults)
