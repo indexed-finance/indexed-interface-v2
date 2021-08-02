@@ -2,6 +2,7 @@ import { AiOutlineUser } from "react-icons/ai";
 import { ExternalLink } from "components/atomic/atoms";
 import { FEATURE_FLAGS } from "feature-flags";
 import { FaGavel, FaSwimmingPool } from "react-icons/fa";
+import { FaListUl } from "react-icons/fa";
 import { GoLightBulb } from "react-icons/go";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, Space } from "antd";
@@ -36,30 +37,35 @@ export function Navigation() {
         justifyContent: "space-around",
       }}
     >
-      <Menu.Item key="vaults">
-        <Link to="/vaults">
-          <Space size="small">
-            <RiSafe2Line style={{ position: "relative", top: 2 }} />{" "}
-            {!isMobile && <span>Vaults</span>}
-          </Space>
-        </Link>
-      </Menu.Item>
-      <Menu.Item key="index-pools">
-        <Link to="/index-pools">
-          <Space size="small">
-            <FaSwimmingPool style={{ position: "relative", top: 2 }} />{" "}
-            {!isMobile && <span>Indexes</span>}
-          </Space>
-        </Link>
-      </Menu.Item>
-      <Menu.Item key="staking">
-        <Link to="/staking">
-          <Space>
-            <RiSafe2Line style={{ position: "relative", top: 2 }} />{" "}
-            {!isMobile && <span>Staking</span>}
-          </Space>
-        </Link>
-      </Menu.Item>
+      <Menu.SubMenu
+        title="Products"
+        icon={<FaListUl style={{ position: "relative", top: -2, left: -20 }} />}
+      >
+        <Menu.Item key="vaults">
+          <Link to="/vaults">
+            <Space size="small">
+              <RiSafe2Line style={{ position: "relative", top: 2 }} />{" "}
+              {!isMobile && <span>Vaults</span>}
+            </Space>
+          </Link>
+        </Menu.Item>
+        <Menu.Item key="index-pools">
+          <Link to="/index-pools">
+            <Space size="small">
+              <FaSwimmingPool style={{ position: "relative", top: 2 }} />{" "}
+              {!isMobile && <span>Indexes</span>}
+            </Space>
+          </Link>
+        </Menu.Item>
+        <Menu.Item key="staking">
+          <Link to="/staking">
+            <Space>
+              <RiSafe2Line style={{ position: "relative", top: 2 }} />{" "}
+              {!isMobile && <span>Staking</span>}
+            </Space>
+          </Link>
+        </Menu.Item>
+      </Menu.SubMenu>
       <Menu.Item key="portfolio">
         <Link to="/portfolio">
           <Space size="small">

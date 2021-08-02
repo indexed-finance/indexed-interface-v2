@@ -1,4 +1,4 @@
-import { Divider, Statistic, Typography } from "antd";
+import { Alert, Divider, Statistic, Typography } from "antd";
 import {
   IndexPoolWidgetGroup,
   Logo,
@@ -6,6 +6,7 @@ import {
   SplashSection,
   VaultGroup,
 } from "components/atomic";
+import { RiSafe2Line } from "react-icons/ri";
 import { selectors } from "features";
 import { useBreakpoints } from "hooks";
 import { useHistory } from "react-router-dom";
@@ -21,6 +22,7 @@ export default function Splash() {
 
   return (
     <Page hasPageHeader={false}>
+      <VaultNotification />
       <div
         style={{
           display: "flex",
@@ -112,5 +114,20 @@ export default function Splash() {
         {null}
       </SplashSection>
     </Page>
+  );
+}
+
+//
+
+function VaultNotification() {
+  return (
+    <Alert
+      icon={<RiSafe2Line />}
+      showIcon={true}
+      type="success"
+      message="New: Vaults"
+      description="Lorem ipsum dolor sit amet."
+      style={{ marginBottom: 24 }}
+    />
   );
 }
