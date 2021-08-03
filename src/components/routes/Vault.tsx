@@ -17,32 +17,59 @@ import {
   VaultCard,
 } from "components/atomic";
 import {
-  useApprovalStatus,
   useBalanceAndApprovalRegistrar,
-  useBalancesRegistrar,
   useTokenApproval,
+  useTokenBalances,
   useVault,
   useVaultAdapterAPRs,
   useVaultRegistrar,
 } from "hooks";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useParams } from "react-router";
 import type { NormalizedVault } from "features";
 
+type TokenAmount = {exact: BigNumber; displayed: string;}
+
 function VaultFormInner({ vault }: { vault: NormalizedVault }) {
   const { underlying, performanceFee } = vault;
+  const balances = useTokenBalances([underlying.id, vault.id])
+  console.log(`Balacnes: ${balances}`)
   const [mode, setMode] = useState<"deposit" | "withdraw">("deposit");
   const changeMode = useCallback(
     (newMode: "deposit" | "withdraw") => setMode(newMode),
     []
   );
-  const [amount, setAmount] = useState<{
-    exact: BigNumber;
-    displayed: string;
-  }>({
+  const [amount, setAmount] = useState<TokenAmount>({
     exact: convert.toBigNumber("0.00"),
     displayed: "0.00",
   });
+
+  const toUnderlyingAmount = useCallback((exactTokenAmount: BigNumber) => {
+    if (!vault.price) return convert.toBigNumber("0");
+    return exactTokenAmount
+      .times(convert.toBigNumber(vault.price))
+      .div(convert.toToken('1', 18));
+  }, [vault]);
+
+  const dependentAmount = useMemo(() => {
+    if (!vault.price) return convert.toBigNumber("0");
+    return amount.exact
+      .times(convert.toToken('1', 18))
+      .div(convert.toBigNumber(vault.price));
+  }, [amount, vault])
+
+  const balance = useMemo(() => {
+    if (mode === 'deposit') {
+      const exact = convert.toBigNumber(balances[0])
+      const displayed = convert.toBalance(exact, underlying.decimals, true, 10)
+      return { exact, displayed }
+    }
+    const exact = toUnderlyingAmount(convert.toBigNumber(balances[1]))
+    const displayed = convert.toBalance(exact, underlying.decimals, false, 10)
+    console.log(`Withdrawal mode - balance ${exact.toString()} | ${displayed}`)
+    return { exact, displayed }
+  }, [balances, mode, toUnderlyingAmount, underlying])
+
   const handleSubmit = useCallback(() => {
     if (mode === "deposit") {
       console.log("am", amount);
@@ -58,22 +85,6 @@ function VaultFormInner({ vault }: { vault: NormalizedVault }) {
   });
 
   useBalanceAndApprovalRegistrar(vault.id, [vault.underlying.id]);
-
-  console.log({ status });
-
-  // const toUnderlyingAmount = (exactTokenAmount: BigNumber) => {
-  //   if (!vault.price) return convert.toBigNumber("0");
-  //   return exactTokenAmount
-  //     .mul(convert.toBigNumber(vault.price))
-  //     .div(convert.toToken(1, 18));
-  // };
-
-  // const toWrappedAmount = (exactUnderlyingAmount: BigNumber) => {
-  //   if (!vault.price) return convert.toBigNumber("0");
-  //   return exactUnderlyingAmount
-  //     .mul(convert.toToken(1, 18))
-  //     .div(convert.toBigNumber(vault.price));
-  // };
 
   return (
     <Card
@@ -109,6 +120,8 @@ function VaultFormInner({ vault }: { vault: NormalizedVault }) {
       <Space direction="vertical" size="large" style={{ width: "100%" }}>
         <TokenSelector
           assets={[]}
+          balanceOverride={balance}
+          selectable={false}
           value={{
             token: underlying.symbol,
             amount,
@@ -120,6 +133,9 @@ function VaultFormInner({ vault }: { vault: NormalizedVault }) {
           }}
           isInput={true}
         />
+        <Typography.Title level={4} style={{ textAlign: "right" }}>
+          Total: 1,337.00
+        </Typography.Title>
         <Alert
           showIcon={true}
           type="info"
