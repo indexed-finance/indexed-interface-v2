@@ -28,12 +28,11 @@ import { useCallback, useMemo, useState } from "react";
 import { useParams } from "react-router";
 import type { NormalizedVault } from "features";
 
-type TokenAmount = {exact: BigNumber; displayed: string;}
+type TokenAmount = { exact: BigNumber; displayed: string };
 
 function VaultFormInner({ vault }: { vault: NormalizedVault }) {
   const { underlying, performanceFee } = vault;
-  const balances = useTokenBalances([underlying.id, vault.id])
-  console.log(`Balacnes: ${balances}`)
+  const balances = useTokenBalances([underlying.id, vault.id]);
   const [mode, setMode] = useState<"deposit" | "withdraw">("deposit");
   const changeMode = useCallback(
     (newMode: "deposit" | "withdraw") => setMode(newMode),
@@ -44,31 +43,34 @@ function VaultFormInner({ vault }: { vault: NormalizedVault }) {
     displayed: "0.00",
   });
 
-  const toUnderlyingAmount = useCallback((exactTokenAmount: BigNumber) => {
-    if (!vault.price) return convert.toBigNumber("0");
-    return exactTokenAmount
-      .times(convert.toBigNumber(vault.price))
-      .div(convert.toToken('1', 18));
-  }, [vault]);
+  const toUnderlyingAmount = useCallback(
+    (exactTokenAmount: BigNumber) => {
+      if (!vault.price) return convert.toBigNumber("0");
+      return exactTokenAmount
+        .times(convert.toBigNumber(vault.price))
+        .div(convert.toToken("1", 18));
+    },
+    [vault]
+  );
 
   const dependentAmount = useMemo(() => {
     if (!vault.price) return convert.toBigNumber("0");
     return amount.exact
-      .times(convert.toToken('1', 18))
+      .times(convert.toToken("1", 18))
       .div(convert.toBigNumber(vault.price));
-  }, [amount, vault])
+  }, [amount, vault]);
 
   const balance = useMemo(() => {
-    if (mode === 'deposit') {
-      const exact = convert.toBigNumber(balances[0])
-      const displayed = convert.toBalance(exact, underlying.decimals, true, 10)
-      return { exact, displayed }
+    if (mode === "deposit") {
+      const exact = convert.toBigNumber(balances[0]);
+      const displayed = convert.toBalance(exact, underlying.decimals, true, 10);
+      return { exact, displayed };
     }
-    const exact = toUnderlyingAmount(convert.toBigNumber(balances[1]))
-    const displayed = convert.toBalance(exact, underlying.decimals, false, 10)
-    console.log(`Withdrawal mode - balance ${exact.toString()} | ${displayed}`)
-    return { exact, displayed }
-  }, [balances, mode, toUnderlyingAmount, underlying])
+    const exact = toUnderlyingAmount(convert.toBigNumber(balances[1]));
+    const displayed = convert.toBalance(exact, underlying.decimals, false, 10);
+    console.log(`Withdrawal mode - balance ${exact.toString()} | ${displayed}`);
+    return { exact, displayed };
+  }, [balances, mode, toUnderlyingAmount, underlying]);
 
   const handleSubmit = useCallback(() => {
     if (mode === "deposit") {
@@ -133,9 +135,6 @@ function VaultFormInner({ vault }: { vault: NormalizedVault }) {
           }}
           isInput={true}
         />
-        <Typography.Title level={4} style={{ textAlign: "right" }}>
-          Total: 1,337.00
-        </Typography.Title>
         <Alert
           showIcon={true}
           type="info"
@@ -168,6 +167,9 @@ function VaultFormInner({ vault }: { vault: NormalizedVault }) {
 
 export function LoadedVault({ vault }: { vault: NormalizedVault }) {
   const chartData = useVaultAdapterAPRs(vault.id);
+  const weightPercentages = vault.weights.map((num) =>
+    parseFloat(convert.toPercent(num))
+  );
 
   useVaultRegistrar(vault.id);
 
@@ -193,11 +195,13 @@ export function LoadedVault({ vault }: { vault: NormalizedVault }) {
             }}
           >
             <VaultAdapterPieChart
-              data={chartData.map((r) => ({
-                name: r.name,
-                value: parseFloat(convert.toPercent(r.apr)),
-                apr: convert.toPercent(r.apr),
-              }))}
+              data={chartData.map((r, i) => {
+                return {
+                  name: r.name,
+                  value: weightPercentages[i],
+                  apr: convert.toPercent(r.apr),
+                };
+              })}
             />
           </div>
         </Col>

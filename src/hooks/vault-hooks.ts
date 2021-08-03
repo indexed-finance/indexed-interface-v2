@@ -11,23 +11,29 @@ export function useAllVaults() {
 }
 
 export function useVaultAPR(id: string) {
-  return useSelector((state: AppState) =>
-    selectors.selectVaultAPR(state, id)
-  );
+  return useSelector((state: AppState) => selectors.selectVaultAPR(state, id));
 }
 
-export function useVaultAdapterAPRs(id: string): { name:string; apr:number; }[] {
-  const vault = useVault(id)
-  return vault?.adapters.reduce(
-    (prev, next) => ([
-      ...prev,
-      {
-        name: next.protocol.name,
-        apr: next.revenueAPRs?.reduce((t, n) => t + convert.toBalanceNumber(n), 0) ?? 0
-      }
-    ]),
-    [] as { name:string; apr:number; }[]
-  ) ?? []
+export function useVaultAdapterAPRs(
+  id: string
+): { name: string; apr: number }[] {
+  const vault = useVault(id);
+  return (
+    vault?.adapters.reduce(
+      (prev, next) => [
+        ...prev,
+        {
+          name: next.protocol.name,
+          apr:
+            next.revenueAPRs?.reduce(
+              (t, n) => t + convert.toBalanceNumber(n),
+              0
+            ) ?? 0,
+        },
+      ],
+      [] as { name: string; apr: number }[]
+    ) ?? []
+  );
 }
 
 export function useVault(id: string) {
@@ -90,7 +96,7 @@ export function createVaultCalls(id: string, adapterIds: string[]) {
       interfaceKind: "IERC20",
       target,
       function: "totalSupply",
-    }
+    },
   ];
   const adapterCalls = adapterIds.reduce((prev, next) => {
     prev.push({
@@ -135,24 +141,26 @@ export function useVaultRegistrar(id: string) {
   });
 }
 
-
 export function useAllVaultsRegistrar() {
-  const vaults = useAllVaults()
+  const vaults = useAllVaults();
   const caller = VAULTS_CALLER;
   const { onChainCalls, offChainCalls } = useMemo(
     () =>
-    vaults.reduce((prev, next) => {
-      const {onChainCalls, offChainCalls} = createVaultCalls(
-        next.id,
-        next.adapters.map(a => a.id)
-      )
-      prev.onChainCalls.push(...onChainCalls)
-      prev.offChainCalls.push(...offChainCalls)
-      return prev
-    }, {
-      onChainCalls: [] as RegisteredCall[],
-      offChainCalls: [] as RegisteredCall[],
-    }),
+      vaults.reduce(
+        (prev, next) => {
+          const { onChainCalls, offChainCalls } = createVaultCalls(
+            next.id,
+            next.adapters.map((a) => a.id)
+          );
+          prev.onChainCalls.push(...onChainCalls);
+          prev.offChainCalls.push(...offChainCalls);
+          return prev;
+        },
+        {
+          onChainCalls: [] as RegisteredCall[],
+          offChainCalls: [] as RegisteredCall[],
+        }
+      ),
     [vaults]
   );
 
