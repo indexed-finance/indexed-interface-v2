@@ -1,5 +1,5 @@
 import { AppState, VAULTS_CALLER, selectors } from "features";
-import { RegisteredCall } from "helpers";
+import { RegisteredCall, convert } from "helpers";
 import { useCallRegistrar } from "./use-call-registrar";
 import { useMemo } from "react";
 import { useSelector } from "react-redux";
@@ -8,6 +8,26 @@ export function useAllVaults() {
   const vaults = useSelector(selectors.selectAllVaults);
 
   return vaults;
+}
+
+export function useVaultAPR(id: string) {
+  return useSelector((state: AppState) =>
+    selectors.selectVaultAPR(state, id)
+  );
+}
+
+export function useVaultAdapterAPRs(id: string): { name:string; apr:number; }[] {
+  const vault = useVault(id)
+  return vault?.adapters.reduce(
+    (prev, next) => ([
+      ...prev,
+      {
+        name: next.protocol.name,
+        apr: next.revenueAPRs?.reduce((t, n) => t + convert.toBalanceNumber(n), 0) ?? 0
+      }
+    ]),
+    [] as { name:string; apr:number; }[]
+  ) ?? []
 }
 
 export function useVault(id: string) {
@@ -59,11 +79,6 @@ export function createVaultCalls(id: string, adapterIds: string[]) {
     {
       interfaceKind,
       target,
-      function: "getAdaptersAndWeights",
-    },
-    {
-      interfaceKind,
-      target,
       function: "balance",
     },
     {
@@ -71,6 +86,11 @@ export function createVaultCalls(id: string, adapterIds: string[]) {
       target,
       function: "getPricePerFullShareWithFee",
     },
+    {
+      interfaceKind: "IERC20",
+      target,
+      function: "totalSupply",
+    }
   ];
   const adapterCalls = adapterIds.reduce((prev, next) => {
     prev.push({
@@ -79,11 +99,7 @@ export function createVaultCalls(id: string, adapterIds: string[]) {
       function: "getRevenueBreakdown",
     });
 
-    prev.push({
-      interfaceKind: "IERC20",
-      target: next,
-      function: "totalSupply",
-    });
+    prev.push();
 
     return prev;
   }, [] as RegisteredCall[]);
