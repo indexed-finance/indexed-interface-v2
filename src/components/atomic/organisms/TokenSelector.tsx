@@ -131,12 +131,17 @@ export function TokenSelector({
   );
   const onAmountChange = useCallback(
     (newAmountNumber: number) => {
-      if (newAmountNumber == null || amount.exact.isLessThan(0)) {
+      console.log({ newAmountNumber, amount });
+
+      if (newAmountNumber == null || amount?.exact?.isLessThan(0)) {
         triggerChange({
           amount: DEFAULT_ENTRY,
         });
         setAmount(DEFAULT_ENTRY);
         setTouched({ [amountField]: true });
+
+        console.log("foo", "bar");
+
         return;
       }
 

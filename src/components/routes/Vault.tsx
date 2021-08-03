@@ -8,6 +8,7 @@ import {
   Space,
   Typography,
 } from "antd";
+import { BigNumber, convert } from "helpers";
 import { Formik } from "formik";
 import {
   Page,
@@ -15,13 +16,18 @@ import {
   VaultAdapterPieChart,
   VaultCard,
 } from "components/atomic";
-import { convert } from "helpers";
+import { useBalancesRegistrar, useVault, useVaultRegistrar } from "hooks";
 import { useCallback, useState } from "react";
 import { useParams } from "react-router";
-import { useVault, useVaultRegistrar } from "hooks";
 import type { FormattedVault } from "features";
 
-function VaultFormInner() {
+function VaultFormInner({
+  underlying,
+  performanceFee,
+}: {
+  underlying: any;
+  performanceFee: number;
+}) {
   const [mode, setMode] = useState<"deposit" | "withdraw">("deposit");
   const changeMode = useCallback(
     (newMode: "deposit" | "withdraw") => setMode(newMode),
@@ -32,6 +38,13 @@ function VaultFormInner() {
     } else {
     }
   }, [mode]);
+  const [amount, setAmount] = useState<{
+    exact: BigNumber;
+    displayed: string;
+  }>({
+    exact: convert.toBigNumber("0.00"),
+    displayed: "0.00",
+  });
 
   return (
     <Card
@@ -68,15 +81,21 @@ function VaultFormInner() {
         <TokenSelector
           assets={[]}
           value={{
-            token: "NDX",
-            amount: {
-              displayed: "0.00",
-              exact: convert.toBigNumber("0"),
-            },
+            token: underlying.symbol,
+            amount,
+          }}
+          onChange={(next) => {
+            if (next?.amount) {
+              setAmount(next.amount);
+            }
           }}
           isInput={true}
         />
-        <Alert showIcon={true} type="info" message="Performance Fee: 13.37%" />
+        <Alert
+          showIcon={true}
+          type="info"
+          message={`Performance Fee: ${convert.toPercent(performanceFee)}`}
+        />
         <Typography.Title level={4} style={{ textAlign: "right" }}>
           Total: 1,337.00
         </Typography.Title>
@@ -101,6 +120,7 @@ export function LoadedVault(props: FormattedVault) {
   }));
 
   useVaultRegistrar(props.id);
+  useBalancesRegistrar([props.underlying.id]);
 
   return (
     <Page hasPageHeader={true} title="Vault">
@@ -128,7 +148,7 @@ export function LoadedVault(props: FormattedVault) {
         </Col>
         <Col span={12}>
           <Typography.Title level={2}>
-            Interact With {props.name}
+            Interact With {props.underlying.name}
           </Typography.Title>
           <Formik
             initialValues={{
@@ -143,7 +163,10 @@ export function LoadedVault(props: FormattedVault) {
             validateOnChange={true}
             validateOnBlur={true}
           >
-            <VaultFormInner />
+            <VaultFormInner
+              underlying={props.underlying}
+              performanceFee={props.performanceFee}
+            />
           </Formik>
         </Col>
       </Row>
