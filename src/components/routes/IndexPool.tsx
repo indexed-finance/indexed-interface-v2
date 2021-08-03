@@ -41,22 +41,6 @@ export function LoadedIndexPool(
                 {props.interaction}
               </div>
             </Col>
-            <Col
-              span={16}
-              style={{
-                boxShadow: "inset 0px 0px 20px 10px rgba(220,220,220,0.4)",
-                background: "#000",
-                marginBottom: 24,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <img
-                alt="nothing"
-                src="http://placehold.it/750x375/000000/ffffff"
-              />
-            </Col>
           </Row>
         )}
         <Row

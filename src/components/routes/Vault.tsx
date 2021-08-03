@@ -16,14 +16,17 @@ import {
   VaultAdapterPieChart,
   VaultCard,
 } from "components/atomic";
-import { useCallback, useState } from "react";
-import { useParams } from "react-router";
 import {
+  useApprovalStatus,
+  useBalanceAndApprovalRegistrar,
+  useBalancesRegistrar,
   useTokenApproval,
   useVault,
   useVaultAdapterAPRs,
   useVaultRegistrar,
 } from "hooks";
+import { useCallback, useState } from "react";
+import { useParams } from "react-router";
 import type { NormalizedVault } from "features";
 
 function VaultFormInner({ vault }: { vault: NormalizedVault }) {
@@ -53,6 +56,8 @@ function VaultFormInner({ vault }: { vault: NormalizedVault }) {
     rawAmount: amount.exact.toString(),
     symbol: vault.symbol,
   });
+
+  useBalanceAndApprovalRegistrar(vault.id, [vault.underlying.id]);
 
   console.log({ status });
 
@@ -145,8 +150,8 @@ function VaultFormInner({ vault }: { vault: NormalizedVault }) {
   );
 }
 
-export function LoadedVault({vault}: {vault: NormalizedVault}) {
-  const chartData = useVaultAdapterAPRs(vault.id)
+export function LoadedVault({ vault }: { vault: NormalizedVault }) {
+  const chartData = useVaultAdapterAPRs(vault.id);
 
   useVaultRegistrar(vault.id);
 
@@ -171,7 +176,13 @@ export function LoadedVault({vault}: {vault: NormalizedVault}) {
               transform: "scale(1.6)",
             }}
           >
-            <VaultAdapterPieChart data={chartData.map(r => ({ name: r.name, value: r.apr.toString(), apr: r.apr.toString() }))} />
+            <VaultAdapterPieChart
+              data={chartData.map((r) => ({
+                name: r.name,
+                value: r.apr.toString(),
+                apr: r.apr.toString(),
+              }))}
+            />
           </div>
         </Col>
         <Col span={12}>
