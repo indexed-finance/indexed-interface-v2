@@ -159,9 +159,8 @@ const vaultsMulticallDataParser = createMulticallDataParser(
             vaultUpdates[target] = { ...(vaultUpdates[target] || {}), totalSupply: result[0] }
             break
           case 'getRevenueBreakdown':
-            const len = result.length;
-            const tokens = result.slice(0, len / 2)
-            const aprs = result.slice(len / 2)
+            const tokens = result[0].split(',')
+            const aprs = result[1].split(',')
             revenueBreakdowns[target] = {
               tokens,
               aprs
