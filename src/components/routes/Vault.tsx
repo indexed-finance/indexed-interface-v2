@@ -18,6 +18,7 @@ import {
 } from "components/atomic";
 import {
   useBalanceAndApprovalRegistrar,
+  useNirnTransactionCallbacks,
   useTokenApproval,
   useTokenBalances,
   useVault,
@@ -33,12 +34,13 @@ type TokenAmount = {exact: BigNumber; displayed: string;}
 function VaultFormInner({ vault }: { vault: NormalizedVault }) {
   const { underlying, performanceFee } = vault;
   const balances = useTokenBalances([underlying.id, vault.id])
-  console.log(`Balacnes: ${balances}`)
+  const {
+    deposit,
+    withdrawUnderlying
+  } = useNirnTransactionCallbacks(vault.id)
+  
   const [mode, setMode] = useState<"deposit" | "withdraw">("deposit");
-  const changeMode = useCallback(
-    (newMode: "deposit" | "withdraw") => setMode(newMode),
-    []
-  );
+
   const [amount, setAmount] = useState<TokenAmount>({
     exact: convert.toBigNumber("0.00"),
     displayed: "0.00",
@@ -53,15 +55,16 @@ function VaultFormInner({ vault }: { vault: NormalizedVault }) {
 
   const dependentAmount = useMemo(() => {
     if (!vault.price) return convert.toBigNumber("0");
-    return amount.exact
+    const exact = amount.exact
       .times(convert.toToken('1', 18))
       .div(convert.toBigNumber(vault.price));
-  }, [amount, vault])
+    return convert.toBalance(exact, underlying.decimals, true, 2)
+  }, [amount, vault, underlying])
 
   const balance = useMemo(() => {
     if (mode === 'deposit') {
       const exact = convert.toBigNumber(balances[0])
-      const displayed = convert.toBalance(exact, underlying.decimals, true, 10)
+      const displayed = convert.toBalance(exact, underlying.decimals, false, 10)
       return { exact, displayed }
     }
     const exact = toUnderlyingAmount(convert.toBigNumber(balances[1]))
@@ -72,10 +75,11 @@ function VaultFormInner({ vault }: { vault: NormalizedVault }) {
 
   const handleSubmit = useCallback(() => {
     if (mode === "deposit") {
-      console.log("am", amount);
+      deposit(amount.exact.integerValue().toString(10))
     } else {
+      withdrawUnderlying(amount.exact.integerValue().toString(10))
     }
-  }, [mode, amount]);
+  }, [mode, amount, deposit, withdrawUnderlying]);
   const { status, approve } = useTokenApproval({
     tokenId: vault.underlying.id,
     spender: vault.id,
@@ -96,7 +100,7 @@ function VaultFormInner({ vault }: { vault: NormalizedVault }) {
               block={true}
               size="large"
               type={mode === "deposit" ? "primary" : "default"}
-              onClick={() => changeMode("deposit")}
+              onClick={() => setMode("deposit")}
             >
               Deposit
             </Button>
@@ -109,7 +113,7 @@ function VaultFormInner({ vault }: { vault: NormalizedVault }) {
               block={true}
               size="large"
               type={mode === "withdraw" ? "primary" : "default"}
-              onClick={() => changeMode("withdraw")}
+              onClick={() => setMode("withdraw")}
             >
               Redeem
             </Button>
@@ -134,14 +138,14 @@ function VaultFormInner({ vault }: { vault: NormalizedVault }) {
           isInput={true}
         />
         <Typography.Title level={4} style={{ textAlign: "right" }}>
-          Total: 1,337.00
+          {mode === 'deposit' ? 'Mint' : 'Burn'}: {dependentAmount} {vault.symbol}
         </Typography.Title>
         <Alert
           showIcon={true}
           type="info"
           message={`Performance Fee: ${convert.toPercent(performanceFee)}`}
         />
-        {status === "approval needed" ? (
+        {(status === "approval needed" && mode === 'deposit') ? (
           <Button
             type="primary"
             block={true}
@@ -167,7 +171,7 @@ function VaultFormInner({ vault }: { vault: NormalizedVault }) {
 }
 
 export function LoadedVault({ vault }: { vault: NormalizedVault }) {
-  const chartData = useVaultAdapterAPRs(vault.id);
+  const chartData = useVaultAdapterAPRs(vault.id).map((a, i) => ({ ...a, value: vault.weights[i] * 100, weight: vault.weights[i] * 100, apr: a.apr * 100}))
 
   useVaultRegistrar(vault.id);
 
@@ -193,11 +197,7 @@ export function LoadedVault({ vault }: { vault: NormalizedVault }) {
             }}
           >
             <VaultAdapterPieChart
-              data={chartData.map((r) => ({
-                name: r.name,
-                value: parseFloat(convert.toPercent(r.apr)),
-                apr: convert.toPercent(r.apr),
-              }))}
+              data={chartData}
             />
           </div>
         </Col>
