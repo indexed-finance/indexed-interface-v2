@@ -16,28 +16,24 @@ import {
   VaultAdapterPieChart,
   VaultCard,
 } from "components/atomic";
-import { useBalancesRegistrar, useVault, useVaultRegistrar } from "hooks";
+import {
+  useApprovalStatus,
+  useBalancesRegistrar,
+  useTokenApproval,
+  useVault,
+  useVaultRegistrar,
+} from "hooks";
 import { useCallback, useState } from "react";
 import { useParams } from "react-router";
 import type { FormattedVault } from "features";
 
-function VaultFormInner({
-  underlying,
-  performanceFee,
-}: {
-  underlying: any;
-  performanceFee: number;
-}) {
+function VaultFormInner({ vault }: { vault: FormattedVault }) {
+  const { underlying, performanceFee } = vault;
   const [mode, setMode] = useState<"deposit" | "withdraw">("deposit");
   const changeMode = useCallback(
     (newMode: "deposit" | "withdraw") => setMode(newMode),
     []
   );
-  const handleSubmit = useCallback(() => {
-    if (mode === "deposit") {
-    } else {
-    }
-  }, [mode]);
   const [amount, setAmount] = useState<{
     exact: BigNumber;
     displayed: string;
@@ -45,6 +41,35 @@ function VaultFormInner({
     exact: convert.toBigNumber("0.00"),
     displayed: "0.00",
   });
+  const handleSubmit = useCallback(() => {
+    if (mode === "deposit") {
+      console.log("am", amount);
+    } else {
+    }
+  }, [mode, amount]);
+  const { status, approve } = useTokenApproval({
+    tokenId: vault.underlying.id,
+    spender: vault.id,
+    amount: amount.displayed,
+    rawAmount: amount.exact.toString(),
+    symbol: vault.symbol,
+  });
+
+  console.log({ status });
+
+  // const toUnderlyingAmount = (exactTokenAmount: BigNumber) => {
+  //   if (!vault.price) return convert.toBigNumber("0");
+  //   return exactTokenAmount
+  //     .mul(convert.toBigNumber(vault.price))
+  //     .div(convert.toToken(1, 18));
+  // };
+
+  // const toWrappedAmount = (exactUnderlyingAmount: BigNumber) => {
+  //   if (!vault.price) return convert.toBigNumber("0");
+  //   return exactUnderlyingAmount
+  //     .mul(convert.toToken(1, 18))
+  //     .div(convert.toBigNumber(vault.price));
+  // };
 
   return (
     <Card
@@ -96,17 +121,26 @@ function VaultFormInner({
           type="info"
           message={`Performance Fee: ${convert.toPercent(performanceFee)}`}
         />
-        <Typography.Title level={4} style={{ textAlign: "right" }}>
-          Total: 1,337.00
-        </Typography.Title>
-        <Button
-          type="primary"
-          block={true}
-          style={{ fontSize: 30, height: 60 }}
-          onClick={handleSubmit}
-        >
-          {mode === "deposit" ? "Deposit" : "Redeem"}
-        </Button>
+        {status === "approval needed" ? (
+          <Button
+            type="primary"
+            block={true}
+            style={{ fontSize: 30, height: 60 }}
+            onClick={approve}
+          >
+            Approve
+          </Button>
+        ) : (
+          <Button
+            type="primary"
+            disabled={status === "unknown"}
+            block={true}
+            style={{ fontSize: 30, height: 60 }}
+            onClick={handleSubmit}
+          >
+            {mode === "deposit" ? "Deposit" : "Redeem"}
+          </Button>
+        )}
       </Space>
     </Card>
   );
@@ -163,10 +197,7 @@ export function LoadedVault(props: FormattedVault) {
             validateOnChange={true}
             validateOnBlur={true}
           >
-            <VaultFormInner
-              underlying={props.underlying}
-              performanceFee={props.performanceFee}
-            />
+            <VaultFormInner vault={props} />
           </Formik>
         </Col>
       </Row>
