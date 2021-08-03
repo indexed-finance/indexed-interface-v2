@@ -17,8 +17,8 @@ import {
 } from "components/atomic";
 import { convert } from "helpers";
 import { useParams } from "react-router";
-import { useVault, useVaultRegistrar } from "hooks";
-import type { FormattedVault } from "features";
+import { useVault, useVaultAdapterAPRs, useVaultRegistrar } from "hooks";
+import type { NormalizedVault } from "features";
 
 function VaultFormInner() {
   return (
@@ -70,23 +70,19 @@ function VaultFormInner() {
   );
 }
 
-export function LoadedVault(props: FormattedVault) {
-  const chartData = props.adapters.map(({ protocol }) => ({
-    name: protocol.name,
-    value: "",
-    apr: "",
-  }));
+export function LoadedVault({vault}: {vault: NormalizedVault}) {
+  const chartData = useVaultAdapterAPRs(vault.id)
 
-  useVaultRegistrar(props.id);
+  useVaultRegistrar(vault.id);
 
   return (
     <Page hasPageHeader={true} title="Vault">
       <VaultCard
-        vaultId={props.id}
+        key={vault.id}
         withTitle={true}
         bordered={false}
         hoverable={false}
-        {...props}
+        vault={vault}
       />
       <Divider />
       <Row gutter={24}>
@@ -100,12 +96,12 @@ export function LoadedVault(props: FormattedVault) {
               transform: "scale(1.6)",
             }}
           >
-            <VaultAdapterPieChart data={chartData} />
+            <VaultAdapterPieChart data={chartData.map(r => ({ name: r.name, value: r.apr.toString(), apr: r.apr.toString() }))} />
           </div>
         </Col>
         <Col span={12}>
           <Typography.Title level={2}>
-            Interact With {props.name}
+            Interact With {vault.underlying.name}
           </Typography.Title>
           <Formik
             initialValues={{
@@ -132,5 +128,5 @@ export default function Vault() {
   const { slug } = useParams<{ slug: string }>();
   const vault = useVault(slug);
 
-  return vault ? <LoadedVault {...vault} /> : null;
+  return vault ? <LoadedVault vault={vault} /> : null;
 }
