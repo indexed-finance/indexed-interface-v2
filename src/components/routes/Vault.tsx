@@ -195,8 +195,8 @@ export function LoadedVault({ vault }: { vault: NormalizedVault }) {
             <VaultAdapterPieChart
               data={chartData.map((r) => ({
                 name: r.name,
-                value: r.apr.toString(),
-                apr: r.apr.toString(),
+                value: parseFloat(convert.toPercent(r.apr)),
+                apr: convert.toPercent(r.apr),
               }))}
             />
           </div>

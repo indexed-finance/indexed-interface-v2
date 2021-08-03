@@ -61,7 +61,7 @@ const renderActiveShape = (props: any) => {
         y={ey}
         textAnchor={textAnchor}
         fill="#fff"
-      >{`${payload.name}: ${value}% of total`}</text>
+      >{`${value}% of total`}</text>
       <text
         x={ex + (cos >= 0 ? 1 : -1) * 12}
         y={ey}
@@ -103,7 +103,7 @@ const renderCustomizedLabel = ({
 };
 
 interface Props {
-  data: Array<{ name: string; value: string; apr: string }>;
+  data: Array<{ name: string; value: number; apr: string }>;
 }
 
 export class VaultAdapterPieChart extends PureComponent<Props> {
