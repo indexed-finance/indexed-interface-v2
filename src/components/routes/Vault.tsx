@@ -29,7 +29,7 @@ import { useCallback, useMemo, useState } from "react";
 import { useParams } from "react-router";
 import type { NormalizedVault } from "features";
 
-type TokenAmount = {exact: BigNumber; displayed: string;}
+type TokenAmount = { exact: BigNumber; displayed: string };
 
 function VaultFormInner({ vault }: { vault: NormalizedVault }) {
   const { underlying, performanceFee } = vault;
@@ -46,12 +46,15 @@ function VaultFormInner({ vault }: { vault: NormalizedVault }) {
     displayed: "0.00",
   });
 
-  const toUnderlyingAmount = useCallback((exactTokenAmount: BigNumber) => {
-    if (!vault.price) return convert.toBigNumber("0");
-    return exactTokenAmount
-      .times(convert.toBigNumber(vault.price))
-      .div(convert.toToken('1', 18));
-  }, [vault]);
+  const toUnderlyingAmount = useCallback(
+    (exactTokenAmount: BigNumber) => {
+      if (!vault.price) return convert.toBigNumber("0");
+      return exactTokenAmount
+        .times(convert.toBigNumber(vault.price))
+        .div(convert.toToken("1", 18));
+    },
+    [vault]
+  );
 
   const dependentAmount = useMemo(() => {
     if (!vault.price) return convert.toBigNumber("0");
@@ -67,11 +70,11 @@ function VaultFormInner({ vault }: { vault: NormalizedVault }) {
       const displayed = convert.toBalance(exact, underlying.decimals, false, 10)
       return { exact, displayed }
     }
-    const exact = toUnderlyingAmount(convert.toBigNumber(balances[1]))
-    const displayed = convert.toBalance(exact, underlying.decimals, false, 10)
-    console.log(`Withdrawal mode - balance ${exact.toString()} | ${displayed}`)
-    return { exact, displayed }
-  }, [balances, mode, toUnderlyingAmount, underlying])
+    const exact = toUnderlyingAmount(convert.toBigNumber(balances[1]));
+    const displayed = convert.toBalance(exact, underlying.decimals, false, 10);
+    console.log(`Withdrawal mode - balance ${exact.toString()} | ${displayed}`);
+    return { exact, displayed };
+  }, [balances, mode, toUnderlyingAmount, underlying]);
 
   const handleSubmit = useCallback(() => {
     if (mode === "deposit") {
