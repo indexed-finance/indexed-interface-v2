@@ -8,6 +8,7 @@ import {
   Space,
   Typography,
 } from "antd";
+import { BigNumber, convert } from "helpers";
 import { Formik } from "formik";
 import {
   Page,
@@ -15,19 +16,72 @@ import {
   VaultAdapterPieChart,
   VaultCard,
 } from "components/atomic";
-import { convert } from "helpers";
+import { useCallback, useState } from "react";
 import { useParams } from "react-router";
-import { useVault, useVaultAdapterAPRs, useVaultRegistrar } from "hooks";
+import {
+  useTokenApproval,
+  useVault,
+  useVaultAdapterAPRs,
+  useVaultRegistrar,
+} from "hooks";
 import type { NormalizedVault } from "features";
 
-function VaultFormInner() {
+function VaultFormInner({ vault }: { vault: NormalizedVault }) {
+  const { underlying, performanceFee } = vault;
+  const [mode, setMode] = useState<"deposit" | "withdraw">("deposit");
+  const changeMode = useCallback(
+    (newMode: "deposit" | "withdraw") => setMode(newMode),
+    []
+  );
+  const [amount, setAmount] = useState<{
+    exact: BigNumber;
+    displayed: string;
+  }>({
+    exact: convert.toBigNumber("0.00"),
+    displayed: "0.00",
+  });
+  const handleSubmit = useCallback(() => {
+    if (mode === "deposit") {
+      console.log("am", amount);
+    } else {
+    }
+  }, [mode, amount]);
+  const { status, approve } = useTokenApproval({
+    tokenId: vault.underlying.id,
+    spender: vault.id,
+    amount: amount.displayed,
+    rawAmount: amount.exact.toString(),
+    symbol: vault.symbol,
+  });
+
+  console.log({ status });
+
+  // const toUnderlyingAmount = (exactTokenAmount: BigNumber) => {
+  //   if (!vault.price) return convert.toBigNumber("0");
+  //   return exactTokenAmount
+  //     .mul(convert.toBigNumber(vault.price))
+  //     .div(convert.toToken(1, 18));
+  // };
+
+  // const toWrappedAmount = (exactUnderlyingAmount: BigNumber) => {
+  //   if (!vault.price) return convert.toBigNumber("0");
+  //   return exactUnderlyingAmount
+  //     .mul(convert.toToken(1, 18))
+  //     .div(convert.toBigNumber(vault.price));
+  // };
+
   return (
     <Card
       bordered={true}
       title={
         <Row gutter={24} align="middle">
           <Col span={10}>
-            <Button block={true} size="large" type="primary">
+            <Button
+              block={true}
+              size="large"
+              type={mode === "deposit" ? "primary" : "default"}
+              onClick={() => changeMode("deposit")}
+            >
               Deposit
             </Button>
           </Col>
@@ -35,7 +89,12 @@ function VaultFormInner() {
             <Divider>or</Divider>
           </Col>
           <Col span={10}>
-            <Button block={true} size="large">
+            <Button
+              block={true}
+              size="large"
+              type={mode === "withdraw" ? "primary" : "default"}
+              onClick={() => changeMode("withdraw")}
+            >
               Redeem
             </Button>
           </Col>
@@ -46,25 +105,41 @@ function VaultFormInner() {
         <TokenSelector
           assets={[]}
           value={{
-            token: "NDX",
-            amount: {
-              displayed: "0.00",
-              exact: convert.toBigNumber("0"),
-            },
+            token: underlying.symbol,
+            amount,
+          }}
+          onChange={(next) => {
+            if (next?.amount) {
+              setAmount(next.amount);
+            }
           }}
           isInput={true}
         />
-        <Alert showIcon={true} type="info" message="Performance Fee: 13.37%" />
-        <Typography.Title level={4} style={{ textAlign: "right" }}>
-          Total: 1,337.00
-        </Typography.Title>
-        <Button
-          type="primary"
-          block={true}
-          style={{ fontSize: 30, height: 60 }}
-        >
-          Send Transaction
-        </Button>
+        <Alert
+          showIcon={true}
+          type="info"
+          message={`Performance Fee: ${convert.toPercent(performanceFee)}`}
+        />
+        {status === "approval needed" ? (
+          <Button
+            type="primary"
+            block={true}
+            style={{ fontSize: 30, height: 60 }}
+            onClick={approve}
+          >
+            Approve
+          </Button>
+        ) : (
+          <Button
+            type="primary"
+            disabled={status === "unknown"}
+            block={true}
+            style={{ fontSize: 30, height: 60 }}
+            onClick={handleSubmit}
+          >
+            {mode === "deposit" ? "Deposit" : "Redeem"}
+          </Button>
+        )}
       </Space>
     </Card>
   );
@@ -116,7 +191,7 @@ export function LoadedVault({vault}: {vault: NormalizedVault}) {
             validateOnChange={true}
             validateOnBlur={true}
           >
-            <VaultFormInner />
+            <VaultFormInner vault={vault} />
           </Formik>
         </Col>
       </Row>
