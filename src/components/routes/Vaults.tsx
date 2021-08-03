@@ -1,9 +1,10 @@
 import { Col, Row, Typography } from "antd";
 import { Page, VaultGroup } from "components/atomic";
-import { useBreakpoints } from "hooks";
+import { useAllVaultsRegistrar, useBreakpoints } from "hooks";
 
 export default function Vaults() {
   const { isMobile } = useBreakpoints();
+  useAllVaultsRegistrar()
 
   return (
     <Page hasPageHeader={true} title="Vaults">

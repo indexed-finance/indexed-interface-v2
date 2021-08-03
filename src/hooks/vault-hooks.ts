@@ -134,3 +134,31 @@ export function useVaultRegistrar(id: string) {
     offChainCalls,
   });
 }
+
+
+export function useAllVaultsRegistrar() {
+  const vaults = useAllVaults()
+  const caller = VAULTS_CALLER;
+  const { onChainCalls, offChainCalls } = useMemo(
+    () =>
+    vaults.reduce((prev, next) => {
+      const {onChainCalls, offChainCalls} = createVaultCalls(
+        next.id,
+        next.adapters.map(a => a.id)
+      )
+      prev.onChainCalls.push(...onChainCalls)
+      prev.offChainCalls.push(...offChainCalls)
+      return prev
+    }, {
+      onChainCalls: [] as RegisteredCall[],
+      offChainCalls: [] as RegisteredCall[],
+    }),
+    [vaults]
+  );
+
+  useCallRegistrar({
+    caller,
+    onChainCalls,
+    offChainCalls,
+  });
+}
