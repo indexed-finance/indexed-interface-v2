@@ -114,7 +114,7 @@ export const vaultsSelectors = {
       netAPR += revenueAPR * vault.weights[i]
     }
     netAPR *= 1-vault.reserveRatio;
-    return netAPR * 100;
+    return +(netAPR * 100).toFixed(2);
   }
 };
 
