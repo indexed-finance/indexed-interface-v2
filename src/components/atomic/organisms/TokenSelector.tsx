@@ -100,7 +100,7 @@ export function TokenSelector({
 
     if (rawBalance && selectedToken) {
       return {
-        displayed: convert.toBalance(rawBalance),
+        displayed: convert.toBalance(rawBalance, selectedToken?.decimals),
         exact: convert.toBigNumber(rawBalance),
       };
     }
