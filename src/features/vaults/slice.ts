@@ -6,7 +6,7 @@ import {
 import { convert, createMulticallDataParser } from "helpers";
 import { createEntityAdapter, createSlice } from "@reduxjs/toolkit";
 import { fetchMulticallData } from "../batcher/requests"; // Circular dependency.
-import { fetchVaultsData } from "./requests";
+import { fetchVaultsData } from "../requests";
 import { mirroredServerState, restartedDueToError } from "../actions";
 import type { AppState } from "../store";
 
