@@ -9,6 +9,7 @@ import { useDispatch } from "react-redux";
 import {
   useIndexPoolContract,
   useIndexedNarwhalRouterContract,
+  useNirnVaultContract,
   useStakingRewardsContract,
   useTokenContract,
 } from "./contract-hooks";
@@ -496,4 +497,36 @@ export function useStakingTransactionCallbacks(
     withdraw,
     claim,
   };
+}
+
+export function useNirnTransactionCallbacks(vault: string) {
+  const contract = useNirnVaultContract(vault);
+  const addTransaction = useAddTransactionCallback();
+
+  const deposit = useCallback((amount: string) => {
+    // @todo Figure out a better way to handle this
+    if (!contract) throw new Error();
+    const tx = contract.deposit(amount);
+    addTransaction(tx);
+  }, [contract, addTransaction])
+
+  const withdraw = useCallback((amount: string) => {
+    // @todo Figure out a better way to handle this
+    if (!contract) throw new Error();
+    const tx = contract.withdraw(amount);
+    addTransaction(tx);
+  }, [contract, addTransaction])
+
+  const withdrawUnderlying = useCallback((amount: string) => {
+    // @todo Figure out a better way to handle this
+    if (!contract) throw new Error();
+    const tx = contract.withdrawUnderlying(amount);
+    addTransaction(tx);
+  }, [contract, addTransaction])
+
+  return {
+    deposit,
+    withdraw,
+    withdrawUnderlying
+  }
 }

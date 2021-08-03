@@ -7,7 +7,7 @@ import {
   createStakingCalls,
   createTotalSuppliesCalls,
 } from "hooks";
-import { actions, selectors, store } from "features";
+import { actions, fetchVaultsData, selectors, store } from "features";
 import { createMasterChefCalls } from "hooks/masterchef-hooks";
 import { createNewStakingCalls } from "hooks/new-staking-hooks";
 import { log } from "./helpers";
@@ -24,6 +24,7 @@ const poolsRegistered: Record<string, boolean> = {};
 const tokensRegistered: Record<string, boolean> = {};
 const pairsRegistered: Record<string, boolean> = {};
 const stakingPoolsRegistered: Record<string, boolean> = {};
+const vaultsRegistered: Record<string, string> = {}
 
 const NEW_SUBSCRIBER_DELAY_SECONDS = 15;
 
@@ -75,6 +76,11 @@ export async function setupStateHandling() {
       withSigner: false,
     })
   );
+  dispatch(
+    fetchVaultsData({
+      provider
+    })
+  )
 }
 
 const BLOCKS_PER_DAY = 86400 / 13.5;
