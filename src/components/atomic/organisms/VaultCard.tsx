@@ -1,19 +1,32 @@
 import { Card, Col, Row, Tooltip, Typography } from "antd";
-import { useAllVaults } from "hooks";
+import { NormalizedVault } from "features";
+import { convert } from "helpers";
+import { useAllVaults, useVaultAPR } from "hooks";
 import { useHistory } from "react-router";
 
-export function VaultCard({
-  vaultId,
-  withTitle,
-  name,
-  bordered,
-  hoverable,
-  underlying,
-  ...rest
-}: any) {
-  const { push } = useHistory();
+type Props = {
+  key: string
+  hoverable?: boolean
+  bordered?: boolean
+  withTitle?: boolean
+  vault: NormalizedVault
+}
 
-  console.log({ rest });
+export function VaultCard({
+  key,
+  hoverable,
+  bordered,
+  withTitle,
+  vault: {
+    id: vaultId,
+    underlying,
+    decimals,
+    totalValue
+  }
+}: Props) {
+  const tvl = convert.toBalance(totalValue || '0', decimals, true, 4)
+  const apr = useVaultAPR(vaultId)
+  const { push } = useHistory();
 
   return (
     <Card
@@ -26,7 +39,7 @@ export function VaultCard({
         <Row>
           <Col xs={24} md={6} style={{ textAlign: "left" }}></Col>
           <Col xs={24} md={6} style={{ textAlign: "center" }}>
-            <Typography.Title level={2}>TVL</Typography.Title>
+            <Typography.Title level={2}>{underlying.symbol} Locked</Typography.Title>
           </Col>
           <Col xs={24} md={6} style={{ textAlign: "center" }}>
             <Typography.Title level={2}>APR</Typography.Title>
@@ -41,14 +54,13 @@ export function VaultCard({
         </Col>
         <Col xs={24} md={6} style={{ textAlign: "center" }}>
           <Typography.Title level={2} style={{ margin: 0 }}>
-            {/* {totalValueLocked} */}
-            (TVL)
+            {tvl}
           </Typography.Title>
         </Col>
         <Col xs={24} md={6} style={{ textAlign: "center" }}>
           <Tooltip title="Annualized based on the current interest rate.">
             <Typography.Title level={3} style={{ margin: 0 }} type="success">
-              (APR)
+              {apr}%
             </Typography.Title>
           </Tooltip>
         </Col>
@@ -65,12 +77,10 @@ export function VaultGroup({ withTitle = false }: { withTitle?: boolean }) {
       {vaults.map((vault) => (
         <VaultCard
           key={vault.name}
-          vaultId={vault.id}
           hoverable={true}
           bordered={true}
           withTitle={withTitle}
-          {...vault}
-          underlying={vault?.underlying ?? ""}
+          vault={vault}
         />
       ))}
     </>
