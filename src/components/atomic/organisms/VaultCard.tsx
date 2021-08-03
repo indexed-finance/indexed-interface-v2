@@ -8,8 +8,12 @@ export function VaultCard({
   name,
   bordered,
   hoverable,
+  underlying,
+  ...rest
 }: any) {
   const { push } = useHistory();
+
+  console.log({ rest });
 
   return (
     <Card
@@ -32,7 +36,7 @@ export function VaultCard({
       <Row align="middle">
         <Col xs={24} md={6}>
           <Typography.Title level={2} style={{ margin: 0 }}>
-            {name}
+            {underlying.name}
           </Typography.Title>
         </Col>
         <Col xs={24} md={6} style={{ textAlign: "center" }}>

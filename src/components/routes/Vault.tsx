@@ -17,7 +17,7 @@ import {
 } from "components/atomic";
 import { convert } from "helpers";
 import { useParams } from "react-router";
-import { useVault } from "hooks";
+import { useVault, useVaultRegistrar } from "hooks";
 import type { FormattedVault } from "features";
 
 function VaultFormInner() {
@@ -76,6 +76,8 @@ export function LoadedVault(props: FormattedVault) {
     value: "",
     apr: "",
   }));
+
+  useVaultRegistrar(props.id);
 
   return (
     <Page hasPageHeader={true} title="Vault">

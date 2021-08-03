@@ -75,7 +75,7 @@ export function createVaultCalls(id: string, adapterIds: string[]) {
   const adapterCalls = adapterIds.reduce((prev, next) => {
     prev.push({
       interfaceKind: "Erc20Adapter",
-      target,
+      target: next,
       function: "getRevenueBreakdown",
     });
 

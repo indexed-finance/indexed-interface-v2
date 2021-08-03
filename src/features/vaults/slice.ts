@@ -7,6 +7,7 @@ import {
 import { createEntityAdapter, createSlice } from "@reduxjs/toolkit";
 import { createMulticallDataParser } from "helpers";
 import { fetchMulticallData } from "../batcher/requests"; // Circular dependency.
+import { fetchVaultsData } from "./requests";
 import { mirroredServerState, restartedDueToError } from "../actions";
 import type { AppState } from "../store";
 
@@ -43,10 +44,17 @@ const slice = createSlice({
 
         if (relevantMulticallData) {
           // TODO: Fill me.
+
+          console.log({ relevantMulticallData });
         }
       })
       .addCase(mirroredServerState, (_, action) => action.payload.vaults)
-      .addCase(restartedDueToError, () => adapter.getInitialState()),
+      .addCase(restartedDueToError, () => adapter.getInitialState())
+      .addCase(fetchVaultsData.fulfilled, (state, action) => {
+        const vaults = action.payload ?? [];
+
+        adapter.upsertMany(state, vaults);
+      }),
 });
 
 export const { actions: vaultsActions, reducer: vaultsReducer } = slice;
@@ -68,6 +76,8 @@ export const vaultsSelectors = {
 const vaultsMulticallDataParser = createMulticallDataParser(
   VAULTS_CALLER,
   (calls) => {
+    console.log({ calls });
+
     // TODO: Fill me.
   }
 );

@@ -18,11 +18,9 @@ export const fetchVaultsData = createAsyncThunk(
     const client = NirnSubgraphClient.forNetwork(name);
 
     try {
-      const data = await client.getAllVaults();
+      const vaults = await client.getAllVaults();
 
-      console.log({ foo: NirnSubgraphClient, data });
-
-      return null;
+      return vaults;
     } catch (error) {
       console.error({ error });
 
