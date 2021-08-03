@@ -16,18 +16,35 @@ import {
   VaultCard,
 } from "components/atomic";
 import { convert } from "helpers";
+import { useCallback, useState } from "react";
 import { useParams } from "react-router";
 import { useVault, useVaultRegistrar } from "hooks";
 import type { FormattedVault } from "features";
 
 function VaultFormInner() {
+  const [mode, setMode] = useState<"deposit" | "withdraw">("deposit");
+  const changeMode = useCallback(
+    (newMode: "deposit" | "withdraw") => setMode(newMode),
+    []
+  );
+  const handleSubmit = useCallback(() => {
+    if (mode === "deposit") {
+    } else {
+    }
+  }, [mode]);
+
   return (
     <Card
       bordered={true}
       title={
         <Row gutter={24} align="middle">
           <Col span={10}>
-            <Button block={true} size="large" type="primary">
+            <Button
+              block={true}
+              size="large"
+              type={mode === "deposit" ? "primary" : "default"}
+              onClick={() => changeMode("deposit")}
+            >
               Deposit
             </Button>
           </Col>
@@ -35,7 +52,12 @@ function VaultFormInner() {
             <Divider>or</Divider>
           </Col>
           <Col span={10}>
-            <Button block={true} size="large">
+            <Button
+              block={true}
+              size="large"
+              type={mode === "withdraw" ? "primary" : "default"}
+              onClick={() => changeMode("withdraw")}
+            >
               Redeem
             </Button>
           </Col>
@@ -62,8 +84,9 @@ function VaultFormInner() {
           type="primary"
           block={true}
           style={{ fontSize: 30, height: 60 }}
+          onClick={handleSubmit}
         >
-          Send Transaction
+          {mode === "deposit" ? "Deposit" : "Redeem"}
         </Button>
       </Space>
     </Card>
