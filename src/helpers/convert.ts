@@ -99,15 +99,12 @@ const convert = {
     provider: ProviderLike,
     token: NormalizedToken,
     amount: BigNumber,
-    decimals: number
   ): CurrencyAmount => {
-    const value = convert.toToken(amount.toString(), decimals);
-
     return token.id === constants.AddressZero
-      ? CurrencyAmount.ether(value.toString())
+      ? CurrencyAmount.ether(amount.toString())
       : new TokenAmount(
           convert.toUniswapSDKToken(provider, token),
-          value.toString()
+          amount.toString()
         );
   },
   // Uniswap SDK

@@ -157,7 +157,6 @@ export function useUniswapTradingPairs(baseTokens: string[]) {
             { network: { chainId: 1 } },
             tokenIn,
             amountIn,
-            18
           ) as TokenAmount,
           convert.toUniswapSDKCurrency(
             { network: { chainId: 1 } },
@@ -188,7 +187,6 @@ export function useUniswapTradingPairs(baseTokens: string[]) {
             { network: { chainId: 1 } },
             tokenOut,
             amountOut,
-            18
           ) as TokenAmount,
           opts ?? { maxHops: 3, maxNumResults: 1 }
         );
