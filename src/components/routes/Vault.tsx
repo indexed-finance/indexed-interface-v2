@@ -34,6 +34,8 @@ type TokenAmount = { exact: BigNumber; displayed: string };
 
 function VaultFormInner({ vault }: { vault: FormattedVault }) {
   const { underlying, performanceFee } = vault;
+
+  useBalanceAndApprovalRegistrar(vault.id, [vault.underlying.id]);
   const balances = useTokenBalances([underlying.id, vault.id])
   const {
     deposit,
@@ -73,7 +75,6 @@ function VaultFormInner({ vault }: { vault: FormattedVault }) {
     }
     const exact = toUnderlyingAmount(convert.toBigNumber(balances[1]));
     const displayed = convert.toBalance(exact, underlying.decimals, false, 10);
-    console.log(`Withdrawal mode - balance ${exact.toString()} | ${displayed}`);
     return { exact, displayed };
   }, [balances, mode, toUnderlyingAmount, underlying]);
 
@@ -91,8 +92,6 @@ function VaultFormInner({ vault }: { vault: FormattedVault }) {
     rawAmount: amount.exact.toString(),
     symbol: vault.symbol,
   });
-
-  useBalanceAndApprovalRegistrar(vault.id, [vault.underlying.id]);
 
   return (
     <Card
