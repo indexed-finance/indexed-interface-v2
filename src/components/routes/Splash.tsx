@@ -70,11 +70,8 @@ export default function Splash() {
       <SplashSection
         banner={require("images/vaults_banner.png").default}
         title="VAULTS"
-        description="Lorem ipsum dolor sit amet consectetur adipisicing elit. Quaerat
-        quas minima dolor libero hic eum doloribus, quasi mollitia placeat.
-        Recusandae mollitia veniam quaerat minima quibusdam error similique
-        nisi, labore facilis!"
-        catchphrase="Catchy phrase for vaults"
+        description="Lend out your assets via Indexed Earn and receive the guaranteed best interest rates across the major lending protocols in DeFi. Low-fee and no-maintenance: let our non-custodial vaults do the work of allocating your funds for maximum impact."
+        catchphrase="Earn interest on your assets"
         actionText="Explore Vaults"
         infoText="How it works"
         onAction={() => history.push("/vaults")}
@@ -86,11 +83,8 @@ export default function Splash() {
       <SplashSection
         banner={require("images/indexpools_banner.png").default}
         title="INDEX POOLS"
-        description="Lorem ipsum dolor sit amet consectetur adipisicing elit. Quaerat
-        quas minima dolor libero hic eum doloribus, quasi mollitia placeat.
-        Recusandae mollitia veniam quaerat minima quibusdam error similique
-        nisi, labore facilis!"
-        catchphrase="Dive in today"
+        description="Gain exposure to a passively-managed, zero management fee crypto index portfolio with a single token. Indexed products offer a hassle-free, battle-tested way of investing in both DeFi and niche market sectors such as oracles or the metaverse."
+        catchphrase="Invest in DeFi markets"
         actionText="Buy an index"
         infoText="Learn more"
         onAction={() => history.push("/index-pools")}
@@ -102,11 +96,8 @@ export default function Splash() {
       <SplashSection
         banner={require("images/staking_banner.png").default}
         title="STAKING"
-        description="Lorem ipsum dolor sit amet consectetur adipisicing elit. Quaerat
-        quas minima dolor libero hic eum doloribus, quasi mollitia placeat.
-        Recusandae mollitia veniam quaerat minima quibusdam error similique
-        nisi, labore facilis!"
-        catchphrase="Catchy phrase for staking"
+        description="Provide liquidity for our index products on major decentralised exchanges and earn our protocol governance token as a reward! Select index products are also eligible for rewards by staking them single-sided. No fees, no lock-up periods."
+        catchphrase="Supply liquidity and earn NDX"
         actionText="Stake Now"
         infoText="Read up"
         onAction={() => history.push("/staking")}
