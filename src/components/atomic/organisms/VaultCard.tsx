@@ -88,15 +88,27 @@ export function VaultCard({
 
 export function VaultGroup({ withTitle = false }: { withTitle?: boolean }) {
   const vaults = useAllVaults();
-
+  
   return (
     <>
+      {withTitle && (
+          <Row>
+            <Col xs={24} md={6} offset={6} style={{ textAlign: "center" }}>
+              <Typography.Title level={2}>TVL</Typography.Title>
+            </Col>
+            <Col xs={24} md={6} style={{ textAlign: "center" }}>
+              <Typography.Title level={2}>APR</Typography.Title>
+            </Col>
+            <Col xs={24} md={6} style={{ textAlign: "center" }}>
+              <Typography.Title level={2}>Protocols</Typography.Title>
+            </Col>
+          </Row>
+      )}
       {vaults.map((vault) => (
         <VaultCard
           key={vault.symbol}
           hoverable={true}
           bordered={true}
-          withTitle={withTitle}
           vault={vault}
         />
       ))}
