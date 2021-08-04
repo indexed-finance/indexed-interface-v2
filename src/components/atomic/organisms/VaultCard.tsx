@@ -54,7 +54,7 @@ export function VaultCard({
         </Col>
         <Col xs={24} md={6} style={{ textAlign: "center" }}>
           <Typography.Title level={2} style={{ margin: 0 }}>
-            {tvl}
+            {tvl} {underlying.symbol}
           </Typography.Title>
         </Col>
         <Col xs={24} md={6} style={{ textAlign: "center" }}>
