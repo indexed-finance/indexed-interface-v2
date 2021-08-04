@@ -13,15 +13,11 @@ export interface FormattedVault extends NormalizedVault {
 export function useAllVaults(): FormattedVault[] {
   const vaults = useSelector(selectors.selectAllVaults);
   const underlyings = vaults.map(v => v.underlying.id);
-  console.log(underlyings)
   const prices = useSelector((state: AppState) => selectors.selectTokenPrices(state, underlyings))
   return useMemo(() => {
     return vaults.map((vault, i): FormattedVault => {
-      console.log(`Getting vault TVL`)
       const price = (prices as number[])[i] || 0;
-      console.log(`Price: ${price}`)
       const balance = convert.toBalanceNumber(vault.totalValue ?? '0', vault.decimals);
-      console.log(`balance: ${balance}`)
       return ({
         ...vault,
         underlyingPrice: price,
