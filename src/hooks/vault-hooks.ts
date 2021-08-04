@@ -38,15 +38,15 @@ export function useVaultAdapterAPRs(
   const vault = useVault(id);
   return (
     vault?.adapters.reduce(
-      (prev, next) => [
+      (prev, next, i) => [
         ...prev,
         {
           name: next.protocol.name,
           apr:
-            next.revenueAPRs?.reduce(
+            (next.revenueAPRs?.reduce(
               (t, n) => t + convert.toBalanceNumber(n),
               0
-            ) ?? 0,
+            ) ?? 0) * vault.weights[i] * (1 - vault.reserveRatio),
         },
       ],
       [] as { name: string; apr: number }[]
