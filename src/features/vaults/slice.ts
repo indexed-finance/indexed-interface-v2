@@ -10,7 +10,7 @@ import { fetchVaultsData } from "../requests";
 import { mirroredServerState, restartedDueToError } from "../actions";
 import type { AppState } from "../store";
 
-type NormalizedTokenAdapter = TokenAdapter & {
+export type NormalizedTokenAdapter = TokenAdapter & {
   revenueTokens?: string[];
   revenueAPRs?: string[];
 }
