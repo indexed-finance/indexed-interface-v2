@@ -6,6 +6,7 @@ import {
   Divider,
   Row,
   Space,
+  Tooltip,
   Typography,
 } from "antd";
 import { BigNumber, convert } from "helpers";
@@ -146,7 +147,9 @@ function VaultFormInner({ vault }: { vault: FormattedVault }) {
         <Alert
           showIcon={true}
           type="info"
-          message={`Performance Fee: ${convert.toPercent(performanceFee)}`}
+          message={<Tooltip title={`The Indexed DAO treasury receives a small percentage of the vault's profits.`}>
+            {`Performance Fee: ${convert.toPercent(performanceFee)}`}
+          </Tooltip>}
         />
         {(status === "approval needed" && mode === 'deposit') ? (
           <Button
