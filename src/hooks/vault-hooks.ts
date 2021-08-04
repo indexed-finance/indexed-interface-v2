@@ -1,4 +1,10 @@
-import { AppState, NormalizedTokenAdapter, NormalizedVault, VAULTS_CALLER, selectors } from "features";
+import {
+  AppState,
+  NormalizedTokenAdapter,
+  NormalizedVault,
+  VAULTS_CALLER,
+  selectors,
+} from "features";
 import { RegisteredCall, convert } from "helpers";
 import { useCallRegistrar } from "./use-call-registrar";
 import { useMemo } from "react";
@@ -12,19 +18,24 @@ export interface FormattedVault extends NormalizedVault {
 
 export function useAllVaults(): FormattedVault[] {
   const vaults = useSelector(selectors.selectAllVaults);
-  const underlyings = vaults.map(v => v.underlying.id);
-  const prices = useSelector((state: AppState) => selectors.selectTokenPrices(state, underlyings))
+  const underlyings = vaults.map((v) => v.underlying.id);
+  const prices = useSelector((state: AppState) =>
+    selectors.selectTokenPrices(state, underlyings)
+  );
   return useMemo(() => {
     return vaults.map((vault, i): FormattedVault => {
       const price = (prices as number[])[i] || 0;
-      const balance = convert.toBalanceNumber(vault.totalValue ?? '0', vault.decimals);
-      return ({
+      const balance = convert.toBalanceNumber(
+        vault.totalValue ?? "0",
+        vault.decimals
+      );
+      return {
         ...vault,
         underlyingPrice: price,
-        usdValue: convert.toComma(+(balance * price).toFixed(2))
-      })
-    })
-  }, [vaults, prices])
+        usdValue: convert.toComma(+(balance * price).toFixed(2)),
+      };
+    });
+  }, [vaults, prices]);
 }
 
 export function useVaultAPR(id: string) {
@@ -47,13 +58,10 @@ export function useVaultAdapterAPRs(
       apr = apr * weight * (1 - reserveRatio);
     }
     return { name, apr };
-  }
+  };
   return (
     vault?.adapters.reduce(
-      (prev, next, i) => [
-        ...prev,
-        getNameAndAPR(next, vault.weights[i]),
-      ],
+      (prev, next, i) => [...prev, getNameAndAPR(next, vault.weights[i])],
       [] as { name: string; apr: number }[]
     ) ?? []
   );
@@ -63,17 +71,20 @@ export function useVault(id: string): FormattedVault | null {
   const vault = useSelector((state: AppState) =>
     selectors.selectVault(state, id)
   );
-  const [prices, loading] = useTokenPrices(vault ? [vault.underlying.id] : [])
+  const [prices, loading] = useTokenPrices(vault ? [vault.underlying.id] : []);
   return useMemo(() => {
     if (loading || !vault) return vault;
     const price = (prices as number[])[0];
-    const balance = convert.toBalanceNumber(vault.totalValue ?? '0', vault.decimals);
+    const balance = convert.toBalanceNumber(
+      vault.totalValue ?? "0",
+      vault.decimals
+    );
     return {
       ...vault,
       underlyingPrice: price,
-      usdValue: convert.toComma(+(balance * price).toFixed(2))
-    }
-  }, [vault, prices, loading])
+      usdValue: convert.toComma(+(balance * price).toFixed(2)),
+    };
+  }, [vault, prices, loading]);
 }
 
 export function useVaultDeposit(id: string) {
@@ -110,7 +121,11 @@ export function useVaultTokens(id: string) {
   }
 }
 
-export function createVaultCalls(id: string, adapterIds: string[], underlying: string) {
+export function createVaultCalls(
+  id: string,
+  adapterIds: string[],
+  underlying: string
+) {
   const target = id;
   const interfaceKind = "NirnVault";
   const baseCalls: RegisteredCall[] = [
@@ -128,6 +143,16 @@ export function createVaultCalls(id: string, adapterIds: string[], underlying: s
       interfaceKind: "IERC20",
       target,
       function: "totalSupply",
+    },
+    {
+      interfaceKind,
+      target,
+      function: "getBalances",
+    },
+    {
+      interfaceKind,
+      target,
+      function: "reserveBalance",
     },
   ];
   const adapterCalls = adapterIds.reduce((prev, next) => {
