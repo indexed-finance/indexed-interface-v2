@@ -1,4 +1,4 @@
-import { Alert, Divider, Statistic, Typography } from "antd";
+import { Divider, Statistic, Typography } from "antd";
 import {
   IndexPoolWidgetGroup,
   Logo,
@@ -6,7 +6,6 @@ import {
   SplashSection,
   VaultGroup,
 } from "components/atomic";
-import { RiSafe2Line } from "react-icons/ri";
 import { selectors } from "features";
 import { useAllVaultsRegistrar, useBreakpoints } from "hooks";
 import { useHistory } from "react-router-dom";
@@ -19,7 +18,7 @@ export default function Splash() {
   );
   const history = useHistory();
   const { isMobile } = useBreakpoints();
-  useAllVaultsRegistrar()
+  useAllVaultsRegistrar();
 
   return (
     <Page hasPageHeader={false}>
@@ -75,7 +74,10 @@ export default function Splash() {
         actionText="Explore Vaults"
         infoText="How it works"
         onAction={() => history.push("/vaults")}
-        onInfo={() => (window.location.href = "https://docs.indexed.finance/introduction/faq/nirn-faq")}
+        onInfo={() =>
+          (window.location.href =
+            "https://docs.indexed.finance/introduction/faq/nirn-faq")
+        }
       >
         <VaultGroup withTitle={true} />
       </SplashSection>
@@ -88,7 +90,10 @@ export default function Splash() {
         actionText="Buy an index"
         infoText="Learn more"
         onAction={() => history.push("/index-pools")}
-        onInfo={() => (window.location.href = "https://docs.indexed.finance/introduction/faq/pool-faq")}
+        onInfo={() =>
+          (window.location.href =
+            "https://docs.indexed.finance/introduction/faq/pool-faq")
+        }
       >
         {poolsExist && <IndexPoolWidgetGroup />}
       </SplashSection>
@@ -101,25 +106,12 @@ export default function Splash() {
         actionText="Stake Now"
         infoText="Read up"
         onAction={() => history.push("/staking")}
-        onInfo={() => (window.location.href = "https://www.youtube.com/watch?v=gp7yh8Cr9iA")}
+        onInfo={() =>
+          (window.location.href = "https://www.youtube.com/watch?v=gp7yh8Cr9iA")
+        }
       >
         {null}
       </SplashSection>
     </Page>
-  );
-}
-
-//
-
-function VaultNotification() {
-  return (
-    <Alert
-      icon={<RiSafe2Line />}
-      showIcon={true}
-      type="success"
-      message="New: Vaults"
-      description="Lorem ipsum dolor sit amet."
-      style={{ marginBottom: 24 }}
-    />
   );
 }

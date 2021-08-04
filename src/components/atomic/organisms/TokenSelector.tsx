@@ -144,11 +144,14 @@ export function TokenSelector({
 
       const nextAmount = {
         displayed: newAmountNumber.toString(),
-        exact: convert.toToken(newAmountNumber.toString(), selectedToken?.decimals),
+        exact: convert.toToken(
+          newAmountNumber.toString(),
+          selectedToken?.decimals
+        ),
       };
 
       // if (!value.hasOwnProperty("amount")) {
-        setAmount(nextAmount);
+      setAmount(nextAmount);
       // }
 
       let error: string | undefined = undefined;
@@ -160,7 +163,15 @@ export function TokenSelector({
 
       triggerChange({ amount: nextAmount, error });
     },
-    [amount, triggerChange, value, balance, isInput, amountField, setTouched, selectedToken?.decimals]
+    [
+      amount,
+      triggerChange,
+      balance,
+      isInput,
+      amountField,
+      setTouched,
+      selectedToken?.decimals,
+    ]
   );
   const onTokenChange = useCallback(
     (newToken: string) => {
@@ -177,17 +188,14 @@ export function TokenSelector({
       input.current.focus();
     }
   }, []);
-  const handleMaxOut = useCallback(
-    () => {
-      const amt = balance
-      setAmount(amt)
-      triggerChange({
-        amount: amt,
-        error: undefined
-      });
-    },
-    [balance, triggerChange, setAmount]
-  );
+  const handleMaxOut = useCallback(() => {
+    const amt = balance;
+    setAmount(amt);
+    triggerChange({
+      amount: amt,
+      error: undefined,
+    });
+  }, [balance, triggerChange, setAmount]);
   const handleOpenTokenSelection = useCallback(() => {
     if (selectable) {
       setSelectingToken(true);
