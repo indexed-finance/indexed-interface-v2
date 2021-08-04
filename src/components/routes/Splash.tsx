@@ -75,7 +75,7 @@ export default function Splash() {
         actionText="Explore Vaults"
         infoText="How it works"
         onAction={() => history.push("/vaults")}
-        onInfo={() => (window.location.href = "https://docs.indexed.finance/")}
+        onInfo={() => (window.location.href = "https://docs.indexed.finance/introduction/faq/nirn-faq")}
       >
         <VaultGroup withTitle={true} />
       </SplashSection>
@@ -88,7 +88,7 @@ export default function Splash() {
         actionText="Buy an index"
         infoText="Learn more"
         onAction={() => history.push("/index-pools")}
-        onInfo={() => (window.location.href = "https://docs.indexed.finance/")}
+        onInfo={() => (window.location.href = "https://docs.indexed.finance/introduction/faq/pool-faq")}
       >
         {poolsExist && <IndexPoolWidgetGroup />}
       </SplashSection>
