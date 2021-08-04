@@ -16,6 +16,9 @@ export default function Vaults() {
           <Col xs={24} md={6} style={{ textAlign: "center" }}>
             <Typography.Title level={2}>APR</Typography.Title>
           </Col>
+          <Col xs={24} md={6} style={{ textAlign: "center" }}>
+            <Typography.Title level={2}>Protocols</Typography.Title>
+          </Col>
         </Row>
       )}
       <VaultGroup />

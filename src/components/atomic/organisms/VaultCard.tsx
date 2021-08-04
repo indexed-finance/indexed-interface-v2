@@ -21,7 +21,8 @@ export function VaultCard({
     id: vaultId,
     underlying,
     decimals,
-    totalValue
+    totalValue,
+    adapters,
   }
 }: Props) {
   const tvl = convert.toBalance(totalValue || '0', decimals, true, 4)
@@ -44,6 +45,9 @@ export function VaultCard({
           <Col xs={24} md={6} style={{ textAlign: "center" }}>
             <Typography.Title level={2}>APR</Typography.Title>
           </Col>
+          <Col xs={24} md={6} style={{ textAlign: "center" }}>
+            <Typography.Title level={2}>Protocols</Typography.Title>
+          </Col>
         </Row>
       )}
       <Row align="middle">
@@ -61,6 +65,13 @@ export function VaultCard({
           <Tooltip title="Annualized based on the current interest rate.">
             <Typography.Title level={3} style={{ margin: 0 }} type="success">
               {apr}%
+            </Typography.Title>
+          </Tooltip>
+        </Col>
+        <Col xs={24} md={6} style={{ textAlign: "center" }}>
+          <Tooltip title="Protocols in use by the vault.">
+            <Typography.Title level={3} style={{ margin: 0 }} type="success">
+              {adapters.map(a => a.protocol.name).join(', ')}
             </Typography.Title>
           </Tooltip>
         </Col>

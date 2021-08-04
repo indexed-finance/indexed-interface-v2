@@ -118,7 +118,7 @@ function VaultFormInner({ vault }: { vault: NormalizedVault }) {
               type={mode === "withdraw" ? "primary" : "default"}
               onClick={() => setMode("withdraw")}
             >
-              Redeem
+              Withdraw
             </Button>
           </Col>
         </Row>
@@ -165,7 +165,7 @@ function VaultFormInner({ vault }: { vault: NormalizedVault }) {
             style={{ fontSize: 30, height: 60 }}
             onClick={handleSubmit}
           >
-            {mode === "deposit" ? "Deposit" : "Redeem"}
+            {mode === "deposit" ? "Deposit" : "Withdraw"}
           </Button>
         )}
       </Space>
