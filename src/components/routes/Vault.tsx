@@ -160,7 +160,7 @@ function VaultFormInner({ vault }: { vault: NormalizedVault }) {
         ) : (
           <Button
             type="primary"
-            disabled={status === "unknown"}
+            disabled={status === "unknown" || amount.exact.eq(0)}
             block={true}
             style={{ fontSize: 30, height: 60 }}
             onClick={handleSubmit}
