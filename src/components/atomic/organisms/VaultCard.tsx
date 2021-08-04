@@ -1,4 +1,4 @@
-import { Card, Col, Row, Tooltip, Typography } from "antd";
+import { Card, Col, Row, Spin, Tooltip, Typography } from "antd";
 import { FormattedVault, useAllVaults, useVaultAPR } from "hooks";
 import { NirnProtocol } from "../atoms/NirnProtocol";
 import { Token } from "../atoms";
@@ -17,10 +17,12 @@ export function VaultCard({
   hoverable,
   bordered,
   withTitle,
-  vault: { id: vaultId, underlying, decimals, usdValue, adapters },
+  vault: { id: vaultId, underlying, usdValue, adapters },
 }: Props) {
   const apr = useVaultAPR(vaultId);
   const { push } = useHistory();
+  const isLoadingApr = apr === 0;
+  const isLoadingTvl = !usdValue || parseFloat(usdValue) === 0;
 
   return (
     <Card
@@ -64,15 +66,19 @@ export function VaultCard({
         </Col>
         <Col xs={24} md={6} style={{ textAlign: "center" }}>
           <Typography.Title level={2} style={{ margin: 0 }}>
-            ${usdValue}
+            {isLoadingTvl ? <Spin /> : `$${usdValue}`}
           </Typography.Title>
         </Col>
         <Col xs={24} md={6} style={{ textAlign: "center" }}>
-          <Tooltip title="Annualized based on the current interest rate.">
-            <Typography.Title level={3} style={{ margin: 0 }} type="success">
-              {apr}%
-            </Typography.Title>
-          </Tooltip>
+          {isLoadingApr ? (
+            <Spin />
+          ) : (
+            <Tooltip title="Annualized based on the current interest rate.">
+              <Typography.Title level={3} style={{ margin: 0 }} type="success">
+                {apr}%
+              </Typography.Title>
+            </Tooltip>
+          )}
         </Col>
         <Col xs={24} md={6} style={{ textAlign: "center" }}>
           <Tooltip title="Protocols in use by the vault.">
