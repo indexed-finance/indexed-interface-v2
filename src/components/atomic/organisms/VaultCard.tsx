@@ -1,9 +1,7 @@
 import { Card, Col, Row, Tooltip, Typography } from "antd";
 import { FormattedVault, useAllVaults, useVaultAPR } from "hooks";
 import { NirnProtocol } from "../atoms/NirnProtocol";
-import { NormalizedVault } from "features";
 import { Token } from "../atoms";
-import { convert } from "helpers";
 import { useHistory } from "react-router";
 
 type Props = {
@@ -27,7 +25,6 @@ export function VaultCard({
     adapters,
   }
 }: Props) {
-  // const tvl = convert.toBalance(totalValue || '0', decimals, true, 4)
   const apr = useVaultAPR(vaultId)
   const { push } = useHistory();
 

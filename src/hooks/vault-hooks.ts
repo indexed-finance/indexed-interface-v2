@@ -1,4 +1,4 @@
-import { AppState, NormalizedVault, VAULTS_CALLER, selectors } from "features";
+import { AppState, NormalizedTokenAdapter, NormalizedVault, VAULTS_CALLER, selectors } from "features";
 import { RegisteredCall, convert } from "helpers";
 import { useCallRegistrar } from "./use-call-registrar";
 import { useMemo } from "react";
@@ -36,18 +36,24 @@ export function useVaultAdapterAPRs(
   id: string
 ): { name: string; apr: number }[] {
   const vault = useVault(id);
+  const reserveRatio = vault?.reserveRatio ?? 0;
+  const getNameAndAPR = (adapter: NormalizedTokenAdapter, weight: number) => {
+    const name = adapter.protocol.name;
+    let apr = 0;
+    if (adapter.revenueAPRs) {
+      apr = adapter.revenueAPRs.reduce(
+        (t, n) => t + convert.toBalanceNumber(n),
+        0
+      );
+      apr = apr * weight * (1 - reserveRatio);
+    }
+    return { name, apr };
+  }
   return (
     vault?.adapters.reduce(
       (prev, next, i) => [
         ...prev,
-        {
-          name: next.protocol.name,
-          apr:
-            (next.revenueAPRs?.reduce(
-              (t, n) => t + convert.toBalanceNumber(n),
-              0
-            ) ?? 0) * vault.weights[i] * (1 - vault.reserveRatio),
-        },
+        getNameAndAPR(next, vault.weights[i]),
       ],
       [] as { name: string; apr: number }[]
     ) ?? []

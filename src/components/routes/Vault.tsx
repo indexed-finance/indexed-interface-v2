@@ -174,7 +174,12 @@ function VaultFormInner({ vault }: { vault: FormattedVault }) {
 }
 
 export function LoadedVault({ vault }: { vault: FormattedVault }) {
-  const chartData = useVaultAdapterAPRs(vault.id).map((a, i) => ({ ...a, value: vault.weights[i] * 100, weight: vault.weights[i] * 100, apr: a.apr * 100}))
+  const chartData = useVaultAdapterAPRs(vault.id).map((a, i) => ({
+    ...a,
+    value: vault.weights[i] * 100,
+    weight: vault.weights[i] * 100,
+    apr: +(a.apr * 100).toFixed(2)
+  }))
 
   useVaultRegistrar(vault.id);
 
