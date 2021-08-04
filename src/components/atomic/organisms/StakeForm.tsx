@@ -141,12 +141,10 @@ function StakeFormInner({
   }, [stakingPool]);
   const [estimatedReward, weight] = useMemo<[string, BigNumber]>(() => {
     const stakedAmount = convert.toBigNumber(staked ?? "0");
-    const addAmount = convert.toToken(
-      values.inputType === "stake"
-        ? values.amount.exact
-        : values.amount.exact.negated(),
-      18
-    );
+    const addAmount = values.inputType === "stake"
+      ? values.amount.exact
+      : values.amount.exact.negated()
+    
     const userNewStaked = stakedAmount.plus(addAmount);
 
     if (userNewStaked.isLessThan(0)) {
@@ -162,9 +160,7 @@ function StakeFormInner({
     return [convert.toComma(result.toNumber()), weight];
   }, [values.amount, stakingPool, staked, values.inputType, rewardsPerDay]);
   const handleSubmit = () => {
-    (values.inputType === "stake" ? onStake : onWithdraw)(
-      convert.toToken(values.amount.exact, token.decimals).toString()
-    );
+    (values.inputType === "stake" ? onStake : onWithdraw)(values.amount.exact.toString());
   };
   const balance = useTokenBalance(stakingPool.token);
   const { status, approve } = useTokenApproval({

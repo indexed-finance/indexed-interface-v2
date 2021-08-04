@@ -13,6 +13,8 @@ interface Props {
   isPair?: boolean;
   onlyImage?: boolean;
   symbolOverride?: string;
+  showName?: boolean;
+  showSymbol?: boolean;
 }
 
 export function Token({
@@ -24,6 +26,8 @@ export function Token({
   amount = "",
   onlyImage = false,
   symbolOverride = "",
+  showName = false,
+  showSymbol = true,
   ...rest
 }: Props) {
   const tokenImageSize = {
@@ -35,7 +39,7 @@ export function Token({
   const fontSize = size === "tiny" || size === "small" ? 16 : 24;
   const Component = asAvatar ? Avatar : "img";
   const isUniswap = symbol.startsWith("UNIV2:");
-  const isSushiswap = symbol.startsWith('SUSHI:');
+  const isSushiswap = symbol.startsWith("SUSHI:");
   const isOtherPairWithSlash = symbol.includes("/");
   const isOtherPairWithDash = symbol.includes("-");
 
@@ -130,7 +134,7 @@ export function Token({
 
       {symbol && !asAvatar && !onlyImage && (
         <Space size="small" style={{ fontSize }}>
-          {symbolOverride || symbol}
+          {showSymbol && (symbolOverride || symbol)} {showName && name}
         </Space>
       )}
     </Space>

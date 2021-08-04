@@ -100,7 +100,7 @@ export function TokenSelector({
 
     if (rawBalance && selectedToken) {
       return {
-        displayed: convert.toBalance(rawBalance),
+        displayed: convert.toBalance(rawBalance, selectedToken?.decimals),
         exact: convert.toBigNumber(rawBalance),
       };
     }
@@ -110,6 +110,7 @@ export function TokenSelector({
       exact: convert.toBigNumber("0"),
     };
   }, [rawBalance, selectedToken, balanceOverride]);
+
   const triggerChange = useCallback(
     (changedValue: TokenSelectorValue) => {
       if (onChange) {
@@ -126,28 +127,29 @@ export function TokenSelector({
   const haveInsufficientBalance = useMemo(
     () =>
       isInput &&
-      balance.exact.isLessThan(convert.toToken(value.amount?.exact ?? "0")),
+      balance.exact.isLessThan(convert.toBigNumber(value.amount?.exact ?? "0")),
     [isInput, value.amount, balance]
   );
   const onAmountChange = useCallback(
     (newAmountNumber: number) => {
-      if (newAmountNumber == null || amount.exact.isLessThan(0)) {
+      if (newAmountNumber == null || amount?.exact?.isLessThan(0)) {
         triggerChange({
           amount: DEFAULT_ENTRY,
         });
         setAmount(DEFAULT_ENTRY);
         setTouched({ [amountField]: true });
+
         return;
       }
 
       const nextAmount = {
         displayed: newAmountNumber.toString(),
-        exact: convert.toBigNumber(newAmountNumber.toString()),
+        exact: convert.toToken(newAmountNumber.toString(), selectedToken?.decimals),
       };
 
-      if (!value.hasOwnProperty("amount")) {
+      // if (!value.hasOwnProperty("amount")) {
         setAmount(nextAmount);
-      }
+      // }
 
       let error: string | undefined = undefined;
       if (isInput && nextAmount.exact.isGreaterThan(0)) {
@@ -158,7 +160,7 @@ export function TokenSelector({
 
       triggerChange({ amount: nextAmount, error });
     },
-    [amount, triggerChange, value, balance, isInput, amountField, setTouched]
+    [amount, triggerChange, value, balance, isInput, amountField, setTouched, selectedToken?.decimals]
   );
   const onTokenChange = useCallback(
     (newToken: string) => {
@@ -176,8 +178,15 @@ export function TokenSelector({
     }
   }, []);
   const handleMaxOut = useCallback(
-    () => onAmountChange(parseFloat(balance.displayed ?? "0.00")),
-    [onAmountChange, balance]
+    () => {
+      const amt = balance
+      setAmount(amt)
+      triggerChange({
+        amount: amt,
+        error: undefined
+      });
+    },
+    [balance, triggerChange, setAmount]
   );
   const handleOpenTokenSelection = useCallback(() => {
     if (selectable) {
@@ -233,7 +242,7 @@ export function TokenSelector({
               balanceLabel={balanceLabel}
               error={haveInsufficientBalance ? "Insufficient balance" : error}
               showBalance={showBalance}
-              balance={balanceOverride ?? balance}
+              balance={balance}
               onClickMax={isInput ? handleMaxOut : undefined}
             />
             <InputNumber

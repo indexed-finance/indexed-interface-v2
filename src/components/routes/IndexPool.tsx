@@ -26,54 +26,60 @@ export function LoadedIndexPool(
   usePoolDetailRegistrar(props.id, tokenIds);
 
   return (
-    <div style={{ paddingTop: 12 }}>
-      {props.interaction && (
-        <div
-          style={{
-            borderLeft: "2px solid #38EE7A",
-            paddingLeft: 24,
-            marginBottom: 24,
+    <>
+      <div style={{ paddingTop: 12 }}>
+        {props.interaction && (
+          <Row gutter={12}>
+            <Col span={8}>
+              <div
+                style={{
+                  borderLeft: "2px solid #38EE7A",
+                  paddingLeft: 24,
+                  marginBottom: 24,
+                }}
+              >
+                {props.interaction}
+              </div>
+            </Col>
+          </Row>
+        )}
+        <Row
+          align="stretch"
+          gutter={{
+            xs: 12,
+            sm: 24,
           }}
         >
-          {props.interaction}
-        </div>
-      )}
-      <Row
-        align="stretch"
-        gutter={{
-          xs: 12,
-          sm: 24,
-        }}
-      >
-        <Col xs={24} md={8}>
-          <Space
-            size="large"
-            direction="vertical"
-            style={{ marginBottom: isMobile ? 24 : 0, display: "flex" }}
-          >
-            <IndexPoolDescription {...props} />
-            <IndexPoolExternalLinks {...props} />
-          </Space>
-        </Col>
-        <Col xs={24} md={16}>
-          <IndexPoolChart poolId={props.id} />
-        </Col>
-      </Row>
-      <Divider />
-      <Row
-        gutter={{
-          xs: 12,
-          sm: 24,
-        }}
-      >
-        <Col xs={24} md={10}>
-          <IndexPoolAssets {...props} />
-        </Col>
-        <Col xs={24} md={14}>
-          <IndexPoolRecentTrades {...props} />
-        </Col>
-      </Row>
-    </div>
+          <Col xs={24} md={8}>
+            <Space
+              size="large"
+              direction="vertical"
+              style={{ marginBottom: isMobile ? 24 : 0, display: "flex" }}
+            >
+              <IndexPoolDescription {...props} />
+              <IndexPoolExternalLinks {...props} />
+            </Space>
+          </Col>
+          <Col xs={24} md={16}>
+            <IndexPoolChart poolId={props.id} />
+          </Col>
+        </Row>
+        <Divider />
+        <Row
+          gutter={{
+            xs: 12,
+            sm: 24,
+          }}
+        >
+          <Col xs={24} md={10}>
+            <IndexPoolAssets {...props} />
+          </Col>
+          <Col xs={24} md={14}>
+            <IndexPoolRecentTrades {...props} />
+          </Col>
+        </Row>
+      </div>
+    </>
   );
 }
 

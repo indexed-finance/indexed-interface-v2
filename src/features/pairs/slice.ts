@@ -86,7 +86,6 @@ const slice = createSlice({
             adapter.addOne(state, pair);
           }
         }
-        // return action.payload.pairs
       })
       .addCase(restartedDueToError, () => adapter.getInitialState()),
 });

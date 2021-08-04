@@ -22,7 +22,6 @@
 
 .fancy {
   text-transform: uppercase !important;
-  letter-spacing: 0.1ch !important;
   font-weight: bold;
 }
 
@@ -54,7 +53,7 @@
 }
 
 .with-background {
-  background-image: url("../images/bg.svg");
+  background-image: url("../images/background.png");
   background-size: cover;
 }
 
@@ -117,6 +116,23 @@
 // -- Ant Overrides
 @font-family: "Main";
 
+.prominent-stat {
+  .ant-statistic-title {
+    font-size: 28px !important;
+
+    @media screen and (max-width: 580px) {
+      font-size: 14px !important;
+    }
+  }
+  .ant-statistic-content-value {
+    font-size: 36px !important;
+
+    @media screen and (max-width: 580px) {
+      font-size: px !important;
+    }
+  }
+}
+
 .ant-page-header {
   border: none !important;
 }
@@ -157,6 +173,12 @@
 
 .ant-progress-circle .ant-progress-text {
   font-size: 12px;
+}
+
+.large-progress {
+  .ant-progress-circle .ant-progress-text {
+    font-size: 28px !important;
+  }
 }
 
 .ant-menu-submenu-title {

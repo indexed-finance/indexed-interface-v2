@@ -5,6 +5,7 @@ import * as stakingRequests from "./staking/requests";
 import * as tokensRequests from "./tokens/requests";
 import { MIN_WEIGHT } from "ethereum";
 import { NDX_ADDRESS, WETH_CONTRACT_ADDRESS } from "config";
+import { NirnSubgraphClient } from "@indexed-finance/subgraph-clients";
 import { convert, dedupe } from "helpers";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { ethers } from "ethers";
@@ -294,6 +295,33 @@ export const fetchInitialData = createAsyncThunk(
     }
   }
 );
+export const fetchVaultsData = createAsyncThunk(
+  "vaults/fetch",
+  async ({
+    provider,
+  }: {
+    provider:
+      | ethers.providers.Web3Provider
+      | ethers.providers.JsonRpcProvider
+      | ethers.providers.InfuraProvider;
+  }) => {
+    const { chainId } = provider.network;
+
+    const name = chainId === 1 ? "mainnet" : "rinkeby";
+    const client = NirnSubgraphClient.forNetwork(name);
+
+    try {
+      const vaults = await client.getAllVaults();
+
+      return vaults;
+    } catch (error) {
+      console.error({ error });
+
+      return null;
+    }
+  }
+);
+
 
 export const requests = {
   ...batcherRequests,
@@ -302,4 +330,5 @@ export const requests = {
   ...newStakingRequests,
   ...tokensRequests,
   fetchInitialData,
+  fetchVaultsData
 };

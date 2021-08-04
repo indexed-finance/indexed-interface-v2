@@ -34,6 +34,7 @@ import { formatDistance } from "date-fns";
 import { newStakingSelectors } from "./newStaking";
 import { settingsSelectors } from "./settings";
 import { sortTokens } from "@indexed-finance/indexed.js/dist/utils/address";
+import { vaultsSelectors } from "./vaults";
 import S from "string";
 import type { AppState } from "./store";
 
@@ -51,6 +52,7 @@ export const selectors = {
   ...userSelectors,
   ...pairsSelectors,
   ...transactionsSelectors,
+  ...vaultsSelectors,
   ...masterChefSelectors,
   // Categories
   selectFormattedCategory: (
@@ -483,6 +485,13 @@ export const selectors = {
       } as FormattedNewStakingDetail
     );
   },
+  selectStakingForSplash(state: AppState) {
+    const basic = selectors.selectFormattedStaking(state);
+    const uniswap = selectors.selectNewFormattedStaking(state);
+    const sushi = selectors.selectMasterChefFormattedStaking(state);
+
+    console.log({ basic, uniswap, sushi });
+  },
   // User
   selectFormattedPortfolio(
     state: AppState,
@@ -586,6 +595,49 @@ export const selectors = {
 
     return formattedPairs;
   },
+  // Vaults
+  // selectFormattedVault(state: AppState, id: string): FormattedVault | null {
+  //   const vault = selectors.selectVault(state, id);
+
+  //   if (vault) {
+  //     const { adapters, weights } = vault;
+
+  //     return {
+  //       id: vault.id,
+  //       symbol: vault.symbol,
+  //       name: vault.name,
+  //       totalValueLocked: vault.totalValueLocked,
+  //       annualPercentageRate: convert.toPercent(vault.netAPR),
+  //       percentageOfVaultAssets: "100.0%",
+  //       amountOfTokensInProtocol: "42,069",
+  //       adapters: adapters.map((adapter, i) => {
+  //         const percentAsFraction = weights[i];
+  //         const percentAsNumber = convert
+  //           .toBigNumber(percentAsFraction)
+  //           .dividedBy(convert.toBigNumber("1e18"))
+  //           .times(100)
+  //           .toNumber();
+
+  //         return {
+  //           id: adapter.id,
+  //           wrapper: adapter.token,
+  //           underlying: adapter.underlying,
+  //           protocol: adapter.protocolID,
+  //           annualPercentageRate: convert.toPercent(adapter.apr),
+  //           percentage: percentAsNumber,
+  //         };
+  //       }),
+  //     };
+  //   } else {
+  //     return null;
+  //   }
+  // },
+  // selectAllFormattedVaults(state: AppState): FormattedVault[] {
+  //   return selectors
+  //     .selectAllVaults(state)
+  //     .map((vault) => selectors.selectFormattedVault(state, vault.id))
+  //     .filter((each): each is FormattedVault => Boolean(each));
+  // },
   // Misc
   selectStakingTokenPrices(state: AppState, pairs: Pair[]) {
     const indexPools = selectors.selectAllStakingPools(state);

@@ -4,7 +4,7 @@ import { TransactionExtra, transactionsActions } from "./transactions";
 import { TransactionResponse } from "@ethersproject/abstract-provider";
 import { batcherActions } from "./batcher";
 import { categoriesActions } from "./categories";
-import { fetchInitialData } from "./requests";
+import { fetchInitialData, fetchVaultsData } from "./requests";
 import { fetchMasterChefData, masterChefActions } from "./masterChef";
 import { fetchNewStakingData } from "./newStaking";
 import { fetchStakingData, stakingActions } from "./staking";
@@ -15,6 +15,7 @@ import { providers } from "ethers";
 import { settingsActions } from "./settings";
 import { tokensActions } from "./tokens";
 import { userActions } from "./user";
+import { vaultsActions } from "./vaults";
 import type { AppThunk } from "./store";
 
 // #region Provider
@@ -103,6 +104,7 @@ export const thunks = {
         })
       );
       dispatch(fetchMasterChefData({ provider }));
+      dispatch(fetchVaultsData({ provider }));
 
       if (selectedAddress) {
         dispatch(actions.userAddressSelected(selectedAddress));
@@ -142,6 +144,7 @@ export const actions = {
   ...tokensActions,
   ...transactionsActions,
   ...userActions,
+  ...vaultsActions,
   ...topLevelActions,
   ...masterChefActions,
   ...thunks,

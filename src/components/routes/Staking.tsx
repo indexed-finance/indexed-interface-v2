@@ -120,16 +120,16 @@ export default function Stake() {
           title={
             <Row gutter={24}>
               <Col xs={24} sm={6}>
-                Asset
+                <Typography.Title level={2}>Asset</Typography.Title>
               </Col>
               <Col xs={24} sm={5}>
-                Rewards
+                <Typography.Title level={2}>Rewards</Typography.Title>
               </Col>
               <Col xs={24} sm={6}>
-                Total Staked
+                <Typography.Title level={2}>Total Staked</Typography.Title>
               </Col>
               <Col xs={24} sm={4} style={{ textAlign: "right" }}>
-                APY
+                <Typography.Title level={2}>APY</Typography.Title>
               </Col>
             </Row>
           }

@@ -150,9 +150,7 @@ function SingleInteractionInner({
           tokenId: tokenIn.id,
           symbol: values.fromToken.toLowerCase(),
           approveAmount: values.fromAmount.displayed,
-          rawApproveAmount: convert
-            .toToken(values.fromAmount.displayed, tokenIn.decimals)
-            .toString(10),
+          rawApproveAmount: values.fromAmount.exact.toString(10)
         };
       }
     }
@@ -470,9 +468,7 @@ function MultiInteractionInner({
           tokenId: tokenIn.id,
           symbol: values.fromToken.toLowerCase(),
           approveAmount: values.fromAmount.displayed,
-          rawApproveAmount: convert
-            .toToken(values.fromAmount.displayed, tokenIn.decimals)
-            .toString(10),
+          rawApproveAmount: values.fromAmount.exact.toString(10)
         };
       }
     }

@@ -5,7 +5,7 @@ import {
   createSlice,
 } from "@reduxjs/toolkit";
 import { createMulticallDataParser } from "helpers";
-import { fetchInitialData } from "../requests"; // Circular dependency.
+import { fetchInitialData, fetchVaultsData } from "../requests"; // Circular dependency.
 import { fetchMulticallData } from "../batcher/requests";
 import { fetchTokenPriceData } from "./requests";
 import { mirroredServerState, restartedDueToError } from "../actions";
@@ -15,6 +15,13 @@ import type { NormalizedToken } from "./types";
 export const tokensAdapter = createEntityAdapter<NormalizedToken>({
   selectId: (entry) => entry.id.toLowerCase(),
 });
+
+type TokenLike = {
+  id: string;
+  symbol: string;
+  name: string;
+  decimals: number;
+};
 
 const slice = createSlice({
   name: "tokens",
@@ -69,6 +76,24 @@ const slice = createSlice({
           }
 
           tokensAdapter.upsertMany(state, fullTokens);
+        }
+      })
+      .addCase(fetchVaultsData.fulfilled, (state, action) => {
+        if (action.payload) {
+          const vaults = action.payload;
+          const tokenLike: TokenLike[] = [
+            ...vaults,
+            ...(vaults.reduce((arr, v) => ([
+              ...arr,
+              ...v.adapters.map(a => a.underlying),
+              ...v.adapters.map(a => a.wrapper),
+            ]), [] as TokenLike[]))
+          ].map(({ id, name, symbol, decimals }) => ({ id, name, symbol, decimals }));
+          for (const token of tokenLike) {
+            if (!state.entities[token.id.toLowerCase()]) {
+              state.entities[token.id.toLowerCase()] = token
+            }
+          }
         }
       })
       .addCase(fetchTokenPriceData.fulfilled, (state, action) => {

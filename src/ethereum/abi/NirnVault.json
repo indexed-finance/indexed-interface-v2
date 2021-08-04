@@ -37,6 +37,25 @@
       {
         "indexed": false,
         "internalType": "uint256",
+        "name": "shares",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "underlying",
+        "type": "uint256"
+      }
+    ],
+    "name": "Deposit",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
         "name": "underlyingAmount",
         "type": "uint256"
       },
@@ -67,6 +86,19 @@
       }
     ],
     "name": "SetFeeRecipient",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "maxBalance",
+        "type": "uint256"
+      }
+    ],
+    "name": "SetMaximumUnderlying",
     "type": "event"
   },
   {
@@ -109,6 +141,25 @@
     "type": "event"
   },
   {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "shares",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "underlying",
+        "type": "uint256"
+      }
+    ],
+    "name": "Withdrawal",
+    "type": "event"
+  },
+  {
     "inputs": [],
     "name": "balance",
     "outputs": [
@@ -116,6 +167,82 @@
         "internalType": "uint256",
         "name": "sum",
         "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "canChangeCompositionAfter",
+    "outputs": [
+      {
+        "internalType": "uint96",
+        "name": "",
+        "type": "uint96"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "currentDistribution",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "contract IErc20Adapter[]",
+            "name": "adapters",
+            "type": "address[]"
+          },
+          {
+            "internalType": "uint256[]",
+            "name": "weights",
+            "type": "uint256[]"
+          },
+          {
+            "internalType": "uint256[]",
+            "name": "balances",
+            "type": "uint256[]"
+          },
+          {
+            "internalType": "int256[]",
+            "name": "liquidityDeltas",
+            "type": "int256[]"
+          },
+          {
+            "internalType": "uint256",
+            "name": "netAPR",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct INirnVault.DistributionParameters",
+        "name": "params",
+        "type": "tuple"
+      },
+      {
+        "internalType": "uint256",
+        "name": "totalProductiveBalance",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_reserveBalance",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "decimals",
+    "outputs": [
+      {
+        "internalType": "uint8",
+        "name": "",
+        "type": "uint8"
       }
     ],
     "stateMutability": "view",
@@ -205,19 +332,6 @@
   },
   {
     "inputs": [],
-    "name": "getAPRs",
-    "outputs": [
-      {
-        "internalType": "uint256[]",
-        "name": "aprs",
-        "type": "uint256[]"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
     "name": "getAdaptersAndWeights",
     "outputs": [
       {
@@ -250,92 +364,6 @@
   {
     "inputs": [],
     "name": "getCurrentLiquidityDeltas",
-    "outputs": [
-      {
-        "internalType": "int256[]",
-        "name": "liquidityDeltas",
-        "type": "int256[]"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "contract IErc20Adapter[]",
-        "name": "proposedAdapters",
-        "type": "address[]"
-      },
-      {
-        "internalType": "uint256[]",
-        "name": "proposedWeights",
-        "type": "uint256[]"
-      }
-    ],
-    "name": "getHypotheticalAPR",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256[]",
-        "name": "proposedWeights",
-        "type": "uint256[]"
-      }
-    ],
-    "name": "getHypotheticalAPR",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "contract IErc20Adapter[]",
-        "name": "proposedAdapters",
-        "type": "address[]"
-      },
-      {
-        "internalType": "uint256[]",
-        "name": "proposedWeights",
-        "type": "uint256[]"
-      }
-    ],
-    "name": "getHypotheticalLiquidityDeltas",
-    "outputs": [
-      {
-        "internalType": "int256[]",
-        "name": "liquidityDeltas",
-        "type": "int256[]"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256[]",
-        "name": "proposedWeights",
-        "type": "uint256[]"
-      }
-    ],
-    "name": "getHypotheticalLiquidityDeltas",
     "outputs": [
       {
         "internalType": "int256[]",
@@ -389,6 +417,34 @@
     "inputs": [
       {
         "internalType": "address",
+        "name": "_underlying",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_rewardsSeller",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_feeRecipient",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_owner",
+        "type": "address"
+      }
+    ],
+    "name": "initialize",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
         "name": "",
         "type": "address"
       }
@@ -406,7 +462,33 @@
   },
   {
     "inputs": [],
+    "name": "maximumUnderlying",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "minimumAPRImprovement",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "minimumCompositionChangeDelay",
     "outputs": [
       {
         "internalType": "uint256",
@@ -580,6 +662,19 @@
   {
     "inputs": [
       {
+        "internalType": "uint256",
+        "name": "_maximumUnderlying",
+        "type": "uint256"
+      }
+    ],
+    "name": "setMaximumUnderlying",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "uint64",
         "name": "_performanceFee",
         "type": "uint64"
@@ -655,6 +750,25 @@
       {
         "internalType": "uint256",
         "name": "owed",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "withdrawUnderlying",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "shares",
         "type": "uint256"
       }
     ],

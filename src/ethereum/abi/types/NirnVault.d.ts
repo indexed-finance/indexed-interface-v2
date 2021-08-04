@@ -22,22 +22,25 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 interface NirnVaultInterface extends ethers.utils.Interface {
   functions: {
     "balance()": FunctionFragment;
+    "canChangeCompositionAfter()": FunctionFragment;
+    "currentDistribution()": FunctionFragment;
+    "decimals()": FunctionFragment;
     "deposit(uint256)": FunctionFragment;
     "depositTo(uint256,address)": FunctionFragment;
     "eoaSafeCaller()": FunctionFragment;
     "feeRecipient()": FunctionFragment;
     "getAPR()": FunctionFragment;
-    "getAPRs()": FunctionFragment;
     "getAdaptersAndWeights()": FunctionFragment;
     "getBalances()": FunctionFragment;
     "getCurrentLiquidityDeltas()": FunctionFragment;
-    "getHypotheticalAPR(address[],uint256[])": FunctionFragment;
-    "getHypotheticalLiquidityDeltas(address[],uint256[])": FunctionFragment;
     "getPendingFees()": FunctionFragment;
     "getPricePerFullShare()": FunctionFragment;
     "getPricePerFullShareWithFee()": FunctionFragment;
+    "initialize(address,address,address,address)": FunctionFragment;
     "lockedTokens(address)": FunctionFragment;
+    "maximumUnderlying()": FunctionFragment;
     "minimumAPRImprovement()": FunctionFragment;
+    "minimumCompositionChangeDelay()": FunctionFragment;
     "name()": FunctionFragment;
     "performanceFee()": FunctionFragment;
     "priceAtLastFee()": FunctionFragment;
@@ -50,15 +53,26 @@ interface NirnVaultInterface extends ethers.utils.Interface {
     "rewardsSeller()": FunctionFragment;
     "sellRewards(address,bytes)": FunctionFragment;
     "setFeeRecipient(address)": FunctionFragment;
+    "setMaximumUnderlying(uint256)": FunctionFragment;
     "setPerformanceFee(uint64)": FunctionFragment;
     "setReserveRatio(uint64)": FunctionFragment;
     "setRewardsSeller(address)": FunctionFragment;
     "symbol()": FunctionFragment;
     "underlying()": FunctionFragment;
     "withdraw(uint256)": FunctionFragment;
+    "withdrawUnderlying(uint256)": FunctionFragment;
   };
 
   encodeFunctionData(functionFragment: "balance", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "canChangeCompositionAfter",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "currentDistribution",
+    values?: undefined
+  ): string;
+  encodeFunctionData(functionFragment: "decimals", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "deposit",
     values: [BigNumberish]
@@ -76,7 +90,6 @@ interface NirnVaultInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(functionFragment: "getAPR", values?: undefined): string;
-  encodeFunctionData(functionFragment: "getAPRs", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "getAdaptersAndWeights",
     values?: undefined
@@ -88,14 +101,6 @@ interface NirnVaultInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "getCurrentLiquidityDeltas",
     values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getHypotheticalAPR",
-    values: [string[], BigNumberish[]]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getHypotheticalLiquidityDeltas",
-    values: [string[], BigNumberish[]]
   ): string;
   encodeFunctionData(
     functionFragment: "getPendingFees",
@@ -110,11 +115,23 @@ interface NirnVaultInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
+    functionFragment: "initialize",
+    values: [string, string, string, string]
+  ): string;
+  encodeFunctionData(
     functionFragment: "lockedTokens",
     values: [string]
   ): string;
   encodeFunctionData(
+    functionFragment: "maximumUnderlying",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "minimumAPRImprovement",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "minimumCompositionChangeDelay",
     values?: undefined
   ): string;
   encodeFunctionData(functionFragment: "name", values?: undefined): string;
@@ -157,6 +174,10 @@ interface NirnVaultInterface extends ethers.utils.Interface {
     values: [string]
   ): string;
   encodeFunctionData(
+    functionFragment: "setMaximumUnderlying",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
     functionFragment: "setPerformanceFee",
     values: [BigNumberish]
   ): string;
@@ -177,8 +198,21 @@ interface NirnVaultInterface extends ethers.utils.Interface {
     functionFragment: "withdraw",
     values: [BigNumberish]
   ): string;
+  encodeFunctionData(
+    functionFragment: "withdrawUnderlying",
+    values: [BigNumberish]
+  ): string;
 
   decodeFunctionResult(functionFragment: "balance", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "canChangeCompositionAfter",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "currentDistribution",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "decimals", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "deposit", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "depositTo", data: BytesLike): Result;
   decodeFunctionResult(
@@ -190,7 +224,6 @@ interface NirnVaultInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "getAPR", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "getAPRs", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "getAdaptersAndWeights",
     data: BytesLike
@@ -201,14 +234,6 @@ interface NirnVaultInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "getCurrentLiquidityDeltas",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "getHypotheticalAPR",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "getHypotheticalLiquidityDeltas",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -223,12 +248,21 @@ interface NirnVaultInterface extends ethers.utils.Interface {
     functionFragment: "getPricePerFullShareWithFee",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "lockedTokens",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "maximumUnderlying",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "minimumAPRImprovement",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "minimumCompositionChangeDelay",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
@@ -271,6 +305,10 @@ interface NirnVaultInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "setMaximumUnderlying",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "setPerformanceFee",
     data: BytesLike
   ): Result;
@@ -285,26 +323,36 @@ interface NirnVaultInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "symbol", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "underlying", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "withdraw", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "withdrawUnderlying",
+    data: BytesLike
+  ): Result;
 
   events: {
     "AdapterRemoved(address)": EventFragment;
     "AllocationsUpdated(address[],uint256[])": EventFragment;
+    "Deposit(uint256,uint256)": EventFragment;
     "FeesClaimed(uint256,uint256)": EventFragment;
     "Rebalanced()": EventFragment;
     "SetFeeRecipient(address)": EventFragment;
+    "SetMaximumUnderlying(uint256)": EventFragment;
     "SetPerformanceFee(uint256)": EventFragment;
     "SetReserveRatio(uint256)": EventFragment;
     "SetRewardsSeller(address)": EventFragment;
+    "Withdrawal(uint256,uint256)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "AdapterRemoved"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "AllocationsUpdated"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "Deposit"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "FeesClaimed"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Rebalanced"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "SetFeeRecipient"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "SetMaximumUnderlying"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "SetPerformanceFee"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "SetReserveRatio"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "SetRewardsSeller"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "Withdrawal"): EventFragment;
 }
 
 export class NirnVault extends BaseContract {
@@ -355,6 +403,36 @@ export class NirnVault extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[BigNumber] & { sum: BigNumber }>;
 
+    canChangeCompositionAfter(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    currentDistribution(
+      overrides?: CallOverrides
+    ): Promise<
+      [
+        [string[], BigNumber[], BigNumber[], BigNumber[], BigNumber] & {
+          adapters: string[];
+          weights: BigNumber[];
+          balances: BigNumber[];
+          liquidityDeltas: BigNumber[];
+          netAPR: BigNumber;
+        },
+        BigNumber,
+        BigNumber
+      ] & {
+        params: [string[], BigNumber[], BigNumber[], BigNumber[], BigNumber] & {
+          adapters: string[];
+          weights: BigNumber[];
+          balances: BigNumber[];
+          liquidityDeltas: BigNumber[];
+          netAPR: BigNumber;
+        };
+        totalProductiveBalance: BigNumber;
+        _reserveBalance: BigNumber;
+      }
+    >;
+
+    decimals(overrides?: CallOverrides): Promise<[number]>;
+
     deposit(
       amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -372,10 +450,6 @@ export class NirnVault extends BaseContract {
 
     getAPR(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    getAPRs(
-      overrides?: CallOverrides
-    ): Promise<[BigNumber[]] & { aprs: BigNumber[] }>;
-
     getAdaptersAndWeights(
       overrides?: CallOverrides
     ): Promise<
@@ -390,28 +464,6 @@ export class NirnVault extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[BigNumber[]] & { liquidityDeltas: BigNumber[] }>;
 
-    "getHypotheticalAPR(address[],uint256[])"(
-      proposedAdapters: string[],
-      proposedWeights: BigNumberish[],
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
-
-    "getHypotheticalAPR(uint256[])"(
-      proposedWeights: BigNumberish[],
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
-
-    "getHypotheticalLiquidityDeltas(address[],uint256[])"(
-      proposedAdapters: string[],
-      proposedWeights: BigNumberish[],
-      overrides?: CallOverrides
-    ): Promise<[BigNumber[]] & { liquidityDeltas: BigNumber[] }>;
-
-    "getHypotheticalLiquidityDeltas(uint256[])"(
-      proposedWeights: BigNumberish[],
-      overrides?: CallOverrides
-    ): Promise<[BigNumber[]] & { liquidityDeltas: BigNumber[] }>;
-
     getPendingFees(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     getPricePerFullShare(overrides?: CallOverrides): Promise<[BigNumber]>;
@@ -420,9 +472,23 @@ export class NirnVault extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
+    initialize(
+      _underlying: string,
+      _rewardsSeller: string,
+      _feeRecipient: string,
+      _owner: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     lockedTokens(arg0: string, overrides?: CallOverrides): Promise<[boolean]>;
 
+    maximumUnderlying(overrides?: CallOverrides): Promise<[BigNumber]>;
+
     minimumAPRImprovement(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    minimumCompositionChangeDelay(
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
 
     name(overrides?: CallOverrides): Promise<[string]>;
 
@@ -464,6 +530,11 @@ export class NirnVault extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    setMaximumUnderlying(
+      _maximumUnderlying: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     setPerformanceFee(
       _performanceFee: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -487,9 +558,44 @@ export class NirnVault extends BaseContract {
       shares: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
+
+    withdrawUnderlying(
+      amount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
   };
 
   balance(overrides?: CallOverrides): Promise<BigNumber>;
+
+  canChangeCompositionAfter(overrides?: CallOverrides): Promise<BigNumber>;
+
+  currentDistribution(
+    overrides?: CallOverrides
+  ): Promise<
+    [
+      [string[], BigNumber[], BigNumber[], BigNumber[], BigNumber] & {
+        adapters: string[];
+        weights: BigNumber[];
+        balances: BigNumber[];
+        liquidityDeltas: BigNumber[];
+        netAPR: BigNumber;
+      },
+      BigNumber,
+      BigNumber
+    ] & {
+      params: [string[], BigNumber[], BigNumber[], BigNumber[], BigNumber] & {
+        adapters: string[];
+        weights: BigNumber[];
+        balances: BigNumber[];
+        liquidityDeltas: BigNumber[];
+        netAPR: BigNumber;
+      };
+      totalProductiveBalance: BigNumber;
+      _reserveBalance: BigNumber;
+    }
+  >;
+
+  decimals(overrides?: CallOverrides): Promise<number>;
 
   deposit(
     amount: BigNumberish,
@@ -508,8 +614,6 @@ export class NirnVault extends BaseContract {
 
   getAPR(overrides?: CallOverrides): Promise<BigNumber>;
 
-  getAPRs(overrides?: CallOverrides): Promise<BigNumber[]>;
-
   getAdaptersAndWeights(
     overrides?: CallOverrides
   ): Promise<
@@ -520,37 +624,27 @@ export class NirnVault extends BaseContract {
 
   getCurrentLiquidityDeltas(overrides?: CallOverrides): Promise<BigNumber[]>;
 
-  "getHypotheticalAPR(address[],uint256[])"(
-    proposedAdapters: string[],
-    proposedWeights: BigNumberish[],
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
-
-  "getHypotheticalAPR(uint256[])"(
-    proposedWeights: BigNumberish[],
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
-
-  "getHypotheticalLiquidityDeltas(address[],uint256[])"(
-    proposedAdapters: string[],
-    proposedWeights: BigNumberish[],
-    overrides?: CallOverrides
-  ): Promise<BigNumber[]>;
-
-  "getHypotheticalLiquidityDeltas(uint256[])"(
-    proposedWeights: BigNumberish[],
-    overrides?: CallOverrides
-  ): Promise<BigNumber[]>;
-
   getPendingFees(overrides?: CallOverrides): Promise<BigNumber>;
 
   getPricePerFullShare(overrides?: CallOverrides): Promise<BigNumber>;
 
   getPricePerFullShareWithFee(overrides?: CallOverrides): Promise<BigNumber>;
 
+  initialize(
+    _underlying: string,
+    _rewardsSeller: string,
+    _feeRecipient: string,
+    _owner: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   lockedTokens(arg0: string, overrides?: CallOverrides): Promise<boolean>;
 
+  maximumUnderlying(overrides?: CallOverrides): Promise<BigNumber>;
+
   minimumAPRImprovement(overrides?: CallOverrides): Promise<BigNumber>;
+
+  minimumCompositionChangeDelay(overrides?: CallOverrides): Promise<BigNumber>;
 
   name(overrides?: CallOverrides): Promise<string>;
 
@@ -592,6 +686,11 @@ export class NirnVault extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  setMaximumUnderlying(
+    _maximumUnderlying: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   setPerformanceFee(
     _performanceFee: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -616,8 +715,43 @@ export class NirnVault extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  withdrawUnderlying(
+    amount: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   callStatic: {
     balance(overrides?: CallOverrides): Promise<BigNumber>;
+
+    canChangeCompositionAfter(overrides?: CallOverrides): Promise<BigNumber>;
+
+    currentDistribution(
+      overrides?: CallOverrides
+    ): Promise<
+      [
+        [string[], BigNumber[], BigNumber[], BigNumber[], BigNumber] & {
+          adapters: string[];
+          weights: BigNumber[];
+          balances: BigNumber[];
+          liquidityDeltas: BigNumber[];
+          netAPR: BigNumber;
+        },
+        BigNumber,
+        BigNumber
+      ] & {
+        params: [string[], BigNumber[], BigNumber[], BigNumber[], BigNumber] & {
+          adapters: string[];
+          weights: BigNumber[];
+          balances: BigNumber[];
+          liquidityDeltas: BigNumber[];
+          netAPR: BigNumber;
+        };
+        totalProductiveBalance: BigNumber;
+        _reserveBalance: BigNumber;
+      }
+    >;
+
+    decimals(overrides?: CallOverrides): Promise<number>;
 
     deposit(
       amount: BigNumberish,
@@ -636,8 +770,6 @@ export class NirnVault extends BaseContract {
 
     getAPR(overrides?: CallOverrides): Promise<BigNumber>;
 
-    getAPRs(overrides?: CallOverrides): Promise<BigNumber[]>;
-
     getAdaptersAndWeights(
       overrides?: CallOverrides
     ): Promise<
@@ -648,37 +780,29 @@ export class NirnVault extends BaseContract {
 
     getCurrentLiquidityDeltas(overrides?: CallOverrides): Promise<BigNumber[]>;
 
-    "getHypotheticalAPR(address[],uint256[])"(
-      proposedAdapters: string[],
-      proposedWeights: BigNumberish[],
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    "getHypotheticalAPR(uint256[])"(
-      proposedWeights: BigNumberish[],
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    "getHypotheticalLiquidityDeltas(address[],uint256[])"(
-      proposedAdapters: string[],
-      proposedWeights: BigNumberish[],
-      overrides?: CallOverrides
-    ): Promise<BigNumber[]>;
-
-    "getHypotheticalLiquidityDeltas(uint256[])"(
-      proposedWeights: BigNumberish[],
-      overrides?: CallOverrides
-    ): Promise<BigNumber[]>;
-
     getPendingFees(overrides?: CallOverrides): Promise<BigNumber>;
 
     getPricePerFullShare(overrides?: CallOverrides): Promise<BigNumber>;
 
     getPricePerFullShareWithFee(overrides?: CallOverrides): Promise<BigNumber>;
 
+    initialize(
+      _underlying: string,
+      _rewardsSeller: string,
+      _feeRecipient: string,
+      _owner: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
     lockedTokens(arg0: string, overrides?: CallOverrides): Promise<boolean>;
 
+    maximumUnderlying(overrides?: CallOverrides): Promise<BigNumber>;
+
     minimumAPRImprovement(overrides?: CallOverrides): Promise<BigNumber>;
+
+    minimumCompositionChangeDelay(
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     name(overrides?: CallOverrides): Promise<string>;
 
@@ -718,6 +842,11 @@ export class NirnVault extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
+    setMaximumUnderlying(
+      _maximumUnderlying: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
     setPerformanceFee(
       _performanceFee: BigNumberish,
       overrides?: CallOverrides
@@ -741,6 +870,11 @@ export class NirnVault extends BaseContract {
       shares: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    withdrawUnderlying(
+      amount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
   };
 
   filters: {
@@ -754,6 +888,14 @@ export class NirnVault extends BaseContract {
     ): TypedEventFilter<
       [string[], BigNumber[]],
       { adapters: string[]; weights: BigNumber[] }
+    >;
+
+    Deposit(
+      shares?: null,
+      underlying?: null
+    ): TypedEventFilter<
+      [BigNumber, BigNumber],
+      { shares: BigNumber; underlying: BigNumber }
     >;
 
     FeesClaimed(
@@ -770,6 +912,10 @@ export class NirnVault extends BaseContract {
       feeRecipient?: null
     ): TypedEventFilter<[string], { feeRecipient: string }>;
 
+    SetMaximumUnderlying(
+      maxBalance?: null
+    ): TypedEventFilter<[BigNumber], { maxBalance: BigNumber }>;
+
     SetPerformanceFee(
       performanceFee?: null
     ): TypedEventFilter<[BigNumber], { performanceFee: BigNumber }>;
@@ -781,10 +927,24 @@ export class NirnVault extends BaseContract {
     SetRewardsSeller(
       rewardsSeller?: null
     ): TypedEventFilter<[string], { rewardsSeller: string }>;
+
+    Withdrawal(
+      shares?: null,
+      underlying?: null
+    ): TypedEventFilter<
+      [BigNumber, BigNumber],
+      { shares: BigNumber; underlying: BigNumber }
+    >;
   };
 
   estimateGas: {
     balance(overrides?: CallOverrides): Promise<BigNumber>;
+
+    canChangeCompositionAfter(overrides?: CallOverrides): Promise<BigNumber>;
+
+    currentDistribution(overrides?: CallOverrides): Promise<BigNumber>;
+
+    decimals(overrides?: CallOverrides): Promise<BigNumber>;
 
     deposit(
       amount: BigNumberish,
@@ -803,35 +963,11 @@ export class NirnVault extends BaseContract {
 
     getAPR(overrides?: CallOverrides): Promise<BigNumber>;
 
-    getAPRs(overrides?: CallOverrides): Promise<BigNumber>;
-
     getAdaptersAndWeights(overrides?: CallOverrides): Promise<BigNumber>;
 
     getBalances(overrides?: CallOverrides): Promise<BigNumber>;
 
     getCurrentLiquidityDeltas(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "getHypotheticalAPR(address[],uint256[])"(
-      proposedAdapters: string[],
-      proposedWeights: BigNumberish[],
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    "getHypotheticalAPR(uint256[])"(
-      proposedWeights: BigNumberish[],
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    "getHypotheticalLiquidityDeltas(address[],uint256[])"(
-      proposedAdapters: string[],
-      proposedWeights: BigNumberish[],
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    "getHypotheticalLiquidityDeltas(uint256[])"(
-      proposedWeights: BigNumberish[],
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
 
     getPendingFees(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -839,9 +975,23 @@ export class NirnVault extends BaseContract {
 
     getPricePerFullShareWithFee(overrides?: CallOverrides): Promise<BigNumber>;
 
+    initialize(
+      _underlying: string,
+      _rewardsSeller: string,
+      _feeRecipient: string,
+      _owner: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     lockedTokens(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
+    maximumUnderlying(overrides?: CallOverrides): Promise<BigNumber>;
+
     minimumAPRImprovement(overrides?: CallOverrides): Promise<BigNumber>;
+
+    minimumCompositionChangeDelay(
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     name(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -883,6 +1033,11 @@ export class NirnVault extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    setMaximumUnderlying(
+      _maximumUnderlying: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     setPerformanceFee(
       _performanceFee: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -906,10 +1061,25 @@ export class NirnVault extends BaseContract {
       shares: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
+
+    withdrawUnderlying(
+      amount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
   };
 
   populateTransaction: {
     balance(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    canChangeCompositionAfter(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    currentDistribution(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    decimals(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     deposit(
       amount: BigNumberish,
@@ -928,8 +1098,6 @@ export class NirnVault extends BaseContract {
 
     getAPR(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    getAPRs(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
     getAdaptersAndWeights(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
@@ -937,28 +1105,6 @@ export class NirnVault extends BaseContract {
     getBalances(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     getCurrentLiquidityDeltas(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "getHypotheticalAPR(address[],uint256[])"(
-      proposedAdapters: string[],
-      proposedWeights: BigNumberish[],
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "getHypotheticalAPR(uint256[])"(
-      proposedWeights: BigNumberish[],
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "getHypotheticalLiquidityDeltas(address[],uint256[])"(
-      proposedAdapters: string[],
-      proposedWeights: BigNumberish[],
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "getHypotheticalLiquidityDeltas(uint256[])"(
-      proposedWeights: BigNumberish[],
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -972,12 +1118,26 @@ export class NirnVault extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    initialize(
+      _underlying: string,
+      _rewardsSeller: string,
+      _feeRecipient: string,
+      _owner: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
     lockedTokens(
       arg0: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    maximumUnderlying(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     minimumAPRImprovement(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    minimumCompositionChangeDelay(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -1021,6 +1181,11 @@ export class NirnVault extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
+    setMaximumUnderlying(
+      _maximumUnderlying: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
     setPerformanceFee(
       _performanceFee: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -1042,6 +1207,11 @@ export class NirnVault extends BaseContract {
 
     withdraw(
       shares: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    withdrawUnderlying(
+      amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
   };

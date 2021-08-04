@@ -210,7 +210,6 @@ function UniswapBurnInteraction({ indexPool }: Props) {
         toAmount,
         lastTouchedField,
       } = values;
-
       if (!toToken || !fromToken) {
         return;
       }

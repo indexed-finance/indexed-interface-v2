@@ -1,91 +1,125 @@
-import { Button, Divider, Statistic, Typography } from "antd";
-import { ExternalLink, IndexPoolWidgetGroup, Page } from "components/atomic";
-import { Link } from "react-router-dom";
+import { Alert, Divider, Statistic, Typography } from "antd";
+import {
+  IndexPoolWidgetGroup,
+  Logo,
+  Page,
+  SplashSection,
+  VaultGroup,
+} from "components/atomic";
+import { RiSafe2Line } from "react-icons/ri";
 import { selectors } from "features";
-import { useBreakpoints, useTranslator } from "hooks";
+import { useAllVaultsRegistrar, useBreakpoints } from "hooks";
+import { useHistory } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 export default function Splash() {
-  const tx = useTranslator();
   const poolsExist = useSelector(selectors.selectPoolCount) > 0;
   const assetsUnderManagement = useSelector(
     selectors.selectTotalAssetsUnderManagement
   );
+  const history = useHistory();
   const { isMobile } = useBreakpoints();
+  useAllVaultsRegistrar()
 
   return (
     <Page hasPageHeader={false}>
+      {/* <VaultNotification /> */}
       <div
         style={{
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
+          paddingTop: 12,
+          background: `url(${
+            require("images/header_splash_background.png").default
+          })`,
         }}
       >
-        <div style={{ textAlign: "center", maxWidth: 1000, marginBottom: 48 }}>
-          <Typography.Title style={{ fontSize: isMobile ? 36 : 64 }}>
-            {tx("DECENTRALIZED_INDEX_PROTOCOL")}
-          </Typography.Title>
-          <Typography.Title level={3}>
-            {/* GAIN_EXPOSURE_TO */}
+        <div
+          style={{
+            textAlign: "center",
+            maxWidth: isMobile ? 300 : 1000,
+          }}
+        >
+          <Logo size="large" />
+          <Typography.Title level={3} style={{ marginTop: 12 }}>
             Gain exposure to passively-managed crypto index portfolios
             represented by a single token.
           </Typography.Title>
-          {assetsUnderManagement !== "$0.00" && (
-            <Statistic
-              className="prominent-stat"
-              title="Total Protocol Assets Under Management "
-              value={assetsUnderManagement}
-              style={{ fontSize: 48 }}
-            />
-          )}
-          <Typography.Title level={3}>
-            <div>
-              {/* DIVE_IN_TODAY */}
-              <Divider className="fancy">Dive in today</Divider>
-              <Button.Group
-                style={{ flexDirection: isMobile ? "column" : "row" }}
-              >
-                <Link to="/index-pools">
-                  <Button
-                    className="plus"
-                    type="primary"
-                    style={{
-                      textTransform: "uppercase",
-                      fontSize: isMobile ? 16 : 24,
-                      width: isMobile ? 160 : "auto",
-                      height: "auto",
-                      marginRight: isMobile ? 0 : 10,
-                      marginBottom: isMobile ? 10 : 0,
-                    }}
-                  >
-                    {/* BUY_AN_INDEX */}
-                    Buy an index
-                  </Button>
-                </Link>
-                <ExternalLink
-                  to="https://docs.indexed.finance/"
-                  withIcon={false}
-                >
-                  <Button
-                    type="default"
-                    style={{
-                      fontSize: isMobile ? 16 : 24,
-                      width: isMobile ? 160 : "auto",
-                      height: "auto",
-                      textTransform: "uppercase",
-                    }}
-                  >
-                    {/* LEARN_MORE */}
-                    Learn more
-                  </Button>
-                </ExternalLink>
-              </Button.Group>
-            </div>
-          </Typography.Title>
+          <Divider>
+            {assetsUnderManagement !== "$0.00" && (
+              <Statistic
+                className="prominent-stat"
+                title={
+                  isMobile ? (
+                    <>
+                      Total Protocol Assets <br /> Under Management
+                    </>
+                  ) : (
+                    "Total Protocol Assets Under Management"
+                  )
+                }
+                value={assetsUnderManagement}
+                style={{ marginRight: 12, marginLeft: 12 }}
+              />
+            )}
+          </Divider>
         </div>
       </div>
-      {poolsExist && <IndexPoolWidgetGroup />}
+      <Divider />
+      <SplashSection
+        banner={require("images/vaults_banner.png").default}
+        title="VAULTS"
+        description="Lend out your assets via Indexed Earn and receive the guaranteed best interest rates across the major lending protocols in DeFi. Low-fee and no-maintenance: let our non-custodial vaults do the work of allocating your funds for maximum impact."
+        catchphrase="Earn interest on your assets"
+        actionText="Explore Vaults"
+        infoText="How it works"
+        onAction={() => history.push("/vaults")}
+        onInfo={() => (window.location.href = "https://docs.indexed.finance/introduction/faq/nirn-faq")}
+      >
+        <VaultGroup withTitle={true} />
+      </SplashSection>
+      <Divider />
+      <SplashSection
+        banner={require("images/indexpools_banner.png").default}
+        title="INDEX POOLS"
+        description="Gain exposure to a passively-managed, zero management fee crypto index portfolio with a single token. Indexed products offer a hassle-free, battle-tested way of investing in both DeFi and niche market sectors such as oracles or the metaverse."
+        catchphrase="Invest in DeFi markets"
+        actionText="Buy an index"
+        infoText="Learn more"
+        onAction={() => history.push("/index-pools")}
+        onInfo={() => (window.location.href = "https://docs.indexed.finance/introduction/faq/pool-faq")}
+      >
+        {poolsExist && <IndexPoolWidgetGroup />}
+      </SplashSection>
+      <Divider />
+      <SplashSection
+        banner={require("images/staking_banner.png").default}
+        title="STAKING"
+        description="Provide liquidity for our index products on major decentralised exchanges and earn our protocol governance token as a reward! Select index products are also eligible for rewards by staking them single-sided. No fees, no lock-up periods."
+        catchphrase="Supply liquidity and earn NDX"
+        actionText="Stake Now"
+        infoText="Read up"
+        onAction={() => history.push("/staking")}
+        onInfo={() => (window.location.href = "https://www.youtube.com/watch?v=gp7yh8Cr9iA")}
+      >
+        {null}
+      </SplashSection>
     </Page>
+  );
+}
+
+//
+
+function VaultNotification() {
+  return (
+    <Alert
+      icon={<RiSafe2Line />}
+      showIcon={true}
+      type="success"
+      message="New: Vaults"
+      description="Lorem ipsum dolor sit amet."
+      style={{ marginBottom: 24 }}
+    />
   );
 }
