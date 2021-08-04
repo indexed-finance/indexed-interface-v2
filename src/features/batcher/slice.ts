@@ -192,36 +192,38 @@ const slice = createSlice({
             "tokens/fetchPriceData/fulfilled",
           ].includes(action.type),
         (state, action) => {
-          const potentialArgs = Object.keys(action.payload).join("_");
-          const callLookup = {
-            "staking/fetch/fulfilled": "fetchStakingData",
-            "indexPools/fetch/fulfilled": `fetchIndexPools/${potentialArgs}`,
-            "indexPools/fetchUpdates/fulfilled": `fetchIndexPoolUpdates/${potentialArgs}`,
-            "indexPools/fetchTransactions/fulfilled": `fetchIndexPoolTransactions/${potentialArgs}`,
-            "batcher/multicall/fulfilled": "fetchMulticallData",
-            "tokens/fetchPriceData/fulfilled": `getTokenPriceData/${potentialArgs}`,
-            "newStaking/fetch/fulfilled": "fetchNewStakingData",
-          };
-          const call = callLookup[action.type as keyof typeof callLookup];
-
-          if (action.type === fetchMulticallData.fulfilled.type) {
-            const { callsToResults } = action.payload as {
-              callsToResults: Record<string, string[]>;
+          if (action.payload) {
+            const potentialArgs = Object.keys(action.payload).join("_");
+            const callLookup = {
+              "staking/fetch/fulfilled": "fetchStakingData",
+              "indexPools/fetch/fulfilled": `fetchIndexPools/${potentialArgs}`,
+              "indexPools/fetchUpdates/fulfilled": `fetchIndexPoolUpdates/${potentialArgs}`,
+              "indexPools/fetchTransactions/fulfilled": `fetchIndexPoolTransactions/${potentialArgs}`,
+              "batcher/multicall/fulfilled": "fetchMulticallData",
+              "tokens/fetchPriceData/fulfilled": `getTokenPriceData/${potentialArgs}`,
+              "newStaking/fetch/fulfilled": "fetchNewStakingData",
             };
+            const call = callLookup[action.type as keyof typeof callLookup];
 
-            for (const [key, value] of Object.entries(callsToResults)) {
-              state.cache[key] = {
-                result: value,
+            if (action.type === fetchMulticallData.fulfilled.type) {
+              const { callsToResults } = action.payload as {
+                callsToResults: Record<string, string[]>;
+              };
+
+              for (const [key, value] of Object.entries(callsToResults)) {
+                state.cache[key] = {
+                  result: value,
+                  fromBlockNumber: state.blockNumber,
+                };
+                state.fetching[key] = false;
+              }
+            } else {
+              state.cache[call] = {
+                result: action.payload as any,
                 fromBlockNumber: state.blockNumber,
               };
-              state.fetching[key] = false;
+              state.fetching[call] = false;
             }
-          } else {
-            state.cache[call] = {
-              result: action.payload as any,
-              fromBlockNumber: state.blockNumber,
-            };
-            state.fetching[call] = false;
           }
         }
       ),
