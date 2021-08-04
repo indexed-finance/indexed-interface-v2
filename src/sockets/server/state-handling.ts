@@ -6,8 +6,9 @@ import {
   createPoolDetailCalls,
   createStakingCalls,
   createTotalSuppliesCalls,
+  createVaultCalls,
 } from "hooks";
-import { actions, fetchVaultsData, selectors, store } from "features";
+import { actions, fetchVaultsData, selectors, store, VAULTS_CALLER } from "features";
 import { createMasterChefCalls } from "hooks/masterchef-hooks";
 import { createNewStakingCalls } from "hooks/new-staking-hooks";
 import { log } from "./helpers";
@@ -45,6 +46,7 @@ function setSubscription() {
         ...registerNewPools(),
         ...registerNewTokensAndPairs(),
         ...registerNewStakingPools(),
+        ...registerNewVaults()
       ].filter((c) => c.offChainCalls.length > 0 || c.onChainCalls.length > 0);
       if (allCalls.length > 0) {
         dispatch(actions.callsRegistered(allCalls));
@@ -81,6 +83,24 @@ export async function setupStateHandling() {
       provider
     })
   )
+}
+
+function registerNewVaults() {
+  const state = getState();
+  const vaults = selectors.selectAllVaults(state);
+  const caller = VAULTS_CALLER;
+  const { vaultCalls } = vaults.reduce((prev, next) => {
+    const { onChainCalls } = createVaultCalls(next.id, next.adapters.map(a => a.id));
+    prev.vaultCalls.onChainCalls.push(...onChainCalls)
+    return prev;
+  }, {
+    vaultCalls: {
+      caller,
+      onChainCalls: [] as RegisteredCall[],
+      offChainCalls: [],
+    }
+  })
+  return [vaultCalls]
 }
 
 const BLOCKS_PER_DAY = 86400 / 13.5;
