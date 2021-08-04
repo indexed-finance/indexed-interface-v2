@@ -8,7 +8,7 @@ import {
 } from "components/atomic";
 import { RiSafe2Line } from "react-icons/ri";
 import { selectors } from "features";
-import { useBreakpoints } from "hooks";
+import { useAllVaultsRegistrar, useBreakpoints } from "hooks";
 import { useHistory } from "react-router-dom";
 import { useSelector } from "react-redux";
 
@@ -19,6 +19,7 @@ export default function Splash() {
   );
   const history = useHistory();
   const { isMobile } = useBreakpoints();
+  useAllVaultsRegistrar()
 
   return (
     <Page hasPageHeader={false}>
