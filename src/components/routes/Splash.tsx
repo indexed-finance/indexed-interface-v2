@@ -101,7 +101,7 @@ export default function Splash() {
         actionText="Stake Now"
         infoText="Read up"
         onAction={() => history.push("/staking")}
-        onInfo={() => (window.location.href = "https://docs.indexed.finance/")}
+        onInfo={() => (window.location.href = "https://www.youtube.com/watch?v=gp7yh8Cr9iA")}
       >
         {null}
       </SplashSection>
