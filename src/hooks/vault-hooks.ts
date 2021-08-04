@@ -1,13 +1,31 @@
-import { AppState, VAULTS_CALLER, selectors } from "features";
+import { AppState, NormalizedVault, VAULTS_CALLER, selectors } from "features";
 import { RegisteredCall, convert } from "helpers";
 import { useCallRegistrar } from "./use-call-registrar";
 import { useMemo } from "react";
 import { useSelector } from "react-redux";
+import { useTokenPrices } from "./token-hooks";
 
-export function useAllVaults() {
+export interface FormattedVault extends NormalizedVault {
+  underlyingPrice?: number;
+  usdValue?: string;
+}
+
+export function useAllVaults(): FormattedVault[] {
   const vaults = useSelector(selectors.selectAllVaults);
-
-  return vaults;
+  const underlyings = vaults.map(v => v.underlying.id);
+  const [prices, loading] = useTokenPrices(underlyings)
+  return useMemo(() => {
+    if (loading) return vaults;
+    return vaults.map((vault, i): FormattedVault => {
+      const price = (prices as number[])[i];
+      const balance = convert.toBalanceNumber(vault.totalValue ?? '0', vault.decimals);
+      return ({
+        ...vault,
+        underlyingPrice: price,
+        usdValue: convert.toComma(+(balance * price).toFixed(2))
+      })
+    })
+  }, [vaults, prices, loading])
 }
 
 export function useVaultAPR(id: string) {
@@ -36,12 +54,21 @@ export function useVaultAdapterAPRs(
   );
 }
 
-export function useVault(id: string) {
+export function useVault(id: string): FormattedVault | null {
   const vault = useSelector((state: AppState) =>
     selectors.selectVault(state, id)
   );
-
-  return vault;
+  const [prices, loading] = useTokenPrices(vault ? [vault.underlying.id] : [])
+  return useMemo(() => {
+    if (loading || !vault) return vault;
+    const price = (prices as number[])[0];
+    const balance = convert.toBalanceNumber(vault.totalValue ?? '0', vault.decimals);
+    return {
+      ...vault,
+      underlyingPrice: price,
+      usdValue: convert.toComma(+(balance * price).toFixed(2))
+    }
+  }, [vault, prices, loading])
 }
 
 export function useVaultDeposit(id: string) {

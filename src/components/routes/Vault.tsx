@@ -9,14 +9,8 @@ import {
   Typography,
 } from "antd";
 import { BigNumber, convert } from "helpers";
-import { Formik } from "formik";
 import {
-  Page,
-  TokenSelector,
-  VaultAdapterPieChart,
-  VaultCard,
-} from "components/atomic";
-import {
+  FormattedVault,
   useBalanceAndApprovalRegistrar,
   useNirnTransactionCallbacks,
   useTokenApproval,
@@ -25,13 +19,19 @@ import {
   useVaultAdapterAPRs,
   useVaultRegistrar,
 } from "hooks";
+import { Formik } from "formik";
+import {
+  Page,
+  TokenSelector,
+  VaultAdapterPieChart,
+  VaultCard,
+} from "components/atomic";
 import { useCallback, useMemo, useState } from "react";
 import { useParams } from "react-router";
-import type { NormalizedVault } from "features";
 
 type TokenAmount = { exact: BigNumber; displayed: string };
 
-function VaultFormInner({ vault }: { vault: NormalizedVault }) {
+function VaultFormInner({ vault }: { vault: FormattedVault }) {
   const { underlying, performanceFee } = vault;
   const balances = useTokenBalances([underlying.id, vault.id])
   const {
@@ -173,7 +173,7 @@ function VaultFormInner({ vault }: { vault: NormalizedVault }) {
   );
 }
 
-export function LoadedVault({ vault }: { vault: NormalizedVault }) {
+export function LoadedVault({ vault }: { vault: FormattedVault }) {
   const chartData = useVaultAdapterAPRs(vault.id).map((a, i) => ({ ...a, value: vault.weights[i] * 100, weight: vault.weights[i] * 100, apr: a.apr * 100}))
 
   useVaultRegistrar(vault.id);

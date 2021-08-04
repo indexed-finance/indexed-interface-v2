@@ -1,7 +1,8 @@
 import { Card, Col, Row, Tooltip, Typography } from "antd";
+import { FormattedVault, useAllVaults, useVaultAPR } from "hooks";
 import { NormalizedVault } from "features";
+import { Token } from "../atoms";
 import { convert } from "helpers";
-import { useAllVaults, useVaultAPR } from "hooks";
 import { useHistory } from "react-router";
 
 type Props = {
@@ -9,7 +10,7 @@ type Props = {
   hoverable?: boolean
   bordered?: boolean
   withTitle?: boolean
-  vault: NormalizedVault
+  vault: FormattedVault
 }
 
 export function VaultCard({
@@ -21,11 +22,11 @@ export function VaultCard({
     id: vaultId,
     underlying,
     decimals,
-    totalValue,
+    usdValue,
     adapters,
   }
 }: Props) {
-  const tvl = convert.toBalance(totalValue || '0', decimals, true, 4)
+  // const tvl = convert.toBalance(totalValue || '0', decimals, true, 4)
   const apr = useVaultAPR(vaultId)
   const { push } = useHistory();
 
@@ -40,7 +41,7 @@ export function VaultCard({
         <Row>
           <Col xs={24} md={6} style={{ textAlign: "left" }}></Col>
           <Col xs={24} md={6} style={{ textAlign: "center" }}>
-            <Typography.Title level={2}>{underlying.symbol} Locked</Typography.Title>
+            <Typography.Title level={2}>TVL</Typography.Title>
           </Col>
           <Col xs={24} md={6} style={{ textAlign: "center" }}>
             <Typography.Title level={2}>APR</Typography.Title>
@@ -53,12 +54,17 @@ export function VaultCard({
       <Row align="middle">
         <Col xs={24} md={6}>
           <Typography.Title level={2} style={{ margin: 0 }}>
-            {underlying.name}
+            <Token
+              name={underlying.name}
+              address={underlying.id}
+              symbol={underlying.symbol}
+              size="small"
+            />
           </Typography.Title>
         </Col>
         <Col xs={24} md={6} style={{ textAlign: "center" }}>
           <Typography.Title level={2} style={{ margin: 0 }}>
-            {tvl} {underlying.symbol}
+            ${usdValue}
           </Typography.Title>
         </Col>
         <Col xs={24} md={6} style={{ textAlign: "center" }}>
@@ -87,7 +93,7 @@ export function VaultGroup({ withTitle = false }: { withTitle?: boolean }) {
     <>
       {vaults.map((vault) => (
         <VaultCard
-          key={vault.name}
+          key={vault.symbol}
           hoverable={true}
           bordered={true}
           withTitle={withTitle}

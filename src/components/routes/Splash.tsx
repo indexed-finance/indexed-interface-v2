@@ -23,7 +23,7 @@ export default function Splash() {
 
   return (
     <Page hasPageHeader={false}>
-      <VaultNotification />
+      {/* <VaultNotification /> */}
       <div
         style={{
           display: "flex",
