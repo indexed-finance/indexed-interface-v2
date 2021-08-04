@@ -79,6 +79,7 @@ const slice = createSlice({
         }
       })
       .addCase(fetchVaultsData.fulfilled, (state, action) => {
+        const newTokens: NormalizedToken[] = [];
         if (action.payload) {
           const vaults = action.payload;
           const tokenLike: TokenLike[] = [
@@ -91,9 +92,10 @@ const slice = createSlice({
           ].map(({ id, name, symbol, decimals }) => ({ id, name, symbol, decimals }));
           for (const token of tokenLike) {
             if (!state.entities[token.id.toLowerCase()]) {
-              state.entities[token.id.toLowerCase()] = token
+              newTokens.push(token)
             }
           }
+          tokensAdapter.upsertMany(state, newTokens)
         }
       })
       .addCase(fetchTokenPriceData.fulfilled, (state, action) => {
