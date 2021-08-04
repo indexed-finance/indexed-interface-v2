@@ -13,19 +13,22 @@ export interface FormattedVault extends NormalizedVault {
 export function useAllVaults(): FormattedVault[] {
   const vaults = useSelector(selectors.selectAllVaults);
   const underlyings = vaults.map(v => v.underlying.id);
-  const [prices, loading] = useTokenPrices(underlyings)
+  console.log(underlyings)
+  const prices = useSelector((state: AppState) => selectors.selectTokenPrices(state, underlyings))
   return useMemo(() => {
-    if (loading) return vaults;
     return vaults.map((vault, i): FormattedVault => {
-      const price = (prices as number[])[i];
+      console.log(`Getting vault TVL`)
+      const price = (prices as number[])[i] || 0;
+      console.log(`Price: ${price}`)
       const balance = convert.toBalanceNumber(vault.totalValue ?? '0', vault.decimals);
+      console.log(`balance: ${balance}`)
       return ({
         ...vault,
         underlyingPrice: price,
         usdValue: convert.toComma(+(balance * price).toFixed(2))
       })
     })
-  }, [vaults, prices, loading])
+  }, [vaults, prices])
 }
 
 export function useVaultAPR(id: string) {
@@ -111,7 +114,7 @@ export function useVaultTokens(id: string) {
   }
 }
 
-export function createVaultCalls(id: string, adapterIds: string[]) {
+export function createVaultCalls(id: string, adapterIds: string[], underlying: string) {
   const target = id;
   const interfaceKind = "NirnVault";
   const baseCalls: RegisteredCall[] = [
@@ -146,7 +149,14 @@ export function createVaultCalls(id: string, adapterIds: string[]) {
   // TheGraph calls go here as off-chain calls.
   return {
     onChainCalls: [...baseCalls, ...adapterCalls],
-    offChainCalls: [],
+    offChainCalls: [
+      {
+        target: "",
+        function: "fetchTokenPriceData",
+        args: [underlying],
+        canBeMerged: true,
+      },
+    ],
   };
 }
 
@@ -158,7 +168,8 @@ export function useVaultRegistrar(id: string) {
       id
         ? createVaultCalls(
             id,
-            vault!.adapters.map((each) => each.id)
+            vault!.adapters.map((each) => each.id),
+            vault?.underlying.id ?? ""
           )
         : {
             onChainCalls: [],
@@ -183,7 +194,8 @@ export function useAllVaultsRegistrar() {
         (prev, next) => {
           const { onChainCalls, offChainCalls } = createVaultCalls(
             next.id,
-            next.adapters.map((a) => a.id)
+            next.adapters.map((a) => a.id),
+            next.underlying.id ?? ""
           );
           prev.onChainCalls.push(...onChainCalls);
           prev.offChainCalls.push(...offChainCalls);

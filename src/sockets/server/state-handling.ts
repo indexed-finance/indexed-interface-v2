@@ -8,7 +8,7 @@ import {
   createTotalSuppliesCalls,
   createVaultCalls,
 } from "hooks";
-import { actions, fetchVaultsData, selectors, store, VAULTS_CALLER } from "features";
+import { VAULTS_CALLER, actions, fetchVaultsData, selectors, store } from "features";
 import { createMasterChefCalls } from "hooks/masterchef-hooks";
 import { createNewStakingCalls } from "hooks/new-staking-hooks";
 import { log } from "./helpers";
@@ -39,8 +39,9 @@ function setSubscription() {
     const indexPools = selectors.selectAllPools(state);
     const stakingPools = selectors.selectAllStakingPools(state);
     const tokens = selectors.selectAllTokens(state);
+    const vaults = selectors.selectAllVaults(state)
 
-    if (indexPools.length > 0 && tokens.length > 0 && stakingPools.length > 0) {
+    if (indexPools.length > 0 && tokens.length > 0 && stakingPools.length > 0 && vaults.length > 0) {
       unsubscribe();
       const allCalls = [
         ...registerNewPools(),
@@ -90,14 +91,15 @@ function registerNewVaults() {
   const vaults = selectors.selectAllVaults(state);
   const caller = VAULTS_CALLER;
   const { vaultCalls } = vaults.reduce((prev, next) => {
-    const { onChainCalls } = createVaultCalls(next.id, next.adapters.map(a => a.id));
+    const { onChainCalls, offChainCalls } = createVaultCalls(next.id, next.adapters.map(a => a.id), next.underlying.id);
     prev.vaultCalls.onChainCalls.push(...onChainCalls)
+    prev.vaultCalls.offChainCalls.push(...offChainCalls)
     return prev;
   }, {
     vaultCalls: {
       caller,
       onChainCalls: [] as RegisteredCall[],
-      offChainCalls: [],
+      offChainCalls: [] as RegisteredCall[],
     }
   })
   return [vaultCalls]
@@ -111,6 +113,7 @@ function registerNewTokensAndPairs() {
   const allPairIds = Object.keys(state.pairs.entities).map((id) =>
     id.toLowerCase()
   );
+
   const allTokenIds = allTokens
     .map((t) => t.id)
     .filter(
@@ -118,9 +121,11 @@ function registerNewTokensAndPairs() {
         !tokensRegistered[tokenId.toLowerCase()] &&
         !allPairIds.includes(tokenId.toLowerCase())
     );
+
   const pairs = buildUniswapPairs(allTokenIds).filter(
     (pair) => !pairsRegistered[pair.id.toLowerCase()]
   );
+
   dispatch(actions.uniswapPairsRegistered(pairs));
   const pairDataCalls = {
     caller: "Pair Data",

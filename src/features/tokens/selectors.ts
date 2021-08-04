@@ -28,6 +28,8 @@ export const tokensSelectors = {
     tokensSelectors.selectTokenLookup(state)[poolId]?.symbol ?? "",
   selectTokenPrice: (state: AppState, tokenId: string) =>
     tokensSelectors.selectTokenById(state, tokenId)?.priceData?.price,
+  selectTokenPrices: (state: AppState, tokenIds: string[]) =>
+    tokensSelectors.selectTokensById(state, tokenIds).map(t => t?.priceData?.price),
   selectTokenSupplies: (state: AppState, tokenIds: string[]) => {
     const lookup = tokensSelectors.selectTokensById(state, tokenIds);
     return lookup
