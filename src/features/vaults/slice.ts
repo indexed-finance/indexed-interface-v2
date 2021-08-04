@@ -128,6 +128,71 @@ export const vaultsSelectors = {
     netAPR *= 1 - vault.reserveRatio;
     return +(netAPR * 100).toFixed(2);
   },
+  selectVaultTargetReserveBalance(state: AppState, id: string) {
+    const vault = selectors.selectById(state, id);
+
+    if (vault?.totalValue) {
+      return convert.toBigNumber(vault.totalValue).times(vault.reserveRatio);
+    } else {
+      return 0;
+    }
+  },
+  selectProtocolTargetBalances(state: AppState, id: string) {
+    const vault = selectors.selectById(state, id);
+
+    if (vault) {
+      const { balances = [], weights, reserveRatio } = vault;
+
+      return weights.map((weight, i) => {
+        const balance = balances[i] ?? "0";
+
+        return convert
+          .toBigNumber(balance)
+          .times(1 - reserveRatio)
+          .times(weight);
+      });
+    } else {
+      return [];
+    }
+  },
+  selectNeedsToRebalance(state: AppState, id: string) {
+    const vault = selectors.selectById(state, id);
+
+    if (vault?.totalValue && vault?.reserveBalance) {
+      const vaultBalance = convert
+        .toBigNumber(vault.totalValue)
+        .times(vault.reserveRatio);
+      const needsToAtTopLevel = vaultBalance
+        .minus(vault.reserveBalance)
+        .abs()
+        .dividedBy(vaultBalance)
+        .isGreaterThanOrEqualTo(0.1);
+
+      if (needsToAtTopLevel) {
+        return true;
+      } else {
+        if (vault.balances) {
+          for (let i = 0; i < vault.adapters.length; i++) {
+            const balance = vault.balances[i];
+            const weight = vault.weights[i];
+            const value = convert
+              .toBigNumber(vault.totalValue)
+              .times(1 - vault.reserveRatio)
+              .times(weight);
+            const difference = value
+              .abs()
+              .dividedBy(convert.toBigNumber(balance));
+
+            if (difference.isGreaterThanOrEqualTo(0.1)) {
+              return true;
+            }
+          }
+        }
+      }
+    }
+
+    return false;
+  },
 };
 
 type RevenueBreakdown = {
