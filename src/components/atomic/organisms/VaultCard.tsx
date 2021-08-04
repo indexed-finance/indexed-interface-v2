@@ -1,5 +1,6 @@
 import { Card, Col, Row, Tooltip, Typography } from "antd";
 import { FormattedVault, useAllVaults, useVaultAPR } from "hooks";
+import { NirnProtocol } from "../atoms/NirnProtocol";
 import { NormalizedVault } from "features";
 import { Token } from "../atoms";
 import { convert } from "helpers";
@@ -77,7 +78,7 @@ export function VaultCard({
         <Col xs={24} md={6} style={{ textAlign: "center" }}>
           <Tooltip title="Protocols in use by the vault.">
             <Typography.Title level={3} style={{ margin: 0 }} type="success">
-              {adapters.map(a => a.protocol.name).join(', ')}
+              {adapters.map(a => <NirnProtocol name={a.protocol.name} showName />)}
             </Typography.Title>
           </Tooltip>
         </Col>
