@@ -4,8 +4,10 @@ import {
   Card,
   Col,
   Divider,
+  Progress,
   Row,
   Space,
+  Spin,
   Tooltip,
   Typography,
 } from "antd";
@@ -17,15 +19,16 @@ import {
   useNirnTransactionCallbacks,
   useTokenApproval,
   useTokenBalances,
+  useVault,
+  useVaultAPR,
   useVaultAdapterAPRs,
-  useVaultRegistrar,
 } from "hooks";
 import { Formik } from "formik";
 import {
+  NirnProtocol,
   Page,
   TokenSelector,
   VaultAdapterPieChart,
-  VaultCard,
 } from "components/atomic";
 import { createChart } from "lightweight-charts";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -102,6 +105,9 @@ function VaultFormInner({ vault }: { vault: FormattedVault }) {
       bordered={true}
       title={
         <Row gutter={24} align="middle">
+          <Col span={24}>
+            <Typography.Title level={2}>I want to</Typography.Title>
+          </Col>
           <Col span={10}>
             <Button
               block={true}
@@ -144,18 +150,26 @@ function VaultFormInner({ vault }: { vault: FormattedVault }) {
           }}
           isInput={true}
         />
-        <Typography.Title level={4} style={{ textAlign: "right" }}>
-          {mode === "deposit" ? "Mint" : "Burn"}: {dependentAmount}{" "}
-          {vault.symbol}
-        </Typography.Title>
         <Alert
           showIcon={true}
           type="info"
+          style={{ borderRadius: 0 }}
           message={
             <Tooltip
               title={`The Indexed DAO treasury receives a small percentage of the vault's profits.`}
             >
               {`Performance Fee: ${convert.toPercent(performanceFee)}`}
+            </Tooltip>
+          }
+        />
+        <Alert
+          showIcon={true}
+          type="success"
+          message={
+            <Tooltip
+              title={`You’ll receive X nWBTC in exchange for your WBTC: don’t misplace this, you’ll need it to get your assets back`}
+            >
+              You will receive {dependentAmount} {vault.symbol}
             </Tooltip>
           }
         />
@@ -184,71 +198,12 @@ function VaultFormInner({ vault }: { vault: FormattedVault }) {
   );
 }
 
-export function LoadedVault({ vault }: { vault: FormattedVault }) {
-  const chartData = useVaultAdapterAPRs(vault.id).map((a, i) => ({
-    ...a,
-    value: vault.weights[i] * 100,
-    weight: vault.weights[i] * 100,
-    apr: +(a.apr * 100).toFixed(2),
-  }));
-
-  useVaultRegistrar(vault.id);
-
-  return (
-    <Page hasPageHeader={true} title="Vault">
-      <VaultCard
-        key={vault.id}
-        withTitle={true}
-        bordered={false}
-        hoverable={false}
-        vault={vault}
-      />
-      <Divider />
-      <Row gutter={24}>
-        <Col span={12}>
-          <Typography.Title level={2}>Protocol Breakdown</Typography.Title>
-          <div
-            style={{
-              width: 600,
-              height: 500,
-              textTransform: "uppercase",
-              transform: "scale(1.6)",
-            }}
-          >
-            <VaultAdapterPieChart data={chartData} />
-          </div>
-        </Col>
-        <Col span={12}>
-          <Typography.Title level={2}>
-            Interact With {vault.underlying.name}
-          </Typography.Title>
-          <Formik
-            initialValues={{
-              asset: "",
-              amount: {
-                displayed: "0.00",
-                exact: convert.toBigNumber("0.00"),
-              },
-              inputType: "stake",
-            }}
-            onSubmit={console.info}
-            validateOnChange={true}
-            validateOnBlur={true}
-          >
-            <VaultFormInner vault={vault} />
-          </Formik>
-        </Col>
-      </Row>
-      {/* <VaultHistoricalChart /> */}
-    </Page>
-  );
-}
-
 export default function Vault() {
   const { slug } = useParams<{ slug: string }>();
-  const vault = useSelector((state: AppState) =>
+  const vaultBySymbol = useSelector((state: AppState) =>
     selectors.selectVaultBySymbol(state, slug)
   );
+  const vault = useVault(vaultBySymbol?.id ?? "");
 
   return vault ? <LoadedVault vault={vault} /> : null;
 }
@@ -266,3 +221,94 @@ export function VaultHistoricalChart() {
 }
 
 // ===
+
+export function LoadedVault({ vault }: { vault: FormattedVault }) {
+  const chartData = useVaultAdapterAPRs(vault.id).map((a, i) => ({
+    ...a,
+    value: vault.weights[i] * 100,
+    weight: vault.weights[i] * 100,
+    apr: +(a.apr * 100).toFixed(2),
+  }));
+  const apr = useVaultAPR(vault.id);
+  const isLoadingApr = apr === 0;
+
+  return (
+    <Page hasPageHeader={true} title="Vault">
+      <Row gutter={24}>
+        {/* Core Stats */}
+        <Col xs={24} md={6}>
+          <div style={{ padding: "36px 24px" }}>
+            <Typography.Title level={1}>Protocols</Typography.Title>
+            {vault.adapters.map((adapter) => (
+              <Space>
+                <div
+                  style={{
+                    transform: "scale(0.3)",
+                    transformOrigin: 0,
+                    fontSize: 32,
+                  }}
+                >
+                  <Progress percent={50} type="circle" />
+                </div>
+                <NirnProtocol
+                  key={adapter.id}
+                  name={adapter.protocol.name}
+                  showName={true}
+                />
+              </Space>
+            ))}
+          </div>
+          <div style={{ padding: "36px 24px" }}>
+            <Typography.Title level={2}>TVL</Typography.Title>
+            <Typography.Title level={1}>${vault.usdValue}</Typography.Title>
+          </div>
+          <div style={{ padding: "36px 24px" }}>
+            <Typography.Title level={2}>APR</Typography.Title>
+            <Typography.Title level={1} type="success">
+              {isLoadingApr ? <Spin /> : convert.toPercent(apr / 100)}
+            </Typography.Title>
+          </div>
+        </Col>
+        {/* Chart */}
+        <Col xs={24} md={12}>
+          <Card
+            title={
+              <Typography.Title level={2}>Protocol Breakdown</Typography.Title>
+            }
+          >
+            <div
+              className="Mememe"
+              style={{
+                position: "relative",
+                width: 400,
+                height: 400,
+                transform: "scale(1.6)",
+                transformOrigin: 0,
+              }}
+            >
+              <VaultAdapterPieChart data={chartData} />
+            </div>
+          </Card>
+        </Col>
+        {/* Form */}
+        <Col xs={24} md={6}>
+          <Formik
+            initialValues={{
+              asset: "",
+              amount: {
+                displayed: "0.00",
+                exact: convert.toBigNumber("0.00"),
+              },
+              inputType: "stake",
+            }}
+            onSubmit={console.info}
+            validateOnChange={true}
+            validateOnBlur={true}
+          >
+            <VaultFormInner vault={vault} />
+          </Formik>
+        </Col>
+      </Row>
+    </Page>
+  );
+}
