@@ -27,6 +27,7 @@ import { Formik } from "formik";
 import {
   NirnProtocol,
   Page,
+  Token,
   TokenSelector,
   VaultAdapterPieChart,
 } from "components/atomic";
@@ -233,7 +234,32 @@ export function LoadedVault({ vault }: { vault: FormattedVault }) {
   const isLoadingApr = apr === 0;
 
   return (
-    <Page hasPageHeader={true} title="Vault">
+    <Page
+      hasPageHeader={true}
+      title={
+        <Space>
+          <Token
+            name={vault.underlying.symbol}
+            symbol={vault.underlying.symbol}
+            size="large"
+          />
+          <span>Nirn Vault</span>
+        </Space>
+      }
+      extra={
+        <Space direction="vertical">
+          <Typography.Title
+            level={3}
+            style={{ margin: 0, marginRight: "1rem" }}
+          >
+            Your Balance:{" "}
+            <Typography.Text type="success">
+              5.00 {vault.symbol}
+            </Typography.Text>
+          </Typography.Title>
+        </Space>
+      }
+    >
       <Row gutter={24}>
         {/* Core Stats */}
         <Col xs={24} md={6}>
