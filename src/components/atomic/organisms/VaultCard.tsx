@@ -37,7 +37,7 @@ export function VaultCard({
         borderBottomRightRadius: 12,
         marginBottom: 24,
       }}
-      onClick={() => push(`/vaults/${vaultId}`)}
+      onClick={() => push(`/vaults/${underlying.symbol.toLowerCase()}`)}
     >
       {withTitle && (
         <Row>

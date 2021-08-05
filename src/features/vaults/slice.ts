@@ -56,12 +56,9 @@ const slice = createSlice({
         if (relevantMulticallData) {
           const { revenueBreakdowns, vaultUpdates } = relevantMulticallData;
 
-          console.log({ vaultUpdates });
-
           for (const [vault, update] of Object.entries(vaultUpdates)) {
             const entry = state.entities[vault];
             if (entry) {
-              console.log(`Found vault with queried update - ${entry.symbol}`);
               if (update.totalSupply) entry.totalSupply = update.totalSupply;
               if (update.netAPR) entry.netAPR = update.netAPR;
               if (update.price) entry.price = update.price;
@@ -78,7 +75,6 @@ const slice = createSlice({
               entity?.adapters.find((a) => a.id === adapter)
             )?.id;
             if (!vaultID) continue;
-            console.log(`Found vault with queried adapter - ${vaultID}`);
             const vault = state.entities[vaultID];
             if (vault) {
               const entry = vault.adapters.find(
@@ -192,6 +188,16 @@ export const vaultsSelectors = {
     }
 
     return false;
+  },
+  selectVaultBySymbol(state: AppState, symbol: string) {
+    return (
+      vaultsSelectors
+        .selectAllVaults(state)
+        .find(
+          (element) =>
+            element.underlying.symbol.toLowerCase() === symbol.toLowerCase()
+        ) ?? null
+    );
   },
 
   // Snapshots

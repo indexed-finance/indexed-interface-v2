@@ -9,6 +9,7 @@ import {
   Tooltip,
   Typography,
 } from "antd";
+import { AppState, selectors } from "features";
 import { BigNumber, convert } from "helpers";
 import {
   FormattedVault,
@@ -16,7 +17,6 @@ import {
   useNirnTransactionCallbacks,
   useTokenApproval,
   useTokenBalances,
-  useVault,
   useVaultAdapterAPRs,
   useVaultRegistrar,
 } from "hooks";
@@ -30,6 +30,7 @@ import {
 import { createChart } from "lightweight-charts";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "react-router";
+import { useSelector } from "react-redux";
 
 type TokenAmount = { exact: BigNumber; displayed: string };
 
@@ -245,7 +246,9 @@ export function LoadedVault({ vault }: { vault: FormattedVault }) {
 
 export default function Vault() {
   const { slug } = useParams<{ slug: string }>();
-  const vault = useVault(slug);
+  const vault = useSelector((state: AppState) =>
+    selectors.selectVaultBySymbol(state, slug)
+  );
 
   return vault ? <LoadedVault vault={vault} /> : null;
 }
@@ -261,3 +264,5 @@ export function VaultHistoricalChart() {
 
   return <div ref={container}>Chart</div>;
 }
+
+// ===
