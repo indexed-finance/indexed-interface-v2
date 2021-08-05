@@ -17,7 +17,7 @@ export interface FormattedVault extends NormalizedVault {
 }
 
 export function useAllVaults(): FormattedVault[] {
-  const vaults = useSelector(selectors.selectAllVaults);
+  const vaults = useSelector(selectors.selectAprSortedVaults);
   const underlyings = vaults.map((v) => v.underlying.id);
   const prices = useSelector((state: AppState) =>
     selectors.selectTokenPrices(state, underlyings)

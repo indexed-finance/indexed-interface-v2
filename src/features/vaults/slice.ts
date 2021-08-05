@@ -199,7 +199,29 @@ export const vaultsSelectors = {
         ) ?? null
     );
   },
+  selectVaultToAprLookup(state: AppState) {
+    const vaults = vaultsSelectors.selectAllVaults(state);
+    const lookup: Record<string, number> = {};
 
+    for (const vault of vaults) {
+      const apr = vaultsSelectors.selectVaultAPR(state, vault.id);
+
+      lookup[vault.id] = apr;
+    }
+
+    return lookup;
+  },
+  selectAprSortedVaults(state: AppState) {
+    const vaults = vaultsSelectors.selectAllVaults(state);
+    const lookup = vaultsSelectors.selectVaultToAprLookup(state);
+
+    return vaults.sort((a, b) => {
+      const aValue = lookup[a.id];
+      const bValue = lookup[b.id];
+
+      return bValue - aValue;
+    });
+  },
   // Snapshots
 };
 
