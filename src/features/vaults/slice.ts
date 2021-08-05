@@ -193,6 +193,8 @@ export const vaultsSelectors = {
 
     return false;
   },
+
+  // Snapshots
 };
 
 type RevenueBreakdown = {

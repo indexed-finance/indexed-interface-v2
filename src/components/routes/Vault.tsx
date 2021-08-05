@@ -27,7 +27,8 @@ import {
   VaultAdapterPieChart,
   VaultCard,
 } from "components/atomic";
-import { useCallback, useMemo, useState } from "react";
+import { createChart } from "lightweight-charts";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "react-router";
 
 type TokenAmount = { exact: BigNumber; displayed: string };
@@ -36,12 +37,9 @@ function VaultFormInner({ vault }: { vault: FormattedVault }) {
   const { underlying, performanceFee } = vault;
 
   useBalanceAndApprovalRegistrar(vault.id, [vault.underlying.id]);
-  const balances = useTokenBalances([underlying.id, vault.id])
-  const {
-    deposit,
-    withdrawUnderlying
-  } = useNirnTransactionCallbacks(vault.id)
-  
+  const balances = useTokenBalances([underlying.id, vault.id]);
+  const { deposit, withdrawUnderlying } = useNirnTransactionCallbacks(vault.id);
+
   const [mode, setMode] = useState<"deposit" | "withdraw">("deposit");
 
   const [amount, setAmount] = useState<TokenAmount>({
@@ -62,16 +60,21 @@ function VaultFormInner({ vault }: { vault: FormattedVault }) {
   const dependentAmount = useMemo(() => {
     if (!vault.price) return convert.toBigNumber("0");
     const exact = amount.exact
-      .times(convert.toToken('1', 18))
+      .times(convert.toToken("1", 18))
       .div(convert.toBigNumber(vault.price));
-    return convert.toBalance(exact, underlying.decimals, true, 2)
-  }, [amount, vault, underlying])
+    return convert.toBalance(exact, underlying.decimals, true, 2);
+  }, [amount, vault, underlying]);
 
   const balance = useMemo(() => {
-    if (mode === 'deposit') {
-      const exact = convert.toBigNumber(balances[0])
-      const displayed = convert.toBalance(exact, underlying.decimals, false, 10)
-      return { exact, displayed }
+    if (mode === "deposit") {
+      const exact = convert.toBigNumber(balances[0]);
+      const displayed = convert.toBalance(
+        exact,
+        underlying.decimals,
+        false,
+        10
+      );
+      return { exact, displayed };
     }
     const exact = toUnderlyingAmount(convert.toBigNumber(balances[1]));
     const displayed = convert.toBalance(exact, underlying.decimals, false, 10);
@@ -80,9 +83,9 @@ function VaultFormInner({ vault }: { vault: FormattedVault }) {
 
   const handleSubmit = useCallback(() => {
     if (mode === "deposit") {
-      deposit(amount.exact.integerValue().toString(10))
+      deposit(amount.exact.integerValue().toString(10));
     } else {
-      withdrawUnderlying(amount.exact.integerValue().toString(10))
+      withdrawUnderlying(amount.exact.integerValue().toString(10));
     }
   }, [mode, amount, deposit, withdrawUnderlying]);
   const { status, approve } = useTokenApproval({
@@ -141,16 +144,21 @@ function VaultFormInner({ vault }: { vault: FormattedVault }) {
           isInput={true}
         />
         <Typography.Title level={4} style={{ textAlign: "right" }}>
-          {mode === 'deposit' ? 'Mint' : 'Burn'}: {dependentAmount} {vault.symbol}
+          {mode === "deposit" ? "Mint" : "Burn"}: {dependentAmount}{" "}
+          {vault.symbol}
         </Typography.Title>
         <Alert
           showIcon={true}
           type="info"
-          message={<Tooltip title={`The Indexed DAO treasury receives a small percentage of the vault's profits.`}>
-            {`Performance Fee: ${convert.toPercent(performanceFee)}`}
-          </Tooltip>}
+          message={
+            <Tooltip
+              title={`The Indexed DAO treasury receives a small percentage of the vault's profits.`}
+            >
+              {`Performance Fee: ${convert.toPercent(performanceFee)}`}
+            </Tooltip>
+          }
         />
-        {(status === "approval needed" && mode === 'deposit') ? (
+        {status === "approval needed" && mode === "deposit" ? (
           <Button
             type="primary"
             block={true}
@@ -180,8 +188,8 @@ export function LoadedVault({ vault }: { vault: FormattedVault }) {
     ...a,
     value: vault.weights[i] * 100,
     weight: vault.weights[i] * 100,
-    apr: +(a.apr * 100).toFixed(2)
-  }))
+    apr: +(a.apr * 100).toFixed(2),
+  }));
 
   useVaultRegistrar(vault.id);
 
@@ -206,9 +214,7 @@ export function LoadedVault({ vault }: { vault: FormattedVault }) {
               transform: "scale(1.6)",
             }}
           >
-            <VaultAdapterPieChart
-              data={chartData}
-            />
+            <VaultAdapterPieChart data={chartData} />
           </div>
         </Col>
         <Col span={12}>
@@ -232,6 +238,7 @@ export function LoadedVault({ vault }: { vault: FormattedVault }) {
           </Formik>
         </Col>
       </Row>
+      {/* <VaultHistoricalChart /> */}
     </Page>
   );
 }
@@ -241,4 +248,16 @@ export default function Vault() {
   const vault = useVault(slug);
 
   return vault ? <LoadedVault vault={vault} /> : null;
+}
+
+export function VaultHistoricalChart() {
+  const container = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (container.current) {
+      createChart(container.current);
+    }
+  }, []);
+
+  return <div ref={container}>Chart</div>;
 }
