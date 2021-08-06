@@ -106,6 +106,7 @@ const slice = createSlice({
             entry.reserveRatio = vault.reserveRatio
             entry.snapshots = vault.snapshots
             entry.weights = vault.weights
+            entry.averagePricePerShare = vault.averagePricePerShare
             if (entry.weights.some((w, i) => vault.weights[i] !== w)) {
               entry.weights = vault.weights
             }
