@@ -107,10 +107,10 @@ const slice = createSlice({
             entry.snapshots = vault.snapshots
             entry.weights = vault.weights
             entry.averagePricePerShare = vault.averagePricePerShare
-            if (entry.weights.some((w, i) => vault.weights[i] !== w)) {
+            if (vault.weights.some((w, i) => entry.weights[i] !== w)) {
               entry.weights = vault.weights
             }
-            if (entry.adapters.some((a, i) => vault.adapters[i].id !== a.id)) {
+            if (vault.adapters.some((a, i) => entry.adapters[i]?.id !== a.id)) {
               for (const {...adapter} of vault.adapters as NormalizedTokenAdapter[]) {
                 const existingAdapter = entry.adapters.find(a => a.id === adapter.id);
                 if (existingAdapter) {
