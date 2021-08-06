@@ -177,6 +177,12 @@ export function createVaultCalls(
         args: [underlying],
         canBeMerged: true,
       },
+      {
+        target: "",
+        function: "fetchVaultsData",
+        args: [],
+        canBeMerged: true,
+      },
     ],
   };
 }

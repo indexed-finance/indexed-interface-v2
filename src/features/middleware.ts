@@ -5,7 +5,7 @@ import {
   fetchIndexPoolTransactions,
   fetchIndexPoolUpdates,
 } from "./indexPools";
-import { fetchInitialData } from "./requests";
+import { fetchInitialData, fetchVaultsData } from "./requests";
 import { fetchMulticallData } from "./batcher";
 import { fetchTokenPriceData } from "./tokens";
 import { selectors } from "./selectors";
@@ -211,6 +211,7 @@ export function handleBatchUpdate() {
             fetchIndexPoolTransactions,
             fetchIndexPoolUpdates,
             fetchTokenPriceData,
+            fetchVaultsData
           }[fn] as any;
 
           if (request) {

@@ -36,6 +36,7 @@ export interface NormalizedVault {
 
   balances?: string[];
   reserveBalance?: string;
+  averagePricePerShare?: number;
 }
 
 export const VAULTS_CALLER = "Vaults";
@@ -94,8 +95,32 @@ const slice = createSlice({
       .addCase(restartedDueToError, () => adapter.getInitialState())
       .addCase(fetchVaultsData.fulfilled, (state, action) => {
         const vaults = action.payload ?? [];
-
-        adapter.upsertMany(state, vaults);
+        for (const { price, ...vault } of vaults) {
+          const entry = state.entities[vault.id.toLowerCase()]
+          if (!entry) {
+            adapter.upsertOne(state, vault)
+          } else {
+            entry.feeRecipient = vault.feeRecipient
+            entry.rewardsSeller = vault.rewardsSeller
+            entry.performanceFee = vault.performanceFee
+            entry.reserveRatio = vault.reserveRatio
+            entry.snapshots = vault.snapshots
+            entry.weights = vault.weights
+            if (entry.weights.some((w, i) => vault.weights[i] !== w)) {
+              entry.weights = vault.weights
+            }
+            if (entry.adapters.some((a, i) => vault.adapters[i].id !== a.id)) {
+              for (const {...adapter} of vault.adapters as NormalizedTokenAdapter[]) {
+                const existingAdapter = entry.adapters.find(a => a.id === adapter.id);
+                if (existingAdapter) {
+                  adapter.revenueAPRs = existingAdapter.revenueAPRs
+                  adapter.revenueTokens = existingAdapter.revenueTokens
+                }
+              }
+              entry.adapters = vault.adapters
+            }
+          }
+        }
       }),
 });
 
