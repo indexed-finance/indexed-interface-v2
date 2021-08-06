@@ -9,6 +9,7 @@ import { RegisteredCall, convert } from "helpers";
 import { useCallRegistrar } from "./use-call-registrar";
 import { useMemo } from "react";
 import { useSelector } from "react-redux";
+import { useTokenBalance } from "./user-hooks";
 import { useTokenPrices } from "./token-hooks";
 
 export interface FormattedVault extends NormalizedVault {
@@ -98,6 +99,19 @@ export function useVaultWithdrawal(id: string) {
 export function useVaultUserBalance(id: string) {
   // Pass
   // Returns { balance: _, value: _ }
+}
+
+export function useVaultInterestForUser(id: string) {
+  const vault = useVault(id)
+  const userBalance = useTokenBalance(id);
+  return useMemo(() => {
+    if (!vault || !userBalance || !vault.averagePricePerShare) return 0;
+    const currentPrice = convert.toBalanceNumber(vault.price ?? "0", 18, 10);
+    const formattedBalance = convert.toBalanceNumber(userBalance, vault.decimals, 10);
+    const currentValue = formattedBalance * currentPrice;
+    const paidValue = formattedBalance * vault.averagePricePerShare;
+    return currentValue - paidValue;
+  }, [vault, userBalance])
 }
 
 export function useVaultTvl(id: string) {
