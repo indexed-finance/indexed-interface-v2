@@ -180,7 +180,8 @@ export function LoadedVault({ vault }: { vault: FormattedVault }) {
     ...a,
     value: vault.weights[i] * 100,
     weight: vault.weights[i] * 100,
-    apr: +(a.apr * 100).toFixed(2)
+    apr: +(a.apr * 100).toFixed(2),
+    baseAPR: +(a.baseAPR * 100).toFixed(2)
   }))
 
   useVaultRegistrar(vault.id);

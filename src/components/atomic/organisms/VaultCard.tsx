@@ -17,7 +17,7 @@ export function VaultCard({
   hoverable,
   bordered,
   withTitle,
-  vault: { id: vaultId, underlying, usdValue, adapters },
+  vault: { id: vaultId, underlying, usdValue, adapters, weights },
 }: Props) {
   const apr = useVaultAPR(vaultId);
   const { push } = useHistory();
