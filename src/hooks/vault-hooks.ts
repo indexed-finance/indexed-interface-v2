@@ -5,11 +5,16 @@ import {
   VAULTS_CALLER,
   selectors,
 } from "features";
-import { RegisteredCall, convert } from "helpers";
+import { BigNumber, RegisteredCall, convert } from "helpers";
+import {
+  useBalanceAndApprovalRegistrar,
+  useTokenBalance,
+  useTokenBalances,
+} from "./user-hooks";
 import { useCallRegistrar } from "./use-call-registrar";
+import { useCallback } from "react";
 import { useMemo } from "react";
 import { useSelector } from "react-redux";
-import { useTokenBalance } from "./user-hooks";
 import { useTokenPrices } from "./token-hooks";
 
 export interface FormattedVault extends NormalizedVault {
@@ -45,7 +50,7 @@ export function useVaultAPR(id: string) {
 
 export function useVaultAdapterAPRs(
   id: string
-): { name: string; apr: number; baseAPR: number; }[] {
+): { name: string; apr: number; baseAPR: number }[] {
   const vault = useVault(id);
   const reserveRatio = vault?.reserveRatio ?? 0;
   const getNameAndAPR = (adapter: NormalizedTokenAdapter, weight: number) => {
@@ -64,7 +69,7 @@ export function useVaultAdapterAPRs(
   return (
     vault?.adapters.reduce(
       (prev, next, i) => [...prev, getNameAndAPR(next, vault.weights[i])],
-      [] as { name: string; apr: number; baseAPR: number; }[]
+      [] as { name: string; apr: number; baseAPR: number }[]
     ) ?? []
   );
 }
@@ -74,8 +79,10 @@ export function useVault(id: string): FormattedVault | null {
     selectors.selectVault(state, id)
   );
   const [prices, loading] = useTokenPrices(vault ? [vault.underlying.id] : []);
+
   return useMemo(() => {
     if (loading || !vault) return vault;
+
     const price = (prices as number[])[0];
     const balance = convert.toBalanceNumber(
       vault.totalValue ?? "0",
@@ -98,21 +105,87 @@ export function useVaultWithdrawal(id: string) {
 }
 
 export function useVaultUserBalance(id: string) {
-  // Pass
-  // Returns { balance: _, value: _ }
+  const vault = useVault(id);
+  const toUnderlyingAmount = useCallback(
+    (vault: FormattedVault) => (exactTokenAmount: BigNumber) => {
+      if (!vault.price) return convert.toBigNumber("0");
+      return exactTokenAmount
+        .times(convert.toBigNumber(vault.price))
+        .div(convert.toToken("1", 18));
+    },
+    []
+  );
+  const underlyingId = vault?.underlying.id ?? "";
+  const balances = useTokenBalances([underlyingId, id]);
+
+  useBalanceAndApprovalRegistrar(id, [underlyingId]);
+
+  if (vault) {
+    const toUnderlyingAmountFn = toUnderlyingAmount(vault);
+    const [rawBalance, rawWrappedBalance] = balances;
+    const formattedBalance = convert.toBigNumber(rawBalance);
+    const formattedWrappedBalance = convert.toBigNumber(rawWrappedBalance);
+    const formattedUnwrappedBalance = toUnderlyingAmountFn(
+      convert.toBigNumber(rawWrappedBalance)
+    );
+
+    return {
+      balance: {
+        exact: formattedBalance,
+        displayed: convert.toBalance(
+          formattedBalance,
+          vault.underlying.decimals,
+          false,
+          10
+        ),
+      },
+      wrappedBalance: {
+        exact: formattedWrappedBalance,
+        displayed: convert.toBalance(
+          formattedWrappedBalance,
+          vault.underlying.decimals,
+          false,
+          10
+        ),
+      },
+      unwrappedBalance: {
+        exact: formattedUnwrappedBalance,
+        displayed: convert.toBalance(
+          formattedUnwrappedBalance,
+          vault.underlying.decimals,
+          false,
+          10
+        ),
+      },
+    };
+  } else {
+    const zero = {
+      exact: convert.toBigNumber("0"),
+      displayed: "0.00",
+    };
+
+    return {
+      balance: zero,
+      wrappedBalance: zero,
+    };
+  }
 }
 
 export function useVaultInterestForUser(id: string) {
-  const vault = useVault(id)
+  const vault = useVault(id);
   const userBalance = useTokenBalance(id);
   return useMemo(() => {
     if (!vault || !userBalance || !vault.averagePricePerShare) return 0;
     const currentPrice = convert.toBalanceNumber(vault.price ?? "0", 18, 10);
-    const formattedBalance = convert.toBalanceNumber(userBalance, vault.decimals, 10);
+    const formattedBalance = convert.toBalanceNumber(
+      userBalance,
+      vault.decimals,
+      10
+    );
     const currentValue = formattedBalance * currentPrice;
     const paidValue = formattedBalance * vault.averagePricePerShare;
     return currentValue - paidValue;
-  }, [vault, userBalance])
+  }, [vault, userBalance]);
 }
 
 export function useVaultTvl(id: string) {

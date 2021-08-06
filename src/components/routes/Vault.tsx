@@ -12,17 +12,18 @@ import {
   Typography,
 } from "antd";
 import { AppState, selectors } from "features";
+import { BiDoughnutChart } from "react-icons/bi";
 import { BigNumber, convert } from "helpers";
 import {
   FormattedVault,
   useBalanceAndApprovalRegistrar,
   useNirnTransactionCallbacks,
   useTokenApproval,
-  useTokenBalances,
   useVault,
   useVaultAPR,
   useVaultAdapterAPRs,
   useVaultRegistrar,
+  useVaultUserBalance,
 } from "hooks";
 import { Formik } from "formik";
 import {
@@ -32,8 +33,15 @@ import {
   TokenSelector,
   VaultAdapterPieChart,
 } from "components/atomic";
+import {
+  ReactNode,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { createChart } from "lightweight-charts";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "react-router";
 import { useSelector } from "react-redux";
 
@@ -41,28 +49,12 @@ type TokenAmount = { exact: BigNumber; displayed: string };
 
 function VaultFormInner({ vault }: { vault: FormattedVault }) {
   const { underlying, performanceFee } = vault;
-
-  useBalanceAndApprovalRegistrar(vault.id, [vault.underlying.id]);
-  const balances = useTokenBalances([underlying.id, vault.id]);
   const { deposit, withdrawUnderlying } = useNirnTransactionCallbacks(vault.id);
-
   const [mode, setMode] = useState<"deposit" | "withdraw">("deposit");
-
   const [amount, setAmount] = useState<TokenAmount>({
     exact: convert.toBigNumber("0.00"),
     displayed: "0.00",
   });
-
-  const toUnderlyingAmount = useCallback(
-    (exactTokenAmount: BigNumber) => {
-      if (!vault.price) return convert.toBigNumber("0");
-      return exactTokenAmount
-        .times(convert.toBigNumber(vault.price))
-        .div(convert.toToken("1", 18));
-    },
-    [vault]
-  );
-
   const dependentAmount = useMemo(() => {
     if (!vault.price) return convert.toBigNumber("0");
     const exact = amount.exact
@@ -70,23 +62,7 @@ function VaultFormInner({ vault }: { vault: FormattedVault }) {
       .div(convert.toBigNumber(vault.price));
     return convert.toBalance(exact, underlying.decimals, true, 2);
   }, [amount, vault, underlying]);
-
-  const balance = useMemo(() => {
-    if (mode === "deposit") {
-      const exact = convert.toBigNumber(balances[0]);
-      const displayed = convert.toBalance(
-        exact,
-        underlying.decimals,
-        false,
-        10
-      );
-      return { exact, displayed };
-    }
-    const exact = toUnderlyingAmount(convert.toBigNumber(balances[1]));
-    const displayed = convert.toBalance(exact, underlying.decimals, false, 10);
-    return { exact, displayed };
-  }, [balances, mode, toUnderlyingAmount, underlying]);
-
+  const { balance, unwrappedBalance } = useVaultUserBalance(vault.id);
   const handleSubmit = useCallback(() => {
     if (mode === "deposit") {
       deposit(amount.exact.integerValue().toString(10));
@@ -101,6 +77,8 @@ function VaultFormInner({ vault }: { vault: FormattedVault }) {
     rawAmount: amount.exact.toString(),
     symbol: vault.symbol,
   });
+
+  useBalanceAndApprovalRegistrar(vault.id, [vault.underlying.id]);
 
   return (
     <Card
@@ -139,7 +117,7 @@ function VaultFormInner({ vault }: { vault: FormattedVault }) {
       <Space direction="vertical" size="large" style={{ width: "100%" }}>
         <TokenSelector
           assets={[]}
-          balanceOverride={balance}
+          balanceOverride={mode === "deposit" ? balance : unwrappedBalance}
           selectable={false}
           value={{
             token: underlying.symbol,
@@ -223,6 +201,56 @@ export function VaultHistoricalChart() {
 }
 
 // ===
+type Chart = "weights" | "apr" | "tvl";
+
+function CoreInformationSection({
+  children,
+  title,
+  onChangeChart,
+  isActive,
+}: {
+  children: ReactNode;
+  title: string;
+  isActive: boolean;
+  onChangeChart(): void;
+}) {
+  return (
+    <Card
+      style={{ marginBottom: 24 }}
+      actions={[
+        <Button
+          block={true}
+          key="1"
+          onClick={onChangeChart}
+          type={isActive ? "primary" : "default"}
+          style={{ border: "none" }}
+          icon={
+            <BiDoughnutChart
+              style={{ position: "relative", top: 2, left: -2 }}
+            />
+          }
+        >
+          Chart
+        </Button>,
+      ]}
+      title={
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <Typography.Title level={2} type={isActive ? "warning" : "secondary"}>
+            {title}
+          </Typography.Title>
+        </div>
+      }
+    >
+      {children}
+    </Card>
+  );
+}
 
 export function LoadedVault({ vault }: { vault: FormattedVault }) {
   const chartData = useVaultAdapterAPRs(vault.id).map((a, i) => ({
@@ -234,6 +262,14 @@ export function LoadedVault({ vault }: { vault: FormattedVault }) {
   }));
   const apr = useVaultAPR(vault.id);
   const isLoadingApr = apr === 0;
+  const [chart, setChart] = useState<Chart>("weights");
+  const onChangeChart = useCallback(
+    (chart: Chart) => () => setChart(chart),
+    []
+  );
+  const {
+    wrappedBalance: { displayed },
+  } = useVaultUserBalance(vault.id);
 
   useVaultRegistrar(vault.id);
 
@@ -258,7 +294,7 @@ export function LoadedVault({ vault }: { vault: FormattedVault }) {
           >
             Your Balance:{" "}
             <Typography.Text type="success">
-              5.00 {vault.symbol}
+              {displayed} {vault.symbol}
             </Typography.Text>
           </Typography.Title>
         </Space>
@@ -267,19 +303,26 @@ export function LoadedVault({ vault }: { vault: FormattedVault }) {
       <Row gutter={24}>
         {/* Core Stats */}
         <Col xs={24} md={6}>
-          <div style={{ padding: "36px 24px" }}>
-            <Typography.Title level={1}>Protocols</Typography.Title>
-            {vault.adapters.map((adapter) => (
-              <Space>
-                <div
-                  style={{
-                    transform: "scale(0.3)",
-                    transformOrigin: 0,
-                    fontSize: 32,
-                  }}
-                >
-                  <Progress percent={50} type="circle" />
-                </div>
+          {/* Protocols */}
+          <CoreInformationSection
+            title="Protocols"
+            isActive={chart === "weights"}
+            onChangeChart={onChangeChart("weights")}
+          >
+            {vault.adapters.map((adapter, i) => (
+              <Space
+                style={{
+                  marginBottom: 12,
+                  justifyContent: "space-between",
+                  width: "100%",
+                }}
+              >
+                <Progress
+                  percent={chartData[i].weight}
+                  type="circle"
+                  size="small"
+                  width={48}
+                />
                 <NirnProtocol
                   key={adapter.id}
                   name={adapter.protocol.name}
@@ -287,38 +330,40 @@ export function LoadedVault({ vault }: { vault: FormattedVault }) {
                 />
               </Space>
             ))}
-          </div>
-          <div style={{ padding: "36px 24px" }}>
-            <Typography.Title level={2}>TVL</Typography.Title>
+          </CoreInformationSection>
+          {/* TVL */}
+          <CoreInformationSection
+            title="TVL"
+            isActive={chart === "tvl"}
+            onChangeChart={onChangeChart("tvl")}
+          >
             <Typography.Title level={1}>${vault.usdValue}</Typography.Title>
-          </div>
-          <div style={{ padding: "36px 24px" }}>
-            <Typography.Title level={2}>APR</Typography.Title>
+          </CoreInformationSection>
+          {/* APR */}
+          <CoreInformationSection
+            title="APR"
+            isActive={chart === "apr"}
+            onChangeChart={onChangeChart("apr")}
+          >
             <Typography.Title level={1} type="success">
               {isLoadingApr ? <Spin /> : convert.toPercent(apr / 100)}
             </Typography.Title>
-          </div>
+          </CoreInformationSection>
         </Col>
         {/* Chart */}
         <Col xs={24} md={12}>
-          <Card
-            title={
-              <Typography.Title level={2}>Protocol Breakdown</Typography.Title>
-            }
+          <div
+            style={{
+              position: "relative",
+              width: 400,
+              height: 400,
+              marginBottom: 80,
+              transform: "scale(2)",
+              transformOrigin: 0,
+            }}
           >
-            <div
-              className="Mememe"
-              style={{
-                position: "relative",
-                width: 400,
-                height: 400,
-                transform: "scale(1.6)",
-                transformOrigin: 0,
-              }}
-            >
-              <VaultAdapterPieChart data={chartData} />
-            </div>
-          </Card>
+            <VaultAdapterPieChart data={chartData} />
+          </div>
         </Col>
         {/* Form */}
         <Col xs={24} md={6}>
@@ -337,6 +382,14 @@ export function LoadedVault({ vault }: { vault: FormattedVault }) {
           >
             <VaultFormInner vault={vault} />
           </Formik>
+
+          <Divider />
+
+          <Card
+            title={<Typography.Title level={2}>Learn more</Typography.Title>}
+          >
+            ...
+          </Card>
         </Col>
       </Row>
     </Page>
