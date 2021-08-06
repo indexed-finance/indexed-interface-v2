@@ -22,6 +22,7 @@ import {
   useVault,
   useVaultAPR,
   useVaultAdapterAPRs,
+  useVaultRegistrar,
 } from "hooks";
 import { Formik } from "formik";
 import {
@@ -229,9 +230,12 @@ export function LoadedVault({ vault }: { vault: FormattedVault }) {
     value: vault.weights[i] * 100,
     weight: vault.weights[i] * 100,
     apr: +(a.apr * 100).toFixed(2),
+    baseAPR: +(a.baseAPR * 100).toFixed(2),
   }));
   const apr = useVaultAPR(vault.id);
   const isLoadingApr = apr === 0;
+
+  useVaultRegistrar(vault.id);
 
   return (
     <Page

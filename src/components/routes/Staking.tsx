@@ -129,7 +129,7 @@ export default function Stake() {
                 <Typography.Title level={2}>Total Staked</Typography.Title>
               </Col>
               <Col xs={24} sm={4} style={{ textAlign: "right" }}>
-                <Typography.Title level={2}>APY</Typography.Title>
+                <Typography.Title level={2}>APR</Typography.Title>
               </Col>
             </Row>
           }

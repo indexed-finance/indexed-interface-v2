@@ -183,13 +183,14 @@ const slice = createSlice({
         (action) =>
           [
             // Put these in manually to avoid a circular dependency.
-            "newStaking/fetch/fulfilled",
             "staking/fetch/fulfilled",
             "indexPools/fetch/fulfilled",
-            "indexPools/fetchTransactions/fulfilled",
             "indexPools/fetchUpdates/fulfilled",
+            "indexPools/fetchTransactions/fulfilled",
             "batcher/multicall/fulfilled",
             "tokens/fetchPriceData/fulfilled",
+            "newStaking/fetch/fulfilled",
+            "vaults/fetch/fulfilled"
           ].includes(action.type),
         (state, action) => {
           if (action.payload) {
@@ -202,6 +203,7 @@ const slice = createSlice({
               "batcher/multicall/fulfilled": "fetchMulticallData",
               "tokens/fetchPriceData/fulfilled": `getTokenPriceData/${potentialArgs}`,
               "newStaking/fetch/fulfilled": "fetchNewStakingData",
+              "vaults/fetch/fulfilled": "fetchVaultsData"
             };
             const call = callLookup[action.type as keyof typeof callLookup];
 

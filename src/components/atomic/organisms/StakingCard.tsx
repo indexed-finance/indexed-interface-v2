@@ -112,7 +112,7 @@ export function StakingCard({
 
           {/* 13.37% APY */}
           <Col xs={24} lg={4} style={{ textAlign: lg ? "right" : "left" }}>
-            {!lg && <Label>APY</Label>}
+            {!lg && <Label>APR</Label>}
             <Typography.Title level={2} type="success" style={{ margin: 0 }}>
               {apy ?? <Spin />}
             </Typography.Title>

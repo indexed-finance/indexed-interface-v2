@@ -9,6 +9,7 @@ import { RegisteredCall, convert } from "helpers";
 import { useCallRegistrar } from "./use-call-registrar";
 import { useMemo } from "react";
 import { useSelector } from "react-redux";
+import { useTokenBalance } from "./user-hooks";
 import { useTokenPrices } from "./token-hooks";
 
 export interface FormattedVault extends NormalizedVault {
@@ -44,25 +45,26 @@ export function useVaultAPR(id: string) {
 
 export function useVaultAdapterAPRs(
   id: string
-): { name: string; apr: number }[] {
+): { name: string; apr: number; baseAPR: number; }[] {
   const vault = useVault(id);
   const reserveRatio = vault?.reserveRatio ?? 0;
   const getNameAndAPR = (adapter: NormalizedTokenAdapter, weight: number) => {
     const name = adapter.protocol.name;
     let apr = 0;
+    let baseAPR = 0;
     if (adapter.revenueAPRs) {
-      apr = adapter.revenueAPRs.reduce(
+      baseAPR = adapter.revenueAPRs.reduce(
         (t, n) => t + convert.toBalanceNumber(n),
         0
       );
-      apr = apr * weight * (1 - reserveRatio);
+      apr = baseAPR * weight * (1 - reserveRatio);
     }
-    return { name, apr };
+    return { name, apr, baseAPR };
   };
   return (
     vault?.adapters.reduce(
       (prev, next, i) => [...prev, getNameAndAPR(next, vault.weights[i])],
-      [] as { name: string; apr: number }[]
+      [] as { name: string; apr: number; baseAPR: number; }[]
     ) ?? []
   );
 }
@@ -98,6 +100,19 @@ export function useVaultWithdrawal(id: string) {
 export function useVaultUserBalance(id: string) {
   // Pass
   // Returns { balance: _, value: _ }
+}
+
+export function useVaultInterestForUser(id: string) {
+  const vault = useVault(id)
+  const userBalance = useTokenBalance(id);
+  return useMemo(() => {
+    if (!vault || !userBalance || !vault.averagePricePerShare) return 0;
+    const currentPrice = convert.toBalanceNumber(vault.price ?? "0", 18, 10);
+    const formattedBalance = convert.toBalanceNumber(userBalance, vault.decimals, 10);
+    const currentValue = formattedBalance * currentPrice;
+    const paidValue = formattedBalance * vault.averagePricePerShare;
+    return currentValue - paidValue;
+  }, [vault, userBalance])
 }
 
 export function useVaultTvl(id: string) {
@@ -175,6 +190,12 @@ export function createVaultCalls(
         target: "",
         function: "fetchTokenPriceData",
         args: [underlying],
+        canBeMerged: true,
+      },
+      {
+        target: "",
+        function: "fetchVaultsData",
+        args: [],
         canBeMerged: true,
       },
     ],
