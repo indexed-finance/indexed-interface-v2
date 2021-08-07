@@ -1,4 +1,11 @@
-import { FaCaretDown, FaCaretUp } from "react-icons/fa";
+import { AiOutlineUser } from "react-icons/ai";
+import { ExternalLink } from "components/atomic/atoms";
+import {
+  FaCaretDown,
+  FaCaretUp,
+  FaGavel,
+  FaSwimmingPool,
+} from "react-icons/fa";
 import {
   JazzIcon,
   Logo,
@@ -7,13 +14,16 @@ import {
   ServerConnection,
   WalletConnector,
 } from "components/atomic/molecules";
-import { Layout, Space } from "antd";
+import { Layout, Menu, Space } from "antd";
+import { Link } from "react-router-dom";
+import { RiSafe2Line } from "react-icons/ri";
 import { selectors } from "features";
-import { useBreakpoints } from "hooks";
+import { useBreakpoints, useTranslator } from "hooks";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 
 export function LayoutHeader() {
+  const tx = useTranslator();
   const { isMobile, xl } = useBreakpoints();
   const [showingUserControls, setShowingUserControls] = useState(false);
   const selectedAddress = useSelector(selectors.selectUserAddress);
@@ -24,8 +34,61 @@ export function LayoutHeader() {
   );
   const userControls = (
     <>
-      <ModeSwitch />
-      <ServerConnection showText={true} />
+      {!xl && (
+        <Menu mode="vertical" style={{ width: "100%" }}>
+          <Menu.Item key="vaults">
+            <Link to="/vaults">
+              <Space size="small">
+                <RiSafe2Line style={{ position: "relative", top: 2 }} /> Vaults
+              </Space>
+            </Link>
+          </Menu.Item>
+
+          <Menu.Item key="index-pools">
+            <Link to="/index-pools">
+              <Space size="small">
+                <FaSwimmingPool style={{ position: "relative", top: 2 }} />
+                Indexes
+              </Space>
+            </Link>
+          </Menu.Item>
+
+          <Menu.Item key="staking">
+            <Link to="/staking">
+              <Space>
+                <RiSafe2Line style={{ position: "relative", top: 2 }} /> Staking
+              </Space>
+            </Link>
+          </Menu.Item>
+
+          <Menu.Item key="portfolio">
+            <Link to="/portfolio">
+              <Space size="small">
+                <AiOutlineUser style={{ position: "relative", top: 2 }} />
+                {tx("PORTFOLIO")}
+              </Space>
+            </Link>
+          </Menu.Item>
+          <Menu.Item>
+            <ExternalLink
+              to="https://legacy.indexed.finance/governance"
+              withIcon={false}
+            >
+              <Space size="small">
+                <FaGavel style={{ position: "relative", top: 2 }} /> Vote
+              </Space>
+            </ExternalLink>
+          </Menu.Item>
+
+          <Menu.Item key="mode">
+            <ModeSwitch />
+          </Menu.Item>
+
+          <Menu.Item key="connection">
+            <ServerConnection showText={true} />
+          </Menu.Item>
+        </Menu>
+      )}
     </>
   );
   const UserControlCaret = showingUserControls ? FaCaretUp : FaCaretDown;
@@ -81,7 +144,7 @@ export function LayoutHeader() {
               top: "100%",
               left: 0,
               width: "100vw",
-              height: 40,
+              // height: 40,
               background: "#151515",
               borderBottom: "1px solid rgba(47, 206, 252, 0.9)",
               borderLeft: "1px solid rgba(47, 206, 252, 0.9)",
@@ -89,7 +152,6 @@ export function LayoutHeader() {
               padding: "0 25px",
               display: "flex",
               alignItems: "center",
-              justifyContent: "flex-end",
             }}
           >
             <Space size="large">{userControls}</Space>

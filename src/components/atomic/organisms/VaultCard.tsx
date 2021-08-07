@@ -1,11 +1,10 @@
-import { Card, Col, Row, Spin, Tooltip, Typography } from "antd";
-import { FormattedVault, useAllVaults, useVaultAPR } from "hooks";
+import { Card, Col, Row, Space, Spin, Tooltip, Typography } from "antd";
+import { FormattedVault, useAllVaults, useVault, useVaultAPR } from "hooks";
 import { NirnProtocol } from "../atoms/NirnProtocol";
 import { Token } from "../atoms";
 import { useHistory } from "react-router";
 
 type Props = {
-  key: string;
   hoverable?: boolean;
   bordered?: boolean;
   withTitle?: boolean;
@@ -13,16 +12,17 @@ type Props = {
 };
 
 export function VaultCard({
-  key,
   hoverable,
   bordered,
   withTitle,
-  vault: { id: vaultId, underlying, usdValue, adapters, weights },
+  vault: { id: vaultId, underlying, usdValue, adapters },
 }: Props) {
   const apr = useVaultAPR(vaultId);
   const { push } = useHistory();
   const isLoadingApr = apr === 0;
   const isLoadingTvl = !usdValue || parseFloat(usdValue) === 0;
+
+  useVault(vaultId);
 
   return (
     <Card
@@ -37,7 +37,7 @@ export function VaultCard({
         borderBottomRightRadius: 12,
         marginBottom: 24,
       }}
-      onClick={() => push(`/vaults/${vaultId}`)}
+      onClick={() => push(`/vaults/${underlying.symbol.toLowerCase()}`)}
     >
       {withTitle && (
         <Row>
@@ -83,9 +83,15 @@ export function VaultCard({
         <Col xs={24} md={6} style={{ textAlign: "center" }}>
           <Tooltip title="Protocols in use by the vault.">
             <Typography.Title level={3} style={{ margin: 0 }} type="success">
-              {adapters.map((a) => (
-                <NirnProtocol name={a.protocol.name} showName />
-              ))}
+              <Space direction="vertical">
+                {adapters.map((a) => (
+                  <NirnProtocol
+                    key={a.id}
+                    name={a.protocol.name}
+                    showName={true}
+                  />
+                ))}
+              </Space>
             </Typography.Title>
           </Tooltip>
         </Col>

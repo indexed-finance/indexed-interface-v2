@@ -4,7 +4,6 @@ import {
   DrawerProvider,
   ErrorBoundary,
   LayoutHeader,
-  Navigation,
   Page,
   TooltipProvider,
   TransactionList,
@@ -87,22 +86,6 @@ export function AppLayout() {
         )}
       </Layout.Content>
       <TransactionList />
-      {isMobile && (
-        <Layout.Footer
-          style={{
-            position: "fixed",
-            bottom: 0,
-            left: 0,
-            width: "100vw",
-            background: "#151515",
-            borderTop: "1px solid #49ffff",
-            padding: 12,
-            zIndex: 10,
-          }}
-        >
-          <Navigation />
-        </Layout.Footer>
-      )}
       {FEATURE_FLAGS.useDEBUG && <DEBUG />}
     </>
   );

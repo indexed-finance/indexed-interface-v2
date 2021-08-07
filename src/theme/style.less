@@ -13,6 +13,16 @@
 }
 
 // -- Customs
+.white-outer-glow {
+  box-shadow: rgba(255, 255, 255, 1) 0px 8px 24px;
+}
+
+.warning-inner-glow {
+  -moz-box-shadow: inset 0 0 20px rgba(216, 150, 18, 0.4) !important;
+  -webkit-box-shadow: inset 0 0 20px rgba(216, 150, 18, 0.4) !important;
+  box-shadow: inset 0 0 20px rgba(216, 150, 18, 0.4) !important;
+}
+
 .IndexPoolWidget {
   .ant-card-meta-description {
     padding-left: 12px !important;
@@ -49,6 +59,10 @@
 
   .ant-statistic-content {
     .colorful;
+  }
+
+  @media screen and (max-width: 540px) {
+    margin: 0;
   }
 }
 
@@ -128,7 +142,7 @@
     font-size: 36px !important;
 
     @media screen and (max-width: 580px) {
-      font-size: px !important;
+      font-size: 18px !important;
     }
   }
 }

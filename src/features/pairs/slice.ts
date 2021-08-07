@@ -68,9 +68,7 @@ const slice = createSlice({
         for (const id of action.payload.pairs.ids) {
           const pair: NormalizedPair = action.payload.pairs.entities[id];
           const entry = state.entities[id.toLowerCase()];
-          if (pair.id !== pair.id.toLowerCase()) {
-            console.log(`Got non-lowercase pair from server`);
-          }
+
           if (entry) {
             if (typeof pair.exists !== "undefined") {
               if (pair.exists && pair.reserves0 && pair.reserves1) {

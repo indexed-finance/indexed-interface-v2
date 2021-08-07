@@ -25,7 +25,6 @@ class FortmaticConnector extends FortmaticConnectorCore {
 
       const { chainId } = this as any;
       if (chainId in CHAIN_ID_NETWORK_ARGUMENT) {
-        console.log("key is ", FORTMATIC_KEY);
         this.fortmatic = new Fortmatic(
           FORTMATIC_KEY,
           CHAIN_ID_NETWORK_ARGUMENT[chainId as FormaticSupportedChains]

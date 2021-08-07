@@ -1,8 +1,7 @@
 import { AiOutlineUser } from "react-icons/ai";
 import { ExternalLink } from "components/atomic/atoms";
 import { FEATURE_FLAGS } from "feature-flags";
-import { FaGavel, FaSwimmingPool } from "react-icons/fa";
-import { FaListUl } from "react-icons/fa";
+import { FaGavel, FaListUl, FaSwimmingPool } from "react-icons/fa";
 import { GoLightBulb } from "react-icons/go";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, Space } from "antd";
