@@ -1,4 +1,4 @@
-import { Card, Col, Row, Spin, Tooltip, Typography } from "antd";
+import { Card, Col, Row, Space, Spin, Tooltip, Typography } from "antd";
 import { FormattedVault, useAllVaults, useVault, useVaultAPR } from "hooks";
 import { NirnProtocol } from "../atoms/NirnProtocol";
 import { Token } from "../atoms";
@@ -15,7 +15,7 @@ export function VaultCard({
   hoverable,
   bordered,
   withTitle,
-  vault: { id: vaultId, underlying, usdValue, adapters, weights },
+  vault: { id: vaultId, underlying, usdValue, adapters },
 }: Props) {
   const apr = useVaultAPR(vaultId);
   const { push } = useHistory();
@@ -83,13 +83,15 @@ export function VaultCard({
         <Col xs={24} md={6} style={{ textAlign: "center" }}>
           <Tooltip title="Protocols in use by the vault.">
             <Typography.Title level={3} style={{ margin: 0 }} type="success">
-              {adapters.map((a) => (
-                <NirnProtocol
-                  key={a.id}
-                  name={a.protocol.name}
-                  showName={true}
-                />
-              ))}
+              <Space direction="vertical">
+                {adapters.map((a) => (
+                  <NirnProtocol
+                    key={a.id}
+                    name={a.protocol.name}
+                    showName={true}
+                  />
+                ))}
+              </Space>
             </Typography.Title>
           </Tooltip>
         </Col>
