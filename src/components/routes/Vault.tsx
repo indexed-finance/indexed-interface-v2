@@ -87,6 +87,12 @@ function CoreInformationSection({
   return tooltip ? <Tooltip title={tooltip}>{inner}</Tooltip> : inner;
 }
 
+function toFixed(num: number, fixed: number) {
+  const re = new RegExp('^-?\\d+(?:\.\\d{0,' + (fixed || -1) + '})?');
+  const res = num.toString().match(re);
+  return res ? res[0] : "";
+}
+
 function LoadedVault({ vault }: { vault: FormattedVault }) {
   const chartData = useVaultAdapterAPRs(vault.id).map((a, i) => ({
     ...a,
@@ -104,7 +110,7 @@ function LoadedVault({ vault }: { vault: FormattedVault }) {
 
   useVaultRegistrar(vault.id);
   const shortenAmount = (amount: string) => {
-    let shortenedAmount: string | number = +parseFloat(amount).toFixed(3)
+    let shortenedAmount: string | number = +toFixed(parseFloat(amount), 3)
     if (shortenedAmount !== parseFloat(amount)) {
       shortenedAmount = `${shortenedAmount}…`
     }
