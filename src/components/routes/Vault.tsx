@@ -103,7 +103,13 @@ function LoadedVault({ vault }: { vault: FormattedVault }) {
   const { isMobile } = useBreakpoints();
 
   useVaultRegistrar(vault.id);
-
+  const shortenAmount = (amount: string) => {
+    let shortenedAmount: string | number = +parseFloat(amount).toFixed(3)
+    if (shortenedAmount !== parseFloat(amount)) {
+      shortenedAmount = `${shortenedAmount}…`
+    }
+    return shortenedAmount
+  }
   return (
     <Page
       hasPageHeader={true}
@@ -127,7 +133,7 @@ function LoadedVault({ vault }: { vault: FormattedVault }) {
             {!isMobile && (
               <Typography.Text type="success">
                 <Tooltip title={`${displayed} ${vault.symbol}`}>
-                  {parseFloat(displayed).toFixed(3)}…
+                  {shortenAmount(displayed)}
                 </Tooltip>{" "}
                 {vault.symbol}
               </Typography.Text>
@@ -136,7 +142,7 @@ function LoadedVault({ vault }: { vault: FormattedVault }) {
           {isMobile && (
             <Typography.Title type="success" level={3}>
               <Tooltip title={`${displayed} ${vault.symbol}`}>
-                {parseFloat(displayed).toFixed(3)}…
+                  {shortenAmount(displayed)}
               </Tooltip>{" "}
               {vault.symbol}
             </Typography.Title>
