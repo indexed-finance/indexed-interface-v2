@@ -143,9 +143,9 @@ export function Inner({ vault }: { vault: FormattedVault }) {
           type="success"
           message={
             <Tooltip
-              title={`You’ll receive X nWBTC in exchange for your WBTC: don’t misplace this, you’ll need it to get your assets back`}
+              title={`${vault.symbol} is the Nirn wrapper for ${underlying.symbol} - it can be burned to redeem ${underlying.symbol}.`}
             >
-              You will receive {dependentAmount} {vault.symbol}
+              You will {mode === 'deposit' ? 'receive' : 'burn'} {dependentAmount} {vault.symbol}
             </Tooltip>
           }
         />
