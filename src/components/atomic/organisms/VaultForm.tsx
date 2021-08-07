@@ -143,9 +143,9 @@ export function Inner({ vault }: { vault: FormattedVault }) {
           type="success"
           message={
             <Tooltip
-              title={`You’ll receive X nWBTC in exchange for your WBTC: don’t misplace this, you’ll need it to get your assets back`}
+              title={`You’ll receive ${dependentAmount} ${vault.symbol} in exchange for your ${vault.underlying.symbol}: don’t misplace this, you’ll need it to get your assets back`}
             >
-              You will receive {dependentAmount} {vault.symbol}
+              You will receive {dependentAmount} {vault.underlying.symbol}
             </Tooltip>
           }
         />

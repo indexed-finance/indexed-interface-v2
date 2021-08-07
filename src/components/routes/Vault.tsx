@@ -15,6 +15,7 @@ import {
   useVault,
   useVaultAPR,
   useVaultAdapterAPRs,
+  useVaultInterestForUser,
   useVaultRegistrar,
   useVaultUserBalance,
 } from "hooks";
@@ -101,6 +102,7 @@ function LoadedVault({ vault }: { vault: FormattedVault }) {
     wrappedBalance: { displayed },
   } = useVaultUserBalance(vault.id);
   const { isMobile } = useBreakpoints();
+  const earnedInterest = useVaultInterestForUser(vault.id);
 
   useVaultRegistrar(vault.id);
 
@@ -119,28 +121,56 @@ function LoadedVault({ vault }: { vault: FormattedVault }) {
       }
       extra={
         <Space direction="vertical">
-          <Typography.Title
-            level={3}
-            style={{ margin: 0, marginRight: "1rem" }}
-          >
-            Your Balance:{" "}
-            {!isMobile && (
-              <Typography.Text type="success">
+          <div>
+            <Typography.Title
+              level={3}
+              style={{ margin: 0, marginRight: "1rem" }}
+            >
+              Your Balance:{" "}
+              {!isMobile && (
+                <Typography.Text type="success" style={{ textAlign: "right" }}>
+                  <Tooltip title={`${displayed} ${vault.symbol}`}>
+                    {parseFloat(displayed).toFixed(2)}…
+                  </Tooltip>{" "}
+                  {vault.symbol}
+                </Typography.Text>
+              )}
+            </Typography.Title>
+            {isMobile && (
+              <Typography.Title type="success" level={3}>
                 <Tooltip title={`${displayed} ${vault.symbol}`}>
-                  {parseFloat(displayed).toFixed(3)}…
+                  {parseFloat(displayed).toFixed(2)}…
                 </Tooltip>{" "}
                 {vault.symbol}
-              </Typography.Text>
+              </Typography.Title>
             )}
-          </Typography.Title>
-          {isMobile && (
-            <Typography.Title type="success" level={3}>
-              <Tooltip title={`${displayed} ${vault.symbol}`}>
-                {parseFloat(displayed).toFixed(3)}…
-              </Tooltip>{" "}
-              {vault.symbol}
+          </div>
+          <div>
+            <Typography.Title
+              level={3}
+              style={{ margin: 0, marginRight: "1rem" }}
+            >
+              Interest Earned:{" "}
+              {!isMobile && (
+                <Typography.Text type="success" style={{ textAlign: "right" }}>
+                  <Tooltip
+                    title={`${earnedInterest} ${vault.underlying.symbol}`}
+                  >
+                    {earnedInterest.toFixed(2)}…
+                  </Tooltip>{" "}
+                  {vault.underlying.symbol}
+                </Typography.Text>
+              )}
             </Typography.Title>
-          )}
+            {isMobile && (
+              <Typography.Title type="success" level={3}>
+                <Tooltip title={`${earnedInterest} ${vault.underlying.symbol}`}>
+                  {earnedInterest.toFixed(2)}…
+                </Tooltip>{" "}
+                {vault.underlying.symbol}
+              </Typography.Title>
+            )}
+          </div>
         </Space>
       }
     >
