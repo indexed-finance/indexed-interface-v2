@@ -101,12 +101,9 @@ const slice = createSlice({
             entry.performanceFee = vault.performanceFee
             entry.reserveRatio = vault.reserveRatio
             entry.snapshots = vault.snapshots
-            entry.weights = vault.weights
             entry.averagePricePerShare = vault.averagePricePerShare
-            if (vault.weights.some((w, i) => entry.weights[i] !== w)) {
+            if (vault.adapters.some((a, i) => entry.adapters[i]?.id !== a.id || entry.weights[i] !== vault.weights[i])) {
               entry.weights = vault.weights
-            }
-            if (vault.adapters.some((a, i) => entry.adapters[i]?.id !== a.id)) {
               for (const {...adapter} of vault.adapters as NormalizedTokenAdapter[]) {
                 const existingAdapter = entry.adapters.find(a => a.id === adapter.id);
                 if (existingAdapter) {

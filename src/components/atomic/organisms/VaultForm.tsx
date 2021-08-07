@@ -143,9 +143,10 @@ export function Inner({ vault }: { vault: FormattedVault }) {
           type="success"
           message={
             <Tooltip
-              title={`You’ll receive ${dependentAmount} ${vault.symbol} in exchange for your ${vault.underlying.symbol}: don’t misplace this, you’ll need it to get your assets back`}
+              title={`${vault.symbol} is the Nirn wrapper for ${underlying.symbol} - it can be burned to redeem ${underlying.symbol}.`}
             >
-              You will receive {dependentAmount} {vault.underlying.symbol}
+              You will {mode === "deposit" ? "receive" : "burn"}{" "}
+              {dependentAmount} {vault.symbol}
             </Tooltip>
           }
         />
