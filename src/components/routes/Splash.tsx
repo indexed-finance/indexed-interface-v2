@@ -22,7 +22,6 @@ export default function Splash() {
 
   return (
     <Page hasPageHeader={false}>
-      {/* <VaultNotification /> */}
       <div
         style={{
           display: "flex",
@@ -59,7 +58,7 @@ export default function Splash() {
                   )
                 }
                 value={assetsUnderManagement}
-                style={{ marginRight: 12, marginLeft: 12 }}
+                style={{ marginTop: 12, marginRight: 12, marginLeft: 12 }}
               />
             )}
           </Divider>

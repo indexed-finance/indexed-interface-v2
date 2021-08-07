@@ -19,4 +19,5 @@ export * from './TooltipProvider';
 export * from './TransactionList';
 export * from './VaultAdapterPieChart';
 export * from './VaultCard';
+export * from './VaultForm';
 export * from './Widget';
