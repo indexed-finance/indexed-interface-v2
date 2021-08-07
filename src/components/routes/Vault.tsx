@@ -12,7 +12,6 @@ import {
   Typography,
 } from "antd";
 import { AppState, selectors } from "features";
-import { BiDoughnutChart } from "react-icons/bi";
 import { BigNumber, convert } from "helpers";
 import {
   FormattedVault,
@@ -201,38 +200,18 @@ export function VaultHistoricalChart() {
 }
 
 // ===
-type Chart = "weights" | "apr" | "tvl";
-
 function CoreInformationSection({
   children,
   title,
-  onChangeChart,
-  isActive,
+  tooltip,
 }: {
   children: ReactNode;
   title: string;
-  isActive: boolean;
-  onChangeChart(): void;
+  tooltip?: ReactNode;
 }) {
-  return (
+  const inner = (
     <Card
       style={{ marginBottom: 24 }}
-      actions={[
-        <Button
-          block={true}
-          key="1"
-          onClick={onChangeChart}
-          type={isActive ? "primary" : "default"}
-          style={{ border: "none" }}
-          icon={
-            <BiDoughnutChart
-              style={{ position: "relative", top: 2, left: -2 }}
-            />
-          }
-        >
-          Chart
-        </Button>,
-      ]}
       title={
         <div
           style={{
@@ -241,7 +220,7 @@ function CoreInformationSection({
             justifyContent: "space-between",
           }}
         >
-          <Typography.Title level={2} type={isActive ? "warning" : "secondary"}>
+          <Typography.Title level={2} type="warning">
             {title}
           </Typography.Title>
         </div>
@@ -250,6 +229,8 @@ function CoreInformationSection({
       {children}
     </Card>
   );
+
+  return tooltip ? <Tooltip title={tooltip}>{inner}</Tooltip> : inner;
 }
 
 export function LoadedVault({ vault }: { vault: FormattedVault }) {
@@ -262,11 +243,6 @@ export function LoadedVault({ vault }: { vault: FormattedVault }) {
   }));
   const apr = useVaultAPR(vault.id);
   const isLoadingApr = apr === 0;
-  const [chart, setChart] = useState<Chart>("weights");
-  const onChangeChart = useCallback(
-    (chart: Chart) => () => setChart(chart),
-    []
-  );
   const {
     wrappedBalance: { displayed },
   } = useVaultUserBalance(vault.id);
@@ -294,7 +270,10 @@ export function LoadedVault({ vault }: { vault: FormattedVault }) {
           >
             Your Balance:{" "}
             <Typography.Text type="success">
-              {displayed} {vault.symbol}
+              <Tooltip title={`${displayed} ${vault.symbol}`}>
+                {parseFloat(displayed).toFixed(3)}…
+              </Tooltip>{" "}
+              {vault.symbol}
             </Typography.Text>
           </Typography.Title>
         </Space>
@@ -304,11 +283,7 @@ export function LoadedVault({ vault }: { vault: FormattedVault }) {
         {/* Core Stats */}
         <Col xs={24} md={6}>
           {/* Protocols */}
-          <CoreInformationSection
-            title="Protocols"
-            isActive={chart === "weights"}
-            onChangeChart={onChangeChart("weights")}
-          >
+          <CoreInformationSection title="Protocols">
             {vault.adapters.map((adapter, i) => (
               <Space
                 style={{
@@ -332,41 +307,35 @@ export function LoadedVault({ vault }: { vault: FormattedVault }) {
             ))}
           </CoreInformationSection>
           {/* TVL */}
-          <CoreInformationSection
-            title="TVL"
-            isActive={chart === "tvl"}
-            onChangeChart={onChangeChart("tvl")}
-          >
+          <CoreInformationSection title="TVL" tooltip="Total Value Locked">
             <Typography.Title level={1}>${vault.usdValue}</Typography.Title>
           </CoreInformationSection>
           {/* APR */}
-          <CoreInformationSection
-            title="APR"
-            isActive={chart === "apr"}
-            onChangeChart={onChangeChart("apr")}
-          >
+          <CoreInformationSection title="APR" tooltip="Annual Percentage Rate">
             <Typography.Title level={1} type="success">
               {isLoadingApr ? <Spin /> : convert.toPercent(apr / 100)}
             </Typography.Title>
           </CoreInformationSection>
         </Col>
         {/* Chart */}
-        <Col xs={24} md={12}>
-          <div
-            style={{
-              position: "relative",
-              width: 400,
-              height: 400,
-              marginBottom: 80,
-              transform: "scale(2)",
-              transformOrigin: 0,
-            }}
-          >
-            <VaultAdapterPieChart data={chartData} />
-          </div>
+        <Col xs={24} md={10}>
+          <CoreInformationSection title="Breakdown">
+            <div
+              style={{
+                position: "relative",
+                width: 400,
+                height: 400,
+                marginBottom: 80,
+                transform: "scale(1.7)",
+                transformOrigin: 0,
+              }}
+            >
+              <VaultAdapterPieChart data={chartData} />
+            </div>
+          </CoreInformationSection>
         </Col>
         {/* Form */}
-        <Col xs={24} md={6}>
+        <Col xs={24} md={8}>
           <Formik
             initialValues={{
               asset: "",
@@ -383,13 +352,13 @@ export function LoadedVault({ vault }: { vault: FormattedVault }) {
             <VaultFormInner vault={vault} />
           </Formik>
 
-          <Divider />
+          {/* <Divider />
 
           <Card
             title={<Typography.Title level={2}>Learn more</Typography.Title>}
           >
             ...
-          </Card>
+          </Card> */}
         </Col>
       </Row>
     </Page>
