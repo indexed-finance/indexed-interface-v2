@@ -299,9 +299,10 @@ export const fetchInitialData = createAsyncThunk(
 export const fetchVaultsData = createAsyncThunk(
   "vaults/fetch",
   async (_: any, { getState }) => {
-    const state = getState()
+    const state = getState();
     const address = (state as any).user.address;
-    const client = NirnSubgraphClient.forNetwork('mainnet');
+    const client = NirnSubgraphClient.forNetwork("mainnet");
+
     try {
       const vaults = await client.getAllVaults(address);
 
@@ -314,7 +315,6 @@ export const fetchVaultsData = createAsyncThunk(
   }
 );
 
-
 export const requests = {
   ...batcherRequests,
   ...indexPoolsRequests,
@@ -322,5 +322,5 @@ export const requests = {
   ...newStakingRequests,
   ...tokensRequests,
   fetchInitialData,
-  fetchVaultsData
+  fetchVaultsData,
 };

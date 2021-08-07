@@ -68,11 +68,15 @@ export function useTokenApproval({
       const approveAmount = constants.MaxUint256;
       const tx = contract.approve(
         spender,
-        approveAmount// convert.toHex(convert.toBigNumber(rawAmount))
+        approveAmount // convert.toHex(convert.toBigNumber(rawAmount))
       );
       addTransaction(tx, {
         type: "ERC20.approve",
-        approval: { spender, tokenAddress: tokenId, amount: approveAmount.toString() },
+        approval: {
+          spender,
+          tokenAddress: tokenId,
+          amount: approveAmount.toString(),
+        },
         summary: `Approve: ${amount} ${symbol}`,
       });
     } else {
@@ -262,49 +266,46 @@ export function useTokenPricesLookup(
 
 export function usePairTokenPrice(id: string) {
   const pairInfo = usePair(id);
-  const [
-    pairArr,
-    supplyArr,
-    pricedTokenId
-  ] = useMemo(() => {
-    if (!pairInfo) return [[], [], ''];
+  const [pairArr, supplyArr, pricedTokenId] = useMemo(() => {
+    if (!pairInfo) return [[], [], ""];
     const { id, exists, token0, token1, sushiswap } = pairInfo;
-    if (!token0 || !token1) return [[], [], ''];
+    if (!token0 || !token1) return [[], [], ""];
     let pricedTokenId: string;
     if (token0.toLowerCase() === WETH_CONTRACT_ADDRESS.toLowerCase()) {
       pricedTokenId = token0.toLowerCase();
     } else {
       pricedTokenId = token1.toLowerCase();
     }
-    return [
-      [{ id, exists, token0, token1, sushiswap }] ,
-      [id],
-      pricedTokenId
-    ]
+    return [[{ id, exists, token0, token1, sushiswap }], [id], pricedTokenId];
   }, [pairInfo]);
 
   const [tokenPrice, tokenPriceLoading] = useTokenPrice(pricedTokenId);
   const [pairs, pairsLoading] = useUniswapPairs(pairArr);
-  const [supplies, suppliesLoading] = useTotalSuppliesWithLoadingIndicator(supplyArr);
+  const [supplies, suppliesLoading] =
+    useTotalSuppliesWithLoadingIndicator(supplyArr);
 
   return useMemo(() => {
-    // console.log(`PRICE LOADING ${tokenPriceLoading} ${tokenPrice}`);
-    // console.log(`SUPPLIES LOADING ${suppliesLoading} ${supplies}`);
     if (pairsLoading || tokenPriceLoading || suppliesLoading) {
       return 0;
     }
     const [pair] = pairs || [];
     const [supply] = supplies || [];
-    const priceZero = pair.token0.address.toLowerCase() === pricedTokenId.toLowerCase();
-    const tokenReserve = priceZero
-      ? pair.reserve0
-      : pair.reserve1;
+    const priceZero =
+      pair.token0.address.toLowerCase() === pricedTokenId.toLowerCase();
+    const tokenReserve = priceZero ? pair.reserve0 : pair.reserve1;
     const valueOfSupplyInToken = parseFloat(tokenReserve.toExact()) * 2;
     const tokensPerLpToken =
-      valueOfSupplyInToken /
-      parseFloat(convert.toBalance(supply, 18, false));
+      valueOfSupplyInToken / parseFloat(convert.toBalance(supply, 18, false));
     return tokensPerLpToken * (tokenPrice as number);
-  }, [tokenPrice, tokenPriceLoading, pairs, pairsLoading, supplies, suppliesLoading, pricedTokenId])
+  }, [
+    tokenPrice,
+    tokenPriceLoading,
+    pairs,
+    pairsLoading,
+    supplies,
+    suppliesLoading,
+    pricedTokenId,
+  ]);
 }
 
 export const useEthPrice = () => useTokenPrice(WETH_CONTRACT_ADDRESS);

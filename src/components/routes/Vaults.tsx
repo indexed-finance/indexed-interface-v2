@@ -4,7 +4,8 @@ import { useAllVaultsRegistrar, useBreakpoints } from "hooks";
 
 export default function Vaults() {
   const { isMobile } = useBreakpoints();
-  useAllVaultsRegistrar()
+
+  useAllVaultsRegistrar();
 
   return (
     <Page hasPageHeader={true} title="Vaults">
