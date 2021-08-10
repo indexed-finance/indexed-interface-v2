@@ -67,8 +67,21 @@ export function WalletConnectionDrawer() {
           .then(async () => {
             const _account = await connector.getAccount();
             const _provider = await connector.getProvider();
-            const provider = new ethers.providers.Web3Provider(_provider, 1);
+            const provider = new ethers.providers.Web3Provider(
+              _provider,
+              "any"
+            );
             const networkId = parseInt(await provider.send("net_version", []));
+
+            provider.on("network", (newNetwork, oldNetwork) => {
+              if (newNetwork?.chainId !== 1) {
+                dispatch(actions.connectedToBadNetwork());
+              }
+
+              if (oldNetwork?.chainId !== 1 && newNetwork?.chainId === 1) {
+                dispatch(actions.connectedToGoodNetwork());
+              }
+            });
 
             if (networkId === 1) {
               dispatch(

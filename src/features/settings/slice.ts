@@ -70,6 +70,9 @@ const slice = createSlice({
     connectedToBadNetwork: (state) => {
       state.badNetwork = true;
     },
+    connectedToGoodNetwork: (state) => {
+      state.badNetwork = false;
+    },
   },
   extraReducers: (builder) =>
     builder.addCase(userActions.userDisconnected.type, (state) => {

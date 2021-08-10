@@ -25,7 +25,7 @@ import ReactGA from "react-ga";
 const GOOGLE_ANALYTICS_TRACKING_CODE = "G-MHCR3CSH7C";
 
 export function getLibrary(_provider?: any, _connector?: any) {
-  return new ethers.providers.Web3Provider(_provider);
+  return new ethers.providers.Web3Provider(_provider, "any");
 }
 
 // Effect:

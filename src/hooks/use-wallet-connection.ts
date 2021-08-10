@@ -29,7 +29,7 @@ export function useInactiveListener(suppress = false) {
               console.error("Failed to activate after chain changed", error);
             });
           } else {
-            console.log(`Connected to bad network`)
+            console.log(`Connected to bad network`);
             dispatch(actions.connectedToBadNetwork());
           }
         }
