@@ -16,7 +16,10 @@ import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 export function LoadedIndexPool(
-  props: FormattedIndexPool & { interaction?: ReactNode }
+  props: FormattedIndexPool & {
+    interaction?: ReactNode;
+    interactionTitle: string;
+  }
 ) {
   const { isMobile } = useBreakpoints();
   const tokenIds = useSelector((state: AppState) =>
@@ -41,6 +44,18 @@ export function LoadedIndexPool(
                 {props.interaction}
               </div>
             </Col>
+            {props.interactionTitle && (
+              <Col span={16}>
+                <img
+                  alt={props.interactionTitle}
+                  src={
+                    require(`images/${props.symbol.toLowerCase()}${
+                      props.interactionTitle
+                    }.png`).default
+                  }
+                />
+              </Col>
+            )}
           </Row>
         )}
         <Row
@@ -92,6 +107,7 @@ export default function IndexPool() {
     poolId ? selectors.selectFormattedIndexPool(state, poolId) : null
   );
   const [interaction, setInteraction] = useState<ReactNode>(null);
+  const [interactionTitle, setInteractionTitle] = useState("");
 
   return (
     <Page
@@ -107,7 +123,10 @@ export default function IndexPool() {
             <Typography.Text>{indexPool.name}</Typography.Text>
             <IndexPoolInteractionBar
               indexPool={indexPool}
-              onChange={setInteraction}
+              onChange={(content, title) => {
+                setInteraction(content);
+                setInteractionTitle(title);
+              }}
             />
           </div>
         ) : (
@@ -117,7 +136,11 @@ export default function IndexPool() {
       hasPageHeader={true}
     >
       {indexPool ? (
-        <LoadedIndexPool interaction={interaction} {...indexPool} />
+        <LoadedIndexPool
+          interaction={interaction}
+          interactionTitle={interactionTitle}
+          {...indexPool}
+        />
       ) : (
         <Spin />
       )}
