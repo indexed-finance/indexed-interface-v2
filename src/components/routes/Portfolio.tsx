@@ -5,18 +5,20 @@ import {
   Col,
   Divider,
   Empty,
+  List,
   Row,
   Space,
   Typography,
 } from "antd";
 import { Fade } from "components/animations";
 import {
+  Label,
   Page,
   PortfolioWidget,
   Token,
   WalletConnector,
 } from "components/atomic";
-import { ReactNode, useEffect, useMemo, useState } from "react";
+import { ReactNode, useCallback, useEffect, useMemo, useState } from "react";
 import { selectors } from "features";
 import {
   useBreakpoints,
@@ -125,78 +127,68 @@ export default function Portfolio() {
   return (
     <Page hasPageHeader={true} title="Portfolio">
       {/* Top */}
-      <Row gutter={24} align="bottom">
+      <Row gutter={24} align="bottom" style={{ marginBottom: 96 }}>
         <Col span={8}>
           <Card
+            bordered={false}
             title={
               <Typography.Title
-                level={2}
-                style={{ margin: 0, textTransform: "uppercase" }}
+                type="warning"
+                level={3}
+                style={{
+                  margin: 0,
+                  marginRight: 24,
+                  textTransform: "uppercase",
+                }}
               >
                 Total value
               </Typography.Title>
             }
-            actions={[
-              <Typography.Title
-                key="1"
-                level={1}
-                type="success"
-                style={{ margin: 0, textAlign: "right", paddingRight: 12 }}
-              >
-                USD {totalValue}
-              </Typography.Title>,
-            ]}
-          ></Card>
+          >
+            <Typography.Title
+              level={1}
+              type="success"
+              style={{ margin: 0, textTransform: "uppercase" }}
+            >
+              USD $42,069.00
+            </Typography.Title>
+          </Card>
         </Col>
-
         <Col span={8}>
           <Card
-            actions={[
-              <Typography.Title
-                key="1"
-                level={3}
-                type="success"
-                style={{ margin: 0, textAlign: "right", paddingRight: 12 }}
-              >
-                USD {ndx.value}
-              </Typography.Title>,
-            ]}
+            bordered={false}
             title={
               <Typography.Title
-                level={2}
-                style={{ margin: 0, textTransform: "uppercase" }}
+                type="warning"
+                level={3}
+                style={{
+                  margin: 0,
+                  marginRight: 24,
+                  textTransform: "uppercase",
+                }}
               >
-                Governance token
+                Governance Token
               </Typography.Title>
             }
           >
-            <Token amount={ndx.balance} symbol="NDX" size="large" name="NDX" />
+            <Typography.Title
+              level={1}
+              style={{ margin: 0, textTransform: "uppercase" }}
+            >
+              <Space direction="vertical" size="large">
+                <Token amount="X.XX" symbol="NDX" name="NDX" size="large" />
+                <Typography.Text type="success" style={{ textAlign: "right" }}>
+                  USD $62,000.00
+                </Typography.Text>
+              </Space>
+            </Typography.Title>
           </Card>
         </Col>
-
-        <Col span={8}>(chart)</Col>
       </Row>
 
-      <Divider />
-
-      {/* By-Kind */}
-      <Row gutter={24}>
-        <Col
-          span={8}
-          style={{ borderRight: "1px solid rgba(255, 255, 255, 0.2)" }}
-        >
-          <VaultsSection />
-        </Col>
-        <Col
-          span={8}
-          style={{ borderRight: "1px solid rgba(255, 255, 255, 0.2)" }}
-        >
-          <IndexesSection />
-        </Col>
-        <Col span={8}>
-          <LiquiditySection />
-        </Col>
-      </Row>
+      <VaultsSection />
+      <IndexesSection />
+      <LiquiditySection />
     </Page>
   );
 }
@@ -204,14 +196,19 @@ export default function Portfolio() {
 // Vault
 function VaultCard() {
   return (
-    <Card
-      title={<Token symbol="DAI" name="DAI" size="large" amount="X.XXX" />}
+    <PortfolioCard
+      amount="X.XX"
+      symbol="DAI"
+      name="DAI"
+      usdValue="USD $200.00"
+      extra={<Typography.Title level={3}>4.20% APR</Typography.Title>}
       actions={[
-        <ul key="list" style={{ textAlign: "left" }}>
-          <li>USD $69,420.00</li>
-          <li>4.20% APR</li>
-          <li>Earned USD $4.20</li>
-        </ul>,
+        <List key="list">
+          <List.Item>
+            <Label>Earned</Label>
+            USD $4.20
+          </List.Item>
+        </List>,
       ]}
     />
   );
@@ -220,27 +217,45 @@ function VaultCard() {
 function VaultsSection() {
   return (
     <PortfolioSection title="Vaults" usdValue="USD $10,000.00">
-      <VaultCard />
-      <VaultCard />
-      <VaultCard />
+      <Row gutter={12} align="bottom">
+        <Col span={8}>
+          <VaultCard />
+        </Col>
+        <Col span={8}>
+          <VaultCard />
+        </Col>
+        <Col span={8}>
+          <VaultCard />
+        </Col>
+      </Row>
     </PortfolioSection>
   );
 }
 
 // Index
-// balance, staking info if any (amt staked, amt of ndx earned & ready to claim)
 
 function IndexCard() {
   return (
-    <Card
-      title={<Token amount="X.XX" symbol="DEFI5" name="DEFI5" size="large" />}
+    <PortfolioCard
+      amount="X.XX"
+      symbol="DEFI5"
+      name="DEFI5"
+      usdValue="USD $200.00"
       actions={[
-        <ul key="list" style={{ textAlign: "left" }}>
-          <li>USD $42,069.00</li>
-          <li>Currently staking X.XX DEFI5</li>
-          <li>Earned X.XX NDX</li>
-          <li>Ready to claim: X.XX NDX</li>
-        </ul>,
+        <List key="list">
+          <List.Item>
+            <Label>Currently staking</Label>
+            X.XX DEFI5
+          </List.Item>
+          <List.Item>
+            <Label>Earned</Label>
+            X.XX NDX
+          </List.Item>
+          <List.Item>
+            <Label>Ready to claim</Label>
+            X.XX NDX{" "}
+          </List.Item>
+        </List>,
       ]}
     />
   );
@@ -249,9 +264,17 @@ function IndexCard() {
 function IndexesSection() {
   return (
     <PortfolioSection title="Indexes" usdValue="USD $10,000.00">
-      <IndexCard />
-      <IndexCard />
-      <IndexCard />
+      <Row gutter={12} align="bottom">
+        <Col span={8}>
+          <IndexCard />
+        </Col>
+        <Col span={8}>
+          <IndexCard />
+        </Col>
+        <Col span={8}>
+          <IndexCard />
+        </Col>
+      </Row>
     </PortfolioSection>
   );
 }
@@ -259,22 +282,26 @@ function IndexesSection() {
 // Liquidity
 function LiquidityCard() {
   return (
-    <Card
-      title={
-        <Token
-          amount="X.XX"
-          symbol="WETH:DEGEN"
-          name="WETH:DEGEN"
-          size="large"
-        />
-      }
+    <PortfolioCard
+      amount="X.XX"
+      symbol="WETH:DEGEN"
+      name="WETH:DEGEN"
+      usdValue="USD $200.00"
       actions={[
-        <ul key="list" style={{ textAlign: "left" }}>
-          <li>USD $42,069.00</li>
-          <li>Currently staking X.XX WETH:DEGEN</li>
-          <li>Earned X.XX NDX</li>
-          <li>Ready to claim: X.XX NDX</li>
-        </ul>,
+        <List key="list">
+          <List.Item>
+            <Label>Currently staking</Label>
+            X.XX WETH:DEGEN
+          </List.Item>
+          <List.Item>
+            <Label>Earned</Label>
+            X.XX NDX
+          </List.Item>
+          <List.Item>
+            <Label>Ready to claim</Label>
+            X.XX NDX
+          </List.Item>
+        </List>,
       ]}
     />
   );
@@ -287,10 +314,59 @@ function LiquiditySection() {
 
   return (
     <PortfolioSection title="Liquidity" usdValue="USD $10,000.00">
-      <LiquidityCard />
-      <LiquidityCard />
-      <LiquidityCard />
+      <Row gutter={12} align="bottom">
+        <Col span={8}>
+          <LiquidityCard />
+        </Col>
+        <Col span={8}>
+          <LiquidityCard />
+        </Col>
+        <Col span={8}>
+          <LiquidityCard />
+        </Col>
+      </Row>
     </PortfolioSection>
+  );
+}
+
+// Top-Level
+function PortfolioCard({
+  amount,
+  symbol,
+  name,
+  usdValue,
+  actions,
+  extra,
+}: {
+  amount: string;
+  symbol: string;
+  name: string;
+  usdValue: string;
+  actions: ReactNode[];
+  extra?: ReactNode;
+}) {
+  const [expanded, setExpanded] = useState(false);
+  const toggleExpanded = useCallback(() => setExpanded((prev) => !prev), []);
+
+  return (
+    <Card
+      extra={extra}
+      hoverable={true}
+      onClick={toggleExpanded}
+      title={
+        <Space direction="vertical" style={{ width: "100%" }}>
+          <Token amount={amount} symbol={symbol} name={name} size="large" />
+          <Typography.Title level={4} type="success" style={{ margin: 0 }}>
+            {usdValue}
+          </Typography.Title>
+        </Space>
+      }
+      bodyStyle={{
+        display: expanded ? undefined : "none",
+      }}
+    >
+      {expanded && actions}
+    </Card>
   );
 }
 
@@ -304,9 +380,10 @@ function PortfolioSection({
   children: ReactNode;
 }) {
   return (
-    <div>
+    <div style={{ marginBottom: 48 }}>
       <Typography.Title
-        level={2}
+        level={1}
+        type="warning"
         style={{ margin: 0, textTransform: "uppercase" }}
       >
         {title}
@@ -320,9 +397,8 @@ function PortfolioSection({
           {usdValue}
         </Typography.Title>
       </Divider>
-      <Space size="large" direction="vertical" style={{ width: "100%" }}>
-        {children}
-      </Space>
+
+      {children}
     </div>
   );
 }
