@@ -5,4 +5,5 @@ export * from './animations';
 export * from './atomic';
 export * from './drawers';
 export * from './interactions';
+export * from './portfolio';
 export * from './routes';
