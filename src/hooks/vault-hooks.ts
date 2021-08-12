@@ -15,7 +15,7 @@ import { useCallRegistrar } from "./use-call-registrar";
 import { useCallback } from "react";
 import { useMemo } from "react";
 import { useSelector } from "react-redux";
-import { useTokenPrices } from "./token-hooks";
+import { useTokenPrice, useTokenPrices } from "./token-hooks";
 
 export interface FormattedVault extends NormalizedVault {
   underlyingPrice?: number;
@@ -117,6 +117,7 @@ export function useVaultUserBalance(id: string) {
   );
   const underlyingId = vault?.underlying.id ?? "";
   const balances = useTokenBalances([underlyingId, id]);
+  const [price, priceLoading] = useTokenPrice(underlyingId);
 
   useBalanceAndApprovalRegistrar(id, [underlyingId]);
 
@@ -128,6 +129,12 @@ export function useVaultUserBalance(id: string) {
     const formattedUnwrappedBalance = toUnderlyingAmountFn(
       convert.toBigNumber(rawWrappedBalance)
     );
+    const usdValue = priceLoading
+      ? "0.00"
+      : convert
+          .toBigNumber(convert.toBalance(formattedUnwrappedBalance))
+          .multipliedBy(price ?? 0)
+          .toFixed(2);
 
     return {
       balance: {
@@ -157,6 +164,7 @@ export function useVaultUserBalance(id: string) {
           10
         ),
       },
+      usdValue,
     };
   } else {
     const zero = {

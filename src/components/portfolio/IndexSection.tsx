@@ -31,10 +31,8 @@ export function IndexSection() {
               usdValue={token.value}
               hasStakingPool={token.hasStakingPool}
               staking={token.staking}
-              earnedSymbol={token.isSushiswapPair ? "SUSHI" : "NDX"}
-              earnedAmount={
-                token.isSushiswapPair ? token.sushiEarned : token.ndxEarned
-              }
+              earnedSymbol="NDX"
+              earnedAmount={token.ndxEarned}
             />
           </Col>
         ))}

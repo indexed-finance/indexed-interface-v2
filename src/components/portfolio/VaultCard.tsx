@@ -1,23 +1,68 @@
 import { Label } from "components/atomic";
-import { List, Typography } from "antd";
+import { List } from "antd";
 import { PortfolioCard } from "./PortfolioCard";
+import { useEffect } from "react";
+import {
+  useVault,
+  useVaultAPR,
+  useVaultRegistrar,
+  useVaultUserBalance,
+} from "hooks";
 
-export function VVaultCard() {
-  return (
+interface Props {
+  address: string;
+  onRegisterUsdValue(id: string, amount: number): void;
+}
+
+export function VVaultCard({ address, onRegisterUsdValue }: Props) {
+  const vault = useVault(address);
+  const { wrappedBalance, usdValue } = useVaultUserBalance(address);
+  const apr = useVaultAPR(address);
+  const symbol = vault?.symbol ?? "";
+  const name = vault?.name ?? "";
+
+  useEffect(() => {
+    if (usdValue) {
+      onRegisterUsdValue(address, parseFloat(usdValue));
+    }
+  }, [address, usdValue, onRegisterUsdValue]);
+
+  useVaultRegistrar(address);
+
+  return parseFloat(usdValue ?? "0.00") === 0 ? null : (
     <PortfolioCard
-      amount="X.XX"
-      symbol="DAI"
-      name="DAI"
-      usdValue="USD $200.00"
-      extra={<Typography.Title level={3}>4.20% APR</Typography.Title>}
+      amount={shortenAmount(wrappedBalance.displayed).toString()}
+      symbol={symbol}
+      name={name}
+      usdValue={`USD $${usdValue}`}
       actions={[
         <List key="list">
           <List.Item>
+            <Label>APR</Label>
+            {apr}%
+          </List.Item>
+          <List.Item>
             <Label>Earned</Label>
-            USD $4.20
+            USD ${usdValue}
           </List.Item>
         </List>,
       ]}
     />
   );
 }
+
+// #region Helpers
+function toFixed(num: number, fixed: number) {
+  const re = new RegExp("^-?\\d+(?:.\\d{0," + (fixed || -1) + "})?");
+  const res = num.toString().match(re);
+  return res ? res[0] : "";
+}
+
+function shortenAmount(amount: string) {
+  let shortenedAmount: string | number = +toFixed(parseFloat(amount), 3);
+  if (shortenedAmount !== parseFloat(amount)) {
+    shortenedAmount = `${shortenedAmount}…`;
+  }
+  return shortenedAmount;
+}
+// #endregion

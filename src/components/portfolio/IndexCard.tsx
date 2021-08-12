@@ -27,13 +27,18 @@ export function IndexCard({
   earnedSymbol,
 }: Props) {
   const tokenIds = usePoolTokenIds(address);
+  const actualSymbol = ["UNIV2:", "SUSHI:"].some((prefix) =>
+    symbol.startsWith(prefix)
+  )
+    ? symbol.split(":")[1].replace(/-/g, "/")
+    : symbol;
 
   usePoolDetailRegistrar(address, tokenIds);
 
   return (
     <PortfolioCard
       amount={amount}
-      symbol={symbol}
+      symbol={actualSymbol}
       name={name}
       usdValue={`USD ${usdValue}`}
       actions={
@@ -42,15 +47,11 @@ export function IndexCard({
               <List key="list">
                 <List.Item>
                   <Label>Currently staking</Label>
-                  {staking} {symbol}
+                  {staking || "0.00"} {actualSymbol}
                 </List.Item>
                 <List.Item>
-                  <Label>Earned</Label>
+                  <Label>Rewards ready to claim</Label>
                   {earnedAmount} {earnedSymbol}
-                </List.Item>
-                <List.Item>
-                  <Label>Ready to claim</Label>
-                  X.XX NDX{" "}
                 </List.Item>
               </List>,
             ]

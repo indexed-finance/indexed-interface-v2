@@ -20,6 +20,7 @@ import {
   Token,
   WalletConnector,
 } from "components/atomic";
+import { convert } from "helpers";
 import { selectors } from "features";
 import {
   useBreakpoints,
@@ -123,9 +124,19 @@ export function PPortfolio() {
 
 export default function Portfolio() {
   const isUserConnected = useSelector(selectors.selectUserConnected);
-  const { ndx, totalValue } = usePortfolioData({
+  const { ndx, totalValue: totalValueWithoutVaults } = usePortfolioData({
     onlyOwnedAssets: true,
   });
+  const [usdValueFromVaults, setUsdValueFromVaults] = useState(0);
+  const handleReceivedUsdValueFromVaults = (amount: number) =>
+    setUsdValueFromVaults(amount);
+  const totalValue = useMemo(() => {
+    const parsedTotalValueWithoutVaults = parseFloat(
+      totalValueWithoutVaults.replace(/\$/g, "").replace(/,/g, "")
+    );
+
+    return parsedTotalValueWithoutVaults + usdValueFromVaults;
+  }, [totalValueWithoutVaults, usdValueFromVaults]);
 
   return (
     <Page hasPageHeader={true} title="Portfolio">
@@ -154,7 +165,7 @@ export default function Portfolio() {
                   type="success"
                   style={{ margin: 0, textTransform: "uppercase" }}
                 >
-                  USD {totalValue}
+                  USD {convert.toCurrency(totalValue)}
                 </Typography.Title>
               </Card>
             </Col>
@@ -197,7 +208,7 @@ export default function Portfolio() {
               </Card>
             </Col>
           </Row>
-          <VaultSection />
+          <VaultSection onUsdValueChange={handleReceivedUsdValueFromVaults} />
           <IndexSection />
           <LiquiditySection />
         </>
