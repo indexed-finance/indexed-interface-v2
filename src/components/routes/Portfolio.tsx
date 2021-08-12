@@ -154,7 +154,7 @@ export default function Portfolio() {
                   type="success"
                   style={{ margin: 0, textTransform: "uppercase" }}
                 >
-                  USD $42,069.00
+                  USD {totalValue}
                 </Typography.Title>
               </Card>
             </Col>
@@ -180,12 +180,17 @@ export default function Portfolio() {
                   style={{ margin: 0, textTransform: "uppercase" }}
                 >
                   <Space direction="vertical" size="large">
-                    <Token amount="X.XX" symbol="NDX" name="NDX" size="large" />
+                    <Token
+                      amount={ndx.balance}
+                      symbol="NDX"
+                      name="NDX"
+                      size="large"
+                    />
                     <Typography.Text
                       type="success"
                       style={{ textAlign: "right", margin: 0 }}
                     >
-                      USD $62,000.00
+                      USD {ndx.value}
                     </Typography.Text>
                   </Space>
                 </Typography.Title>
