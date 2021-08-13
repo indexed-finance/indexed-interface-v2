@@ -10,13 +10,16 @@ import {
   IndexPoolRecentTrades,
   Page,
 } from "components/atomic";
-import { ReactNode, useState } from "react";
+import { ReactNode, useCallback, useState } from "react";
 import { useBreakpoints, usePoolDetailRegistrar } from "hooks";
 import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 export function LoadedIndexPool(
-  props: FormattedIndexPool & { interaction?: ReactNode }
+  props: FormattedIndexPool & {
+    interaction?: ReactNode;
+    interactionTitle: string;
+  }
 ) {
   const { isMobile } = useBreakpoints();
   const tokenIds = useSelector((state: AppState) =>
@@ -41,6 +44,19 @@ export function LoadedIndexPool(
                 {props.interaction}
               </div>
             </Col>
+            {/* Pending new interaction images. */}
+            {/* {props.interactionTitle && (
+              <Col span={16}>
+                <img
+                  alt={props.interactionTitle}
+                  src={
+                    require(`images/${props.symbol.toLowerCase()}${
+                      props.interactionTitle
+                    }.png`).default
+                  }
+                />
+              </Col>
+            )} */}
           </Row>
         )}
         <Row
@@ -92,6 +108,14 @@ export default function IndexPool() {
     poolId ? selectors.selectFormattedIndexPool(state, poolId) : null
   );
   const [interaction, setInteraction] = useState<ReactNode>(null);
+  const [interactionTitle, setInteractionTitle] = useState("");
+  const handleInteractionBarChange = useCallback(
+    (content: ReactNode, title: "buy" | "burn" | "mint") => {
+      setInteraction(content);
+      setInteractionTitle(title);
+    },
+    []
+  );
 
   return (
     <Page
@@ -107,7 +131,7 @@ export default function IndexPool() {
             <Typography.Text>{indexPool.name}</Typography.Text>
             <IndexPoolInteractionBar
               indexPool={indexPool}
-              onChange={setInteraction}
+              onChange={handleInteractionBarChange}
             />
           </div>
         ) : (
@@ -117,7 +141,11 @@ export default function IndexPool() {
       hasPageHeader={true}
     >
       {indexPool ? (
-        <LoadedIndexPool interaction={interaction} {...indexPool} />
+        <LoadedIndexPool
+          interaction={interaction}
+          interactionTitle={interactionTitle}
+          {...indexPool}
+        />
       ) : (
         <Spin />
       )}

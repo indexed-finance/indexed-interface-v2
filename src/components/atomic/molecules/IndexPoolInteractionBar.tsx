@@ -44,7 +44,7 @@ export function IndexPoolInteractionBar({
   onChange,
 }: {
   indexPool: FormattedIndexPool;
-  onChange(content: ReactNode): void;
+  onChange(content: ReactNode, title: "buy" | "mint" | "burn"): void;
 }) {
   const indexPoolInteractions = useIndexPoolInteractions(indexPool.id);
   const [activeTitle, setActiveTitle] = useState("");
@@ -108,7 +108,7 @@ export function IndexPoolInteractionBar({
         </Space>
       );
 
-    onChange(content);
+    onChange(content, activeTitle.toLowerCase() as "buy" | "mint" | "burn");
   }, [activeKey, activeTitle, indexPool, onChange]);
 
   useEffect(() => {

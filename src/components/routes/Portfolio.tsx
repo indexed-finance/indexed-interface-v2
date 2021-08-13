@@ -1,93 +1,179 @@
-import { Alert, Checkbox, Col, Empty, Row, Space, Typography } from "antd";
-import { Fade } from "components/animations";
-import { Page, PortfolioWidget, WalletConnector } from "components/atomic";
-import { selectors } from "features";
+import { Card, Col, Empty, Row, Space, Typography } from "antd";
 import {
-  useBreakpoints,
-  useMasterChefRegistrar,
-  useNewStakingRegistrar,
-  usePortfolioData,
-  useStakingRegistrar,
-  useTranslator,
-} from "hooks";
-import { useEffect, useMemo, useState } from "react";
+  IndexSection,
+  LiquiditySection,
+  VaultSection,
+} from "components/portfolio";
+import {
+  Page,
+  PortfolioPieChart,
+  Token,
+  WalletConnector,
+} from "components/atomic";
+import { convert } from "helpers";
+import { selectors } from "features";
+import { useBreakpoints, usePortfolioData } from "hooks";
+import { useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 
 export default function Portfolio() {
-  const tx = useTranslator();
-  const [showOwnedAssets, setShowOwnedAssets] = useState(true);
-  const { ndx, tokens, totalValue } = usePortfolioData({
-    onlyOwnedAssets: showOwnedAssets,
-  });
-  const data = useMemo(() => [ndx, ...tokens], [ndx, tokens]);
   const { isMobile } = useBreakpoints();
   const isUserConnected = useSelector(selectors.selectUserConnected);
-  const [fadedWidget, setFadedWidget] = useState(-1);
-
-  useStakingRegistrar();
-  useNewStakingRegistrar();
-  useMasterChefRegistrar();
-
-  useEffect(() => {
-    if (fadedWidget < data.length - 1) {
-      setTimeout(() => {
-        setFadedWidget((prev) => prev + 1);
-      }, 200);
+  const { ndx, tokens, totalValue: totalValueWithoutVaults } = usePortfolioData(
+    {
+      onlyOwnedAssets: true,
     }
-  }, [fadedWidget, data.length]);
+  );
+  const [usdValueFromVaults, setUsdValueFromVaults] = useState(0);
+  const handleReceivedUsdValueFromVaults = (amount: number) =>
+    setUsdValueFromVaults(amount);
+  const totalValue = useMemo(() => {
+    const parsedTotalValueWithoutVaults = parseFloat(
+      totalValueWithoutVaults.replace(/\$/g, "").replace(/,/g, "")
+    );
+
+    return parsedTotalValueWithoutVaults + usdValueFromVaults;
+  }, [totalValueWithoutVaults, usdValueFromVaults]);
+
+  const chartData = useMemo(() => {
+    // NDX
+    const ndxUsdValue = parseFloat(
+      ndx.value.replace(/\$/g, "").replace(/,/g, "")
+    );
+    const ndxPercentage = ndxUsdValue / totalValue;
+
+    // Index
+    const indexTokens = tokens.filter(
+      (token) => !token.isSushiswapPair && !token.isUniswapPair
+    );
+    const indexUsdValue = indexTokens
+      .map((token) => token.value.replace(/\$/g, ""))
+      .map((value) => parseFloat(value))
+      .reduce((prev, next) => prev + next, 0);
+    const indexPercentage = indexUsdValue / totalValue;
+
+    // Liquidity
+    const liquidityTokens = tokens.filter(
+      (token) => token.isSushiswapPair || token.isUniswapPair
+    );
+    const liquidityUsdValue = liquidityTokens
+      .map((token) => token.value.replace(/\$/g, ""))
+      .map((value) => parseFloat(value))
+      .reduce((prev, next) => prev + next, 0);
+    const liquidityPercentage = liquidityUsdValue / totalValue;
+
+    // Vaults
+    const subtotal = indexPercentage + liquidityPercentage + ndxPercentage;
+    const vaultsPercentage = 1 - subtotal;
+
+    return [
+      {
+        name: "NDX",
+        value: ndxPercentage,
+      },
+      {
+        name: "Vaults",
+        value: vaultsPercentage,
+      },
+      {
+        name: "Indexes",
+        value: indexPercentage,
+      },
+      {
+        name: "Liquidity",
+        value: liquidityPercentage,
+      },
+    ];
+  }, [ndx, tokens, totalValue]);
 
   return (
-    <Page
-      hasPageHeader={true}
-      title={tx("PORTFOLIO")}
-      extra={
-        isUserConnected ? (
-          <Space direction="vertical">
-            <Typography.Title
-              level={3}
-              style={{ margin: 0, marginRight: "1rem" }}
-            >
-              Total value:{" "}
-              {!isMobile && (
-                <Typography.Text type="success" style={{ margin: 0 }}>
-                  {totalValue}
-                </Typography.Text>
-              )}
-            </Typography.Title>
-            {isMobile && (
-              <Typography.Title type="success" style={{ margin: 0 }}>
-                {totalValue}
-              </Typography.Title>
-            )}
-            <Checkbox
-              checked={showOwnedAssets}
-              onChange={(value) => setShowOwnedAssets(value.target.checked)}
-            >
-              Only show owned or staked assets
-            </Checkbox>
-          </Space>
-        ) : (
-          <Alert
-            style={{ maxWidth: 500 }}
-            showIcon={true}
-            type="warning"
-            message="Connect your wallet to view."
-          />
-        )
-      }
-    >
+    <Page hasPageHeader={true} title="Portfolio">
       {isUserConnected ? (
-        <Row gutter={[20, 20]}>
-          {data
-            .filter((heldAsset) => !heldAsset.symbol.includes("ERROR"))
-            .map((heldAsset, index) => (
-              <Col xs={24} sm={8}>
-                <Fade key={heldAsset.address} in={fadedWidget >= index}>
-                  <PortfolioWidget {...heldAsset} />
-                </Fade>
-              </Col>
-            ))}
-        </Row>
+        <>
+          <Row gutter={24} align="bottom" style={{ marginBottom: 96 }}>
+            <Col xs={24} md={12} lg={8}>
+              <Card
+                bordered={false}
+                title={
+                  <Typography.Title
+                    type="warning"
+                    level={3}
+                    style={{
+                      margin: 0,
+                      marginRight: 24,
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    Total value
+                  </Typography.Title>
+                }
+              >
+                <Typography.Title
+                  level={1}
+                  type="success"
+                  style={{ margin: 0, textTransform: "uppercase" }}
+                >
+                  {convert.toCurrency(totalValue)}
+                </Typography.Title>
+              </Card>
+            </Col>
+            <Col xs={24} md={12} lg={8}>
+              <Card
+                bordered={false}
+                title={
+                  <Typography.Title
+                    type="warning"
+                    level={3}
+                    style={{
+                      margin: 0,
+                      marginRight: 24,
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    Governance Token
+                  </Typography.Title>
+                }
+              >
+                <Typography.Title
+                  level={1}
+                  style={{ margin: 0, textTransform: "uppercase" }}
+                >
+                  <Space direction="vertical" size="large">
+                    <Token
+                      amount={ndx.balance}
+                      symbol="NDX"
+                      name="NDX"
+                      size="large"
+                    />
+                    <Typography.Text
+                      type="success"
+                      style={{ textAlign: "right", margin: 0 }}
+                    >
+                      {ndx.value}
+                    </Typography.Text>
+                  </Space>
+                </Typography.Title>
+              </Card>
+            </Col>
+            <Col xs={24} lg={8}>
+              <div
+                style={{
+                  position: "relative",
+                  width: 200,
+                  height: 200,
+                  transform: `scale(${isMobile ? "1.2" : "1.6"}) ${
+                    isMobile ? "translateX(80px) translateY(40px)" : ""
+                  }`,
+                }}
+              >
+                <PortfolioPieChart data={chartData} />
+              </div>
+            </Col>
+          </Row>
+          <VaultSection onUsdValueChange={handleReceivedUsdValueFromVaults} />
+          <IndexSection />
+          <LiquiditySection />
+        </>
       ) : (
         <Space direction="vertical" align="center" style={{ width: "100%" }}>
           <Empty description="No wallet detected." />

@@ -64,7 +64,7 @@ export function StakingStats({
         <Descriptions.Item label="Earned Rewards">
           <Row>
             <Col xs={24} md={14}>
-              {earned} NDX
+              {earned} {rewardsAsset}
             </Col>
             <Col xs={24} md={8}>
               <Button type="primary" block={true} onClick={onClaim}>
