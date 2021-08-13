@@ -10,6 +10,7 @@ export * from './IndexPoolRecentTrades';
 export * from './IndexPoolWidget';
 export * from './LayoutHeader';
 export * from './Page';
+export * from './PortfolioPieChart';
 export * from './PortfolioWidget';
 export * from './StakeForm';
 export * from './StakeStats';

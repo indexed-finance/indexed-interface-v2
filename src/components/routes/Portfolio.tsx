@@ -16,6 +16,7 @@ import {
 } from "components/portfolio";
 import {
   Page,
+  PortfolioPieChart,
   PortfolioWidget,
   Token,
   WalletConnector,
@@ -124,9 +125,11 @@ export function PPortfolio() {
 
 export default function Portfolio() {
   const isUserConnected = useSelector(selectors.selectUserConnected);
-  const { ndx, totalValue: totalValueWithoutVaults } = usePortfolioData({
-    onlyOwnedAssets: true,
-  });
+  const { ndx, tokens, totalValue: totalValueWithoutVaults } = usePortfolioData(
+    {
+      onlyOwnedAssets: true,
+    }
+  );
   const [usdValueFromVaults, setUsdValueFromVaults] = useState(0);
   const handleReceivedUsdValueFromVaults = (amount: number) =>
     setUsdValueFromVaults(amount);
@@ -137,6 +140,57 @@ export default function Portfolio() {
 
     return parsedTotalValueWithoutVaults + usdValueFromVaults;
   }, [totalValueWithoutVaults, usdValueFromVaults]);
+
+  const chartData = useMemo(() => {
+    // NDX
+    const ndxUsdValue = parseFloat(
+      ndx.value.replace(/\$/g, "").replace(/,/g, "")
+    );
+    const ndxPercentage = ndxUsdValue / totalValue;
+
+    // Index
+    const indexTokens = tokens.filter(
+      (token) => !token.isSushiswapPair && !token.isUniswapPair
+    );
+    const indexUsdValue = indexTokens
+      .map((token) => token.value.replace(/\$/g, ""))
+      .map((value) => parseFloat(value))
+      .reduce((prev, next) => prev + next, 0);
+    const indexPercentage = indexUsdValue / totalValue;
+
+    // Liquidity
+    const liquidityTokens = tokens.filter(
+      (token) => token.isSushiswapPair || token.isUniswapPair
+    );
+    const liquidityUsdValue = liquidityTokens
+      .map((token) => token.value.replace(/\$/g, ""))
+      .map((value) => parseFloat(value))
+      .reduce((prev, next) => prev + next, 0);
+    const liquidityPercentage = liquidityUsdValue / totalValue;
+
+    // Vaults
+    const subtotal = indexPercentage + liquidityPercentage;
+    const vaultsPercentage = 1 - subtotal;
+
+    return [
+      {
+        name: "NDX",
+        value: ndxPercentage,
+      },
+      {
+        name: "Vaults",
+        value: vaultsPercentage,
+      },
+      {
+        name: "Indexes",
+        value: indexPercentage,
+      },
+      {
+        name: "Liquidity",
+        value: liquidityPercentage,
+      },
+    ];
+  }, [ndx, tokens, totalValue]);
 
   return (
     <Page hasPageHeader={true} title="Portfolio">
@@ -207,6 +261,17 @@ export default function Portfolio() {
                 </Typography.Title>
               </Card>
             </Col>
+            <div
+              style={{
+                position: "relative",
+                width: 400,
+                height: 200,
+                transform: `scale(2.0) translateY(-40px)`,
+              }}
+            >
+              <PortfolioPieChart data={chartData} />
+            </div>
+            <Col span={8}></Col>
           </Row>
           <VaultSection onUsdValueChange={handleReceivedUsdValueFromVaults} />
           <IndexSection />
