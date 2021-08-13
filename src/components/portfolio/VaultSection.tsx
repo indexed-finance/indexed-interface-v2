@@ -22,12 +22,15 @@ export function VaultSection({ onUsdValueChange }: Props) {
     []
   );
   const usdValue = useMemo(
-    () => Object.values(usdValueByVault).reduce((prev, next) => prev + next, 0),
+    () =>
+      Object.values(usdValueByVault)
+        .reduce((prev, next) => prev + next, 0)
+        .toFixed(2),
     [usdValueByVault]
   );
 
   useEffect(() => {
-    onUsdValueChange(usdValue);
+    onUsdValueChange(parseFloat(usdValue));
   }, [onUsdValueChange, usdValue]);
 
   return (

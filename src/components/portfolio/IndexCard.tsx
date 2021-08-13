@@ -46,6 +46,10 @@ export function IndexCard({
           ? [
               <List key="list">
                 <List.Item>
+                  <Label>Asset</Label>
+                  {name}
+                </List.Item>
+                <List.Item>
                   <Label>Currently staking</Label>
                   {staking || "0.00"} {actualSymbol}
                 </List.Item>

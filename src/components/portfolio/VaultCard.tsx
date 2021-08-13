@@ -38,6 +38,10 @@ export function VVaultCard({ address, onRegisterUsdValue }: Props) {
       actions={[
         <List key="list">
           <List.Item>
+            <Label>Vault</Label>
+            {name}
+          </List.Item>
+          <List.Item>
             <Label>APR</Label>
             {apr}%
           </List.Item>

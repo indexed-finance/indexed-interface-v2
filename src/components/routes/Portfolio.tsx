@@ -169,7 +169,7 @@ export default function Portfolio() {
     const liquidityPercentage = liquidityUsdValue / totalValue;
 
     // Vaults
-    const subtotal = indexPercentage + liquidityPercentage;
+    const subtotal = indexPercentage + liquidityPercentage + ndxPercentage;
     const vaultsPercentage = 1 - subtotal;
 
     return [
@@ -261,17 +261,18 @@ export default function Portfolio() {
                 </Typography.Title>
               </Card>
             </Col>
-            <div
-              style={{
-                position: "relative",
-                width: 400,
-                height: 200,
-                transform: `scale(2.0) translateY(-40px)`,
-              }}
-            >
-              <PortfolioPieChart data={chartData} />
-            </div>
-            <Col span={8}></Col>
+            <Col span={8}>
+              <div
+                style={{
+                  position: "relative",
+                  width: 400,
+                  height: 200,
+                  transform: `scale(2.0) translateY(-40px)`,
+                }}
+              >
+                <PortfolioPieChart data={chartData} />
+              </div>
+            </Col>
           </Row>
           <VaultSection onUsdValueChange={handleReceivedUsdValueFromVaults} />
           <IndexSection />
