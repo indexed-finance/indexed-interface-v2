@@ -33,8 +33,9 @@ export function VVaultCard({ address, onRegisterUsdValue }: Props) {
     <PortfolioCard
       amount={shortenAmount(wrappedBalance.displayed).toString()}
       symbol={symbol}
+      removeTheN={true}
       name={name}
-      usdValue={`USD $${usdValue}`}
+      usdValue={`$${usdValue}`}
       actions={[
         <List key="list">
           <List.Item>
@@ -46,8 +47,7 @@ export function VVaultCard({ address, onRegisterUsdValue }: Props) {
             {apr}%
           </List.Item>
           <List.Item>
-            <Label>Earned</Label>
-            USD ${usdValue}
+            <Label>Earned</Label>${usdValue}
           </List.Item>
         </List>,
       ]}

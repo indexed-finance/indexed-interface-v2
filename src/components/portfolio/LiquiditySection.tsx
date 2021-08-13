@@ -3,6 +3,7 @@ import { IndexCard } from "./IndexCard";
 import { PortfolioSection } from "./PortfolioSection";
 import { convert } from "helpers";
 import {
+  useBreakpoints,
   useMasterChefRegistrar,
   useNewStakingRegistrar,
   usePortfolioData,
@@ -10,6 +11,7 @@ import {
 } from "hooks";
 
 export function LiquiditySection() {
+  const { isMobile } = useBreakpoints();
   const { tokens } = usePortfolioData({
     onlyOwnedAssets: true,
   });
@@ -28,10 +30,15 @@ export function LiquiditySection() {
   useMasterChefRegistrar();
 
   return (
-    <PortfolioSection title="Liquidity" usdValue={`USD ${sectionUsdValue}`}>
+    <PortfolioSection title="Liquidity" usdValue={sectionUsdValue}>
       <Row gutter={12} align="bottom">
         {liquidityTokens.map((token) => (
-          <Col key={token.address} span={8}>
+          <Col
+            key={token.address}
+            xs={24}
+            lg={8}
+            style={{ marginBottom: isMobile ? 12 : 0 }}
+          >
             <IndexCard
               name={token.name}
               symbol={token.symbol}

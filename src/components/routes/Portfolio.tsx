@@ -124,6 +124,7 @@ export function PPortfolio() {
 }
 
 export default function Portfolio() {
+  const { isMobile } = useBreakpoints();
   const isUserConnected = useSelector(selectors.selectUserConnected);
   const { ndx, tokens, totalValue: totalValueWithoutVaults } = usePortfolioData(
     {
@@ -197,7 +198,7 @@ export default function Portfolio() {
       {isUserConnected ? (
         <>
           <Row gutter={24} align="bottom" style={{ marginBottom: 96 }}>
-            <Col span={8}>
+            <Col xs={24} md={12} lg={8}>
               <Card
                 bordered={false}
                 title={
@@ -219,11 +220,11 @@ export default function Portfolio() {
                   type="success"
                   style={{ margin: 0, textTransform: "uppercase" }}
                 >
-                  USD {convert.toCurrency(totalValue)}
+                  {convert.toCurrency(totalValue)}
                 </Typography.Title>
               </Card>
             </Col>
-            <Col span={8}>
+            <Col xs={24} md={12} lg={8}>
               <Card
                 bordered={false}
                 title={
@@ -255,19 +256,23 @@ export default function Portfolio() {
                       type="success"
                       style={{ textAlign: "right", margin: 0 }}
                     >
-                      USD {ndx.value}
+                      {ndx.value}
                     </Typography.Text>
                   </Space>
                 </Typography.Title>
               </Card>
             </Col>
-            <Col span={8}>
+            <Col xs={24} lg={8}>
               <div
                 style={{
                   position: "relative",
                   width: 400,
                   height: 200,
-                  transform: `scale(2.0) translateY(-40px)`,
+                  transform: `scale(${isMobile ? "1.2" : "2.0"}) ${
+                    isMobile
+                      ? "translateX(-40px) translateY(-40px)"
+                      : "translateY(-40px)"
+                  }`,
                 }}
               >
                 <PortfolioPieChart data={chartData} />

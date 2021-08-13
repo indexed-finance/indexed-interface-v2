@@ -9,6 +9,7 @@ export function PortfolioCard({
   usdValue,
   actions,
   extra,
+  removeTheN = false,
 }: {
   amount: string;
   symbol: string;
@@ -16,9 +17,11 @@ export function PortfolioCard({
   usdValue: string;
   actions: ReactNode[];
   extra?: ReactNode;
+  removeTheN?: boolean;
 }) {
   const [expanded, setExpanded] = useState(false);
   const toggleExpanded = useCallback(() => setExpanded((prev) => !prev), []);
+  const symbolToUse = removeTheN ? symbol.split("").slice(1).join("") : symbol;
 
   return (
     <Card
@@ -27,7 +30,13 @@ export function PortfolioCard({
       onClick={toggleExpanded}
       title={
         <Space direction="vertical" style={{ width: "100%" }}>
-          <Token amount={amount} symbol={symbol} name={name} size="large" />
+          <Token
+            amount={amount}
+            symbol={symbolToUse}
+            symbolOverride={symbol}
+            name={name}
+            size="large"
+          />
           <Typography.Title level={4} type="success" style={{ margin: 0 }}>
             {usdValue}
           </Typography.Title>

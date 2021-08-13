@@ -2,9 +2,10 @@ import { Col, Row } from "antd";
 import { IndexCard } from "./IndexCard";
 import { PortfolioSection } from "./PortfolioSection";
 import { convert } from "helpers";
-import { usePortfolioData } from "hooks";
+import { useBreakpoints, usePortfolioData } from "hooks";
 
 export function IndexSection() {
+  const { isMobile } = useBreakpoints();
   const { tokens } = usePortfolioData({
     onlyOwnedAssets: true,
   });
@@ -19,10 +20,15 @@ export function IndexSection() {
   );
 
   return (
-    <PortfolioSection title="Indexes" usdValue={`USD ${sectionUsdValue}`}>
+    <PortfolioSection title="Indexes" usdValue={sectionUsdValue}>
       <Row gutter={12} align="bottom">
         {indexTokens.map((token) => (
-          <Col key={token.address} span={8}>
+          <Col
+            key={token.address}
+            xs={24}
+            lg={8}
+            style={{ marginBottom: isMobile ? 12 : 0 }}
+          >
             <IndexCard
               name={token.name}
               symbol={token.symbol}

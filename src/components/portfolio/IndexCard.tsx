@@ -40,7 +40,7 @@ export function IndexCard({
       amount={amount}
       symbol={actualSymbol}
       name={name}
-      usdValue={`USD ${usdValue}`}
+      usdValue={usdValue}
       actions={
         hasStakingPool
           ? [
