@@ -1,13 +1,14 @@
+import { Col, List } from "antd";
 import { Label } from "components/atomic";
-import { List } from "antd";
 import { PortfolioCard } from "./PortfolioCard";
-import { useEffect } from "react";
 import {
+  useBreakpoints,
   useVault,
   useVaultAPR,
   useVaultRegistrar,
   useVaultUserBalance,
 } from "hooks";
+import { useEffect } from "react";
 
 interface Props {
   address: string;
@@ -15,6 +16,7 @@ interface Props {
 }
 
 export function VVaultCard({ address, onRegisterUsdValue }: Props) {
+  const { isMobile } = useBreakpoints();
   const vault = useVault(address);
   const { wrappedBalance, usdValue } = useVaultUserBalance(address);
   const apr = useVaultAPR(address);
@@ -30,28 +32,30 @@ export function VVaultCard({ address, onRegisterUsdValue }: Props) {
   useVaultRegistrar(address);
 
   return parseFloat(usdValue ?? "0.00") === 0 ? null : (
-    <PortfolioCard
-      amount={shortenAmount(wrappedBalance.displayed).toString()}
-      symbol={symbol}
-      removeTheN={true}
-      name={name}
-      usdValue={`$${usdValue}`}
-      actions={[
-        <List key="list">
-          <List.Item>
-            <Label>Vault</Label>
-            {name}
-          </List.Item>
-          <List.Item>
-            <Label>APR</Label>
-            {apr}%
-          </List.Item>
-          <List.Item>
-            <Label>Earned</Label>${usdValue}
-          </List.Item>
-        </List>,
-      ]}
-    />
+    <Col xs={24} lg={8} style={{ marginBottom: isMobile ? 12 : 0 }}>
+      <PortfolioCard
+        amount={shortenAmount(wrappedBalance.displayed).toString()}
+        symbol={symbol}
+        removeTheN={true}
+        name={name}
+        usdValue={`$${usdValue}`}
+        actions={[
+          <List key="list">
+            <List.Item>
+              <Label>Vault</Label>
+              {name}
+            </List.Item>
+            <List.Item>
+              <Label>APR</Label>
+              {apr}%
+            </List.Item>
+            <List.Item>
+              <Label>Earned</Label>${usdValue}
+            </List.Item>
+          </List>,
+        ]}
+      />
+    </Col>
   );
 }
 

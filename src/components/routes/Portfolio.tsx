@@ -1,14 +1,4 @@
-import {
-  Alert,
-  Card,
-  Checkbox,
-  Col,
-  Empty,
-  Row,
-  Space,
-  Typography,
-} from "antd";
-import { Fade } from "components/animations";
+import { Card, Col, Empty, Row, Space, Typography } from "antd";
 import {
   IndexSection,
   LiquiditySection,
@@ -17,111 +7,14 @@ import {
 import {
   Page,
   PortfolioPieChart,
-  PortfolioWidget,
   Token,
   WalletConnector,
 } from "components/atomic";
 import { convert } from "helpers";
 import { selectors } from "features";
-import {
-  useBreakpoints,
-  useMasterChefRegistrar,
-  useNewStakingRegistrar,
-  usePortfolioData,
-  useStakingRegistrar,
-  useTranslator,
-} from "hooks";
-import { useEffect, useMemo, useState } from "react";
+import { useBreakpoints, usePortfolioData } from "hooks";
+import { useMemo, useState } from "react";
 import { useSelector } from "react-redux";
-
-export function PPortfolio() {
-  const tx = useTranslator();
-  const [showOwnedAssets, setShowOwnedAssets] = useState(true);
-  const { ndx, tokens, totalValue } = usePortfolioData({
-    onlyOwnedAssets: showOwnedAssets,
-  });
-  const data = useMemo(() => [ndx, ...tokens], [ndx, tokens]);
-  const { isMobile } = useBreakpoints();
-  const isUserConnected = useSelector(selectors.selectUserConnected);
-  const [fadedWidget, setFadedWidget] = useState(-1);
-
-  useStakingRegistrar();
-  useNewStakingRegistrar();
-  useMasterChefRegistrar();
-
-  useEffect(() => {
-    if (fadedWidget < data.length - 1) {
-      setTimeout(() => {
-        setFadedWidget((prev) => prev + 1);
-      }, 200);
-    }
-  }, [fadedWidget, data.length]);
-
-  return (
-    <Page
-      hasPageHeader={true}
-      title={tx("PORTFOLIO")}
-      extra={
-        isUserConnected ? (
-          <Space direction="vertical">
-            <Typography.Title
-              level={3}
-              style={{
-                margin: 0,
-                marginRight: "1rem",
-                textTransform: "uppercase",
-              }}
-            >
-              Total value:{" "}
-              {!isMobile && (
-                <Typography.Text type="success" style={{ margin: 0 }}>
-                  {totalValue}
-                </Typography.Text>
-              )}
-            </Typography.Title>
-            {isMobile && (
-              <Typography.Title type="success" style={{ margin: 0 }}>
-                {totalValue}
-              </Typography.Title>
-            )}
-            <Checkbox
-              checked={showOwnedAssets}
-              onChange={(value) => setShowOwnedAssets(value.target.checked)}
-            >
-              Only show owned or staked assets
-            </Checkbox>
-          </Space>
-        ) : (
-          <Alert
-            style={{ maxWidth: 500 }}
-            showIcon={true}
-            type="warning"
-            message="Connect your wallet to view."
-          />
-        )
-      }
-    >
-      {isUserConnected ? (
-        <Row gutter={[20, 20]}>
-          {data
-            .filter((heldAsset) => !heldAsset.symbol.includes("ERROR"))
-            .map((heldAsset, index) => (
-              <Col xs={24} sm={8}>
-                <Fade key={heldAsset.address} in={fadedWidget >= index}>
-                  <PortfolioWidget {...heldAsset} />
-                </Fade>
-              </Col>
-            ))}
-        </Row>
-      ) : (
-        <Space direction="vertical" align="center" style={{ width: "100%" }}>
-          <Empty description="No wallet detected." />
-          <WalletConnector />
-        </Space>
-      )}
-    </Page>
-  );
-}
 
 export default function Portfolio() {
   const { isMobile } = useBreakpoints();
@@ -266,12 +159,10 @@ export default function Portfolio() {
               <div
                 style={{
                   position: "relative",
-                  width: 400,
+                  width: 200,
                   height: 200,
-                  transform: `scale(${isMobile ? "1.2" : "2.0"}) ${
-                    isMobile
-                      ? "translateX(-40px) translateY(-40px)"
-                      : "translateY(-40px)"
+                  transform: `scale(${isMobile ? "1.2" : "1.6"}) ${
+                    isMobile ? "translateX(80px) translateY(40px)" : ""
                   }`,
                 }}
               >

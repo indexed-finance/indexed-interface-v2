@@ -1,8 +1,8 @@
-import { Col, Row } from "antd";
 import { PortfolioSection } from "./PortfolioSection";
+import { Row } from "antd";
 import { VVaultCard } from "./VaultCard";
 import { convert } from "helpers";
-import { useAllVaults, useBreakpoints } from "hooks";
+import { useAllVaults } from "hooks";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 interface Props {
@@ -10,7 +10,6 @@ interface Props {
 }
 
 export function VaultSection({ onUsdValueChange }: Props) {
-  const { isMobile } = useBreakpoints();
   const vaults = useAllVaults();
   const [usdValueByVault, setUsdValueByVault] = useState<
     Record<string, number>
@@ -36,17 +35,11 @@ export function VaultSection({ onUsdValueChange }: Props) {
     <PortfolioSection title="Vaults" usdValue={convert.toCurrency(usdValue)}>
       <Row gutter={12} align="bottom">
         {vaults.map((vault) => (
-          <Col
+          <VVaultCard
             key={vault.id}
-            xs={24}
-            lg={8}
-            style={{ marginBottom: isMobile ? 12 : 0 }}
-          >
-            <VVaultCard
-              address={vault.id}
-              onRegisterUsdValue={registerUsdValue}
-            />
-          </Col>
+            address={vault.id}
+            onRegisterUsdValue={registerUsdValue}
+          />
         ))}
       </Row>
     </PortfolioSection>
