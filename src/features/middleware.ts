@@ -1,4 +1,5 @@
 import { FEATURE_FLAGS } from "feature-flags";
+import { LOCALSTORAGE_KEY } from "config";
 import { RegisteredCall, debugConsole, deserializeOnChainCall } from "helpers";
 import { actions, disconnectFromProvider, provider } from "./thunks";
 import {
@@ -19,6 +20,7 @@ export function userDisconnectionMiddleware() {
   return (next: any) => (action: any) => {
     if (action.type === userActions.userDisconnected.type) {
       disconnectFromProvider();
+      window.localStorage.removeItem(LOCALSTORAGE_KEY);
     }
 
     return next(action);
@@ -211,7 +213,7 @@ export function handleBatchUpdate() {
             fetchIndexPoolTransactions,
             fetchIndexPoolUpdates,
             fetchTokenPriceData,
-            fetchVaultsData
+            fetchVaultsData,
           }[fn] as any;
 
           if (request) {
