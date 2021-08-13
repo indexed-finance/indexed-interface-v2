@@ -28,7 +28,6 @@ const renderCustomizedLabel = ({
       fill="#eee"
       textAnchor={x > cx ? "start" : "end"}
       dominantBaseline="central"
-      //   fontWeight={900}
       fontSize={10}
     >
       {name.toUpperCase()}: {convert.toPercent(percent)}
@@ -67,9 +66,7 @@ export class PortfolioPieChart extends Component<Props> {
           labelLine={false}
         >
           {this.props.data.map((entry, index) => (
-            <Cell key={entry.name} fill={colors[index % colors.length]}>
-              hi
-            </Cell>
+            <Cell key={entry.name} fill={colors[index % colors.length]} />
           ))}
         </Pie>
       </PieChart>
