@@ -134,7 +134,7 @@
     "develop:server": "npm run build:server && node ./webpack/server/server",
     "lint": "eslint . --fix --ignore-path .gitignore --ext .ts,.tsx,.js",
     "start": "react-app-rewired start",
-    "start:server": "node ./webpack/server/server",
+    "start:server": "node ./webpack/run-server",
     "storybook": "start-storybook -p 6006",
     "storybook:deploy": "storybook-to-ghpages",
     "test": "react-app-rewired test",

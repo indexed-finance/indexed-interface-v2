@@ -54,6 +54,18 @@ export function setupClientHandling() {
     socketServer.on("connection", handleConnection);
     socketServer.on("close", handleClose);
     socketServer.on("error", handleError);
+
+    process.on('SIGTERM', () => {
+      console.info('SIGTERM signal received.');
+      console.log('Removing all listeners from socket server...')
+      socketServer.removeAllListeners()
+      console.log('Removed all listeners from socket server')
+      console.log('Killing socket server...');
+      socketServer.close(() => {
+        console.log('Socket server killed.')
+        process.exit(0)
+      })
+    })
   } else {
     const API_CERT_PATH = process.env.API_CERT_PATH;
     const API_KEY_PATH = process.env.API_KEY_PATH;
@@ -81,6 +93,22 @@ export function setupClientHandling() {
     socketServer.on("error", handleError);
 
     server.listen(443, () => "Server listening on 443...");
+
+    process.on('SIGTERM', () => {
+      console.info('SIGTERM signal received.');
+      console.log('Removing all listeners from socket server...')
+      socketServer.removeAllListeners()
+      console.log('Removed all listeners from socket server')
+      console.log('Killing socket server...');
+      socketServer.close(() => {
+        console.log('Socket server killed.');
+        console.log('Killing https server...');
+        server.close(() => {
+          console.log('Https server killed.');
+          process.exit(0);
+        })
+      })
+    })
   }
 
   continuouslyCheckForInactivity();
