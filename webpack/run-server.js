@@ -24,7 +24,8 @@ const addListeners = () => {
   });
   
   server.stderr.on('data', (data) => {
-    printErr(`server stderr: ${data}`)
+    printErr(data)
+    killServer()
   });
 
   server.on('close', (code) => {
@@ -37,6 +38,13 @@ const addListeners = () => {
     printMsg(`server ran for ${(ts - lastStartTimestamp) / 1000} seconds | restart interval is ${RESTART_INTERVAL} seconds`)
     startServer()
   });
+}
+
+const killServer = () => {
+  if (!server.killed) {
+    printMsg(`sending shutdown signal to server...`)
+    server.kill('SIGTERM')
+  }
 }
 
 const startServer = () => {
@@ -54,8 +62,7 @@ const startServer = () => {
 
 const restartProcess = () => {
   if (server) {
-    printMsg(`sending shutdown signal to server...`)
-    server.kill('SIGTERM')
+    killServer()
   } else {
     startServer()
   }
