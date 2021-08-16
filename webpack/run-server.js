@@ -1,11 +1,10 @@
-require('dotenv').config();
 const { spawn } = require('child_process');
 const path = require('path');
 const chalk = require('chalk');
 
 const serverFile = path.join(__dirname, 'server', 'server');
 
-const { RESTART_INTERVAL = 15 } = process.env;
+const RESTART_INTERVAL = 7200;
 
 let lastStartTimestamp;
 let server;
