@@ -33,7 +33,7 @@ export function LoadedIndexPool(
       <div style={{ paddingTop: 12 }}>
         {props.interaction && (
           <Row gutter={12}>
-            <Col span={8}>
+            <Col span={24}>
               <div
                 style={{
                   borderLeft: "2px solid #38EE7A",
@@ -44,19 +44,6 @@ export function LoadedIndexPool(
                 {props.interaction}
               </div>
             </Col>
-            {/* Pending new interaction images. */}
-            {/* {props.interactionTitle && (
-              <Col span={16}>
-                <img
-                  alt={props.interactionTitle}
-                  src={
-                    require(`images/${props.symbol.toLowerCase()}${
-                      props.interactionTitle
-                    }.png`).default
-                  }
-                />
-              </Col>
-            )} */}
           </Row>
         )}
         <Row

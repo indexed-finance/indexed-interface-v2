@@ -35,6 +35,10 @@ export default function Portfolio() {
     return parsedTotalValueWithoutVaults + usdValueFromVaults;
   }, [totalValueWithoutVaults, usdValueFromVaults]);
 
+  (window as any).conv = convert;
+
+  console.log({ usdValueFromVaults });
+
   const chartData = useMemo(() => {
     // NDX
     const ndxUsdValue = parseFloat(

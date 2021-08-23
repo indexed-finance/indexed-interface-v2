@@ -150,7 +150,7 @@ function SingleInteractionInner({
           tokenId: tokenIn.id,
           symbol: values.fromToken.toLowerCase(),
           approveAmount: values.fromAmount.displayed,
-          rawApproveAmount: values.fromAmount.exact.toString(10)
+          rawApproveAmount: values.fromAmount.exact.toString(10),
         };
       }
     }
@@ -468,7 +468,7 @@ function MultiInteractionInner({
           tokenId: tokenIn.id,
           symbol: values.fromToken.toLowerCase(),
           approveAmount: values.fromAmount.displayed,
-          rawApproveAmount: values.fromAmount.exact.toString(10)
+          rawApproveAmount: values.fromAmount.exact.toString(10),
         };
       }
     }
@@ -527,7 +527,7 @@ function MultiInteractionInner({
 
   return (
     <Row gutter={12}>
-      <Col xs={24} sm={12}>
+      <Col xs={24} md={12}>
         <Space direction="vertical" style={{ width: "100%" }}>
           <TokenSelector
             isInput={isInput}
@@ -571,7 +571,7 @@ function MultiInteractionInner({
           )}
         </Space>
       </Col>
-      <Col xs={24} sm={12}>
+      <Col xs={24} md={12}>
         {!sm && <Divider />}
         {assets.map((asset) => (
           <AssetEntry
