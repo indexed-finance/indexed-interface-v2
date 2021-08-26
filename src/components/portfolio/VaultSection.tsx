@@ -32,7 +32,10 @@ export function VaultSection({ onUsdValueChange }: Props) {
   }, [onUsdValueChange, usdValue]);
 
   return (
-    <PortfolioSection title="Vaults" usdValue={convert.toCurrency(usdValue)}>
+    <PortfolioSection
+      title="Vaults"
+      walletUsdValue={convert.toCurrency(usdValue)}
+    >
       <Row gutter={12} align="bottom">
         {vaults.map((vault) => (
           <VVaultCard

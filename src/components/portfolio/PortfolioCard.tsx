@@ -3,18 +3,22 @@ import { ReactNode, useCallback, useState } from "react";
 import { Token } from "components/atomic";
 
 export function PortfolioCard({
-  amount,
+  walletAmount,
   symbol,
   name,
-  usdValue,
+  walletUsdValue,
+  stakingAmount,
+  stakingUsdValue,
   actions,
   extra,
   removeTheN = false,
 }: {
-  amount: string;
+  walletAmount: string;
+  walletUsdValue: string;
+  stakingAmount?: string;
+  stakingUsdValue?: string;
   symbol: string;
   name: string;
-  usdValue: string;
   actions: ReactNode[];
   extra?: ReactNode;
   removeTheN?: boolean;
@@ -31,15 +35,72 @@ export function PortfolioCard({
       title={
         <Space direction="vertical" style={{ width: "100%" }}>
           <Token
-            amount={amount}
             symbol={symbolToUse}
             symbolOverride={symbol}
             name={name}
-            size="large"
+            size="medium"
           />
-          <Typography.Title level={4} type="success" style={{ margin: 0 }}>
-            {usdValue}
-          </Typography.Title>
+          {/* Wallet */}
+          <Card
+            type="inner"
+            bordered={false}
+            title="In Wallet"
+            bodyStyle={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            <Token
+              amount={walletAmount}
+              symbol={symbolToUse}
+              symbolOverride={symbol}
+              name={name}
+              size="small"
+              style={{ textAlign: "left" }}
+            />
+            <Typography.Title
+              level={4}
+              type="success"
+              style={{
+                margin: 0,
+              }}
+            >
+              {walletUsdValue}
+            </Typography.Title>
+          </Card>
+
+          {/* Staking */}
+          {stakingAmount && stakingUsdValue && (
+            <Card
+              bordered={false}
+              type="inner"
+              title="Staking"
+              bodyStyle={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
+              <Token
+                amount={stakingAmount}
+                symbol={symbolToUse}
+                symbolOverride={symbol}
+                name={name}
+                size="small"
+                style={{ textAlign: "left" }}
+              />
+              <Typography.Title
+                level={4}
+                type="danger"
+                style={{
+                  margin: 0,
+                }}
+              >
+                {stakingUsdValue}
+              </Typography.Title>
+            </Card>
+          )}
         </Space>
       }
       bodyStyle={{

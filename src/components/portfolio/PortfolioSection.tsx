@@ -1,13 +1,15 @@
-import { Divider, Typography } from "antd";
+import { Divider, Space, Typography } from "antd";
 import { ReactNode } from "react";
 
 export function PortfolioSection({
   title,
-  usdValue,
+  walletUsdValue,
+  stakingUsdValue,
   children,
 }: {
   title: ReactNode;
-  usdValue: string;
+  walletUsdValue: string;
+  stakingUsdValue?: string;
   children: ReactNode;
 }) {
   return (
@@ -20,13 +22,27 @@ export function PortfolioSection({
         {title}
       </Typography.Title>
       <Divider orientation="right">
-        <Typography.Title
-          level={3}
-          type="success"
-          style={{ textAlign: "right", margin: 0 }}
-        >
-          {usdValue}
-        </Typography.Title>
+        <Space>
+          <Typography.Title
+            level={3}
+            type="success"
+            style={{ textAlign: "right", margin: 0 }}
+          >
+            {walletUsdValue}
+          </Typography.Title>
+          {stakingUsdValue && (
+            <>
+              {" / "}
+              <Typography.Title
+                level={3}
+                type="danger"
+                style={{ textAlign: "right", margin: 0 }}
+              >
+                {stakingUsdValue}
+              </Typography.Title>
+            </>
+          )}
+        </Space>
       </Divider>
 
       {children}

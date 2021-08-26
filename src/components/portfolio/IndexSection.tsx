@@ -12,7 +12,7 @@ export function IndexSection() {
   const indexTokens = tokens.filter(
     (token) => !token.isSushiswapPair && !token.isUniswapPair
   );
-  const sectionUsdValue = convert.toCurrency(
+  const sectionWalletUsdValue = convert.toCurrency(
     indexTokens
       .map((token) => token.value.replace(/\$/g, ""))
       .map((value) => parseFloat(value))
@@ -20,7 +20,11 @@ export function IndexSection() {
   );
 
   return (
-    <PortfolioSection title="Indexes" usdValue={sectionUsdValue}>
+    <PortfolioSection
+      title="Indexes"
+      walletUsdValue={sectionWalletUsdValue}
+      stakingUsdValue="$250.00"
+    >
       <Row gutter={12} align="bottom">
         {indexTokens.map((token) => (
           <Col
@@ -33,8 +37,8 @@ export function IndexSection() {
               name={token.name}
               symbol={token.symbol}
               address={token.address}
-              amount={token.balance}
-              usdValue={token.value}
+              walletAmount={token.balance}
+              walletUsdValue={token.value}
               hasStakingPool={token.hasStakingPool}
               staking={token.staking}
               earnedSymbol="NDX"

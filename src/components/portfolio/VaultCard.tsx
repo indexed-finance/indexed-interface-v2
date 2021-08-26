@@ -34,11 +34,11 @@ export function VVaultCard({ address, onRegisterUsdValue }: Props) {
   return parseFloat(usdValue ?? "0.00") === 0 ? null : (
     <Col xs={24} lg={8} style={{ marginBottom: isMobile ? 12 : 0 }}>
       <PortfolioCard
-        amount={shortenAmount(wrappedBalance.displayed).toString()}
+        walletAmount={shortenAmount(wrappedBalance.displayed).toString()}
+        walletUsdValue={`$${usdValue}`}
         symbol={symbol}
         removeTheN={true}
         name={name}
-        usdValue={`$${usdValue}`}
         actions={[
           <List key="list">
             <List.Item>

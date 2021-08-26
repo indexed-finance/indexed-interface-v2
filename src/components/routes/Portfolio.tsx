@@ -1,4 +1,4 @@
-import { Card, Col, Empty, Row, Space, Typography } from "antd";
+import { Card, Col, Divider, Empty, Row, Space, Typography } from "antd";
 import {
   IndexSection,
   LiquiditySection,
@@ -34,10 +34,6 @@ export default function Portfolio() {
 
     return parsedTotalValueWithoutVaults + usdValueFromVaults;
   }, [totalValueWithoutVaults, usdValueFromVaults]);
-
-  (window as any).conv = convert;
-
-  console.log({ usdValueFromVaults });
 
   const chartData = useMemo(() => {
     // NDX
@@ -94,7 +90,7 @@ export default function Portfolio() {
     <Page hasPageHeader={true} title="Portfolio">
       {isUserConnected ? (
         <>
-          <Row gutter={24} align="bottom" style={{ marginBottom: 96 }}>
+          <Row gutter={24} align="top" style={{ marginBottom: 48 }}>
             <Col xs={24} md={12} lg={8}>
               <Card
                 bordered={false}
@@ -112,13 +108,25 @@ export default function Portfolio() {
                   </Typography.Title>
                 }
               >
-                <Typography.Title
-                  level={1}
-                  type="success"
-                  style={{ margin: 0, textTransform: "uppercase" }}
-                >
-                  {convert.toCurrency(totalValue)}
-                </Typography.Title>
+                <Card title="In Wallet" type="inner">
+                  <Typography.Title
+                    level={1}
+                    type="success"
+                    style={{ margin: 0, textTransform: "uppercase" }}
+                  >
+                    {convert.toCurrency(totalValue)}
+                  </Typography.Title>
+                </Card>
+                <Divider />
+                <Card title="Staked" type="inner">
+                  <Typography.Title
+                    level={1}
+                    type="danger"
+                    style={{ margin: 0, textTransform: "uppercase" }}
+                  >
+                    $????.??
+                  </Typography.Title>
+                </Card>
               </Card>
             </Col>
             <Col xs={24} md={12} lg={8}>
@@ -138,25 +146,57 @@ export default function Portfolio() {
                   </Typography.Title>
                 }
               >
-                <Typography.Title
-                  level={1}
-                  style={{ margin: 0, textTransform: "uppercase" }}
-                >
-                  <Space direction="vertical" size="large">
-                    <Token
-                      amount={ndx.balance}
-                      symbol="NDX"
-                      name="NDX"
-                      size="large"
-                    />
-                    <Typography.Text
-                      type="success"
-                      style={{ textAlign: "right", margin: 0 }}
+                <Card title="In Wallet" type="inner">
+                  <Typography.Title
+                    level={1}
+                    style={{ margin: 0, textTransform: "uppercase" }}
+                  >
+                    <Space direction="vertical" size="large">
+                      <Token
+                        amount={ndx.balance}
+                        symbol="NDX"
+                        name="NDX"
+                        size="large"
+                      />
+                      <Typography.Text
+                        type="success"
+                        style={{ textAlign: "right", margin: 0 }}
+                      >
+                        {ndx.value}
+                      </Typography.Text>
+                    </Space>
+                  </Typography.Title>
+                </Card>
+
+                <Divider />
+
+                <Card title="Staked" type="inner">
+                  <Typography.Title
+                    level={1}
+                    type="danger"
+                    style={{ margin: 0, textTransform: "uppercase" }}
+                  >
+                    <Typography.Title
+                      level={1}
+                      style={{ margin: 0, textTransform: "uppercase" }}
                     >
-                      {ndx.value}
-                    </Typography.Text>
-                  </Space>
-                </Typography.Title>
+                      <Space direction="vertical" size="large">
+                        <Token
+                          amount={"50.00"}
+                          symbol="NDX"
+                          name="NDX"
+                          size="large"
+                        />
+                        <Typography.Text
+                          type="danger"
+                          style={{ textAlign: "right", margin: 0 }}
+                        >
+                          $????.??
+                        </Typography.Text>
+                      </Space>
+                    </Typography.Title>
+                  </Typography.Title>
+                </Card>
               </Card>
             </Col>
             <Col xs={24} lg={8}>

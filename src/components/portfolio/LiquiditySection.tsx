@@ -18,7 +18,7 @@ export function LiquiditySection() {
   const liquidityTokens = tokens.filter(
     (token) => token.isSushiswapPair || token.isUniswapPair
   );
-  const sectionUsdValue = convert.toCurrency(
+  const sectionWalletUsdValue = convert.toCurrency(
     liquidityTokens
       .map((token) => token.value.replace(/\$/g, ""))
       .map((value) => parseFloat(value))
@@ -30,7 +30,11 @@ export function LiquiditySection() {
   useMasterChefRegistrar();
 
   return (
-    <PortfolioSection title="Liquidity" usdValue={sectionUsdValue}>
+    <PortfolioSection
+      title="Liquidity"
+      walletUsdValue={sectionWalletUsdValue}
+      stakingUsdValue="$250.00"
+    >
       <Row gutter={12} align="bottom">
         {liquidityTokens.map((token) => (
           <Col
@@ -43,8 +47,8 @@ export function LiquiditySection() {
               name={token.name}
               symbol={token.symbol}
               address={token.address}
-              amount={token.balance}
-              usdValue={token.value}
+              walletAmount={token.balance}
+              walletUsdValue={token.value}
               hasStakingPool={token.hasStakingPool}
               staking={token.staking}
               earnedSymbol={token.isSushiswapPair ? "SUSHI" : "NDX"}
