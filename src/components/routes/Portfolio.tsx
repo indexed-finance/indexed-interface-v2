@@ -12,11 +12,15 @@ import {
 } from "components/atomic";
 import { convert } from "helpers";
 import { selectors } from "features";
-import { useBreakpoints, usePortfolioData } from "hooks";
+import { useAllPortfolioData, useBreakpoints, usePortfolioData } from "hooks";
 import { useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 
 export default function Portfolio() {
+  ///////
+  useAllPortfolioData();
+  ///////
+
   const { isMobile } = useBreakpoints();
   const isUserConnected = useSelector(selectors.selectUserConnected);
   const { ndx, tokens, totalValue: totalValueWithoutVaults } = usePortfolioData(

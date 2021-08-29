@@ -109,6 +109,197 @@ function usePriceLookupArgs(indexPools: NormalizedIndexPool[]): PricedAsset[] {
   }, [indexPools]);
 }
 
+export function useAllPortfolioData() {
+  // Common
+  const allIndexes = useAllPools();
+  const tokenLookup = useTokenLookup();
+  const priceLookupArgs = usePriceLookupArgs(allIndexes);
+  const priceLookup = useTokenPricesLookup(priceLookupArgs);
+
+  // Indexes
+  const tokensAndEthPairs = usePortfolioTokensAndEthPairs(allIndexes);
+  const { indexes, indexIds } = useMemo(() => {
+    const result = tokensAndEthPairs.filter(
+      ({ isSushiswapPair, isUniswapPair }) =>
+        !(isSushiswapPair || isUniswapPair)
+    );
+
+    return {
+      indexes: result,
+      indexIds: result.map(({ id }) => id),
+    };
+  }, [tokensAndEthPairs]);
+  const balances = useTokenBalances(indexIds);
+
+  // Liquidity
+  const liquidityIds = useMemo(() => {
+    return tokensAndEthPairs
+      .filter(
+        ({ isSushiswapPair, isUniswapPair }) => isSushiswapPair || isUniswapPair
+      )
+      .map(({ id }) => id);
+  }, [tokensAndEthPairs]);
+  const pairExistsLookup = usePairExistsLookup(liquidityIds);
+
+  // -- Basic
+  const stakingPoolsByToken = useStakingPoolsForTokens(liquidityIds);
+  const stakingInfoLookup = useStakingInfoLookup();
+
+  // -- Uniswap
+  const uniswapStakingPoolsByToken = useNewStakingPoolsForTokens(liquidityIds);
+  const uniswapStakingInfoLookup = useNewStakingInfoLookup(liquidityIds);
+
+  // -- Sushiswap
+  const sushiswapStakingPoolsByToken =
+    useMasterChefPoolsForTokens(liquidityIds);
+  const sushiswapStakingInfoLookup = useMasterChefInfoLookup(liquidityIds);
+
+  // 1. For each index pool offered through index, calculate the dollar value in wallet and staked.
+  const tokenData = indexIds.concat(liquidityIds).reduce(
+    (prev, next, index) => {
+      // -- Early exit for governance token.
+      const isNdx = next.toLowerCase() === NDX_ADDRESS.toLowerCase();
+
+      if (isNdx) {
+        return prev;
+      }
+
+      // -- Common
+      const decimals = tokenLookup[next]?.decimals ?? 18;
+      const price = priceLookup[next] ?? 0;
+
+      // -- In Wallet
+      const walletBalance = balances[index] ?? "0";
+      const convertedWalletBalance = convert.toBalanceNumber(
+        walletBalance,
+        decimals
+      );
+      const walletValue = convertedWalletBalance * price;
+
+      prev.inWallet += walletValue;
+
+      // -- Accrued via Staking
+      const [
+        associatedStakingPool,
+        associatedUniswapStakingPool,
+        associatedSushiswapStakingPool,
+      ] = [
+        stakingPoolsByToken[index],
+        uniswapStakingPoolsByToken[index],
+        sushiswapStakingPoolsByToken[index],
+      ];
+      const [
+        associatedStakingUserInfo,
+        associatedUniswapStakingUserInfo,
+        associatedSushiswapStakingUserInfo,
+      ] = [
+        associatedStakingPool
+          ? stakingInfoLookup[associatedStakingPool.id]
+          : undefined,
+        uniswapStakingInfoLookup[next.toLowerCase()],
+        sushiswapStakingInfoLookup[next.toLowerCase()],
+      ];
+
+      let stakedAmount = 0;
+      let accruedAmount = 0;
+
+      // -- Through us...
+      if (associatedStakingUserInfo) {
+        stakedAmount += convert.toBalanceNumber(
+          associatedStakingUserInfo.balance,
+          decimals
+        );
+
+        accruedAmount += convert.toBalanceNumber(
+          associatedStakingUserInfo.earned,
+          decimals
+        );
+      }
+
+      // -- Through Uniswap...
+      stakedAmount += associatedUniswapStakingUserInfo?.balance ?? 0;
+      accruedAmount += associatedUniswapStakingUserInfo?.rewards ?? 0;
+
+      // -- Through Sushiswap...
+      stakedAmount += associatedSushiswapStakingUserInfo?.balance ?? 0;
+      accruedAmount += associatedSushiswapStakingUserInfo?.rewards ?? 0;
+
+      prev.accrued += accruedAmount * price;
+      prev.staked += stakedAmount * price;
+
+      return prev;
+    },
+    {
+      inWallet: 0,
+      accrued: 0,
+      staked: 0,
+    }
+  );
+
+  //////
+  console.log({ tokenData });
+  /////
+
+  return {
+    totalValue: {
+      inWallet: {
+        amount: 0,
+        value: 0,
+      },
+      accrued: {
+        amount: 0,
+        value: 0,
+      },
+    },
+    governanceToken: {
+      inWallet: {
+        amount: 0,
+        value: 0,
+      },
+      accrued: {
+        amount: 0,
+        value: 0,
+      },
+    },
+    breakdown: {
+      ndx: "",
+      vaults: "",
+      indexes: "",
+      liquidity: "",
+    },
+    vaults: {
+      inWallet: {
+        amount: 0,
+        value: 0,
+      },
+      accrued: {
+        amount: 0,
+        value: 0,
+      },
+    },
+    indexes: {
+      inWallet: {
+        amount: 0,
+        value: 0,
+      },
+      accrued: {
+        amount: 0,
+        value: 0,
+      },
+    },
+    liquidity: {
+      inWallet: {
+        amount: 0,
+        value: 0,
+      },
+      accrued: {
+        amount: 0,
+        value: 0,
+      },
+    },
+  };
+}
+
 export function usePortfolioData({
   onlyOwnedAssets,
 }: {
@@ -120,6 +311,7 @@ export function usePortfolioData({
   totalNdxEarned: string;
 } {
   const theme = useSelector((state: AppState) => selectors.selectTheme(state));
+
   const indexPools = useAllPools();
   const assetsRaw = usePortfolioTokensAndEthPairs(indexPools);
   const pairIds = useMemo(() => {
@@ -127,6 +319,7 @@ export function usePortfolioData({
       .filter((a) => a.isSushiswapPair || a.isUniswapPair)
       .map((a) => a.id);
   }, [assetsRaw]);
+
   const priceLookupArgs = usePriceLookupArgs(indexPools);
   const priceLookup = useTokenPricesLookup(priceLookupArgs);
   const pairExistsLookup = usePairExistsLookup(pairIds);
@@ -140,6 +333,7 @@ export function usePortfolioData({
 
     return [assets, assetIds];
   }, [assetsRaw, pairExistsLookup]);
+
   const balances = useTokenBalances(assetIds);
   const stakingPoolsByTokens = useStakingPoolsForTokens(assetIds);
   const newStakingPoolsByTokens = useNewStakingPoolsForTokens(assetIds);
