@@ -31,12 +31,10 @@ export interface FormattedVault extends NormalizedVault {
 export function useAllVaults(): FormattedVault[] {
   const vaults = useSelector(selectors.selectAprSortedVaults);
   const underlyings = vaults.map((v) => v.underlying.id);
-  const prices = useSelector((state: AppState) =>
-    selectors.selectTokenPrices(state, underlyings)
-  );
+  const prices = useTokenPricesLessStrict(underlyings)
   return useMemo(() => {
     return vaults.map((vault, i): FormattedVault => {
-      const price = (prices as number[])[i] || 0;
+      const price = prices[i];
       const balance = convert.toBalanceNumber(
         vault.totalValue ?? "0",
         vault.decimals
@@ -115,15 +113,6 @@ export function useAllVaultsUserBalance() {
   const lookup = useSelector((state: AppState) =>
     selectors.selectVaultLookup(state)
   );
-  const toUnderlyingAmount = useCallback(
-    (vault: FormattedVault) => (exactTokenAmount: BigNumber) => {
-      if (!vault.price) return convert.toBigNumber("0");
-      return exactTokenAmount
-        .times(convert.toBigNumber(vault.price))
-        .div(convert.toToken("1", 18));
-    },
-    []
-  );
 
   const vaultIds = vaults.map((vault) => vault.id);
   const vaultUnderlyingIds = vaults.map((vault) => vault.underlying.id);
@@ -140,46 +129,42 @@ export function useAllVaultsUserBalance() {
       const vault = lookup[vaultId];
 
       if (vault) {
-        const toUnderlyingAmountFn = toUnderlyingAmount(vault);
-        const vaultTokenBalance = vaultTokenBalances[index];
-        const vaultUnderlyingBalance = vaultUnderlyingBalances[index];
-        const formattedBalance = convert.toBigNumber(vaultTokenBalance);
-        const formattedWrappedBalance = convert.toBigNumber(
-          vaultUnderlyingBalance
+        const underlyingBalance = convert.toBigNumber(vaultUnderlyingBalances[index]);
+        const wrappedBalance = convert.toBigNumber(vaultTokenBalances[index]);
+        const unwrappedBalance = wrappedBalance
+          .times(convert.toBigNumber(vault.price ?? "0"))
+          .div(convert.toToken("1", 18));
+
+        const usdValue = convert.toBalance(
+          unwrappedBalance.times(vaultUnderlyingPrices![index] ?? 0),
+          vault.decimals,
+          true,
+          2
         );
-        const formattedUnwrappedBalance = toUnderlyingAmountFn(
-          convert.toBigNumber(formattedWrappedBalance)
-        );
-        const usdValue = false
-          ? "0.00"
-          : convert
-              .toBigNumber(convert.toBalance(formattedUnwrappedBalance))
-              .multipliedBy(vaultUnderlyingPrices![index] ?? 0)
-              .toFixed(2);
 
         return {
           balance: {
-            exact: formattedBalance,
+            exact: underlyingBalance,
             displayed: convert.toBalance(
-              formattedBalance,
+              underlyingBalance,
               vault.underlying.decimals,
               false,
               10
             ),
           },
           wrappedBalance: {
-            exact: formattedWrappedBalance,
+            exact: wrappedBalance,
             displayed: convert.toBalance(
-              formattedWrappedBalance,
+              wrappedBalance,
               vault.underlying.decimals,
               false,
               10
             ),
           },
           unwrappedBalance: {
-            exact: formattedUnwrappedBalance,
+            exact: unwrappedBalance,
             displayed: convert.toBalance(
-              formattedUnwrappedBalance,
+              unwrappedBalance,
               vault.underlying.decimals,
               false,
               10
