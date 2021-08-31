@@ -181,59 +181,50 @@ export function useAllVaultsUserBalance() {
 
 export function useVaultUserBalance(id: string) {
   const vault = useVault(id);
-  const toUnderlyingAmount = useCallback(
-    (vault: FormattedVault) => (exactTokenAmount: BigNumber) => {
-      if (!vault.price) return convert.toBigNumber("0");
-      return exactTokenAmount
-        .times(convert.toBigNumber(vault.price))
-        .div(convert.toToken("1", 18));
-    },
-    []
-  );
+
   const underlyingId = vault?.underlying.id ?? "";
   const balances = useTokenBalances([underlyingId, id]);
-  const [price, priceLoading] = useTokenPrice(underlyingId);
+  const [price] = useTokenPricesLessStrict([underlyingId]);
 
   useBalanceAndApprovalRegistrar(id, [underlyingId]);
 
   if (vault) {
-    const toUnderlyingAmountFn = toUnderlyingAmount(vault);
-    const [rawBalance, rawWrappedBalance] = balances;
-    const formattedBalance = convert.toBigNumber(rawBalance);
-    const formattedWrappedBalance = convert.toBigNumber(rawWrappedBalance);
-    const formattedUnwrappedBalance = toUnderlyingAmountFn(
-      convert.toBigNumber(rawWrappedBalance)
+    const underlyingBalance = convert.toBigNumber(balances[0]);
+    const wrappedBalance = convert.toBigNumber(balances[1]);
+    const unwrappedBalance = wrappedBalance
+      .times(convert.toBigNumber(vault.price ?? "0"))
+      .div(convert.toToken("1", 18));
+
+    const usdValue = convert.toBalance(
+      unwrappedBalance.times(price),
+      vault.decimals,
+      true,
+      2
     );
-    const usdValue = priceLoading
-      ? "0.00"
-      : convert
-          .toBigNumber(convert.toBalance(formattedUnwrappedBalance))
-          .multipliedBy(price ?? 0)
-          .toFixed(2);
 
     return {
       balance: {
-        exact: formattedBalance,
+        exact: underlyingBalance,
         displayed: convert.toBalance(
-          formattedBalance,
+          underlyingBalance,
           vault.underlying.decimals,
           false,
           10
         ),
       },
       wrappedBalance: {
-        exact: formattedWrappedBalance,
+        exact: wrappedBalance,
         displayed: convert.toBalance(
-          formattedWrappedBalance,
+          wrappedBalance,
           vault.underlying.decimals,
           false,
           10
         ),
       },
       unwrappedBalance: {
-        exact: formattedUnwrappedBalance,
+        exact: unwrappedBalance,
         displayed: convert.toBalance(
-          formattedUnwrappedBalance,
+          unwrappedBalance,
           vault.underlying.decimals,
           false,
           10
