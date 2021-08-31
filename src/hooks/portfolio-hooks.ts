@@ -120,6 +120,8 @@ export function useAllPortfolioData() {
   // Vaults
   const allVaultUserBalances = useAllVaultsUserBalance();
 
+  console.log({ allVaultUserBalances });
+
   // Indexes
   const tokensAndEthPairs = usePortfolioTokensAndEthPairs(allIndexes);
   const indexIds = useMemo(

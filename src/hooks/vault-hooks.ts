@@ -14,6 +14,7 @@ import {
 } from "./token-hooks";
 import {
   useBalanceAndApprovalRegistrar,
+  useBalancesAndApprovalsRegistrar,
   useTokenBalance,
   useTokenBalances,
 } from "./user-hooks";
@@ -124,25 +125,73 @@ export function useAllVaultsUserBalance() {
     []
   );
 
-  const tokenIds = useAllTokenIds();
+  const vaultIds = vaults.map((vault) => vault.id);
+  const vaultUnderlyingIds = vaults.map((vault) => vault.underlying.id);
+  const vaultTokenBalances = useTokenBalances(vaultIds);
+  const vaultUnderlyingBalances = useTokenBalances(vaultUnderlyingIds);
+  const vaultUnderlyingPrices = useTokenPricesLessStrict(vaultUnderlyingIds);
 
-  const tokenBalances = useTokenBalances(tokenIds); // map vault ids
-  const tokenPrices = useTokenPricesLessStrict(tokenIds); // map vault underlyings
+  console.log({ vaultUnderlyingPrices });
 
-  const vaultTokenUserDataLookup = tokenIds.reduce((prev, next, index) => {
-    if (lookup[next.toLowerCase()]) {
-      prev[next] = {
-        balance: tokenBalances[index],
-        price: tokenPrices[index],
-      };
-    }
+  useBalancesAndApprovalsRegistrar(vaultIds, vaultUnderlyingIds);
 
-    return prev;
-  }, {} as Record<string, { balance: string; price: number }>);
+  return vaultIds
+    .map((vaultId, index) => {
+      const vault = lookup[vaultId];
 
-  console.log({ vaultTokenUserDataLookup });
+      if (vault) {
+        const toUnderlyingAmountFn = toUnderlyingAmount(vault);
+        const vaultTokenBalance = vaultTokenBalances[index];
+        const vaultUnderlyingBalance = vaultUnderlyingBalances[index];
+        const formattedBalance = convert.toBigNumber(vaultTokenBalance);
+        const formattedWrappedBalance = convert.toBigNumber(
+          vaultUnderlyingBalance
+        );
+        const formattedUnwrappedBalance = toUnderlyingAmountFn(
+          convert.toBigNumber(formattedWrappedBalance)
+        );
+        const usdValue = false
+          ? "0.00"
+          : convert
+              .toBigNumber(convert.toBalance(formattedUnwrappedBalance))
+              .multipliedBy(vaultUnderlyingPrices![index] ?? 0)
+              .toFixed(2);
 
-  return vaultTokenUserDataLookup;
+        return {
+          balance: {
+            exact: formattedBalance,
+            displayed: convert.toBalance(
+              formattedBalance,
+              vault.underlying.decimals,
+              false,
+              10
+            ),
+          },
+          wrappedBalance: {
+            exact: formattedWrappedBalance,
+            displayed: convert.toBalance(
+              formattedWrappedBalance,
+              vault.underlying.decimals,
+              false,
+              10
+            ),
+          },
+          unwrappedBalance: {
+            exact: formattedUnwrappedBalance,
+            displayed: convert.toBalance(
+              formattedUnwrappedBalance,
+              vault.underlying.decimals,
+              false,
+              10
+            ),
+          },
+          usdValue,
+        };
+      } else {
+        return null;
+      }
+    })
+    .filter(Boolean);
 }
 
 export function useVaultUserBalance(id: string) {
