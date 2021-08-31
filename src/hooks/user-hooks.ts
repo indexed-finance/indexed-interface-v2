@@ -99,3 +99,24 @@ export function useBalancesRegistrar(tokenIds: string[]) {
     onChainCalls: userDataCalls,
   });
 }
+
+export function useBalancesAndApprovalsRegistrar(
+  spenders: string[],
+  tokens: string[]
+) {
+  const userAddress = useUserAddress();
+  const userDataCalls: RegisteredCall[] = useMemo(() => {
+    return userAddress ? [
+      ...buildBalanceCalls(userAddress, tokens),
+      ...tokens.reduce((arr, token, i) => ([
+        ...arr,
+        ...buildAllowanceCalls(userAddress, spenders[i], [token])
+      ]), [] as RegisteredCall[])
+    ] : []
+  }, [userAddress, spenders, tokens]);
+
+  useCallRegistrar({
+    caller: USER_CALLER,
+    onChainCalls: userDataCalls,
+  });
+}
