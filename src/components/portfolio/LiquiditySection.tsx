@@ -33,7 +33,7 @@ export function LiquiditySection() {
     <PortfolioSection
       title="Liquidity"
       walletUsdValue={sectionWalletUsdValue}
-      stakingUsdValue="$250.00"
+      accruedUsdValue="$250.00"
     >
       <Row gutter={12} align="bottom">
         {liquidityTokens.map((token) => (

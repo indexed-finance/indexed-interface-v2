@@ -25,6 +25,11 @@ export const useToken = (tokenId: string) =>
 export const useTokens = (tokenIds: string[]) =>
   useSelector((state: AppState) => selectors.selectTokensById(state, tokenIds));
 
+export const useAllTokenIds = () =>
+  useSelector((state: AppState) => selectors.selectAllTokens(state)).map(
+    (each) => each.id
+  );
+
 export const useTokenLookup = () =>
   useSelector((state: AppState) => selectors.selectTokenLookup(state));
 

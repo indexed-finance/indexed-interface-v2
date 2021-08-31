@@ -7,6 +7,12 @@ import {
 } from "features";
 import { BigNumber, RegisteredCall, convert } from "helpers";
 import {
+  useAllTokenIds,
+  useTokenPrice,
+  useTokenPrices,
+  useTokenPricesLessStrict,
+} from "./token-hooks";
+import {
   useBalanceAndApprovalRegistrar,
   useTokenBalance,
   useTokenBalances,
@@ -15,7 +21,6 @@ import { useCallRegistrar } from "./use-call-registrar";
 import { useCallback } from "react";
 import { useMemo } from "react";
 import { useSelector } from "react-redux";
-import { useTokenPrice, useTokenPrices } from "./token-hooks";
 
 export interface FormattedVault extends NormalizedVault {
   underlyingPrice?: number;
@@ -102,6 +107,42 @@ export function useVaultDeposit(id: string) {
 
 export function useVaultWithdrawal(id: string) {
   // Pass
+}
+
+export function useAllVaultsUserBalance() {
+  const vaults = useAllVaults();
+  const lookup = useSelector((state: AppState) =>
+    selectors.selectVaultLookup(state)
+  );
+  const toUnderlyingAmount = useCallback(
+    (vault: FormattedVault) => (exactTokenAmount: BigNumber) => {
+      if (!vault.price) return convert.toBigNumber("0");
+      return exactTokenAmount
+        .times(convert.toBigNumber(vault.price))
+        .div(convert.toToken("1", 18));
+    },
+    []
+  );
+
+  const tokenIds = useAllTokenIds();
+
+  const tokenBalances = useTokenBalances(tokenIds); // map vault ids
+  const tokenPrices = useTokenPricesLessStrict(tokenIds); // map vault underlyings
+
+  const vaultTokenUserDataLookup = tokenIds.reduce((prev, next, index) => {
+    if (lookup[next.toLowerCase()]) {
+      prev[next] = {
+        balance: tokenBalances[index],
+        price: tokenPrices[index],
+      };
+    }
+
+    return prev;
+  }, {} as Record<string, { balance: string; price: number }>);
+
+  console.log({ vaultTokenUserDataLookup });
+
+  return vaultTokenUserDataLookup;
 }
 
 export function useVaultUserBalance(id: string) {

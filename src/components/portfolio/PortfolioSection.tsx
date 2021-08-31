@@ -4,12 +4,12 @@ import { ReactNode } from "react";
 export function PortfolioSection({
   title,
   walletUsdValue,
-  stakingUsdValue,
+  accruedUsdValue,
   children,
 }: {
   title: ReactNode;
   walletUsdValue: string;
-  stakingUsdValue?: string;
+  accruedUsdValue?: string;
   children: ReactNode;
 }) {
   return (
@@ -30,7 +30,7 @@ export function PortfolioSection({
           >
             {walletUsdValue}
           </Typography.Title>
-          {stakingUsdValue && (
+          {accruedUsdValue && (
             <>
               {" / "}
               <Typography.Title
@@ -38,7 +38,7 @@ export function PortfolioSection({
                 type="danger"
                 style={{ textAlign: "right", margin: 0 }}
               >
-                {stakingUsdValue}
+                {accruedUsdValue}
               </Typography.Title>
             </>
           )}

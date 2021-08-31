@@ -23,7 +23,7 @@ export function IndexSection() {
     <PortfolioSection
       title="Indexes"
       walletUsdValue={sectionWalletUsdValue}
-      stakingUsdValue="$250.00"
+      accruedUsdValue="$250.00"
     >
       <Row gutter={12} align="bottom">
         {indexTokens.map((token) => (

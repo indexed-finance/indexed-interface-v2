@@ -40,7 +40,7 @@ export function IndexCard({
       walletAmount={walletAmount}
       walletUsdValue={walletUsdValue}
       stakingAmount="50.00"
-      stakingUsdValue="$????.??"
+      accruedUsdValue="$????.??"
       symbol={actualSymbol}
       name={name}
       actions={

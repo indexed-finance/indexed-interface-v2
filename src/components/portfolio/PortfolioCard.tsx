@@ -8,7 +8,7 @@ export function PortfolioCard({
   name,
   walletUsdValue,
   stakingAmount,
-  stakingUsdValue,
+  accruedUsdValue,
   actions,
   extra,
   removeTheN = false,
@@ -16,7 +16,7 @@ export function PortfolioCard({
   walletAmount: string;
   walletUsdValue: string;
   stakingAmount?: string;
-  stakingUsdValue?: string;
+  accruedUsdValue?: string;
   symbol: string;
   name: string;
   actions: ReactNode[];
@@ -71,7 +71,7 @@ export function PortfolioCard({
           </Card>
 
           {/* Staking */}
-          {stakingAmount && stakingUsdValue && (
+          {stakingAmount && accruedUsdValue && (
             <Card
               bordered={false}
               type="inner"
@@ -97,7 +97,7 @@ export function PortfolioCard({
                   margin: 0,
                 }}
               >
-                {stakingUsdValue}
+                {accruedUsdValue}
               </Typography.Title>
             </Card>
           )}

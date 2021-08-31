@@ -92,26 +92,36 @@ const slice = createSlice({
       .addCase(fetchVaultsData.fulfilled, (state, action) => {
         const vaults = action.payload ?? [];
         for (const { price, ...vault } of vaults) {
-          const entry = state.entities[vault.id.toLowerCase()]
+          const entry = state.entities[vault.id.toLowerCase()];
           if (!entry) {
-            adapter.upsertOne(state, vault)
+            adapter.upsertOne(state, vault);
           } else {
-            entry.feeRecipient = vault.feeRecipient
-            entry.rewardsSeller = vault.rewardsSeller
-            entry.performanceFee = vault.performanceFee
-            entry.reserveRatio = vault.reserveRatio
-            entry.snapshots = vault.snapshots
-            entry.averagePricePerShare = vault.averagePricePerShare
-            if (vault.adapters.some((a, i) => entry.adapters[i]?.id !== a.id || entry.weights[i] !== vault.weights[i])) {
-              entry.weights = vault.weights
-              for (const {...adapter} of vault.adapters as NormalizedTokenAdapter[]) {
-                const existingAdapter = entry.adapters.find(a => a.id === adapter.id);
+            entry.feeRecipient = vault.feeRecipient;
+            entry.rewardsSeller = vault.rewardsSeller;
+            entry.performanceFee = vault.performanceFee;
+            entry.reserveRatio = vault.reserveRatio;
+            entry.snapshots = vault.snapshots;
+            entry.averagePricePerShare = vault.averagePricePerShare;
+            if (
+              vault.adapters.some(
+                (a, i) =>
+                  entry.adapters[i]?.id !== a.id ||
+                  entry.weights[i] !== vault.weights[i]
+              )
+            ) {
+              entry.weights = vault.weights;
+              for (const {
+                ...adapter
+              } of vault.adapters as NormalizedTokenAdapter[]) {
+                const existingAdapter = entry.adapters.find(
+                  (a) => a.id === adapter.id
+                );
                 if (existingAdapter) {
-                  adapter.revenueAPRs = existingAdapter.revenueAPRs
-                  adapter.revenueTokens = existingAdapter.revenueTokens
+                  adapter.revenueAPRs = existingAdapter.revenueAPRs;
+                  adapter.revenueTokens = existingAdapter.revenueTokens;
                 }
               }
-              entry.adapters = vault.adapters
+              entry.adapters = vault.adapters;
             }
           }
         }
@@ -125,6 +135,9 @@ const selectors = adapter.getSelectors((state: AppState) => state.vaults);
 export const vaultsSelectors = {
   selectAllVaults(state: AppState) {
     return selectors.selectAll(state);
+  },
+  selectVaultLookup(state: AppState) {
+    return selectors.selectEntities(state);
   },
   selectVault(state: AppState, id: string) {
     const vault = selectors.selectById(state, id);

@@ -19,6 +19,7 @@ import {
   uniswapInfoTokenLink,
 } from "helpers";
 import { useAllPools } from "./pool-hooks";
+import { useAllVaultsUserBalance } from "./vault-hooks";
 import {
   useMasterChefInfoLookup,
   useMasterChefPoolsForTokens,
@@ -116,19 +117,21 @@ export function useAllPortfolioData() {
   const priceLookupArgs = usePriceLookupArgs(allIndexes);
   const priceLookup = useTokenPricesLookup(priceLookupArgs);
 
+  // Vaults
+  const allVaultUserBalances = useAllVaultsUserBalance();
+
   // Indexes
   const tokensAndEthPairs = usePortfolioTokensAndEthPairs(allIndexes);
-  const { indexes, indexIds } = useMemo(() => {
-    const result = tokensAndEthPairs.filter(
-      ({ isSushiswapPair, isUniswapPair }) =>
-        !(isSushiswapPair || isUniswapPair)
-    );
-
-    return {
-      indexes: result,
-      indexIds: result.map(({ id }) => id),
-    };
-  }, [tokensAndEthPairs]);
+  const indexIds = useMemo(
+    () =>
+      tokensAndEthPairs
+        .filter(
+          ({ isSushiswapPair, isUniswapPair }) =>
+            !(isSushiswapPair || isUniswapPair)
+        )
+        .map(({ id }) => id),
+    [tokensAndEthPairs]
+  );
   const balances = useTokenBalances(indexIds);
 
   // Liquidity
@@ -139,164 +142,129 @@ export function useAllPortfolioData() {
       )
       .map(({ id }) => id);
   }, [tokensAndEthPairs]);
-  const pairExistsLookup = usePairExistsLookup(liquidityIds);
 
   // -- Basic
-  const stakingPoolsByToken = useStakingPoolsForTokens(liquidityIds);
+  const assetIds = indexIds.concat(liquidityIds);
+  const stakingPoolsByToken = useStakingPoolsForTokens(assetIds);
   const stakingInfoLookup = useStakingInfoLookup();
+  const uniswapStakingInfoLookup = useNewStakingInfoLookup(assetIds);
+  const sushiswapStakingInfoLookup = useMasterChefInfoLookup(assetIds);
 
-  // -- Uniswap
-  const uniswapStakingPoolsByToken = useNewStakingPoolsForTokens(liquidityIds);
-  const uniswapStakingInfoLookup = useNewStakingInfoLookup(liquidityIds);
+  // -- Map it.
+  const assetData = indexIds.concat(liquidityIds).map((assetId, index) => {
+    const returnValue = {
+      id: assetId,
+      inWallet: {
+        amount: 0,
+        value: 0,
+        symbol: "",
+      },
+      accrued: {
+        amount: 0,
+        value: 0,
+        symbol: "",
+      },
+      staking: {
+        amount: 0,
+        value: 0,
+        symbol: "",
+      },
+    };
 
-  // -- Sushiswap
-  const sushiswapStakingPoolsByToken =
-    useMasterChefPoolsForTokens(liquidityIds);
-  const sushiswapStakingInfoLookup = useMasterChefInfoLookup(liquidityIds);
+    // -- Common
+    const symbol = tokenLookup[assetId]?.symbol ?? "";
+    const decimals = tokenLookup[assetId]?.decimals ?? 18;
+    const price = priceLookup[assetId] ?? 0;
 
-  // 1. For each index pool offered through index, calculate the dollar value in wallet and staked.
-  const tokenData = indexIds.concat(liquidityIds).reduce(
-    (prev, next, index) => {
-      // -- Early exit for governance token.
-      const isNdx = next.toLowerCase() === NDX_ADDRESS.toLowerCase();
+    // -- In Wallet
+    const walletBalance = balances[index] ?? "0";
+    const convertedWalletBalance = convert.toBalanceNumber(
+      walletBalance,
+      decimals
+    );
+    const walletValue = convertedWalletBalance * price;
 
-      if (isNdx) {
-        return prev;
-      }
+    returnValue.inWallet.amount = convertedWalletBalance;
+    returnValue.inWallet.value = walletValue;
+    returnValue.inWallet.symbol = symbol;
 
-      // -- Common
-      const decimals = tokenLookup[next]?.decimals ?? 18;
-      const price = priceLookup[next] ?? 0;
+    // -- Accrued and Staking
+    const associatedStakingPool = stakingPoolsByToken[index];
+    const [
+      associatedStakingUserInfo,
+      associatedUniswapStakingUserInfo,
+      associatedSushiswapStakingUserInfo,
+    ] = [
+      associatedStakingPool
+        ? stakingInfoLookup[associatedStakingPool.id]
+        : undefined,
+      uniswapStakingInfoLookup[assetId.toLowerCase()],
+      sushiswapStakingInfoLookup[assetId.toLowerCase()],
+    ];
 
-      // -- In Wallet
-      const walletBalance = balances[index] ?? "0";
-      const convertedWalletBalance = convert.toBalanceNumber(
-        walletBalance,
+    // -- Through us...
+    if (associatedStakingUserInfo) {
+      returnValue.accrued.amount += convert.toBalanceNumber(
+        associatedStakingUserInfo.earned,
         decimals
       );
-      const walletValue = convertedWalletBalance * price;
+      returnValue.accrued.symbol = "NDX";
 
-      prev.inWallet += walletValue;
+      returnValue.staking.amount += convert.toBalanceNumber(
+        associatedStakingUserInfo.balance,
+        decimals
+      );
+      returnValue.staking.symbol = symbol;
+    }
 
-      // -- Accrued via Staking
-      const [
-        associatedStakingPool,
-        associatedUniswapStakingPool,
-        associatedSushiswapStakingPool,
-      ] = [
-        stakingPoolsByToken[index],
-        uniswapStakingPoolsByToken[index],
-        sushiswapStakingPoolsByToken[index],
-      ];
-      const [
-        associatedStakingUserInfo,
-        associatedUniswapStakingUserInfo,
-        associatedSushiswapStakingUserInfo,
-      ] = [
-        associatedStakingPool
-          ? stakingInfoLookup[associatedStakingPool.id]
-          : undefined,
-        uniswapStakingInfoLookup[next.toLowerCase()],
-        sushiswapStakingInfoLookup[next.toLowerCase()],
-      ];
+    // -- Through Uniswap...
+    if (associatedUniswapStakingUserInfo) {
+      returnValue.accrued.amount +=
+        associatedUniswapStakingUserInfo?.rewards ?? 0;
+      returnValue.accrued.symbol = "NDX";
+      returnValue.staking.amount +=
+        associatedUniswapStakingUserInfo?.balance ?? 0;
+    }
 
-      let stakedAmount = 0;
-      let accruedAmount = 0;
+    // -- Through Sushiswap...
+    if (associatedSushiswapStakingUserInfo) {
+      returnValue.accrued.amount +=
+        associatedSushiswapStakingUserInfo?.rewards ?? 0;
+      returnValue.accrued.symbol = "SUSHI";
+      returnValue.staking.amount +=
+        associatedSushiswapStakingUserInfo?.balance ?? 0;
+    }
 
-      // -- Through us...
-      if (associatedStakingUserInfo) {
-        stakedAmount += convert.toBalanceNumber(
-          associatedStakingUserInfo.balance,
-          decimals
-        );
+    // Calculate values.
+    returnValue.staking.value = returnValue.staking.amount * price;
+    returnValue.accrued.value = returnValue.accrued.amount * price;
 
-        accruedAmount += convert.toBalanceNumber(
-          associatedStakingUserInfo.earned,
-          decimals
-        );
-      }
+    return returnValue;
+  });
 
-      // -- Through Uniswap...
-      stakedAmount += associatedUniswapStakingUserInfo?.balance ?? 0;
-      accruedAmount += associatedUniswapStakingUserInfo?.rewards ?? 0;
-
-      // -- Through Sushiswap...
-      stakedAmount += associatedSushiswapStakingUserInfo?.balance ?? 0;
-      accruedAmount += associatedSushiswapStakingUserInfo?.rewards ?? 0;
-
-      prev.accrued += accruedAmount * price;
-      prev.staked += stakedAmount * price;
+  const totalValue = assetData.reduce(
+    (prev, next) => {
+      prev.inWallet += next.inWallet.value;
+      prev.accrued += next.accrued.value;
+      prev.staking += next.staking.value;
 
       return prev;
     },
     {
       inWallet: 0,
       accrued: 0,
-      staked: 0,
+      staking: 0,
     }
   );
 
-  //////
-  console.log({ tokenData });
-  /////
+  console.log({
+    totalValue,
+    assetData,
+  });
 
   return {
-    totalValue: {
-      inWallet: {
-        amount: 0,
-        value: 0,
-      },
-      accrued: {
-        amount: 0,
-        value: 0,
-      },
-    },
-    governanceToken: {
-      inWallet: {
-        amount: 0,
-        value: 0,
-      },
-      accrued: {
-        amount: 0,
-        value: 0,
-      },
-    },
-    breakdown: {
-      ndx: "",
-      vaults: "",
-      indexes: "",
-      liquidity: "",
-    },
-    vaults: {
-      inWallet: {
-        amount: 0,
-        value: 0,
-      },
-      accrued: {
-        amount: 0,
-        value: 0,
-      },
-    },
-    indexes: {
-      inWallet: {
-        amount: 0,
-        value: 0,
-      },
-      accrued: {
-        amount: 0,
-        value: 0,
-      },
-    },
-    liquidity: {
-      inWallet: {
-        amount: 0,
-        value: 0,
-      },
-      accrued: {
-        amount: 0,
-        value: 0,
-      },
-    },
+    totalValue,
+    assetData,
   };
 }
 
