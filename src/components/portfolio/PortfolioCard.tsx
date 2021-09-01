@@ -3,20 +3,28 @@ import { ReactNode, useCallback, useState } from "react";
 import { Token } from "components/atomic";
 
 export function PortfolioCard({
+  showStaking = true,
   walletAmount,
   symbol,
   name,
   walletUsdValue,
-  stakingAmount,
+  accruedSymbol,
+  accruedAmount,
   accruedUsdValue,
+  stakingAmount,
+  stakingUsdValue,
   actions,
   extra,
   removeTheN = false,
 }: {
+  showStaking?: boolean;
   walletAmount: string;
   walletUsdValue: string;
-  stakingAmount?: string;
+  accruedSymbol?: string;
+  accruedAmount?: string;
   accruedUsdValue?: string;
+  stakingAmount?: string;
+  stakingUsdValue?: string;
   symbol: string;
   name: string;
   actions: ReactNode[];
@@ -31,6 +39,7 @@ export function PortfolioCard({
     <Card
       extra={extra}
       hoverable={true}
+      bordered={false}
       onClick={toggleExpanded}
       title={
         <Space direction="vertical" style={{ width: "100%" }}>
@@ -71,35 +80,64 @@ export function PortfolioCard({
           </Card>
 
           {/* Staking */}
-          {stakingAmount && accruedUsdValue && (
-            <Card
-              bordered={false}
-              type="inner"
-              title="Staking"
-              bodyStyle={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-              }}
-            >
-              <Token
-                amount={stakingAmount}
-                symbol={symbolToUse}
-                symbolOverride={symbol}
-                name={name}
-                size="small"
-                style={{ textAlign: "left" }}
-              />
-              <Typography.Title
-                level={4}
-                type="danger"
-                style={{
-                  margin: 0,
+          {showStaking && (
+            <>
+              <Card
+                bordered={false}
+                type="inner"
+                title="Accrued"
+                bodyStyle={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
                 }}
               >
-                {accruedUsdValue}
-              </Typography.Title>
-            </Card>
+                <Token
+                  amount={accruedAmount}
+                  symbol={accruedSymbol ?? ""}
+                  name={name}
+                  size="small"
+                  style={{ textAlign: "left" }}
+                />
+                <Typography.Title
+                  level={4}
+                  type="danger"
+                  style={{
+                    margin: 0,
+                  }}
+                >
+                  {accruedUsdValue}
+                </Typography.Title>
+              </Card>
+              <Card
+                bordered={false}
+                type="inner"
+                title="Staking"
+                bodyStyle={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                }}
+              >
+                <Token
+                  amount={stakingAmount}
+                  symbol={symbolToUse}
+                  symbolOverride={symbol}
+                  name={name}
+                  size="small"
+                  style={{ textAlign: "left" }}
+                />
+                <Typography.Title
+                  level={4}
+                  type="secondary"
+                  style={{
+                    margin: 0,
+                  }}
+                >
+                  {stakingUsdValue}
+                </Typography.Title>
+              </Card>
+            </>
           )}
         </Space>
       }

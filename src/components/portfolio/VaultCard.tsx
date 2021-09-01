@@ -8,14 +8,12 @@ import {
   useVaultRegistrar,
   useVaultUserBalance,
 } from "hooks";
-import { useEffect } from "react";
 
 interface Props {
   address: string;
-  onRegisterUsdValue(id: string, amount: number): void;
 }
 
-export function VVaultCard({ address, onRegisterUsdValue }: Props) {
+export function VVaultCard({ address }: Props) {
   const { isMobile } = useBreakpoints();
   const vault = useVault(address);
   const { wrappedBalance, usdValue } = useVaultUserBalance(address);
@@ -23,17 +21,12 @@ export function VVaultCard({ address, onRegisterUsdValue }: Props) {
   const symbol = vault?.symbol ?? "";
   const name = vault?.name ?? "";
 
-  useEffect(() => {
-    if (usdValue) {
-      onRegisterUsdValue(address, parseFloat(usdValue));
-    }
-  }, [address, usdValue, onRegisterUsdValue]);
-
   useVaultRegistrar(address);
 
   return parseFloat(usdValue ?? "0.00") === 0 ? null : (
     <Col xs={24} lg={8} style={{ marginBottom: isMobile ? 12 : 0 }}>
       <PortfolioCard
+        showStaking={false}
         walletAmount={shortenAmount(wrappedBalance.displayed).toString()}
         walletUsdValue={`$${usdValue}`}
         symbol={symbol}

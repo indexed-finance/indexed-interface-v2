@@ -52,12 +52,12 @@ export class PortfolioPieChart extends Component<Props> {
       <PieChart
         width={400}
         height={400}
-        margin={{
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-        }}
+        // margin={{
+        //   top: 0,
+        //   left: 0,
+        //   right: 0,
+        //   bottom: 0,
+        // }}
       >
         <Pie
           dataKey="value"

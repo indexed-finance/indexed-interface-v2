@@ -281,16 +281,16 @@ export function useAllPortfolioData() {
         prev.staking += next.staking.value;
       }
 
-      // Vaults?
-
       return prev;
     },
     {
-      inWallet: 0,
+      inWallet: vaultsTotalValue,
       accrued: 0,
       staking: 0,
     }
   );
+  const ecosystemTotalValue =
+    totalValue.inWallet + totalValue.accrued + totalValue.staking;
   // #endregion
 
   // #region Governance Token
@@ -299,12 +299,15 @@ export function useAllPortfolioData() {
   ) ?? {
     inWallet: {
       amount: 0,
+      value: 0,
     },
     staking: {
       amount: 0,
+      value: 0,
     },
     accrued: {
       amount: 0,
+      value: 0,
     },
   };
   // #endregion
@@ -313,6 +316,9 @@ export function useAllPortfolioData() {
   let indexValue = 0;
   let liquidityValue = 0;
   let ndxValue = 0;
+
+  const indexAssets = [];
+  const liquidityAssets = [];
 
   for (const _asset of assetData) {
     const asset = _asset!; // We filtered with Boolean before.
@@ -324,22 +330,20 @@ export function useAllPortfolioData() {
       ndxValue += asset.staking.value;
     } else if (isIndex(asset.id)) {
       // Index
+      indexAssets.push(asset);
+
       indexValue += asset.inWallet.value;
       indexValue += asset.accrued.value;
       indexValue += asset.staking.value;
     } else {
       // Liquidity
+      liquidityAssets.push(asset);
+
       liquidityValue += asset.inWallet.value;
       liquidityValue += asset.accrued.value;
       liquidityValue += asset.staking.value;
     }
   }
-
-  const ecosystemValue =
-    totalValue.inWallet +
-    totalValue.accrued +
-    totalValue.staking +
-    vaultsTotalValue;
 
   return {
     totalValue,
@@ -354,13 +358,28 @@ export function useAllPortfolioData() {
         value: convert.toCurrency(earnedSushi * sushiPrice),
       },
     },
-    percentages: {
-      ndx: ndxValue / ecosystemValue,
-      vaults: vaultsTotalValue / ecosystemValue,
-      indexes: indexValue / ecosystemValue,
-      liquidity: liquidityValue / ecosystemValue,
+    chart: [
+      {
+        name: "NDX",
+        value: ndxValue / ecosystemTotalValue,
+      },
+      {
+        name: "Vaults",
+        value: vaultsTotalValue / ecosystemTotalValue,
+      },
+      {
+        name: "Indexes",
+        value: indexValue / ecosystemTotalValue,
+      },
+      {
+        name: "Liquidity",
+        value: liquidityValue / ecosystemTotalValue,
+      },
+    ],
+    assets: {
+      indexes: indexAssets,
+      liquidity: liquidityAssets,
     },
-    assetData,
   };
 }
 

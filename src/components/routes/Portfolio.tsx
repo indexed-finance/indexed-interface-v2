@@ -1,4 +1,4 @@
-import { Card, Col, Divider, Empty, Row, Space, Typography } from "antd";
+import { Card, Col, Empty, Row, Space, Typography } from "antd";
 import {
   IndexSection,
   LiquiditySection,
@@ -12,84 +12,12 @@ import {
 } from "components/atomic";
 import { convert } from "helpers";
 import { selectors } from "features";
-import { useAllPortfolioData, useBreakpoints, usePortfolioData } from "hooks";
-import { useMemo, useState } from "react";
+import { useAllPortfolioData } from "hooks";
 import { useSelector } from "react-redux";
 
 export default function Portfolio() {
-  ///////
-  const result = useAllPortfolioData();
-  console.log({ result });
-  ///////
-
-  const { isMobile } = useBreakpoints();
+  const data = useAllPortfolioData();
   const isUserConnected = useSelector(selectors.selectUserConnected);
-  const { ndx, tokens, totalValue: totalValueWithoutVaults } = usePortfolioData(
-    {
-      onlyOwnedAssets: true,
-    }
-  );
-  const [usdValueFromVaults, setUsdValueFromVaults] = useState(0);
-  const handleReceivedUsdValueFromVaults = (amount: number) =>
-    setUsdValueFromVaults(amount);
-  const totalValue = useMemo(() => {
-    const parsedTotalValueWithoutVaults = parseFloat(
-      totalValueWithoutVaults.replace(/\$/g, "").replace(/,/g, "")
-    );
-
-    return parsedTotalValueWithoutVaults + usdValueFromVaults;
-  }, [totalValueWithoutVaults, usdValueFromVaults]);
-
-  const chartData = useMemo(() => {
-    // NDX
-    const ndxUsdValue = parseFloat(
-      ndx.value.replace(/\$/g, "").replace(/,/g, "")
-    );
-    const ndxPercentage = ndxUsdValue / totalValue;
-
-    // Index
-    const indexTokens = tokens.filter(
-      (token) => !token.isSushiswapPair && !token.isUniswapPair
-    );
-    const indexUsdValue = indexTokens
-      .map((token) => token.value.replace(/\$/g, ""))
-      .map((value) => parseFloat(value))
-      .reduce((prev, next) => prev + next, 0);
-    const indexPercentage = indexUsdValue / totalValue;
-
-    // Liquidity
-    const liquidityTokens = tokens.filter(
-      (token) => token.isSushiswapPair || token.isUniswapPair
-    );
-    const liquidityUsdValue = liquidityTokens
-      .map((token) => token.value.replace(/\$/g, ""))
-      .map((value) => parseFloat(value))
-      .reduce((prev, next) => prev + next, 0);
-    const liquidityPercentage = liquidityUsdValue / totalValue;
-
-    // Vaults
-    const subtotal = indexPercentage + liquidityPercentage + ndxPercentage;
-    const vaultsPercentage = 1 - subtotal;
-
-    return [
-      {
-        name: "NDX",
-        value: ndxPercentage,
-      },
-      {
-        name: "Vaults",
-        value: vaultsPercentage,
-      },
-      {
-        name: "Indexes",
-        value: indexPercentage,
-      },
-      {
-        name: "Liquidity",
-        value: liquidityPercentage,
-      },
-    ];
-  }, [ndx, tokens, totalValue]);
 
   return (
     <Page hasPageHeader={true} title="Portfolio">
@@ -113,23 +41,31 @@ export default function Portfolio() {
                   </Typography.Title>
                 }
               >
-                <Card title="In Wallet" type="inner">
+                <Card title="In Wallet" type="inner" bordered={false}>
                   <Typography.Title
                     level={1}
                     type="success"
                     style={{ margin: 0, textTransform: "uppercase" }}
                   >
-                    {convert.toCurrency(totalValue)}
+                    {convert.toCurrency(data.totalValue.inWallet)}
                   </Typography.Title>
                 </Card>
-                <Divider />
-                <Card title="Staked" type="inner">
+                <Card title="Accrued" type="inner" bordered={false}>
                   <Typography.Title
                     level={1}
                     type="danger"
                     style={{ margin: 0, textTransform: "uppercase" }}
                   >
-                    $????.??
+                    {convert.toCurrency(data.totalValue.accrued)}
+                  </Typography.Title>
+                </Card>
+                <Card title="Staked" type="inner" bordered={false}>
+                  <Typography.Title
+                    level={1}
+                    type="secondary"
+                    style={{ margin: 0, textTransform: "uppercase" }}
+                  >
+                    {convert.toCurrency(data.totalValue.staking)}
                   </Typography.Title>
                 </Card>
               </Card>
@@ -151,14 +87,14 @@ export default function Portfolio() {
                   </Typography.Title>
                 }
               >
-                <Card title="In Wallet" type="inner">
+                <Card title="In Wallet" type="inner" bordered={false}>
                   <Typography.Title
                     level={1}
                     style={{ margin: 0, textTransform: "uppercase" }}
                   >
                     <Space direction="vertical" size="large">
                       <Token
-                        amount={ndx.balance}
+                        amount={data.governanceToken.inWallet.amount.toFixed(2)}
                         symbol="NDX"
                         name="NDX"
                         size="large"
@@ -167,15 +103,15 @@ export default function Portfolio() {
                         type="success"
                         style={{ textAlign: "right", margin: 0 }}
                       >
-                        {ndx.value}
+                        {convert.toCurrency(
+                          data.governanceToken.inWallet.value
+                        )}
                       </Typography.Text>
                     </Space>
                   </Typography.Title>
                 </Card>
-
-                <Divider />
-
-                <Card title="Staked" type="inner">
+                {/* // Wait for dNDX */}
+                {/* <Card title="Staked" type="inner" bordered={false}>
                   <Typography.Title
                     level={1}
                     type="danger"
@@ -187,24 +123,48 @@ export default function Portfolio() {
                     >
                       <Space direction="vertical" size="large">
                         <Token
-                          amount={"50.00"}
+                          amount={data.governanceToken.staking.amount.toFixed(
+                            2
+                          )}
                           symbol="NDX"
                           name="NDX"
                           size="large"
                         />
                         <Typography.Text
-                          type="danger"
+                          type="secondary"
                           style={{ textAlign: "right", margin: 0 }}
                         >
-                          $????.??
+                          {convert.toCurrency(
+                            data.governanceToken.staking.value
+                          )}
                         </Typography.Text>
                       </Space>
                     </Typography.Title>
                   </Typography.Title>
-                </Card>
+                </Card> */}
               </Card>
             </Col>
             <Col xs={24} lg={8}>
+              <Card
+                title={
+                  <Typography.Title
+                    type="warning"
+                    level={3}
+                    style={{
+                      margin: 0,
+                      marginRight: 24,
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    Breakdown
+                  </Typography.Title>
+                }
+                bordered={false}
+              >
+                <PortfolioPieChart data={data.chart} />
+              </Card>
+            </Col>
+            {/* <Col xs={24} lg={8}>
               <div
                 style={{
                   position: "relative",
@@ -215,11 +175,11 @@ export default function Portfolio() {
                   }`,
                 }}
               >
-                <PortfolioPieChart data={chartData} />
+                <PortfolioPieChart data={data.chart} />
               </div>
-            </Col>
+            </Col> */}
           </Row>
-          <VaultSection onUsdValueChange={handleReceivedUsdValueFromVaults} />
+          <VaultSection />
           <IndexSection />
           <LiquiditySection />
         </>

@@ -9,6 +9,11 @@ interface Props {
   name: string;
   walletAmount: string;
   walletUsdValue: string;
+  accruedSymbol?: string;
+  accruedAmount?: string;
+  accruedUsdValue?: string;
+  stakingAmount?: string;
+  stakingUsdValue?: string;
   hasStakingPool: boolean;
   staking?: string;
   earnedAmount?: string;
@@ -21,6 +26,11 @@ export function IndexCard({
   name,
   walletAmount,
   walletUsdValue,
+  accruedSymbol,
+  accruedAmount,
+  accruedUsdValue,
+  stakingAmount,
+  stakingUsdValue,
   hasStakingPool,
   staking = "0.00",
   earnedAmount = "0.00",
@@ -39,8 +49,11 @@ export function IndexCard({
     <PortfolioCard
       walletAmount={walletAmount}
       walletUsdValue={walletUsdValue}
-      stakingAmount="50.00"
-      accruedUsdValue="$????.??"
+      accruedSymbol={accruedSymbol}
+      accruedAmount={accruedAmount}
+      accruedUsdValue={accruedUsdValue}
+      stakingAmount={stakingAmount}
+      stakingUsdValue={stakingUsdValue}
       symbol={actualSymbol}
       name={name}
       actions={
