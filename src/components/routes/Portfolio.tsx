@@ -143,6 +143,68 @@ export default function Portfolio() {
                   </Typography.Title>
                 </Card> */}
               </Card>
+              <Card
+                bordered={false}
+                title={
+                  <Typography.Title
+                    type="warning"
+                    level={3}
+                    style={{
+                      margin: 0,
+                      marginRight: 24,
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    Earned Rewards
+                  </Typography.Title>
+                }
+              >
+                <Card bordered={true} style={{ borderBottom: "none" }}>
+                  <Typography.Title
+                    level={1}
+                    style={{ margin: 0, textTransform: "uppercase" }}
+                  >
+                    <Space direction="vertical" size="large">
+                      <Token
+                        amount={data.earnedRewards.NDX.amount.toFixed(2)}
+                        symbol="NDX"
+                        name="NDX"
+                        size="large"
+                      />
+                      <Typography.Text
+                        type="success"
+                        style={{ textAlign: "right", margin: 0 }}
+                      >
+                        {data.earnedRewards.NDX.value}
+                      </Typography.Text>
+                    </Space>
+                  </Typography.Title>
+                </Card>
+                <Card
+                  bordered={true}
+                  style={{ borderTopLeftRadius: 0, borderTopRightRadius: 0 }}
+                >
+                  <Typography.Title
+                    level={1}
+                    style={{ margin: 0, textTransform: "uppercase" }}
+                  >
+                    <Space direction="vertical" size="large">
+                      <Token
+                        amount={data.earnedRewards.SUSHI.amount.toFixed(2)}
+                        symbol="SUSHI"
+                        name="SUSHI"
+                        size="large"
+                      />
+                      <Typography.Text
+                        type="success"
+                        style={{ textAlign: "right", margin: 0 }}
+                      >
+                        {data.earnedRewards.SUSHI.value}
+                      </Typography.Text>
+                    </Space>
+                  </Typography.Title>
+                </Card>
+              </Card>
             </Col>
             <Col xs={24} lg={8}>
               <Card
