@@ -18,7 +18,8 @@ import { useSelector } from "react-redux";
 
 export default function Portfolio() {
   ///////
-  useAllPortfolioData();
+  const result = useAllPortfolioData();
+  console.log({ result });
   ///////
 
   const { isMobile } = useBreakpoints();

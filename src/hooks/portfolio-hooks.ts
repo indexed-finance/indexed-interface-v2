@@ -19,7 +19,6 @@ import {
   uniswapInfoTokenLink,
 } from "helpers";
 import { useAllPools } from "./pool-hooks";
-import { useAllVaultsUserBalance } from "./vault-hooks";
 import {
   useMasterChefInfoLookup,
   useMasterChefPoolsForTokens,
@@ -36,6 +35,7 @@ import {
   useStakingPoolsForTokens,
 } from "./staking-hooks";
 import { useTokenBalances } from "./user-hooks";
+import { useVaultPortfolioTotalValue } from "./vault-hooks";
 import S from "string";
 
 type RawAsset = {
@@ -118,9 +118,7 @@ export function useAllPortfolioData() {
   const priceLookup = useTokenPricesLookup(priceLookupArgs);
 
   // Vaults
-  const allVaultUserBalances = useAllVaultsUserBalance();
-
-  console.log({ allVaultUserBalances });
+  const vaultsTotalValue = useVaultPortfolioTotalValue();
 
   // Indexes
   const tokensAndEthPairs = usePortfolioTokensAndEthPairs(allIndexes);
@@ -152,7 +150,7 @@ export function useAllPortfolioData() {
   const uniswapStakingInfoLookup = useNewStakingInfoLookup(assetIds);
   const sushiswapStakingInfoLookup = useMasterChefInfoLookup(assetIds);
 
-  // -- Map it.
+  // #region Assets
   const assetData = indexIds.concat(liquidityIds).map((assetId, index) => {
     const returnValue = {
       id: assetId,
@@ -243,12 +241,16 @@ export function useAllPortfolioData() {
 
     return returnValue;
   });
+  // #endregion
 
+  // #region Total Value
   const totalValue = assetData.reduce(
     (prev, next) => {
       prev.inWallet += next.inWallet.value;
       prev.accrued += next.accrued.value;
       prev.staking += next.staking.value;
+
+      // Vaults?
 
       return prev;
     },
@@ -258,14 +260,69 @@ export function useAllPortfolioData() {
       staking: 0,
     }
   );
+  // #endregion
 
-  console.log({
-    totalValue,
-    assetData,
-  });
+  // #region Governance Token
+  const governanceToken = assetData.find(
+    (each) => each.id.toLowerCase() === NDX_ADDRESS.toLowerCase()
+  ) ?? {
+    inWallet: {
+      amount: 0,
+    },
+    staking: {
+      amount: 0,
+    },
+    accrued: {
+      amount: 0,
+    },
+  };
+  // #endregion
+
+  // #region Percentages
+  const indexIdLookup = indexIds.reduce((prev, next) => {
+    prev[next] = true;
+    return prev;
+  }, {} as Record<string, true>);
+
+  let indexValue = 0;
+  let liquidityValue = 0;
+  let ndxValue = 0;
+
+  for (const asset of assetData) {
+    const isNdx = asset.id.toLowerCase() === NDX_ADDRESS.toLowerCase();
+
+    if (isNdx) {
+      ndxValue += asset.inWallet.value;
+      ndxValue += asset.accrued.value;
+      ndxValue += asset.staking.value;
+    } else if (indexIdLookup[asset.id]) {
+      // Index
+      indexValue += asset.inWallet.value;
+      indexValue += asset.accrued.value;
+      indexValue += asset.staking.value;
+    } else {
+      // Liquidity
+      liquidityValue += asset.inWallet.value;
+      liquidityValue += asset.accrued.value;
+      liquidityValue += asset.staking.value;
+    }
+  }
+
+  const ecosystemValue =
+    totalValue.inWallet +
+    totalValue.accrued +
+    totalValue.staking +
+    vaultsTotalValue;
 
   return {
     totalValue,
+    governanceToken,
+    percentages: {
+      ndx: ndxValue / ecosystemValue,
+      vaults: vaultsTotalValue / ecosystemValue,
+      indexes: indexValue / ecosystemValue,
+      liquidity: liquidityValue / ecosystemValue,
+    },
     assetData,
   };
 }

@@ -7,21 +7,14 @@ import {
 } from "features";
 import { BigNumber, RegisteredCall, convert } from "helpers";
 import {
-  useAllTokenIds,
-  useTokenPrice,
-  useTokenPrices,
-  useTokenPricesLessStrict,
-} from "./token-hooks";
-import {
-  useBalanceAndApprovalRegistrar,
   useBalancesAndApprovalsRegistrar,
   useTokenBalance,
   useTokenBalances,
 } from "./user-hooks";
 import { useCallRegistrar } from "./use-call-registrar";
-import { useCallback } from "react";
 import { useMemo } from "react";
 import { useSelector } from "react-redux";
+import { useTokenPrices, useTokenPricesLessStrict } from "./token-hooks";
 
 export interface FormattedVault extends NormalizedVault {
   underlyingPrice?: number;
@@ -31,7 +24,7 @@ export interface FormattedVault extends NormalizedVault {
 export function useAllVaults(): FormattedVault[] {
   const vaults = useSelector(selectors.selectAprSortedVaults);
   const underlyings = vaults.map((v) => v.underlying.id);
-  const prices = useTokenPricesLessStrict(underlyings)
+  const prices = useTokenPricesLessStrict(underlyings);
   return useMemo(() => {
     return vaults.map((vault, i): FormattedVault => {
       const price = prices[i];
@@ -100,27 +93,16 @@ export function useVault(id: string): FormattedVault | null {
   }, [vault, prices, loading]);
 }
 
-export function useVaultDeposit(id: string) {
-  // Pass
-}
-
-export function useVaultWithdrawal(id: string) {
-  // Pass
-}
-
-export function useAllVaultsUserBalance() {
+export function useAllVaultsUserBalance(): Record<string, VaultBalanceEntries> {
   const vaults = useAllVaults();
   const lookup = useSelector((state: AppState) =>
     selectors.selectVaultLookup(state)
   );
-
   const vaultIds = vaults.map((vault) => vault.id);
   const vaultUnderlyingIds = vaults.map((vault) => vault.underlying.id);
   const vaultTokenBalances = useTokenBalances(vaultIds);
   const vaultUnderlyingBalances = useTokenBalances(vaultUnderlyingIds);
   const vaultUnderlyingPrices = useTokenPricesLessStrict(vaultUnderlyingIds);
-
-  console.log({ vaultUnderlyingPrices });
 
   useBalancesAndApprovalsRegistrar(vaultIds, vaultUnderlyingIds);
 
@@ -129,12 +111,13 @@ export function useAllVaultsUserBalance() {
       const vault = lookup[vaultId];
 
       if (vault) {
-        const underlyingBalance = convert.toBigNumber(vaultUnderlyingBalances[index]);
+        const underlyingBalance = convert.toBigNumber(
+          vaultUnderlyingBalances[index]
+        );
         const wrappedBalance = convert.toBigNumber(vaultTokenBalances[index]);
         const unwrappedBalance = wrappedBalance
           .times(convert.toBigNumber(vault.price ?? "0"))
           .div(convert.toToken("1", 18));
-
         const usdValue = convert.toBalance(
           unwrappedBalance.times(vaultUnderlyingPrices![index] ?? 0),
           vault.decimals,
@@ -143,6 +126,7 @@ export function useAllVaultsUserBalance() {
         );
 
         return {
+          id: vaultId,
           balance: {
             exact: underlyingBalance,
             displayed: convert.toBalance(
@@ -176,73 +160,30 @@ export function useAllVaultsUserBalance() {
         return null;
       }
     })
-    .filter(Boolean);
+    .filter(Boolean)
+    .reduce((prev, next) => {
+      if (next) {
+        prev[next.id] = next;
+      }
+
+      return prev;
+    }, {} as Record<string, VaultBalanceEntries>);
 }
 
 export function useVaultUserBalance(id: string) {
-  const vault = useVault(id);
+  const balances = useAllVaultsUserBalance();
 
-  const underlyingId = vault?.underlying.id ?? "";
-  const balances = useTokenBalances([underlyingId, id]);
-  const [price] = useTokenPricesLessStrict([underlyingId]);
+  return balances[id];
+}
 
-  useBalanceAndApprovalRegistrar(id, [underlyingId]);
+export function useVaultPortfolioTotalValue() {
+  const userBalances = useAllVaultsUserBalance();
 
-  if (vault) {
-    const underlyingBalance = convert.toBigNumber(balances[0]);
-    const wrappedBalance = convert.toBigNumber(balances[1]);
-    const unwrappedBalance = wrappedBalance
-      .times(convert.toBigNumber(vault.price ?? "0"))
-      .div(convert.toToken("1", 18));
+  return Object.values(userBalances).reduce((prev, next) => {
+    prev += parseFloat(next.usdValue.replace(/,/g, ""));
 
-    const usdValue = convert.toBalance(
-      unwrappedBalance.times(price),
-      vault.decimals,
-      true,
-      2
-    );
-
-    return {
-      balance: {
-        exact: underlyingBalance,
-        displayed: convert.toBalance(
-          underlyingBalance,
-          vault.underlying.decimals,
-          false,
-          10
-        ),
-      },
-      wrappedBalance: {
-        exact: wrappedBalance,
-        displayed: convert.toBalance(
-          wrappedBalance,
-          vault.underlying.decimals,
-          false,
-          10
-        ),
-      },
-      unwrappedBalance: {
-        exact: unwrappedBalance,
-        displayed: convert.toBalance(
-          unwrappedBalance,
-          vault.underlying.decimals,
-          false,
-          10
-        ),
-      },
-      usdValue,
-    };
-  } else {
-    const zero = {
-      exact: convert.toBigNumber("0"),
-      displayed: "0.00",
-    };
-
-    return {
-      balance: zero,
-      wrappedBalance: zero,
-    };
-  }
+    return prev;
+  }, 0);
 }
 
 export function useVaultInterestForUser(id: string) {
@@ -404,3 +345,18 @@ export function useAllVaultsRegistrar() {
     offChainCalls,
   });
 }
+
+// Types
+
+type BalanceEntry = {
+  exact: BigNumber;
+  displayed: string;
+};
+
+type VaultBalanceEntries = {
+  id: string;
+  balance: BalanceEntry;
+  wrappedBalance: BalanceEntry;
+  unwrappedBalance: BalanceEntry;
+  usdValue: string;
+};
