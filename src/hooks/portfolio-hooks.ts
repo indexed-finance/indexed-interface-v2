@@ -262,7 +262,12 @@ export function useAllPortfolioData() {
 
         // Calculate values.
         returnValue.staking.value = returnValue.staking.amount * price;
-        returnValue.accrued.value = returnValue.accrued.amount * price;
+
+        if (returnValue.accrued.symbol === "NDX") {
+          returnValue.accrued.value = returnValue.accrued.amount * ndxPrice;
+        } else if (returnValue.accrued.symbol === "SUSHI") {
+          returnValue.accrued.value = returnValue.accrued.amount * sushiPrice;
+        }
 
         return returnValue;
       } else {
