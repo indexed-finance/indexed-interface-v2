@@ -2,8 +2,7 @@ import { Alert, Button, Card, Col, Row, Space, Typography } from "antd";
 import { Label, Page, Progress } from "components/atomic";
 import {
   calculateBonusMultiplier,
-  calculateEarlyWithdrawalFee,
-  convert,
+  calculateEarlyWithdrawalFeePercent,
 } from "helpers";
 import { formatDistance } from "date-fns";
 
@@ -18,7 +17,7 @@ export default function Timelocks() {
             duration={31104000}
             dividends={12.04}
             timeLeft={0}
-            unlocksAt={1631303807596}
+            unlocksAt={1631303807596 / 1000}
           />
         </Col>
         <Col span={8}>
@@ -28,7 +27,7 @@ export default function Timelocks() {
             duration={31104000}
             dividends={12.04}
             timeLeft={1037000}
-            unlocksAt={1631303807596}
+            unlocksAt={1631303807596 / 1000}
           />
         </Col>
       </Row>
@@ -56,8 +55,12 @@ function TimelockCard(props: Props) {
   const formattedTimeLeft = duration(props.timeLeft);
   const percentage = (1 - props.timeLeft / props.duration) * 100;
   const isReady = props.timeLeft <= 0;
-  const earlyWithdrawalFee = calculateEarlyWithdrawalFee(
-    convert.toBigNumber(props.baseNdxAmount.toString()),
+  //   const earlyWithdrawalFee = calculateEarlyWithdrawalFee(
+  //     convert.toBigNumber(props.baseNdxAmount.toString()),
+  //     props.unlocksAt,
+  //     props.duration
+  //   );
+  const earlyWithdrawalFeePercent = calculateEarlyWithdrawalFeePercent(
     props.unlocksAt,
     props.duration
   );
@@ -129,7 +132,7 @@ function TimelockCard(props: Props) {
               <Alert
                 style={{ marginTop: 12 }}
                 type="error"
-                message={`Withdrawing this timelock early will result in a fee of ${earlyWithdrawalFee.displayed}`}
+                message={`Withdrawing this timelock early will result in a fee of ${earlyWithdrawalFeePercent}%`}
               />
             </>
           )}

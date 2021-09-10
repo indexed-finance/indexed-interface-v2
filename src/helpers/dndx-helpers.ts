@@ -94,3 +94,22 @@ export function calculateEarlyWithdrawalFee(
     .div(convert.toToken("1", 36).times(duration));
   return formatAmount(minimumFee.plus(dynamicFee));
 }
+
+export function calculateEarlyWithdrawalFeePercent(
+  unlockAt: number,
+  duration: number
+) {
+  const timeRemaining = unlockAt - timestampNow();
+  const minimumFee = minEarlyWithdrawalFee;
+  const multiplier = calculateMultiplier(duration);
+  const dynamicFee = baseEarlyWithdrawalFee
+    .times(timeRemaining)
+    .times(multiplier.exact)
+    .div(one.times(duration));
+  return convert.toBalance(
+    minimumFee.plus(dynamicFee).times(100),
+    18,
+    false,
+    2
+  );
+}
