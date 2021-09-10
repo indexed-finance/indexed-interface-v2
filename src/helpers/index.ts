@@ -7,6 +7,7 @@ export * from './create-lookup';
 export * from './create-multicall-data-parser';
 export * from './create-translator';
 export * from './dedupe';
+export * from './dndx-helpers';
 export * from './get-random-entries';
 export * from './links';
 export * from './logger';

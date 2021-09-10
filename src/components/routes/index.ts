@@ -10,6 +10,7 @@ export * from './Splash';
 export * from './Stake';
 export * from './Staking';
 export * from './SushiswapStakeForm';
+export * from './Timelocks';
 export * from './UniswapStakeForm';
 export * from './Vault';
 export * from './Vaults';

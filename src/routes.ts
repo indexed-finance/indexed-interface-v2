@@ -21,6 +21,7 @@ const IndexPools = lazy(() => import("./components/routes/IndexPools"));
 const IndexPool = lazy(() => import("./components/routes/IndexPool"));
 const Vaults = lazy(() => import("./components/routes/Vaults"));
 const Vault = lazy(() => import("./components/routes/Vault"));
+const Timelocks = lazy(() => import("./components/routes/Timelocks"));
 
 export const routes: RouteWithBreadcrumbs[] = [
   {
@@ -90,6 +91,11 @@ export const routes: RouteWithBreadcrumbs[] = [
     path: "/vaults/:slug",
     exact: true,
     component: Vault,
+  },
+  {
+    path: "/timelocks",
+    exact: true,
+    component: Timelocks,
   },
 ];
 

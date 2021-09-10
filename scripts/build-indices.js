@@ -13,6 +13,8 @@ const ignoreDirs = [
   "ethereum/abi",
   "data",
   "data/learn",
+  "libs",
+  "libs/@walletconnect-connector",
 ].map((dir) => path.join(sourceDirectory, dir));
 const isSpecFile = (file) => file.includes("spec");
 const isTypescriptFile = (file) => path.extname(file).includes("ts");

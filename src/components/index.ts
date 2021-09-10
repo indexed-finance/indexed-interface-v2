@@ -3,6 +3,7 @@
 
 export * from './animations';
 export * from './atomic';
+export * from './dndx';
 export * from './drawers';
 export * from './interactions';
 export * from './portfolio';
