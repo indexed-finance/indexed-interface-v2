@@ -1,11 +1,24 @@
-import { Alert, Button, Divider, Typography } from "antd";
+import { Alert, Button, Switch, Typography } from "antd";
 import { Formik } from "formik";
 import { Label, TokenSelector } from "components/atomic";
 import { TimelockField } from "./TimelockField";
-import { convert } from "helpers";
+import {
+  calculateEarlyWithdrawalFee,
+  calculateEarlyWithdrawalFeePercent,
+  convert,
+} from "helpers";
 
 export function TimelockWithdrawalForm() {
   const isReady = true;
+  const earlyWithdrawalFee = calculateEarlyWithdrawalFee(
+    convert.toBigNumber("10.00"),
+    1631303807596 / 1000,
+    19476000
+  );
+  const earlyWithdrawalFeePercent = calculateEarlyWithdrawalFeePercent(
+    1631303807596 / 1000,
+    19476000
+  );
 
   return (
     <Formik
@@ -18,7 +31,6 @@ export function TimelockWithdrawalForm() {
       onSubmit={console.info}
     >
       <>
-        <Divider />
         <TimelockField
           title="Amount"
           description="How much NDX do you wish to withdraw?"
@@ -64,7 +76,7 @@ export function TimelockWithdrawalForm() {
             </span>
           </div>
         </TimelockField>
-        <TimelockField title="Fees">
+        <TimelockField title="Fee">
           {isReady ? (
             <Alert
               type="success"
@@ -73,13 +85,38 @@ export function TimelockWithdrawalForm() {
             />
           ) : (
             <Alert
-              type="warning"
+              type="error"
               showIcon={true}
               message="This timelock isn't quite ready -- withdrawing will incur a fee."
             />
           )}
+          {!isReady && (
+            <Typography.Title
+              type="danger"
+              level={1}
+              style={{
+                marginTop: 24,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
+              <span style={{ color: "#A61C23" }}>
+                {earlyWithdrawalFee.displayed} NDX ({earlyWithdrawalFeePercent}
+                %)
+              </span>
+              <small style={{ fontSize: 12 }}>
+                <Switch /> I understand a fee will be levied.
+              </small>
+            </Typography.Title>
+          )}
         </TimelockField>
-        <Button type="primary" block={true} style={{ height: "unset" }}>
+        <Button
+          type="primary"
+          block={true}
+          style={{ height: "unset" }}
+          danger={!isReady}
+        >
           <Typography.Title level={2} style={{ margin: 0 }}>
             Withdraw from Timelock
           </Typography.Title>
