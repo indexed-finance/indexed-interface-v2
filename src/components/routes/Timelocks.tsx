@@ -1,12 +1,12 @@
 import { Col, Row, Space } from "antd";
-import { CreateTimelockForm, TimelockCard } from "components/dndx";
 import { Page } from "components/atomic";
+import { TimelockCard, TimelockWithdrawalForm } from "components/dndx";
 
 export default function Timelocks() {
   return (
     <Page title="Timelocks" hasPageHeader={true}>
       <Space direction="vertical" size="large">
-        <CreateTimelockForm />
+        <TimelockWithdrawalForm />
 
         <Row>
           <Col span={8}>

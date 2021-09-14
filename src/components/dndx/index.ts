@@ -5,3 +5,4 @@ export * from './CreateTimelockForm';
 export * from './TimelockCard';
 export * from './TimelockDurationSlider';
 export * from './TimelockField';
+export * from './TimelockWithdrawalForm';
