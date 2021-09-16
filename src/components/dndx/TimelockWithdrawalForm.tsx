@@ -8,8 +8,11 @@ import {
   convert,
 } from "helpers";
 
-export function TimelockWithdrawalForm() {
-  const isReady = true;
+interface Props {
+  isReady: boolean;
+}
+
+export function TimelockWithdrawalForm({ isReady }: Props) {
   const earlyWithdrawalFee = calculateEarlyWithdrawalFee(
     convert.toBigNumber("10.00"),
     1631303807596 / 1000,
@@ -38,7 +41,7 @@ export function TimelockWithdrawalForm() {
           <div
             style={{
               display: "flex",
-              alignItems: "center",
+              alignItems: "flex-start",
               justifyContent: "space-between",
             }}
           >
@@ -69,9 +72,18 @@ export function TimelockWithdrawalForm() {
                 >
                   Available{" "}
                 </Label>
-                <Typography.Title level={2} type="success">
+                <Typography.Title
+                  level={4}
+                  type="success"
+                  style={{ margin: 0 }}
+                >
                   12.06 NDX
                 </Typography.Title>
+                {isReady && (
+                  <Button type="dashed" style={{ marginLeft: 24 }}>
+                    Take All
+                  </Button>
+                )}
               </div>
             </span>
           </div>
@@ -96,21 +108,28 @@ export function TimelockWithdrawalForm() {
               level={1}
               style={{
                 marginTop: 24,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
               }}
             >
               <span style={{ color: "#A61C23" }}>
                 {earlyWithdrawalFee.displayed} NDX ({earlyWithdrawalFeePercent}
                 %)
               </span>
-              <small style={{ fontSize: 12 }}>
-                <Switch /> I understand a fee will be levied.
+              <br />
+              <Switch />{" "}
+              <small style={{ fontSize: 16 }}>
+                I understand a fee will be levied.
               </small>
             </Typography.Title>
           )}
         </TimelockField>
+        <TimelockField
+          title="dNDX"
+          description={
+            <Typography.Title level={4} style={{ margin: 0 }}>
+              4.06 dNDX will be burned.
+            </Typography.Title>
+          }
+        ></TimelockField>
         <Button
           type="primary"
           block={true}

@@ -57,6 +57,7 @@ interface Props {
   onChange?: (value: TokenSelectorValue) => void;
   isInput?: boolean;
   loading?: boolean;
+  small?: boolean;
 }
 
 const DEFAULT_ENTRY = {
@@ -78,6 +79,7 @@ export function TokenSelector({
   autoFocus = false,
   onChange,
   isInput,
+  small = false,
 }: Props) {
   const tx = useTranslator();
   const { setTouched } = useFormikContext<any>();
@@ -264,7 +266,7 @@ export function TokenSelector({
               onFocus={() => setTouched({ [amountField]: true })}
               onChange={onAmountChange}
               style={{
-                width: isMobile ? 120 : 200,
+                width: isMobile || small ? 120 : 200,
                 fontSize: 22,
                 flex: reversed ? 1 : 0,
               }}

@@ -53,7 +53,7 @@ export function CreateTimelockForm() {
           description="Adjust how long the timelock takes to mature."
         >
           <Row align="middle" gutter={36}>
-            <Col span={18} offset={3} style={{ marginBottom: 24 }}>
+            <Col span={24} style={{ marginBottom: 24 }}>
               <Alert type="info" message={<TimelockDurationSlider />} />
             </Col>
             <Col span={24}>

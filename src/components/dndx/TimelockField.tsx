@@ -12,7 +12,7 @@ export function TimelockField({
 }) {
   return (
     <Card
-      style={{ background: "#232323", marginBottom: 24 }}
+      style={{ background: "#232323", marginBottom: 24, padding: 12 }}
       hoverable={false}
       bordered={false}
       title={
