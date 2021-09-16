@@ -4,6 +4,7 @@ import { TransactionExtra, transactionsActions } from "./transactions";
 import { TransactionResponse } from "@ethersproject/abstract-provider";
 import { batcherActions } from "./batcher";
 import { categoriesActions } from "./categories";
+import { dndxActions } from "./dndx";
 import { fetchInitialData, fetchVaultsData } from "./requests";
 import { fetchMasterChefData, masterChefActions } from "./masterChef";
 import { fetchNewStakingData } from "./newStaking";
@@ -137,6 +138,7 @@ export const thunks = {
 export const actions = {
   ...batcherActions,
   ...categoriesActions,
+  ...dndxActions,
   ...indexPoolsActions,
   ...pairsActions,
   ...settingsActions,

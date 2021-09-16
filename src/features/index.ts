@@ -5,6 +5,7 @@ export * from './actions';
 export * from './batcher';
 export * from './categories';
 export * from './dailySnapshots';
+export * from './dndx';
 export * from './indexPools';
 export * from './masterChef';
 export * from './middleware';

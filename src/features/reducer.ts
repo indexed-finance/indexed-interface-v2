@@ -2,6 +2,7 @@ import { batcherReducer } from "./batcher";
 import { categoriesReducer } from "./categories";
 import { combineReducers } from "@reduxjs/toolkit";
 import { dailySnapshotsReducer } from "./dailySnapshots";
+import { dndxReducer } from "./dndx";
 import { indexPoolsReducer } from "./indexPools";
 import { masterChefReducer } from "./masterChef";
 import { newStakingReducer } from "./newStaking";
@@ -17,6 +18,7 @@ export const rootReducer = combineReducers({
   batcher: batcherReducer,
   categories: categoriesReducer,
   dailySnapshots: dailySnapshotsReducer,
+  dndx: dndxReducer,
   indexPools: indexPoolsReducer,
   pairs: pairsReducer,
   settings: settingsReducer,

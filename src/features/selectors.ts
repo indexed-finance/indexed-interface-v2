@@ -30,6 +30,7 @@ import { batcherSelectors } from "./batcher";
 import { computeSushiswapPairAddress, convert } from "helpers";
 import { createSelector } from "reselect";
 import { dailySnapshotsSelectors } from "./dailySnapshots";
+import { dndxSelectors } from "./dndx";
 import { formatDistance } from "date-fns";
 import { newStakingSelectors } from "./newStaking";
 import { settingsSelectors } from "./settings";
@@ -44,6 +45,7 @@ export const selectors = {
   ...batcherSelectors,
   ...categoriesSelectors,
   ...dailySnapshotsSelectors,
+  ...dndxSelectors,
   ...indexPoolsSelectors,
   ...settingsSelectors,
   ...stakingSelectors,
