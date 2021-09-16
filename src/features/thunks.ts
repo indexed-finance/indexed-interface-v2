@@ -4,8 +4,11 @@ import { TransactionExtra, transactionsActions } from "./transactions";
 import { TransactionResponse } from "@ethersproject/abstract-provider";
 import { batcherActions } from "./batcher";
 import { categoriesActions } from "./categories";
-import { dndxActions } from "./dndx";
-import { fetchInitialData, fetchVaultsData } from "./requests";
+import {
+  fetchInitialData,
+  fetchTimelocksData,
+  fetchVaultsData,
+} from "./requests";
 import { fetchMasterChefData, masterChefActions } from "./masterChef";
 import { fetchNewStakingData } from "./newStaking";
 import { fetchStakingData, stakingActions } from "./staking";
@@ -14,6 +17,7 @@ import { notification } from "antd";
 import { pairsActions } from "./pairs";
 import { providers } from "ethers";
 import { settingsActions } from "./settings";
+import { timelocksActions } from "./timelocks";
 import { tokensActions } from "./tokens";
 import { userActions } from "./user";
 import { vaultsActions } from "./vaults";
@@ -106,6 +110,7 @@ export const thunks = {
       );
       dispatch(fetchMasterChefData({ provider }));
       dispatch(fetchVaultsData({ provider }));
+      dispatch(fetchTimelocksData({ provider }));
 
       if (selectedAddress) {
         dispatch(actions.userAddressSelected(selectedAddress));
@@ -138,12 +143,12 @@ export const thunks = {
 export const actions = {
   ...batcherActions,
   ...categoriesActions,
-  ...dndxActions,
   ...indexPoolsActions,
   ...pairsActions,
   ...settingsActions,
   ...stakingActions,
   ...tokensActions,
+  ...timelocksActions,
   ...transactionsActions,
   ...userActions,
   ...vaultsActions,

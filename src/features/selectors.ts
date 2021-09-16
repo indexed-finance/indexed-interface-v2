@@ -30,11 +30,11 @@ import { batcherSelectors } from "./batcher";
 import { computeSushiswapPairAddress, convert } from "helpers";
 import { createSelector } from "reselect";
 import { dailySnapshotsSelectors } from "./dailySnapshots";
-import { dndxSelectors } from "./dndx";
 import { formatDistance } from "date-fns";
 import { newStakingSelectors } from "./newStaking";
 import { settingsSelectors } from "./settings";
 import { sortTokens } from "@indexed-finance/indexed.js/dist/utils/address";
+import { timelocksSelectors } from "./timelocks";
 import { vaultsSelectors } from "./vaults";
 import S from "string";
 import type { AppState } from "./store";
@@ -45,11 +45,11 @@ export const selectors = {
   ...batcherSelectors,
   ...categoriesSelectors,
   ...dailySnapshotsSelectors,
-  ...dndxSelectors,
   ...indexPoolsSelectors,
   ...settingsSelectors,
   ...stakingSelectors,
   ...newStakingSelectors,
+  ...timelocksSelectors,
   ...tokensSelectors,
   ...userSelectors,
   ...pairsSelectors,

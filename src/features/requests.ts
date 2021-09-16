@@ -315,6 +315,30 @@ export const fetchVaultsData = createAsyncThunk(
   }
 );
 
+export const fetchTimelocksData = createAsyncThunk(
+  "timelocks/fetch",
+  async (_: any, { getState }) => {
+    const state = getState();
+
+    return [];
+
+    // TODO: Get rid of fake data.
+
+    // const address = (state as any).user.address;
+    // const client = NirnSubgraphClient.forNetwork("mainnet");
+
+    // try {
+    //   const vaults = await client.getAllVaults(address);
+
+    //   return vaults;
+    // } catch (error) {
+    //   console.error({ error });
+
+    //   return null;
+    // }
+  }
+);
+
 export const requests = {
   ...batcherRequests,
   ...indexPoolsRequests,
