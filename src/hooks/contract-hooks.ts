@@ -1,6 +1,8 @@
 import {
 	ADAPTER_REGISTRY_ADDRESS,
 	BURN_ROUTER_ADDRESS,
+	DNDX_ADDRESS,
+	DNDX_TIMELOCK_ADDRESS,
 	MASTER_CHEF_ADDRESS,
 	MINT_ROUTER_ADDRESS,
 	MULTICALL2_ADDRESS,
@@ -26,6 +28,10 @@ export function useAdapterRegistryContract() {
 
 export function useErc20AdapterContract(address: string) {
 	return useContractWithSigner(address, "Erc20Adapter");
+}
+
+export function useDNDXContract() {
+	return useContractWithSigner(DNDX_ADDRESS, "ERC20DividendsOwned");
 }
 
 export function useTokenContract(address: string) {
@@ -78,6 +84,10 @@ export function usePairContract(address: string) {
 
 export function useRewardsScheduleContract(address: string) {
 	return useContractWithSigner(address, "RewardsSchedule");
+}
+
+export function useSharesTimeLockContract() {
+	return useContractWithSigner(DNDX_TIMELOCK_ADDRESS, "SharesTimeLock");
 }
 
 export function useStakingRewardsContract(address: string) {
