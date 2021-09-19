@@ -2,6 +2,7 @@ import * as batcherRequests from "./batcher/requests";
 import * as indexPoolsRequests from "./indexPools/requests";
 import * as newStakingRequests from "./newStaking/requests";
 import * as stakingRequests from "./staking/requests";
+import * as timelocksRequests from "./tokens/requests";
 import * as tokensRequests from "./tokens/requests";
 import { MIN_WEIGHT } from "ethereum";
 import { NDX_ADDRESS, WETH_CONTRACT_ADDRESS } from "config";
@@ -315,27 +316,12 @@ export const fetchVaultsData = createAsyncThunk(
   }
 );
 
-export const fetchTimelocksData = createAsyncThunk(
-  "timelocks/fetch",
-  async (_: any, { getState }) => {
-    const state = getState();
-
-    // TODO: Get rid of fake data.
-    const fakeData = [];
-
-    try {
-      return [];
-    } catch (error) {
-      return [];
-    }
-  }
-);
-
 export const requests = {
   ...batcherRequests,
   ...indexPoolsRequests,
   ...stakingRequests,
   ...newStakingRequests,
+  ...timelocksRequests,
   ...tokensRequests,
   fetchInitialData,
   fetchVaultsData,

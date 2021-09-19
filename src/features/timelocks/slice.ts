@@ -1,6 +1,6 @@
+import * as requests from "./requests";
 import { createEntityAdapter, createSlice } from "@reduxjs/toolkit";
 import { fetchMulticallData } from "../batcher";
-import { fetchTimelocksData } from "../requests";
 import { restartedDueToError } from "../actions";
 import type { AppState } from "../store";
 
@@ -9,12 +9,13 @@ export type Amount = {
   displayed: string;
 };
 
-export type DividendsLock = {
+export type TimeLockData = {
   id: string;
   owner: string;
-  unlockAt: number;
+  createdAt: number;
+  ndxAmount: string;
   duration: number;
-  amount: string;
+  dndxShares: string;
 };
 
 export type FormattedDividendsLock = {
@@ -31,24 +32,35 @@ export type FormattedDividendsLock = {
 
 export const TIMELOCKS_CALLER = "Timelocks";
 
-const adapter = createEntityAdapter<DividendsLock>({
+const adapter = createEntityAdapter<TimeLockData>({
   selectId: (entry) => entry.id.toLowerCase(),
 });
 
 const slice = createSlice({
   name: "timelocks",
-  initialState: adapter.getInitialState(),
+  initialState: adapter.getInitialState({
+    metadata: {},
+  }),
   reducers: {},
   extraReducers: (builder) =>
     builder
-      .addCase(fetchMulticallData.fulfilled, (state, action) => {
-        return state;
+      .addCase(restartedDueToError, () =>
+        adapter.getInitialState({
+          metadata: {},
+        })
+      )
+      .addCase(requests.fetchTimelocksMetadata.fulfilled, (state, action) => {
+        // const timelocks = action.payload ?? [];
+        // adapter.upsertMany(state, timelocks);
+        state.metadata = action.payload as any;
       })
-      .addCase(restartedDueToError, () => adapter.getInitialState())
-      .addCase(fetchTimelocksData.fulfilled, (state, action) => {
-        const timelocks = action.payload ?? [];
-
-        adapter.upsertMany(state, timelocks);
+      .addCase(requests.fetchTimelockData.fulfilled, (state, action) => {
+        if (action.payload) {
+          adapter.upsertOne(state, action.payload);
+        }
+      })
+      .addCase(requests.fetchUserTimelocks.fulfilled, (state, action) => {
+        adapter.upsertMany(state, action.payload);
       }),
 });
 

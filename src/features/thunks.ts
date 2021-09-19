@@ -4,11 +4,7 @@ import { TransactionExtra, transactionsActions } from "./transactions";
 import { TransactionResponse } from "@ethersproject/abstract-provider";
 import { batcherActions } from "./batcher";
 import { categoriesActions } from "./categories";
-import {
-  fetchInitialData,
-  fetchTimelocksData,
-  fetchVaultsData,
-} from "./requests";
+import { fetchInitialData, fetchVaultsData, requests } from "./requests";
 import { fetchMasterChefData, masterChefActions } from "./masterChef";
 import { fetchNewStakingData } from "./newStaking";
 import { fetchStakingData, stakingActions } from "./staking";
@@ -110,7 +106,6 @@ export const thunks = {
       );
       dispatch(fetchMasterChefData({ provider }));
       dispatch(fetchVaultsData({ provider }));
-      dispatch(fetchTimelocksData({ provider }));
 
       if (selectedAddress) {
         dispatch(actions.userAddressSelected(selectedAddress));
