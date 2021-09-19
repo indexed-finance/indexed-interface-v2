@@ -33,7 +33,7 @@ export type FormattedDividendsLock = {
 export const TIMELOCKS_CALLER = "Timelocks";
 
 const adapter = createEntityAdapter<TimeLockData>({
-  selectId: (entry) => entry.id.toLowerCase(),
+  selectId: (entry) => entry?.id.toLowerCase() ?? "",
 });
 
 const slice = createSlice({

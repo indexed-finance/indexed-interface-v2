@@ -1,10 +1,11 @@
+import * as timelocksRequests from "./timelocks/requests";
 import * as topLevelActions from "./actions";
 import { RegisteredCall, abbreviateAddress } from "helpers";
 import { TransactionExtra, transactionsActions } from "./transactions";
 import { TransactionResponse } from "@ethersproject/abstract-provider";
 import { batcherActions } from "./batcher";
 import { categoriesActions } from "./categories";
-import { fetchInitialData, fetchVaultsData, requests } from "./requests";
+import { fetchInitialData, fetchVaultsData } from "./requests";
 import { fetchMasterChefData, masterChefActions } from "./masterChef";
 import { fetchNewStakingData } from "./newStaking";
 import { fetchStakingData, stakingActions } from "./staking";
@@ -109,6 +110,7 @@ export const thunks = {
 
       if (selectedAddress) {
         dispatch(actions.userAddressSelected(selectedAddress));
+        dispatch(timelocksRequests.fetchUserTimelocks(selectedAddress));
       }
 
       dispatch(actions.walletConnected());

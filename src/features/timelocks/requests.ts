@@ -1,5 +1,6 @@
 import { IndexedDividendsSubgraphClient } from "@indexed-finance/subgraph-clients";
 import { createAsyncThunk } from "@reduxjs/toolkit";
+import type { TimeLockData } from "./slice";
 
 export const fetchTimelocksMetadata = createAsyncThunk(
   "timelocks/metadata/fetch",
@@ -41,9 +42,11 @@ export const fetchUserTimelocks = createAsyncThunk(
     const client = IndexedDividendsSubgraphClient.forNetwork("mainnet");
 
     try {
-      const timelocks = await client.getLocksByOwner(userId);
+      const timelocks = (await (client.getLocksByOwner(
+        userId
+      ) as unknown)) as TimeLockData[];
 
-      return [timelocks];
+      return timelocks;
     } catch (error) {
       console.error({ error });
 
