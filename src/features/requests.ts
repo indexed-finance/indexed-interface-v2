@@ -320,22 +320,14 @@ export const fetchTimelocksData = createAsyncThunk(
   async (_: any, { getState }) => {
     const state = getState();
 
-    return [];
-
     // TODO: Get rid of fake data.
+    const fakeData = [];
 
-    // const address = (state as any).user.address;
-    // const client = NirnSubgraphClient.forNetwork("mainnet");
-
-    // try {
-    //   const vaults = await client.getAllVaults(address);
-
-    //   return vaults;
-    // } catch (error) {
-    //   console.error({ error });
-
-    //   return null;
-    // }
+    try {
+      return [];
+    } catch (error) {
+      return [];
+    }
   }
 );
 
