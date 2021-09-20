@@ -1,38 +1,61 @@
-import { DNDX_ADDRESS } from "config";
+import { BigNumber } from "helpers";
+import { DNDX_ADDRESS, DNDX_TIMELOCK_ADDRESS } from "config";
 import { TIMELOCKS_CALLER } from "features";
+import { useAddTransactionCallback } from "./transaction-hooks";
 import { useCallRegistrar } from "./use-call-registrar";
+import { useCallback } from "react";
+import { useTimelockContract } from "./contract-hooks";
 
-export function useTimelocksRegistrar(id: string) {
+export function useTimelockCreator() {
+  const contract = useTimelockContract();
+  const addTransaction = useAddTransactionCallback();
+  const createTimelock = useCallback(
+    (ndxAmount: BigNumber, duration: BigNumber) => {
+      if (!contract) throw new Error();
+
+      const tx = contract.deposit(ndxAmount.toString(), duration.toString());
+
+      addTransaction(tx);
+    },
+    [contract, addTransaction]
+  );
+
+  return createTimelock;
+}
+
+export function useTimelocksRegistrar(
+  userAddress: string,
+  timelockIds: string[]
+) {
   const caller = TIMELOCKS_CALLER;
-  const target = id;
   const onChainCalls = [
-    {
+    ...timelockIds.map((id) => ({
       caller,
-      target,
+      target: DNDX_TIMELOCK_ADDRESS,
       interfaceKind: "SharesTimeLock" as any,
       function: "locks",
       args: [id],
-    },
+    })),
     {
       caller,
-      target: "",
+      target: DNDX_ADDRESS,
       interfaceKind: "IERC20" as any,
-      function: DNDX_ADDRESS,
-      args: [id],
+      function: "balanceOf",
+      args: [userAddress],
     },
     {
       caller,
-      target,
+      target: DNDX_ADDRESS,
       interfaceKind: "ERC20DividendsOwned" as any,
       function: "withdrawableDividendsOf",
-      args: [id],
+      args: [userAddress],
     },
     {
       caller,
-      target,
+      target: DNDX_ADDRESS,
       interfaceKind: "ERC20DividendsOwned" as any,
       function: "withdrawnDividendsOf",
-      args: [id],
+      args: [userAddress],
     },
   ];
 

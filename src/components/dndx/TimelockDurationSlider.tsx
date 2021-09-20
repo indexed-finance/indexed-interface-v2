@@ -1,18 +1,23 @@
+import { BigNumber, convert, duration } from "helpers";
 import { Slider } from "antd";
-import { duration } from "helpers";
-import { useState } from "react";
 
-export function TimelockDurationSlider() {
+interface Props {
+  value: BigNumber;
+  onChange(seconds: BigNumber): void;
+}
+
+export function TimelockDurationSlider({ value, onChange }: Props) {
   const MINIMUM = 7776000;
   const MAXIMUM = 31104000;
-  const [value, setValue] = useState(MINIMUM);
 
   return (
     <Slider
       min={MINIMUM}
       max={MAXIMUM}
-      value={value}
-      onChange={setValue}
+      value={value.toNumber()}
+      onChange={(numberValue: number) =>
+        onChange(convert.toBigNumber(numberValue.toString()))
+      }
       tipFormatter={(value) => (value ? duration(value) : null)}
       style={{ margin: "1rem", marginBottom: "3rem" }}
       marks={{
