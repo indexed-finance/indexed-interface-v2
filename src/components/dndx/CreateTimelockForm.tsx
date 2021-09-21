@@ -1,5 +1,10 @@
 import { Alert, Button, Col, Row, Typography } from "antd";
-import { BigNumber, convert, duration } from "helpers";
+import {
+  BigNumber,
+  calculateBonusMultiplier,
+  convert,
+  duration,
+} from "helpers";
 import { DNDX_TIMELOCK_ADDRESS, NDX_ADDRESS } from "config";
 import { Formik, FormikProps } from "formik";
 import { Label, TokenSelector } from "components/atomic";
@@ -29,7 +34,7 @@ export function CreateTimelockForm() {
     <Formik
       initialValues={{
         amount: ZERO,
-        duration: convert.toBigNumber("0"),
+        duration: convert.toBigNumber("7776000"),
       }}
       onSubmit={console.info}
     >
@@ -50,6 +55,13 @@ function CreateTimelockFormInner({
     rawAmount: values.amount.exact.toString(),
     symbol: "NDX",
   });
+  const amountValue = parseFloat(values.amount.displayed);
+  const durationValue = values.duration.toNumber();
+  const multiplier = parseFloat(
+    calculateBonusMultiplier(durationValue).displayed
+  );
+  const bonusDndx = amountValue * multiplier;
+  const totalDndx = amountValue + bonusDndx;
 
   useBalanceAndApprovalRegistrar(DNDX_TIMELOCK_ADDRESS.toLowerCase(), [
     NDX_ADDRESS.toLowerCase(),
@@ -123,7 +135,7 @@ function CreateTimelockFormInner({
                   Ready In
                 </Label>
                 <Typography.Title level={2} type="success">
-                  {duration(19476000)}
+                  {duration(durationValue)}
                 </Typography.Title>
               </div>
               <div style={{ textAlign: "right" }}>
@@ -137,7 +149,7 @@ function CreateTimelockFormInner({
                   Bonus{" "}
                 </Label>
                 <Typography.Title level={2} type="success">
-                  2.0x
+                  {multiplier}%
                 </Typography.Title>
               </div>
             </div>
@@ -148,16 +160,17 @@ function CreateTimelockFormInner({
         title="dNDX"
         description={
           <Typography.Title level={4} style={{ margin: 0 }}>
-            4.06 dNDX will be minted.
+            {totalDndx.toFixed(2)} dNDX will be minted.
           </Typography.Title>
         }
       >
         <Typography.Title level={5} type="secondary">
-          <em>1.06 base NDX + 3.00 dNDX bonus (3.0x multiplier)</em>
+          <em>
+            {amountValue.toFixed(2)} base NDX + {bonusDndx.toFixed(2)} dNDX
+            bonus ({multiplier}x multiplier)
+          </em>
         </Typography.Title>
       </TimelockField>
-
-      <div>{status}</div>
 
       {status === "approval needed" ? (
         <Button
