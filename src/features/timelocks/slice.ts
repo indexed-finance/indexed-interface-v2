@@ -1,5 +1,6 @@
 import * as requests from "./requests";
 import { createEntityAdapter, createSlice } from "@reduxjs/toolkit";
+import { createMulticallDataParser } from "helpers";
 import { fetchMulticallData } from "../batcher";
 import { restartedDueToError } from "../actions";
 import type { AppState } from "../store";
@@ -40,13 +41,37 @@ const slice = createSlice({
   name: "timelocks",
   initialState: adapter.getInitialState({
     metadata: {},
+    dndx: "0",
+    withdrawn: "0",
+    withdrawable: "0",
   }),
   reducers: {},
   extraReducers: (builder) =>
     builder
+      .addCase(fetchMulticallData.fulfilled, (state, action) => {
+        const relevantMulticallData = timelocksMulticallDataParser(
+          action.payload
+        );
+
+        console.log({ relevantMulticallData });
+
+        if (relevantMulticallData) {
+          const { dndxAmount, withdrawable, withdrawn, timelocks } =
+            relevantMulticallData;
+
+          state.dndx = dndxAmount;
+          state.withdrawn = withdrawn;
+          state.withdrawable = withdrawable;
+
+          adapter.upsertMany(state, timelocks);
+        }
+      })
       .addCase(restartedDueToError, () =>
         adapter.getInitialState({
           metadata: {},
+          dndx: "0",
+          withdrawn: "0",
+          withdrawable: "0",
         })
       )
       .addCase(requests.fetchTimelocksMetadata.fulfilled, (state, action) => {
@@ -68,6 +93,43 @@ export const { actions: timelocksActions, reducer: timelocksReducer } = slice;
 
 const selectors = adapter.getSelectors((state: AppState) => state.timelocks);
 
-export const timelocksSelectors = {};
+export const timelocksSelectors = {
+  selectUserTimelocks: selectors.selectAll,
+};
 
-// Temporary
+// #region Helpers
+const timelocksMulticallDataParser = createMulticallDataParser(
+  TIMELOCKS_CALLER,
+  (calls) => {
+    const [locksCall, dndxCalls] = calls;
+    const [, { locks }] = locksCall;
+    const formattedLocks: TimeLockData[] = locks.map((lock) => {
+      const [id] = lock.args ?? [];
+      const [ndxAmount, createdAt, duration, owner] = lock.result ?? [];
+
+      return {
+        id,
+        owner,
+        ndxAmount,
+        createdAt: parseInt(createdAt),
+        duration: parseInt(duration),
+        dndxShares: "0",
+      };
+    });
+
+    const [, { balanceOf, withdrawableDividendsOf, withdrawnDividendsOf }] =
+      dndxCalls;
+    const dndxAmount = balanceOf[0].result?.[0] ?? "0";
+    const withdrawable = withdrawableDividendsOf[0].result?.[0] ?? "0";
+    const withdrawn = withdrawnDividendsOf[0].result?.[0] ?? "0";
+
+    return {
+      dndxAmount,
+      withdrawable,
+      withdrawn,
+      timelocks: formattedLocks,
+    };
+  }
+);
+
+// #endregion

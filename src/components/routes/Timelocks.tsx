@@ -5,8 +5,25 @@ import {
 } from "components/dndx";
 import { Page } from "components/atomic";
 import { Space } from "antd";
+import { requests } from "features";
+import { useDispatch } from "react-redux";
+import { useEffect, useMemo } from "react";
+import { useTimelocksRegistrar, useUserAddress, useUserTimelocks } from "hooks";
 
 export default function Timelocks() {
+  const dispatch = useDispatch();
+  const userAddress = useUserAddress();
+  const timelocks = useUserTimelocks();
+  const timelockIds = useMemo(() => timelocks.map(({ id }) => id), [timelocks]);
+
+  useTimelocksRegistrar(timelockIds);
+
+  useEffect(() => {
+    dispatch(requests.fetchUserTimelocks(userAddress));
+  }, [dispatch, userAddress]);
+
+  console.log({ timelocks });
+
   return (
     <Page title="Timelocks" hasPageHeader={true}>
       <Space direction="vertical" size="large">

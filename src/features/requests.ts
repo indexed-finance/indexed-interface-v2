@@ -2,7 +2,7 @@ import * as batcherRequests from "./batcher/requests";
 import * as indexPoolsRequests from "./indexPools/requests";
 import * as newStakingRequests from "./newStaking/requests";
 import * as stakingRequests from "./staking/requests";
-import * as timelocksRequests from "./tokens/requests";
+import * as timelocksRequests from "./timelocks/requests";
 import * as tokensRequests from "./tokens/requests";
 import { MIN_WEIGHT } from "ethereum";
 import { NDX_ADDRESS, WETH_CONTRACT_ADDRESS } from "config";

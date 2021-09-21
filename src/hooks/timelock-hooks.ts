@@ -1,10 +1,12 @@
 import { BigNumber } from "helpers";
 import { DNDX_ADDRESS, DNDX_TIMELOCK_ADDRESS } from "config";
-import { TIMELOCKS_CALLER } from "features";
+import { TIMELOCKS_CALLER, selectors } from "features";
 import { useAddTransactionCallback } from "./transaction-hooks";
 import { useCallRegistrar } from "./use-call-registrar";
 import { useCallback } from "react";
+import { useSelector } from "react-redux";
 import { useTimelockContract } from "./contract-hooks";
+import { useUserAddress } from "./user-hooks";
 
 export function useTimelockCreator() {
   const contract = useTimelockContract();
@@ -23,10 +25,14 @@ export function useTimelockCreator() {
   return createTimelock;
 }
 
-export function useTimelocksRegistrar(
-  userAddress: string,
-  timelockIds: string[]
-) {
+export function useUserTimelocks() {
+  const userTimelocks = useSelector(selectors.selectUserTimelocks);
+
+  return userTimelocks;
+}
+
+export function useTimelocksRegistrar(timelockIds: string[]) {
+  const userAddress = useUserAddress();
   const caller = TIMELOCKS_CALLER;
   const onChainCalls = [
     ...timelockIds.map((id) => ({
