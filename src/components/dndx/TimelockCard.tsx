@@ -13,6 +13,7 @@ export interface Props {
   dividends: number;
   timeLeft: number;
   unlocksAt: number;
+  createdAt: number;
 }
 
 export function TimelockCard(props: Props) {
