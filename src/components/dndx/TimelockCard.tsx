@@ -21,7 +21,7 @@ export function TimelockCard(props: Props) {
   const bonusMultiplier = calculateBonusMultiplier(props.duration);
   const formattedDuration = duration(props.duration);
   const formattedTimeLeft = duration(props.timeLeft);
-  const percentage = (1 - props.timeLeft / props.duration) * 100;
+  const percentage = (1 - (props.timeLeft * 1000) / props.duration) * 100;
   const isReady = props.timeLeft <= 0;
   const earlyWithdrawalFeePercent = calculateEarlyWithdrawalFeePercent(
     props.unlocksAt,

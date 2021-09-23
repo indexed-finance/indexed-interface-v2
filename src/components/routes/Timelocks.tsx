@@ -111,7 +111,7 @@ export default function Timelocks() {
           Your timelocks
         </Typography.Title>
 
-        {formattedTimelocks.length === 0 ? (
+        {formattedTimelocks.length === 1 ? (
           <Alert
             type="info"
             message="It doesn't look like you have any timelocks yet -- press the New Timelock button to get started."
