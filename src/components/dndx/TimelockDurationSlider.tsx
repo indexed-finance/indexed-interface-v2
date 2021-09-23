@@ -23,17 +23,22 @@ export function TimelockDurationSlider({ value, onChange }: Props) {
       marks={{
         7776000: (
           <>
-            90d, <br /> 1.0x
+            90d, <br /> 0x
           </>
         ),
-        19476000: (
+        15550000: (
           <>
-            225d, <br /> 2.0x
+            180d, <br /> 1x
+          </>
+        ),
+        [7776000 * 3]: (
+          <>
+            270d, <br /> +2x
           </>
         ),
         31104000: (
           <>
-            360d, <br /> 3.0x
+            360d, <br /> +3x
           </>
         ),
       }}

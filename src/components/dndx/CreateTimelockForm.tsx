@@ -149,7 +149,7 @@ function CreateTimelockFormInner({
                   Bonus{" "}
                 </Label>
                 <Typography.Title level={2} type="success">
-                  {multiplier}%
+                  +{multiplier.toFixed(2)}x
                 </Typography.Title>
               </div>
             </div>
@@ -178,6 +178,7 @@ function CreateTimelockFormInner({
           block={true}
           style={{ height: "unset" }}
           onClick={approve}
+          disabled={parseFloat(values.amount.displayed) === 0}
         >
           <Typography.Title level={2} style={{ margin: 0 }}>
             Approve
@@ -189,7 +190,9 @@ function CreateTimelockFormInner({
           block={true}
           style={{ height: "unset" }}
           onClick={() => createTimelock(values.amount.exact, values.duration)}
-          disabled={status === "unknown"}
+          disabled={
+            status === "unknown" || parseFloat(values.amount.displayed) === 0
+          }
         >
           <Typography.Title level={2} style={{ margin: 0 }}>
             Create Timelock

@@ -1,6 +1,6 @@
+import { CreateTimelockForm, TimelockCard } from "components/dndx";
 import { Page } from "components/atomic";
 import { Space } from "antd";
-import { TimelockCard } from "components/dndx";
 import { convert } from "helpers";
 import { requests } from "features";
 import { useDispatch } from "react-redux";
@@ -14,12 +14,10 @@ export default function Timelocks() {
   const timelockIds = useMemo(() => timelocks.map(({ id }) => id), [timelocks]);
   const formattedTimelocks = timelocks.map((timelock) => ({
     id: timelock.id,
-    dndxAmount: parseFloat(
-      convert.toBalance(convert.toBigNumber(timelock.ndxAmount))
-    ),
-    duration: timelock.duration / 1000,
-    dndxShares: parseFloat(timelock.dndxShares),
-    createdAt: timelock.createdAt / 1000,
+    ndxAmount: convert.toBalanceNumber(timelock.ndxAmount),
+    duration: timelock.duration,
+    dndxShares: convert.toBalanceNumber(timelock.dndxShares),
+    createdAt: timelock.createdAt,
     owner: timelock.owner,
   }));
 
@@ -32,17 +30,16 @@ export default function Timelocks() {
   return (
     <Page title="Timelocks" hasPageHeader={true}>
       <Space direction="vertical" size="large">
-        {JSON.stringify(formattedTimelocks, null, 2)}
+        <CreateTimelockForm />
 
         <Space size="large" align="start">
           {formattedTimelocks.map((timelock) => (
             <TimelockCard
               key={timelock.id}
-              dndxAmount={timelock.dndxAmount}
+              ndxAmount={timelock.ndxAmount}
               duration={timelock.duration}
               dividends={timelock.dndxShares}
               timeLeft={timelock.createdAt - timelock.duration}
-              baseNdxAmount={0}
               unlocksAt={timelock.createdAt + timelock.duration}
               createdAt={timelock.createdAt}
             />

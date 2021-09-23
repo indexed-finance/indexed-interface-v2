@@ -7,8 +7,7 @@ import {
 } from "helpers";
 
 export interface Props {
-  dndxAmount: number;
-  baseNdxAmount: number;
+  ndxAmount: number;
   duration: number;
   dividends: number;
   timeLeft: number;
@@ -40,7 +39,7 @@ export function TimelockCard(props: Props) {
       ]}
       title={
         <Typography.Title level={3} type="success">
-          {props.dndxAmount} dNDX
+          {props.ndxAmount} dNDX
         </Typography.Title>
       }
     >
@@ -49,7 +48,7 @@ export function TimelockCard(props: Props) {
         style={{ borderRadius: 0, marginBottom: 18 }}
         message={
           <>
-            Deposit of {props.baseNdxAmount} NDX for {formattedDuration} with a{" "}
+            Deposit of {props.ndxAmount} NDX for {formattedDuration} with a{" "}
             {bonusMultiplier.displayed}x bonus.
           </>
         }
