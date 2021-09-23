@@ -21,7 +21,7 @@ export function TimelockCard(props: Props) {
   const bonusMultiplier = calculateBonusMultiplier(props.duration);
   const formattedDuration = duration(props.duration);
   const formattedTimeLeft = duration(props.timeLeft);
-  const percentage = (1 - (props.timeLeft * 1000) / props.duration) * 100;
+  const percentage = (1 - props.timeLeft / props.duration) * 100;
   const isReady = props.timeLeft <= 0;
   const earlyWithdrawalFeePercent = calculateEarlyWithdrawalFeePercent(
     props.unlocksAt,
@@ -64,19 +64,6 @@ export function TimelockCard(props: Props) {
       />
 
       <Space direction="vertical" size="large" style={{ width: "100%" }}>
-        <div key="dividends">
-          <Label style={{ color: "#00AEAF" }}>Dividends</Label>
-          <Space
-            size="large"
-            style={{ width: "100%", justifyContent: "space-between" }}
-          >
-            <Typography.Title style={{ margin: 0 }} level={3}>
-              {props.dividends} WETH
-            </Typography.Title>
-            <Button>Claim</Button>
-          </Space>
-        </div>
-
         <div key="timeLeft">
           {isReady ? (
             <Space style={{ width: "100%", justifyContent: "space-between" }}>

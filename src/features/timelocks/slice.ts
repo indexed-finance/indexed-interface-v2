@@ -1,6 +1,6 @@
 import * as requests from "./requests";
+import { convert, createMulticallDataParser } from "helpers";
 import { createEntityAdapter, createSlice } from "@reduxjs/toolkit";
-import { createMulticallDataParser } from "helpers";
 import { fetchMulticallData } from "../batcher";
 import { restartedDueToError } from "../actions";
 import type { AppState } from "../store";
@@ -53,8 +53,6 @@ const slice = createSlice({
           action.payload
         );
 
-        console.log({ relevantMulticallData });
-
         if (relevantMulticallData) {
           const { dndxAmount, withdrawable, withdrawn, timelocks } =
             relevantMulticallData;
@@ -75,8 +73,6 @@ const slice = createSlice({
         })
       )
       .addCase(requests.fetchTimelocksMetadata.fulfilled, (state, action) => {
-        // const timelocks = action.payload ?? [];
-        // adapter.upsertMany(state, timelocks);
         state.metadata = action.payload as any;
       })
       .addCase(requests.fetchTimelockData.fulfilled, (state, action) => {
@@ -95,6 +91,16 @@ const selectors = adapter.getSelectors((state: AppState) => state.timelocks);
 
 export const timelocksSelectors = {
   selectUserTimelocks: selectors.selectAll,
+  selectDndxBalance: (state: AppState) =>
+    convert.toBalance(state.timelocks.dndx, 18),
+  selectDividendData: (state: AppState) => {
+    const { withdrawn, withdrawable } = state.timelocks;
+
+    return {
+      withdrawn: convert.toBalance(withdrawn),
+      withdrawable: convert.toBalance(withdrawable),
+    };
+  },
 };
 
 // #region Helpers
@@ -113,7 +119,7 @@ const timelocksMulticallDataParser = createMulticallDataParser(
         ndxAmount,
         createdAt: parseInt(createdAt),
         duration: parseInt(duration),
-        dndxShares: "0",
+        dndxShares: "0", // Doesn't get used.
       };
     });
 
