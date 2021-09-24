@@ -4,27 +4,35 @@ import { Label, Page, Token } from "components/atomic";
 import { TimelockCard } from "components/dndx";
 import { convert } from "helpers";
 import { requests, selectors } from "features";
+import {
+  useBreakpoints,
+  useTimelocksRegistrar,
+  useUserAddress,
+  useUserTimelocks,
+} from "hooks";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useMemo } from "react";
 import { useHistory } from "react-router-dom";
-import { useTimelocksRegistrar, useUserAddress, useUserTimelocks } from "hooks";
 
 export default function Timelocks() {
   const dispatch = useDispatch();
   const userAddress = useUserAddress();
   const timelocks = useUserTimelocks();
   const timelockIds = useMemo(() => timelocks.map(({ id }) => id), [timelocks]);
-  const formattedTimelocks = timelocks.map((timelock) => ({
-    id: timelock.id,
-    ndxAmount: convert.toBalanceNumber(timelock.ndxAmount),
-    duration: timelock.duration,
-    dndxShares: parseFloat(convert.toBalance(timelock.dndxShares)),
-    createdAt: timelock.createdAt,
-    owner: timelock.owner,
-  }));
+  const formattedTimelocks = timelocks
+    .filter((timelock) => Object.hasOwnProperty.call(timelock, "ndxAmount"))
+    .map((timelock) => ({
+      id: timelock.id,
+      ndxAmount: convert.toBalanceNumber(timelock.ndxAmount),
+      duration: timelock.duration,
+      dndxShares: parseFloat(convert.toBalance(timelock.dndxShares)),
+      createdAt: timelock.createdAt,
+      owner: timelock.owner,
+    }));
   const history = useHistory();
   const dndx = useSelector(selectors.selectDndxBalance);
   const { withdrawn, withdrawable } = useSelector(selectors.selectDividendData);
+  const { isMobile } = useBreakpoints();
 
   useTimelocksRegistrar(timelockIds);
 
@@ -53,8 +61,14 @@ export default function Timelocks() {
       }
     >
       <Space direction="vertical" size="large" style={{ width: "100%" }}>
-        <Row>
-          <Col span={8}>
+        <Row gutter={12}>
+          <Col
+            xs={24}
+            lg={8}
+            style={{
+              marginBottom: isMobile ? 24 : 0,
+            }}
+          >
             <Typography.Title
               type="warning"
               level={3}
@@ -73,7 +87,7 @@ export default function Timelocks() {
               size="large"
             />
           </Col>
-          <Col span={8}>
+          <Col xs={24} lg={8}>
             <Typography.Title
               type="warning"
               level={3}
@@ -125,7 +139,7 @@ export default function Timelocks() {
               const timeLeft = unlockDate - new Date().getTime();
 
               return (
-                <Col span={8}>
+                <Col xs={24} lg={8}>
                   <TimelockCard
                     key={timelock.id}
                     id={timelock.id}

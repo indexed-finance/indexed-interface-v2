@@ -77,13 +77,15 @@ function CreateTimelockFormInner({
             <small>
               <br />
               <em>
-                Remember, NDX locked in a timelock can still be used to vote.
+                Remember, NDX locked in a timelock will be delegated back to you
+                for on-chain voting.
               </em>
             </small>
           </>
         }
       >
         <TokenSelector
+          isInput={true}
           loading={false}
           assets={[]}
           value={{

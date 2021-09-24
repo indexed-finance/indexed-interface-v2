@@ -7,6 +7,7 @@ import {
   calculateEarlyWithdrawalFeePercent,
   convert,
 } from "helpers";
+import { useBreakpoints } from "hooks";
 
 interface Props {
   isReady: boolean;
@@ -22,6 +23,7 @@ export function TimelockWithdrawalForm({ isReady }: Props) {
     1631303807596 / 1000,
     19476000
   );
+  const { isMobile } = useBreakpoints();
 
   return (
     <Formik
@@ -41,6 +43,7 @@ export function TimelockWithdrawalForm({ isReady }: Props) {
           <div
             style={{
               display: "flex",
+              flexDirection: isMobile ? "column" : "row",
               alignItems: "flex-start",
               justifyContent: "space-between",
             }}
@@ -61,8 +64,8 @@ export function TimelockWithdrawalForm({ isReady }: Props) {
                 /** Pass */
               }}
             />
-            <span>
-              <div style={{ textAlign: "right" }}>
+            <span style={{ marginTop: isMobile ? 24 : 0 }}>
+              <div style={{ textAlign: isMobile ? "left" : "right" }}>
                 <Label
                   style={{
                     fontSize: 20,
@@ -80,7 +83,10 @@ export function TimelockWithdrawalForm({ isReady }: Props) {
                   12.06 NDX
                 </Typography.Title>
                 {isReady && (
-                  <Button type="dashed" style={{ marginLeft: 24 }}>
+                  <Button
+                    type="dashed"
+                    style={{ marginLeft: isMobile ? 0 : 24 }}
+                  >
                     Take All
                   </Button>
                 )}
@@ -136,9 +142,14 @@ export function TimelockWithdrawalForm({ isReady }: Props) {
           style={{ height: "unset" }}
           danger={!isReady}
         >
-          <Typography.Title level={2} style={{ margin: 0 }}>
-            Withdraw from Timelock
-          </Typography.Title>
+          {isMobile ? (
+            "Withdraw from Timelock"
+          ) : (
+            <Typography.Title
+              level={2}
+              style={{ margin: 0 }}
+            ></Typography.Title>
+          )}
         </Button>
       </>
     </Formik>

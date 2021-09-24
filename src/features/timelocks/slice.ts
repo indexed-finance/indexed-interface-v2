@@ -107,34 +107,43 @@ export const timelocksSelectors = {
 const timelocksMulticallDataParser = createMulticallDataParser(
   TIMELOCKS_CALLER,
   (calls) => {
-    const [locksCall, dndxCalls] = calls;
-    const [, { locks }] = locksCall;
-    const formattedLocks: TimeLockData[] = locks.map((lock) => {
-      const [id] = lock.args ?? [];
-      const [ndxAmount, createdAt, duration, owner] = lock.result ?? [];
+    try {
+      const [locksCall, dndxCalls] = calls;
+      const [, { locks }] = locksCall;
+      const formattedLocks: TimeLockData[] = locks.map((lock) => {
+        const [id] = lock.args ?? [];
+        const [ndxAmount, createdAt, duration, owner] = lock.result ?? [];
+
+        return {
+          id,
+          owner,
+          ndxAmount,
+          createdAt: parseInt(createdAt),
+          duration: parseInt(duration),
+          dndxShares: "0", // Doesn't get used.
+        };
+      });
+
+      const [, { balanceOf, withdrawableDividendsOf, withdrawnDividendsOf }] =
+        dndxCalls;
+      const dndxAmount = balanceOf[0].result?.[0] ?? "0";
+      const withdrawable = withdrawableDividendsOf[0].result?.[0] ?? "0";
+      const withdrawn = withdrawnDividendsOf[0].result?.[0] ?? "0";
 
       return {
-        id,
-        owner,
-        ndxAmount,
-        createdAt: parseInt(createdAt),
-        duration: parseInt(duration),
-        dndxShares: "0", // Doesn't get used.
+        dndxAmount,
+        withdrawable,
+        withdrawn,
+        timelocks: formattedLocks,
       };
-    });
-
-    const [, { balanceOf, withdrawableDividendsOf, withdrawnDividendsOf }] =
-      dndxCalls;
-    const dndxAmount = balanceOf[0].result?.[0] ?? "0";
-    const withdrawable = withdrawableDividendsOf[0].result?.[0] ?? "0";
-    const withdrawn = withdrawnDividendsOf[0].result?.[0] ?? "0";
-
-    return {
-      dndxAmount,
-      withdrawable,
-      withdrawn,
-      timelocks: formattedLocks,
-    };
+    } catch {
+      return {
+        dndxAmount: "0",
+        withdrawable: "0",
+        withdrawn: "0",
+        timelocks: [],
+      };
+    }
   }
 );
 

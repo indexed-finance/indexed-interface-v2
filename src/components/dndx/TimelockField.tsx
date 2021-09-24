@@ -24,12 +24,16 @@ export function TimelockField({
               margin: 0,
               textTransform: "uppercase",
               letterSpacing: "0.2ch",
+              whiteSpace: "pre-wrap",
             }}
           >
             {title}
           </Typography.Title>
           {description && (
-            <Typography.Title level={4} style={{ margin: 0 }}>
+            <Typography.Title
+              level={4}
+              style={{ margin: 0, whiteSpace: "pre-wrap" }}
+            >
               {description}
             </Typography.Title>
           )}
