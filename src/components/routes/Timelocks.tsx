@@ -4,8 +4,14 @@ import { Label, Page, Token } from "components/atomic";
 import { TimelockCard } from "components/dndx";
 import { convert } from "helpers";
 import { requests, selectors } from "features";
+import {
+  useBreakpoints,
+  useDndxBalance,
+  useTimelocksRegistrar,
+  useUserAddress,
+  useUserTimelocks
+} from "hooks";
 import { useDispatch, useSelector } from "react-redux";
-import { useDndxBalance, useTimelocksRegistrar, useUserAddress, useUserTimelocks } from "hooks";
 import { useEffect, useMemo } from "react";
 import { useHistory } from "react-router-dom";
 
@@ -14,7 +20,6 @@ export default function Timelocks() {
   const userAddress = useUserAddress();
   const timelocks = useUserTimelocks();
   const timelockIds = useMemo(() => timelocks.map(({ id }) => id), [timelocks]);
-  console.log(timelocks)
   const formattedTimelocks = timelocks.map((timelock) => ({
     id: timelock.id,
     ndxAmount: convert.toBalanceNumber(timelock.ndxAmount),
@@ -26,6 +31,7 @@ export default function Timelocks() {
   const history = useHistory();
   const dndx = useDndxBalance()
   const { withdrawn, withdrawable } = useSelector(selectors.selectDividendData);
+  const { isMobile } = useBreakpoints();
 
   useTimelocksRegistrar(timelockIds);
 
@@ -54,8 +60,14 @@ export default function Timelocks() {
       }
     >
       <Space direction="vertical" size="large" style={{ width: "100%" }}>
-        <Row>
-          <Col span={8}>
+        <Row gutter={12}>
+          <Col
+            xs={24}
+            lg={8}
+            style={{
+              marginBottom: isMobile ? 24 : 0,
+            }}
+          >
             <Typography.Title
               type="warning"
               level={3}
@@ -74,7 +86,7 @@ export default function Timelocks() {
               size="large"
             />
           </Col>
-          <Col span={8}>
+          <Col xs={24} lg={8}>
             <Typography.Title
               type="warning"
               level={3}
@@ -112,7 +124,7 @@ export default function Timelocks() {
           Your timelocks
         </Typography.Title>
 
-        {formattedTimelocks.length === 1 ? (
+        {formattedTimelocks.length === 0 ? (
           <Alert
             type="info"
             message="It doesn't look like you have any timelocks yet -- press the New Timelock button to get started."
@@ -126,7 +138,7 @@ export default function Timelocks() {
               const timeLeft = unlockDate - new Date().getTime();
 
               return (
-                <Col span={8}>
+                <Col xs={24} lg={8}>
                   <TimelockCard
                     key={timelock.id}
                     id={timelock.id}

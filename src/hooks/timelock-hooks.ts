@@ -73,7 +73,7 @@ export function useUserTimelocks() {
 export function useTimelocksRegistrar(timelockIds: string[]) {
   const userAddress = useUserAddress();
   const caller = TIMELOCKS_CALLER;
-  useBalancesRegistrar([DNDX_ADDRESS  ])
+  useBalancesRegistrar([ DNDX_ADDRESS ])
   const onChainCalls = [
     ...timelockIds.map((id) => ({
       caller,

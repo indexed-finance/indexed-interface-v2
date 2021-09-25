@@ -9,8 +9,8 @@ import {
   convert,
 } from "helpers";
 import { timestampNow } from "helpers"
+import { useBreakpoints, useDndxBalance, useTimelockWithdrawCallbacks } from "hooks";
 import { useCallback, useMemo, useState } from "react";
-import { useDndxBalance, useTimelockWithdrawCallbacks } from "hooks";
 
 const ZERO = {
   displayed: "0.00",
@@ -50,6 +50,7 @@ export function TimelockWithdrawalFormInner({ lock, values, setFieldValue  }: Pr
     return values.amount.exact.eq(0)
   }, [isReady, didAcknowledgeFee, sufficientDndx, values.amount])
 
+  const { isMobile } = useBreakpoints();
   const earlyWithdrawalFee = isReady ? undefined : calculateEarlyWithdrawalFee(
     values.amount.exact,
     lock.unlockAt,
@@ -79,6 +80,7 @@ export function TimelockWithdrawalFormInner({ lock, values, setFieldValue  }: Pr
           <div
             style={{
               display: "flex",
+              flexDirection: isMobile ? "column" : "row",
               alignItems: "flex-start",
               justifyContent: "space-between",
             }}
@@ -100,8 +102,8 @@ export function TimelockWithdrawalFormInner({ lock, values, setFieldValue  }: Pr
                 }
               }}
             />
-            <span>
-              <div style={{ textAlign: "right" }}>
+            <span style={{ marginTop: isMobile ? 24 : 0 }}>
+              <div style={{ textAlign: isMobile ? "left" : "right" }}>
                 <Label
                   style={{
                     fontSize: 20,
@@ -119,7 +121,10 @@ export function TimelockWithdrawalFormInner({ lock, values, setFieldValue  }: Pr
                   {lock.ndxAmount.displayed} NDX
                 </Typography.Title>
                 {isReady && (
-                  <Button type="dashed" style={{ marginLeft: 24 }}>
+                  <Button
+                    type="dashed"
+                    style={{ marginLeft: isMobile ? 0 : 24 }}
+                  >
                     Take All
                   </Button>
                 )}
@@ -194,9 +199,14 @@ export function TimelockWithdrawalFormInner({ lock, values, setFieldValue  }: Pr
           disabled={disableWithdraw}
           onClick={handleSubmit}
         >
-          <Typography.Title level={2} style={{ margin: 0 }}>
-            Withdraw from Timelock
-          </Typography.Title>
+          {isMobile ? (
+            "Withdraw from Timelock"
+          ) : (
+            <Typography.Title
+              level={2}
+              style={{ margin: 0 }}
+            >Withdraw from Timelock</Typography.Title>
+          )}
         </Button>
       </>
     </>
