@@ -1,5 +1,6 @@
 import type {
 	AdapterRegistry,
+	ERC20DividendsOwned,
 	Erc20Adapter,
 	IERC20,
 	IIndexedUniswapV2Oracle,
@@ -14,6 +15,7 @@ import type {
 	NirnVault,
 	Pair,
 	RewardsSchedule,
+	SharesTimeLock,
 	StakingRewards,
 	StakingRewardsFactory,
 	UniswapV2Router,
@@ -28,6 +30,7 @@ import { JsonRpcProvider, JsonRpcSigner } from "@ethersproject/providers";
 export type ContractTypeLookup = {
 	AdapterRegistry: AdapterRegistry,
 	Erc20Adapter: Erc20Adapter,
+	ERC20DividendsOwned: ERC20DividendsOwned,
 	IERC20: IERC20,
 	IIndexedUniswapV2Oracle: IIndexedUniswapV2Oracle,
 	IndexedNarwhalRouter: IndexedNarwhalRouter,
@@ -41,6 +44,7 @@ export type ContractTypeLookup = {
 	NirnVault: NirnVault,
 	Pair: Pair,
 	RewardsSchedule: RewardsSchedule,
+	SharesTimeLock: SharesTimeLock,
 	StakingRewards: StakingRewards,
 	StakingRewardsFactory: StakingRewardsFactory,
 	UniswapV2Router: UniswapV2Router,

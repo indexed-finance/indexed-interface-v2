@@ -8,6 +8,7 @@ import { newStakingReducer } from "./newStaking";
 import { pairsReducer } from "./pairs";
 import { settingsReducer } from "./settings";
 import { stakingReducer } from "./staking";
+import { timelocksReducer } from "./timelocks";
 import { tokensReducer } from "./tokens";
 import { transactionsReducer } from "./transactions";
 import { userReducer } from "./user";
@@ -22,6 +23,7 @@ export const rootReducer = combineReducers({
   settings: settingsReducer,
   staking: stakingReducer,
   newStaking: newStakingReducer,
+  timelocks: timelocksReducer,
   tokens: tokensReducer,
   transactions: transactionsReducer,
   user: userReducer,

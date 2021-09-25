@@ -3,6 +3,7 @@
 /* eslint-disable */
 export type { AdapterRegistry } from "./AdapterRegistry";
 export type { Erc20Adapter } from "./Erc20Adapter";
+export type { ERC20DividendsOwned } from "./ERC20DividendsOwned";
 export type { IERC20 } from "./IERC20";
 export type { IIndexedUniswapV2Oracle } from "./IIndexedUniswapV2Oracle";
 export type { IndexedNarwhalRouter } from "./IndexedNarwhalRouter";
@@ -16,6 +17,7 @@ export type { MultiTokenStaking } from "./MultiTokenStaking";
 export type { NirnVault } from "./NirnVault";
 export type { Pair } from "./Pair";
 export type { RewardsSchedule } from "./RewardsSchedule";
+export type { SharesTimeLock } from "./SharesTimeLock";
 export type { StakingRewards } from "./StakingRewards";
 export type { StakingRewardsFactory } from "./StakingRewardsFactory";
 export type { UniswapV2Router } from "./UniswapV2Router";

@@ -40,6 +40,14 @@ export function Navigation() {
         title="Products"
         icon={<FaListUl style={{ position: "relative", top: -2, left: -20 }} />}
       >
+        <Menu.Item key="index-pools">
+          <Link to="/index-pools">
+            <Space size="small">
+              <FaSwimmingPool style={{ position: "relative", top: 2 }} />{" "}
+              {!isMobile && <span>Indexes</span>}
+            </Space>
+          </Link>
+        </Menu.Item>
         <Menu.Item key="vaults">
           <Link to="/vaults">
             <Space size="small">
@@ -48,11 +56,11 @@ export function Navigation() {
             </Space>
           </Link>
         </Menu.Item>
-        <Menu.Item key="index-pools">
-          <Link to="/index-pools">
+        <Menu.Item key="timelocks">
+          <Link to="/timelocks">
             <Space size="small">
-              <FaSwimmingPool style={{ position: "relative", top: 2 }} />{" "}
-              {!isMobile && <span>Indexes</span>}
+              <RiSafe2Line style={{ position: "relative", top: 2 }} />{" "}
+              {!isMobile && <span>Timelocks</span>}
             </Space>
           </Link>
         </Menu.Item>

@@ -17,6 +17,7 @@ export * from './settings';
 export * from './staking';
 export * from './store';
 export * from './thunks';
+export * from './timelocks';
 export * from './tokens';
 export * from './transactions';
 export * from './user';

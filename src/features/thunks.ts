@@ -1,3 +1,4 @@
+import * as timelocksRequests from "./timelocks/requests";
 import * as topLevelActions from "./actions";
 import { RegisteredCall, abbreviateAddress } from "helpers";
 import { TransactionExtra, transactionsActions } from "./transactions";
@@ -13,6 +14,7 @@ import { notification } from "antd";
 import { pairsActions } from "./pairs";
 import { providers } from "ethers";
 import { settingsActions } from "./settings";
+import { timelocksActions } from "./timelocks";
 import { tokensActions } from "./tokens";
 import { userActions } from "./user";
 import { vaultsActions } from "./vaults";
@@ -108,6 +110,7 @@ export const thunks = {
 
       if (selectedAddress) {
         dispatch(actions.userAddressSelected(selectedAddress));
+        dispatch(timelocksRequests.fetchUserTimelocks(selectedAddress));
       }
 
       dispatch(actions.walletConnected());
@@ -142,6 +145,7 @@ export const actions = {
   ...settingsActions,
   ...stakingActions,
   ...tokensActions,
+  ...timelocksActions,
   ...transactionsActions,
   ...userActions,
   ...vaultsActions,

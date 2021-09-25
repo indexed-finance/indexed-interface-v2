@@ -106,7 +106,8 @@ const ContractNameOverrides = {
   IERC20: 'Token',
   IndexedUniswapRouterBurner: 'BurnRouter',
   IndexedUniswapRouterMinter: 'MintRouter',
-  UniswapV2Router: 'UniswapRouter'
+  UniswapV2Router: 'UniswapRouter',
+  ERC20DividendsOwned: 'DNDX'
 };
 
 const SingletonContracts = {
@@ -117,7 +118,9 @@ const SingletonContracts = {
   MultiCall2: 'MULTICALL2_ADDRESS',
   IndexedNarwhalRouter: 'NARWHAL_ROUTER_ADDRESS',
   MasterChef: 'MASTER_CHEF_ADDRESS',
-  AdapterRegistry: 'ADAPTER_REGISTRY_ADDRESS'
+  AdapterRegistry: 'ADAPTER_REGISTRY_ADDRESS',
+  ERC20DividendsOwned: 'DNDX_ADDRESS',
+  SharesTimeLock: 'DNDX_TIMELOCK_ADDRESS'
 };
 
 const ConstantsImports = [

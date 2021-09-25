@@ -12,6 +12,7 @@ export * from './pool-hooks';
 export * from './portfolio-hooks';
 export * from './staking-hooks';
 export * from './swap-hooks';
+export * from './timelock-hooks';
 export * from './token-hooks';
 export * from './transaction-hooks';
 export * from './use-breakpoints';
