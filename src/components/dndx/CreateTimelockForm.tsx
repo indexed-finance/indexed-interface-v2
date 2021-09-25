@@ -17,6 +17,7 @@ import {
   useCreateTimelockCallback,
   useTokenApproval,
 } from "hooks";
+import { useMemo } from "react";
 
 interface TimelockValues {
   amount: {
@@ -64,6 +65,7 @@ function CreateTimelockFormInner({
   );
   const bonusDndx = amountValue * multiplier;
   const totalDndx = amountValue + bonusDndx;
+  const isBelowMinimum = useMemo(() => amountValue !== 0 && amountValue < 100, [amountValue]);
 
   useBalanceAndApprovalRegistrar(DNDX_TIMELOCK_ADDRESS.toLowerCase(), [
     NDX_ADDRESS.toLowerCase(),
@@ -78,9 +80,7 @@ function CreateTimelockFormInner({
             How much NDX will be locked up?{" "}
             <small>
               <br />
-              <em>
-                Voting shares for deposited NDX will automatically be delegated to you.
-              </em>
+              <em> Voting shares for deposited NDX will automatically be delegated to you. </em>
             </small>
           </>
         }
@@ -94,13 +94,13 @@ function CreateTimelockFormInner({
             token: "NDX",
           }}
           selectable={false}
-          
           onChange={(newValues) => {
             if (newValues.amount) {
               setFieldValue("amount", newValues.amount);
             }
           }}
         />
+        {isBelowMinimum && <Typography.Text type="danger">Can not deposit less than 100 NDX</Typography.Text>}
       </TimelockField>
       <TimelockField
         title="Duration"
@@ -214,7 +214,9 @@ function CreateTimelockFormInner({
           style={{ height: "unset" }}
           onClick={() => createTimelock(values.amount.exact, values.duration)}
           disabled={
-            status === "unknown" || parseFloat(values.amount.displayed) === 0
+            status === "unknown" ||
+            parseFloat(values.amount.displayed) === 0 ||
+            isBelowMinimum
           }
         >
           <Typography.Title level={2} style={{ margin: 0 }}>
