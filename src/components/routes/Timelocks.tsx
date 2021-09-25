@@ -5,15 +5,16 @@ import { TimelockCard } from "components/dndx";
 import { convert } from "helpers";
 import { requests, selectors } from "features";
 import { useDispatch, useSelector } from "react-redux";
+import { useDndxBalance, useTimelocksRegistrar, useUserAddress, useUserTimelocks } from "hooks";
 import { useEffect, useMemo } from "react";
 import { useHistory } from "react-router-dom";
-import { useTimelocksRegistrar, useUserAddress, useUserTimelocks } from "hooks";
 
 export default function Timelocks() {
   const dispatch = useDispatch();
   const userAddress = useUserAddress();
   const timelocks = useUserTimelocks();
   const timelockIds = useMemo(() => timelocks.map(({ id }) => id), [timelocks]);
+  console.log(timelocks)
   const formattedTimelocks = timelocks.map((timelock) => ({
     id: timelock.id,
     ndxAmount: convert.toBalanceNumber(timelock.ndxAmount),
@@ -23,7 +24,7 @@ export default function Timelocks() {
     owner: timelock.owner,
   }));
   const history = useHistory();
-  const dndx = useSelector(selectors.selectDndxBalance);
+  const dndx = useDndxBalance()
   const { withdrawn, withdrawable } = useSelector(selectors.selectDividendData);
 
   useTimelocksRegistrar(timelockIds);
@@ -69,7 +70,7 @@ export default function Timelocks() {
               symbol="NDX"
               symbolOverride="dNDX"
               name="dNDX"
-              amount={dndx}
+              amount={dndx.displayed}
               size="large"
             />
           </Col>
@@ -86,16 +87,16 @@ export default function Timelocks() {
             </Typography.Title>
             <Space direction="vertical">
               <Typography.Title style={{ margin: 0 }} level={3}>
-                <Label>Claimed</Label> {withdrawn} WETH
+                <Label>Withdrawn</Label> {withdrawn} ETH
               </Typography.Title>
               <Space
                 align="end"
                 style={{ justifyContent: "space-between", width: "100%" }}
               >
                 <Typography.Title style={{ margin: 0 }} level={3}>
-                  <Label>Earned</Label> {withdrawable} WETH
+                  <Label>Available</Label> {withdrawable} ETH
                 </Typography.Title>
-                <Button style={{ marginLeft: 24 }}>Claim</Button>
+                <Button disabled={withdrawable === "0.00"} style={{ marginLeft: 24 }}>Withdraw</Button>
               </Space>
             </Space>
           </Col>
