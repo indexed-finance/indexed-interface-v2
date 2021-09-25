@@ -2,8 +2,10 @@ import { Alert, Button, Col, Row, Typography } from "antd";
 import {
   BigNumber,
   calculateBonusMultiplier,
+  calculateEarlyWithdrawalFeePercent,
   convert,
   duration,
+  timestampNow,
 } from "helpers";
 import { DNDX_TIMELOCK_ADDRESS, NDX_ADDRESS } from "config";
 import { Formik, FormikProps } from "formik";
@@ -12,7 +14,7 @@ import { TimelockDurationSlider } from "./TimelockDurationSlider";
 import { TimelockField } from "./TimelockField";
 import {
   useBalanceAndApprovalRegistrar,
-  useTimelockCreator,
+  useCreateTimelockCallback,
   useTokenApproval,
 } from "hooks";
 
@@ -47,7 +49,7 @@ function CreateTimelockFormInner({
   values,
   setFieldValue,
 }: FormikProps<TimelockValues>) {
-  const createTimelock = useTimelockCreator();
+  const createTimelock = useCreateTimelockCallback();
   const { status, approve } = useTokenApproval({
     spender: DNDX_TIMELOCK_ADDRESS.toLowerCase(),
     tokenId: NDX_ADDRESS.toLowerCase(),
@@ -70,20 +72,21 @@ function CreateTimelockFormInner({
   return (
     <>
       <TimelockField
-        title="Amount"
+        title="Deposit"
         description={
           <>
             How much NDX will be locked up?{" "}
             <small>
               <br />
               <em>
-                Remember, NDX locked in a timelock can still be used to vote.
+                Voting shares for deposited NDX will automatically be delegated to you.
               </em>
             </small>
           </>
         }
       >
         <TokenSelector
+          isInput
           loading={false}
           assets={[]}
           value={{
@@ -91,6 +94,7 @@ function CreateTimelockFormInner({
             token: "NDX",
           }}
           selectable={false}
+          
           onChange={(newValues) => {
             if (newValues.amount) {
               setFieldValue("amount", newValues.amount);
@@ -132,10 +136,19 @@ function CreateTimelockFormInner({
                     letterSpacing: "0.2ch",
                   }}
                 >
-                  Ready In
+                  Lock For
                 </Label>
                 <Typography.Title level={2} type="success">
                   {duration(durationValue)}
+                </Typography.Title>
+
+                <Typography.Title level={5} type="secondary">
+                  <em>
+                    Withdrawing early will incur a penalty determined by the remaining time in the lock and the bonus multiplier.
+                  </em>
+                  <br />
+                  <em>The maximum early withdrawal fee for this lock is {calculateEarlyWithdrawalFeePercent(timestampNow() + durationValue, durationValue)}%</em>
+
                 </Typography.Title>
               </div>
               <div style={{ textAlign: "right" }}>
@@ -164,11 +177,21 @@ function CreateTimelockFormInner({
           </Typography.Title>
         }
       >
-        <Typography.Title level={5} type="secondary">
-          <em>
-            {amountValue.toFixed(2)} base NDX + {bonusDndx.toFixed(2)} dNDX
-            bonus ({multiplier}x multiplier)
-          </em>
+        <Typography.Title level={5} >
+          <Typography.Text>{amountValue.toFixed(2)} NDX deposited</Typography.Text>
+          <br />
+          <Typography.Text type="success" style={{ marginLeft: '1em' }}>+ {bonusDndx.toFixed(2)} ({multiplier}x bonus)</Typography.Text>
+          <br />
+          <Typography.Text type="warning" style={{ marginLeft: '1em' }}>= {totalDndx} dNDX</Typography.Text>
+     {/*      <br />
+          <em style={{ marginLeft: '1em' }}> + {bonusDndx.toFixed(2)} ({multiplier}x bonus) </em>
+          <br />
+          <em style={{ marginLeft: '1em' }}> = {totalDndx} dNDX </em> */}
+        </Typography.Title>
+        <Typography.Title level={5} type="danger">
+          dNDX is an ERC20 token that can be traded freely; however,
+          in order to withdraw all or some of your deposited NDX, you
+          will be required to burn a proportionate amount of dNDX according to the timelock multiplier.
         </Typography.Title>
       </TimelockField>
 
