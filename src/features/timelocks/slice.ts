@@ -104,16 +104,17 @@ const timelocksMulticallDataParser = createMulticallDataParser(
       formattedLocks = locks.map((lock) => {
         const [id] = lock.args ?? [];
         const [ndxAmount, createdAt, duration, owner] = lock.result ?? [];
+        if (!id || !ndxAmount) return undefined;
   
         return {
           id,
           owner,
-          ndxAmount,
+          ndxAmount: ndxAmount.toString(),
           createdAt: parseInt(createdAt),
           duration: parseInt(duration),
           dndxShares: "0", // Doesn't get used.
         };
-      });
+      }).filter((t) => Boolean(t)) as TimeLockData[];
     }
     let withdrawable: string | undefined
     let withdrawn: string | undefined
