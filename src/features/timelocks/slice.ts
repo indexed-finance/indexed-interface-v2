@@ -1,4 +1,5 @@
 import * as requests from "./requests";
+import { DNDX_ADDRESS, DNDX_TIMELOCK_ADDRESS } from "config";
 import { convert, createMulticallDataParser } from "helpers";
 import { createEntityAdapter, createSlice } from "@reduxjs/toolkit";
 import { fetchMulticallData } from "../batcher";
@@ -19,18 +20,6 @@ export type TimeLockData = {
   dndxShares: string;
 };
 
-export type FormattedDividendsLock = {
-  id: string;
-  owner: string;
-  unlockAt: number;
-  duration: number;
-  timeRemaining: number;
-  unlocked: boolean;
-  amount: Amount;
-  dividends: Amount;
-  available: Amount; // Amount of NDX that could be withdrawn now
-};
-
 export const TIMELOCKS_CALLER = "Timelocks";
 
 const adapter = createEntityAdapter<TimeLockData>({
@@ -41,7 +30,6 @@ const slice = createSlice({
   name: "timelocks",
   initialState: adapter.getInitialState({
     metadata: {},
-    dndx: "0",
     withdrawn: "0",
     withdrawable: "0",
   }),
@@ -54,12 +42,10 @@ const slice = createSlice({
         );
 
         if (relevantMulticallData) {
-          const { dndxAmount, withdrawable, withdrawn, timelocks } =
+          const { withdrawable, withdrawn, timelocks } =
             relevantMulticallData;
-
-          state.dndx = dndxAmount;
-          state.withdrawn = withdrawn;
-          state.withdrawable = withdrawable;
+          if (withdrawn !== undefined) state.withdrawn = withdrawn;
+          if (withdrawable !== undefined) state.withdrawable = withdrawable;
 
           adapter.upsertMany(state, timelocks);
         }
@@ -91,8 +77,7 @@ const selectors = adapter.getSelectors((state: AppState) => state.timelocks);
 
 export const timelocksSelectors = {
   selectUserTimelocks: selectors.selectAll,
-  selectDndxBalance: (state: AppState) =>
-    convert.toBalance(state.timelocks.dndx, 18),
+  selectUserTimelock: (state: AppState, id: string) => selectors.selectById(state, id),
   selectDividendData: (state: AppState) => {
     const { withdrawn, withdrawable } = state.timelocks;
 
@@ -107,30 +92,39 @@ export const timelocksSelectors = {
 const timelocksMulticallDataParser = createMulticallDataParser(
   TIMELOCKS_CALLER,
   (calls) => {
-    const [locksCall, dndxCalls] = calls;
-    const [, { locks }] = locksCall;
-    const formattedLocks: TimeLockData[] = locks.map((lock) => {
-      const [id] = lock.args ?? [];
-      const [ndxAmount, createdAt, duration, owner] = lock.result ?? [];
+    // const [locksCall, dndxCalls] = calls;
+    const locksCall = calls.find((call) => call[0].toLowerCase() === DNDX_TIMELOCK_ADDRESS.toLowerCase())
+    const dndxCalls = calls.find((call) => call[0].toLowerCase() === DNDX_ADDRESS.toLowerCase())
 
-      return {
-        id,
-        owner,
-        ndxAmount,
-        createdAt: parseInt(createdAt),
-        duration: parseInt(duration),
-        dndxShares: "0", // Doesn't get used.
-      };
-    });
-
-    const [, { balanceOf, withdrawableDividendsOf, withdrawnDividendsOf }] =
-      dndxCalls;
-    const dndxAmount = balanceOf[0].result?.[0] ?? "0";
-    const withdrawable = withdrawableDividendsOf[0].result?.[0] ?? "0";
-    const withdrawn = withdrawnDividendsOf[0].result?.[0] ?? "0";
+    // console.log(`GOT TIMELOCK RESULTS`)
+    // console.log(locksCall)
+    let formattedLocks: TimeLockData[] = []
+    if (locksCall) {
+      const [, { locks }] = locksCall;
+      formattedLocks = locks.map((lock) => {
+        const [id] = lock.args ?? [];
+        const [ndxAmount, createdAt, duration, owner] = lock.result ?? [];
+  
+        return {
+          id,
+          owner,
+          ndxAmount,
+          createdAt: parseInt(createdAt),
+          duration: parseInt(duration),
+          dndxShares: "0", // Doesn't get used.
+        };
+      });
+    }
+    let withdrawable: string | undefined
+    let withdrawn: string | undefined
+    if (dndxCalls) {
+      const [, { balanceOf, withdrawableDividendsOf, withdrawnDividendsOf }] =
+        dndxCalls;
+      withdrawable = withdrawableDividendsOf[0].result?.[0] ?? "0";
+      withdrawn = withdrawnDividendsOf[0].result?.[0] ?? "0";
+    }
 
     return {
-      dndxAmount,
       withdrawable,
       withdrawn,
       timelocks: formattedLocks,
