@@ -1,5 +1,6 @@
 import { Alert, Button, Switch, Typography } from "antd";
-import { Formik } from "formik";
+import { Amount, FormattedDividendsLock, calculateDividendShares } from "helpers";
+import { Formik, FormikProps } from "formik";
 import { Label, TokenSelector } from "components/atomic";
 import { TimelockField } from "./TimelockField";
 import {
@@ -7,35 +8,72 @@ import {
   calculateEarlyWithdrawalFeePercent,
   convert,
 } from "helpers";
+import { timestampNow } from "helpers"
+import { useCallback, useMemo, useState } from "react";
+import { useDndxBalance, useTimelockWithdrawCallbacks } from "hooks";
 
-interface Props {
-  isReady: boolean;
+const ZERO = {
+  displayed: "0.00",
+  exact: convert.toBigNumber("0.00"),
+};
+
+type WithdrawalValue = {
+  amount: Amount
 }
 
-export function TimelockWithdrawalForm({ isReady }: Props) {
-  const earlyWithdrawalFee = calculateEarlyWithdrawalFee(
-    convert.toBigNumber("10.00"),
-    1631303807596 / 1000,
-    19476000
-  );
-  const earlyWithdrawalFeePercent = calculateEarlyWithdrawalFeePercent(
-    1631303807596 / 1000,
-    19476000
-  );
-
+export function TimelockWithdrawalForm({ lock }: { lock: FormattedDividendsLock }) {
   return (
     <Formik
       initialValues={{
-        amount: {
-          displayed: "0.00",
-          exact: convert.toBigNumber("0.00"),
-        },
+        amount: ZERO,
       }}
       onSubmit={console.info}
     >
+      {(props) => <TimelockWithdrawalFormInner {...props} lock={lock} />}
+    </Formik>
+  );
+}
+
+type Props = FormikProps<WithdrawalValue> & { lock: FormattedDividendsLock }
+
+export function TimelockWithdrawalFormInner({ lock, values, setFieldValue  }: Props) {
+  const isReady = timestampNow() >= lock.unlockAt;
+  const [didAcknowledgeFee, setDidAcknowledgeFee] = useState(false);
+  const { destroy, withdraw } = useTimelockWithdrawCallbacks(lock.id)
+  // const [canWithdraw, setCanWithdraw] = useState(false);
+  const dndxBalance = useDndxBalance()
+  const burnAmount = calculateDividendShares(values.amount, lock.duration);
+  const sufficientDndx = useMemo(() => burnAmount.exact.lte(dndxBalance.exact), [burnAmount.exact, dndxBalance.exact]);
+  const disableWithdraw = useMemo(() => {
+    if (!sufficientDndx) return true;
+    if (!isReady && !didAcknowledgeFee) return true;
+    return values.amount.exact.eq(0)
+  }, [isReady, didAcknowledgeFee, sufficientDndx, values.amount])
+
+  const earlyWithdrawalFee = isReady ? undefined : calculateEarlyWithdrawalFee(
+    values.amount.exact,
+    lock.unlockAt,
+    lock.duration
+  );
+  const earlyWithdrawalFeePercent = isReady ? undefined : calculateEarlyWithdrawalFeePercent(
+    lock.unlockAt,
+    lock.duration
+  );
+
+  const handleSubmit = useCallback(() => {
+    if (values.amount.exact.eq(0)) return;
+    if (values.amount.exact.eq(lock.ndxAmount.exact)) {
+      destroy()
+    } else {
+      withdraw(values.amount.exact)
+    }
+  }, [destroy, withdraw, lock.ndxAmount, values.amount])
+
+  return (
+    <>
       <>
         <TimelockField
-          title="Amount"
+          title="Withdraw"
           description="How much NDX do you wish to withdraw?"
         >
           <div
@@ -46,19 +84,20 @@ export function TimelockWithdrawalForm({ isReady }: Props) {
             }}
           >
             <TokenSelector
+              isInput
               loading={false}
               assets={[]}
-              showBalance={false}
+              balanceOverride={lock.ndxAmount}
               value={{
+                amount: values.amount,
                 token: "NDX",
-                amount: {
-                  displayed: "0.00",
-                  exact: convert.toBigNumber("0"),
-                },
               }}
               selectable={false}
+              
               onChange={(newValues) => {
-                /** Pass */
+                if (newValues.amount) {
+                  setFieldValue("amount", newValues.amount);
+                }
               }}
             />
             <span>
@@ -70,14 +109,14 @@ export function TimelockWithdrawalForm({ isReady }: Props) {
                     letterSpacing: "0.2ch",
                   }}
                 >
-                  Available{" "}
+                  Locked{" "}
                 </Label>
                 <Typography.Title
                   level={4}
                   type="success"
                   style={{ margin: 0 }}
                 >
-                  12.06 NDX
+                  {lock.ndxAmount.displayed} NDX
                 </Typography.Title>
                 {isReady && (
                   <Button type="dashed" style={{ marginLeft: 24 }}>
@@ -93,40 +132,57 @@ export function TimelockWithdrawalForm({ isReady }: Props) {
             <Alert
               type="success"
               showIcon={true}
-              message="This timelock is ready to go -- no fee required."
+              message="This timelock has expired and your deposited NDX are available for withdrawal."
             />
           ) : (
             <Alert
               type="error"
               showIcon={true}
-              message="This timelock isn't quite ready -- withdrawing will incur a fee."
+              message="This timelock has not expired. Withdrawing now will incur an early withdrawal fee."
             />
           )}
-          {!isReady && (
-            <Typography.Title
-              type="danger"
-              level={1}
-              style={{
-                marginTop: 24,
-              }}
-            >
-              <span style={{ color: "#A61C23" }}>
-                {earlyWithdrawalFee.displayed} NDX ({earlyWithdrawalFeePercent}
-                %)
-              </span>
-              <br />
-              <Switch />{" "}
-              <small style={{ fontSize: 16 }}>
-                I understand a fee will be levied.
-              </small>
-            </Typography.Title>
+          {earlyWithdrawalFee && (
+            <>
+              <Typography.Title
+                type="danger"
+                level={1}
+                style={{
+                  marginTop: 24,
+                }}
+              >
+                <span style={{ color: "#A61C23" }}>
+                  {earlyWithdrawalFee.displayed} NDX ({earlyWithdrawalFeePercent}
+                  %)
+                </span>
+                <br />
+                <Switch checked={didAcknowledgeFee} onChange={setDidAcknowledgeFee} />{" "}
+                <small style={{ fontSize: 16 }}>
+                  I understand a fee will be levied.
+                </small>
+              </Typography.Title>
+              <Typography.Title
+                level={2}
+                style={{
+                  marginTop: 24,
+                }}
+              >
+                You will receive <span style={{ color: "#38ee7b" }}>
+                  {convert.toBalance(values.amount.exact.minus(earlyWithdrawalFee.exact), 18, false, 4)}
+                </span> NDX
+              </Typography.Title>
+              </>
           )}
         </TimelockField>
         <TimelockField
           title="dNDX"
           description={
-            <Typography.Title level={4} style={{ margin: 0 }}>
-              4.06 dNDX will be burned.
+            <Typography.Title level={4} {...(sufficientDndx ? {} : {type: "danger"})} style={{ margin: 0 }}>
+              {
+                sufficientDndx
+                  ? <>This withdrawal will burn {burnAmount.displayed} dNDX.</>
+                  : <> This withdrawal requires that you burn {burnAmount.displayed} dNDX, but you only have {dndxBalance.displayed}.</>
+              }
+              
             </Typography.Title>
           }
         ></TimelockField>
@@ -135,12 +191,14 @@ export function TimelockWithdrawalForm({ isReady }: Props) {
           block={true}
           style={{ height: "unset" }}
           danger={!isReady}
+          disabled={disableWithdraw}
+          onClick={handleSubmit}
         >
           <Typography.Title level={2} style={{ margin: 0 }}>
             Withdraw from Timelock
           </Typography.Title>
         </Button>
       </>
-    </Formik>
+    </>
   );
 }
