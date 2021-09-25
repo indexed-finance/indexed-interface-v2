@@ -1,17 +1,10 @@
 import { BigNumber, convert } from "helpers";
 import { DEFAULT_DECIMAL_COUNT } from "config";
+import { TimeLockData } from "features";
 
 export type Amount = {
   exact: BigNumber;
   displayed: string;
-};
-
-export type DividendsLock = {
-  id: string;
-  owner: string;
-  unlockAt: number;
-  duration: number;
-  amount: string;
 };
 
 export type FormattedDividendsLock = {
@@ -21,8 +14,8 @@ export type FormattedDividendsLock = {
   duration: number;
   timeRemaining: number;
   unlocked: boolean;
-  amount: Amount;
-  dividends: Amount;
+  ndxAmount: Amount;
+  dndxShares: Amount;
   available: Amount; // Amount of NDX that could be withdrawn now
 };
 
@@ -39,26 +32,36 @@ export function formatAmount(
   };
 }
 
+export function calculateDividendShares(
+  ndxAmount: Amount,
+  duration: number
+): Amount {
+  const multiplier = calculateMultiplier(duration);
+  return formatAmount(ndxAmount.exact.times(multiplier.exact).div(one));
+}
+
 export function formatDividendsLock(
-  lock: DividendsLock
+  lock: TimeLockData
 ): FormattedDividendsLock {
+  const unlockAt = lock.createdAt + lock.duration
   const timestamp = Math.floor(Date.now() / 1000);
-  const unlocked = timestamp >= lock.unlockAt;
-  const timeRemaining = Math.max(0, timestamp - lock.unlockAt);
-  const amount = formatAmount(lock.amount);
+  const unlocked = timestamp >= unlockAt;
+  const timeRemaining = Math.max(0, timestamp - unlockAt);
+  const ndxAmount = formatAmount(lock.ndxAmount);
   const multiplier = calculateMultiplier(lock.duration);
-  const dividends = formatAmount(amount.exact.times(multiplier.exact).div(one));
+  const dndxShares = formatAmount(ndxAmount.exact.times(multiplier.exact).div(one));
   const earlyWithdrawalFee: number | BigNumber = unlocked
     ? 0
-    : calculateEarlyWithdrawalFee(amount.exact, lock.unlockAt, lock.duration)
+    : calculateEarlyWithdrawalFee(ndxAmount.exact, unlockAt, lock.duration)
         .exact;
-  const available = formatAmount(amount.exact.minus(earlyWithdrawalFee));
+  const available = formatAmount(ndxAmount.exact.minus(earlyWithdrawalFee));
   return {
     ...lock,
+    unlockAt,
     timeRemaining,
     unlocked,
-    amount,
-    dividends,
+    ndxAmount,
+    dndxShares,
     available,
   };
 }
