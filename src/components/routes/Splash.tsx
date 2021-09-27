@@ -1,4 +1,4 @@
-import { Divider, Statistic, Typography } from "antd";
+import { Alert, Button, Divider, Statistic, Typography } from "antd";
 import {
   IndexPoolWidgetGroup,
   Logo,
@@ -64,6 +64,19 @@ export default function Splash() {
           </Divider>
         </div>
       </div>
+      <Alert
+        style={{ textAlign: "center" }}
+        type="info"
+        message={
+          <>
+            NEW: Enter a timelock with your NDX governance tokens and receive
+            dNDX for a proportional claim on protocol revenue.{" "}
+            <Button type="primary" onClick={() => history.push("/timelocks")}>
+              Try it
+            </Button>
+          </>
+        }
+      />
       <Divider />
       <SplashSection
         banner={require("images/indexpools_banner.png").default}

@@ -1,4 +1,4 @@
-import { AiOutlinePlusCircle } from "react-icons/ai";
+import { AiOutlineBarChart, AiOutlinePlusCircle } from "react-icons/ai";
 import { Alert, Button, Col, Row, Space, Typography } from "antd";
 import { Label, Page, Token } from "components/atomic";
 import { TimelockCard } from "components/dndx";
@@ -9,7 +9,7 @@ import {
   useDndxBalance,
   useTimelocksRegistrar,
   useUserAddress,
-  useUserTimelocks
+  useUserTimelocks,
 } from "hooks";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useMemo } from "react";
@@ -29,7 +29,7 @@ export default function Timelocks() {
     owner: timelock.owner,
   }));
   const history = useHistory();
-  const dndx = useDndxBalance()
+  const dndx = useDndxBalance();
   const { withdrawn, withdrawable } = useSelector(selectors.selectDividendData);
   const { isMobile } = useBreakpoints();
 
@@ -44,19 +44,35 @@ export default function Timelocks() {
       title="Timelocks"
       hasPageHeader={true}
       extra={
-        <Button
-          type="primary"
-          block={true}
-          style={{ height: "unset" }}
-          onClick={() => history.push("/create-timelock")}
-        >
-          <Typography.Title level={2} style={{ margin: 0 }}>
-            New Timelock
-            <AiOutlinePlusCircle
-              style={{ position: "relative", top: 5, left: 5 }}
-            />
-          </Typography.Title>
-        </Button>
+        <Space>
+          <a
+            href="https://dune.xyz/marcocrypto/Indexed-Finance-dNDX-Tracker"
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            <Button type="ghost" block={true} style={{ height: "unset" }}>
+              <Typography.Title level={2} style={{ margin: 0 }}>
+                Analytics
+                <AiOutlineBarChart
+                  style={{ position: "relative", top: 5, left: 5 }}
+                />
+              </Typography.Title>
+            </Button>
+          </a>
+          <Button
+            type="primary"
+            block={true}
+            style={{ height: "unset" }}
+            onClick={() => history.push("/create-timelock")}
+          >
+            <Typography.Title level={2} style={{ margin: 0 }}>
+              New Timelock
+              <AiOutlinePlusCircle
+                style={{ position: "relative", top: 5, left: 5 }}
+              />
+            </Typography.Title>
+          </Button>
+        </Space>
       }
     >
       <Space direction="vertical" size="large" style={{ width: "100%" }}>
@@ -108,7 +124,12 @@ export default function Timelocks() {
                 <Typography.Title style={{ margin: 0 }} level={3}>
                   <Label>Available</Label> {withdrawable} ETH
                 </Typography.Title>
-                <Button disabled={withdrawable === "0.00"} style={{ marginLeft: 24 }}>Withdraw</Button>
+                <Button
+                  disabled={withdrawable === "0.00"}
+                  style={{ marginLeft: 24 }}
+                >
+                  Withdraw
+                </Button>
               </Space>
             </Space>
           </Col>
