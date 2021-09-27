@@ -66,22 +66,6 @@ export default function Splash() {
       </div>
       <Divider />
       <SplashSection
-        banner={require("images/vaults_banner.png").default}
-        title="VAULTS"
-        description="Lend out your assets via Indexed Earn and receive the guaranteed best interest rates across the major lending protocols in DeFi. Low-fee and no-maintenance: let our non-custodial vaults do the work of allocating your funds for maximum impact."
-        catchphrase="Earn interest on your assets"
-        actionText="Explore Vaults"
-        infoText="How it works"
-        onAction={() => history.push("/vaults")}
-        onInfo={() =>
-          (window.location.href =
-            "https://docs.indexed.finance/introduction/faq/nirn-faq")
-        }
-      >
-        <VaultGroup withTitle={true} />
-      </SplashSection>
-      <Divider />
-      <SplashSection
         banner={require("images/indexpools_banner.png").default}
         title="INDEX POOLS"
         description="Gain exposure to a passively-managed, zero management fee crypto index portfolio with a single token. Indexed products offer a hassle-free, battle-tested way of investing in both DeFi and niche market sectors such as oracles or the metaverse."
@@ -95,6 +79,22 @@ export default function Splash() {
         }
       >
         {poolsExist && <IndexPoolWidgetGroup />}
+      </SplashSection>
+      <Divider />
+      <SplashSection
+        banner={require("images/vaults_banner.png").default}
+        title="VAULTS"
+        description="Lend out your assets via Indexed Earn and receive the guaranteed best interest rates across the major lending protocols in DeFi. Low-fee and no-maintenance: let our non-custodial vaults do the work of allocating your funds for maximum impact."
+        catchphrase="Earn interest on your assets"
+        actionText="Explore Vaults"
+        infoText="How it works"
+        onAction={() => history.push("/vaults")}
+        onInfo={() =>
+          (window.location.href =
+            "https://docs.indexed.finance/introduction/faq/nirn-faq")
+        }
+      >
+        <VaultGroup withTitle={true} />
       </SplashSection>
       <Divider />
       <SplashSection
