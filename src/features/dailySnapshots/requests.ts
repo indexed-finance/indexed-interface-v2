@@ -22,8 +22,6 @@ export const fetchSnapshotsData = createAsyncThunk(
     try {
       const snapshots = await client.getPoolSnapshots(poolId, hours);
 
-      console.log({ snapshots });
-
       return snapshots;
     } catch (error) {
       console.error({ error });
