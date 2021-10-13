@@ -1,13 +1,11 @@
-import { AppState, selectors } from "features";
+import { AppState, Timeframe, requests, selectors } from "features";
 import { Card, Radio, RadioChangeEvent, Spin } from "antd";
 import { LineSeriesChart, Quote } from "components/atomic/molecules";
 import { convert } from "helpers";
 import { last } from "hooks";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import noop from "lodash.noop";
-
-type Timeframe = "Day" | "Week";
 
 interface Props {
   poolId: string;
@@ -15,7 +13,8 @@ interface Props {
 }
 
 export function IndexPoolChart({ poolId, expanded = false }: Props) {
-  const [timeframe, setTimeframe] = useState<Timeframe>("Week");
+  const dispatch = useDispatch();
+  const [timeframe, setTimeframe] = useState<Timeframe>("1W");
   const [rerendering, setRerendering] = useState(false);
   const data = useSelector((state: AppState) =>
     selectors.selectTimeSeriesSnapshotData(state, poolId, timeframe, "value")
@@ -44,7 +43,9 @@ export function IndexPoolChart({ poolId, expanded = false }: Props) {
   useEffect(() => {
     setRerendering(true);
     setTimeout(() => setRerendering(false), 0);
-  }, [timeframe]);
+
+    dispatch(requests.fetchSnapshotsData({ poolId, timeframe }));
+  }, [dispatch, poolId, timeframe]);
 
   return (
     <Card style={{ height: "100%" }}>
@@ -81,8 +82,13 @@ export function IndexPoolChart({ poolId, expanded = false }: Props) {
                 value={timeframe}
                 size="large"
               >
-                <Radio.Button value="Day">Day</Radio.Button>
-                <Radio.Button value="Week">Week</Radio.Button>
+                {["1D", "1W", "2W", "1M" /*, "3M", "6M", "1Y"*/].map(
+                  (timeframe) => (
+                    <Radio.Button key={timeframe} value={timeframe}>
+                      {timeframe}
+                    </Radio.Button>
+                  )
+                )}
               </Radio.Group>
             </div>
           </div>

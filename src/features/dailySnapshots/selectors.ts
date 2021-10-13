@@ -34,6 +34,7 @@ export const dailySnapshotsSelectors = {
       "asc"
     );
     const unixNow = Date.now() / 1000;
+
     return [...snapshots].filter(
       (snapshot) => unixNow - snapshot.date <= maxAgeInSeconds
     );
@@ -41,10 +42,20 @@ export const dailySnapshotsSelectors = {
   selectTimeSeriesSnapshotData: (
     state: AppState,
     poolId: string,
-    timeframe: "Day" | "Week",
+    timeframe: Timeframe,
     key: SnapshotKey
   ) => {
-    const maxAgeInSeconds = timeframe === "Day" ? 86400 : 604800;
+    const oneDay = 86400;
+    const maxAgeLookup: Record<Timeframe, number> = {
+      "1D": oneDay,
+      "1W": oneDay * 7,
+      "2W": oneDay * 14,
+      "1M": oneDay * 30,
+      "3M": oneDay * 90,
+      "6M": oneDay * 180,
+      "1Y": oneDay * 365,
+    };
+    const maxAgeInSeconds = maxAgeLookup[timeframe];
     const snapshots =
       dailySnapshotsSelectors.selectSortedSnapshotsOfPoolInTimeframe(
         state,
@@ -55,6 +66,7 @@ export const dailySnapshotsSelectors = {
       time: snapshot.date,
       value: snapshot[key],
     }));
+
     return timeSeriesData;
   },
   selectMostRecentSnapshotOfPool: (state: AppState, poolId: string) => {
@@ -159,3 +171,5 @@ export const dailySnapshotsSelectors = {
     }
   },
 };
+
+export type Timeframe = "1D" | "1W" | "2W" | "1M" | "3M" | "6M" | "1Y";
