@@ -82,11 +82,13 @@ export function IndexPoolChart({ poolId, expanded = false }: Props) {
                 value={timeframe}
                 size="large"
               >
-                {["1D", "1W", "2W", "1M", "3M", "6M", "1Y"].map((timeframe) => (
-                  <Radio.Button key={timeframe} value={timeframe}>
-                    {timeframe}
-                  </Radio.Button>
-                ))}
+                {["1D", "1W", "2W", "1M" /*, "3M", "6M", "1Y"*/].map(
+                  (timeframe) => (
+                    <Radio.Button key={timeframe} value={timeframe}>
+                      {timeframe}
+                    </Radio.Button>
+                  )
+                )}
               </Radio.Group>
             </div>
           </div>
