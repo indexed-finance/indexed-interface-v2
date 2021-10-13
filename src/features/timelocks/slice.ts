@@ -42,8 +42,7 @@ const slice = createSlice({
         );
 
         if (relevantMulticallData) {
-          const { withdrawable, withdrawn, timelocks } =
-            relevantMulticallData;
+          const { withdrawable, withdrawn, timelocks } = relevantMulticallData;
           if (withdrawn !== undefined) state.withdrawn = withdrawn;
           if (withdrawable !== undefined) state.withdrawable = withdrawable;
 
@@ -77,7 +76,8 @@ const selectors = adapter.getSelectors((state: AppState) => state.timelocks);
 
 export const timelocksSelectors = {
   selectUserTimelocks: selectors.selectAll,
-  selectUserTimelock: (state: AppState, id: string) => selectors.selectById(state, id),
+  selectUserTimelock: (state: AppState, id: string) =>
+    selectors.selectById(state, id),
   selectDividendData: (state: AppState) => {
     const { withdrawn, withdrawable } = state.timelocks;
 
@@ -93,34 +93,39 @@ const timelocksMulticallDataParser = createMulticallDataParser(
   TIMELOCKS_CALLER,
   (calls) => {
     // const [locksCall, dndxCalls] = calls;
-    const locksCall = calls.find((call) => call[0].toLowerCase() === DNDX_TIMELOCK_ADDRESS.toLowerCase())
-    const dndxCalls = calls.find((call) => call[0].toLowerCase() === DNDX_ADDRESS.toLowerCase())
+    const locksCall = calls.find(
+      (call) => call[0].toLowerCase() === DNDX_TIMELOCK_ADDRESS.toLowerCase()
+    );
+    const dndxCalls = calls.find(
+      (call) => call[0].toLowerCase() === DNDX_ADDRESS.toLowerCase()
+    );
 
     // console.log(`GOT TIMELOCK RESULTS`)
     // console.log(locksCall)
-    let formattedLocks: TimeLockData[] = []
+    let formattedLocks: TimeLockData[] = [];
     if (locksCall) {
       const [, { locks }] = locksCall;
-      formattedLocks = locks.map((lock) => {
-        const [id] = lock.args ?? [];
-        const [ndxAmount, createdAt, duration, owner] = lock.result ?? [];
-        if (!id || !ndxAmount) return undefined;
-  
-        return {
-          id,
-          owner,
-          ndxAmount: ndxAmount.toString(),
-          createdAt: parseInt(createdAt),
-          duration: parseInt(duration),
-          dndxShares: "0", // Doesn't get used.
-        };
-      }).filter((t) => Boolean(t)) as TimeLockData[];
+      formattedLocks = locks
+        .map((lock) => {
+          const [id] = lock.args ?? [];
+          const [ndxAmount, createdAt, duration, owner] = lock.result ?? [];
+          if (!id || !ndxAmount) return undefined;
+
+          return {
+            id,
+            owner,
+            ndxAmount: ndxAmount.toString(),
+            createdAt: parseInt(createdAt),
+            duration: parseInt(duration),
+            dndxShares: "0", // Doesn't get used.
+          };
+        })
+        .filter((t) => Boolean(t)) as TimeLockData[];
     }
-    let withdrawable: string | undefined
-    let withdrawn: string | undefined
+    let withdrawable: string | undefined;
+    let withdrawn: string | undefined;
     if (dndxCalls) {
-      const [, { balanceOf, withdrawableDividendsOf, withdrawnDividendsOf }] =
-        dndxCalls;
+      const [, { withdrawableDividendsOf, withdrawnDividendsOf }] = dndxCalls;
       withdrawable = withdrawableDividendsOf[0].result?.[0] ?? "0";
       withdrawn = withdrawnDividendsOf[0].result?.[0] ?? "0";
     }

@@ -1,4 +1,5 @@
 import * as batcherRequests from "./batcher/requests";
+import * as dailySnapshotRequests from "./dailySnapshots/requests";
 import * as indexPoolsRequests from "./indexPools/requests";
 import * as newStakingRequests from "./newStaking/requests";
 import * as stakingRequests from "./staking/requests";
@@ -318,6 +319,7 @@ export const fetchVaultsData = createAsyncThunk(
 
 export const requests = {
   ...batcherRequests,
+  ...dailySnapshotRequests,
   ...indexPoolsRequests,
   ...stakingRequests,
   ...newStakingRequests,
