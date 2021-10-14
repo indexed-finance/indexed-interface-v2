@@ -27,7 +27,7 @@ export function useIndexPoolInteractions(indexPoolAddress: string) {
 
     const symbol = formattedPool?.symbol ?? "";
 
-    if (symbol !== "CC10" && symbol !== "DEFI5") {
+    if (symbol !== "CC10" && symbol !== "DEFI5" && symbol !== "FFF") {
       baseInteractions.push({
         title: "Mint",
         link: `${slug}/mint`,
