@@ -23,20 +23,27 @@ export function useIndexPoolInteractions(indexPoolAddress: string) {
         link: `${slug}/buy`,
         icon: <FaCoins />,
       },
-      {
-        title: "Mint",
-        link: `${slug}/mint`,
-        icon: <BiCoin />,
-      },
-      {
-        title: "Burn",
-        link: `${slug}/burn`,
-        icon: <FaFireAlt />,
-      },
     ];
 
+    const symbol = formattedPool?.symbol ?? "";
+
+    if (symbol !== "CC10" && symbol !== "DEFI5") {
+      baseInteractions.push(
+        {
+          title: "Mint",
+          link: `${slug}/mint`,
+          icon: <BiCoin />,
+        },
+        {
+          title: "Burn",
+          link: `${slug}/burn`,
+          icon: <FaFireAlt />,
+        }
+      );
+    }
+
     return baseInteractions;
-  }, [slug]);
+  }, [slug, formattedPool]);
 }
 
 export function IndexPoolInteractionBar({

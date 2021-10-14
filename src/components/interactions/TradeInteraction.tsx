@@ -29,14 +29,10 @@ export function TradeInteraction({ indexPool }: Props) {
   const assets = useSelector((state: AppState) =>
     selectors.selectTokensById(state, tokenIds)
   );
-
-  useBalanceAndApprovalRegistrar(NARWHAL_ROUTER_ADDRESS, tokenIds);
-
   const {
     calculateBestTradeForExactInput,
     calculateBestTradeForExactOutput,
   } = useUniswapTradingPairs(tokenIds);
-
   const handleChange = useCallback(
     (values: SingleInteractionValues) => {
       const {
@@ -133,6 +129,8 @@ export function TradeInteraction({ indexPool }: Props) {
       handleTrade,
     ]
   );
+
+  useBalanceAndApprovalRegistrar(NARWHAL_ROUTER_ADDRESS, tokenIds);
 
   return (
     <SingleInteraction

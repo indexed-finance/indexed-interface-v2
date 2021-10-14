@@ -1,5 +1,5 @@
 import * as yup from "yup";
-import { Alert, Button, Col, Divider, Row, Space } from "antd";
+import { Alert, Button, Col, Divider, Row, Space, message } from "antd";
 import { BigNumber, convert } from "helpers";
 import { Flipper } from "components/atomic/atoms";
 import { Formik, FormikProps, useFormikContext } from "formik";
@@ -250,6 +250,15 @@ function SingleInteractionInner({
       }
     }
   };
+
+  useEffect(() => {
+    if (values.toToken === "CC10" || values.toToken === "DEFI5") {
+      setFieldValue("toToken", "");
+      message.error(
+        `Purchasing ${values.toToken} is currently disabled. Selling is still enabled.`
+      );
+    }
+  });
 
   return (
     <Row gutter={24}>
