@@ -28,19 +28,18 @@ export function useIndexPoolInteractions(indexPoolAddress: string) {
     const symbol = formattedPool?.symbol ?? "";
 
     if (symbol !== "CC10" && symbol !== "DEFI5") {
-      baseInteractions.push(
-        {
-          title: "Mint",
-          link: `${slug}/mint`,
-          icon: <BiCoin />,
-        },
-        {
-          title: "Burn",
-          link: `${slug}/burn`,
-          icon: <FaFireAlt />,
-        }
-      );
+      baseInteractions.push({
+        title: "Mint",
+        link: `${slug}/mint`,
+        icon: <BiCoin />,
+      });
     }
+
+    baseInteractions.push({
+      title: "Burn",
+      link: `${slug}/burn`,
+      icon: <FaFireAlt />,
+    });
 
     return baseInteractions;
   }, [slug, formattedPool]);

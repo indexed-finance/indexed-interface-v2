@@ -1,5 +1,5 @@
+import { Alert, Col, Divider, Row, Space, Spin, Typography } from "antd";
 import { AppState, FormattedIndexPool, selectors } from "features";
-import { Col, Divider, Row, Space, Spin, Typography } from "antd";
 import {
   IndexPoolAssets,
   IndexPoolChart,
@@ -106,7 +106,11 @@ export default function IndexPool() {
 
   return (
     <Page
-      extra={indexPool ? <IndexPoolPerformance {...indexPool} /> : <Spin />}
+      extra={
+        <div>
+          {indexPool ? <IndexPoolPerformance {...indexPool} /> : <Spin />}
+        </div>
+      }
       title={
         indexPool ? (
           <div
@@ -128,11 +132,28 @@ export default function IndexPool() {
       hasPageHeader={true}
     >
       {indexPool ? (
-        <LoadedIndexPool
-          interaction={interaction}
-          interactionTitle={interactionTitle}
-          {...indexPool}
-        />
+        <>
+          {["CC10", "DEFI5"].includes(indexPool?.symbol ?? "") && (
+            <Alert
+              type="warning"
+              message={
+                <>
+                  This index has been exploited, but is currently stable. <br />
+                  We recommend you do not burn it at this time, as your tokens
+                  have been severely diluted by an inflated supply. <br />
+                  <a href="https://twitter.com/ndxfi">
+                    See Twitter for addl. information.
+                  </a>
+                </>
+              }
+            />
+          )}
+          <LoadedIndexPool
+            interaction={interaction}
+            interactionTitle={interactionTitle}
+            {...indexPool}
+          />
+        </>
       ) : (
         <Spin />
       )}
