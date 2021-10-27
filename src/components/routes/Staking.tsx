@@ -81,6 +81,11 @@ export default function Stake() {
               <ExpiredStakingCard key={stakingPool.id} {...stakingPool} />
             </Fade>
           ))}
+          {newStakingDetail.expired.map((stakingPool, index) => (
+            <Fade key={stakingPool.id} in={fadedCard >= index}>
+              <ExpiredStakingCard key={stakingPool.id} {...stakingPool} />
+            </Fade>
+          ))}
         </ExpiredAlert>
       )}
       {showingNothing && <Empty />}

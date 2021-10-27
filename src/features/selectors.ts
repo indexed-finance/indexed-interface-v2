@@ -415,6 +415,7 @@ export const selectors = {
   // selectNewFormattedStakingToken
   selectNewFormattedStaking(state: AppState): FormattedNewStakingDetail {
     const stakingPools = selectors.selectAllNewStakingPools(state);
+    const expiredPools: any[] = [];
     const formattedStaking = stakingPools
       .map((stakingPool) => {
         let indexPoolAddress: string;
@@ -431,11 +432,8 @@ export const selectors = {
           indexPoolAddress = stakingPool.token;
         }
         const indexPool = selectors.selectPool(state, indexPoolAddress);
-        const forcedToExpire = ["DEFI5", "CC10", "FFF"].some((item) =>
-          stakingPool.symbol.toLowerCase().includes(item.toLowerCase())
-        );
 
-        if (!indexPool || forcedToExpire) {
+        if (!indexPool) {
           return null;
         }
 
@@ -456,7 +454,7 @@ export const selectors = {
         );
 
         const rewardsPerDay = convert.toBalance(stakingPool.rewardsPerDay, 18);
-        return {
+        const formatted = {
           id: stakingPool.id,
           indexPool: indexPool.id,
           isWethPair: stakingPool.isWethPair,
@@ -469,6 +467,18 @@ export const selectors = {
           earned: `${earned} NDX`,
           rewardsPerDay,
         } as FormattedNewStakingData;
+
+        const forcedToExpire = ["DEFI5", "CC10", "FFF"].some((item) =>
+          stakingPool.symbol.toLowerCase().includes(item.toLowerCase())
+        );
+
+        if (forcedToExpire) {
+          expiredPools.push(formatted);
+
+          return null;
+        } else {
+          return formatted;
+        }
       })
       .filter((each): each is FormattedNewStakingData => Boolean(each))
       .sort((a, b) => +b.rewardsPerDay - +a.rewardsPerDay)
@@ -491,6 +501,7 @@ export const selectors = {
       {
         indexTokens: [],
         liquidityTokens: [],
+        expired: expiredPools,
       } as FormattedNewStakingDetail
     );
   },

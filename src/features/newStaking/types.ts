@@ -65,4 +65,5 @@ export interface FormattedNewStakingData {
 export interface FormattedNewStakingDetail {
   indexTokens: FormattedNewStakingData[];
   liquidityTokens: FormattedNewStakingData[];
+  expired: FormattedNewStakingData[];
 }
