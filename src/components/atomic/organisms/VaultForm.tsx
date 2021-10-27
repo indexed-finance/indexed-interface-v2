@@ -74,6 +74,12 @@ export function Inner({ vault }: { vault: FormattedVault }) {
     symbol: vault.symbol,
   });
 
+  // 10/27 Cream was exploited, temporarily disable deposits there.
+  const isTemporarilyDisabled = useMemo(
+    () => mode === "deposit" && ["nWBTC", "nAAVE"].includes(vault.symbol),
+    [mode, vault]
+  );
+
   useBalanceAndApprovalRegistrar(vault.id, [vault.underlying.id]);
 
   return (
@@ -110,67 +116,76 @@ export function Inner({ vault }: { vault: FormattedVault }) {
         </Row>
       }
     >
-      <Space direction="vertical" size="large" style={{ width: "100%" }}>
-        <TokenSelector
-          assets={[]}
-          balanceOverride={mode === "deposit" ? balance : unwrappedBalance}
-          selectable={false}
-          value={{
-            token: underlying.symbol,
-            amount,
-          }}
-          onChange={(next) => {
-            if (next?.amount) {
-              setAmount(next.amount);
+      {isTemporarilyDisabled ? (
+        <Alert
+          type="error"
+          message="Due to the recent Cream Finance exploit, deposits into vaults which were targeting Cream have been temporarily disabled."
+        />
+      ) : (
+        <Space direction="vertical" size="large" style={{ width: "100%" }}>
+          <TokenSelector
+            assets={[]}
+            balanceOverride={mode === "deposit" ? balance : unwrappedBalance}
+            selectable={false}
+            value={{
+              token: underlying.symbol,
+              amount,
+            }}
+            onChange={(next) => {
+              if (next?.amount) {
+                setAmount(next.amount);
+              }
+            }}
+            isInput={true}
+          />
+          <Alert
+            showIcon={true}
+            type="info"
+            style={{ borderRadius: 0 }}
+            message={
+              <Tooltip
+                title={`The Indexed DAO treasury receives a small percentage of the vault's profits.`}
+              >
+                {`Performance Fee: ${convert.toPercent(
+                  performanceFee
+                )} of yield`}
+              </Tooltip>
             }
-          }}
-          isInput={true}
-        />
-        <Alert
-          showIcon={true}
-          type="info"
-          style={{ borderRadius: 0 }}
-          message={
-            <Tooltip
-              title={`The Indexed DAO treasury receives a small percentage of the vault's profits.`}
+          />
+          <Alert
+            showIcon={true}
+            type="success"
+            message={
+              <Tooltip
+                title={`${vault.symbol} is the Nirn wrapper for ${underlying.symbol} - it can be burned to redeem ${underlying.symbol}.`}
+              >
+                You will {mode === "deposit" ? "receive" : "burn"}{" "}
+                {dependentAmount} {vault.symbol}
+              </Tooltip>
+            }
+          />
+          {status === "approval needed" && mode === "deposit" ? (
+            <Button
+              type="primary"
+              block={true}
+              style={{ fontSize: 30, height: 60 }}
+              onClick={approve}
             >
-              {`Performance Fee: ${convert.toPercent(performanceFee)} of yield`}
-            </Tooltip>
-          }
-        />
-        <Alert
-          showIcon={true}
-          type="success"
-          message={
-            <Tooltip
-              title={`${vault.symbol} is the Nirn wrapper for ${underlying.symbol} - it can be burned to redeem ${underlying.symbol}.`}
+              Approve
+            </Button>
+          ) : (
+            <Button
+              type="primary"
+              disabled={status === "unknown" || amount.exact.eq(0)}
+              block={true}
+              style={{ fontSize: 30, height: 60 }}
+              onClick={handleSubmit}
             >
-              You will {mode === "deposit" ? "receive" : "burn"}{" "}
-              {dependentAmount} {vault.symbol}
-            </Tooltip>
-          }
-        />
-        {status === "approval needed" && mode === "deposit" ? (
-          <Button
-            type="primary"
-            block={true}
-            style={{ fontSize: 30, height: 60 }}
-            onClick={approve}
-          >
-            Approve
-          </Button>
-        ) : (
-          <Button
-            type="primary"
-            disabled={status === "unknown" || amount.exact.eq(0)}
-            block={true}
-            style={{ fontSize: 30, height: 60 }}
-            onClick={handleSubmit}
-          >
-            {mode === "deposit" ? "Deposit" : "Withdraw"}
-          </Button>
-        )}
-      </Space>
+              {mode === "deposit" ? "Deposit" : "Withdraw"}
+            </Button>
+          )}
+        </Space>
+      )}
     </Card>
   );
 }
