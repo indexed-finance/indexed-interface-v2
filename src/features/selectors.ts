@@ -468,7 +468,7 @@ export const selectors = {
           rewardsPerDay,
         } as FormattedNewStakingData;
 
-        const forcedToExpire = ["DEFI5", "CC10", "FFF"].some((item) =>
+        const forcedToExpire = ["DEFI5", "CC10", "FFF", "ERROR"].some((item) =>
           stakingPool.symbol.toLowerCase().includes(item.toLowerCase())
         );
 
