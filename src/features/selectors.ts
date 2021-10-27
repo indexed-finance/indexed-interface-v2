@@ -264,7 +264,11 @@ export const selectors = {
           userStakedBalance: "0",
           userRewardsEarned: "0",
         };
-        const expired = stakingPool.periodFinish < Date.now() / 1000;
+        const expiredFromTime = stakingPool.periodFinish < Date.now() / 1000;
+        const forcedToExpire = ["DEFI5", "CC10", "FFF"].some((item) =>
+          indexPool.symbol.toLowerCase().includes(item.toLowerCase())
+        );
+        const expired = expiredFromTime || forcedToExpire;
         const totalStaked = convert.toBalance(
           stakingPool.totalSupply ?? "0",
           18,
@@ -427,8 +431,11 @@ export const selectors = {
           indexPoolAddress = stakingPool.token;
         }
         const indexPool = selectors.selectPool(state, indexPoolAddress);
+        const forcedToExpire = ["DEFI5", "CC10", "FFF"].some((item) =>
+          stakingPool.symbol.toLowerCase().includes(item.toLowerCase())
+        );
 
-        if (!indexPool) {
+        if (!indexPool || forcedToExpire) {
           return null;
         }
 

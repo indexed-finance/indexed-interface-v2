@@ -43,6 +43,7 @@ export default function Stake() {
       }),
     []
   );
+
   const showingNothing = !Object.values(showing).some(Boolean);
   const [fadedCard, setFadedCard] = useState(-1);
   const inner = (
