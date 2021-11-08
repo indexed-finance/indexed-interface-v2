@@ -196,3 +196,15 @@ export function ExpiredStakingCard(props: Props) {
     />
   );
 }
+
+export function ExpiredNewStakingCard(props: Props) {
+  return (
+    <StakingCard
+      {...props}
+      linkPath="staking-new"
+      badge="Expired"
+      badgeColor="red"
+      useApy={useNewStakingApy}
+    />
+  );
+}

@@ -1,6 +1,7 @@
 import { AiOutlineWarning } from "react-icons/ai";
 import { Alert, Card, Checkbox, Col, Empty, Row, Typography } from "antd";
 import {
+  ExpiredNewStakingCard,
   ExpiredStakingCard,
   Page,
   SingleSidedStakingCard,
@@ -83,7 +84,7 @@ export default function Stake() {
           ))}
           {newStakingDetail.expired.map((stakingPool, index) => (
             <Fade key={stakingPool.id} in={fadedCard >= index}>
-              <ExpiredStakingCard key={stakingPool.id} {...stakingPool} />
+              <ExpiredNewStakingCard key={stakingPool.id} {...stakingPool} />
             </Fade>
           ))}
         </ExpiredAlert>
