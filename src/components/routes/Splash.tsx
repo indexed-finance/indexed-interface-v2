@@ -81,8 +81,8 @@ export default function Splash() {
       <SplashSection
         banner={require("images/indexpools_banner.png").default}
         title="INDEX POOLS"
-        description="Gain exposure to a passively-managed, zero management fee crypto index portfolio with a single token. Indexed products offer a hassle-free, battle-tested way of investing in both DeFi and niche market sectors such as oracles or the metaverse."
-        catchphrase="Invest in DeFi markets"
+        description="Gain exposure to a passively-managed, zero management fee crypto index portfolio with a single token. Indexed products offer a hassle-free, battle-tested way of getting into DeFi and niche market sectors such as oracles or the metaverse."
+        catchphrase="Get involved in DeFi markets"
         actionText="Buy an index"
         infoText="Learn more"
         onAction={() => history.push("/index-pools")}

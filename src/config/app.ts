@@ -66,5 +66,5 @@ export const INDEX_POOL_TAGLINES: Record<string, string> = {
     "A barbell-weighted fund tracking the favoured projects of 0xb1.484, one of the largest capital providers in DeFi.",
   // FFF
   "0xabafa52d3d5a2c18a4c1ae24480d22b831fc0413":
-    "A new-to-crypto-investing option, providing 20% exposure to both BTC and ETH, as well as large-mid cap DeFi protocols.",
+    "A new-to-crypto option, providing 20% exposure to both BTC and ETH, as well as large-mid cap DeFi protocols.",
 };
