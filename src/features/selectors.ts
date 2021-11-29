@@ -241,6 +241,7 @@ export const selectors = {
       .selectAllPools(state)
       .map((pool) => selectors.selectFormattedIndexPool(state, pool.id))
       .filter((each): each is FormattedIndexPool => Boolean(each))
+      .filter((each) => !["FFF", "CC10", "DEFI5"].includes(each.symbol))
       .sort((a, b) => {
         const aValue = a.totalValueLocked.replace(/\$/g, "").replace(/,/g, "");
         const bValue = b.totalValueLocked.replace(/\$/g, "").replace(/,/g, "");
