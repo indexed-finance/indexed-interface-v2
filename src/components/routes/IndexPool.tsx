@@ -133,14 +133,17 @@ export default function IndexPool() {
     >
       {indexPool ? (
         <>
-          {["CC10", "DEFI5"].includes(indexPool?.symbol ?? "") && (
+          {["FFF", "CC10", "DEFI5"].includes(indexPool?.symbol ?? "") && (
             <Alert
               type="warning"
               message={
                 <>
-                  This index has been exploited, but is currently stable. <br />
-                  We recommend you do not burn it at this time, as your tokens
-                  have been severely diluted by an inflated supply. <br />
+                  This index was disabled in the aftermath of the October 2021
+                  attack on Indexed Finance as a result of{" "}
+                  <a href="https://www.withtally.com/governance/indexed/proposal/16">
+                    governance proposal 16
+                  </a>
+                  . They can no longer be traded, minted or burned.
                   <a href="https://twitter.com/ndxfi">
                     See Twitter for addl. information.
                   </a>
