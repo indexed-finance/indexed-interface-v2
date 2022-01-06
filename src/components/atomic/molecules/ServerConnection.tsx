@@ -6,6 +6,7 @@ import { selectors } from "features";
 import { useMemo } from "react";
 import { useSelector } from "react-redux";
 import { useTranslator } from "hooks";
+import useENS from "../../../hooks/useENS";
 
 interface Props {
   showText?: boolean;
@@ -13,6 +14,7 @@ interface Props {
 
 export function ServerConnection({ showText = false }: Props) {
   const tx = useTranslator();
+  const { ensName } = useENS();
   const userAddress = useSelector(selectors.selectUserAddress);
   const isUserConnected = useSelector(selectors.selectUserConnected);
   const isServerConnected = useSelector(selectors.selectConnected);
@@ -55,7 +57,7 @@ export function ServerConnection({ showText = false }: Props) {
     >
       <Space>
         <ConnectionIcon style={{ position: "relative", top: 2 }} />
-        {showText && connectionText}
+        {showText && (ensName || connectionText)}
       </Space>
     </Typography.Title>
   );
