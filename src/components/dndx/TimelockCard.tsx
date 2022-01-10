@@ -70,7 +70,13 @@ export function TimelockCard(props: Props) {
               <Typography.Title style={{ margin: 0 }} level={3} type="success">
                 Ready
               </Typography.Title>
-              <Button type="primary">Withdraw</Button>
+              <Button
+                  type="primary"
+                  danger={!isReady}
+                  onClick={() => history.push(`/timelocks/${props.id}`)}
+                >
+                  Withdraw
+                </Button>
             </Space>
           ) : (
             <>
