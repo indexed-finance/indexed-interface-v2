@@ -2,12 +2,10 @@ import { Dropdown, Menu, notification } from "antd";
 import { ExternalLink } from "components/atomic/atoms";
 import { actions } from "features";
 import { useBreakpoints, useTranslator } from "hooks";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback } from "react";
 import { useDispatch } from "react-redux";
 import { useWeb3React } from "@web3-react/core";
-import ReactDOM from "react-dom";
-import jazzicon from "@metamask/jazzicon";
-
+import Davatar from "@davatar/react";
 interface Props {
   address: string;
   isWalletIcon?: boolean;
@@ -17,7 +15,6 @@ export function JazzIcon({ address, isWalletIcon = false }: Props) {
   const tx = useTranslator();
   const { deactivate } = useWeb3React();
   const dispatch = useDispatch();
-  const blockie = useRef<null | HTMLSpanElement>(null);
   const handleDisconnect = useCallback(() => {
     deactivate();
     dispatch(actions.userDisconnected());
@@ -28,36 +25,10 @@ export function JazzIcon({ address, isWalletIcon = false }: Props) {
     });
   }, [dispatch, deactivate, tx]);
   const breakpoints = useBreakpoints();
-  const inner = <span ref={blockie} />;
 
-  // Effect:
-  // Use refs to integrate the third party library for displaying a wallet identicon.
-  useEffect(() => {
-    const _blockie = blockie.current;
-    let element: any;
-
-    if (_blockie) {
-      const parsedAddress = parseInt(address.slice(2, 10), 16);
-
-      element = jazzicon(28, parsedAddress);
-      element.style.display = "block";
-      element.style.border = "2px solid #ccccff";
-      element.style.top = "-4px";
-
-      _blockie.appendChild(element);
-    }
-
-    return () => {
-      if (element) {
-        element.remove();
-      }
-
-      if (_blockie) {
-        ReactDOM.unmountComponentAtNode(_blockie);
-      }
-    };
-  }, [address, breakpoints]);
-
+  const getDavatar = () => (
+    <Davatar size={30} address={address} generatedAvatarType="jazzicon" />
+  );
   return isWalletIcon ? (
     <Dropdown
       arrow={true}
@@ -75,11 +46,11 @@ export function JazzIcon({ address, isWalletIcon = false }: Props) {
         </Menu>
       }
     >
-      {inner}
+      <span>{getDavatar()}</span>
     </Dropdown>
   ) : (
     <ExternalLink to={`https://etherscan.io/tx/${address}`} withIcon={false}>
-      {inner}
+      {getDavatar()}
     </ExternalLink>
   );
 }
