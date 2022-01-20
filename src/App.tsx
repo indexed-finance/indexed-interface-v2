@@ -14,7 +14,8 @@ import { BrowserRouter, Route, useLocation } from "react-router-dom";
 import { FEATURE_FLAGS } from "feature-flags";
 import { Layout, message, notification } from "antd";
 import { Provider, useSelector } from "react-redux";
-import { Suspense, useEffect, useRef } from "react";
+import { SUPPORTED_NETWORKS } from "config";
+import { Suspense, useEffect, useMemo, useRef } from "react";
 import { Web3ReactProvider } from "@web3-react/core";
 import { ethers } from "ethers";
 import { routes } from "routes";
@@ -60,7 +61,8 @@ export function AppLayout() {
   const { pathname } = useLocation();
   const previousLocation = useRef(pathname);
   const { isMobile } = useBreakpoints();
-  const onBadNetwork = useSelector(selectors.selectBadNetwork);
+  const network = useSelector(selectors.selectNetwork);
+  const badNetwork = useMemo(() => (network === undefined || SUPPORTED_NETWORKS.includes(network)), [network])
   const inner = (
     <>
       <LayoutHeader />
@@ -68,7 +70,7 @@ export function AppLayout() {
         className="with-background"
         style={{ minHeight: "100vh", paddingTop: 1, paddingBottom: 12 }}
       >
-        {onBadNetwork ? (
+        {badNetwork ? (
           <Page hasPageHeader={false}>
             <BadNetworkDrawer />
           </Page>
