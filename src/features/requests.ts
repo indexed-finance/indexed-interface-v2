@@ -125,7 +125,7 @@ export async function queryInitialData(url: string): Promise<Category[]> {
   }
 }
 
-export function normalizeInitialData(categories: Category[]) {
+export function normalizeInitialData(categories: Category[], chainId: number) {
   return categories.reduce(
     (prev, next) => {
       const category = next;
@@ -153,6 +153,7 @@ export function normalizeInitialData(categories: Category[]) {
           normalizedTokensForCategory.ids.push(tokenId);
           normalizedTokensForCategory.entities[tokenId] = {
             id: tokenId,
+            chainId,
             name,
             decimals,
             symbol,
@@ -190,6 +191,7 @@ export function normalizeInitialData(categories: Category[]) {
             normalizedTokensForCategory.entities[tokenId] = {
               ...token.token,
               id: tokenId,
+              chainId,
             };
           }
 
@@ -231,6 +233,7 @@ export function normalizeInitialData(categories: Category[]) {
           prev.tokens.ids.push(indexPool.id.toLowerCase());
           prev.tokens.entities[indexPool.id.toLowerCase()] = {
             id: indexPool.id.toLowerCase(),
+            chainId,
             name: indexPool.name,
             symbol: indexPool.symbol,
             decimals: 18,
@@ -264,14 +267,9 @@ export function normalizeInitialData(categories: Category[]) {
       tokens: {
         ids: [WETH_CONTRACT_ADDRESS.toLowerCase(), NDX_ADDRESS.toLowerCase()],
         entities: {
-          [WETH_CONTRACT_ADDRESS.toLowerCase()]: {
-            id: WETH_CONTRACT_ADDRESS.toLowerCase(),
-            name: "Wrapped Ether",
-            symbol: "WETH",
-            decimals: 18,
-          },
           [NDX_ADDRESS.toLowerCase()]: {
             id: NDX_ADDRESS.toLowerCase(),
+            chainId: 1,
             name: "Indexed",
             symbol: "NDX",
             decimals: 18,
@@ -291,7 +289,7 @@ export const fetchInitialData = createAsyncThunk(
     try {
       const initial = await queryInitialData(url);
 
-      return normalizeInitialData(initial);
+      return normalizeInitialData(initial, chainId);
     } catch (error) {
       return null;
     }
