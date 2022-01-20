@@ -1,11 +1,28 @@
-export const etherscanAddressLink = (address: string) => `https://etherscan.io/address/${address}`;
-export const etherscanTokenLink = (address: string) => `https://etherscan.io/token/${address}`;
-export const etherscanTransactionLink = (tx: string) => `https://etherscan.io/tx/${tx}`;
+import { ChainId } from "@indexed-finance/narwhal-sdk";
 
-export const uniswapInfoTokenLink = (address: string) => `https://v2.info.uniswap.org/token/${address}`;
-export const uniswapInfoPairLink = (address: string) => `https://v2.info.uniswap.org/pair/${address}`;
+const EXPLORER: Record<number, string> = {
+  [ChainId.MAINNET]: 'https://etherscan.io',
+  [ChainId.POLYGON]: 'https://polygonscan.com'
+};
 
-export const sushiswapInfoTokenLink = (address: string) => `https://analytics.sushi.com/tokens/${address}`;
-export const sushiswapInfoPairLink = (address: string) => `https://analytics.sushi.com/pairs/${address}`;
+const UNISWAP_INFO: Record<number, string> = {
+  [ChainId.MAINNET]: 'https://v2.info.uniswap.org',
+  [ChainId.POLYGON]: 'https://info.quickswap.exchange/#'
+};
 
-export const sushiswapAddLiquidityLink = (token0: string, token1: string) => `https://app.sushi.com/add/${token0}/${token1}`
+const SUSHISWAP_INFO: Record<number, string> = {
+  [ChainId.MAINNET]: 'https://analytics.sushi.com',
+  [ChainId.POLYGON]: 'https://analytics-polygon.sushi.com'
+}
+
+export const etherscanAddressLink = (address: string, network = 1) => `${EXPLORER[network]}/address/${address}`;
+export const etherscanTokenLink = (address: string, network = 1) => `${EXPLORER[network]}/token/${address}`;
+export const etherscanTransactionLink = (tx: string, network = 1) => `${EXPLORER[network]}/tx/${tx}`;
+
+export const uniswapInfoTokenLink = (address: string, network = 1) => `${UNISWAP_INFO[network]}/token/${address}`;
+export const uniswapInfoPairLink = (address: string, network = 1) => `${UNISWAP_INFO[network]}/pair/${address}`;
+
+export const sushiswapInfoTokenLink = (address: string, network = 1) => `${SUSHISWAP_INFO[network]}.sushi.com/tokens/${address}`;
+export const sushiswapInfoPairLink = (address: string, network = 1) => `${SUSHISWAP_INFO[network]}.sushi.com/pairs/${address}`;
+
+export const sushiswapAddLiquidityLink = (token0: string, token1: string, network = 1) => `https://app.sushi.com/add/${token0}/${token1}`
