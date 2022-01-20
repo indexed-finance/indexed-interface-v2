@@ -9,6 +9,14 @@ export function getIndexedUrl(chainId: number) {
   }
 }
 
+export function getOldStakeURL(chainId: number) {
+  if (chainId === 1) {
+    return config.OLD_STAKING_SUBGRAPH_URL;
+  } else {
+    return config.INDEXED_RINKEBY_SUBGRAPH_URL;
+  }
+}
+
 export function getUniswapUrl(chainId: number) {
   if (chainId === 1) {
     return config.UNISWAP_SUBGRAPH_URL;
