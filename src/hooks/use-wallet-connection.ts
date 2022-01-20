@@ -24,13 +24,14 @@ export function useInactiveListener(suppress = false) {
         if (provider) {
           const networkId = parseInt(await provider.send("net_version", []));
 
-          if (networkId === 1) {
+          if (networkId) {
             activate(injected, noop, true).catch((error) => {
               console.error("Failed to activate after chain changed", error);
             });
+            dispatch(actions.changedNetwork(networkId))
           } else {
             console.log(`Connected to bad network`);
-            dispatch(actions.connectedToBadNetwork());
+            dispatch(actions.userDisconnected());
           }
         }
       };
@@ -67,7 +68,7 @@ export function useEagerConnect() {
       const provider = new ethers.providers.Web3Provider(_provider, 1);
       const networkId = parseInt(await provider.send("net_version", []));
 
-      if (networkId === 1) {
+      if (networkId) {
         dispatch(
           actions.initialize({
             provider,
@@ -75,8 +76,9 @@ export function useEagerConnect() {
             selectedAddress: account ?? "",
           })
         );
+        dispatch(actions.changedNetwork(networkId))
       } else {
-        dispatch(actions.connectedToBadNetwork());
+        dispatch(actions.userDisconnected());
       }
     }
   }, [dispatch, account, connector]);
