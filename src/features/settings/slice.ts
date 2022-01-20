@@ -13,7 +13,7 @@ interface SettingsState {
     title: string;
     value: SupportedLanguageCode;
   }>;
-  badNetwork: boolean;
+  network: number | undefined
 }
 
 const settingsInitialState: SettingsState = {
@@ -34,7 +34,7 @@ const settingsInitialState: SettingsState = {
       value: "zh-cn",
     },
   ],
-  badNetwork: false,
+  network: 1,
 };
 
 const slice = createSlice({
@@ -67,16 +67,13 @@ const slice = createSlice({
     connectionLost: (state) => {
       state.connected = false;
     },
-    connectedToBadNetwork: (state) => {
-      state.badNetwork = true;
-    },
-    connectedToGoodNetwork: (state) => {
-      state.badNetwork = false;
+    changedNetwork: (state, action: PayloadAction<number>) => {
+      state.network = action.payload
     },
   },
   extraReducers: (builder) =>
     builder.addCase(userActions.userDisconnected.type, (state) => {
-      state.badNetwork = false;
+      state.network = undefined;
     }),
 });
 
@@ -109,7 +106,7 @@ export const settingsSelectors = {
   selectSupportedLanguages(state: AppState) {
     return settingsSelectors.selectSettings(state).supportedLanguages;
   },
-  selectBadNetwork(state: AppState) {
-    return settingsSelectors.selectSettings(state).badNetwork;
+  selectNetwork(state: AppState) {
+    return settingsSelectors.selectSettings(state).network;
   },
 };
