@@ -62,7 +62,7 @@ export function AppLayout() {
   const previousLocation = useRef(pathname);
   const { isMobile } = useBreakpoints();
   const network = useSelector(selectors.selectNetwork);
-  const badNetwork = useMemo(() => (network === undefined || SUPPORTED_NETWORKS.includes(network)), [network])
+  const badNetwork = useMemo(() => (network === undefined || !SUPPORTED_NETWORKS.includes(network)), [network])
   const inner = (
     <>
       <LayoutHeader />
