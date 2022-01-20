@@ -1,3 +1,5 @@
+import { ChainId } from "@indexed-finance/narwhal-sdk";
+
 export const NETWORKS = {
   mainnet: {
     id: 1,
@@ -8,3 +10,8 @@ export const NETWORKS = {
     name: "rinkeby",
   },
 };
+
+export const SUPPORTED_NETWORKS = [
+  ChainId.MAINNET,
+  ChainId.POLYGON
+]
