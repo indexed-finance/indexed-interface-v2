@@ -3,6 +3,7 @@ import { BaseDrawer, useDrawer } from "./Drawer";
 import { Divider, Space, Typography, notification } from "antd";
 import { Fade } from "components/animations";
 import { OVERLAY_READY, fortmatic } from "ethereum";
+import { SUPPORTED_NETWORKS } from "config";
 import { UnsupportedChainIdError, useWeb3React } from "@web3-react/core";
 import { WalletConnectConnector } from "@web3-react/walletconnect-connector";
 import { actions } from "features";
@@ -73,17 +74,11 @@ export function WalletConnectionDrawer() {
             );
             const networkId = parseInt(await provider.send("net_version", []));
 
-            provider.on("network", (newNetwork, oldNetwork) => {
-              if (newNetwork?.chainId !== 1) {
-                dispatch(actions.connectedToBadNetwork());
-              }
-
-              if (oldNetwork?.chainId !== 1 && newNetwork?.chainId === 1) {
-                dispatch(actions.connectedToGoodNetwork());
-              }
+            provider.on("network", (newNetwork) => {
+              dispatch(actions.changedNetwork(newNetwork))
             });
 
-            if (networkId === 1) {
+            if (SUPPORTED_NETWORKS.includes(networkId)) {
               dispatch(
                 actions.initialize({
                   provider,
@@ -96,8 +91,6 @@ export function WalletConnectionDrawer() {
                 message: tx("CONNECTED"),
                 description: tx("YOU_HAVE_SUCCESSFULLY_CONNECTED_YOUR_WALLET"),
               });
-            } else {
-              dispatch(actions.connectedToBadNetwork());
             }
           })
           .catch((error) => {
