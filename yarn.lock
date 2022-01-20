@@ -2196,10 +2196,10 @@
   resolved "https://registry.yarnpkg.com/@indexed-finance/multicall/-/multicall-1.0.7.tgz#76c8d8f2cec9c90482491bee2e99067b00ebfa4c"
   integrity sha512-KGEgxHQplaoNdvXw3rECATHxipmxStntaeP7RhpDcBWahLKWThHbtMufL6c9R+Q1vgJUtHz/gp3MXxksdzJzVg==
 
-"@indexed-finance/narwhal-sdk@^1.0.1":
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/@indexed-finance/narwhal-sdk/-/narwhal-sdk-1.0.1.tgz#c2fd94b7b244b47fd0cc8b6703f66fd0f758749b"
-  integrity sha512-msE3kSgppDkOVU9WVYSmQo1FlP/zfvNtD636YD28EnCjziUjdFFNN0jwMm4sn3evd0gOqXW6KIaB0qHuF/mbVg==
+"@indexed-finance/narwhal-sdk@^1.0.2":
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@indexed-finance/narwhal-sdk/-/narwhal-sdk-1.0.2.tgz#c4ba931ca8e1754215608465a4a148738b244324"
+  integrity sha512-maM/1L1y5jQdaGhhwS7d5P4R7qwfiTVfe8hSrPk5ypKDYt0DhpAg//2uj3YgbZvYKk1SRJoqWPMp8W+ms/v+IQ==
   dependencies:
     "@uniswap/v2-core" "^1.0.0"
     big.js "^5.2.2"
