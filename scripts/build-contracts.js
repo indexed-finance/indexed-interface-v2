@@ -104,16 +104,12 @@ fs.writeFileSync(contractPath, ContractFile);
 const ContractNameOverrides = {
   IPool: 'IndexPool',
   IERC20: 'Token',
-  IndexedUniswapRouterBurner: 'BurnRouter',
-  IndexedUniswapRouterMinter: 'MintRouter',
   UniswapV2Router: 'UniswapRouter',
   ERC20DividendsOwned: 'DNDX'
 };
 
 const SingletonContracts = {
   MultiTokenStaking: 'MULTI_TOKEN_STAKING_ADDRESS',
-  IndexedUniswapRouterMinter: 'MINT_ROUTER_ADDRESS',
-  IndexedUniswapRouterBurner: 'BURN_ROUTER_ADDRESS',
   UniswapV2Router: 'UNISWAP_ROUTER_ADDRESS',
   MultiCall2: 'MULTICALL2_ADDRESS',
   IndexedNarwhalRouter: 'NARWHAL_ROUTER_ADDRESS',
