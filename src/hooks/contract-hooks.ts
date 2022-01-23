@@ -56,20 +56,6 @@ export function useIndexedNarwhalRouterContract() {
   return useContractWithSigner(NARWHAL_ROUTER_ADDRESS, "IndexedNarwhalRouter");
 }
 
-export function useBurnRouterContract() {
-  return useContractWithSigner(
-    BURN_ROUTER_ADDRESS,
-    "IndexedUniswapRouterBurner"
-  );
-}
-
-export function useMintRouterContract() {
-  return useContractWithSigner(
-    MINT_ROUTER_ADDRESS,
-    "IndexedUniswapRouterMinter"
-  );
-}
-
 export function useIndexPoolContract(address: string) {
   return useContractWithSigner(address, "IPool");
 }
