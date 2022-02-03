@@ -2221,10 +2221,10 @@
     graphql-tag "^2.12.4"
     isomorphic-fetch "^3.0.0"
 
-"@indexed-finance/subgraph-clients@^0.0.18":
-  version "0.0.18"
-  resolved "https://registry.yarnpkg.com/@indexed-finance/subgraph-clients/-/subgraph-clients-0.0.18.tgz#183aa9a1ffccabeb58e2e2c7b7aae9a53df0073f"
-  integrity sha512-/F35Juaxyxe1CG68/rBJNlpRS/bT37lx1eDmu7tyZ8X7hL1973chbPSJTKqW9VQ7enHPDfxCkPY/sTZRS6Ocwg==
+"@indexed-finance/subgraph-clients@^0.0.22":
+  version "0.0.22"
+  resolved "https://registry.yarnpkg.com/@indexed-finance/subgraph-clients/-/subgraph-clients-0.0.22.tgz#41b20c5a57fb51b19b19b7e477a3c946baf42212"
+  integrity sha512-kHHS2LGvt8gRFVK4wWzwgKJCq+d5nnLSgc4VlCc4Cu5KaNuVsPEp7GICLhITw/QyiH76Qy2rUJ5EXhHUkhcYPg==
   dependencies:
     apollo-cache-inmemory "^1.6.6"
     apollo-client "^2.6.10"
