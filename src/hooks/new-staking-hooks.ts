@@ -1,5 +1,5 @@
 import { AppState, selectors } from "features";
-import { NDX_ADDRESS, WETH_CONTRACT_ADDRESS } from "config";
+import { NDX_ADDRESS, WETH_ADDRESS } from "config";
 import { NewStakingMeta, NewStakingPool } from "features/newStaking";
 import { RegisteredCall, convert } from "helpers";
 import {
@@ -9,6 +9,7 @@ import {
 import { useCallRegistrar } from "./use-call-registrar";
 import { useCallback, useMemo } from "react";
 import { useMultiTokenStakingContract } from "./contract-hooks";
+import { useNdxAddress } from "./address-hooks";
 import { useSelector } from "react-redux";
 import {
   useTokenPrice,
@@ -31,6 +32,7 @@ export const useNewStakingPool = (id: string) =>
   useSelector((state: AppState) => selectors.selectNewStakingPool(state, id));
 
 export function useNewStakingTokenPrice(id: string) {
+  
   const stakingPool = useNewStakingPool(id);
   const [supplyTokens, _pairs, indexPool] = useMemo(() => {
     if (!stakingPool) return [[], [], ""];
@@ -42,7 +44,7 @@ export function useNewStakingTokenPrice(id: string) {
       stakingPool.token1 as string,
     ];
     const indexPool = (
-      stakingPool.token0?.toLowerCase() === WETH_CONTRACT_ADDRESS
+      stakingPool.token0?.toLowerCase() === WETH_ADDRESS
         ? stakingPool.token1
         : stakingPool.token0
     ) as string;
@@ -101,8 +103,9 @@ export const useNewStakingInfoLookup = (ids: string[]) =>
   );
 
 export function useNewStakingApy(pid: string) {
+  const ndxAddress = useNdxAddress();
   const stakingPool = useNewStakingPool(pid);
-  const [ndxPrice] = useTokenPrice(NDX_ADDRESS);
+  const [ndxPrice] = useTokenPrice(ndxAddress);
   const tokenPrice = useNewStakingTokenPrice(pid);
 
   return useMemo(() => {
