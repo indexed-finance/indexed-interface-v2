@@ -63,9 +63,13 @@ const slice = createSlice({
       })
       .addCase(fetchInitialData.fulfilled, (state, action) => {
         if (action.payload) {
-          const { indexPools } = action.payload;
+          const { chainId, indexPools } = action.payload;
           const fullPools = indexPools.ids.map((id) => indexPools.entities[id]);
-
+          for (const pool of fullPools) {
+            if (!pool.chainId) {
+              pool.chainId = chainId;
+            }
+          }
           for (const { tokens } of fullPools) {
             for (const tokenId of tokens.ids) {
               const token = tokens.entities[tokenId];
@@ -80,7 +84,7 @@ const slice = createSlice({
             }
           }
 
-          adapter.addMany(state, fullPools);
+          adapter.upsertMany(state, fullPools);
         }
       })
       .addCase(fetchIndexPoolTransactions.fulfilled, (state, action) => {
@@ -92,7 +96,13 @@ const slice = createSlice({
           }
         }
       })
-      .addCase(mirroredServerState, (_, action) => action.payload.indexPools)
+      .addCase(mirroredServerState, (state, action) => {
+        const {indexPools} = action.payload;
+        // const fullPools = Object.keys(indexPools).map(k => indexPools[k]);
+        const fullPools = indexPools.ids.map((id: string) => indexPools.entities[id]);
+        adapter.upsertMany(state, fullPools);
+
+      })
       .addCase(restartedDueToError, () => adapter.getInitialState()),
 });
 
@@ -191,7 +201,7 @@ export function formatPoolAsset(
 ): FormattedPoolAsset {
   if (token) {
     const coingeckoData = token.priceData || {};
-    const withDisplayedSigns = { signDisplay: "always" };
+    const withDisplayedSigns = { signDisplay: "always" as any };
 
     let balance = "";
     let balanceUsd = "";
