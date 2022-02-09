@@ -145,6 +145,20 @@ export function useCommonUniswapPairs(
   return useUniswapPairs(pairs);
 }
 
+export function getTokenValue(
+  calculateBestTradeForExactInput: (tokenIn: NormalizedToken, tokenOut: NormalizedToken, amountIn: BigNumber, opts?: BestTradeOptions | undefined) => Trade | undefined,
+  tokenIn: NormalizedToken,
+  tokenOut: NormalizedToken,
+  amountIn: BigNumber
+) {
+  if (tokenIn.id.toLowerCase() === tokenOut.id.toLowerCase()) {
+    return amountIn
+  }
+  const bestTrade = calculateBestTradeForExactInput(tokenIn, tokenOut, amountIn, { maxNumResults: 1, maxHops: 2 });
+  if (!bestTrade) return null;
+  return convert.toBigNumber(bestTrade.outputAmount.raw.toString(10))
+}
+
 type TradeOptions = BestTradeOptions & {
   tokenPairSubset?: string[][]
 }
