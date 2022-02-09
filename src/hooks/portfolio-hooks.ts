@@ -1,16 +1,11 @@
-import {
-  AppState,
-  FormattedPortfolioAsset,
-  NormalizedIndexPool,
-  selectors,
-} from "features";
-import { NDX_ADDRESS, SUSHI_ADDRESS, WETH_CONTRACT_ADDRESS } from "config";
+import { FormattedPortfolioAsset, NormalizedIndexPool, } from "features";
 import {
   PricedAsset,
   useToken,
   useTokenLookup,
   useTokenPricesLookup,
 } from "./token-hooks";
+import { WETH_ADDRESS } from "config";
 import {
   computeSushiswapPairAddress,
   computeUniswapPairAddress,
@@ -20,17 +15,18 @@ import {
   uniswapInfoTokenLink,
 } from "helpers";
 import { useAllPools } from "./pool-hooks";
+import { useChainId, useTheme } from "./settings-hooks";
 import {
   useMasterChefInfoLookup,
   useMasterChefPoolsForTokens,
 } from "./masterchef-hooks";
 import { useMemo } from "react";
+import { useNdxAddress, useSushiAddress } from "./address-hooks";
 import {
   useNewStakingInfoLookup,
   useNewStakingPoolsForTokens,
 } from "./new-staking-hooks";
 import { usePairExistsLookup } from "./pair-hooks";
-import { useSelector } from "react-redux";
 import {
   useStakingInfoLookup,
   useStakingPoolsForTokens,
@@ -47,17 +43,18 @@ type RawAsset = {
   isSushiswapPair?: boolean;
 };
 
-export const buildEthUniPair = (asset: RawAsset) => ({
-  id: computeUniswapPairAddress(asset.id, WETH_CONTRACT_ADDRESS).toLowerCase(),
+export const buildEthUniPair = (asset: RawAsset, chainId: number) => ({
+  id: computeUniswapPairAddress(asset.id, WETH_ADDRESS[chainId], chainId).toLowerCase(),
   symbol: `UNIV2:ETH-${asset.symbol}`,
   name: `Uniswap V2: ETH-${asset.symbol}`,
   isUniswapPair: true,
 });
 
-export const buildEthSushiPair = (asset: RawAsset) => ({
+export const buildEthSushiPair = (asset: RawAsset, chainId: number) => ({
   id: computeSushiswapPairAddress(
     asset.id,
-    WETH_CONTRACT_ADDRESS
+    WETH_ADDRESS[chainId],
+    chainId
   ).toLowerCase(),
   symbol: `SUSHI:ETH-${asset.symbol}`,
   name: `Sushiswap V2: ETH-${asset.symbol}`,
@@ -67,6 +64,8 @@ export const buildEthSushiPair = (asset: RawAsset) => ({
 export function usePortfolioTokensAndEthPairs(
   indexPools: NormalizedIndexPool[]
 ): RawAsset[] {
+  const chainId = useChainId()
+  const ndxAddress = useNdxAddress()
   return useMemo(() => {
     const baseTokens = [
       ...indexPools.map(({ id, name, symbol }) => ({
@@ -74,31 +73,35 @@ export function usePortfolioTokensAndEthPairs(
         name,
         symbol,
       })),
-      {
-        id: NDX_ADDRESS.toLowerCase(),
+      
+    ];
+    if (ndxAddress) {
+      baseTokens.push({
+        id: ndxAddress.toLowerCase(),
         name: "Indexed",
         symbol: "NDX",
-      },
-    ];
+      })
+    }
     const pairTokens = baseTokens.reduce(
       (arr, asset) => [
         ...arr,
-        buildEthUniPair(asset),
-        buildEthSushiPair(asset),
+        buildEthUniPair(asset, chainId),
+        buildEthSushiPair(asset, chainId),
       ],
       [] as RawAsset[]
     );
 
     return [...baseTokens, ...pairTokens];
-  }, [indexPools]);
+  }, [indexPools, ndxAddress, chainId]);
 }
 
 function usePriceLookupArgs(indexPools: NormalizedIndexPool[]): PricedAsset[] {
+  const ndxAddress = useNdxAddress()
   return useMemo(() => {
-    const ids = [
-      ...indexPools.map((p) => p.id.toLowerCase()),
-      NDX_ADDRESS.toLowerCase(),
-    ];
+    const ids = indexPools.map((p) => p.id.toLowerCase());
+    if (ndxAddress) {
+      ids.push(ndxAddress.toLowerCase())
+    }
     return ids.reduce(
       (prev, id) => [
         ...prev,
@@ -108,17 +111,19 @@ function usePriceLookupArgs(indexPools: NormalizedIndexPool[]): PricedAsset[] {
       ],
       [] as PricedAsset[]
     );
-  }, [indexPools]);
+  }, [indexPools, ndxAddress]);
 }
 
 export function useAllPortfolioData() {
   // Common
+  const ndxAddress = useNdxAddress()
+  const sushiAddress = useSushiAddress()
   const allIndexes = useAllPools();
   const tokenLookup = useTokenLookup();
   const priceLookupArgs = usePriceLookupArgs(allIndexes);
   const priceLookup = useTokenPricesLookup(priceLookupArgs);
-  const ndxPrice = priceLookup[NDX_ADDRESS.toLowerCase()];
-  const sushiPrice = useToken(SUSHI_ADDRESS)?.priceData?.price ?? 10;
+  const ndxPrice = priceLookup[ndxAddress?.toLowerCase() ?? ""] ?? 0;
+  const sushiPrice = useToken(sushiAddress)?.priceData?.price ?? 10;
 
   // Vaults
   const vaultsTotalValue = useVaultPortfolioTotalValue();
@@ -300,7 +305,7 @@ export function useAllPortfolioData() {
 
   // #region Governance Token
   const governanceToken = assetData.find(
-    (each) => each && each.id.toLowerCase() === NDX_ADDRESS.toLowerCase()
+    (each) => each && each.id.toLowerCase() === ndxAddress?.toLowerCase()
   ) ?? {
     inWallet: {
       amount: 0,
@@ -327,7 +332,7 @@ export function useAllPortfolioData() {
 
   for (const _asset of assetData) {
     const asset = _asset!; // We filtered with Boolean before.
-    const isNdx = asset.id.toLowerCase() === NDX_ADDRESS.toLowerCase();
+    const isNdx = asset.id.toLowerCase() === ndxAddress?.toLowerCase();
 
     if (isNdx) {
       ndxValue += asset.inWallet.value;
@@ -398,8 +403,8 @@ export function usePortfolioData({
   totalValue: string;
   totalNdxEarned: string;
 } {
-  const theme = useSelector((state: AppState) => selectors.selectTheme(state));
-
+  const theme = useTheme()
+  const ndxAddress = useNdxAddress() ?? "";
   const indexPools = useAllPools();
   const assetsRaw = usePortfolioTokensAndEthPairs(indexPools);
   const pairIds = useMemo(() => {
@@ -484,8 +489,8 @@ export function usePortfolioData({
           ? uniswapInfoPairLink(id.toLowerCase())
           : isSushiswapPair
           ? sushiswapInfoPairLink(id.toLowerCase())
-          : id.toLowerCase() === NDX_ADDRESS.toLowerCase()
-          ? uniswapInfoTokenLink(NDX_ADDRESS)
+          : id.toLowerCase() === ndxAddress?.toLowerCase()
+          ? uniswapInfoTokenLink(ndxAddress)
           : `/index-pools/${S(name).slugify().s}`;
 
         return {
@@ -512,13 +517,14 @@ export function usePortfolioData({
     );
 
     const ndx = portfolioTokens.find(
-      (t) => t.address === NDX_ADDRESS.toLowerCase()
+      (t) => t.address === ndxAddress.toLowerCase()
     ) as FormattedPortfolioAsset;
-
-    const earnedValue = totalNdxEarned * parseFloat(ndx.price);
-    ndx.value = (parseFloat(ndx.value) + earnedValue).toFixed(2);
-    ndx.image = `indexed-${theme}`;
-    totalValue += earnedValue;
+    if (ndx) {
+      const earnedValue = totalNdxEarned * parseFloat(ndx.price);
+      ndx.value = (parseFloat(ndx.value) + earnedValue).toFixed(2);
+      ndx.image = `indexed-${theme}`;
+      totalValue += earnedValue;
+    }
     portfolioTokens.sort((a, b) => parseFloat(b.value) - parseFloat(a.value));
     portfolioTokens.forEach((token) => {
       token.weight = convert.toPercent(parseFloat(token.value) / totalValue);
@@ -526,7 +532,7 @@ export function usePortfolioData({
     });
 
     let tokensToUse = portfolioTokens.filter(
-      (t) => t.address !== NDX_ADDRESS.toLowerCase()
+      (t) => t.address !== ndxAddress.toLowerCase()
     );
 
     if (onlyOwnedAssets) {
@@ -557,5 +563,6 @@ export function usePortfolioData({
     masterChefPools,
     newStakingPoolsByTokens,
     onlyOwnedAssets,
+    ndxAddress
   ]);
 }
