@@ -98,7 +98,6 @@ const slice = createSlice({
       })
       .addCase(mirroredServerState, (state, action) => {
         const {indexPools} = action.payload;
-        // const fullPools = Object.keys(indexPools).map(k => indexPools[k]);
         const fullPools = indexPools.ids.map((id: string) => indexPools.entities[id]);
         adapter.upsertMany(state, fullPools);
 
