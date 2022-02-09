@@ -286,7 +286,6 @@ export const batcherSelectors = {
       return [...toKeep, ...merged];
     }
     const keysForThisChain = onChainCalls.filter(c => +(c.split('/')[0]) === stateChainId).length;
-    console.log(`GETTING ON CHAIN CALLS TO EXEC`)
     console.log(`# OnChain Calls: ${onChainCalls.length} | # For Chain: ${keysForThisChain}`)
     const activeAndOutdated = (k: string) => {
       const [chainId] = k.split('/');
