@@ -1,11 +1,16 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
+import { ethers } from "ethers";
 import CoinGecko from "coingecko-api";
 
 export const fetchTokenPriceData = createAsyncThunk(
   "tokens/fetchPriceData",
-  async ({ arg: tokenAddresses }: { arg: string[] }) => {
+  async ({ arg: tokenAddresses, provider }: { arg: string[], provider:
+    | ethers.providers.Web3Provider
+    | ethers.providers.JsonRpcProvider
+    | ethers.providers.InfuraProvider; }) => {
     try {
-      const tokens = await getTokenPriceData(tokenAddresses);
+      const {chainId} = await provider.getNetwork()
+      const tokens = await getTokenPriceData(tokenAddresses, chainId);
       return tokens;
     } catch (error) {
       return [];
@@ -20,11 +25,11 @@ type TokenHistoryResponse = {
   last_updated_at: number;
 };
 
-export const getTokenPriceData = async (tokenAddresses: string[]) => {
+export const getTokenPriceData = async (tokenAddresses: string[], chainId: number) => {
   try {
     const client = new CoinGecko();
     const { data: stats } = await client.simple.fetchTokenPrice({
-      asset_platform: "ethereum",
+      asset_platform: chainId === 1 ? "ethereum" : "polygon-pos",
       contract_addresses: tokenAddresses.join(","),
       include_24hr_change: true,
       include_last_updated_at: true,
@@ -61,6 +66,8 @@ export const getTokenPriceData = async (tokenAddresses: string[]) => {
 
     return formattedStats;
   } catch (error) {
+    console.log(`CAUGHT ERR IN COINGECKO!!`);
+    console.log(error)
     return {};
   }
 };
