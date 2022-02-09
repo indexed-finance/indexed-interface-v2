@@ -132,8 +132,6 @@ const selectPoolUnderlyingTokens = createSelector(
 const selectPoolTokenAddresses = (state: AppState, poolId: string) =>
   state.indexPools.entities[poolId.toString()]?.tokens.ids ?? [];
 
-  // [...(state.indexPools.entities[poolId.toString()]?.tokensList ?? [])];
-
 const selectTokenWeights = (
   state: AppState,
   poolId: string,
