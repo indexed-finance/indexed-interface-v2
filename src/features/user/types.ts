@@ -24,11 +24,12 @@ export type FormattedPortfolioDatum = {
   link?: string;
   staking?: string;
   earned?: string;
+  image?: string;
 };
 
 export interface FormattedPortfolioData {
   tokens: FormattedPortfolioDatum[];
-  ndx: FormattedPortfolioDatum;
+  ndx?: FormattedPortfolioDatum;
   totalValue: string;
 }
 
