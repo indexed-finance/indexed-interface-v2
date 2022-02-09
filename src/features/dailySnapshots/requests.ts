@@ -1,4 +1,5 @@
 import { IndexedCoreSubgraphClient } from "@indexed-finance/subgraph-clients";
+import { NETWORKS_BY_ID } from "config";
 import { Timeframe } from "./selectors";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
@@ -15,8 +16,11 @@ const TIMEFRAME_TO_HOURS: Record<Timeframe, number> = {
 
 export const fetchSnapshotsData = createAsyncThunk(
   "dailySnapshots/fetch",
-  async ({ poolId, timeframe }: { poolId: string; timeframe: Timeframe }) => {
-    const client = IndexedCoreSubgraphClient.forNetwork("mainnet");
+  async ({ poolId, timeframe }: { poolId: string; timeframe: Timeframe }, { getState }) => {
+    const state = getState();
+    const chainId = (state as any).settings.network
+    const network = NETWORKS_BY_ID[chainId].name;
+    const client = IndexedCoreSubgraphClient.forNetwork(network);
     const hours = TIMEFRAME_TO_HOURS[timeframe];
 
     try {
