@@ -145,18 +145,25 @@ export function useCommonUniswapPairs(
   return useUniswapPairs(pairs);
 }
 
-export function getTokenValue(
+export function getTokenValueGetter(
   calculateBestTradeForExactInput: (tokenIn: NormalizedToken, tokenOut: NormalizedToken, amountIn: BigNumber, opts?: BestTradeOptions | undefined) => Trade | undefined,
-  tokenIn: NormalizedToken,
-  tokenOut: NormalizedToken,
-  amountIn: BigNumber
+  token: NormalizedToken,
+  quoteToken: NormalizedToken
 ) {
-  if (tokenIn.id.toLowerCase() === tokenOut.id.toLowerCase()) {
-    return amountIn
+  const oneToken = convert.toToken("1", token.decimals);
+  let price: BigNumber;
+
+  if (token.id.toLowerCase() === quoteToken.id.toLowerCase()) {
+    price = oneToken
+  } else {
+    const bestTrade = calculateBestTradeForExactInput(token, quoteToken, oneToken, { maxNumResults: 1, maxHops: 2 });
+    if (bestTrade) {
+      price = convert.toBigNumber(bestTrade.outputAmount.raw.toString(10));
+    } else {
+      price = oneToken;
+    }
   }
-  const bestTrade = calculateBestTradeForExactInput(tokenIn, tokenOut, amountIn, { maxNumResults: 1, maxHops: 2 });
-  if (!bestTrade) return null;
-  return convert.toBigNumber(bestTrade.outputAmount.raw.toString(10))
+  return (tokenAmount: BigNumber | number) => price.times(tokenAmount).div(oneToken);
 }
 
 type TradeOptions = BestTradeOptions & {
