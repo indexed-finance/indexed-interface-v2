@@ -1,28 +1,24 @@
 import * as config from "config";
+import { NETWORKS_BY_ID } from "config";
+import { SUBGRAPH_URLS } from "@indexed-finance/subgraph-clients/dist/constants"
 import axios from "axios";
 
 export function getIndexedUrl(chainId: number) {
-  if (chainId === 1) {
-    return config.INDEXED_SUBGRAPH_URL;
-  } else {
-    return config.INDEXED_RINKEBY_SUBGRAPH_URL;
-  }
+  const networkName = NETWORKS_BY_ID[chainId].name;
+  return SUBGRAPH_URLS[networkName].indexedCore
 }
 
 export function getOldStakeURL(chainId: number) {
   if (chainId === 1) {
     return config.OLD_STAKING_SUBGRAPH_URL;
   } else {
-    return config.INDEXED_RINKEBY_SUBGRAPH_URL;
+    return config.OLD_STAKING_SUBGRAPH_URL;
   }
 }
 
 export function getUniswapUrl(chainId: number) {
-  if (chainId === 1) {
-    return config.UNISWAP_SUBGRAPH_URL;
-  } else {
-    return config.UNISWAP_SUBGRAPH_URL_RINKEBY;
-  }
+  const networkName = NETWORKS_BY_ID[chainId].name;
+  return SUBGRAPH_URLS[networkName].uniswap
 }
 
 export async function sendQuery(url: string, query: string) {
