@@ -17,6 +17,7 @@ export type NormalizedTokenAdapter = TokenAdapter & {
 
 export interface NormalizedVault {
   id: string;
+  chainId: number;
   symbol: string;
   name: string;
   decimals: number;
@@ -90,38 +91,40 @@ const slice = createSlice({
       .addCase(mirroredServerState, (_, action) => action.payload.vaults)
       .addCase(restartedDueToError, () => adapter.getInitialState())
       .addCase(fetchVaultsData.fulfilled, (state, action) => {
-        const vaults = action.payload ?? [];
-        for (const { price, ...vault } of vaults) {
-          const entry = state.entities[vault.id.toLowerCase()];
-          if (!entry) {
-            adapter.upsertOne(state, vault);
-          } else {
-            entry.feeRecipient = vault.feeRecipient;
-            entry.rewardsSeller = vault.rewardsSeller;
-            entry.performanceFee = vault.performanceFee;
-            entry.reserveRatio = vault.reserveRatio;
-            entry.snapshots = vault.snapshots;
-            entry.averagePricePerShare = vault.averagePricePerShare;
-            if (
-              vault.adapters.some(
-                (a, i) =>
-                  entry.adapters[i]?.id !== a.id ||
-                  entry.weights[i] !== vault.weights[i]
-              )
-            ) {
-              entry.weights = vault.weights;
-              for (const {
-                ...adapter
-              } of vault.adapters as NormalizedTokenAdapter[]) {
-                const existingAdapter = entry.adapters.find(
-                  (a) => a.id === adapter.id
-                );
-                if (existingAdapter) {
-                  adapter.revenueAPRs = existingAdapter.revenueAPRs;
-                  adapter.revenueTokens = existingAdapter.revenueTokens;
+        const {vaults, chainId} = action.payload ?? {};
+        if (vaults && chainId !== undefined) {
+          for (const { price, ...vault } of vaults) {
+            const entry = state.entities[vault.id.toLowerCase()];
+            if (!entry) {
+              adapter.upsertOne(state, vault);
+            } else {
+              entry.feeRecipient = vault.feeRecipient;
+              entry.rewardsSeller = vault.rewardsSeller;
+              entry.performanceFee = vault.performanceFee;
+              entry.reserveRatio = vault.reserveRatio;
+              entry.snapshots = vault.snapshots;
+              entry.averagePricePerShare = vault.averagePricePerShare;
+              if (
+                vault.adapters.some(
+                  (a, i) =>
+                    entry.adapters[i]?.id !== a.id ||
+                    entry.weights[i] !== vault.weights[i]
+                )
+              ) {
+                entry.weights = vault.weights;
+                for (const {
+                  ...adapter
+                } of vault.adapters as NormalizedTokenAdapter[]) {
+                  const existingAdapter = entry.adapters.find(
+                    (a) => a.id === adapter.id
+                  );
+                  if (existingAdapter) {
+                    adapter.revenueAPRs = existingAdapter.revenueAPRs;
+                    adapter.revenueTokens = existingAdapter.revenueTokens;
+                  }
                 }
+                entry.adapters = vault.adapters;
               }
-              entry.adapters = vault.adapters;
             }
           }
         }
@@ -134,7 +137,8 @@ const selectors = adapter.getSelectors((state: AppState) => state.vaults);
 
 export const vaultsSelectors = {
   selectAllVaults(state: AppState) {
-    return selectors.selectAll(state);
+    const chainId = state.settings.network;
+    return selectors.selectAll(state).filter((v) => v.chainId === chainId);
   },
   selectVaultLookup(state: AppState) {
     return selectors.selectEntities(state);
