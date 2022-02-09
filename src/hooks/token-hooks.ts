@@ -1,5 +1,6 @@
 import { AppState, selectors } from "features";
 import { ApprovalStatus } from "features/user/slice";
+import { COMMON_BASE_TOKENS, DISPLAYED_COMMON_BASE_TOKENS } from "config";
 import { Pair } from "@indexed-finance/narwhal-sdk";
 import {
   RegisteredCall,
@@ -9,21 +10,25 @@ import {
   getRandomEntries,
   sortTokens,
 } from "helpers";
-import { WETH_CONTRACT_ADDRESS } from "config";
 import { constants } from "ethers";
 import { useAddTransactionCallback } from "./transaction-hooks";
+import { useCachedValue } from "./use-debounce";
 import { useCallRegistrar } from "./use-call-registrar";
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useChainId } from "./settings-hooks";
 import { usePair, useUniswapPairs } from "./pair-hooks";
 import { useSelector } from "react-redux";
 import { useTokenContract } from "./contract-hooks";
+import { useWethAddress } from "./address-hooks";
 
 // #region General
 export const useToken = (tokenId: string) =>
   useSelector((state: AppState) => selectors.selectTokenById(state, tokenId));
 
-export const useTokens = (tokenIds: string[]) =>
-  useSelector((state: AppState) => selectors.selectTokensById(state, tokenIds));
+export const useTokens = (tokenIds: string[]) => {
+  const cachedIds = useCachedValue(tokenIds);
+  return useSelector((state: AppState) => selectors.selectTokensById(state, cachedIds));
+}
 
 export const useAllTokenIds = () =>
   useSelector((state: AppState) => selectors.selectAllTokens(state)).map(
@@ -36,6 +41,16 @@ export const useTokenLookup = () =>
 export const useTokenLookupBySymbol = () =>
   useSelector(selectors.selectTokenLookupBySymbol);
 // #endregion
+
+export function useCommonBaseTokens() {
+  const chainId = useChainId();
+  return useMemo(() => COMMON_BASE_TOKENS[chainId], [chainId]);
+}
+
+export function useDisplayedCommonBaseTokens() {
+  const chainId = useChainId();
+  return useMemo(() => DISPLAYED_COMMON_BASE_TOKENS[chainId], [chainId]);
+}
 
 // #region Approval
 interface TokenApprovalOptions {
@@ -110,8 +125,8 @@ export const TOKEN_PRICES_CALLER = "Token Prices";
 
 export function useTokenPrice(id: string): [number, false] | [undefined, true] {
   const token = useToken(id.toLowerCase());
-
-  usePricesRegistrar([id]);
+  const arr = useMemo(() => ([id]), [id]);
+  usePricesRegistrar(arr);
 
   if (token?.priceData?.price) {
     return [token.priceData.price, false];
@@ -122,6 +137,7 @@ export function useTokenPrice(id: string): [number, false] | [undefined, true] {
 
 export function useTokenPricesLessStrict(ids: string[]): number[] {
   const tokens = useTokens(ids.map((id) => id.toLowerCase()));
+  useEffect(() => console.log(`useTokenPricesLessStrict: RE-RENDER`), [tokens])
 
   usePricesRegistrar(ids);
 
@@ -139,7 +155,7 @@ export function useTokenPricesLessStrict(ids: string[]): number[] {
 export function useTokenPrices(
   ids: string[]
 ): [number[], false] | [undefined, true] {
-  const tokens = useTokens(ids.map((id) => id.toLowerCase()));
+  const tokens = useTokens(ids);
 
   usePricesRegistrar(ids);
 
@@ -196,18 +212,20 @@ export type PricedAsset = {
 export function useTokenPricesLookup(
   tokens: PricedAsset[]
 ): Record<string, number> {
+  const wethAddress = useWethAddress()
+  const chainId = useChainId()
   const [baseTokenIds, pairTokens, pairTokenIds] = useMemo(() => {
     const baseTokenIds = [
       ...tokens.filter((t) => !t.useEthLpTokenPrice).map((t) => t.id),
-      WETH_CONTRACT_ADDRESS,
+      wethAddress,
     ];
     const pairTokens = tokens
       .filter((t) => t.useEthLpTokenPrice)
       .map((token) => {
-        const [token0, token1] = sortTokens(token.id, WETH_CONTRACT_ADDRESS);
+        const [token0, token1] = sortTokens(token.id, wethAddress);
         const id = token.sushiswap
-          ? computeSushiswapPairAddress(token0, token1).toLowerCase()
-          : computeUniswapPairAddress(token0, token1).toLowerCase();
+          ? computeSushiswapPairAddress(token0, token1, chainId).toLowerCase()
+          : computeUniswapPairAddress(token0, token1, chainId).toLowerCase();
         return {
           id,
           token0,
@@ -217,13 +235,10 @@ export function useTokenPricesLookup(
         };
       });
     if (pairTokens.length) {
-      baseTokenIds.push(WETH_CONTRACT_ADDRESS);
+      baseTokenIds.push(wethAddress);
     }
     return [baseTokenIds, pairTokens, pairTokens.map((p) => p.id)];
-  }, [tokens]);
-  // const [baseTokenPrices, baseTokenPricesLoading] = useTokenPrices(
-  //   baseTokenIds
-  // );
+  }, [tokens, wethAddress, chainId]);
   const baseTokenPrices = useTokenPricesLessStrict(baseTokenIds);
   // @todo only lookup supplies if we know the pair actually exists
   const [supplies, suppliesLoading] =
@@ -249,7 +264,7 @@ export function useTokenPricesLookup(
           priceMap[id] = getLpTokenPrice(
             pair,
             supply,
-            WETH_CONTRACT_ADDRESS,
+            wethAddress,
             ethPrice
           );
         }
@@ -266,23 +281,25 @@ export function useTokenPricesLookup(
     suppliesLoading,
     pairs,
     pairsLoading,
+    wethAddress
   ]);
 }
 
 export function usePairTokenPrice(id: string) {
+  const wethAddress = useWethAddress()
   const pairInfo = usePair(id);
   const [pairArr, supplyArr, pricedTokenId] = useMemo(() => {
     if (!pairInfo) return [[], [], ""];
     const { id, exists, token0, token1, sushiswap } = pairInfo;
     if (!token0 || !token1) return [[], [], ""];
     let pricedTokenId: string;
-    if (token0.toLowerCase() === WETH_CONTRACT_ADDRESS.toLowerCase()) {
+    if (token0.toLowerCase() === wethAddress.toLowerCase()) {
       pricedTokenId = token0.toLowerCase();
     } else {
       pricedTokenId = token1.toLowerCase();
     }
     return [[{ id, exists, token0, token1, sushiswap }], [id], pricedTokenId];
-  }, [pairInfo]);
+  }, [pairInfo, wethAddress]);
 
   const [tokenPrice, tokenPriceLoading] = useTokenPrice(pricedTokenId);
   const [pairs, pairsLoading] = useUniswapPairs(pairArr);
@@ -313,17 +330,23 @@ export function usePairTokenPrice(id: string) {
   ]);
 }
 
-export const useEthPrice = () => useTokenPrice(WETH_CONTRACT_ADDRESS);
+export const useEthPrice = () => {
+  const wethAddress = useWethAddress();
+  return useTokenPrice(wethAddress);
+}
+
+const caller2 = TOKEN_PRICES_CALLER.concat("1")
 
 export function usePricesRegistrar(tokenIds: string[]) {
+  const cachedIds = useCachedValue(tokenIds);
   useCallRegistrar({
-    caller: TOKEN_PRICES_CALLER.concat("1"),
+    caller: caller2,
     onChainCalls: [],
     offChainCalls: [
       {
         target: "",
         function: "fetchTokenPriceData",
-        args: tokenIds,
+        args: cachedIds,
         canBeMerged: true,
       },
     ],
