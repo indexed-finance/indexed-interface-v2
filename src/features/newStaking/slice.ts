@@ -16,9 +16,9 @@ const adapter = createEntityAdapter<NewStakingPool>({
 
 const initialState = {
   metadata: {
-    id: MULTI_TOKEN_STAKING_ADDRESS,
+    id: MULTI_TOKEN_STAKING_ADDRESS[1],
     owner: "",
-    rewardsSchedule: REWARDS_SCHEDULE_ADDDRESS,
+    rewardsSchedule: REWARDS_SCHEDULE_ADDDRESS[1],
     startBlock: 12454000,
     endBlock: 17232181,
     rewardsToken: "0x86772b1409b61c639eaac9ba0acfbb6e238e5f83",
