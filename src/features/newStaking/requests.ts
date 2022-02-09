@@ -19,7 +19,7 @@ export const fetchNewStakingData = createAsyncThunk(
     const { chainId } = provider.network;
     const name = chainId === 1 ? "mainnet" : "rinkeby";
     const client = IndexedStakingSubgraphClient.forNetwork(name);
-
+    if (!client) return null;
     try {
       const data = await client.getStakingInfo();
       const { pools, ...meta } = data;
@@ -32,7 +32,7 @@ export const fetchNewStakingData = createAsyncThunk(
           token1,
         }));
 
-      dispatch(pairsActions.uniswapPairsRegistered(pairTokens));
+      dispatch(pairsActions.uniswapPairsRegistered({ pairs: pairTokens, chainId }));
 
       return {
         meta,
