@@ -1,4 +1,5 @@
 export const INFURA_ID = process.env.REACT_APP_INFURA_ID;
+export const ALCHEMY_API_KEY = process.env.REACT_APP_ALCHEMY_API_KEY;
 export const FORTMATIC_KEY = process.env.REACT_APP_FORTMATIC_KEY;
 
 export const INDEXED_SUBGRAPH_URL =
