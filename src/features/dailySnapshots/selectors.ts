@@ -1,6 +1,6 @@
+import { DailyPoolSnapshot } from "indexed-types";
 import { dailySnapshotsAdapter } from "./slice";
 import type { AppState } from "features/store";
-import type { SnapshotKey } from "./types";
 
 const SECONDS_PER_DAY = 24 * 60 * 60;
 const SECONDS_PER_WEEK = SECONDS_PER_DAY * 7;
@@ -39,12 +39,12 @@ export const dailySnapshotsSelectors = {
       (snapshot) => unixNow - snapshot.date <= maxAgeInSeconds
     );
   },
-  selectTimeSeriesSnapshotData: (
+  selectTimeSeriesSnapshotData: <K extends keyof DailyPoolSnapshot>(
     state: AppState,
     poolId: string,
     timeframe: Timeframe,
-    key: SnapshotKey
-  ) => {
+    key: K
+  ): { time: number; value: DailyPoolSnapshot[K]}[] => {
     const oneDay = 86400;
     const maxAgeLookup: Record<Timeframe, number> = {
       "1D": oneDay,
