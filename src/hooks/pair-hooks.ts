@@ -10,11 +10,13 @@ import {
 } from "helpers";
 import { useCallRegistrar } from "./use-call-registrar";
 import { useCallback, useEffect, useMemo } from "react";
+import { useChainId } from "./settings-hooks";
 import { useDispatch, useSelector } from "react-redux";
 import BigNumber from "bignumber.js";
 import type { AppState, FormattedPair, NormalizedToken } from "features";
 import type {
   BestTradeOptions,
+  ChainId,
   Pair,
   Token,
   TokenAmount,
@@ -66,22 +68,22 @@ type PairToken = {
   sushiswap?: boolean;
 };
 
-export function buildUniswapPairs(baseTokens: string[]) {
-  const tokenPairs = buildCommonTokenPairs(baseTokens);
+export function buildUniswapPairs(baseTokens: string[], chainId: number) {
+  const tokenPairs = buildCommonTokenPairs(baseTokens, chainId);
   const pairs: PairToken[] = tokenPairs.reduce((arr, [tokenA, tokenB]) => {
     const [token0, token1] = sortTokens(tokenA, tokenB);
 
     return [
       ...arr,
       {
-        id: computeUniswapPairAddress(token0, token1),
+        id: computeUniswapPairAddress(token0, token1, chainId),
         exists: undefined,
         token0,
         token1,
         sushiswap: false,
       },
       {
-        id: computeSushiswapPairAddress(token0, token1),
+        id: computeSushiswapPairAddress(token0, token1, chainId),
         exists: undefined,
         token0,
         token1,
@@ -97,6 +99,7 @@ export function useUniswapPairs(
   pairs: PairToken[]
 ): [Pair[], false] | [undefined, true] {
   const dispatch = useDispatch();
+  const chainId = useChainId()
   const pairDatas = useSelector((state: AppState) =>
     selectors.selectFormattedPairsById(
       state,
@@ -105,8 +108,8 @@ export function useUniswapPairs(
   );
 
   useEffect(() => {
-    dispatch(actions.uniswapPairsRegistered(pairs));
-  }, [dispatch, pairs]);
+    if (chainId !== undefined) dispatch(actions.uniswapPairsRegistered({ pairs, chainId }));
+  }, [dispatch, pairs, chainId]);
 
   usePairDataRegistrar(pairs);
 
@@ -121,7 +124,7 @@ export function useUniswapPairs(
           ({ exists }) => exists
         );
         const uniSdkPairs = goodPairs.map((entry) =>
-          convert.toUniswapSDKPair({ network: { chainId: 1 } }, entry)
+          convert.toUniswapSDKPair({ network: { chainId } }, entry)
         ) as Pair[];
 
         return [uniSdkPairs, false];
@@ -131,35 +134,50 @@ export function useUniswapPairs(
     } catch (error) {
       return [undefined, true];
     }
-  }, [pairDatas, isLoading]);
+  }, [pairDatas, isLoading, chainId]);
 }
 
 export function useCommonUniswapPairs(
   baseTokens: string[]
 ): [Pair[], false] | [undefined, true] {
-  const pairs = useMemo(() => buildUniswapPairs(baseTokens), [baseTokens]);
+  const chainId = useChainId()
+  const pairs = useMemo(() => buildUniswapPairs(baseTokens, chainId), [baseTokens, chainId]);
   return useUniswapPairs(pairs);
+}
+
+type TradeOptions = BestTradeOptions & {
+  tokenPairSubset?: string[][]
 }
 
 export function useUniswapTradingPairs(baseTokens: string[]) {
   const [pairs, loading] = useCommonUniswapPairs(baseTokens);
+  const chainId = useChainId() as ChainId
+  console.log(`Using ${pairs?.length} Uniswap Pairs. Loading: ${loading}`)
   const calculateBestTradeForExactInput = useCallback(
     (
       tokenIn: NormalizedToken,
       tokenOut: NormalizedToken,
       amountIn: BigNumber,
-      opts?: BestTradeOptions
+      {tokenPairSubset, ...opts}: TradeOptions = {}
     ): Trade | undefined => {
       if (!loading) {
+        const allowedPairIds = tokenPairSubset
+        ? tokenPairSubset.reduce((arr, [a, b]) => ([
+          ...arr,
+          computeUniswapPairAddress(a, b, chainId).toLowerCase(),
+          computeSushiswapPairAddress(a, b, chainId).toLowerCase()
+        ]), [])
+        : (pairs as Pair[]).map(p => p.liquidityToken.address.toLowerCase());
+        const allowedPairs = (pairs as Pair[]).filter((p) => allowedPairIds.includes(p.liquidityToken.address.toLowerCase()))
         const [bestTrade] = bestTradeExactIn(
-          pairs as Pair[],
+          allowedPairs as Pair[],
           convert.toUniswapSDKCurrencyAmount(
-            { network: { chainId: 1 } },
+            { network: { chainId } },
             tokenIn,
             amountIn,
           ) as TokenAmount,
           convert.toUniswapSDKCurrency(
-            { network: { chainId: 1 } },
+            { network: { chainId} },
             tokenOut
           ) as Token,
           opts ?? { maxHops: 3, maxNumResults: 1 }
@@ -167,24 +185,32 @@ export function useUniswapTradingPairs(baseTokens: string[]) {
         return bestTrade;
       }
     },
-    [loading, pairs]
+    [loading, pairs, chainId]
   );
   const calculateBestTradeForExactOutput = useCallback(
     (
       tokenIn: NormalizedToken,
       tokenOut: NormalizedToken,
       amountOut: BigNumber,
-      opts?: BestTradeOptions
+      {tokenPairSubset, ...opts}: TradeOptions = {}
     ): Trade | undefined => {
       if (!loading) {
+        const allowedPairIds = tokenPairSubset
+          ? tokenPairSubset.reduce((arr, [a, b]) => ([
+            ...arr,
+            computeUniswapPairAddress(a, b, chainId).toLowerCase(),
+            computeSushiswapPairAddress(a, b, chainId).toLowerCase()
+          ]), [])
+          : (pairs as Pair[]).map(p => p.liquidityToken.address.toLowerCase());
+        const allowedPairs = (pairs as Pair[]).filter((p) => allowedPairIds.includes(p.liquidityToken.address.toLowerCase()))
         const [bestTrade] = bestTradeExactOut(
-          pairs as Pair[],
+          allowedPairs,
           convert.toUniswapSDKCurrency(
-            { network: { chainId: 1 } },
+            { network: { chainId } },
             tokenIn
           ) as Token,
           convert.toUniswapSDKCurrencyAmount(
-            { network: { chainId: 1 } },
+            { network: { chainId } },
             tokenOut,
             amountOut,
           ) as TokenAmount,
@@ -194,13 +220,14 @@ export function useUniswapTradingPairs(baseTokens: string[]) {
         return bestTrade;
       }
     },
-    [loading, pairs]
+    [loading, pairs, chainId]
   );
 
   return {
     calculateBestTradeForExactInput,
     calculateBestTradeForExactOutput,
     loading,
+    pairs
   };
 }
 // #endregion
