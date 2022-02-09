@@ -137,7 +137,6 @@ export function useTokenPrice(id: string): [number, false] | [undefined, true] {
 
 export function useTokenPricesLessStrict(ids: string[]): number[] {
   const tokens = useTokens(ids.map((id) => id.toLowerCase()));
-  useEffect(() => console.log(`useTokenPricesLessStrict: RE-RENDER`), [tokens])
 
   usePricesRegistrar(ids);
 
