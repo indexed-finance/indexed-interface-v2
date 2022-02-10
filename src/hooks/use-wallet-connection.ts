@@ -1,12 +1,14 @@
 import { FEATURE_FLAGS } from "feature-flags";
+import { Provider, selectors } from "features";
 import { SocketClient } from "sockets/client";
 import { actions } from "features";
 import { ethers } from "ethers";
 import { fortmatic, injected, portis, walletConnect } from "ethereum";
 import { isMobile } from "react-device-detect";
-import { provider, selectors } from "features";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { usePrevious } from "./use-previous";
+import { useUserAddress } from "./user-hooks";
 import { useWeb3React } from "@web3-react/core";
 import noop from "lodash.noop";
 
@@ -14,47 +16,39 @@ export type InjectedWindow = typeof window & { ethereum?: any; web3?: any };
 
 export function useInactiveListener(suppress = false) {
   const dispatch = useDispatch();
-  const { active, error, activate } = useWeb3React();
-
+  const { active, activate, account, chainId, connector } = useWeb3React();
+  const prevChainId = usePrevious(chainId);
+  const prevActive = usePrevious(active);
+  const storeAccount = useUserAddress();
   useEffect(() => {
-    const { ethereum } = window as InjectedWindow;
-
-    if (ethereum && ethereum.on && !active && !error && !suppress) {
-      const handleChainChanged = async () => {
-        if (provider) {
-          const networkId = parseInt(await provider.send("net_version", []));
-
-          if (networkId) {
-            activate(injected, noop, true).catch((error) => {
-              console.error("Failed to activate after chain changed", error);
-            });
-            dispatch(actions.changedNetwork(networkId))
-          } else {
-            console.log(`Connected to bad network`);
-            dispatch(actions.userDisconnected());
+    // Ignore if triggered by wallet activation
+    if (account && active && chainId && chainId !== prevChainId) {
+      console.log(`Got changed network in inactive listener useEffect. New network ${chainId}`);
+      if (account !== storeAccount || active !== prevActive) {
+        console.log(`Caused by wallet connect. Ignoring.`)
+      } else {
+        console.log(`Not caused by wallet connect. Triggering setNetwork`);
+        dispatch(actions.changedNetwork(chainId))
+        activate(injected, noop, true).then(async () => {
+          if (connector) {
+            const _provider = await connector.getProvider();
+            const provider = new ethers.providers.Web3Provider(
+              _provider,
+              "any"
+            );
+            await provider?.ready;
+            dispatch(actions.setNetwork({
+              provider: provider as Provider,
+              selectedAddress: account ?? "",
+              withSigner: true
+            }))
           }
         }
-      };
-
-      const handleAccountsChanged = (accounts: string[]) => {
-        if (accounts.length > 0) {
-          activate(injected, noop, true).catch((error) => {
-            console.error("Failed to activate after accounts changed", error);
-          });
-        }
-      };
-
-      ethereum.on("chainChanged", handleChainChanged);
-      ethereum.on("accountsChanged", handleAccountsChanged);
-
-      return () => {
-        if (ethereum.removeListener) {
-          ethereum.removeListener("chainChanged", handleChainChanged);
-          ethereum.removeListener("accountsChanged", handleAccountsChanged);
-        }
-      };
+        )
+      }
     }
-  }, [active, error, suppress, activate, dispatch]);
+    // if (!active && !error && !suppress) {}
+  }, [chainId, prevChainId, active, account, storeAccount, dispatch, prevActive, activate, connector])
 }
 
 export function useEagerConnect() {
@@ -65,18 +59,16 @@ export function useEagerConnect() {
   const handlePostActivate = useCallback(async () => {
     if (connector) {
       const _provider = await connector.getProvider();
-      const provider = new ethers.providers.Web3Provider(_provider, 1);
+      const provider = new ethers.providers.Web3Provider(_provider, "any");
       const networkId = parseInt(await provider.send("net_version", []));
-
-      if (networkId) {
+      if (networkId !== undefined) {
         dispatch(
-          actions.initialize({
+          actions.setNetwork({
             provider,
             withSigner: true,
             selectedAddress: account ?? "",
           })
         );
-        dispatch(actions.changedNetwork(networkId))
       } else {
         dispatch(actions.userDisconnected());
       }
