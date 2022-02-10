@@ -3,6 +3,7 @@ import { RegisteredCall } from "helpers";
 import { constants } from "ethers";
 import { selectors } from "features";
 import { useCallRegistrar } from "./use-call-registrar";
+import { useChainId } from "./settings-hooks";
 import { useMemo } from "react";
 import { useSelector } from "react-redux";
 import type { AppState } from "features/store";
@@ -72,15 +73,17 @@ export function useBalanceAndApprovalRegistrar(
   spender: string,
   _tokens: string | string[]
 ) {
+  const chainId = useChainId();
+  const ndxAddress = NDX_ADDRESS[chainId];
   const userAddress = useUserAddress();
   const userDataCalls: RegisteredCall[] = useMemo(() => {
-    const tokens = Array.isArray(_tokens) ? _tokens : [_tokens];
+    const tokens = Array.isArray(_tokens) ? [..._tokens] : [_tokens];
+    if (ndxAddress) tokens.push(ndxAddress)
     return userAddress ? [
-      ...buildBalanceCalls(userAddress, [...tokens, NDX_ADDRESS]),
+      ...buildBalanceCalls(userAddress, tokens),
       ...buildAllowanceCalls(userAddress, spender, tokens)
     ] : []
-  }, [userAddress, spender, _tokens]);
-
+  }, [userAddress, spender, _tokens, ndxAddress]);
   useCallRegistrar({
     caller: USER_CALLER,
     onChainCalls: userDataCalls,
