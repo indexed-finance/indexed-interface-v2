@@ -1,5 +1,5 @@
 import { FEATURE_FLAGS } from "feature-flags";
-import { LOCALSTORAGE_KEY } from "config";
+import { LOCALSTORAGE_KEY, SUPPORTED_NETWORKS } from "config";
 import { RegisteredCall, debugConsole, deserializeOnChainCall } from "helpers";
 import { actions, disconnectFromProvider, provider } from "./thunks";
 import {
@@ -81,9 +81,8 @@ if (!process.env.IS_SERVER) {
 // #region Bad Network
 export function badNetworkMiddleware({ dispatch, getState }: any) {
   return (next: any) => (action: any) => {
-    const {
-      settings: { badNetwork },
-    } = getState();
+    const { settings: { network } } = getState();
+    const badNetwork = network === undefined || !SUPPORTED_NETWORKS.includes(network)
 
     if (
       action.type !== actions.userDisconnected.type &&
@@ -91,8 +90,8 @@ export function badNetworkMiddleware({ dispatch, getState }: any) {
       provider
     ) {
       provider.send("net_version", []).then((rawNetworkId) => {
-        if (parseInt(rawNetworkId) !== 1) {
-          dispatch(actions.connectedToBadNetwork());
+        if (parseInt(rawNetworkId) !== network) {
+          dispatch(actions.changedNetwork(parseInt(rawNetworkId)));
         }
       });
     }
@@ -118,6 +117,12 @@ function handleBlockNumberChange(newBlockNumber: number) {
       lastActiveOutdatedCalls = [];
       dispatch(actions.blockNumberChanged(newBlockNumber));
       debouncedHandleBatchUpdate();
+      if (provider) {
+        const chainId = provider.network.chainId;
+        provider.getGasPrice().then((gasPrice) => {
+          dispatch(actions.setGasPrice({ chainId, gasPrice: gasPrice.toNumber() }))
+        })
+      }
     }
   }
 }
