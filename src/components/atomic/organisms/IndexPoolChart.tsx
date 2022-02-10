@@ -2,7 +2,7 @@ import { AppState, Timeframe, requests, selectors } from "features";
 import { Card, Radio, RadioChangeEvent, Spin } from "antd";
 import { LineSeriesChart, Quote } from "components/atomic/molecules";
 import { convert } from "helpers";
-import { last } from "hooks";
+import { last, useFormattedIndexPool } from "hooks";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import noop from "lodash.noop";
@@ -24,17 +24,19 @@ export function IndexPoolChart({ poolId, expanded = false }: Props) {
     price: string;
   }>(null);
   const [netChange, netChangePercent] = useMemo(() => {
-    const firstValue = data[0].value;
-    const currentValue = last(data).value;
+    const _first = data[0];
+    const _last = last(data);
+    const haveData = _first && data.length > 1;
+    const [firstValue, currentValue] = haveData
+      ? [_first.value, _last.value]
+      : [0, 0];
     const delta = currentValue - firstValue;
     return [
       convert.toCurrency(delta, { signDisplay: "always" }),
       convert.toPercent(delta / firstValue, { signDisplay: "always" }),
     ];
   }, [data]);
-  const formattedPool = useSelector((state: AppState) =>
-    selectors.selectFormattedIndexPool(state, poolId)
-  );
+  const formattedPool = useFormattedIndexPool(poolId)
   const handleTimeframeChange = useCallback(
     (event: RadioChangeEvent) => setTimeframe(event.target.value),
     []
@@ -66,7 +68,7 @@ export function IndexPoolChart({ poolId, expanded = false }: Props) {
                 price={
                   historicalData ? historicalData.price : formattedPool.priceUsd
                 }
-                netChange={historicalData ? historicalData.when : netChange}
+                netChange={historicalData?.when ? historicalData.when : netChange}
                 netChangePercent={historicalData ? "" : netChangePercent}
                 inline={true}
                 textSize="large"
@@ -92,7 +94,7 @@ export function IndexPoolChart({ poolId, expanded = false }: Props) {
               </Radio.Group>
             </div>
           </div>
-          <div
+          {<div
             style={{ height: 260, overflow: "auto" }}
             onMouseOut={() => setHistoricalData(null)}
           >
@@ -104,7 +106,7 @@ export function IndexPoolChart({ poolId, expanded = false }: Props) {
                 onMoveCrosshair={setHistoricalData}
               />
             )}
-          </div>
+          </div>}
         </>
       ) : (
         <Spin />

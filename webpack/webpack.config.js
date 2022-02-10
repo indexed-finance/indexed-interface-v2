@@ -10,17 +10,12 @@ const envConfig = new DotEnv({
   safe: false
 })
 
-module.exports = {
+const commonConfig = {
   mode: process.env.NODE_ENV ?? 'development',
   node: {
     global: true,
   },
   target: "node",
-  entry: path.resolve(__dirname, "../src/sockets/server/start"),
-  output: {
-    path: path.resolve(__dirname, "server"),
-    filename: "server.js",
-  },
   resolve: {
     modules: [path.resolve(__dirname, "../src"), "node_modules"],
     extensions: [".js", ".json", ".ts", ".tsx", ".d.ts"],
@@ -57,3 +52,26 @@ module.exports = {
     ],
   },
 };
+
+const serverConfig = {
+  ...commonConfig,
+  entry: path.resolve(__dirname, "../src/sockets/server/start"),
+  output: {
+    path: path.resolve(__dirname, "server"),
+    filename: "server.js",
+  },
+};
+
+const stateConfig = {
+  ...commonConfig,
+  entry: path.resolve(__dirname, "../src/sockets/server/state-handling"),
+  output: {
+    path: path.resolve(__dirname, "server"),
+    filename: "server-state.js",
+  },
+};
+
+module.exports = [
+  serverConfig,
+  stateConfig
+]

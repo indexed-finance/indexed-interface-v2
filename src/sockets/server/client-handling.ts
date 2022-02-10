@@ -1,12 +1,12 @@
 import {
   CLIENT_STATISTICS_REPORTING_RATE,
+  SUPPORTED_NETWORKS,
   WEBSOCKET_SERVER_PING_RATE,
   WEBSOCKET_SERVER_PORT,
 } from "config";
 import { IncomingMessage } from "http";
 import { createServer } from "https";
-import { formatMirrorStateResponse, log } from "./helpers";
-import { store } from "features";
+import { formatMirrorStateResponse, getNetworkStates, log } from "./helpers";
 import WebSocket from "isomorphic-ws";
 import fs from "fs";
 
@@ -120,7 +120,7 @@ setInterval(sendUpdates, 5000);
 // #region Helpers
 function handleConnection(client: WebSocket, incoming: IncomingMessage) {
   const ip = incoming.headers.origin ?? "";
-
+  
   if (!ipToClientLookup[ip]) {
     log("A client has connected.", ip);
 
@@ -139,7 +139,8 @@ function handleConnection(client: WebSocket, incoming: IncomingMessage) {
 
     connections.push(client);
 
-    client.send(formatMirrorStateResponse(store.getState()));
+    const networkStates = getNetworkStates();
+    client.send(formatMirrorStateResponse(networkStates));
 
     clientStatistics.totalMirrorsSent++;
   }
@@ -156,22 +157,43 @@ function handleError(client: WebSocket) {
   clientStatistics.totalErrors++;
 }
 
-let lastBlockNumber = -1;
-function sendUpdates() {
-  const currentState = store.getState();
-  const currentBlockNumber = currentState.batcher.blockNumber;
+const lastBlockNumbers: Record<number, number> = {};
 
-  if (currentBlockNumber !== lastBlockNumber && connections.length > 0) {
+function initializeBlockNumbers() {
+  const networkStates = getNetworkStates()
+  for (const chainId of SUPPORTED_NETWORKS) {
+    const networkState = networkStates[chainId];
+    if (networkState) {
+      lastBlockNumbers[chainId] = networkState.batcher.blockNumber;
+    } else {
+      lastBlockNumbers[chainId] = -1;
+    }
+  }
+}
+
+initializeBlockNumbers()
+
+function sendUpdates() {
+  const networkStates = getNetworkStates();
+  let anyChanges = false;
+  for (const chainId of SUPPORTED_NETWORKS) {
+    const lastBlockNumber = lastBlockNumbers[chainId];
+    const currentBlockNumber = networkStates[chainId]?.batcher?.blockNumber ?? -1;
+    if (currentBlockNumber !== lastBlockNumber) {
+      anyChanges = true;
+      lastBlockNumbers[chainId] = currentBlockNumber;
+    }
+  }
+
+  if (anyChanges && connections.length > 0) {
     log(`Updating ${connections.length} clients.`);
 
     for (const client of connections) {
-      client.send(formatMirrorStateResponse(store.getState()));
+      client.send(formatMirrorStateResponse(networkStates));
     }
 
     clientStatistics.totalMirrorsSent++;
   }
-
-  lastBlockNumber = currentBlockNumber;
 }
 
 function continuouslyCheckForInactivity() {

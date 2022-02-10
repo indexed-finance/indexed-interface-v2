@@ -4,6 +4,7 @@ import {
   FaCaretDown,
   FaCaretUp,
   FaGavel,
+  FaNetworkWired,
   FaSwimmingPool,
 } from "react-icons/fa";
 import {
@@ -16,11 +17,14 @@ import {
 } from "components/atomic/molecules";
 import { Layout, Menu, Space } from "antd";
 import { Link } from "react-router-dom";
+import { ReactNode, useEffect, useState } from "react";
 import { RiSafe2Line } from "react-icons/ri";
 import { selectors } from "features";
 import { useBreakpoints, useTranslator } from "hooks";
-import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import EthIcon from "images/eth.png";
+import Icon from "@ant-design/icons";
+import MaticIcon from "images/matic.png";
 
 export function LayoutHeader() {
   const tx = useTranslator();
@@ -75,10 +79,28 @@ export function LayoutHeader() {
               withIcon={false}
             >
               <Space size="small">
-                <FaGavel style={{ position: "relative", top: 2 }} /> Vote
+                <FaGavel style={{ position: "relative", top: 2 }} /> Governance
               </Space>
             </ExternalLink>
           </Menu.Item>
+
+          <Menu.SubMenu
+            title={<span style={{ marginLeft: 10 }}>Network</span>}
+            icon={<FaNetworkWired style={{ position: "relative" }} />}
+            style={{
+              flex: 1,
+              background: "transparent",
+              display: "block",
+            }}
+            className="make_blocky"
+          >
+            <Menu.Item key="eth-network">
+              <Icon src={EthIcon} style={{ position: "relative", top: 2 }} />{" "} Ethereum
+            </Menu.Item>
+            <Menu.Item key="matic-network">
+              <Icon src={MaticIcon} style={{ position: "relative", top: 2, maxHeight: '20px' }} />{" "} Polygon
+            </Menu.Item>
+          </Menu.SubMenu>
 
           <Menu.Item key="mode">
             <ModeSwitch />

@@ -1,6 +1,7 @@
 import { Dropdown, Menu, notification } from "antd";
 import { ExternalLink } from "components/atomic/atoms";
 import { actions } from "features";
+import { explorerAddressLink } from "helpers";
 import { useBreakpoints, useTranslator } from "hooks";
 import { useCallback, useEffect, useRef } from "react";
 import { useDispatch } from "react-redux";
@@ -65,7 +66,7 @@ export function JazzIcon({ address, isWalletIcon = false }: Props) {
       overlay={
         <Menu>
           <Menu.Item>
-            <ExternalLink to={`https://etherscan.io/address/${address}`}>
+            <ExternalLink to={explorerAddressLink(address)}>
               {tx("VIEW_ON_ETHERSCAN")}
             </ExternalLink>
           </Menu.Item>
@@ -78,7 +79,7 @@ export function JazzIcon({ address, isWalletIcon = false }: Props) {
       {inner}
     </Dropdown>
   ) : (
-    <ExternalLink to={`https://etherscan.io/tx/${address}`} withIcon={false}>
+    <ExternalLink to={explorerAddressLink(address)} withIcon={false}>
       {inner}
     </ExternalLink>
   );

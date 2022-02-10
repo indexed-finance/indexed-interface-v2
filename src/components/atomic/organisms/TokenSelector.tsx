@@ -58,6 +58,7 @@ interface Props {
   isInput?: boolean;
   loading?: boolean;
   small?: boolean;
+  inputDisabled?: boolean;
 }
 
 const DEFAULT_ENTRY = {
@@ -80,6 +81,7 @@ export function TokenSelector({
   onChange,
   isInput,
   small = false,
+  inputDisabled,
 }: Props) {
   const tx = useTranslator();
   const { setTouched } = useFormikContext<any>();
@@ -262,7 +264,7 @@ export function TokenSelector({
               max={max}
               step="0.01"
               value={parseFloat(value.amount?.displayed || amount.displayed)}
-              disabled={onChange === undefined}
+              disabled={onChange === undefined || inputDisabled}
               onFocus={() => setTouched({ [amountField]: true })}
               onChange={onAmountChange}
               style={{
@@ -350,7 +352,7 @@ export function TokenSelector({
           <List>
             {assets.map((asset) => (
               <SelectableToken
-                key={asset.name}
+                key={asset.symbol}
                 asset={asset}
                 onClick={handleSelectToken}
               />

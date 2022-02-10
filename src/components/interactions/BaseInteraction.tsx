@@ -15,7 +15,10 @@ import { TokenSelector } from "components/atomic/organisms/TokenSelector"; // Ci
 import { selectors } from "features";
 import {
   useBreakpoints,
+  useCachedValue,
+  useDebounce,
   useMultiTokenMintCallbacks,
+  usePrevious,
   useTokenApproval,
   useTokenBalance,
   useTokenBalances,
@@ -23,6 +26,7 @@ import {
   useTranslator,
 } from "hooks";
 import { useSelector } from "react-redux";
+import isEqual from "lodash.isequal";
 import noop from "lodash.noop";
 
 const DEFAULT_ENTRY = {
@@ -43,8 +47,10 @@ interface Props {
   defaultOutputSymbol?: string;
   requiresApproval?: boolean;
   onSubmit(values: SingleInteractionValues): void;
-  onChange(values: SingleInteractionValues): void | string;
+  onChange(values: SingleInteractionValues): void | string | Promise<string | void>;
   loading?: boolean;
+  disableInputEntry?: boolean;
+  disableOutputEntry?: boolean;
 }
 
 // #endregion
@@ -83,6 +89,8 @@ export function SingleInteraction({
   disableOutputSelect,
   requiresApproval = true,
   loading,
+  disableInputEntry,
+  disableOutputEntry
 }: Props) {
   const interactionRef = useRef<null | HTMLDivElement>(null);
 
@@ -111,6 +119,8 @@ export function SingleInteraction({
             disableInputSelect={disableInputSelect}
             disableOutputSelect={disableOutputSelect}
             requiresApproval={requiresApproval}
+            disableInputEntry={disableInputEntry}
+            disableOutputEntry={disableOutputEntry}
           />
         )}
       </Formik>
@@ -139,7 +149,10 @@ function SingleInteractionInner({
   disableOutputSelect,
   requiresApproval,
   loading,
+  disableInputEntry,
+  disableOutputEntry,
 }: InnerSingleProps) {
+  const [calculating, setCalculating] = useState<"from" | "to" | null>(null)
   const tx = useTranslator();
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
   const { tokenId, symbol, approveAmount, rawApproveAmount } = useMemo(() => {
@@ -161,6 +174,15 @@ function SingleInteractionInner({
       rawApproveAmount: "0",
     };
   }, [values.fromAmount, values.fromToken, tokenLookup]);
+  const cachedValues = useCachedValue(values)
+  const [lastCalculatedInput, setLastCalculatedInput] = useState<SingleInteractionValues>(values)
+  const debouncedValues = useDebounce(cachedValues, 200);
+  useEffect(() => {
+    if (/* calculating === null && */ debouncedValues.fromToken && debouncedValues.toToken) {
+      console.log('debounce values')
+      setCalculating("from")
+    }
+  }, [debouncedValues, setCalculating, /* calculating */])
   // @todo Clean this up at some point.
   // Not doing the lookup by symbol in the hook because we already have it in scope
   const { status, approve } = useTokenApproval({
@@ -179,6 +201,40 @@ function SingleInteractionInner({
     [assets, values.fromToken]
   );
   const disableFlip = disableInputSelect || disableOutputSelect;
+
+  useEffect(() => {
+    if (calculating !== null && !isEqual(values, lastCalculatedInput)) {
+      console.log(`CALC HANDLING UPDATE`)
+      setLastCalculatedInput(values)
+      const newValues: SingleInteractionValues = { ...values, fromAmount: {...values.fromAmount}, toAmount: {...values.toAmount} }
+      Promise.resolve(onChange(newValues as SingleInteractionValues)).then(
+        (error) => {
+          if (error) {
+            console.log(`CALC GOT ERR`)
+            console.log(error)
+            const inputErr =
+              error.includes("Input") ||
+              (newValues.lastTouchedField === "from" && !error.includes("Output"));
+    
+            if (inputErr) {
+              setFieldError("fromAmount.displayed", error);
+            } else {
+              setFieldError("toAmount.displayed", error);
+            }
+          }
+          setCalculating(null)
+          if (!isEqual(newValues, values)) {
+            console.log(`CALC WRITING NEW VALUES`)
+            setValues(newValues);
+
+          } else {
+            console.log(`CALC values did not change, skipping update`)
+          }
+        }
+      )
+    }
+  }, [calculating, values, onChange, setValues, setFieldError, lastCalculatedInput, setLastCalculatedInput]);
+
   const handleFlip = useCallback(() => {
     if (!disableFlip) {
       const newValues = {
@@ -188,21 +244,10 @@ function SingleInteractionInner({
         toAmount: values.fromAmount,
         lastTouchedField: values.lastTouchedField,
       };
-      const error = onChange(newValues as SingleInteractionValues);
-      if (error) {
-        const inputErr =
-          error.includes("Input") ||
-          (newValues.lastTouchedField === "from" && !error.includes("Output"));
-
-        if (inputErr) {
-          setFieldError("fromAmount.displayed", error);
-        } else {
-          setFieldError("toAmount.displayed", error);
-        }
-      }
       setValues(newValues);
+      // setCalculating(values.lastTouchedField)
     }
-  }, [disableFlip, values, setValues, onChange, setFieldError]);
+  }, [disableFlip, values, setValues]);
 
   // Effect:
   // On initial load, select two arbitrary tokens.
@@ -228,6 +273,7 @@ function SingleInteractionInner({
       error?: string;
     }
   ) => {
+    if (calculating !== null) return
     const [tokenField, amountField] =
       field === "from" ? ["fromToken", "fromAmount"] : ["toToken", "toAmount"];
     const newValues = {
@@ -236,18 +282,11 @@ function SingleInteractionInner({
       [amountField]: amount || DEFAULT_ENTRY,
       lastTouchedField: field,
     } as SingleInteractionValues;
-    const calcError = onChange(newValues);
-
-    setValues(newValues, false);
-
+    console.log(`HANDLING CHANGE`)
+    setValues({...newValues})
+    // setCalculating(field === "to" ? "from" : "to")
     if (fieldError) {
       setFieldError(amountField, fieldError);
-    } else if (calcError) {
-      if (calcError.includes("Input")) {
-        setFieldError("fromAmount.displayed", calcError);
-      } else if (calcError.includes("Output")) {
-        setFieldError("toAmount.displayed", calcError);
-      }
     }
   };
 
@@ -264,7 +303,7 @@ function SingleInteractionInner({
     <Row gutter={24}>
       <Col xs={24} sm={10}>
         <TokenSelector
-          loading={loading}
+          loading={loading /* || calculating === "to" */}
           isInput
           autoFocus={true}
           label={tx("FROM")}
@@ -276,12 +315,13 @@ function SingleInteractionInner({
           selectable={!disableInputSelect}
           error={errors.fromAmount?.displayed}
           onChange={(newValues) => handleChange("from", newValues)}
+          inputDisabled={disableInputEntry /* || calculating === "to" */}
         />
 
         <Flipper disabled={disableFlip} onFlip={handleFlip} />
 
         <TokenSelector
-          loading={loading}
+          loading={loading /* || calculating === "from" */}
           label={tx("TO")}
           assets={outputOptions}
           value={{
@@ -290,6 +330,7 @@ function SingleInteractionInner({
           }}
           selectable={!disableOutputSelect}
           onChange={(newValues) => handleChange("to", newValues)}
+          inputDisabled={disableOutputEntry /* || calculating === "from" */}
         />
 
         <Divider />

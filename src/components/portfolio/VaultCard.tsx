@@ -11,9 +11,10 @@ import {
 
 interface Props {
   address: string;
+  link?: string;
 }
 
-export function VVaultCard({ address }: Props) {
+export function VVaultCard({ address, link }: Props) {
   const { isMobile } = useBreakpoints();
   const vault = useVault(address);
   const { wrappedBalance, usdValue } = useVaultUserBalance(address);
@@ -32,6 +33,7 @@ export function VVaultCard({ address }: Props) {
         symbol={symbol}
         removeTheN={true}
         name={name}
+        link={link}
         actions={[
           <List key="list">
             <List.Item>

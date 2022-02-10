@@ -1,12 +1,12 @@
 // import { Switch } from "antd";
 // import { actions, selectors } from "features";
 // import { useDispatch, useSelector } from "react-redux";
-// import { useTranslator } from "hooks";
+// import { useTranslator, useTheme } from "hooks";
 
 export function ModeSwitch() {
   // const tx = useTranslator();
   // const dispatch = useDispatch();
-  // const theme = useSelector(selectors.selectTheme);
+  // const theme = useTheme();
 
   return null;
 

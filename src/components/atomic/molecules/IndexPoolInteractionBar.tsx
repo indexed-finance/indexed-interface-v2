@@ -1,4 +1,3 @@
-import { AppState, FormattedIndexPool, selectors } from "features";
 import { BiCoin } from "react-icons/bi";
 import {
   BurnInteraction,
@@ -7,13 +6,12 @@ import {
 } from "components/interactions";
 import { Button, Menu, Space, Typography } from "antd";
 import { FaCoins, FaFireAlt } from "react-icons/fa";
+import { FormattedIndexPool } from "features";
 import { ReactNode, useCallback, useEffect, useMemo, useState } from "react";
-import { useSelector } from "react-redux";
+import { useFormattedIndexPool } from "hooks";
 
 export function useIndexPoolInteractions(indexPoolAddress: string) {
-  const formattedPool = useSelector((state: AppState) =>
-    selectors.selectFormattedIndexPool(state, indexPoolAddress)
-  );
+  const formattedPool = useFormattedIndexPool(indexPoolAddress)
   const slug = formattedPool?.slug ?? "";
 
   return useMemo(() => {
