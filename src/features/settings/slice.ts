@@ -1,5 +1,7 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { SupportedLanguageCode, createTranslator } from "helpers";
+import { changedNetwork } from "../actions"
+import { fetchInitialData } from "features/requests";
 import { userActions } from "../user";
 import type { AppState } from "features/store";
 
@@ -13,7 +15,13 @@ interface SettingsState {
     title: string;
     value: SupportedLanguageCode;
   }>;
-  network: number | undefined
+  network: number;
+  initializedNetworks: {
+    [chainId: number]: number;
+  };
+  gasPrices: {
+    [chainId: number]: number;
+  }
 }
 
 const settingsInitialState: SettingsState = {
@@ -35,6 +43,8 @@ const settingsInitialState: SettingsState = {
     },
   ],
   network: 1,
+  initializedNetworks: {},
+  gasPrices: {}
 };
 
 const slice = createSlice({
@@ -67,13 +77,20 @@ const slice = createSlice({
     connectionLost: (state) => {
       state.connected = false;
     },
-    changedNetwork: (state, action: PayloadAction<number>) => {
-      state.network = action.payload
-    },
+    setGasPrice: (state, action: PayloadAction<{chainId: number; gasPrice: number;}>) => {
+      const {chainId, gasPrice} = action.payload;
+      if (!state.gasPrices) state.gasPrices = {};
+      state.gasPrices[chainId] = gasPrice;
+    }
   },
   extraReducers: (builder) =>
-    builder.addCase(userActions.userDisconnected.type, (state) => {
-      state.network = undefined;
+    builder
+    .addCase(changedNetwork, (state, action) =>  {
+      state.network = action.payload
+    })
+    .addCase(fetchInitialData.fulfilled, (state, action) => {
+      const chainId = action.payload?.chainId;
+      if (chainId) state.initializedNetworks[chainId] = +new Date();
     }),
 });
 
@@ -107,6 +124,9 @@ export const settingsSelectors = {
     return settingsSelectors.selectSettings(state).supportedLanguages;
   },
   selectNetwork(state: AppState) {
-    return settingsSelectors.selectSettings(state).network;
+    return state.settings.network;
   },
+  selectGasPrice(state: AppState, chainId: number) {
+    return state.settings.gasPrices[chainId];
+  }
 };
