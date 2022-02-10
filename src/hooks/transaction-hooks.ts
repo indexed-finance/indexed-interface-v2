@@ -238,7 +238,7 @@ export function useRoutedMintTransactionCallbacks(indexPool: string) {
     [contract, indexPool, poolSymbol, addTransaction]
   );
 
-  const mintExactAmountOut = useCallback(
+  const mintSingleExactAmountOut = useCallback(
     (
       maxAmountIn: BigNumber,
       path: string[],
@@ -271,7 +271,53 @@ export function useRoutedMintTransactionCallbacks(indexPool: string) {
     [contract, indexPool, poolSymbol, addTransaction]
   );
 
-  return { mintExactAmountIn, mintExactAmountOut };
+  const mintMultiExactAmountOut = useCallback(
+    (
+      intermediaries: string[],
+      poolAmountOut: BigNumber,
+      tokenIn: string,
+      amountInMax: BigNumber,
+      ethInput: boolean
+    ) => {
+      if (!contract) throw new Error();
+      let tx: Promise<ContractTransaction>;
+      if (ethInput) {
+        tx = contract.swapETHForAllTokensAndMintExact(
+          indexPool,
+          intermediaries,
+          convert.toHex(poolAmountOut),
+          { value: convert.toHex(amountInMax) }
+        ) 
+      } else {
+        console.log({
+          indexPool,
+          intermediaries,
+          poolAmountOut: convert.toHex(poolAmountOut),
+          tokenIn,
+          amountInMax: convert.toHex(amountInMax)
+        });
+        tx = contract.swapTokensForAllTokensAndMintExact(
+          indexPool,
+          intermediaries,
+          convert.toHex(poolAmountOut),
+          tokenIn,
+          convert.toHex(amountInMax)
+        )
+      }
+/*       const tx = fn === 'swapETHForAllTokensAndMintExact'
+        // eslint-disable-next-line prefer-spread
+        ? contract.swapETHForAllTokensAndMintExact.apply(contract, args as Parameters<IndexedNarwhalRouter['swapETHForAllTokensAndMintExact']>)
+        // eslint-disable-next-line prefer-spread
+        : contract.swapTokensForAllTokensAndMintExact.apply(contract, args as Parameters<IndexedNarwhalRouter['swapTokensForAllTokensAndMintExact']>)
+ */
+      const displayAmount = convert.toBalance(poolAmountOut, 18, true, 3);
+      const summary = `Mint ${displayAmount} ${poolSymbol}`;
+      addTransaction(tx, { summary });
+    },
+    [contract, poolSymbol, addTransaction, indexPool]
+  )
+
+  return { mintExactAmountIn, mintSingleExactAmountOut, mintMultiExactAmountOut };
 }
 
 interface RoutedBurnTransactionCallbacks {
