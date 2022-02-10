@@ -11,6 +11,7 @@ import {
   useTokenBalance,
   useTokenBalances,
 } from "./user-hooks";
+import { useCachedValue } from "./use-debounce";
 import { useCallRegistrar } from "./use-call-registrar";
 import { useMemo } from "react";
 import { useSelector } from "react-redux";
@@ -19,6 +20,11 @@ import { useTokenPrices, useTokenPricesLessStrict } from "./token-hooks";
 export interface FormattedVault extends NormalizedVault {
   underlyingPrice?: number;
   usdValue?: string;
+}
+
+export function useVaultsCount(): number {
+  const vaults = useSelector(selectors.selectAllVaults);
+  return vaults.length;
 }
 
 export function useAllVaults(): FormattedVault[] {
@@ -75,7 +81,9 @@ export function useVault(id: string): FormattedVault | null {
   const vault = useSelector((state: AppState) =>
     selectors.selectVault(state, id)
   );
-  const [prices, loading] = useTokenPrices(vault ? [vault.underlying.id] : []);
+  const tokenIds = useMemo(() => vault ? [vault.underlying.id] : [], [vault]);
+  const cachedIds = useCachedValue(tokenIds)
+  const [prices, loading] = useTokenPrices(cachedIds);
 
   return useMemo(() => {
     if (loading || !vault) return vault;
