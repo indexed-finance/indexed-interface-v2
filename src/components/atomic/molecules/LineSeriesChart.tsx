@@ -116,7 +116,9 @@ export function LineSeriesChart({
       series.setData(data as any);
       if (chart) {
         const timestamps = data.map(d => d.time);
-        chart.timeScale().setVisibleRange({ from: Math.min(...timestamps), to: Math.max(...timestamps) } as any)
+        if (timestamps.length) {
+          chart.timeScale().setVisibleRange({ from: Math.min(...timestamps), to: Math.max(...timestamps) } as any)
+        }
       }
     }
   }, [data, chart, series]);
