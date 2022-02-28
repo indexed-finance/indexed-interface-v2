@@ -1,6 +1,5 @@
 import * as timelocksRequests from "./timelocks/requests";
 import * as topLevelActions from "./actions";
-import { NETWORKS_BY_ID } from "config";
 import { RegisteredCall, abbreviateAddress } from "helpers";
 import { TransactionExtra, transactionsActions } from "./transactions";
 import { TransactionResponse } from "@ethersproject/abstract-provider";

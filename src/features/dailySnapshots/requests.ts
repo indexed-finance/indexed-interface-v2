@@ -1,5 +1,5 @@
 import { IndexedCoreSubgraphClient } from "@indexed-finance/subgraph-clients";
-import { NETWORKS_BY_ID } from "config";
+import { NETWORKS_BY_ID } from "../../config";
 import { Timeframe } from "./selectors";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 

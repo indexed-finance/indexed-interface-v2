@@ -6,7 +6,7 @@ import * as newStakingRequests from "./newStaking/requests";
 import * as stakingRequests from "./staking/requests";
 import * as timelocksRequests from "./timelocks/requests";
 import * as tokensRequests from "./tokens/requests";
-import { COMMON_BASE_TOKENS, NDX_ADDRESS, NETWORKS_BY_ID } from "config";
+import { COMMON_BASE_TOKENS, NDX_ADDRESS, NETWORKS_BY_ID } from "../config";
 import { MIN_WEIGHT } from "ethereum";
 import { NirnSubgraphClient } from "@indexed-finance/subgraph-clients";
 import { VaultData } from "@indexed-finance/subgraph-clients/dist/nirn/types";

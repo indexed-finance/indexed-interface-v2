@@ -1,6 +1,6 @@
 import { Alert, Button, Typography, notification } from "antd";
 import { BaseDrawer, useDrawer } from "./Drawer";
-import { NETWORKS_BY_ID } from "config";
+import { NETWORKS_BY_ID } from "../../config/network";
 import { actions } from "features";
 import { useBreakpoints, useTranslator } from "hooks";
 import { useCallback } from "react";

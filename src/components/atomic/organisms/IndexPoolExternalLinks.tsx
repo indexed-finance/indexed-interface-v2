@@ -1,8 +1,9 @@
-import { BRIDGED_POLYGON_ADDRESSES, NETWORKS_BY_ID } from "config";
+import { BRIDGED_POLYGON_ADDRESSES } from "config/base-tokens"
 import { Button, Card, Space } from "antd";
 import { ExternalLink } from "components/atomic/atoms";
 import { FormattedIndexPool } from "features";
 import { Fragment, useMemo } from "react";
+import { NETWORKS_BY_ID } from "../../../config/network";
 import { exchangeAddLiquidityLink, exchangeSwapLink, explorerAddressLink, uniswapInfoTokenLink } from "helpers";
 import { getPoolQuickswapLink, useChainId } from "hooks";
 

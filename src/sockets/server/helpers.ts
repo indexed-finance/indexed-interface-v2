@@ -1,4 +1,4 @@
-import { ALCHEMY_API_KEY, INFURA_ID, NETWORKS_BY_ID, SUPPORTED_NETWORKS } from "config";
+import { ALCHEMY_API_KEY, INFURA_ID, NETWORKS_BY_ID, SUPPORTED_NETWORKS } from "../../config";
 import { AppState, Provider } from "features";
 import { providers } from "ethers";
 import fs from 'fs'

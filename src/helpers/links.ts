@@ -1,5 +1,5 @@
 import { ChainId } from "@indexed-finance/narwhal-sdk";
-import { NETWORKS_BY_ID } from "config";
+import { NETWORKS_BY_ID } from "../config";
 
 const SUSHISWAP_INFO_URL: Record<number, string> = {
   [ChainId.MAINNET]: 'https://analytics.sushi.com',

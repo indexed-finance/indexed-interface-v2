@@ -13,7 +13,7 @@ import {
 import { BrowserRouter, Route, useLocation } from "react-router-dom";
 import { FEATURE_FLAGS } from "feature-flags";
 import { Layout, message, notification } from "antd";
-import { NETWORKS_BY_ID } from "config";
+import { NETWORKS_BY_ID } from "./config/network";
 import { Provider } from "react-redux";
 import { Suspense, useEffect, useMemo, useRef } from "react";
 import { Web3ReactProvider } from "@web3-react/core";

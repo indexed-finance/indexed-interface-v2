@@ -1,5 +1,4 @@
-import * as config from "config";
-import { NETWORKS_BY_ID } from "config";
+import { NETWORKS_BY_ID, OLD_STAKING_SUBGRAPH_URL } from "../config";
 import { SUBGRAPH_URLS } from "@indexed-finance/subgraph-clients/dist/constants"
 import axios from "axios";
 
@@ -9,11 +8,7 @@ export function getIndexedUrl(chainId: number) {
 }
 
 export function getOldStakeURL(chainId: number) {
-  if (chainId === 1) {
-    return config.OLD_STAKING_SUBGRAPH_URL;
-  } else {
-    return config.OLD_STAKING_SUBGRAPH_URL;
-  }
+  return OLD_STAKING_SUBGRAPH_URL;
 }
 
 export function getUniswapUrl(chainId: number) {

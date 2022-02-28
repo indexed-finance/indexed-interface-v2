@@ -1,5 +1,5 @@
 import { AppState, actions, selectors } from "features";
-import { NETWORKS_BY_ID } from "config";
+import { NETWORKS_BY_ID } from "../config";
 import { providers } from "ethers";
 import { useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
