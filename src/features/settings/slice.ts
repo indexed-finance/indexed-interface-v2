@@ -124,7 +124,9 @@ export const settingsSelectors = {
     return settingsSelectors.selectSettings(state).supportedLanguages;
   },
   selectNetwork(state: AppState) {
-    return state.settings.network;
+    const chainId = state.settings.network;
+    if (chainId === undefined) return 1;
+    return chainId;
   },
   selectGasPrice(state: AppState, chainId: number) {
     return state.settings.gasPrices[chainId];
