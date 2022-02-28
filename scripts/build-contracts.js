@@ -104,36 +104,31 @@ fs.writeFileSync(contractPath, ContractFile);
 const ContractNameOverrides = {
   IPool: 'IndexPool',
   IERC20: 'Token',
-  IndexedUniswapRouterBurner: 'BurnRouter',
-  IndexedUniswapRouterMinter: 'MintRouter',
   UniswapV2Router: 'UniswapRouter',
-  ERC20DividendsOwned: 'DNDX'
+  ERC20DividendsOwned: 'DNDX',
+  SharesTimeLock: 'Timelock'
 };
 
 const SingletonContracts = {
-  MultiTokenStaking: 'MULTI_TOKEN_STAKING_ADDRESS',
-  IndexedUniswapRouterMinter: 'MINT_ROUTER_ADDRESS',
-  IndexedUniswapRouterBurner: 'BURN_ROUTER_ADDRESS',
-  UniswapV2Router: 'UNISWAP_ROUTER_ADDRESS',
   MultiCall2: 'MULTICALL2_ADDRESS',
+};
+
+const NetworkDependentContracts = {
+  MultiTokenStaking: 'MULTI_TOKEN_STAKING_ADDRESS',
+  UniswapV2Router: 'UNISWAP_ROUTER_ADDRESS',
   IndexedNarwhalRouter: 'NARWHAL_ROUTER_ADDRESS',
   MasterChef: 'MASTER_CHEF_ADDRESS',
   AdapterRegistry: 'ADAPTER_REGISTRY_ADDRESS',
   ERC20DividendsOwned: 'DNDX_ADDRESS',
-  SharesTimeLock: 'DNDX_TIMELOCK_ADDRESS'
-};
-
-const ConstantsImports = [
-  `import {`,
-  ...Object.values(SingletonContracts).sort().map(c => `\t${c},`),
-  `} from "config";`
-].join('\n');
+  SharesTimeLock: 'DNDX_TIMELOCK_ADDRESS',
+}
 
 const ContractsImports = `import { ContractTypeLookup, InterfaceKind, getContract } from "ethereum";`;
+const ChainIdImport = `import { useChainId } from "hooks";`;
 const SignerImport = `import { useSigner } from "features";`;
 
 const UseContractBaseHook =
-`export function useContractWithSigner<T extends InterfaceKind>(address: string, name: T): ContractTypeLookup[T] | undefined {
+`export function useContractWithSigner<T extends InterfaceKind>(address: string | undefined, name: T): ContractTypeLookup[T] | undefined {
   const signer = useSigner();
   if (signer && address) {
     return getContract(address, name, signer);
@@ -142,21 +137,39 @@ const UseContractBaseHook =
 
 const ContractHooks = contractNames.map((name) => {
   const displayName = ContractNameOverrides[name] ?? name;
+  const addressName = NetworkDependentContracts[name];
   const address = SingletonContracts[name];
-  return [
+  const useAddressParam = !(address || addressName);
+  const arr = [
     [
       `export function use${displayName}Contract(`,
-      (address ? '' : `address: string`),
+      (useAddressParam ? `address: string` : ''),
       `) {`
     ].join(''),
-    `\treturn useContractWithSigner(${address ? address : `address`}, "${name}");`,
-    '}'
-  ].join('\n');
+  ];
+  if (addressName) {
+    arr.push(`\tconst chainId = useChainId();`, `\tconst address = ${addressName}[chainId];`);
+  } else if (address) {
+    arr.push(`\tconst address = ${address};`)
+  }
+  arr.push(`\treturn useContractWithSigner(address, "${name}");`);
+  arr.push('}')
+  return arr.join('\n');
 }).join('\n\n');
+
+const ConstantsImports = [
+  `import {`,
+  ...[
+    ...Object.values(SingletonContracts),
+    ...Object.values(NetworkDependentContracts)
+  ].sort().map(c => `\t${c},`),
+  `} from "config";`
+].join('\n');
 
 const ContractHooksFile = [
   ConstantsImports,
   ContractsImports,
+  ChainIdImport,
   SignerImport,
   UseContractBaseHook,
   ContractHooks
@@ -165,3 +178,55 @@ const ContractHooksFile = [
 const contractHooksPath = path.join(srcDir, 'hooks', 'contract-hooks.ts')
 fs.writeFileSync(contractHooksPath, ContractHooksFile);
 //#endregion
+
+/* const tokens = [
+  'NDX_ADDRESS',
+  'WETH_ADDRESS',
+  'SUSHI_ADDRESS',
+  'DAI_ADDRESS',
+  'USDC_ADDRESS',
+  'DNDX_ADDRESS',
+]; */
+
+const NameLookup = Object.entries({
+  ...SingletonContracts,
+  ...NetworkDependentContracts
+}).reduce((prev, [name, addressVar]) => ({
+  ...prev,
+  [addressVar]: name
+}), {
+  NDX_ADDRESS: 'Ndx',
+  WETH_ADDRESS: 'Weth',
+  SUSHI_ADDRESS: 'Sushi',
+  DAI_ADDRESS: 'Dai',
+  USDC_ADDRESS: 'Usdc',
+  DNDX_ADDRESS: 'Dndx',
+})
+
+const AddressVars = Object.keys(NameLookup);
+
+const AddressImports = [
+  `import {`,
+  ...AddressVars.sort().map(t => `\t${t},`),
+  `} from "config";`
+].join('\n');
+
+const AddressFns = AddressVars.map((addressVar) => {
+  const name = NameLookup[addressVar];
+  
+  return [
+    `export function use${name}Address() {`,
+    `\tconst chainId = useChainId();`,
+    `\treturn useMemo(() => ${addressVar}[chainId]?.toLowerCase(), [chainId]);`,
+    `}`
+  ].join('\n');
+}).join('\n\n');
+
+const AddressHooksFile = [
+  AddressImports,
+  ChainIdImport,
+  AddressFns
+].join('\n\n');
+
+const AddressHooksPath = path.join(srcDir, 'hooks', 'address-hooks.ts')
+fs.writeFileSync(AddressHooksPath, AddressHooksFile);

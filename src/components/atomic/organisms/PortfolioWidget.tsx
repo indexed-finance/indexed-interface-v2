@@ -51,7 +51,7 @@ export function PortfolioWidget(props: FormattedPortfolioAsset) {
       isSushiswapPair={props.isSushiswapPair}
     >
       <Card
-        hoverable={true}
+        // hoverable={true}
         title={<Token size="medium" symbol={props.symbol} name={props.name} />}
         actions={actions}
         extra={

@@ -1,6 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { ethers } from "ethers";
-import { getIndexedUrl, sendQuery } from "helpers";
+import { getIndexedUrl, getOldStakeURL, sendQuery } from "helpers";
 import type { NdxStakingPool } from "indexed-types";
 import type { NormalizedStakingPool } from "../staking";
 
@@ -60,7 +60,7 @@ export const fetchStakingData = createAsyncThunk(
       | ethers.providers.InfuraProvider;
   }) => {
     const { chainId } = provider.network;
-    const url = getIndexedUrl(chainId);
+    const url = getOldStakeURL(chainId);
 
     try {
       const staking = await queryStaking(url);

@@ -1,4 +1,5 @@
-import { INFURA_ID, MASTER_CHEF_ADDRESS } from "config";
+import { AppState, VAULTS_CALLER, actions, fetchVaultsData, selectors, store } from "features";
+import { MASTER_CHEF_ADDRESS, NETWORKS } from "config";
 import {
   TOKEN_PRICES_CALLER,
   buildUniswapPairs,
@@ -8,18 +9,29 @@ import {
   createTotalSuppliesCalls,
   createVaultCalls,
 } from "hooks";
-import { VAULTS_CALLER, actions, fetchVaultsData, selectors, store } from "features";
 import { createMasterChefCalls } from "hooks/masterchef-hooks";
 import { createNewStakingCalls } from "hooks/new-staking-hooks";
-import { log } from "./helpers";
+import { getProvider, log, readState, writeState } from "./helpers";
 import { masterChefCaller } from "features/masterChef";
-import { providers } from "ethers";
 import type { RegisteredCall, RegisteredCaller } from "helpers";
 import type { Unsubscribe } from "redux";
 
 // The same provider is used for the lifetime of the server.
 const { dispatch, getState, subscribe } = store;
-const provider = new providers.InfuraProvider("mainnet", INFURA_ID);
+const network = process.argv[2];
+const chainId = NETWORKS[network].id;
+const provider = getProvider(network);
+
+const getLastBlockNumber = () => {
+  const lastStateJson = readState(network);
+  if (lastStateJson) {
+    const lastState = JSON.parse(lastStateJson) as AppState;
+    return lastState.batcher.blockNumber;
+  }
+  return -1;
+}
+
+let lastBlockNumber = getLastBlockNumber();
 
 const poolsRegistered: Record<string, boolean> = {};
 const tokensRegistered: Record<string, boolean> = {};
@@ -28,6 +40,7 @@ const stakingPoolsRegistered: Record<string, boolean> = {};
 const vaultsRegistered: Record<string, string> = {}
 
 const NEW_SUBSCRIBER_DELAY_SECONDS = 15;
+const WRITE_STATE_INTERVAL = 5000;
 
 let subbed = false;
 let unsubscribe: Unsubscribe;
@@ -63,6 +76,19 @@ setInterval(() => {
   }
 }, NEW_SUBSCRIBER_DELAY_SECONDS * 1000);
 
+setInterval(() => {
+  const state = getState();
+  const stateInitialized = subbed && state.indexPools.ids.length > 0;
+  // Don't write to state if not fully initialized or unchanged
+  if (stateInitialized) {
+    if (lastBlockNumber !== state.batcher.blockNumber) {
+      console.log(`Writing ${network} state to storage...`);
+      writeState(network, JSON.stringify(state));
+      lastBlockNumber = state.batcher.blockNumber;
+    }
+  }
+}, WRITE_STATE_INTERVAL);
+
 /**
  * After creating the connection, allow it to update before initializing the store.
  */
@@ -74,7 +100,7 @@ export async function setupStateHandling() {
   log("Provider ready. Initializing.");
 
   dispatch(
-    actions.initialize({
+    actions.setNetwork({
       provider,
       withSigner: false,
     })
@@ -97,6 +123,7 @@ function registerNewVaults() {
     return prev;
   }, {
     vaultCalls: {
+      chainId,
       caller,
       onChainCalls: [] as RegisteredCall[],
       offChainCalls: [] as RegisteredCall[],
@@ -109,7 +136,8 @@ const BLOCKS_PER_DAY = 86400 / 13.5;
 
 function registerNewTokensAndPairs() {
   const state = getState();
-  const allTokens = selectors.selectAllTokens(state);
+  const chainId = selectors.selectNetwork(state)
+  const allTokens = selectors.selectAllTokens(state).filter(t => t.chainId === chainId);
   const allPairIds = Object.keys(state.pairs.entities).map((id) =>
     id.toLowerCase()
   );
@@ -122,18 +150,20 @@ function registerNewTokensAndPairs() {
         !allPairIds.includes(tokenId.toLowerCase())
     );
 
-  const pairs = buildUniswapPairs(allTokenIds).filter(
+  const pairs = buildUniswapPairs(allTokenIds, chainId).filter(
     (pair) => !pairsRegistered[pair.id.toLowerCase()]
   );
 
-  dispatch(actions.uniswapPairsRegistered(pairs));
+  if (chainId !== undefined) dispatch(actions.uniswapPairsRegistered({ pairs, chainId }));
   const pairDataCalls = {
     caller: "Pair Data",
+    chainId,
     onChainCalls: createPairDataCalls(pairs),
     offChainCalls: [],
   };
   const tokenPriceCalls = {
     caller: TOKEN_PRICES_CALLER,
+    chainId,
     onChainCalls: [],
     offChainCalls: [
       {
@@ -153,6 +183,7 @@ function registerNewTokensAndPairs() {
 
   const totalSuppliesCalls = {
     caller: "Total Supplies",
+    chainId,
     onChainCalls: createTotalSuppliesCalls(
       pairs.map((pair) => pair.id.toLowerCase())
     ),
@@ -182,6 +213,7 @@ function registerNewPools() {
     {
       poolDetailCalls: {
         caller: "Pool Data",
+        chainId,
         onChainCalls: [],
         offChainCalls: [],
       },
@@ -205,6 +237,8 @@ function registerNewStakingPools() {
     .filter((pool) => !stakingPoolsRegistered[`MC-${pool.id}`.toLowerCase()]);
   const newStakingMeta = selectors.selectNewStakingMeta(state);
   const calls: RegisteredCaller[] = [];
+  const chainId = state.settings.network;
+  const masterChefAddress = MASTER_CHEF_ADDRESS[chainId]
   if (newStakingPools.length > 0) {
     const fromBlock = newStakingPools.sort(
       (a, b) => b.lastRewardBlock - a.lastRewardBlock
@@ -223,6 +257,7 @@ function registerNewStakingPools() {
       },
       {
         caller: "NewStaking",
+        chainId,
         onChainCalls: [
           {
             target: newStakingMeta.rewardsSchedule,
@@ -255,6 +290,7 @@ function registerNewStakingPools() {
       },
       {
         caller: "Staking",
+        chainId,
         onChainCalls: [],
         offChainCalls: [],
       } as RegisteredCaller
@@ -264,19 +300,20 @@ function registerNewStakingPools() {
     });
     calls.push(stakingCalls);
   }
-  if (masterChefPairs.length > 0) {
+  if (masterChefPairs.length > 0 && masterChefAddress) {
     const mcCalls = masterChefPairs.reduce(
       (prev, next) => {
-        const poolCalls = createMasterChefCalls(next.id, next.token);
+        const poolCalls = createMasterChefCalls(chainId, next.id, next.token);
         prev.onChainCalls.push(...poolCalls);
         return prev;
       },
       {
         caller: masterChefCaller,
+        chainId,
         onChainCalls: [
           {
             interfaceKind: "MasterChef",
-            target: MASTER_CHEF_ADDRESS,
+            target: masterChefAddress,
             function: "totalAllocPoint",
           },
         ],
@@ -290,3 +327,11 @@ function registerNewStakingPools() {
   }
   return calls;
 }
+
+setupStateHandling();
+
+process.on('SIGTERM', () => {
+  console.info('SIGTERM signal received.');
+  console.log(`Killing ${network} state updater...`);
+  process.exit(0)
+})

@@ -16,6 +16,8 @@ import {
   useBalanceAndApprovalRegistrar,
   useBalancesRegistrar,
   useBurnRouterCallbacks,
+  useChainId,
+  useDisplayedCommonBaseTokens,
   useMultiTokenBurnCallbacks,
   useSingleTokenBurnCallbacks,
 } from "hooks";
@@ -184,20 +186,23 @@ function MultiTokenBurnInteraction({ indexPool }: Props) {
 }
 
 function UniswapBurnInteraction({ indexPool }: Props) {
+  const chainId = useChainId();
   const poolId = indexPool.id;
+  const narwhalRouter = NARWHAL_ROUTER_ADDRESS[chainId];
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
   const {
     getBestBurnRouteForAmountIn,
     getBestBurnRouteForAmountOut,
     executeRoutedBurn,
   } = useBurnRouterCallbacks(poolId);
+  const baseTokens = useDisplayedCommonBaseTokens()
 
   const assets = [
-    ...DISPLAYED_COMMON_BASE_TOKENS,
+    ...baseTokens,
     { id: indexPool.id, name: indexPool.name, symbol: indexPool.symbol },
   ];
 
-  useBalanceAndApprovalRegistrar(NARWHAL_ROUTER_ADDRESS.toLowerCase(), [
+  useBalanceAndApprovalRegistrar(narwhalRouter.toLowerCase(), [
     poolId,
   ]);
 
@@ -305,7 +310,7 @@ function UniswapBurnInteraction({ indexPool }: Props) {
           id: string;
         }[]
       }
-      spender={NARWHAL_ROUTER_ADDRESS.toLowerCase()}
+      spender={narwhalRouter.toLowerCase()}
       onSubmit={handleSubmit}
       onChange={handleChange}
       defaultInputSymbol={indexPool.symbol}

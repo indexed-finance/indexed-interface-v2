@@ -1,6 +1,7 @@
 import { ETH_BALANCE_GETTER, NDX_ADDRESS } from "config";
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import { constants } from "ethers"; // Circular dependency.
+import { changedNetwork } from "features/actions"; // Circular dependency.
+import { constants } from "ethers";
 import { convert, createMulticallDataParser } from "helpers";
 import { fetchMulticallData } from "../batcher/requests";
 import { stakingMulticallDataParser } from "../staking";
@@ -73,6 +74,9 @@ const slice = createSlice({
           state.allowances[`user${spender}-user${tokenAddress}`.toLowerCase()] =
             amount;
         }
+      })
+      .addCase(changedNetwork, (state, action) => {
+        delete state.balances[constants.AddressZero]
       }),
 });
 
@@ -193,7 +197,7 @@ const userMulticallDataParser = createMulticallDataParser("User", (calls) => {
 
         prev.balances[tokenAddress] = value;
 
-        if (tokenAddress === NDX_ADDRESS.toLowerCase()) {
+        if (tokenAddress === NDX_ADDRESS[1].toLowerCase()) {
           prev.ndx = value;
         }
       }

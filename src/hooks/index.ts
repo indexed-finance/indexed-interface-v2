@@ -25,5 +25,6 @@ export * from './use-query';
 export * from './use-scroll-prevention';
 export * from './use-storage-entry';
 export * from './use-wallet-connection';
+export * from './settings-hooks';
 export * from './user-hooks';
 export * from './vault-hooks';

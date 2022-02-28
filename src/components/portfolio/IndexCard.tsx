@@ -18,6 +18,7 @@ interface Props {
   staking?: string;
   earnedAmount?: string;
   earnedSymbol: string;
+  link?: string;
 }
 
 export function IndexCard({
@@ -35,6 +36,7 @@ export function IndexCard({
   staking = "0.00",
   earnedAmount = "0.00",
   earnedSymbol,
+  link,
 }: Props) {
   const tokenIds = usePoolTokenIds(address);
   const actualSymbol = ["UNIV2:", "SUSHI:"].some((prefix) =>
@@ -56,6 +58,8 @@ export function IndexCard({
       stakingUsdValue={stakingUsdValue}
       symbol={actualSymbol}
       name={name}
+      link={link}
+      showStaking={hasStakingPool || earnedAmount !== "0.00"}
       actions={
         hasStakingPool
           ? [

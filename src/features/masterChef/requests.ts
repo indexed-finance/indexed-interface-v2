@@ -16,7 +16,7 @@ export const fetchMasterChefData = createAsyncThunk(
 
     const name = chainId === 1 ? "mainnet" : "rinkeby";
     const client = MasterChefSubgraphClient.forNetwork(name);
-
+    if (!client) return null;
     try {
       const data = await client.getStakingInfo();
       const { pools, ...meta } = data;

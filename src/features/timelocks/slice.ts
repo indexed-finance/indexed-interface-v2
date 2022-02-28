@@ -66,7 +66,7 @@ const slice = createSlice({
         }
       })
       .addCase(requests.fetchUserTimelocks.fulfilled, (state, action) => {
-        adapter.upsertMany(state, action.payload);
+        if (action.payload) adapter.upsertMany(state, action.payload);
       }),
 });
 
@@ -94,10 +94,10 @@ const timelocksMulticallDataParser = createMulticallDataParser(
   (calls) => {
     // const [locksCall, dndxCalls] = calls;
     const locksCall = calls.find(
-      (call) => call[0].toLowerCase() === DNDX_TIMELOCK_ADDRESS.toLowerCase()
+      (call) => call[0].toLowerCase() === DNDX_TIMELOCK_ADDRESS[1].toLowerCase()
     );
     const dndxCalls = calls.find(
-      (call) => call[0].toLowerCase() === DNDX_ADDRESS.toLowerCase()
+      (call) => call[0].toLowerCase() === DNDX_ADDRESS[1].toLowerCase()
     );
 
     // console.log(`GOT TIMELOCK RESULTS`)

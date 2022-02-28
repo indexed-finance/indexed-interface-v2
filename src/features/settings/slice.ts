@@ -1,5 +1,7 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { SupportedLanguageCode, createTranslator } from "helpers";
+import { changedNetwork } from "../actions"
+import { fetchInitialData } from "features/requests";
 import { userActions } from "../user";
 import type { AppState } from "features/store";
 
@@ -13,7 +15,13 @@ interface SettingsState {
     title: string;
     value: SupportedLanguageCode;
   }>;
-  badNetwork: boolean;
+  network: number;
+  initializedNetworks: {
+    [chainId: number]: number;
+  };
+  gasPrices: {
+    [chainId: number]: number;
+  }
 }
 
 const settingsInitialState: SettingsState = {
@@ -34,7 +42,9 @@ const settingsInitialState: SettingsState = {
       value: "zh-cn",
     },
   ],
-  badNetwork: false,
+  network: 1,
+  initializedNetworks: {},
+  gasPrices: {}
 };
 
 const slice = createSlice({
@@ -67,16 +77,20 @@ const slice = createSlice({
     connectionLost: (state) => {
       state.connected = false;
     },
-    connectedToBadNetwork: (state) => {
-      state.badNetwork = true;
-    },
-    connectedToGoodNetwork: (state) => {
-      state.badNetwork = false;
-    },
+    setGasPrice: (state, action: PayloadAction<{chainId: number; gasPrice: number;}>) => {
+      const {chainId, gasPrice} = action.payload;
+      if (!state.gasPrices) state.gasPrices = {};
+      state.gasPrices[chainId] = gasPrice;
+    }
   },
   extraReducers: (builder) =>
-    builder.addCase(userActions.userDisconnected.type, (state) => {
-      state.badNetwork = false;
+    builder
+    .addCase(changedNetwork, (state, action) =>  {
+      state.network = action.payload
+    })
+    .addCase(fetchInitialData.fulfilled, (state, action) => {
+      const chainId = action.payload?.chainId;
+      if (chainId) state.initializedNetworks[chainId] = +new Date();
     }),
 });
 
@@ -109,7 +123,10 @@ export const settingsSelectors = {
   selectSupportedLanguages(state: AppState) {
     return settingsSelectors.selectSettings(state).supportedLanguages;
   },
-  selectBadNetwork(state: AppState) {
-    return settingsSelectors.selectSettings(state).badNetwork;
+  selectNetwork(state: AppState) {
+    return state.settings.network;
   },
+  selectGasPrice(state: AppState, chainId: number) {
+    return state.settings.gasPrices[chainId];
+  }
 };

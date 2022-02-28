@@ -8,6 +8,7 @@ import {
 import { JsonRpcProvider, JsonRpcSigner } from "@ethersproject/providers";
 import { MULTICALL2_ADDRESS } from "../../config";
 import { chunk } from "lodash";
+import { constants } from "ethers";
 import { getContract } from "ethereum/abi";
 import type { Call, MulticallResults } from "./types";
 
@@ -91,7 +92,7 @@ async function executeChunk(
     const { blockNumber, returnData } =
       await multicallContract.callStatic.tryBlockAndAggregate(
         false,
-        _calls.map((c) => ({ target: c.target, callData: c.callData }))
+        _calls.map((c) => ({ target: c.target ? c.target : constants.AddressZero, callData: c.callData }))
       );
     const decodedResult = returnData.map((r) =>
       r.success ? r.returnData : "0x"

@@ -2,7 +2,7 @@ import { AppState, selectors } from "features";
 import { ExternalLink, StakeForm } from "components/atomic";
 import { Link, useParams } from "react-router-dom";
 import { MULTI_TOKEN_STAKING_ADDRESS } from "config";
-import { abbreviateAddress } from "helpers";
+import { abbreviateAddress, explorerAddressLink } from "helpers";
 import {
   useBalanceAndApprovalRegistrar,
   useNewStakingRegistrar,
@@ -10,11 +10,13 @@ import {
   usePortfolioData,
 } from "hooks";
 import { useMemo } from "react";
+import { useMultiTokenStakingAddress } from "hooks/address-hooks";
 import { useSelector } from "react-redux";
 import S from "string";
 
 export default function UniswapStakeForm() {
   const { id } = useParams<{ id: string }>();
+  const stakingAddress = useMultiTokenStakingAddress()
   const { stake, withdraw, exit, claim } = useNewStakingTransactionCallbacks(
     id
   );
@@ -35,7 +37,7 @@ export default function UniswapStakeForm() {
 
   useNewStakingRegistrar();
   useBalanceAndApprovalRegistrar(
-    MULTI_TOKEN_STAKING_ADDRESS,
+    stakingAddress,
     stakingPool ? [stakingPool.token] : []
   );
 
@@ -45,16 +47,16 @@ export default function UniswapStakeForm() {
       portfolioToken={portfolioToken}
       rewardsPerDay={stakingPool?.rewardsPerDay ?? "0.00"}
       rewardsAsset="NDX"
-      spender={MULTI_TOKEN_STAKING_ADDRESS}
+      spender={stakingAddress}
       onStake={stake}
       onWithdraw={withdraw}
       onExit={exit}
       onClaim={claim}
       poolLink={
         <ExternalLink
-          to={`https://etherscan.io/address/${MULTI_TOKEN_STAKING_ADDRESS}`}
+          to={explorerAddressLink(stakingAddress)}
         >
-          {abbreviateAddress(MULTI_TOKEN_STAKING_ADDRESS)}
+          {abbreviateAddress(stakingAddress)}
         </ExternalLink>
       }
       stakingTokenLink={

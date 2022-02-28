@@ -14,7 +14,14 @@ function formatName(from = "") {
 
 const selectors = adapter.getSelectors((state: AppState) => state.indexPools);
 
-const selectAllPools = (state: AppState) => selectors.selectAll(state);
+const selectChainId = (state: AppState) => state.settings.network;
+
+const selectAllPools = createSelector(
+  [selectors.selectAll, selectChainId],
+  (indexPools, chainId) => {
+    return indexPools.filter(p => p.chainId === chainId);
+  }
+);
 
 const selectPool = (state: AppState, poolId: string) =>
   selectors.selectById(state, poolId);

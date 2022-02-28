@@ -1,6 +1,6 @@
 import { AppState, selectors } from "features";
-import { COMMON_BASE_TOKENS, SLIPPAGE_RATE } from "config";
 import { Currency, Trade } from "@indexed-finance/narwhal-sdk";
+import { SLIPPAGE_RATE } from "config";
 import {
   _calcAllOutGivenPoolIn,
   calcPoolInGivenSingleOut,
@@ -15,9 +15,9 @@ import {
   useRoutedBurnTransactionCallbacks,
 } from "./transaction-hooks";
 import { useCallback, useMemo } from "react";
+import { useCommonBaseTokens, useTokenLookupBySymbol } from "./token-hooks";
 import { usePoolTokenAddresses, usePoolUnderlyingTokens } from "./pool-hooks";
 import { useSelector } from "react-redux";
-import { useTokenLookupBySymbol } from "./token-hooks";
 import { useUniswapTradingPairs } from "./pair-hooks";
 import type { BigNumber } from "ethereum";
 
@@ -169,12 +169,13 @@ export function useMultiTokenBurnCallbacks(poolId: string) {
 
 // #region Routing
 export function useBurnRouterCallbacks(poolId: string) {
+  const baseTokens = useCommonBaseTokens()
   const poolTokens = usePoolUnderlyingTokens(poolId);
   const poolTokenIds = usePoolTokenAddresses(poolId);
   const tokenLookupBySymbol = useTokenLookupBySymbol();
   const tokenIds = useMemo(
-    () => [...poolTokenIds, ...COMMON_BASE_TOKENS.map(({ id }) => id)],
-    [poolTokenIds]
+    () => [...poolTokenIds, ...baseTokens.map(({ id }) => id)],
+    [poolTokenIds, baseTokens]
   );
   const { calculateAmountIn, calculateAmountOut } =
     useSingleTokenBurnCallbacks(poolId);

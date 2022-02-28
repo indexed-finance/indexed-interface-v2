@@ -2,6 +2,7 @@ import { AiOutlineArrowRight } from "react-icons/ai";
 import { Card, List, Space, Typography } from "antd";
 import { FormattedIndexPool } from "features";
 import { Token } from "components/atomic/atoms";
+import { explorerTransactionLink } from "helpers";
 import { useBreakpoints } from "hooks";
 
 const MAXIMUM_DISPLAYED_TRADES = 8;
@@ -25,7 +26,7 @@ export function IndexPoolRecentTrades({
         {trades.map((trade, index) => (
           <List.Item key={index}>
             <a
-              href={`https://etherscan.io/tx/${trade.transactionHash}`}
+              href={explorerTransactionLink(trade.transactionHash)}
               rel="noopener noreferrer"
               target="_blank"
               style={{

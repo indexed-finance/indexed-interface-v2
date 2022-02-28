@@ -1,11 +1,12 @@
 import { ImConnection } from "react-icons/im";
 import { MdAccountBalanceWallet } from "react-icons/md";
+import { SUPPORTED_NETWORKS } from "config";
 import { Space, Typography } from "antd";
 import { abbreviateAddress } from "helpers";
 import { selectors } from "features";
+import { useChainId, useTranslator } from "hooks";
 import { useMemo } from "react";
 import { useSelector } from "react-redux";
-import { useTranslator } from "hooks";
 
 interface Props {
   showText?: boolean;
@@ -16,7 +17,8 @@ export function ServerConnection({ showText = false }: Props) {
   const userAddress = useSelector(selectors.selectUserAddress);
   const isUserConnected = useSelector(selectors.selectUserConnected);
   const isServerConnected = useSelector(selectors.selectConnected);
-  const onBadNetwork = useSelector(selectors.selectBadNetwork);
+  const network = useChainId()
+  const onBadNetwork = useMemo(() => (network === undefined || !SUPPORTED_NETWORKS.includes(network)), [network])
   const connectionStatus = useMemo(() => {
     const firstPass = {
       type: (isUserConnected || isServerConnected

@@ -2,8 +2,9 @@ import { BaseType } from "antd/lib/typography/Base";
 import { BiLinkExternal } from "react-icons/bi";
 import { Button, Space, Typography, notification } from "antd";
 import { ExternalLink } from "components/atomic/atoms";
-import { abbreviateAddress } from "helpers";
+import { abbreviateAddress, explorerTransactionLink } from "helpers";
 import { actions, selectors } from "features";
+import { useChainId } from "hooks";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useMemo, useRef, useState } from "react";
 import cx from "classnames";
@@ -11,6 +12,7 @@ import cx from "classnames";
 const LOCALSTORAGE_KEY = "Hidden Tx";
 
 export function TransactionList() {
+  const chainId = useChainId()
   const transactions = useSelector(selectors.selectTransactions);
   const hiding = useRef<Record<string, true>>({});
   const [hidden, setHidden] = useState<Record<string, true>>(
@@ -111,7 +113,7 @@ export function TransactionList() {
           return (
             <ExternalLink
               key={tx.hash}
-              to={`https://etherscan.io/tx/${tx.hash}`}
+              to={explorerTransactionLink(tx.hash, chainId)}
               withIcon={false}
             >
               <Typography.Text

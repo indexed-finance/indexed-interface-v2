@@ -1,29 +1,27 @@
 import { DataReceiverConfig, actions } from "features";
-import { isEqual } from "lodash";
+import { useCachedValue } from "./use-debounce";
+import { useChainId } from "./settings-hooks";
 import { useDispatch } from "react-redux";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 export function useCallRegistrar(calls: DataReceiverConfig) {
   const dispatch = useDispatch();
-  const [cachedCalls, setCachedCalls] = useState(calls);
+  const cachedChainId = useChainId();
+  const cachedCalls = useCachedValue(calls);
 
   // Effect:
   // Handle updates "gracefully" in a McJanky way.
   useEffect(() => {
-    if (!isEqual(calls, cachedCalls)) {
-      setCachedCalls(calls);
-    }
-  }, [calls, cachedCalls]);
+    console.log(`${cachedCalls.caller}: CHANGING CACHED CALLS`)
+  }, [cachedCalls]);
 
-  // Effect:
-  // Register a multicall listener that queries certain functions every update.
-  // Note: if the user is connected, defer all updates to the server.
   useEffect(() => {
     if (cachedCalls) {
       const allCalls = {
         caller: cachedCalls.caller,
         onChainCalls: cachedCalls.onChainCalls ?? [],
         offChainCalls: cachedCalls.offChainCalls ?? [],
+        chainId: cachedChainId
       };
 
       dispatch(actions.callsRegistered(allCalls));
@@ -32,5 +30,5 @@ export function useCallRegistrar(calls: DataReceiverConfig) {
         dispatch(actions.callsUnregistered(allCalls));
       };
     }
-  }, [dispatch, cachedCalls]);
+  }, [dispatch, cachedCalls, cachedChainId]);
 }

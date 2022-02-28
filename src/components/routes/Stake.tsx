@@ -8,7 +8,7 @@ import {
 import { ExternalLink, Label, Page, TokenSelector } from "components/atomic";
 import { Formik, useFormikContext } from "formik";
 import { Link, useParams } from "react-router-dom";
-import { abbreviateAddress, convert } from "helpers";
+import { abbreviateAddress, convert, explorerAddressLink, uniswapInfoPairLink } from "helpers";
 import { format } from "date-fns";
 import { useMemo } from "react";
 import { usePortfolioData, useStakingTransactionCallbacks } from "hooks";
@@ -300,7 +300,7 @@ function StakingStats({
       </Descriptions.Item>
 
       <Descriptions.Item label="Rewards Pool">
-        <ExternalLink to={`https://etherscan.io/address/${stakingToken.id}`}>
+        <ExternalLink to={explorerAddressLink(stakingToken.id)}>
           {abbreviateAddress(stakingToken.id)}
         </ExternalLink>
       </Descriptions.Item>
@@ -317,7 +317,7 @@ function StakingStats({
       <Descriptions.Item label="Staking Token">
         {stakingToken.isWethPair ? (
           <ExternalLink
-            to={`https://v2.info.uniswap.org/pair/${stakingToken.stakingToken}`}
+            to={uniswapInfoPairLink(stakingToken.stakingToken)}
           >
             {symbol}
           </ExternalLink>

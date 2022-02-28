@@ -1,45 +1,53 @@
+import { BRIDGED_POLYGON_ADDRESSES, NETWORKS_BY_ID } from "config";
 import { Button, Card, Space } from "antd";
 import { ExternalLink } from "components/atomic/atoms";
 import { FormattedIndexPool } from "features";
 import { Fragment, useMemo } from "react";
-import { usePoolQuickswapLink } from "hooks";
+import { exchangeAddLiquidityLink, exchangeSwapLink, explorerAddressLink, uniswapInfoTokenLink } from "helpers";
+import { getPoolQuickswapLink, useChainId } from "hooks";
 
-const USEFUL_LINKS: Array<{
+const usePoolExternalLinks = (address: string, chainId: number): Array<{
   text: string;
   image: string;
-  makeLink(address: string): string;
-}> = [
-  {
-    text: "View on Etherscan",
-    image: require("images/etherscan-link.png").default,
-    makeLink: (address) =>
-      `https://etherscan.io/address/${address.toLowerCase()}#code`,
-  },
-  {
-    text: "Buy on Uniswap",
-    image: require("images/uniswap-link.png").default,
-    makeLink: (address) =>
-      `https://v2.info.uniswap.org/token/${address.toLowerCase()}`,
-  },
-];
+  url: string;
+}> => {
+  const {explorer, defaultExchange} = NETWORKS_BY_ID[chainId];
+  const explorerLink = useMemo(() => ({
+    text: `View on ${explorer.name}`,
+    image: require(`images/${explorer.icon}`).default,
+    url: explorerAddressLink(address, chainId)
+  }), [address, explorer, chainId])
+  const addLiquidityLink = useMemo(() => ({
+    text: `Add Liquidity on ${defaultExchange.name}`,
+    image: require(`images/${defaultExchange.icon}`).default,
+    url: exchangeAddLiquidityLink(address, 'ETH', chainId)
+  }), [chainId, address, defaultExchange]);
+  const bridgeQuickswapLink = useMemo(() => {
+    if (chainId === 1) {
+      const polygonExplorer = NETWORKS_BY_ID[137];
+      const bridgedAddress = BRIDGED_POLYGON_ADDRESSES[address.toLowerCase()];
+      return {
+        text: "Buy on Quickswap",
+        image: require(`images/${polygonExplorer.explorer.icon}`).default,
+        url: exchangeSwapLink(bridgedAddress, 'ETH', 137)
+      };
+    }
+  }, [address, chainId]);
+  return [
+    explorerLink,
+    addLiquidityLink,
+    ...(bridgeQuickswapLink ? [bridgeQuickswapLink] : [])
+  ]
+}
 
 export function IndexPoolExternalLinks({ id }: FormattedIndexPool) {
-  const quickswapLink = usePoolQuickswapLink(id);
-  const links = useMemo(
-    () =>
-      quickswapLink
-        ? USEFUL_LINKS.concat({
-            text: "Buy on Quickswap",
-            image: require("images/quickswap.png").default,
-            makeLink: (_) => quickswapLink,
-          })
-        : USEFUL_LINKS,
-    [quickswapLink]
-  );
+  const chainId = useChainId();
+  // const quickswapLink = usePoolQuickswapLink(id);
+  const links = usePoolExternalLinks(id, chainId);
 
   return (
     <Card>
-      {links.map(({ text, image, makeLink }, index) => (
+      {links.map(({ text, image, url }, index) => (
         <Fragment key={text}>
           <Button
             type="text"
@@ -49,7 +57,7 @@ export function IndexPoolExternalLinks({ id }: FormattedIndexPool) {
               marginBottom: index === links.length - 1 ? 0 : 12,
             }}
           >
-            <ExternalLink to={makeLink(id)}>
+            <ExternalLink to={url}>
               <Space
                 style={{
                   display: "flex",

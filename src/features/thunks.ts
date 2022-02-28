@@ -1,5 +1,6 @@
 import * as timelocksRequests from "./timelocks/requests";
 import * as topLevelActions from "./actions";
+import { NETWORKS_BY_ID } from "config";
 import { RegisteredCall, abbreviateAddress } from "helpers";
 import { TransactionExtra, transactionsActions } from "./transactions";
 import { TransactionResponse } from "@ethersproject/abstract-provider";
@@ -21,7 +22,7 @@ import { vaultsActions } from "./vaults";
 import type { AppThunk } from "./store";
 
 // #region Provider
-type Provider =
+export type Provider =
   | providers.Web3Provider
   | providers.JsonRpcProvider
   | providers.InfuraProvider;
@@ -61,6 +62,21 @@ type InitialzeOptions = {
   selectedAddress?: string;
 };
 
+const getSigner = (options: InitialzeOptions) => {
+  let selectedAddress = "";
+  if (options.withSigner) {
+    signer = options.provider.getSigner();
+    if (options.selectedAddress) {
+      selectedAddress = options.selectedAddress;
+    } else if (options.provider.connection.url === "metamask") {
+      selectedAddress = (provider as any).provider.selectedAddress;
+    } else {
+      throw new Error("Unable to initialize without a selected address.");
+    }
+  }
+  return selectedAddress;
+}
+
 export const thunks = {
   /**
    *
@@ -68,28 +84,7 @@ export const thunks = {
   initialize:
     (options: InitialzeOptions): AppThunk =>
     async (dispatch) => {
-      let selectedAddress = "";
-
       provider = options.provider;
-
-      if (provider.blockNumber !== -1) {
-        dispatch(actions.blockNumberChanged(provider.blockNumber));
-      }
-
-      if (options.withSigner) {
-        signer = provider.getSigner();
-
-        if (options.selectedAddress) {
-          selectedAddress = options.selectedAddress;
-        } else if (provider.connection.url === "metamask") {
-          selectedAddress = (provider as any).provider.selectedAddress;
-        } else {
-          throw new Error("Unable to initialize without a selected address.");
-        }
-      }
-
-      await provider.ready;
-
       dispatch(
         fetchInitialData({
           provider,
@@ -107,14 +102,32 @@ export const thunks = {
       );
       dispatch(fetchMasterChefData({ provider }));
       dispatch(fetchVaultsData({ provider }));
-
-      if (selectedAddress) {
-        dispatch(actions.userAddressSelected(selectedAddress));
-        dispatch(timelocksRequests.fetchUserTimelocks(selectedAddress));
-      }
-
-      dispatch(actions.walletConnected());
     },
+  setNetwork: (options: InitialzeOptions): AppThunk =>
+  async (dispatch, getState) => {
+    const state = getState();
+    provider = options.provider;
+    await provider.ready;
+
+    const {chainId} = await provider.getNetwork()
+    const lastInit = state.settings.initializedNetworks[chainId] || 0;
+    const timeSince = (+new Date() - lastInit) / 1000;
+    if (provider.blockNumber !== -1) {
+      dispatch(actions.blockNumberChanged(provider.blockNumber));
+    }
+    dispatch(actions.changedNetwork(chainId))
+    if (timeSince > 60) {
+      dispatch(actions.initialize(options))
+    }
+
+    const selectedAddress = getSigner(options)
+    if (selectedAddress) {
+      dispatch(actions.userAddressSelected(selectedAddress));
+      dispatch(timelocksRequests.fetchUserTimelocks(selectedAddress));
+    }
+
+    dispatch(actions.walletConnected());
+  },
   addTransaction:
     (
       _tx: TransactionResponse | Promise<TransactionResponse>,

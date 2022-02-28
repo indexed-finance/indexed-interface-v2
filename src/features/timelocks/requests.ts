@@ -40,7 +40,7 @@ export const fetchUserTimelocks = createAsyncThunk(
   "timelocks/user/fetch",
   async (userId: string) => {
     const client = IndexedDividendsSubgraphClient.forNetwork("mainnet");
-
+    if (!client) return null;
     try {
       const timelocks = (await (client.getLocksByOwner(
         userId

@@ -44,7 +44,8 @@ export function sortTokens(tokenA: string, tokenB: string): string[] {
 
 export function computeUniswapPairAddress(
   tokenA: string,
-  tokenB: string
+  tokenB: string,
+  chainId: number
 ): string {
   const initCodeHash = INIT_CODE_HASH_UNI;
   const [token0, token1] = sortTokens(tokenA, tokenB);
@@ -54,12 +55,13 @@ export function computeUniswapPairAddress(
       convert.toAddressBuffer(token1),
     ])
   );
-  return getCreate2Address(UNISWAP_FACTORY_ADDRESS, salt, initCodeHash);
+  return getCreate2Address(UNISWAP_FACTORY_ADDRESS[chainId], salt, initCodeHash);
 }
 
 export function computeSushiswapPairAddress(
   tokenA: string,
-  tokenB: string
+  tokenB: string,
+  chainId: number
 ): string {
   const initCodeHash = INIT_CODE_HASH_SUSHI;
   const [token0, token1] = sortTokens(tokenA, tokenB);
@@ -69,7 +71,7 @@ export function computeSushiswapPairAddress(
       convert.toAddressBuffer(token1),
     ])
   );
-  return getCreate2Address(SUSHISWAP_FACTORY_ADDRESS, salt, initCodeHash);
+  return getCreate2Address(SUSHISWAP_FACTORY_ADDRESS[chainId], salt, initCodeHash);
 }
 
 /**
@@ -91,8 +93,8 @@ export const bigNumberishToBigInt = (amount: BigNumberish): BigInt =>
 export const bestTradeExactIn = Trade.bestTradeExactIn;
 export const bestTradeExactOut = Trade.bestTradeExactOut;
 
-export function buildCommonTokenPairs(_tokens: string[]) {
-  const bases = COMMON_BASE_TOKENS.map(t => t.id).filter(t => t !== constants.AddressZero);
+export function buildCommonTokenPairs(_tokens: string[], chainId: number) {
+  const bases = COMMON_BASE_TOKENS[chainId].map(t => t.id.toLowerCase()).filter(t => t !== constants.AddressZero);
   const tokens = _tokens.filter(t => t !== constants.AddressZero && !bases.includes(t));
   const basePairs = flatMap(
     bases, (base): [string, string][] => bases.map(otherBase => [base.toLowerCase(), otherBase.toLowerCase()])

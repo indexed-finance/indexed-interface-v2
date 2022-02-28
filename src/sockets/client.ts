@@ -30,12 +30,17 @@ export class SocketClient {
       store.dispatch(actions.connectionEstablished());
 
       onConnect();
+      // socket.send()
     };
 
     socket.onmessage = (message) => {
-      const serverState = JSON.parse(message.data) as AppState;
-
-      return store.dispatch(actions.mirroredServerState(serverState));
+      const state = store.getState();
+      const chainId = state.settings.network;
+      const networkStates = JSON.parse(message.data) as Record<number, AppState>;
+      const serverState  = networkStates[chainId];
+      if (serverState) {
+        return store.dispatch(actions.mirroredServerState(serverState));
+      }
     };
 
     socket.onerror = async () => {

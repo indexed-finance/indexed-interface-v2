@@ -13,13 +13,14 @@ import {
 import { BrowserRouter, Route, useLocation } from "react-router-dom";
 import { FEATURE_FLAGS } from "feature-flags";
 import { Layout, message, notification } from "antd";
-import { Provider, useSelector } from "react-redux";
-import { Suspense, useEffect, useRef } from "react";
+import { NETWORKS_BY_ID } from "config";
+import { Provider } from "react-redux";
+import { Suspense, useEffect, useMemo, useRef } from "react";
 import { Web3ReactProvider } from "@web3-react/core";
 import { ethers } from "ethers";
 import { routes } from "routes";
-import { selectors, store } from "features";
-import { useBreakpoints, useWalletConnection } from "hooks";
+import { store } from "features";
+import { useBreakpoints, useChainId, useWalletConnection } from "hooks";
 import ReactGA from "react-ga";
 
 const GOOGLE_ANALYTICS_TRACKING_CODE = "G-MHCR3CSH7C";
@@ -60,7 +61,8 @@ export function AppLayout() {
   const { pathname } = useLocation();
   const previousLocation = useRef(pathname);
   const { isMobile } = useBreakpoints();
-  const onBadNetwork = useSelector(selectors.selectBadNetwork);
+  const network = useChainId()
+  const badNetwork = useMemo(() => !NETWORKS_BY_ID[network], [network])
   const inner = (
     <>
       <LayoutHeader />
@@ -68,7 +70,7 @@ export function AppLayout() {
         className="with-background"
         style={{ minHeight: "100vh", paddingTop: 1, paddingBottom: 12 }}
       >
-        {onBadNetwork ? (
+        {badNetwork ? (
           <Page hasPageHeader={false}>
             <BadNetworkDrawer />
           </Page>

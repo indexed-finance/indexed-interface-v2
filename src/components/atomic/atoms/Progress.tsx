@@ -1,9 +1,8 @@
 import { Progress as AntProgress, ProgressProps } from "antd";
-import { selectors } from "features";
-import { useSelector } from "react-redux";
+import { useTheme } from "hooks";
 
 export function Progress(props: ProgressProps) {
-  const theme = useSelector(selectors.selectTheme);
+  const theme = useTheme()
   const progressStrokeColor: any =
     theme === "outrun"
       ? {

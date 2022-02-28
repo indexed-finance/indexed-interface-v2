@@ -1,15 +1,17 @@
 import { isEqual } from 'lodash'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 // modified from https://usehooks.com/useDebounce/
 export function useDebounce<T>(value: T, delay: number): T {
-  const [debouncedValue, setDebouncedValue] = useState<T>(value)
+  // const [debouncedValue, setDebouncedValue] = useState<T>(value)
+  const valueRef = useRef<T>(value)
 
   useEffect(() => {
     // Update debounced value after delay
     const handler = setTimeout(() => {
-      if (!isEqual(value, debouncedValue)) {
-        setDebouncedValue(value)
+      if (!isEqual(value, valueRef.current)) {
+        // setDebouncedValue(value)
+        valueRef.current = value;
       }
     }, delay)
 
@@ -19,20 +21,18 @@ export function useDebounce<T>(value: T, delay: number): T {
     return () => {
       clearTimeout(handler)
     }
-  }, [debouncedValue, value, delay])
+  }, [value, delay])
 
-  return debouncedValue
+  return valueRef.current
 }
 
 // modified from https://usehooks.com/useDebounce/
 export function useCachedValue<T>(value: T): T {
-  const [debouncedValue, setDebouncedValue] = useState<T>(value)
-
+  const valueRef = useRef<T>(value)
   useEffect(() => {
-    if (!isEqual(value, debouncedValue)) {
-      setDebouncedValue(value)
+    if (!isEqual(value, valueRef.current)) {
+      valueRef.current = value;
     }
-  }, [debouncedValue, value])
-
-  return debouncedValue
+  }, [value])
+  return valueRef.current;
 }

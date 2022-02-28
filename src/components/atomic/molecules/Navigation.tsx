@@ -1,18 +1,28 @@
 import { AiOutlineUser } from "react-icons/ai";
 import { ExternalLink } from "components/atomic/atoms";
 import { FEATURE_FLAGS } from "feature-flags";
-import { FaGavel, FaListUl, FaSwimmingPool } from "react-icons/fa";
+import { FaEthereum, FaGavel, FaListUl, FaNetworkWired, FaSwimmingPool } from "react-icons/fa";
 import { GoLightBulb } from "react-icons/go";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, Space } from "antd";
+import { NETWORKS_BY_ID, SUPPORTED_NETWORKS } from "config";
 import { RiSafe2Line } from "react-icons/ri";
-import { useBreakpoints, useTranslator } from "hooks";
+import { useBreakpoints, useChainId, useRequestChangeNetworkCallback, useTranslator } from "hooks";
 import { useMemo } from "react";
+import EthIcon from "images/eth.png";
+import Icon from "@ant-design/icons";
+import MaticIcon from "images/matic.png";
+
+// const MaticIcon = () => <img src={MaticIconSvg} />;
+const NetworkIcon = (chainId: number) => <img style={{ height: '2em'}} src={require(`images/${NETWORKS_BY_ID[chainId].icon}`).default} />
 
 export function Navigation() {
   const tx = useTranslator();
   const { isMobile } = useBreakpoints();
   const { pathname } = useLocation();
+  const chainId = useChainId();
+  const requestChangeNetwork = useRequestChangeNetworkCallback()
+
   const selectedKey = useMemo(() => {
     for (const link of ["portfolio", "staking", "index-pools"]) {
       if (pathname.includes(link)) {
@@ -92,6 +102,35 @@ export function Navigation() {
           </Space>
         </ExternalLink>
       </Menu.Item>
+      <Menu.SubMenu
+        title={NETWORKS_BY_ID[chainId].name}
+        icon={<Icon component={() => NetworkIcon(chainId)} style={{ position: "relative", top: -2, left: -10 }} />}
+      >
+        {SUPPORTED_NETWORKS.filter((n) => n !== chainId).map((id) => {
+          const { name } = NETWORKS_BY_ID[id];
+          return <Menu.Item key={`${name}-network`} onClick={() => requestChangeNetwork(id)}>
+          {/* <Link to="/index-pools"> */}
+            <Space size="large">
+              <Icon component={() => NetworkIcon(id)} style={{ position: "relative", top: -4 }}  />
+              <span style={{ textTransform: "uppercase", fontSize: 20 }}>{name}</span>
+            </Space>
+          {/* </Link> */}
+        </Menu.Item>
+        })}
+       {/*  <Menu.Item key="eth-network">
+          <Link to="/index-pools">
+            <Space size="large">
+              <Icon component={MaticIcon} style={{ position: "relative", top: -4 }}  />{" "}
+              <span style={{ fontSize: 20 }}>Ethereum</span>
+            </Space>
+          </Link>
+        </Menu.Item> */}
+        {/* <Menu.Item key="matic-network">
+          <Space size="small">
+            <Icon src={MaticIcon} style={{ position: "relative", top: 2 }} />{" "} Polygon
+          </Space>
+        </Menu.Item> */}
+      </Menu.SubMenu>
       {FEATURE_FLAGS.useAcademy && (
         <Menu.Item key="learn">
           <Link to="/learn">

@@ -7,7 +7,7 @@ import {
   VaultGroup,
 } from "components/atomic";
 import { selectors } from "features";
-import { useAllVaultsRegistrar, useBreakpoints } from "hooks";
+import { useAllVaultsRegistrar, useBreakpoints, useVaultsCount } from "hooks";
 import { useHistory } from "react-router-dom";
 import { useSelector } from "react-redux";
 
@@ -18,6 +18,7 @@ export default function Splash() {
   );
   const history = useHistory();
   const { isMobile } = useBreakpoints();
+  const vaultsCount = useVaultsCount();
   useAllVaultsRegistrar();
 
   return (
@@ -93,22 +94,28 @@ export default function Splash() {
       >
         {poolsExist && <IndexPoolWidgetGroup />}
       </SplashSection>
-      <Divider />
-      <SplashSection
-        banner={require("images/vaults_banner.png").default}
-        title="VAULTS"
-        description="Lend out your assets via Indexed Earn and receive the guaranteed best interest rates across the major lending protocols in DeFi. Low-fee and no-maintenance: let our non-custodial vaults do the work of allocating your funds for maximum impact."
-        catchphrase="Earn interest on your assets"
-        actionText="Explore Vaults"
-        infoText="How it works"
-        onAction={() => history.push("/vaults")}
-        onInfo={() =>
-          (window.location.href =
-            "https://docs.indexed.finance/introduction/faq/nirn-faq")
-        }
-      >
-        <VaultGroup withTitle={true} />
-      </SplashSection>
+      {vaultsCount > 0
+        ? <>
+          <Divider />
+          <SplashSection
+            banner={require("images/vaults_banner.png").default}
+            title="VAULTS"
+            description="Lend out your assets via Indexed Earn and receive the guaranteed best interest rates across the major lending protocols in DeFi. Low-fee and no-maintenance: let our non-custodial vaults do the work of allocating your funds for maximum impact."
+            catchphrase="Earn interest on your assets"
+            actionText="Explore Vaults"
+            infoText="How it works"
+            onAction={() => history.push("/vaults")}
+            onInfo={() =>
+              (window.location.href =
+                "https://docs.indexed.finance/introduction/faq/nirn-faq")
+            }
+          >
+            <VaultGroup withTitle={true} />
+          </SplashSection>
+        </>
+        : <> </>
+      }
+      
       <Divider />
       <SplashSection
         banner={require("images/staking_banner.png").default}

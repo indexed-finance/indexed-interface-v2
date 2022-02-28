@@ -3,6 +3,7 @@ import { ExternalLink, StakeForm } from "components/atomic";
 import { MASTER_CHEF_ADDRESS } from "config";
 import {
   abbreviateAddress,
+  explorerAddressLink,
   sushiswapAddLiquidityLink,
   sushiswapInfoPairLink,
 } from "helpers";
@@ -14,11 +15,13 @@ import {
   usePair,
   usePortfolioData,
 } from "hooks";
+import { useMasterChefAddress } from "hooks/address-hooks";
 import { useMemo } from "react";
 import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 export default function SushiswapStakeForm() {
+  const masterChefAddress = useMasterChefAddress()
   const { id } = useParams<{ id: string }>();
   const { stake, withdraw, exit, claim } = useMasterChefTransactionCallbacks(
     id
@@ -46,7 +49,7 @@ export default function SushiswapStakeForm() {
 
   useMasterChefRegistrar();
   useBalanceAndApprovalRegistrar(
-    MASTER_CHEF_ADDRESS,
+    masterChefAddress,
     stakingPool ? [stakingPool.token] : []
   );
 
@@ -54,16 +57,16 @@ export default function SushiswapStakeForm() {
     <StakeForm
       stakingPool={stakingPool}
       portfolioToken={portfolioToken}
-      spender={MASTER_CHEF_ADDRESS}
+      spender={masterChefAddress}
       onStake={stake}
       onWithdraw={withdraw}
       onExit={exit}
       onClaim={claim}
       poolLink={
         <ExternalLink
-          to={`https://etherscan.io/address/${MASTER_CHEF_ADDRESS}`}
+          to={explorerAddressLink(masterChefAddress)}
         >
-          {abbreviateAddress(MASTER_CHEF_ADDRESS)}
+          {abbreviateAddress(masterChefAddress)}
         </ExternalLink>
       }
       stakingTokenLink={

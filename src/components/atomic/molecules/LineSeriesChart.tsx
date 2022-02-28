@@ -8,9 +8,8 @@ import {
 } from "lightweight-charts";
 import { convert } from "helpers";
 import { format } from "date-fns";
-import { selectors } from "features";
 import { useEffect, useRef, useState } from "react";
-import { useSelector } from "react-redux";
+import { useTheme } from "hooks";
 import throttle from "lodash.throttle";
 
 export interface SeriesDataItem {
@@ -31,7 +30,7 @@ export function LineSeriesChart({
   onChangeTheme,
   onMoveCrosshair,
 }: Props) {
-  const theme = useSelector(selectors.selectTheme);
+  const theme = useTheme();
   const cardRef = useRef<null | HTMLDivElement>(null);
   const [chart, setChart] = useState<IChartApi | null>(null);
   const [series, setSeries] = useState<ISeriesApi<"Line"> | null>(null);
@@ -117,7 +116,9 @@ export function LineSeriesChart({
       series.setData(data as any);
       if (chart) {
         const timestamps = data.map(d => d.time);
-        chart.timeScale().setVisibleRange({ from: Math.min(...timestamps), to: Math.max(...timestamps) } as any)
+        if (timestamps.length) {
+          chart.timeScale().setVisibleRange({ from: Math.min(...timestamps), to: Math.max(...timestamps) } as any)
+        }
       }
     }
   }, [data, chart, series]);

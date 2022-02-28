@@ -10,16 +10,18 @@ type Asset = {
 interface Props {
   asset: Asset;
   onClick(asset: Asset): void;
+  key: string;
 }
 
 const { Item } = List;
 
-export function SelectableToken({ asset, onClick }: Props) {
+export function SelectableToken({ asset, onClick, key }: Props) {
   return (
     <Item
       onClick={() => onClick(asset)}
       className="SelectableToken"
       style={{ padding: "1rem" }}
+      key={key}
     >
       <Item.Meta
         style={{ alignItems: "center" }}

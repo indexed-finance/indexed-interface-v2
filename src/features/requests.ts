@@ -1,3 +1,4 @@
+import * as balancerMath from "ethereum/utils/balancer-math";
 import * as batcherRequests from "./batcher/requests";
 import * as dailySnapshotRequests from "./dailySnapshots/requests";
 import * as indexPoolsRequests from "./indexPools/requests";
@@ -5,9 +6,10 @@ import * as newStakingRequests from "./newStaking/requests";
 import * as stakingRequests from "./staking/requests";
 import * as timelocksRequests from "./timelocks/requests";
 import * as tokensRequests from "./tokens/requests";
+import { COMMON_BASE_TOKENS, NDX_ADDRESS, NETWORKS_BY_ID } from "config";
 import { MIN_WEIGHT } from "ethereum";
-import { NDX_ADDRESS, WETH_CONTRACT_ADDRESS } from "config";
 import { NirnSubgraphClient } from "@indexed-finance/subgraph-clients";
+import { VaultData } from "@indexed-finance/subgraph-clients/dist/nirn/types";
 import { convert, dedupe } from "helpers";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { ethers } from "ethers";
@@ -33,6 +35,7 @@ export type NormalizedInitialData = {
   dailySnapshots: NormalizedEntity<NormalizedDailySnapshot>;
   indexPools: NormalizedEntity<NormalizedIndexPool>;
   tokens: NormalizedEntity<NormalizedToken>;
+  chainId: number;
 };
 
 export interface OffChainRequest {
@@ -125,7 +128,23 @@ export async function queryInitialData(url: string): Promise<Category[]> {
   }
 }
 
-export function normalizeInitialData(categories: Category[]) {
+export function normalizeInitialData(categories: Category[], chainId: number) {
+  const baseTokens = COMMON_BASE_TOKENS[chainId].map(t => ({ ...t, id: t.id.toLowerCase() }));
+  const ndxAddress = NDX_ADDRESS[chainId];
+  if (ndxAddress && !baseTokens.find(t => t.id === ndxAddress)) {
+    baseTokens.push({
+      id: ndxAddress.toLowerCase(),
+      chainId: 1,
+      name: "Indexed",
+      symbol: "NDX",
+      decimals: 18,
+    })
+  }
+  const baseTokenIds = baseTokens.map(t => t.id);
+  const baseTokenEntities = baseTokens.reduce((prev, next) => ({
+    [next.id]: next,
+    ...prev
+  }), {})
   return categories.reduce(
     (prev, next) => {
       const category = next;
@@ -140,6 +159,7 @@ export function normalizeInitialData(categories: Category[]) {
         tokens: {
           ids: category.tokens.map(({ id }) => id),
           entities: category.tokens.reduce((prev, next) => {
+            next.decimals = +next.decimals;
             prev[next.id] = next;
             return prev;
           }, {} as Record<string, Token>),
@@ -153,8 +173,9 @@ export function normalizeInitialData(categories: Category[]) {
           normalizedTokensForCategory.ids.push(tokenId);
           normalizedTokensForCategory.entities[tokenId] = {
             id: tokenId,
+            chainId,
             name,
-            decimals,
+            decimals: +decimals,
             symbol,
           };
         }
@@ -184,12 +205,14 @@ export function normalizeInitialData(categories: Category[]) {
         > = {};
         for (const token of tokens ?? []) {
           const [, tokenId] = token.id.split("-");
+          token.token.decimals = +token.token.decimals;
 
           if (!normalizedTokensForCategory.ids.includes(tokenId)) {
             normalizedTokensForCategory.ids.push(tokenId);
             normalizedTokensForCategory.entities[tokenId] = {
               ...token.token,
               id: tokenId,
+              chainId,
             };
           }
 
@@ -198,15 +221,23 @@ export function normalizeInitialData(categories: Category[]) {
             ? {
                 usedBalance: token.balance,
                 usedDenorm: token.denorm,
+
               }
             : {
                 usedBalance: token.minimumBalance,
                 usedDenorm: MIN_WEIGHT,
               };
+          const usedWeight = balancerMath
+              .bdiv(
+                convert.toBigNumber(extras.usedDenorm),
+                convert.toBigNumber(totalWeight)
+              )
+              .toString();
           tokenEntities[tokenId] = {
-            ...(tokenEntities[tokenId] ?? {}),
+            ...(tokenEntities[tokenId] ?? {address: tokenId}),
             ...token,
             ...extras,
+            usedWeight
           };
         }
 
@@ -225,12 +256,14 @@ export function normalizeInitialData(categories: Category[]) {
           totalDenorm: totalWeight,
           totalSupply,
           swapFee: convert.toToken("0.025", 18).toString(10),
+          chainId
         };
 
         if (indexPool.initialized) {
           prev.tokens.ids.push(indexPool.id.toLowerCase());
           prev.tokens.entities[indexPool.id.toLowerCase()] = {
             id: indexPool.id.toLowerCase(),
+            chainId,
             name: indexPool.name,
             symbol: indexPool.symbol,
             decimals: 18,
@@ -262,22 +295,10 @@ export function normalizeInitialData(categories: Category[]) {
         entities: {},
       },
       tokens: {
-        ids: [WETH_CONTRACT_ADDRESS.toLowerCase(), NDX_ADDRESS.toLowerCase()],
-        entities: {
-          [WETH_CONTRACT_ADDRESS.toLowerCase()]: {
-            id: WETH_CONTRACT_ADDRESS.toLowerCase(),
-            name: "Wrapped Ether",
-            symbol: "WETH",
-            decimals: 18,
-          },
-          [NDX_ADDRESS.toLowerCase()]: {
-            id: NDX_ADDRESS.toLowerCase(),
-            name: "Indexed",
-            symbol: "NDX",
-            decimals: 18,
-          },
-        },
+        ids: baseTokenIds,//[WETH_ADDRESS.toLowerCase(), NDX_ADDRESS.toLowerCase()],
+        entities: baseTokenEntities,
       },
+      chainId,
     } as NormalizedInitialData
   );
 }
@@ -291,7 +312,7 @@ export const fetchInitialData = createAsyncThunk(
     try {
       const initial = await queryInitialData(url);
 
-      return normalizeInitialData(initial);
+      return normalizeInitialData(initial, chainId);
     } catch (error) {
       return null;
     }
@@ -302,17 +323,20 @@ export const fetchVaultsData = createAsyncThunk(
   "vaults/fetch",
   async (_: any, { getState }) => {
     const state = getState();
-    const address = (state as any).user.address;
-    const client = NirnSubgraphClient.forNetwork("mainnet");
-
-    try {
-      const vaults = await client.getAllVaults(address);
-
-      return vaults;
-    } catch (error) {
-      console.error({ error });
-
-      return null;
+    const chainId = (state as any).settings.network as number | undefined
+    if (chainId !== undefined) {
+      const network = NETWORKS_BY_ID[chainId].name
+      const address = (state as any).user.address;
+      const client = NirnSubgraphClient.forNetwork(network);
+      if (!client) return null;
+      try {
+        const vaults: Array<VaultData & { chainId: number }> = (await client.getAllVaults(address)).map((v) => ({ ...v, chainId }));
+        return {vaults, chainId};
+      } catch (error) {
+        console.error({ error });
+  
+        return null;
+      }
     }
   }
 );

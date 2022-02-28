@@ -14,6 +14,7 @@ import { TimelockDurationSlider } from "./TimelockDurationSlider";
 import { TimelockField } from "./TimelockField";
 import {
   useBalanceAndApprovalRegistrar,
+  useChainId,
   useCreateTimelockCallback,
   useTokenApproval,
 } from "hooks";
@@ -50,10 +51,13 @@ function CreateTimelockFormInner({
   values,
   setFieldValue,
 }: FormikProps<TimelockValues>) {
+  const chainId = useChainId();
+  const timelockAddress = DNDX_TIMELOCK_ADDRESS[chainId];
+  const ndxAddress = NDX_ADDRESS[chainId];
   const createTimelock = useCreateTimelockCallback();
   const { status, approve } = useTokenApproval({
-    spender: DNDX_TIMELOCK_ADDRESS.toLowerCase(),
-    tokenId: NDX_ADDRESS.toLowerCase(),
+    spender: timelockAddress.toLowerCase(),
+    tokenId: ndxAddress.toLowerCase(),
     amount: values.amount.displayed,
     rawAmount: values.amount.exact.toString(),
     symbol: "NDX",
@@ -67,8 +71,8 @@ function CreateTimelockFormInner({
   const totalDndx = amountValue + bonusDndx;
   const isBelowMinimum = useMemo(() => amountValue !== 0 && amountValue < 100, [amountValue]);
 
-  useBalanceAndApprovalRegistrar(DNDX_TIMELOCK_ADDRESS.toLowerCase(), [
-    NDX_ADDRESS.toLowerCase(),
+  useBalanceAndApprovalRegistrar(timelockAddress.toLowerCase(), [
+    ndxAddress.toLowerCase(),
   ]);
 
   return (

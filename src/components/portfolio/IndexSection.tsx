@@ -54,6 +54,7 @@ export function IndexSection() {
                 staking={token.staking}
                 earnedSymbol="NDX"
                 earnedAmount={token.ndxEarned}
+                link={token.link}
               />
             </Col>
           );

@@ -6,9 +6,11 @@ export type CallRegistration = {
   caller: string;
   onChainCalls: RegisteredCall[];
   offChainCalls: RegisteredCall[];
+  chainId: number;
 };
 
 export type RegisteredCall = {
+  chainId?: number;
   interfaceKind?: InterfaceKind;
   target: string;
   function: string;
@@ -18,6 +20,7 @@ export type RegisteredCall = {
 
 export type RegisteredCaller = {
   caller: string;
+  chainId: number;
   onChainCalls: RegisteredCall[];
   offChainCalls: RegisteredCall[];
 };
@@ -28,14 +31,14 @@ export type CallWithResult = Omit<RegisteredCall, "interface" | "args"> & {
 };
 
 export function serializeOnChainCall(call: RegisteredCall): string {
-  return `${call.interfaceKind}/${call.target}/${call.function}/${(
+  return `${call.chainId}/${call.interfaceKind}/${call.target}/${call.function}/${(
     call.args ?? []
   ).join("_")}`;
 }
 
 export function deserializeOnChainCall(callId: string): null | RegisteredCall {
   try {
-    const [interfaceKind, target, fn, args] = callId.split("/");
+    const [chainId, interfaceKind, target, fn, args] = callId.split("/");
     const abi = interfaceLookup[interfaceKind as InterfaceKind];
     if (!abi) {
       return null;
@@ -44,6 +47,7 @@ export function deserializeOnChainCall(callId: string): null | RegisteredCall {
       target,
       interface: abi,
       function: fn,
+      chainId: +chainId
     };
 
     if (args) {
@@ -54,14 +58,14 @@ export function deserializeOnChainCall(callId: string): null | RegisteredCall {
     } else {
       return common;
     }
-  } catch (error) {
+  } catch (error: any) {
     debugConsole.error("Bad on-chain call ID", callId, error);
     return null;
   }
 }
 
 export function serializeOffChainCall(call: RegisteredCall): string {
-  return `${call.function}/${(call.args ?? []).join("_")}${
+  return `${call.chainId}/${call.function}/${(call.args ?? []).join("_")}${
     call.canBeMerged ? "/merge" : ""
   }`;
 }

@@ -3,6 +3,7 @@ import { BaseDrawer, useDrawer } from "./Drawer";
 import { Divider, Space, Typography, notification } from "antd";
 import { Fade } from "components/animations";
 import { OVERLAY_READY, fortmatic } from "ethereum";
+import { SUPPORTED_NETWORKS } from "config";
 import { UnsupportedChainIdError, useWeb3React } from "@web3-react/core";
 import { WalletConnectConnector } from "@web3-react/walletconnect-connector";
 import { actions } from "features";
@@ -47,58 +48,60 @@ export function WalletConnectionDrawer() {
   const { close } = useDrawer();
   const tx = useTranslator();
   const dispatch = useDispatch();
-  const { account, activate } = useWeb3React();
+  const { account, activate, chainId } = useWeb3React();
   const [attemptingActivation, setAttemptingActivation] = useState(false);
   const walletOptions = useWalletOptions();
   const attemptActivation = useCallback(
     async (connector: null | WalletConnectConnector | AbstractConnector) => {
       if (connector && !attemptingActivation) {
+        console.log('connecting a...')
         setAttemptingActivation(true);
+        console.log('connecting bb...')
 
         if (
           // For WalletConnect, manually reset the connector.
           connector instanceof WalletConnectConnector &&
           connector.walletConnectProvider?.wc?.uri
         ) {
+          console.log('deleting provider...')
           delete connector.walletConnectProvider;
         }
 
         activate(connector, noop, true)
           .then(async () => {
+            console.log('did activate')
             const _account = await connector.getAccount();
             const _provider = await connector.getProvider();
             const provider = new ethers.providers.Web3Provider(
               _provider,
               "any"
             );
-            const networkId = parseInt(await provider.send("net_version", []));
+            console.log('connecting...')
 
-            provider.on("network", (newNetwork, oldNetwork) => {
-              if (newNetwork?.chainId !== 1) {
-                dispatch(actions.connectedToBadNetwork());
-              }
-
-              if (oldNetwork?.chainId !== 1 && newNetwork?.chainId === 1) {
-                dispatch(actions.connectedToGoodNetwork());
-              }
-            });
-
-            if (networkId === 1) {
+            provider.on("network", (newNetwork) => {
+              console.log(`!!! Got changed network (drawer) !!!`)
+              // dispatch(actions.changedNetwork(parseInt(newNetwork.chainId)))
               dispatch(
-                actions.initialize({
+                actions.setNetwork({
                   provider,
                   withSigner: true,
                   selectedAddress: account ?? _account ?? "",
                 })
               );
+            });
 
-              notification.success({
-                message: tx("CONNECTED"),
-                description: tx("YOU_HAVE_SUCCESSFULLY_CONNECTED_YOUR_WALLET"),
-              });
-            } else {
-              dispatch(actions.connectedToBadNetwork());
-            }
+            dispatch(
+              actions.setNetwork({
+                provider,
+                withSigner: true,
+                selectedAddress: account ?? _account ?? "",
+              })
+            );
+
+            notification.success({
+              message: tx("CONNECTED"),
+              description: tx("YOU_HAVE_SUCCESSFULLY_CONNECTED_YOUR_WALLET"),
+            });
           })
           .catch((error) => {
             if (error instanceof UnsupportedChainIdError) {

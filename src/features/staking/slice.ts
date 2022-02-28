@@ -20,7 +20,7 @@ const slice = createSlice({
   extraReducers: (builder) =>
     builder
       .addCase(fetchStakingData.fulfilled, (state, action) => {
-        adapter.addMany(state, action.payload);
+        if (action.payload) adapter.addMany(state, action.payload);
       })
       .addCase(fetchMulticallData.fulfilled, (state, action) => {
         const relevantMulticallData = stakingMulticallDataParser(

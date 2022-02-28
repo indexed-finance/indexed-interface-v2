@@ -1,8 +1,10 @@
-import type { IndexPool, PoolUnderlyingToken, Swap } from "indexed-types";
-import type { Swap as Trade } from "uniswap-types";
+import { PoolSwapData as Swap } from '@indexed-finance/subgraph-clients/dist/core/types'
+import { PairSwapData as Trade } from '@indexed-finance/subgraph-clients/dist/uniswap/types'
+import type { IndexPool, PoolUnderlyingToken } from "indexed-types";
 
 export interface NormalizedIndexPool
   extends Omit<IndexPool, "dailySnapshots" | "tokens"> {
+  chainId: number;
   dailySnapshots: string[];
   transactions: {
     trades: Trade[];
@@ -43,6 +45,7 @@ export type NormalizedPoolUpdate = {
 };
 
 export interface FormattedIndexPool {
+  chainId: number;
   category: string;
   canStake: boolean;
   id: string;

@@ -11,7 +11,7 @@ import {
   Page,
 } from "components/atomic";
 import { ReactNode, useCallback, useState } from "react";
-import { useBreakpoints, usePoolDetailRegistrar } from "hooks";
+import { useBreakpoints, useFormattedIndexPool, usePoolDetailRegistrar } from "hooks";
 import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 
@@ -91,9 +91,7 @@ export default function IndexPool() {
   const poolId = useSelector((state: AppState) =>
     selectors.selectPoolIdByName(state, slug)
   );
-  const indexPool = useSelector((state: AppState) =>
-    poolId ? selectors.selectFormattedIndexPool(state, poolId) : null
-  );
+  const indexPool = useFormattedIndexPool(poolId)
   const [interaction, setInteraction] = useState<ReactNode>(null);
   const [interactionTitle, setInteractionTitle] = useState("");
   const handleInteractionBarChange = useCallback(

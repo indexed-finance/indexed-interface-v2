@@ -1,5 +1,6 @@
 export interface NormalizedToken {
   id: string;
+  chainId: number;
   decimals: number;
   name?: string;
   symbol: string;

@@ -75,9 +75,9 @@ const slice = createSlice({
       const values = [action.payload].flat();
 
       for (const callRegistration of values) {
-        const { caller, onChainCalls, offChainCalls } = callRegistration;
+        const { caller, onChainCalls, offChainCalls, chainId } = callRegistration;
         debugConsole.log(
-          `REGISTER :: ${caller} : Registering ${onChainCalls.length} on-chain calls for ${caller}`
+          `REGISTER :: ${caller} : Registering ${onChainCalls.length} on-chain and ${offChainCalls.length} off-chain calls for ${caller}`
         );
 
         const existingEntry = state.callers[caller];
@@ -86,7 +86,9 @@ const slice = createSlice({
           offChainCalls: existingEntry?.offChainCalls ?? [],
         };
 
-        for (const call of onChainCalls) {
+        for (const _call of onChainCalls) {
+          const call = { ..._call }
+          if (!call.chainId) call.chainId = chainId;
           const callId = serializeOnChainCall(call);
 
           if (!state.onChainCalls.includes(callId)) {
@@ -99,7 +101,9 @@ const slice = createSlice({
             (state.listenerCounts[callId] ?? 0) + 1;
         }
 
-        for (const call of offChainCalls) {
+        for (const _call of offChainCalls) {
+          const call = { ..._call }
+          if (!call.chainId) call.chainId = chainId;
           const callId = serializeOffChainCall(call);
 
           if (!state.offChainCalls.includes(callId)) {
@@ -119,19 +123,24 @@ const slice = createSlice({
       state,
       action: PayloadAction<{
         caller: string;
+        chainId: number;
         onChainCalls: RegisteredCall[];
         offChainCalls: RegisteredCall[];
       }>
     ) {
-      const { onChainCalls, offChainCalls } = action.payload;
+      const { onChainCalls, offChainCalls, chainId } = action.payload;
 
-      for (const call of onChainCalls) {
+      for (const _call of onChainCalls) {
+        const call = { ..._call }
+        if (!call.chainId) call.chainId = chainId;
         const callId = serializeOnChainCall(call);
 
         state.listenerCounts[callId]--;
       }
 
-      for (const call of offChainCalls) {
+      for (const _call of offChainCalls) {
+        const call = { ..._call }
+        if (!call.chainId) call.chainId = chainId;
         const callId = serializeOffChainCall(call);
 
         state.listenerCounts[callId]--;
@@ -178,6 +187,7 @@ const slice = createSlice({
         state.blockNumber = action.payload.batcher.blockNumber;
       })
       .addCase(restartedDueToError, () => batcherInitialState)
+      // .addCase(changedNetwork, () => batcherInitialState)
       // Caching data from on- and off-chain calls.
       .addMatcher(
         (action) =>
@@ -247,12 +257,13 @@ export const batcherSelectors = {
       listenerCounts,
       fetching,
     } = state.batcher;
+    const stateChainId = state.settings.network;
     function mergeOffChainCalls() {
       const { toMerge, toKeep } = offChainCalls
         .filter((k) => listenerCounts[k] > 0)
         .reduce(
           (prev, next) => {
-            const [call, args, canBeMerged] = next.split("/");
+            const [chainId, call, args, canBeMerged] = next.split("/");
             if (canBeMerged) {
               if (!prev.toMerge[call]) {
                 prev.toMerge[call] = [];
@@ -274,9 +285,12 @@ export const batcherSelectors = {
 
       return [...toKeep, ...merged];
     }
+    const keysForThisChain = onChainCalls.filter(c => +(c.split('/')[0]) === stateChainId).length;
+    console.log(`# OnChain Calls: ${onChainCalls.length} | # For Chain: ${keysForThisChain}`)
     const activeAndOutdated = (k: string) => {
+      const [chainId] = k.split('/');
       const outdated = !cache[k] || cache[k].fromBlockNumber < blockNumber;
-      return listenerCounts[k] > 0 && outdated && !fetching[k];
+      return listenerCounts[k] > 0 && outdated && !fetching[k] && stateChainId === +chainId;
     };
     return {
       callers,

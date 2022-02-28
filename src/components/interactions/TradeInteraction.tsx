@@ -4,10 +4,12 @@ import { SingleInteraction, SingleInteractionValues } from "./BaseInteraction";
 import { convert } from "helpers";
 import {
   useBalanceAndApprovalRegistrar,
+  useDisplayedCommonBaseTokens,
   useUniswapTradingPairs,
   useUniswapTransactionCallback,
 } from "hooks";
 import { useCallback, useMemo } from "react";
+import { useIndexedNarwhalRouterAddress } from "hooks/address-hooks";
 import { useSelector } from "react-redux";
 
 interface Props {
@@ -22,9 +24,11 @@ const DEFAULT_ENTRY = {
 export function TradeInteraction({ indexPool }: Props) {
   const handleTrade = useUniswapTransactionCallback();
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
+  const baseTokens = useDisplayedCommonBaseTokens()
+  const narwhalRouterAddress = useIndexedNarwhalRouterAddress()
   const tokenIds = useMemo(
-    () => [indexPool.id, ...DISPLAYED_COMMON_BASE_TOKENS.map(({ id }) => id)],
-    [indexPool.id]
+    () => [indexPool.id, ...baseTokens.map(({ id }) => id)],
+    [indexPool.id, baseTokens]
   );
   const assets = useSelector((state: AppState) =>
     selectors.selectTokensById(state, tokenIds)
@@ -130,13 +134,13 @@ export function TradeInteraction({ indexPool }: Props) {
     ]
   );
 
-  useBalanceAndApprovalRegistrar(NARWHAL_ROUTER_ADDRESS, tokenIds);
+  useBalanceAndApprovalRegistrar(narwhalRouterAddress, tokenIds);
 
   return (
     <SingleInteraction
       assets={assets as any}
-      spender={NARWHAL_ROUTER_ADDRESS}
-      defaultInputSymbol={DISPLAYED_COMMON_BASE_TOKENS[0].symbol}
+      spender={narwhalRouterAddress}
+      defaultInputSymbol={baseTokens[0].symbol}
       defaultOutputSymbol={indexPool.symbol}
       onSubmit={handleSubmit}
       onChange={handleChange}

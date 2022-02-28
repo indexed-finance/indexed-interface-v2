@@ -1,5 +1,6 @@
 import { Alert, Button, Typography, notification } from "antd";
 import { BaseDrawer, useDrawer } from "./Drawer";
+import { NETWORKS_BY_ID } from "config";
 import { actions } from "features";
 import { useBreakpoints, useTranslator } from "hooks";
 import { useCallback } from "react";
@@ -25,9 +26,18 @@ export function BadNetworkDrawer() {
     });
   }, [dispatch, deactivate, tx]);
 
+  const goodNetworks = Object.values(NETWORKS_BY_ID).map(n => n.name);
+  let goodNetworksString = goodNetworks[0];
+  for (let i = 1; i < goodNetworks.length - 1; i++) {
+    goodNetworksString += `, ${goodNetworks[i]}`
+  }
+  if (goodNetworks.length > 1) {
+    goodNetworksString += ` or ${goodNetworks[goodNetworks.length-1]}`
+  }
+
   return (
     <BaseDrawer
-      title="Bad Network"
+      title="Unsupported Network"
       onClose={handleClose}
       width={isMobile ? "100vw" : 600}
       maskClosable={false}
@@ -48,11 +58,11 @@ export function BadNetworkDrawer() {
           <Alert
             type="error"
             message={
-              <Typography.Title level={1}>Mainnet Only</Typography.Title>
+              <Typography.Title level={1}>Unsupported Network</Typography.Title>
             }
             description={
               <Typography.Title level={2}>
-                Please change the network in your wallet settings to mainnet.
+                Please change the network in your wallet settings to { goodNetworksString }.
               </Typography.Title>
             }
           />

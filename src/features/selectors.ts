@@ -22,7 +22,7 @@ import {
   FormattedStakingDetail,
   stakingSelectors,
 } from "./staking";
-import { NDX_ADDRESS, WETH_CONTRACT_ADDRESS } from "config";
+import { NDX_ADDRESS, WETH_ADDRESS } from "config";
 import { NormalizedToken, tokensSelectors } from "./tokens";
 import { NormalizedTransaction, transactionsSelectors } from "./transactions";
 import { Pair } from "uniswap-types";
@@ -143,6 +143,7 @@ export const selectors = {
 
       return pool && pool.symbol !== "ERROR"
         ? ({
+            chainId: pool.chainId,
             category: pool.category.id,
             canStake: false,
             id: pool.id,
@@ -205,7 +206,7 @@ export const selectors = {
                 return {
                   when: formatDistance(
                     new Date(
-                      parseInt(trade.timestamp) * MILLISECONDS_PER_SECOND
+                      trade.timestamp * MILLISECONDS_PER_SECOND
                     ),
                     new Date(),
                     {
@@ -216,7 +217,7 @@ export const selectors = {
                   to: tokenOut.symbol,
                   fromAddress: tokenIn.id.toLowerCase(),
                   toAddress: tokenOut.id.toLowerCase(),
-                  amount: convert.toCurrency(parseFloat(trade.amountUSD)),
+                  amount: convert.toCurrency(trade.amountUSD),
                   kind:
                     tokenIn.symbol.toLowerCase() === pool.symbol.toLowerCase()
                       ? "sell"
@@ -242,6 +243,7 @@ export const selectors = {
       .map((pool) => selectors.selectFormattedIndexPool(state, pool.id))
       .filter((each): each is FormattedIndexPool => Boolean(each))
       .filter((each) => !["FFF", "CC10", "DEFI5"].includes(each.symbol))
+      .filter((each) => each.chainId === state.settings.network)
       .sort((a, b) => {
         const aValue = a.totalValueLocked.replace(/\$/g, "").replace(/,/g, "");
         const bValue = b.totalValueLocked.replace(/\$/g, "").replace(/,/g, "");
@@ -329,10 +331,16 @@ export const selectors = {
   },
   selectPossibleMasterChefPairs(state: AppState) {
     const indexPoolIds = selectors.selectAllPoolIds(state);
-    return [...indexPoolIds, NDX_ADDRESS].map((token) => {
-      const [token0, token1] = sortTokens(token, WETH_CONTRACT_ADDRESS);
+    const chainId = selectors.selectNetwork(state);
+    const ndxAddress = NDX_ADDRESS[chainId];
+    const wethAddress = WETH_ADDRESS[chainId];
+    if (!ndxAddress || !wethAddress) {
+      return [];
+    }
+    return [...indexPoolIds, ndxAddress].map((token) => {
+      const [token0, token1] = sortTokens(token, wethAddress);
       return {
-        id: computeSushiswapPairAddress(token0, token1).toLowerCase(),
+        id: computeSushiswapPairAddress(token0, token1, chainId).toLowerCase(),
         token0: token0.toLowerCase(),
         token1: token1.toLowerCase(),
         sushiswap: true,
@@ -352,6 +360,10 @@ export const selectors = {
   },
   // selectNewFormattedStakingToken
   selectMasterChefFormattedStaking(state: AppState): FormattedMasterChefData[] {
+    const chainId = selectors.selectNetwork(state);
+    if (chainId !== 1) {
+      return [];
+    }
     const meta = selectors.selectMasterChefMeta(state);
     const stakingPools =
       selectors.selectMasterChefPoolsWithRecognizedPairs(state);
@@ -415,15 +427,24 @@ export const selectors = {
   },
   // selectNewFormattedStakingToken
   selectNewFormattedStaking(state: AppState): FormattedNewStakingDetail {
+    const chainId = selectors.selectNetwork(state);
+    if (chainId !== 1) {
+      return {
+        indexTokens: [],
+        liquidityTokens: [],
+        expired: []
+      }
+    }
     const stakingPools = selectors.selectAllNewStakingPools(state);
     const expiredPools: any[] = [];
+    const wethAddress = WETH_ADDRESS[chainId]
     const formattedStaking = stakingPools
       .map((stakingPool) => {
         let indexPoolAddress: string;
         if (stakingPool.isWethPair) {
           if (
             stakingPool.token0?.toLowerCase() ===
-            WETH_CONTRACT_ADDRESS.toLowerCase()
+            wethAddress.toLowerCase()
           ) {
             indexPoolAddress = stakingPool.token1 as string;
           } else {
@@ -506,19 +527,13 @@ export const selectors = {
       } as FormattedNewStakingDetail
     );
   },
-  selectStakingForSplash(state: AppState) {
-    const basic = selectors.selectFormattedStaking(state);
-    const uniswap = selectors.selectNewFormattedStaking(state);
-    const sushi = selectors.selectMasterChefFormattedStaking(state);
-
-    console.log({ basic, uniswap, sushi });
-  },
   // User
   selectFormattedPortfolio(
     state: AppState,
     ethPrice: number
   ): FormattedPortfolioData {
     const theme = selectors.selectTheme(state);
+    const chainId = selectors.selectNetwork(state);
     const poolLookup = selectors.selectPoolLookup(state);
     const tokenLookup = selectors.selectTokenLookup(state);
     const tokenBalanceLookup = selectors.selectTokenSymbolsToBalances(state);
@@ -567,9 +582,14 @@ export const selectors = {
         accumulatedTokenValues[index] / accumulatedValue
       ),
     }));
-    const formattedPortfolio = {
-      ndx: {
-        address: NDX_ADDRESS,
+    const formattedPortfolio: FormattedPortfolioData = {
+      tokens,
+      totalValue: convert.toCurrency(accumulatedValue),
+    };
+    const ndxAddress = NDX_ADDRESS[chainId]
+    if (ndxAddress) {
+      formattedPortfolio.ndx = {
+        address: ndxAddress,
         image: `indexed-${theme}`,
         symbol: "NDX",
         name: "Indexed",
@@ -577,10 +597,8 @@ export const selectors = {
         value: convert.toCurrency(ndxValue),
         earned: ndxEarned.toFixed(2),
         weight: convert.toPercent(ndxValue / accumulatedValue),
-      },
-      tokens,
-      totalValue: convert.toCurrency(accumulatedValue),
-    };
+      }
+    }
 
     return formattedPortfolio;
   },

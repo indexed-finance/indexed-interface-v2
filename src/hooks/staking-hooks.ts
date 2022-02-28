@@ -1,8 +1,9 @@
 import { AppState, selectors } from "features";
-import { NDX_ADDRESS, WETH_CONTRACT_ADDRESS } from "config";
+import { WETH_ADDRESS } from "config";
 import { convert, sortTokens } from "helpers";
 import { useCallRegistrar } from "./use-call-registrar";
 import { useMemo } from "react";
+import { useNdxAddress, useWethAddress } from "./address-hooks";
 import { useSelector } from "react-redux";
 import {
   useTokenPrice,
@@ -29,6 +30,7 @@ export const useStakingPoolsForTokens = (stakingTokens: string[]) =>
   );
 
 export function useStakingTokenPrice(stakingPoolAddress: string) {
+  const wethAddress = useWethAddress()
   const stakingPool = useStakingPool(stakingPoolAddress);
   const [supplyTokens, _pairs] = useMemo(() => {
     if (!stakingPool?.isWethPair) {
@@ -36,7 +38,7 @@ export function useStakingTokenPrice(stakingPoolAddress: string) {
     }
     const [token0, token1] = sortTokens(
       stakingPool.indexPool,
-      WETH_CONTRACT_ADDRESS
+      wethAddress
     );
     return [
       [stakingPool.stakingToken.toLowerCase()],
@@ -53,6 +55,7 @@ export function useStakingTokenPrice(stakingPoolAddress: string) {
     stakingPool?.isWethPair,
     stakingPool?.stakingToken,
     stakingPool?.indexPool,
+    wethAddress,
   ]);
   const [supplies, suppliesLoading] =
     useTotalSuppliesWithLoadingIndicator(supplyTokens);
@@ -94,13 +97,14 @@ export function useStakingTokenPrice(stakingPoolAddress: string) {
 }
 
 export function useStakingApy(stakingPoolAddress: string) {
+  const ndxAddress = useNdxAddress()
   const stakingPool = useStakingPool(stakingPoolAddress);
-  const [ndxPrice] = useTokenPrice(NDX_ADDRESS);
+  const [ndxPrice] = useTokenPrice(ndxAddress);
   const tokenPrice = useStakingTokenPrice(stakingPoolAddress);
 
   return useMemo(() => {
     const hasLoaded = ndxPrice && tokenPrice && stakingPool;
-    const isWethAddress = stakingPoolAddress === WETH_CONTRACT_ADDRESS;
+    const isWethAddress = stakingPoolAddress === WETH_ADDRESS;
 
     if (!isWethAddress && hasLoaded) {
       const isExpired = stakingPool!.periodFinish < Date.now() / 1000;

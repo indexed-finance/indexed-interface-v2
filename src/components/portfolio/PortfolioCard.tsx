@@ -1,6 +1,7 @@
 import { Card, Space, Typography } from "antd";
+import { ExternalLink, Token } from "components/atomic";
+import { Link } from "react-router-dom";
 import { ReactNode, useCallback, useState } from "react";
-import { Token } from "components/atomic";
 
 export function PortfolioCard({
   showStaking = true,
@@ -13,10 +14,12 @@ export function PortfolioCard({
   accruedUsdValue,
   stakingAmount,
   stakingUsdValue,
+  link,
   actions,
   extra,
   removeTheN = false,
 }: {
+  link?: string;
   showStaking?: boolean;
   walletAmount: string;
   walletUsdValue: string;
@@ -43,12 +46,22 @@ export function PortfolioCard({
       onClick={toggleExpanded}
       title={
         <Space direction="vertical" style={{ width: "100%" }}>
-          <Token
-            symbol={symbolToUse}
-            symbolOverride={symbol}
-            name={name}
-            size="medium"
-          />
+          <Space direction="horizontal" style={{ width: "100%" }}>
+            <Token
+              symbol={symbolToUse}
+              symbolOverride={symbol}
+              name={name}
+              size="medium"
+            />
+            {
+              link
+                ?
+                  link.startsWith('https')
+                    ? <ExternalLink to={link}>Go To</ExternalLink>
+                    : <Link to={link}>Go To</Link>
+                : ""
+            }
+          </Space>
           {/* Wallet */}
           <Card
             type="inner"

@@ -1,4 +1,4 @@
-import { NDX_ADDRESS, WETH_CONTRACT_ADDRESS } from "config";
+import { NDX_ADDRESS, WETH_ADDRESS } from "config";
 import {
   PayloadAction,
   createEntityAdapter,
@@ -24,8 +24,8 @@ const slice = createSlice({
   name: "pairs",
   initialState: adapter.getInitialState(),
   reducers: {
-    uniswapPairsRegistered(state, action: PayloadAction<NormalizedPair[]>) {
-      const filtered = action.payload.filter(
+    uniswapPairsRegistered(state, action: PayloadAction<{ pairs: NormalizedPair[]; chainId: number; }>) {
+      const filtered = action.payload.pairs.filter(
         ({ id }) => !state.entities[id.toLowerCase()]
       );
       const formatted = filtered.map(
@@ -114,7 +114,7 @@ export const pairsSelectors = {
   selectAllUpdatedPairs: (state: AppState) =>
     selectors.selectAll(state).filter((pair) => pair.exists !== undefined),
   selectTokenPair: (state: AppState, tokenA: string, tokenB: string) => {
-    const pairAddress = computeUniswapPairAddress(tokenA, tokenB);
+    const pairAddress = computeUniswapPairAddress(tokenA, tokenB, state.settings.network);
     return selectors.selectById(state, pairAddress.toLowerCase());
   },
   selectPairExistsLookup: (state: AppState, pairIds: string[]) => {
@@ -128,9 +128,14 @@ export const pairsSelectors = {
     );
   },
   selectNdxPrice(state: AppState, ethPrice: number) {
+    const chainId = state.settings.network;
+    const wethAddress = WETH_ADDRESS[chainId];
+    const ndxAddress = NDX_ADDRESS[chainId];
+    if (!ndxAddress) return 0;
     const wethNdxPair = computeUniswapPairAddress(
-      WETH_CONTRACT_ADDRESS,
-      NDX_ADDRESS
+      wethAddress,
+      ndxAddress,
+      state.settings.network
     );
     const [pairData] = pairsSelectors.selectPairsById(state, [wethNdxPair]);
 
@@ -138,7 +143,7 @@ export const pairsSelectors = {
       const { token0, reserves0, reserves1 } = pairData;
 
       if (token0 && reserves0 && reserves1) {
-        const firstIsNdx = NDX_ADDRESS.toLowerCase() === token0.toLowerCase();
+        const firstIsNdx = ndxAddress.toLowerCase() === token0.toLowerCase();
         const [firstValue, secondValue] = firstIsNdx
           ? [reserves1, reserves0]
           : [reserves0, reserves1];

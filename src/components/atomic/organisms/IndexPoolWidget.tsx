@@ -4,7 +4,7 @@ import { Fade } from "components/animations";
 import { INDEX_POOL_TAGLINES } from "config";
 import { Quote } from "../molecules";
 import { Token } from "../atoms";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { usePoolDetailRegistrar } from "hooks";
 import { useSelector } from "react-redux";
@@ -35,9 +35,7 @@ export function IndexPoolWidgetGroup() {
 }
 
 export function IndexPoolWidget(props: FormattedIndexPool) {
-  const tokenIds = useSelector((state: AppState) =>
-    selectors.selectPoolTokenAddresses(state, props.id)
-  );
+  const tokenIds = useMemo(() => props.assets.map(a => a.id), [props]);
   const { push } = useHistory();
 
   usePoolDetailRegistrar(props.id, tokenIds);
