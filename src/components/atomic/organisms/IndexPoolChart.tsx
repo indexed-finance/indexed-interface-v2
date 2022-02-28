@@ -68,7 +68,7 @@ export function IndexPoolChart({ poolId, expanded = false }: Props) {
                 price={
                   historicalData ? historicalData.price : formattedPool.priceUsd
                 }
-                netChange={historicalData?.when ? historicalData.when : netChange}
+                netChange={historicalData ? historicalData.when : netChange}
                 netChangePercent={historicalData ? "" : netChangePercent}
                 inline={true}
                 textSize="large"
