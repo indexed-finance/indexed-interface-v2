@@ -18,7 +18,7 @@ import {
   useVaultUserBalance,
 } from "hooks";
 import { Formik } from "formik";
-import { TokenSelector } from "components/atomic";
+import { TokenSelector } from "components/atomic/organisms/TokenSelector";
 import { useCallback, useMemo, useState } from "react";
 
 type TokenAmount = { exact: BigNumber; displayed: string };

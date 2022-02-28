@@ -1,6 +1,6 @@
 import { IndexedCoreSubgraphClient, UniswapSubgraphClient } from "@indexed-finance/subgraph-clients";
 import { NETWORKS_BY_ID, WETH_ADDRESS } from "config";
-import { NormalizedIndexPoolTransactions } from ".";
+import { NormalizedIndexPoolTransactions } from "./types";
 import { computeUniswapPairAddress } from "helpers";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import type { OffChainRequest } from "../requests";

@@ -1,8 +1,7 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import { SupportedLanguageCode, createTranslator } from "helpers";
+import { SupportedLanguageCode, createTranslator } from "helpers/create-translator";
 import { changedNetwork } from "../actions"
 import { fetchInitialData } from "features/requests";
-import { userActions } from "../user";
 import type { AppState } from "features/store";
 
 type Theme = "dark" | "light" | "outrun";

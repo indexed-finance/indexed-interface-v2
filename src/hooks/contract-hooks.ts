@@ -11,7 +11,7 @@ import {
 
 import { ContractTypeLookup, InterfaceKind, getContract } from "ethereum";
 
-import { useChainId } from "hooks";
+import { useChainId } from "./settings-hooks";
 
 import { useSigner } from "features";
 

@@ -1,4 +1,5 @@
 import * as requests from "./requests";
+import { Amount, TimeLockData } from "./types"
 import { DNDX_ADDRESS, DNDX_TIMELOCK_ADDRESS } from "config";
 import { convert, createMulticallDataParser } from "helpers";
 import { createEntityAdapter, createSlice } from "@reduxjs/toolkit";
@@ -6,19 +7,6 @@ import { fetchMulticallData } from "../batcher";
 import { restartedDueToError } from "../actions";
 import type { AppState } from "../store";
 
-export type Amount = {
-  exactAsString: string;
-  displayed: string;
-};
-
-export type TimeLockData = {
-  id: string;
-  owner: string;
-  createdAt: number;
-  ndxAmount: string;
-  duration: number;
-  dndxShares: string;
-};
 
 export const TIMELOCKS_CALLER = "Timelocks";
 

@@ -1,6 +1,12 @@
 import { DailyPoolSnapshot } from "indexed-types";
-import { dailySnapshotsAdapter } from "./slice";
+import { createEntityAdapter } from "@reduxjs/toolkit";
 import type { AppState } from "features/store";
+import type { NormalizedDailySnapshot } from "./types";
+
+export const dailySnapshotsAdapter =
+  createEntityAdapter<NormalizedDailySnapshot>({
+    selectId: (entry) => entry.id.toLowerCase(),
+  });
 
 const SECONDS_PER_DAY = 24 * 60 * 60;
 const SECONDS_PER_WEEK = SECONDS_PER_DAY * 7;

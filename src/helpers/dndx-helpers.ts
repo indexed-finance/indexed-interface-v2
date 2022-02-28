@@ -1,6 +1,7 @@
-import { BigNumber, convert } from "helpers";
+import { BigNumber } from "bignumber.js";
 import { DEFAULT_DECIMAL_COUNT } from "config";
-import { TimeLockData } from "features";
+import { TimeLockData } from "features/timelocks/types";
+import { convert } from "./convert";
 
 export type Amount = {
   exact: BigNumber;

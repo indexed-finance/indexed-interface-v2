@@ -1,6 +1,6 @@
 import { IndexedDividendsSubgraphClient } from "@indexed-finance/subgraph-clients";
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import type { TimeLockData } from "./slice";
+import type { TimeLockData } from "./types";
 
 export const fetchTimelocksMetadata = createAsyncThunk(
   "timelocks/metadata/fetch",

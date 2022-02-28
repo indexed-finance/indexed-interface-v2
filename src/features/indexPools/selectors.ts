@@ -1,6 +1,6 @@
 import { DEFAULT_DECIMAL_COUNT } from "config";
 import { adapter } from "./slice";
-import { categoriesSelectors } from "features/categories";
+import { categoriesSelectors } from "features/categories/selectors";
 import { convert } from "helpers";
 import { createSelector } from "reselect";
 import { tokensSelectors } from "../tokens";

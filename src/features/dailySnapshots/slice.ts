@@ -1,15 +1,11 @@
 import { DailyPoolSnapshot } from "indexed-types";
-import { createEntityAdapter, createSlice } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
+import { dailySnapshotsAdapter } from "./selectors"
 import { fetchIndexPoolUpdates } from "../indexPools/requests";
 import { fetchInitialData } from "../requests";
 import { fetchSnapshotsData } from "./requests";
 import { mirroredServerState, restartedDueToError } from "../actions";
-import type { NormalizedDailySnapshot } from "./types";
 
-export const dailySnapshotsAdapter =
-  createEntityAdapter<NormalizedDailySnapshot>({
-    selectId: (entry) => entry.id.toLowerCase(),
-  });
 
 const slice = createSlice({
   name: "dailySnapshots",

@@ -1,15 +1,12 @@
+import { categoriesAdapter, categoriesSelectors as selectors } from "./selectors";
 import { createEntityAdapter, createSlice } from "@reduxjs/toolkit";
 import { fetchInitialData } from "../requests";
 import { mirroredServerState, restartedDueToError } from "../actions";
-import S from "string";
 import type { AppState } from "../store";
 import type { NormalizedCategory } from "./types";
 
-const adapter = createEntityAdapter<NormalizedCategory>({
-  selectId: (entry) => entry.id.toLowerCase(),
-});
-const initialState = adapter.getInitialState();
-const categoriesInitialState = adapter.addMany(initialState, [
+const initialState = categoriesAdapter.getInitialState();
+const categoriesInitialState = categoriesAdapter.addMany(initialState, [
   {
     id: "0x1",
     name: "Cryptocurrency",
@@ -119,7 +116,7 @@ const slice = createSlice({
               ...categories.entities[existing.id],
             }));
 
-          adapter.upsertMany(state, mapped);
+            categoriesAdapter.upsertMany(state, mapped);
         }
       })
       .addCase(mirroredServerState, (_, action) => action.payload.categories)
@@ -128,23 +125,3 @@ const slice = createSlice({
 
 export const { actions: categoriesActions, reducer: categoriesReducer } = slice;
 
-const selectors = adapter.getSelectors((state: AppState) => state.categories);
-
-export const categoriesSelectors = {
-  selectCategory: (state: AppState, categoryId: string) =>
-    selectors.selectById(state, categoryId),
-  selectCategoryLookup: (state: AppState) => selectors.selectEntities(state),
-  selectAllCategories: (state: AppState) => selectors.selectAll(state),
-  selectCategoryByName: (state: AppState, name: string) => {
-    const formatName = (from: string) => S(from).camelize().s.toLowerCase();
-    const formattedName = formatName(name);
-    const categories = categoriesSelectors
-      .selectAllCategories(state)
-      .reduce((prev, next) => {
-        prev[formatName(next.name)] = next;
-        return prev;
-      }, {} as Record<string, NormalizedCategory>);
-
-    return categories[formattedName] ?? null;
-  },
-};

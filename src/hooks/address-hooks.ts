@@ -14,7 +14,7 @@ import {
 	WETH_ADDRESS,
 } from "config";
 
-import { useChainId } from "hooks";
+import { useChainId } from "./settings-hooks";
 
 export function useAdapterRegistryAddress() {
 	const chainId = useChainId();
