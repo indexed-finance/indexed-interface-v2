@@ -101,7 +101,6 @@ async function executeChunk(
   } catch (err) {
     console.log("Got mC err");
     console.log(err);
-    console.log(_calls.map(c => c.target ? c.target : constants.AddressZero).join('\n'))
     throw err;
   }
 }
