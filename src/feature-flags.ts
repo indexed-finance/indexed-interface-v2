@@ -1,5 +1,5 @@
 export const FEATURE_FLAGS = {
-  useProductionServerLocally: false,
+  useProductionServerLocally: true,
   useSessionSaving: true,
   useFortmatic: true,
   useActionLogging: process.env.IS_SERVER === "true",
