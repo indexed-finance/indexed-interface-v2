@@ -145,9 +145,6 @@ export function usePoolDetailRegistrar(
           },
     [poolAddress, cachedIds]
   );
-  useEffect(() => {
-    console.log(`Pool Detail Registrar: calls changed`);
-  }, [onChainCalls, offChainCalls])
 
   useCallRegistrar({
     caller,
