@@ -5,14 +5,23 @@ import { FaGavel, FaListUl, FaSwimmingPool } from "react-icons/fa";
 import { GoLightBulb } from "react-icons/go";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, Space } from "antd";
-import { NETWORKS_BY_ID, SUPPORTED_NETWORKS } from "../../../config/network";
+import { NETWORKS, SUPPORTED_NETWORKS } from "../../../config/network";
 import { RiSafe2Line } from "react-icons/ri";
 import { useBreakpoints, useChainId, useRequestChangeNetworkCallback, useTranslator } from "hooks";
 import { useMemo } from "react";
 import Icon from "@ant-design/icons";
 
+const NETWORKS_BY_ID: Record<number, any> = {
+  '1': NETWORKS.mainnet,
+  '137': NETWORKS.polygon
+}
+
+function NetworkIcon({ chainId }: {chainId: number}) {
+  return <img style={{ height: '2em'}} src={require(`images/${NETWORKS_BY_ID[chainId].icon}`).default} />
+}
+
 // const MaticIcon = () => <img src={MaticIconSvg} />;
-const NetworkIcon = (chainId: number) => <img style={{ height: '2em'}} src={require(`images/${NETWORKS_BY_ID[chainId].icon}`).default} />
+// const NetworkIcon = (chainId: number) => <img style={{ height: '2em'}} src={require(`images/${NETWORKS_BY_ID[chainId].icon}`).default} />
 
 export function Navigation() {
   const tx = useTranslator();
@@ -102,14 +111,14 @@ export function Navigation() {
       </Menu.Item>
       <Menu.SubMenu
         title={NETWORKS_BY_ID[chainId].name}
-        icon={<Icon component={() => NetworkIcon(chainId)} style={{ position: "relative", top: -2, left: -10 }} />}
+        icon={<Icon component={() => <NetworkIcon chainId={chainId} />} style={{ position: "relative", top: -2, left: -10 }} />}
       >
         {SUPPORTED_NETWORKS.filter((n) => n !== chainId).map((id) => {
           const { name } = NETWORKS_BY_ID[id];
           return <Menu.Item key={`${name}-network`} onClick={() => requestChangeNetwork(id)}>
           {/* <Link to="/index-pools"> */}
             <Space size="large">
-              <Icon component={() => NetworkIcon(id)} style={{ position: "relative", top: -4 }}  />
+              <Icon component={() => <NetworkIcon chainId={id} />} style={{ position: "relative", top: -4 }}  />
               <span style={{ textTransform: "uppercase", fontSize: 20 }}>{name}</span>
             </Space>
           {/* </Link> */}
