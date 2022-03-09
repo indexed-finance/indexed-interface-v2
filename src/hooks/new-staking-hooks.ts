@@ -8,6 +8,7 @@ import {
 } from "./transaction-hooks";
 import { useCallRegistrar } from "./use-call-registrar";
 import { useCallback, useMemo } from "react";
+import { useChainId } from "./settings-hooks";
 import { useMultiTokenStakingContract } from "./contract-hooks";
 import { useNdxAddress } from "./address-hooks";
 import { useSelector } from "react-redux";
@@ -32,7 +33,7 @@ export const useNewStakingPool = (id: string) =>
   useSelector((state: AppState) => selectors.selectNewStakingPool(state, id));
 
 export function useNewStakingTokenPrice(id: string) {
-  
+  const chainId = useChainId()
   const stakingPool = useNewStakingPool(id);
   const [supplyTokens, _pairs, indexPool] = useMemo(() => {
     if (!stakingPool) return [[], [], ""];
@@ -44,7 +45,7 @@ export function useNewStakingTokenPrice(id: string) {
       stakingPool.token1 as string,
     ];
     const indexPool = (
-      stakingPool.token0?.toLowerCase() === WETH_ADDRESS
+      stakingPool.token0?.toLowerCase() === WETH_ADDRESS[chainId]
         ? stakingPool.token1
         : stakingPool.token0
     ) as string;
@@ -55,12 +56,12 @@ export function useNewStakingTokenPrice(id: string) {
           id: stakingPool.token.toLowerCase(),
           token0,
           token1,
-          exists: true,
+          exists: undefined,
         },
       ],
       indexPool,
     ];
-  }, [stakingPool]);
+  }, [stakingPool, chainId]);
   const [supplies, suppliesLoading] =
     useTotalSuppliesWithLoadingIndicator(supplyTokens);
   const [pairs, pairsLoading] = useUniswapPairs(_pairs);
