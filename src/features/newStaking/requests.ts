@@ -26,12 +26,11 @@ export const fetchNewStakingData = createAsyncThunk(
       const pairTokens = pools
         .filter((p) => p.isPairToken)
         .map(({ token: id, token0, token1 }) => ({
-          id,
+          id: id.toLowerCase(),
+          token0: token0?.toLowerCase(),
+          token1: token1?.toLowerCase(),
           exists: true,
-          token0,
-          token1,
         }));
-
       dispatch(pairsActions.uniswapPairsRegistered({ pairs: pairTokens, chainId }));
 
       return {
