@@ -76,7 +76,7 @@ const slice = createSlice({
                 entry.reserves0 = pair.reserves0;
                 entry.reserves1 = pair.reserves1;
               } else {
-                entry.exists = false;
+                if (entry.exists === undefined) entry.exists = false;
               }
             }
           } else {
@@ -179,7 +179,7 @@ const pairMulticallDataParser = createMulticallDataParser(
               convert.toBigNumber(value).isGreaterThan(0)
             );
 
-            prev[pairAddress] = {
+            prev[pairAddress.toLowerCase()] = {
               exists,
               reserves0,
               reserves1,

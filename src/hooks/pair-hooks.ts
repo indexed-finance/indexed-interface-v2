@@ -114,7 +114,7 @@ export function useUniswapPairs(
   usePairDataRegistrar(pairs);
 
   const isLoading = useMemo(() => {
-    return pairDatas.some((p) => !p || typeof p.exists === "undefined");
+    return pairDatas.some((p) => !p || typeof p.exists === "undefined" || (typeof p.reserves0 === "undefined" && p.exists));
   }, [pairDatas]);
 
   return useMemo(() => {
