@@ -52,8 +52,8 @@ export function IndexPoolInteractionBar({
 }) {
   const indexPoolInteractions = useIndexPoolInteractions(indexPool.id);
   const [activeTitle, setActiveTitle] = useState("");
-  const [activeKey, setActiveKey] = useState<"single" | "multi" | "router">(
-    "single"
+  const [activeKey, setActiveKey] = useState<"router" | "single" | "multi">(
+    "router"
   );
   const updateContent = useCallback(() => {
     let content: ReactNode;
@@ -73,18 +73,19 @@ export function IndexPoolInteractionBar({
             mode="horizontal"
             style={{ marginLeft: -12 }}
             activeKey={activeKey}
+            selectedKeys={[activeKey]}
             defaultActiveFirst={true}
           >
-            <Menu.Item onClick={() => setActiveKey("single")}>Single</Menu.Item>
-            <Menu.Item onClick={() => setActiveKey("multi")}>Multi</Menu.Item>
-            <Menu.Item onClick={() => setActiveKey("router")}>Router</Menu.Item>
+            <Menu.Item key="router" onClick={() => setActiveKey("router")}>Router</Menu.Item>
+            <Menu.Item key="single" onClick={() => setActiveKey("single")}>Single</Menu.Item>
+            <Menu.Item key="multi" onClick={() => setActiveKey("multi")}>Multi</Menu.Item>
           </Menu>
+          {activeKey === "router" && (
+            <MintInteraction indexPool={indexPool} uniswap={true} />
+          )}
           {activeKey === "single" && <MintInteraction indexPool={indexPool} />}
           {activeKey === "multi" && (
             <MintInteraction indexPool={indexPool} multi={true} />
-          )}
-          {activeKey === "router" && (
-            <MintInteraction indexPool={indexPool} uniswap={true} />
           )}
         </Space>
       );
@@ -96,18 +97,19 @@ export function IndexPoolInteractionBar({
             mode="horizontal"
             style={{ marginLeft: -12 }}
             activeKey={activeKey}
+            selectedKeys={[activeKey]}
             defaultActiveFirst={true}
           >
-            <Menu.Item onClick={() => setActiveKey("single")}>Single</Menu.Item>
-            <Menu.Item onClick={() => setActiveKey("multi")}>Multi</Menu.Item>
-            <Menu.Item onClick={() => setActiveKey("router")}>Router</Menu.Item>
+            <Menu.Item key="router" onClick={() => setActiveKey("router")}>Router</Menu.Item>
+            <Menu.Item key="single" onClick={() => setActiveKey("single")}>Single</Menu.Item>
+            <Menu.Item key="multi" onClick={() => setActiveKey("multi")}>Multi</Menu.Item>
           </Menu>
+          {activeKey === "router" && (
+            <BurnInteraction indexPool={indexPool} uniswap={true} />
+          )}
           {activeKey === "single" && <BurnInteraction indexPool={indexPool} />}
           {activeKey === "multi" && (
             <BurnInteraction indexPool={indexPool} multi={true} />
-          )}
-          {activeKey === "router" && (
-            <BurnInteraction indexPool={indexPool} uniswap={true} />
           )}
         </Space>
       );
