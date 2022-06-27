@@ -15,10 +15,6 @@
 
 ## Repo Structure
 
-### .storybook
-
-Contains setup files for [Storybook](https://storybook.js.org/), a solution for viewing components without surrounding app context.
-
 ### build [.gitignore]
 
 After building the app, the files are located here.
@@ -58,7 +54,6 @@ Contains the configuration logic for the socket server's webpack build, as well 
 | React-Redux      | https://react-redux.js.org/     | React-Redux connects a React app with a Redux data store.                                |
 | Redux Toolkit    | https://redux-toolkit.js.org/   | Redux Toolkit is an opinion toolset and pattern for Redux.                               |
 | Ant Design       | https://ant.design/             | Ant Design is a UI framework that contains React components.                             |
-| Storybook        | https://storybook.js.org/       | Storybook allows developers to view components in isolation.                             |
 | Cypress          | https://cypress.io/             | Cypress is an end-to-end test engine that automates quality assurance testing in Chrome. |
 | Typescript       | https://www.typescriptlang.org/ | TypeScript is a superset of ECMAScript that provides a robust build-time type solution.  |
 | Formik           | https://formik.org/             | Formik is a form solution to make forms easier in React.                                 |
