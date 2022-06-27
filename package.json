@@ -139,7 +139,6 @@
     "storybook": "start-storybook -p 6006",
     "storybook:deploy": "storybook-to-ghpages",
     "test": "react-app-rewired test",
-    "test:integration": "cypress open",
     "test:unit": "node scripts/test",
     "watch:data": "nodemon --watch ./data --exec \"node ./scripts/build-data.js\" -e js,md",
     "watch:themes": "nodemon --watch ./src/theme --exec \"THEME=dark node ./scripts/build-themes && THEME=light node ./scripts/build-themes\" -e less",
@@ -159,7 +158,6 @@
     "ignorePatterns": [
       "**/*.d.ts",
       "scripts/**/*",
-      "cypress/**/*",
       "**/*.js"
     ],
     "parser": "@typescript-eslint/parser",
