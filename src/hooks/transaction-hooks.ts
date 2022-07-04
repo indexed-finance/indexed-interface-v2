@@ -494,56 +494,8 @@ export function useBurnMultiTransactionCallback(poolAddress: string) {
   );
 }
 export interface StakingTransactionCallbacks {
-  stake: (amount: string) => void;
+  // stake: (amount: string) => void;
   withdraw: (amount: string) => void;
   exit: () => void;
   claim: () => void;
-}
-
-export function useStakingTransactionCallbacks(
-  stakingPool: string
-): StakingTransactionCallbacks {
-  const contract = useStakingRewardsContract(stakingPool);
-  const addTransaction = useAddTransactionCallback();
-
-  const stake = useCallback(
-    (amount: string) => {
-      // @todo Figure out a better way to handle this
-      if (!contract) throw new Error();
-      const tx = contract.stake(amount);
-      addTransaction(tx);
-    },
-    [contract, addTransaction]
-  );
-
-  const withdraw = useCallback(
-    (amount: string) => {
-      // @todo Figure out a better way to handle this
-      if (!contract) throw new Error();
-      const tx = contract.withdraw(amount);
-      addTransaction(tx);
-    },
-    [contract, addTransaction]
-  );
-
-  const exit = useCallback(() => {
-    // @todo Figure out a better way to handle this
-    if (!contract) throw new Error();
-    const tx = contract.exit();
-    addTransaction(tx);
-  }, [contract, addTransaction]);
-
-  const claim = useCallback(() => {
-    // @todo Figure out a better way to handle this
-    if (!contract) throw new Error();
-    const tx = contract.getReward();
-    addTransaction(tx);
-  }, [contract, addTransaction]);
-
-  return {
-    stake,
-    exit,
-    withdraw,
-    claim,
-  };
 }
