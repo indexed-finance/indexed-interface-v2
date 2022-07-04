@@ -4,7 +4,6 @@ import { changedNetwork } from "features/actions"; // Circular dependency.
 import { constants } from "ethers";
 import { convert, createMulticallDataParser } from "helpers";
 import { fetchMulticallData } from "../batcher/requests";
-import { stakingMulticallDataParser } from "../staking";
 import { tokensSelectors } from "../tokens";
 import { transactionFinalized } from "../transactions/actions";
 import type { AppState } from "../store";
@@ -39,7 +38,6 @@ const slice = createSlice({
     builder
       .addCase(fetchMulticallData.fulfilled, (state, action) => {
         const userData = userMulticallDataParser(action.payload);
-        const stakingData = stakingMulticallDataParser(action.payload);
 
         if (userData) {
           const { allowances, balances, ndx } = userData;
@@ -50,19 +48,6 @@ const slice = createSlice({
             state.allowances[key.toLowerCase()] = allowances[key];
           }
           state.ndx = ndx;
-        }
-
-        if (stakingData) {
-          for (const [stakingPoolAddress, update] of Object.entries(
-            stakingData
-          )) {
-            if (update.userData) {
-              state.staking[stakingPoolAddress] = {
-                balance: update.userData.userStakedBalance,
-                earned: update.userData.userRewardsEarned,
-              };
-            }
-          }
         }
 
         return state;
@@ -76,7 +61,7 @@ const slice = createSlice({
         }
       })
       .addCase(changedNetwork, (state, action) => {
-        delete state.balances[constants.AddressZero]
+        delete state.balances[constants.AddressZero];
       }),
 });
 

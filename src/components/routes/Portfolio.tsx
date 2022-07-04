@@ -1,9 +1,5 @@
 import { Card, Col, Empty, Row, Space, Typography } from "antd";
-import {
-  IndexSection,
-  LiquiditySection,
-  VaultSection,
-} from "components/portfolio";
+
 import {
   Page,
   PortfolioPieChart,
@@ -59,15 +55,6 @@ export default function Portfolio() {
                     {convert.toCurrency(data.totalValue.accrued)}
                   </Typography.Title>
                 </Card>
-                <Card title="Staked" type="inner" bordered={false}>
-                  <Typography.Title
-                    level={1}
-                    type="secondary"
-                    style={{ margin: 0, textTransform: "uppercase" }}
-                  >
-                    {convert.toCurrency(data.totalValue.staking)}
-                  </Typography.Title>
-                </Card>
               </Card>
             </Col>
             <Col xs={24} md={12} lg={8}>
@@ -110,100 +97,6 @@ export default function Portfolio() {
                     </Space>
                   </Typography.Title>
                 </Card>
-                {/* // Wait for dNDX */}
-                {/* <Card title="Staked" type="inner" bordered={false}>
-                  <Typography.Title
-                    level={1}
-                    type="danger"
-                    style={{ margin: 0, textTransform: "uppercase" }}
-                  >
-                    <Typography.Title
-                      level={1}
-                      style={{ margin: 0, textTransform: "uppercase" }}
-                    >
-                      <Space direction="vertical" size="large">
-                        <Token
-                          amount={data.governanceToken.staking.amount.toFixed(
-                            2
-                          )}
-                          symbol="NDX"
-                          name="NDX"
-                          size="large"
-                        />
-                        <Typography.Text
-                          type="secondary"
-                          style={{ textAlign: "right", margin: 0 }}
-                        >
-                          {convert.toCurrency(
-                            data.governanceToken.staking.value
-                          )}
-                        </Typography.Text>
-                      </Space>
-                    </Typography.Title>
-                  </Typography.Title>
-                </Card> */}
-              </Card>
-              <Card
-                bordered={false}
-                title={
-                  <Typography.Title
-                    type="warning"
-                    level={3}
-                    style={{
-                      margin: 0,
-                      marginRight: 24,
-                      textTransform: "uppercase",
-                    }}
-                  >
-                    Earned Rewards
-                  </Typography.Title>
-                }
-              >
-                <Card bordered={true} style={{ borderBottom: "none" }}>
-                  <Typography.Title
-                    level={1}
-                    style={{ margin: 0, textTransform: "uppercase" }}
-                  >
-                    <Space direction="vertical" size="large">
-                      <Token
-                        amount={data.earnedRewards.NDX.amount.toFixed(2)}
-                        symbol="NDX"
-                        name="NDX"
-                        size="large"
-                      />
-                      <Typography.Text
-                        type="success"
-                        style={{ textAlign: "right", margin: 0 }}
-                      >
-                        {data.earnedRewards.NDX.value}
-                      </Typography.Text>
-                    </Space>
-                  </Typography.Title>
-                </Card>
-                <Card
-                  bordered={true}
-                  style={{ borderTopLeftRadius: 0, borderTopRightRadius: 0 }}
-                >
-                  <Typography.Title
-                    level={1}
-                    style={{ margin: 0, textTransform: "uppercase" }}
-                  >
-                    <Space direction="vertical" size="large">
-                      <Token
-                        amount={data.earnedRewards.SUSHI.amount.toFixed(2)}
-                        symbol="SUSHI"
-                        name="SUSHI"
-                        size="large"
-                      />
-                      <Typography.Text
-                        type="success"
-                        style={{ textAlign: "right", margin: 0 }}
-                      >
-                        {data.earnedRewards.SUSHI.value}
-                      </Typography.Text>
-                    </Space>
-                  </Typography.Title>
-                </Card>
               </Card>
             </Col>
             <Col xs={24} lg={8}>
@@ -226,24 +119,7 @@ export default function Portfolio() {
                 <PortfolioPieChart data={data.chart} />
               </Card>
             </Col>
-            {/* <Col xs={24} lg={8}>
-              <div
-                style={{
-                  position: "relative",
-                  width: 200,
-                  height: 200,
-                  transform: `scale(${isMobile ? "1.2" : "1.6"}) ${
-                    isMobile ? "translateX(80px) translateY(40px)" : ""
-                  }`,
-                }}
-              >
-                <PortfolioPieChart data={data.chart} />
-              </div>
-            </Col> */}
           </Row>
-          <VaultSection />
-          <IndexSection />
-          <LiquiditySection />
         </>
       ) : (
         <Space direction="vertical" align="center" style={{ width: "100%" }}>

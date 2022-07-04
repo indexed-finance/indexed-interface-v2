@@ -41,11 +41,9 @@ export interface FormattedPortfolioAsset {
   symbol: string;
   isUniswapPair: boolean;
   isSushiswapPair: boolean;
-  hasStakingPool: boolean;
   balance: string;
-  staking: string;
   ndxEarned: string;
-  sushiEarned: string;
+  sushiEarned?: string;
   price: string;
   value: string;
   weight: string;

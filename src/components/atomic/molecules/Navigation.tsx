@@ -7,17 +7,27 @@ import { Link, useLocation } from "react-router-dom";
 import { Menu, Space } from "antd";
 import { NETWORKS, SUPPORTED_NETWORKS } from "../../../config/network";
 import { RiSafe2Line } from "react-icons/ri";
-import { useBreakpoints, useChainId, useRequestChangeNetworkCallback, useTranslator } from "hooks";
+import {
+  useBreakpoints,
+  useChainId,
+  useRequestChangeNetworkCallback,
+  useTranslator,
+} from "hooks";
 import { useMemo } from "react";
 import Icon from "@ant-design/icons";
 
 const NETWORKS_BY_ID: Record<number, any> = {
-  '1': NETWORKS.mainnet,
-  '137': NETWORKS.polygon
-}
+  "1": NETWORKS.mainnet,
+  "137": NETWORKS.polygon,
+};
 
-function NetworkIcon({ chainId }: {chainId: number}) {
-  return <img style={{ height: '2em'}} src={require(`images/${NETWORKS_BY_ID[chainId].icon}`).default} />
+function NetworkIcon({ chainId }: { chainId: number }) {
+  return (
+    <img
+      style={{ height: "2em" }}
+      src={require(`images/${NETWORKS_BY_ID[chainId].icon}`).default}
+    />
+  );
 }
 
 // const MaticIcon = () => <img src={MaticIconSvg} />;
@@ -28,10 +38,10 @@ export function Navigation() {
   const { isMobile } = useBreakpoints();
   const { pathname } = useLocation();
   const chainId = useChainId();
-  const requestChangeNetwork = useRequestChangeNetworkCallback()
+  const requestChangeNetwork = useRequestChangeNetworkCallback();
 
   const selectedKey = useMemo(() => {
-    for (const link of ["portfolio", "staking", "index-pools"]) {
+    for (const link of ["portfolio", "index-pools"]) {
       if (pathname.includes(link)) {
         return link;
       }
@@ -65,27 +75,11 @@ export function Navigation() {
             </Space>
           </Link>
         </Menu.Item>
-        <Menu.Item key="vaults">
-          <Link to="/vaults">
-            <Space size="small">
-              <RiSafe2Line style={{ position: "relative", top: 2 }} />{" "}
-              {!isMobile && <span>Vaults</span>}
-            </Space>
-          </Link>
-        </Menu.Item>
         <Menu.Item key="timelocks">
           <Link to="/timelocks">
             <Space size="small">
               <RiSafe2Line style={{ position: "relative", top: 2 }} />{" "}
               {!isMobile && <span>Timelocks</span>}
-            </Space>
-          </Link>
-        </Menu.Item>
-        <Menu.Item key="staking">
-          <Link to="/staking">
-            <Space>
-              <RiSafe2Line style={{ position: "relative", top: 2 }} />{" "}
-              {!isMobile && <span>Staking</span>}
             </Space>
           </Link>
         </Menu.Item>
@@ -111,20 +105,35 @@ export function Navigation() {
       </Menu.Item>
       <Menu.SubMenu
         title={NETWORKS_BY_ID[chainId].name}
-        icon={<Icon component={() => <NetworkIcon chainId={chainId} />} style={{ position: "relative", top: -2, left: -10 }} />}
+        icon={
+          <Icon
+            component={() => <NetworkIcon chainId={chainId} />}
+            style={{ position: "relative", top: -2, left: -10 }}
+          />
+        }
       >
         {SUPPORTED_NETWORKS.filter((n) => n !== chainId).map((id) => {
           const { name } = NETWORKS_BY_ID[id];
-          return <Menu.Item key={`${name}-network`} onClick={() => requestChangeNetwork(id)}>
-          {/* <Link to="/index-pools"> */}
-            <Space size="large">
-              <Icon component={() => <NetworkIcon chainId={id} />} style={{ position: "relative", top: -4 }}  />
-              <span style={{ textTransform: "uppercase", fontSize: 20 }}>{name}</span>
-            </Space>
-          {/* </Link> */}
-        </Menu.Item>
+          return (
+            <Menu.Item
+              key={`${name}-network`}
+              onClick={() => requestChangeNetwork(id)}
+            >
+              {/* <Link to="/index-pools"> */}
+              <Space size="large">
+                <Icon
+                  component={() => <NetworkIcon chainId={id} />}
+                  style={{ position: "relative", top: -4 }}
+                />
+                <span style={{ textTransform: "uppercase", fontSize: 20 }}>
+                  {name}
+                </span>
+              </Space>
+              {/* </Link> */}
+            </Menu.Item>
+          );
         })}
-       {/*  <Menu.Item key="eth-network">
+        {/*  <Menu.Item key="eth-network">
           <Link to="/index-pools">
             <Space size="large">
               <Icon component={MaticIcon} style={{ position: "relative", top: -4 }}  />{" "}

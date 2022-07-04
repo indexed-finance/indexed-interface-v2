@@ -1,4 +1,4 @@
-import { FormattedPortfolioAsset, NormalizedIndexPool, } from "features";
+import { FormattedPortfolioAsset, NormalizedIndexPool } from "features";
 import {
   PricedAsset,
   useToken,
@@ -16,23 +16,10 @@ import {
 } from "helpers";
 import { useAllPools } from "./pool-hooks";
 import { useChainId, useTheme } from "./settings-hooks";
-import {
-  useMasterChefInfoLookup,
-  useMasterChefPoolsForTokens,
-} from "./masterchef-hooks";
 import { useMemo } from "react";
 import { useNdxAddress, useSushiAddress } from "./address-hooks";
-import {
-  useNewStakingInfoLookup,
-  useNewStakingPoolsForTokens,
-} from "./new-staking-hooks";
 import { usePairExistsLookup } from "./pair-hooks";
-import {
-  useStakingInfoLookup,
-  useStakingPoolsForTokens,
-} from "./staking-hooks";
 import { useTokenBalances } from "./user-hooks";
-import { useVaultPortfolioTotalValue } from "./vault-hooks";
 import S from "string";
 
 type RawAsset = {
@@ -44,7 +31,11 @@ type RawAsset = {
 };
 
 export const buildEthUniPair = (asset: RawAsset, chainId: number) => ({
-  id: computeUniswapPairAddress(asset.id, WETH_ADDRESS[chainId], chainId).toLowerCase(),
+  id: computeUniswapPairAddress(
+    asset.id,
+    WETH_ADDRESS[chainId],
+    chainId
+  ).toLowerCase(),
   symbol: `UNIV2:ETH-${asset.symbol}`,
   name: `Uniswap V2: ETH-${asset.symbol}`,
   isUniswapPair: true,
@@ -64,8 +55,8 @@ export const buildEthSushiPair = (asset: RawAsset, chainId: number) => ({
 export function usePortfolioTokensAndEthPairs(
   indexPools: NormalizedIndexPool[]
 ): RawAsset[] {
-  const chainId = useChainId()
-  const ndxAddress = useNdxAddress()
+  const chainId = useChainId();
+  const ndxAddress = useNdxAddress();
   return useMemo(() => {
     const baseTokens = [
       ...indexPools.map(({ id, name, symbol }) => ({
@@ -73,14 +64,13 @@ export function usePortfolioTokensAndEthPairs(
         name,
         symbol,
       })),
-      
     ];
     if (ndxAddress) {
       baseTokens.push({
         id: ndxAddress.toLowerCase(),
         name: "Indexed",
         symbol: "NDX",
-      })
+      });
     }
     const pairTokens = baseTokens.reduce(
       (arr, asset) => [
@@ -96,11 +86,11 @@ export function usePortfolioTokensAndEthPairs(
 }
 
 function usePriceLookupArgs(indexPools: NormalizedIndexPool[]): PricedAsset[] {
-  const ndxAddress = useNdxAddress()
+  const ndxAddress = useNdxAddress();
   return useMemo(() => {
     const ids = indexPools.map((p) => p.id.toLowerCase());
     if (ndxAddress) {
-      ids.push(ndxAddress.toLowerCase())
+      ids.push(ndxAddress.toLowerCase());
     }
     return ids.reduce(
       (prev, id) => [
@@ -116,17 +106,14 @@ function usePriceLookupArgs(indexPools: NormalizedIndexPool[]): PricedAsset[] {
 
 export function useAllPortfolioData() {
   // Common
-  const ndxAddress = useNdxAddress()
-  const sushiAddress = useSushiAddress()
+  const ndxAddress = useNdxAddress();
+  const sushiAddress = useSushiAddress();
   const allIndexes = useAllPools();
   const tokenLookup = useTokenLookup();
   const priceLookupArgs = usePriceLookupArgs(allIndexes);
   const priceLookup = useTokenPricesLookup(priceLookupArgs);
   const ndxPrice = priceLookup[ndxAddress?.toLowerCase() ?? ""] ?? 0;
   const sushiPrice = useToken(sushiAddress)?.priceData?.price ?? 10;
-
-  // Vaults
-  const vaultsTotalValue = useVaultPortfolioTotalValue();
 
   // Indexes
   const tokensAndEthPairs = usePortfolioTokensAndEthPairs(allIndexes);
@@ -157,15 +144,7 @@ export function useAllPortfolioData() {
   }, [tokensAndEthPairs]);
 
   // -- Basic
-  const assetIds = indexIds.concat(liquidityIds);
-  const stakingPoolsByToken = useStakingPoolsForTokens(assetIds);
-  const stakingInfoLookup = useStakingInfoLookup();
-  const uniswapStakingInfoLookup = useNewStakingInfoLookup(assetIds);
-  const sushiswapStakingInfoLookup = useMasterChefInfoLookup(assetIds);
-
   // #region Assets
-  let earnedNdx = 0;
-  let earnedSushi = 0;
 
   const assetData = indexIds
     .concat(liquidityIds)
@@ -208,63 +187,6 @@ export function useAllPortfolioData() {
         returnValue.inWallet.value = walletValue;
         returnValue.inWallet.symbol = symbol;
 
-        // -- Accrued and Staking
-        const associatedStakingPool = stakingPoolsByToken[index];
-        const [
-          associatedStakingUserInfo,
-          associatedUniswapStakingUserInfo,
-          associatedSushiswapStakingUserInfo,
-        ] = [
-          associatedStakingPool
-            ? stakingInfoLookup[associatedStakingPool.id]
-            : undefined,
-          uniswapStakingInfoLookup[assetId.toLowerCase()],
-          sushiswapStakingInfoLookup[assetId.toLowerCase()],
-        ];
-
-        // -- Through us...
-        if (associatedStakingUserInfo) {
-          const amount = convert.toBalanceNumber(
-            associatedStakingUserInfo.earned,
-            decimals
-          );
-
-          earnedNdx += amount;
-
-          returnValue.accrued.amount += amount;
-          returnValue.accrued.symbol = "NDX";
-
-          returnValue.staking.amount += convert.toBalanceNumber(
-            associatedStakingUserInfo.balance,
-            decimals
-          );
-          returnValue.staking.symbol = symbol;
-        }
-
-        // -- Through Uniswap...
-        if (associatedUniswapStakingUserInfo) {
-          const amount = associatedUniswapStakingUserInfo?.rewards ?? 0;
-
-          earnedNdx += amount;
-
-          returnValue.accrued.amount += amount;
-          returnValue.accrued.symbol = "NDX";
-          returnValue.staking.amount +=
-            associatedUniswapStakingUserInfo?.balance ?? 0;
-        }
-
-        // -- Through Sushiswap...
-        if (associatedSushiswapStakingUserInfo) {
-          const amount = associatedSushiswapStakingUserInfo?.rewards ?? 0;
-
-          earnedSushi += amount;
-
-          returnValue.accrued.amount += amount;
-          returnValue.accrued.symbol = "SUSHI";
-          returnValue.staking.amount +=
-            associatedSushiswapStakingUserInfo?.balance ?? 0;
-        }
-
         // Calculate values.
         returnValue.staking.value = returnValue.staking.amount * price;
 
@@ -294,7 +216,7 @@ export function useAllPortfolioData() {
       return prev;
     },
     {
-      inWallet: vaultsTotalValue,
+      inWallet: 0,
       accrued: 0,
       staking: 0,
     }
@@ -358,24 +280,11 @@ export function useAllPortfolioData() {
   return {
     totalValue,
     governanceToken,
-    earnedRewards: {
-      NDX: {
-        amount: earnedNdx,
-        value: convert.toCurrency(earnedNdx * ndxPrice),
-      },
-      SUSHI: {
-        amount: earnedSushi,
-        value: convert.toCurrency(earnedSushi * sushiPrice),
-      },
-    },
+    earnedRewards: {},
     chart: [
       {
         name: "NDX",
         value: ndxValue / ecosystemTotalValue,
-      },
-      {
-        name: "Vaults",
-        value: vaultsTotalValue / ecosystemTotalValue,
       },
       {
         name: "Indexes",
@@ -403,7 +312,7 @@ export function usePortfolioData({
   totalValue: string;
   totalNdxEarned: string;
 } {
-  const theme = useTheme()
+  const theme = useTheme();
   const ndxAddress = useNdxAddress() ?? "";
   const indexPools = useAllPools();
   const assetsRaw = usePortfolioTokensAndEthPairs(indexPools);
@@ -428,12 +337,6 @@ export function usePortfolioData({
   }, [assetsRaw, pairExistsLookup]);
 
   const balances = useTokenBalances(assetIds);
-  const stakingPoolsByTokens = useStakingPoolsForTokens(assetIds);
-  const newStakingPoolsByTokens = useNewStakingPoolsForTokens(assetIds);
-  const stakingInfoLookup = useStakingInfoLookup();
-  const masterChefPools = useMasterChefPoolsForTokens(assetIds);
-  const newStakingInfoLookup = useNewStakingInfoLookup(assetIds);
-  const masterChefInfoLookup = useMasterChefInfoLookup(assetIds);
   const tokenLookup = useTokenLookup();
 
   return useMemo(() => {
@@ -442,47 +345,14 @@ export function usePortfolioData({
 
     const portfolioTokens: FormattedPortfolioAsset[] = assets.map(
       ({ name, symbol, id, isUniswapPair, isSushiswapPair }, i) => {
-        const stakingPool = stakingPoolsByTokens[i];
-        const newStakingPool = newStakingPoolsByTokens[i];
-        const masterChefPool = masterChefPools[i];
-        const stakingPoolUserInfo = stakingPool
-          ? stakingInfoLookup[stakingPool.id.toLowerCase()]
-          : undefined;
-        const newStakingPoolUserInfo = newStakingInfoLookup[id.toLowerCase()];
-        const masterchefUserInfo = masterChefInfoLookup[id.toLowerCase()];
         const decimals = tokenLookup[id]?.decimals ?? 18;
 
-        let ndxEarned = 0;
-        let staked = 0;
-        let sushiEarned = 0;
-
-        if (stakingPoolUserInfo) {
-          const earned = convert.toBalanceNumber(
-            stakingPoolUserInfo.earned,
-            decimals
-          );
-          ndxEarned += earned;
-          staked += convert.toBalanceNumber(
-            stakingPoolUserInfo.balance,
-            decimals,
-            6
-          );
-        }
-
-        if (newStakingPoolUserInfo) {
-          ndxEarned += newStakingPoolUserInfo.rewards;
-          staked += newStakingPoolUserInfo.balance;
-        }
-
-        if (masterchefUserInfo) {
-          sushiEarned += masterchefUserInfo.rewards;
-          staked += masterchefUserInfo.balance;
-        }
+        const ndxEarned = 0;
 
         totalNdxEarned += ndxEarned;
         const price = priceLookup[id] ?? 0;
         const balance = convert.toBalanceNumber(balances[i] ?? "0", decimals);
-        const value = (staked + balance) * price;
+        const value = balance * price;
 
         totalValue += value;
         const link = isUniswapPair
@@ -502,16 +372,12 @@ export function usePortfolioData({
           image: symbol,
           isUniswapPair: Boolean(isUniswapPair),
           isSushiswapPair: Boolean(isSushiswapPair),
-          hasStakingPool: Boolean(
-            stakingPool || newStakingPool || masterChefPool
-          ),
+          hasStakingPool: false,
           price: price.toFixed(2),
           balance: balance.toFixed(2),
           value: value.toFixed(2),
           weight: "",
-          staking: staked > 0 ? staked.toFixed(2) : "",
           ndxEarned: ndxEarned.toFixed(2),
-          sushiEarned: sushiEarned.toFixed(2),
         };
       }
     );
@@ -538,9 +404,7 @@ export function usePortfolioData({
     if (onlyOwnedAssets) {
       tokensToUse = tokensToUse.filter((token) => {
         const hasBalance = token.balance !== "0.00";
-        const isStaking = token.staking !== "";
-
-        return hasBalance || isStaking;
+        return hasBalance;
       });
     }
 
@@ -553,16 +417,10 @@ export function usePortfolioData({
   }, [
     assets,
     balances,
-    stakingInfoLookup,
     theme,
-    stakingPoolsByTokens,
     priceLookup,
-    newStakingInfoLookup,
     tokenLookup,
-    masterChefInfoLookup,
-    masterChefPools,
-    newStakingPoolsByTokens,
     onlyOwnedAssets,
-    ndxAddress
+    ndxAddress,
   ]);
 }
