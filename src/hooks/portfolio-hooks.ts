@@ -1,4 +1,4 @@
-import { FormattedPortfolioAsset, NormalizedIndexPool } from "features";
+import { NormalizedIndexPool } from "features";
 import {
   PricedAsset,
   useToken,
@@ -10,17 +10,12 @@ import {
   computeSushiswapPairAddress,
   computeUniswapPairAddress,
   convert,
-  sushiswapInfoPairLink,
-  uniswapInfoPairLink,
-  uniswapInfoTokenLink,
 } from "helpers";
 import { useAllPools } from "./pool-hooks";
-import { useChainId, useTheme } from "./settings-hooks";
+import { useChainId } from "./settings-hooks";
 import { useMemo } from "react";
 import { useNdxAddress, useSushiAddress } from "./address-hooks";
-import { usePairExistsLookup } from "./pair-hooks";
 import { useTokenBalances } from "./user-hooks";
-import S from "string";
 
 type RawAsset = {
   id: string;
@@ -161,11 +156,6 @@ export function useAllPortfolioData() {
           value: 0,
           symbol: "",
         },
-        staking: {
-          amount: 0,
-          value: 0,
-          symbol: "",
-        },
       };
 
       // -- Common
@@ -187,9 +177,6 @@ export function useAllPortfolioData() {
         returnValue.inWallet.value = walletValue;
         returnValue.inWallet.symbol = symbol;
 
-        // Calculate values.
-        returnValue.staking.value = returnValue.staking.amount * price;
-
         if (returnValue.accrued.symbol === "NDX") {
           returnValue.accrued.value = returnValue.accrued.amount * ndxPrice;
         } else if (returnValue.accrued.symbol === "SUSHI") {
@@ -210,7 +197,6 @@ export function useAllPortfolioData() {
       if (next) {
         prev.inWallet += next.inWallet.value;
         prev.accrued += next.accrued.value;
-        prev.staking += next.staking.value;
       }
 
       return prev;
@@ -218,11 +204,9 @@ export function useAllPortfolioData() {
     {
       inWallet: 0,
       accrued: 0,
-      staking: 0,
     }
   );
-  const ecosystemTotalValue =
-    totalValue.inWallet + totalValue.accrued + totalValue.staking;
+  const ecosystemTotalValue = totalValue.inWallet + totalValue.accrued;
   // #endregion
 
   // #region Governance Token
@@ -230,10 +214,6 @@ export function useAllPortfolioData() {
     (each) => each && each.id.toLowerCase() === ndxAddress?.toLowerCase()
   ) ?? {
     inWallet: {
-      amount: 0,
-      value: 0,
-    },
-    staking: {
       amount: 0,
       value: 0,
     },
@@ -259,21 +239,18 @@ export function useAllPortfolioData() {
     if (isNdx) {
       ndxValue += asset.inWallet.value;
       ndxValue += asset.accrued.value;
-      ndxValue += asset.staking.value;
     } else if (isIndex(asset.id)) {
       // Index
       indexAssets.push(asset);
 
       indexValue += asset.inWallet.value;
       indexValue += asset.accrued.value;
-      indexValue += asset.staking.value;
     } else {
       // Liquidity
       liquidityAssets.push(asset);
 
       liquidityValue += asset.inWallet.value;
       liquidityValue += asset.accrued.value;
-      liquidityValue += asset.staking.value;
     }
   }
 
@@ -300,127 +277,4 @@ export function useAllPortfolioData() {
       liquidity: liquidityAssets,
     },
   };
-}
-
-export function usePortfolioData({
-  onlyOwnedAssets,
-}: {
-  onlyOwnedAssets: boolean;
-}): {
-  tokens: FormattedPortfolioAsset[];
-  ndx: FormattedPortfolioAsset;
-  totalValue: string;
-  totalNdxEarned: string;
-} {
-  const theme = useTheme();
-  const ndxAddress = useNdxAddress() ?? "";
-  const indexPools = useAllPools();
-  const assetsRaw = usePortfolioTokensAndEthPairs(indexPools);
-  const pairIds = useMemo(() => {
-    return assetsRaw
-      .filter((a) => a.isSushiswapPair || a.isUniswapPair)
-      .map((a) => a.id);
-  }, [assetsRaw]);
-
-  const priceLookupArgs = usePriceLookupArgs(indexPools);
-  const priceLookup = useTokenPricesLookup(priceLookupArgs);
-  const pairExistsLookup = usePairExistsLookup(pairIds);
-  const [assets, assetIds] = useMemo(() => {
-    const assets = assetsRaw.filter(
-      (asset) =>
-        pairExistsLookup[asset.id] ||
-        !(asset.isUniswapPair || asset.isSushiswapPair)
-    );
-    const assetIds = assets.map((asset) => asset.id);
-
-    return [assets, assetIds];
-  }, [assetsRaw, pairExistsLookup]);
-
-  const balances = useTokenBalances(assetIds);
-  const tokenLookup = useTokenLookup();
-
-  return useMemo(() => {
-    let totalNdxEarned = 0;
-    let totalValue = 0;
-
-    const portfolioTokens: FormattedPortfolioAsset[] = assets.map(
-      ({ name, symbol, id, isUniswapPair, isSushiswapPair }, i) => {
-        const decimals = tokenLookup[id]?.decimals ?? 18;
-
-        const ndxEarned = 0;
-
-        totalNdxEarned += ndxEarned;
-        const price = priceLookup[id] ?? 0;
-        const balance = convert.toBalanceNumber(balances[i] ?? "0", decimals);
-        const value = balance * price;
-
-        totalValue += value;
-        const link = isUniswapPair
-          ? uniswapInfoPairLink(id.toLowerCase())
-          : isSushiswapPair
-          ? sushiswapInfoPairLink(id.toLowerCase())
-          : id.toLowerCase() === ndxAddress?.toLowerCase()
-          ? uniswapInfoTokenLink(ndxAddress)
-          : `/index-pools/${S(name).slugify().s}`;
-
-        return {
-          address: id,
-          decimals,
-          name,
-          symbol,
-          link,
-          image: symbol,
-          isUniswapPair: Boolean(isUniswapPair),
-          isSushiswapPair: Boolean(isSushiswapPair),
-          hasStakingPool: false,
-          price: price.toFixed(2),
-          balance: balance.toFixed(2),
-          value: value.toFixed(2),
-          weight: "",
-          ndxEarned: ndxEarned.toFixed(2),
-        };
-      }
-    );
-
-    const ndx = portfolioTokens.find(
-      (t) => t.address === ndxAddress.toLowerCase()
-    ) as FormattedPortfolioAsset;
-    if (ndx) {
-      const earnedValue = totalNdxEarned * parseFloat(ndx.price);
-      ndx.value = (parseFloat(ndx.value) + earnedValue).toFixed(2);
-      ndx.image = `indexed-${theme}`;
-      totalValue += earnedValue;
-    }
-    portfolioTokens.sort((a, b) => parseFloat(b.value) - parseFloat(a.value));
-    portfolioTokens.forEach((token) => {
-      token.weight = convert.toPercent(parseFloat(token.value) / totalValue);
-      token.value = convert.toCurrency(parseFloat(token.value));
-    });
-
-    let tokensToUse = portfolioTokens.filter(
-      (t) => t.address !== ndxAddress.toLowerCase()
-    );
-
-    if (onlyOwnedAssets) {
-      tokensToUse = tokensToUse.filter((token) => {
-        const hasBalance = token.balance !== "0.00";
-        return hasBalance;
-      });
-    }
-
-    return {
-      ndx,
-      tokens: tokensToUse,
-      totalValue: convert.toCurrency(totalValue.toFixed(2)),
-      totalNdxEarned: totalNdxEarned.toFixed(2),
-    };
-  }, [
-    assets,
-    balances,
-    theme,
-    priceLookup,
-    tokenLookup,
-    onlyOwnedAssets,
-    ndxAddress,
-  ]);
 }

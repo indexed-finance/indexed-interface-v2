@@ -15,7 +15,6 @@ const initialState: NormalizedUser & { connected: boolean } = {
   address: "",
   allowances: {},
   balances: {},
-  staking: {},
   ndx: null,
   connected: false,
 };
@@ -85,16 +84,6 @@ export const userSelectors = {
   },
   selectTokenBalances(state: AppState, tokenIds: string[]) {
     return tokenIds.map((id) => state.user.balances[id.toLowerCase()] ?? "0");
-  },
-  selectStakingInfoLookup(state: AppState) {
-    const stakingPoolIds = Object.keys(state.user.staking);
-    return stakingPoolIds.reduce(
-      (prev, next) => ({
-        ...prev,
-        [next as string]: state.user.staking[next],
-      }),
-      {} as Record<string, { balance: string; earned: string }>
-    );
   },
   selectApprovalStatus(
     state: AppState,

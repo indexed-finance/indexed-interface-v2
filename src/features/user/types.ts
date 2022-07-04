@@ -1,8 +1,3 @@
-export interface NormalizedUserStakingData {
-  balance: string;
-  earned: string;
-}
-
 export interface NormalizedUser {
   address: string;
   allowances: Record<
@@ -10,7 +5,6 @@ export interface NormalizedUser {
     string /* Token Balance */
   >;
   balances: Record<string /* <tokenId> */, string /* Token Balance */>;
-  staking: Record<string /* <stakingPoolId> */, NormalizedUserStakingData>;
   ndx: null | string;
 }
 
@@ -22,7 +16,6 @@ export type FormattedPortfolioDatum = {
   value: string;
   weight: string;
   link?: string;
-  staking?: string;
   earned?: string;
   image?: string;
 };
@@ -40,10 +33,8 @@ export interface FormattedPortfolioAsset {
   image: string;
   symbol: string;
   isUniswapPair: boolean;
-  isSushiswapPair: boolean;
   balance: string;
   ndxEarned: string;
-  sushiEarned?: string;
   price: string;
   value: string;
   weight: string;

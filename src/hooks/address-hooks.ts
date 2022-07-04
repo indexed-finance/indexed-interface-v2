@@ -3,9 +3,7 @@ import {
   DAI_ADDRESS,
   DNDX_ADDRESS,
   DNDX_TIMELOCK_ADDRESS,
-  MASTER_CHEF_ADDRESS,
   MULTICALL2_ADDRESS,
-  MULTI_TOKEN_STAKING_ADDRESS,
   NARWHAL_ROUTER_ADDRESS,
   NDX_ADDRESS,
   SUSHI_ADDRESS,
@@ -39,11 +37,6 @@ export function useSharesTimeLockAddress() {
 export function useMultiCall2Address() {
   const chainId = useChainId();
   return MULTICALL2_ADDRESS[chainId];
-}
-
-export function useMultiTokenStakingAddress() {
-  const chainId = useChainId();
-  return MULTI_TOKEN_STAKING_ADDRESS[chainId];
 }
 
 export function useIndexedNarwhalRouterAddress() {

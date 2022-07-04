@@ -2,9 +2,7 @@ import {
   ADAPTER_REGISTRY_ADDRESS,
   DNDX_ADDRESS,
   DNDX_TIMELOCK_ADDRESS,
-  MASTER_CHEF_ADDRESS,
   MULTICALL2_ADDRESS,
-  MULTI_TOKEN_STAKING_ADDRESS,
   NARWHAL_ROUTER_ADDRESS,
   UNISWAP_ROUTER_ADDRESS,
 } from "config";
@@ -76,12 +74,6 @@ export function useMultiCall2Contract() {
   return useContractWithSigner(address, "MultiCall2");
 }
 
-export function useMultiTokenStakingContract() {
-  const chainId = useChainId();
-  const address = MULTI_TOKEN_STAKING_ADDRESS[chainId];
-  return useContractWithSigner(address, "MultiTokenStaking");
-}
-
 export function usePairContract(address: string) {
   return useContractWithSigner(address, "Pair");
 }
@@ -94,14 +86,6 @@ export function useTimelockContract() {
   const chainId = useChainId();
   const address = DNDX_TIMELOCK_ADDRESS[chainId];
   return useContractWithSigner(address, "SharesTimeLock");
-}
-
-export function useStakingRewardsContract(address: string) {
-  return useContractWithSigner(address, "StakingRewards");
-}
-
-export function useStakingRewardsFactoryContract(address: string) {
-  return useContractWithSigner(address, "StakingRewardsFactory");
 }
 
 export function useUniswapRouterContract() {

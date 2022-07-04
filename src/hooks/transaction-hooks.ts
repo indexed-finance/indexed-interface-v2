@@ -492,8 +492,3 @@ export function useBurnMultiTransactionCallback(poolAddress: string) {
     [contract, addTransaction]
   );
 }
-export interface StakingTransactionCallbacks {
-  withdraw: (amount: string) => void;
-  exit: () => void;
-  claim: () => void;
-}
