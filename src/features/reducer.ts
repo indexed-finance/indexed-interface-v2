@@ -3,7 +3,6 @@ import { categoriesReducer } from "./categories";
 import { combineReducers } from "@reduxjs/toolkit";
 import { dailySnapshotsReducer } from "./dailySnapshots";
 import { indexPoolsReducer } from "./indexPools";
-import { masterChefReducer } from "./masterChef";
 import { pairsReducer } from "./pairs";
 import { settingsReducer } from "./settings";
 import { timelocksReducer } from "./timelocks";
@@ -22,5 +21,4 @@ export const rootReducer = combineReducers({
   tokens: tokensReducer,
   transactions: transactionsReducer,
   user: userReducer,
-  masterChef: masterChefReducer,
 });

@@ -4,7 +4,6 @@
 export * from "./address-hooks";
 export * from "./burn-hooks";
 export * from "./contract-hooks";
-export * from "./masterchef-hooks";
 export * from "./mint-hooks";
 export * from "./notification-hooks";
 export * from "./pair-hooks";

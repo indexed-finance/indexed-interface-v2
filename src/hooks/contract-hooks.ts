@@ -71,12 +71,6 @@ export function useIPoolInitializerContract(address: string) {
   return useContractWithSigner(address, "IPoolInitializer");
 }
 
-export function useMasterChefContract() {
-  const chainId = useChainId();
-  const address = MASTER_CHEF_ADDRESS[chainId];
-  return useContractWithSigner(address, "MasterChef");
-}
-
 export function useMultiCall2Contract() {
   const address = MULTICALL2_ADDRESS;
   return useContractWithSigner(address, "MultiCall2");

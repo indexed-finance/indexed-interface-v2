@@ -6,19 +6,16 @@ import {
   indexPoolsSelectors,
 } from "./indexPools";
 import { FormattedPair, pairsSelectors } from "./pairs";
-import { FormattedPortfolioData, userSelectors } from "./user";
-import { MasterChefPool, masterChefSelectors } from "./masterChef";
-import { NDX_ADDRESS, WETH_ADDRESS } from "config";
 import { NormalizedToken, tokensSelectors } from "./tokens";
 import { NormalizedTransaction, transactionsSelectors } from "./transactions";
 import { batcherSelectors } from "./batcher";
-import { computeSushiswapPairAddress, convert } from "helpers";
+import { convert } from "helpers";
 import { createSelector } from "reselect";
 import { dailySnapshotsSelectors } from "./dailySnapshots";
 import { formatDistance } from "date-fns";
 import { settingsSelectors } from "./settings";
-import { sortTokens } from "@indexed-finance/indexed.js/dist/utils/address";
 import { timelocksSelectors } from "./timelocks";
+import { userSelectors } from "./user";
 import S from "string";
 import type { AppState } from "./store";
 
@@ -35,7 +32,6 @@ export const selectors = {
   ...userSelectors,
   ...pairsSelectors,
   ...transactionsSelectors,
-  ...masterChefSelectors,
   // Categories
   selectFormattedCategory: (
     state: AppState,
@@ -125,7 +121,6 @@ export const selectors = {
         ? ({
             chainId: pool.chainId,
             category: pool.category.id,
-            canStake: false,
             id: pool.id,
             symbol: pool.symbol,
             priceUsd: stats ? convert.toCurrency(stats.price) : "",
@@ -228,110 +223,6 @@ export const selectors = {
 
         return parseFloat(bValue) - parseFloat(aValue);
       });
-  },
-  selectPossibleMasterChefPairs(state: AppState) {
-    const indexPoolIds = selectors.selectAllPoolIds(state);
-    const chainId = selectors.selectNetwork(state);
-    const ndxAddress = NDX_ADDRESS[chainId];
-    const wethAddress = WETH_ADDRESS[chainId];
-    if (!ndxAddress || !wethAddress) {
-      return [];
-    }
-    return [...indexPoolIds, ndxAddress].map((token) => {
-      const [token0, token1] = sortTokens(token, wethAddress);
-      return {
-        id: computeSushiswapPairAddress(token0, token1, chainId).toLowerCase(),
-        token0: token0.toLowerCase(),
-        token1: token1.toLowerCase(),
-        sushiswap: true,
-        exists: undefined,
-      };
-    });
-  },
-  selectMasterChefPoolsWithRecognizedPairs(state: AppState): MasterChefPool[] {
-    const pairIds = selectors
-      .selectPossibleMasterChefPairs(state)
-      .map((p) => p.id);
-    const pools = selectors.selectMasterChefPoolsByStakingTokens(
-      state,
-      pairIds
-    );
-    return pools.filter((_) => Boolean(_)) as MasterChefPool[];
-  },
-  // User
-  selectFormattedPortfolio(
-    state: AppState,
-    ethPrice: number
-  ): FormattedPortfolioData {
-    const theme = selectors.selectTheme(state);
-    const chainId = selectors.selectNetwork(state);
-    const poolLookup = selectors.selectPoolLookup(state);
-    const tokenLookup = selectors.selectTokenLookup(state);
-    const tokenBalanceLookup = selectors.selectTokenSymbolsToBalances(state);
-    const { staking } = selectors.selectUser(state);
-    const ndxBalance = selectors.selectNdxBalance(state);
-    const ndxEarned = Object.values(staking).reduce((prev, next) => {
-      const { earned } = next;
-      const parsed = convert.toBigNumber(earned).toNumber();
-
-      return prev + parsed;
-    }, 0);
-    const ndxPrice = selectors.selectNdxPrice(state, ethPrice);
-    const ndxValue = ndxBalance * ndxPrice;
-
-    let accumulatedValue = ndxValue;
-    const accumulatedTokenValues: number[] = [];
-    const processedTokens = selectors.selectAllPoolIds(state).map((poolId) => {
-      const pool = poolLookup[poolId]!;
-
-      const balanceAsNumber = convert.toBigNumber(
-        tokenBalanceLookup[pool.symbol.toLowerCase()]
-      );
-      const displayedBalance = convert.toBalance(balanceAsNumber);
-      const poolToken = tokenLookup[pool.id];
-      const poolTokenPrice = poolToken?.priceData?.price ?? 0;
-      const value = balanceAsNumber.times(poolTokenPrice).toNumber();
-      const displayedValue = convert.toCurrency(value);
-
-      accumulatedTokenValues.push(value);
-      accumulatedValue += value;
-
-      return {
-        address: pool.id,
-        link: `/index-pools/${S(pool.name).slugify().s}`,
-        symbol: pool.symbol,
-        name: pool.name,
-        balance: displayedBalance,
-        staking: staking[pool.id]?.balance ?? "",
-        value: displayedValue,
-        weight: "0.00%", // Calculate weight after.
-      };
-    });
-    const tokens = processedTokens.map((token, index) => ({
-      ...token,
-      weight: convert.toPercent(
-        accumulatedTokenValues[index] / accumulatedValue
-      ),
-    }));
-    const formattedPortfolio: FormattedPortfolioData = {
-      tokens,
-      totalValue: convert.toCurrency(accumulatedValue),
-    };
-    const ndxAddress = NDX_ADDRESS[chainId];
-    if (ndxAddress) {
-      formattedPortfolio.ndx = {
-        address: ndxAddress,
-        image: `indexed-${theme}`,
-        symbol: "NDX",
-        name: "Indexed",
-        balance: `${ndxBalance.toFixed(2)}`,
-        value: convert.toCurrency(ndxValue),
-        earned: ndxEarned.toFixed(2),
-        weight: convert.toPercent(ndxValue / accumulatedValue),
-      };
-    }
-
-    return formattedPortfolio;
   },
   // Pairs
   selectFormattedPairsById: (

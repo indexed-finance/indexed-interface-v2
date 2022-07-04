@@ -9,7 +9,6 @@ import { useDispatch } from "react-redux";
 import {
   useIndexPoolContract,
   useIndexedNarwhalRouterContract,
-  useStakingRewardsContract,
   useTokenContract,
 } from "./contract-hooks";
 import { usePoolSymbol } from "./pool-hooks";
@@ -494,7 +493,6 @@ export function useBurnMultiTransactionCallback(poolAddress: string) {
   );
 }
 export interface StakingTransactionCallbacks {
-  // stake: (amount: string) => void;
   withdraw: (amount: string) => void;
   exit: () => void;
   claim: () => void;

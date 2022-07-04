@@ -6,7 +6,6 @@ import { TransactionResponse } from "@ethersproject/abstract-provider";
 import { batcherActions } from "./batcher";
 import { categoriesActions } from "./categories";
 import { fetchInitialData } from "./requests";
-import { fetchMasterChefData, masterChefActions } from "./masterChef";
 import { indexPoolsActions } from "./indexPools";
 import { notification } from "antd";
 import { pairsActions } from "./pairs";
@@ -86,7 +85,6 @@ export const thunks = {
           provider,
         })
       );
-      dispatch(fetchMasterChefData({ provider }));
     },
   setNetwork:
     (options: InitialzeOptions): AppThunk =>
@@ -147,7 +145,6 @@ export const actions = {
   ...transactionsActions,
   ...userActions,
   ...topLevelActions,
-  ...masterChefActions,
   ...thunks,
 };
 
