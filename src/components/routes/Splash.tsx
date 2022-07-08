@@ -70,7 +70,7 @@ export default function Splash() {
         style={{ textAlign: "center" }}
         type="warning"
         message={
-          <Space direction="vertical" size="small">
+          <div style={{ display: "flex", flexDirection: "column" }}>
             <span>
               Remaining assets from the{" "}
               <a
@@ -88,7 +88,10 @@ export default function Splash() {
               >
                 CC10
               </a>{" "}
-              <a href="https://discord.com/channels/@me/991236780676349963/994954651835314177">
+              <a
+                href="https://discord.com/channels/@me/991236780676349963/994954651835314177"
+                style={{ color: "#FF160C" }}
+              >
                 exploits
               </a>{" "}
               are available to redeem.
@@ -104,6 +107,8 @@ export default function Splash() {
               danger
               style={{
                 padding: "5px!important",
+                alignSelf: "center",
+                marginTop: "10px",
               }}
             >
               <a
@@ -114,7 +119,7 @@ export default function Splash() {
                 Redemption App
               </a>
             </Button>
-          </Space>
+          </div>
         }
       />
 
