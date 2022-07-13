@@ -17,8 +17,8 @@ import { useMemo } from "react";
 import Icon from "@ant-design/icons";
 
 const NETWORKS_BY_ID: Record<number, any> = {
-  "1": NETWORKS.mainnet,
-  "137": NETWORKS.polygon,
+  1: NETWORKS.mainnet,
+  137: NETWORKS.polygon,
 };
 
 function NetworkIcon({ chainId }: { chainId: number }) {
