@@ -6,7 +6,6 @@ import { lazy } from "react";
 type RouteWithBreadcrumbs = RouteProps & { breadcrumbName?: TranslatedTerm };
 
 const Splash = lazy(() => import("./components/routes/Splash"));
-const Portfolio = lazy(() => import("./components/routes/Portfolio"));
 const Learn = lazy(() => import("./components/routes/Learn"));
 const LearnArticle = lazy(() => import("./components/routes/LearnArticle"));
 const IndexPools = lazy(() => import("./components/routes/IndexPools"));
@@ -22,12 +21,6 @@ export const routes: RouteWithBreadcrumbs[] = [
     path: "/",
     exact: true,
     component: Splash,
-  },
-  {
-    path: "/portfolio",
-    breadcrumbName: "PORTFOLIO",
-    exact: true,
-    component: Portfolio,
   },
   {
     path: "/index-pools",

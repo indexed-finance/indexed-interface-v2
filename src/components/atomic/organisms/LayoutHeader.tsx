@@ -48,14 +48,6 @@ export function LayoutHeader() {
             </Link>
           </Menu.Item>
 
-          <Menu.Item key="portfolio">
-            <Link to="/portfolio">
-              <Space size="small">
-                <AiOutlineUser style={{ position: "relative", top: 2 }} />
-                {tx("PORTFOLIO")}
-              </Space>
-            </Link>
-          </Menu.Item>
           <Menu.Item>
             <ExternalLink
               to="https://legacy.indexed.finance/governance"

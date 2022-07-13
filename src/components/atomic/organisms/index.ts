@@ -10,7 +10,6 @@ export * from "./IndexPoolRecentTrades";
 export * from "./IndexPoolWidget";
 export * from "./LayoutHeader";
 export * from "./Page";
-export * from "./PortfolioPieChart";
 export * from "./TokenSelector";
 export * from "./TooltipProvider";
 export * from "./TransactionList";

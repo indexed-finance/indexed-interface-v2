@@ -41,7 +41,7 @@ export function Navigation() {
   const requestChangeNetwork = useRequestChangeNetworkCallback();
 
   const selectedKey = useMemo(() => {
-    for (const link of ["portfolio", "index-pools"]) {
+    for (const link of ["index-pools"]) {
       if (pathname.includes(link)) {
         return link;
       }
@@ -84,14 +84,7 @@ export function Navigation() {
           </Link>
         </Menu.Item>
       </Menu.SubMenu>
-      <Menu.Item key="portfolio">
-        <Link to="/portfolio">
-          <Space size="small">
-            <AiOutlineUser style={{ position: "relative", top: 2 }} />{" "}
-            {!isMobile && <span>{tx("PORTFOLIO")}</span>}
-          </Space>
-        </Link>
-      </Menu.Item>
+
       <Menu.Item>
         <ExternalLink
           to="https://legacy.indexed.finance/governance"
