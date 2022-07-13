@@ -176,10 +176,10 @@ function SingleInteractionInner({
       rawApproveAmount: "0",
     };
   }, [values.fromAmount, values.fromToken, tokenLookup]);
-  const cachedValues = useCachedValue(values);
+
   const [lastCalculatedInput, setLastCalculatedInput] =
     useState<SingleInteractionValues>(values);
-  const debouncedValues = useDebounce(cachedValues, 200);
+  const debouncedValues = useDebounce(useCachedValue(values), 200);
   useEffect(() => {
     if (
       /* calculating === null && */ debouncedValues.fromToken &&
