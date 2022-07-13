@@ -35,7 +35,7 @@ export function IndexPoolWidgetGroup() {
 }
 
 export function IndexPoolWidget(props: FormattedIndexPool) {
-  const tokenIds = useMemo(() => props.assets.map((a) => a.id), [props]);
+  const tokenIds = useMemo(() => props.assets.map(({ id }) => id), [props]);
   const { push } = useHistory();
 
   usePoolDetailRegistrar(props.id, tokenIds);
