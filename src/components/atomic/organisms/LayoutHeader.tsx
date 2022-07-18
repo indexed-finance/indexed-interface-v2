@@ -75,7 +75,7 @@ export function LayoutHeader() {
           </Menu.Item>
           <Menu.Item>
             <ExternalLink
-              to="https://legacy.indexed.finance/governance"
+              to="https://www.tally.xyz/governance/eip155:1:0x95129751769f99CC39824a0793eF4933DD8Bb74B"
               withIcon={false}
             >
               <Space size="small">
@@ -95,10 +95,15 @@ export function LayoutHeader() {
             className="make_blocky"
           >
             <Menu.Item key="eth-network">
-              <Icon src={EthIcon} style={{ position: "relative", top: 2 }} />{" "} Ethereum
+              <Icon src={EthIcon} style={{ position: "relative", top: 2 }} />{" "}
+              Ethereum
             </Menu.Item>
             <Menu.Item key="matic-network">
-              <Icon src={MaticIcon} style={{ position: "relative", top: 2, maxHeight: '20px' }} />{" "} Polygon
+              <Icon
+                src={MaticIcon}
+                style={{ position: "relative", top: 2, maxHeight: "20px" }}
+              />{" "}
+              Polygon
             </Menu.Item>
           </Menu.SubMenu>
 
