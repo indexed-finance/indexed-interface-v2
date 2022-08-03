@@ -1,4 +1,4 @@
-import { Alert, Button, Divider, Statistic, Typography } from "antd";
+import { Alert, Button, Divider, Space, Statistic, Typography } from "antd";
 import {
   IndexPoolWidgetGroup,
   Logo,
@@ -62,19 +62,72 @@ export default function Splash() {
           </Divider>
         </div>
       </div>
+
       <Alert
         style={{ textAlign: "center" }}
-        type="info"
+        type="warning"
         message={
-          <>
-            NEW: Enter a timelock with your NDX governance tokens and receive
-            dNDX for a proportional claim on protocol revenue.{" "}
-            <Button type="primary" onClick={() => history.push("/timelocks")}>
-              Try it
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <span>
+              Remaining assets left unaffected from the{" "}
+              <a
+                href="https://etherscan.io/token/0xfa6de2697d59e88ed7fc4dfe5a33dac43565ea41"
+                target="_blank"
+                rel="noreferrer"
+              >
+                DEFI5
+              </a>{", "}
+              and{" "}
+              <a
+                href="https://etherscan.io/token/0x17ac188e09a7890a1844e5e65471fe8b0ccfadf3"
+                target="_blank"
+                rel="noreferrer"
+              >
+                CC10
+              </a>{" and"}
+               <a
+                href="https://etherscan.io/token/0xabafa52d3d5a2c18a4c1ae24480d22b831fc0413"
+                target="_blank"
+                style={{ color: "#FF160C" }}
+              >
+                FFF
+              </a>{" "}
+              <a
+                href="https://ndxfi.medium.com/indexed-attack-post-mortem-b006094f0bdc"
+                target="_blank"
+                style={{ color: "#FF160C" }}
+              >
+                exploits
+              </a>{" "}
+              are available to redeem.
+            </span>
+
+            <span>
+              If you are an effected victim that held any of the above assets at the time of the exploit and still have the associated balances, they can be redeemed for
+              the remaining underlying assets.
+            </span>
+
+            <Button
+              type="primary"
+              danger
+              style={{
+                padding: "5px!important",
+                alignSelf: "center",
+                marginTop: "10px",
+              }}
+            >
+              <a
+                href="http://drain-reversal.indexed.finance/"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Redemption
+              </a>
             </Button>
-          </>
+          </div>
         }
       />
+
       <Divider />
       <SplashSection
         banner={require("images/indexpools_banner.png").default}
@@ -91,7 +144,30 @@ export default function Splash() {
       >
         {poolsExist && <IndexPoolWidgetGroup />}
       </SplashSection>
-
+      
+      {vaultsCount > 0 ? (
+        <>
+          <Divider />
+          <SplashSection
+            banner={require("images/vaults_banner.png").default}
+            title="VAULTS"
+            description="Lend out your assets via Indexed Earn and receive the guaranteed best interest rates across the major lending protocols in DeFi. Low-fee and no-maintenance: let our non-custodial vaults do the work of allocating your funds for maximum impact."
+            catchphrase="Earn interest on your assets"
+            actionText="Explore Vaults"
+            infoText="How it works"
+            onAction={() => history.push("/vaults")}
+            onInfo={() =>
+              (window.location.href =
+                "https://docs.indexed.finance/introduction/faq/nirn-faq")
+            }
+          >
+            <VaultGroup withTitle={true} />
+          </SplashSection>
+        </>
+      ) : (
+        <> </>
+      )}
+      
       <Divider />
     </Page>
   );

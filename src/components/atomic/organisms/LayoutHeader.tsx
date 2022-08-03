@@ -50,7 +50,7 @@ export function LayoutHeader() {
 
           <Menu.Item>
             <ExternalLink
-              to="https://legacy.indexed.finance/governance"
+              to="https://www.tally.xyz/governance/eip155:1:0x95129751769f99CC39824a0793eF4933DD8Bb74B"
               withIcon={false}
             >
               <Space size="small">
