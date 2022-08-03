@@ -4,10 +4,9 @@ import {
   Logo,
   Page,
   SplashSection,
-  VaultGroup,
 } from "components/atomic";
 import { selectors } from "features";
-import { useAllVaultsRegistrar, useBreakpoints, useVaultsCount } from "hooks";
+import { useBreakpoints } from "hooks";
 import { useHistory } from "react-router-dom";
 import { useSelector } from "react-redux";
 
@@ -18,8 +17,6 @@ export default function Splash() {
   );
   const history = useHistory();
   const { isMobile } = useBreakpoints();
-  const vaultsCount = useVaultsCount();
-  useAllVaultsRegistrar();
 
   return (
     <Page hasPageHeader={false}>
@@ -147,6 +144,7 @@ export default function Splash() {
       >
         {poolsExist && <IndexPoolWidgetGroup />}
       </SplashSection>
+      
       {vaultsCount > 0 ? (
         <>
           <Divider />
@@ -169,22 +167,8 @@ export default function Splash() {
       ) : (
         <> </>
       )}
-
+      
       <Divider />
-      <SplashSection
-        banner={require("images/staking_banner.png").default}
-        title="STAKING"
-        description="Provide liquidity for our index products on major decentralised exchanges and earn our protocol governance token as a reward! Select index products are also eligible for rewards by staking them single-sided. No fees, no lock-up periods."
-        catchphrase="Supply liquidity and earn NDX"
-        actionText="Stake Now"
-        infoText="Read up"
-        onAction={() => history.push("/staking")}
-        onInfo={() =>
-          (window.location.href = "https://www.youtube.com/watch?v=gp7yh8Cr9iA")
-        }
-      >
-        {null}
-      </SplashSection>
     </Page>
   );
 }

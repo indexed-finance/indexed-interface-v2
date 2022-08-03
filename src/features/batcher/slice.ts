@@ -75,7 +75,8 @@ const slice = createSlice({
       const values = [action.payload].flat();
 
       for (const callRegistration of values) {
-        const { caller, onChainCalls, offChainCalls, chainId } = callRegistration;
+        const { caller, onChainCalls, offChainCalls, chainId } =
+          callRegistration;
         debugConsole.log(
           `REGISTER :: ${caller} : Registering ${onChainCalls.length} on-chain and ${offChainCalls.length} off-chain calls for ${caller}`
         );
@@ -87,7 +88,7 @@ const slice = createSlice({
         };
 
         for (const _call of onChainCalls) {
-          const call = { ..._call }
+          const call = { ..._call };
           if (!call.chainId) call.chainId = chainId;
           const callId = serializeOnChainCall(call);
 
@@ -102,7 +103,7 @@ const slice = createSlice({
         }
 
         for (const _call of offChainCalls) {
-          const call = { ..._call }
+          const call = { ..._call };
           if (!call.chainId) call.chainId = chainId;
           const callId = serializeOffChainCall(call);
 
@@ -131,7 +132,7 @@ const slice = createSlice({
       const { onChainCalls, offChainCalls, chainId } = action.payload;
 
       for (const _call of onChainCalls) {
-        const call = { ..._call }
+        const call = { ..._call };
         if (!call.chainId) call.chainId = chainId;
         const callId = serializeOnChainCall(call);
 
@@ -139,7 +140,7 @@ const slice = createSlice({
       }
 
       for (const _call of offChainCalls) {
-        const call = { ..._call }
+        const call = { ..._call };
         if (!call.chainId) call.chainId = chainId;
         const callId = serializeOffChainCall(call);
 
@@ -193,27 +194,21 @@ const slice = createSlice({
         (action) =>
           [
             // Put these in manually to avoid a circular dependency.
-            "staking/fetch/fulfilled",
             "indexPools/fetch/fulfilled",
             "indexPools/fetchUpdates/fulfilled",
             "indexPools/fetchTransactions/fulfilled",
             "batcher/multicall/fulfilled",
             "tokens/fetchPriceData/fulfilled",
-            "newStaking/fetch/fulfilled",
-            "vaults/fetch/fulfilled"
           ].includes(action.type),
         (state, action) => {
           if (action.payload) {
             const potentialArgs = Object.keys(action.payload).join("_");
             const callLookup = {
-              "staking/fetch/fulfilled": "fetchStakingData",
               "indexPools/fetch/fulfilled": `fetchIndexPools/${potentialArgs}`,
               "indexPools/fetchUpdates/fulfilled": `fetchIndexPoolUpdates/${potentialArgs}`,
               "indexPools/fetchTransactions/fulfilled": `fetchIndexPoolTransactions/${potentialArgs}`,
               "batcher/multicall/fulfilled": "fetchMulticallData",
               "tokens/fetchPriceData/fulfilled": `getTokenPriceData/${potentialArgs}`,
-              "newStaking/fetch/fulfilled": "fetchNewStakingData",
-              "vaults/fetch/fulfilled": "fetchVaultsData"
             };
             const call = callLookup[action.type as keyof typeof callLookup];
 
@@ -285,12 +280,21 @@ export const batcherSelectors = {
 
       return [...toKeep, ...merged];
     }
-    const keysForThisChain = onChainCalls.filter(c => +(c.split('/')[0]) === stateChainId).length;
-    console.log(`# OnChain Calls: ${onChainCalls.length} | # For Chain: ${keysForThisChain}`)
+    const keysForThisChain = onChainCalls.filter(
+      (c) => +c.split("/")[0] === stateChainId
+    ).length;
+    console.log(
+      `# OnChain Calls: ${onChainCalls.length} | # For Chain: ${keysForThisChain}`
+    );
     const activeAndOutdated = (k: string) => {
-      const [chainId] = k.split('/');
+      const [chainId] = k.split("/");
       const outdated = !cache[k] || cache[k].fromBlockNumber < blockNumber;
-      return listenerCounts[k] > 0 && outdated && !fetching[k] && stateChainId === +chainId;
+      return (
+        listenerCounts[k] > 0 &&
+        outdated &&
+        !fetching[k] &&
+        stateChainId === +chainId
+      );
     };
     return {
       callers,

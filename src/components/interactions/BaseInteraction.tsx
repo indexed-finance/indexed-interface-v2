@@ -47,7 +47,9 @@ interface Props {
   defaultOutputSymbol?: string;
   requiresApproval?: boolean;
   onSubmit(values: SingleInteractionValues): void;
-  onChange(values: SingleInteractionValues): void | string | Promise<string | void>;
+  onChange(
+    values: SingleInteractionValues
+  ): void | string | Promise<string | void>;
   loading?: boolean;
   disableInputEntry?: boolean;
   disableOutputEntry?: boolean;
@@ -90,7 +92,7 @@ export function SingleInteraction({
   requiresApproval = true,
   loading,
   disableInputEntry,
-  disableOutputEntry
+  disableOutputEntry,
 }: Props) {
   const interactionRef = useRef<null | HTMLDivElement>(null);
 
@@ -152,7 +154,7 @@ function SingleInteractionInner({
   disableInputEntry,
   disableOutputEntry,
 }: InnerSingleProps) {
-  const [calculating, setCalculating] = useState<"from" | "to" | null>(null)
+  const [calculating, setCalculating] = useState<"from" | "to" | null>(null);
   const tx = useTranslator();
   const tokenLookup = useSelector(selectors.selectTokenLookupBySymbol);
   const { tokenId, symbol, approveAmount, rawApproveAmount } = useMemo(() => {
@@ -174,15 +176,19 @@ function SingleInteractionInner({
       rawApproveAmount: "0",
     };
   }, [values.fromAmount, values.fromToken, tokenLookup]);
-  const cachedValues = useCachedValue(values)
-  const [lastCalculatedInput, setLastCalculatedInput] = useState<SingleInteractionValues>(values)
-  const debouncedValues = useDebounce(cachedValues, 200);
+
+  const [lastCalculatedInput, setLastCalculatedInput] =
+    useState<SingleInteractionValues>(values);
+  const debouncedValues = useDebounce(useCachedValue(values), 200);
   useEffect(() => {
-    if (/* calculating === null && */ debouncedValues.fromToken && debouncedValues.toToken) {
-      console.log('debounce values')
-      setCalculating("from")
+    if (
+      /* calculating === null && */ debouncedValues.fromToken &&
+      debouncedValues.toToken
+    ) {
+      console.log("debounce values");
+      setCalculating("from");
     }
-  }, [debouncedValues, setCalculating, /* calculating */])
+  }, [debouncedValues, setCalculating /* calculating */]);
   // @todo Clean this up at some point.
   // Not doing the lookup by symbol in the hook because we already have it in scope
   const { status, approve } = useTokenApproval({
@@ -204,36 +210,48 @@ function SingleInteractionInner({
 
   useEffect(() => {
     if (calculating !== null && !isEqual(values, lastCalculatedInput)) {
-      console.log(`CALC HANDLING UPDATE`)
-      setLastCalculatedInput(values)
-      const newValues: SingleInteractionValues = { ...values, fromAmount: {...values.fromAmount}, toAmount: {...values.toAmount} }
+      console.log(`CALC HANDLING UPDATE`);
+      setLastCalculatedInput(values);
+      const newValues: SingleInteractionValues = {
+        ...values,
+        fromAmount: { ...values.fromAmount },
+        toAmount: { ...values.toAmount },
+      };
       Promise.resolve(onChange(newValues as SingleInteractionValues)).then(
         (error) => {
           if (error) {
-            console.log(`CALC GOT ERR`)
-            console.log(error)
+            console.log(`CALC GOT ERR`);
+            console.log(error);
             const inputErr =
               error.includes("Input") ||
-              (newValues.lastTouchedField === "from" && !error.includes("Output"));
-    
+              (newValues.lastTouchedField === "from" &&
+                !error.includes("Output"));
+
             if (inputErr) {
               setFieldError("fromAmount.displayed", error);
             } else {
               setFieldError("toAmount.displayed", error);
             }
           }
-          setCalculating(null)
+          setCalculating(null);
           if (!isEqual(newValues, values)) {
-            console.log(`CALC WRITING NEW VALUES`)
+            console.log(`CALC WRITING NEW VALUES`);
             setValues(newValues);
-
           } else {
-            console.log(`CALC values did not change, skipping update`)
+            console.log(`CALC values did not change, skipping update`);
           }
         }
-      )
+      );
     }
-  }, [calculating, values, onChange, setValues, setFieldError, lastCalculatedInput, setLastCalculatedInput]);
+  }, [
+    calculating,
+    values,
+    onChange,
+    setValues,
+    setFieldError,
+    lastCalculatedInput,
+    setLastCalculatedInput,
+  ]);
 
   const handleFlip = useCallback(() => {
     if (!disableFlip) {
@@ -273,7 +291,7 @@ function SingleInteractionInner({
       error?: string;
     }
   ) => {
-    if (calculating !== null) return
+    if (calculating !== null) return;
     const [tokenField, amountField] =
       field === "from" ? ["fromToken", "fromAmount"] : ["toToken", "toAmount"];
     const newValues = {
@@ -282,8 +300,8 @@ function SingleInteractionInner({
       [amountField]: amount || DEFAULT_ENTRY,
       lastTouchedField: field,
     } as SingleInteractionValues;
-    console.log(`HANDLING CHANGE`)
-    setValues({...newValues})
+    console.log(`HANDLING CHANGE`);
+    setValues({ ...newValues });
     // setCalculating(field === "to" ? "from" : "to")
     if (fieldError) {
       setFieldError(amountField, fieldError);

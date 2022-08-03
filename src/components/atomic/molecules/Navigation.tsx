@@ -17,8 +17,8 @@ import { useMemo } from "react";
 import Icon from "@ant-design/icons";
 
 const NETWORKS_BY_ID: Record<number, any> = {
-  "1": NETWORKS.mainnet,
-  "137": NETWORKS.polygon,
+  1: NETWORKS.mainnet,
+  137: NETWORKS.polygon,
 };
 
 function NetworkIcon({ chainId }: { chainId: number }) {
@@ -41,7 +41,7 @@ export function Navigation() {
   const requestChangeNetwork = useRequestChangeNetworkCallback();
 
   const selectedKey = useMemo(() => {
-    for (const link of ["portfolio", "staking", "index-pools"]) {
+    for (const link of ["index-pools"]) {
       if (pathname.includes(link)) {
         return link;
       }
@@ -75,14 +75,6 @@ export function Navigation() {
             </Space>
           </Link>
         </Menu.Item>
-        <Menu.Item key="vaults">
-          <Link to="/vaults">
-            <Space size="small">
-              <RiSafe2Line style={{ position: "relative", top: 2 }} />{" "}
-              {!isMobile && <span>Vaults</span>}
-            </Space>
-          </Link>
-        </Menu.Item>
         <Menu.Item key="timelocks">
           <Link to="/timelocks">
             <Space size="small">
@@ -91,23 +83,8 @@ export function Navigation() {
             </Space>
           </Link>
         </Menu.Item>
-        <Menu.Item key="staking">
-          <Link to="/staking">
-            <Space>
-              <RiSafe2Line style={{ position: "relative", top: 2 }} />{" "}
-              {!isMobile && <span>Staking</span>}
-            </Space>
-          </Link>
-        </Menu.Item>
       </Menu.SubMenu>
-      <Menu.Item key="portfolio">
-        <Link to="/portfolio">
-          <Space size="small">
-            <AiOutlineUser style={{ position: "relative", top: 2 }} />{" "}
-            {!isMobile && <span>{tx("PORTFOLIO")}</span>}
-          </Space>
-        </Link>
-      </Menu.Item>
+
       <Menu.Item>
         <ExternalLink
           to="https://www.tally.xyz/governance/eip155:1:0x95129751769f99CC39824a0793eF4933DD8Bb74B"

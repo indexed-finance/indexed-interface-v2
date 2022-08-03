@@ -1,6 +1,6 @@
-import { AppState, FormattedIndexPool, selectors } from "features";
 import { Card, Col, Row, Statistic } from "antd";
 import { Fade } from "components/animations";
+import { FormattedIndexPool, selectors } from "features";
 import { INDEX_POOL_TAGLINES } from "config";
 import { Quote } from "../molecules";
 import { Token } from "../atoms";
@@ -35,7 +35,7 @@ export function IndexPoolWidgetGroup() {
 }
 
 export function IndexPoolWidget(props: FormattedIndexPool) {
-  const tokenIds = useMemo(() => props.assets.map(a => a.id), [props]);
+  const tokenIds = useMemo(() => props.assets.map(({ id }) => id), [props]);
   const { push } = useHistory();
 
   usePoolDetailRegistrar(props.id, tokenIds);

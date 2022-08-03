@@ -5,10 +5,7 @@ import { TransactionExtra, transactionsActions } from "./transactions";
 import { TransactionResponse } from "@ethersproject/abstract-provider";
 import { batcherActions } from "./batcher";
 import { categoriesActions } from "./categories";
-import { fetchInitialData, fetchVaultsData } from "./requests";
-import { fetchMasterChefData, masterChefActions } from "./masterChef";
-import { fetchNewStakingData } from "./newStaking";
-import { fetchStakingData, stakingActions } from "./staking";
+import { fetchInitialData } from "./requests";
 import { indexPoolsActions } from "./indexPools";
 import { notification } from "antd";
 import { pairsActions } from "./pairs";
@@ -17,7 +14,6 @@ import { settingsActions } from "./settings";
 import { timelocksActions } from "./timelocks";
 import { tokensActions } from "./tokens";
 import { userActions } from "./user";
-import { vaultsActions } from "./vaults";
 import type { AppThunk } from "./store";
 
 // #region Provider
@@ -74,7 +70,7 @@ const getSigner = (options: InitialzeOptions) => {
     }
   }
   return selectedAddress;
-}
+};
 
 export const thunks = {
   /**
@@ -89,44 +85,33 @@ export const thunks = {
           provider,
         })
       );
-      dispatch(
-        fetchStakingData({
-          provider,
-        })
-      );
-      dispatch(
-        fetchNewStakingData({
-          provider,
-        })
-      );
-      dispatch(fetchMasterChefData({ provider }));
-      dispatch(fetchVaultsData({ provider }));
     },
-  setNetwork: (options: InitialzeOptions): AppThunk =>
-  async (dispatch, getState) => {
-    const state = getState();
-    provider = options.provider;
-    await provider.ready;
+  setNetwork:
+    (options: InitialzeOptions): AppThunk =>
+    async (dispatch, getState) => {
+      const state = getState();
+      provider = options.provider;
+      await provider.ready;
 
-    const {chainId} = await provider.getNetwork()
-    const lastInit = state.settings.initializedNetworks[chainId] || 0;
-    const timeSince = (+new Date() - lastInit) / 1000;
-    if (provider.blockNumber !== -1) {
-      dispatch(actions.blockNumberChanged(provider.blockNumber));
-    }
-    dispatch(actions.changedNetwork(chainId))
-    if (timeSince > 60) {
-      dispatch(actions.initialize(options))
-    }
+      const { chainId } = await provider.getNetwork();
+      const lastInit = state.settings.initializedNetworks[chainId] || 0;
+      const timeSince = (+new Date() - lastInit) / 1000;
+      if (provider.blockNumber !== -1) {
+        dispatch(actions.blockNumberChanged(provider.blockNumber));
+      }
+      dispatch(actions.changedNetwork(chainId));
+      if (timeSince > 60) {
+        dispatch(actions.initialize(options));
+      }
 
-    const selectedAddress = getSigner(options)
-    if (selectedAddress) {
-      dispatch(actions.userAddressSelected(selectedAddress));
-      dispatch(timelocksRequests.fetchUserTimelocks(selectedAddress));
-    }
+      const selectedAddress = getSigner(options);
+      if (selectedAddress) {
+        dispatch(actions.userAddressSelected(selectedAddress));
+        dispatch(timelocksRequests.fetchUserTimelocks(selectedAddress));
+      }
 
-    dispatch(actions.walletConnected());
-  },
+      dispatch(actions.walletConnected());
+    },
   addTransaction:
     (
       _tx: TransactionResponse | Promise<TransactionResponse>,
@@ -155,14 +140,11 @@ export const actions = {
   ...indexPoolsActions,
   ...pairsActions,
   ...settingsActions,
-  ...stakingActions,
   ...tokensActions,
   ...timelocksActions,
   ...transactionsActions,
   ...userActions,
-  ...vaultsActions,
   ...topLevelActions,
-  ...masterChefActions,
   ...thunks,
 };
 
