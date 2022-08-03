@@ -15,10 +15,6 @@
 
 ## Repo Structure
 
-### .storybook
-
-Contains setup files for [Storybook](https://storybook.js.org/), a solution for viewing components without surrounding app context.
-
 ### build [.gitignore]
 
 After building the app, the files are located here.
