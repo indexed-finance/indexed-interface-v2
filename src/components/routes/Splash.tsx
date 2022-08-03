@@ -72,14 +72,14 @@ export default function Splash() {
         message={
           <div style={{ display: "flex", flexDirection: "column" }}>
             <span>
-              Remaining assets from the{" "}
+              Remaining assets left unaffected from the{" "}
               <a
                 href="https://etherscan.io/token/0xfa6de2697d59e88ed7fc4dfe5a33dac43565ea41"
                 target="_blank"
                 rel="noreferrer"
               >
                 DEFI5
-              </a>{" "}
+              </a>{", "}
               and{" "}
               <a
                 href="https://etherscan.io/token/0x17ac188e09a7890a1844e5e65471fe8b0ccfadf3"
@@ -87,9 +87,17 @@ export default function Splash() {
                 rel="noreferrer"
               >
                 CC10
+              </a>{" and"}
+               <a
+                href="https://etherscan.io/token/0xabafa52d3d5a2c18a4c1ae24480d22b831fc0413"
+                target="_blank"
+                style={{ color: "#FF160C" }}
+              >
+                FFF
               </a>{" "}
               <a
-                href="https://discord.com/channels/@me/991236780676349963/994954651835314177"
+                href="https://ndxfi.medium.com/indexed-attack-post-mortem-b006094f0bdc"
+                target="_blank"
                 style={{ color: "#FF160C" }}
               >
                 exploits
@@ -98,8 +106,8 @@ export default function Splash() {
             </span>
 
             <span>
-              If you are a tokenholder of either asset, they can be redeemed for
-              the underlying assets.
+              If you are an effected victim that held any of the above assets at the time of the exploit and still have the associated balances, they can be redeemed for
+              the remaining underlying assets.
             </span>
 
             <Button
@@ -116,7 +124,7 @@ export default function Splash() {
                 target="_blank"
                 rel="noreferrer"
               >
-                Redemption App
+                Redemption
               </a>
             </Button>
           </div>
