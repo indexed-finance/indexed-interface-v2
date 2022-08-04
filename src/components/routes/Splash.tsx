@@ -1,4 +1,4 @@
-import { Alert, Button, Divider, Space, Statistic, Typography } from "antd";
+import { Alert, Button, Divider, Statistic, Typography } from "antd";
 import {
   IndexPoolWidgetGroup,
   Logo,
@@ -88,13 +88,15 @@ export default function Splash() {
                <a
                 href="https://etherscan.io/token/0xabafa52d3d5a2c18a4c1ae24480d22b831fc0413"
                 target="_blank"
+                rel="noreferrer"
               >
                 FFF
               </a>{" "}
               <a
                 href="https://ndxfi.medium.com/indexed-attack-post-mortem-b006094f0bdc"
-                target="_blank"
                 style={{ color: "#FF160C" }}
+                target="_blank"
+                rel="noreferrer"
               >
                 exploits
               </a>{" "}

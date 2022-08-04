@@ -258,7 +258,7 @@ export const batcherSelectors = {
         .filter((k) => listenerCounts[k] > 0)
         .reduce(
           (prev, next) => {
-            const [chainId, call, args, canBeMerged] = next.split("/");
+            const [ , call, args, canBeMerged] = next.split("/");
             if (canBeMerged) {
               if (!prev.toMerge[call]) {
                 prev.toMerge[call] = [];

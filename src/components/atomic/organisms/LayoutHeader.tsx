@@ -1,4 +1,3 @@
-import { AiOutlineUser } from "react-icons/ai";
 import { ExternalLink } from "components/atomic/atoms";
 import {
   FaCaretDown,
@@ -18,7 +17,7 @@ import {
 import { Layout, Menu, Space } from "antd";
 import { Link } from "react-router-dom";
 import { selectors } from "features";
-import { useBreakpoints, useTranslator } from "hooks";
+import { useBreakpoints } from "hooks";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import EthIcon from "images/eth.png";
@@ -26,7 +25,6 @@ import Icon from "@ant-design/icons";
 import MaticIcon from "images/matic.png";
 
 export function LayoutHeader() {
-  const tx = useTranslator();
   const { isMobile, xl } = useBreakpoints();
   const [showingUserControls, setShowingUserControls] = useState(false);
   const selectedAddress = useSelector(selectors.selectUserAddress);

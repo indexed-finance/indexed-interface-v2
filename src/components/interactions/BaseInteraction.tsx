@@ -18,7 +18,6 @@ import {
   useCachedValue,
   useDebounce,
   useMultiTokenMintCallbacks,
-  usePrevious,
   useTokenApproval,
   useTokenBalance,
   useTokenBalances,

@@ -1,4 +1,3 @@
-import { AiOutlineUser } from "react-icons/ai";
 import { ExternalLink } from "components/atomic/atoms";
 import { FEATURE_FLAGS } from "feature-flags";
 import { FaGavel, FaListUl, FaSwimmingPool } from "react-icons/fa";
@@ -11,7 +10,6 @@ import {
   useBreakpoints,
   useChainId,
   useRequestChangeNetworkCallback,
-  useTranslator,
 } from "hooks";
 import { useMemo } from "react";
 import Icon from "@ant-design/icons";
@@ -24,6 +22,7 @@ const NETWORKS_BY_ID: Record<number, any> = {
 function NetworkIcon({ chainId }: { chainId: number }) {
   return (
     <img
+      alt={`${chainId}-icon`}
       style={{ height: "2em" }}
       src={require(`images/${NETWORKS_BY_ID[chainId].icon}`).default}
     />
@@ -34,7 +33,6 @@ function NetworkIcon({ chainId }: { chainId: number }) {
 // const NetworkIcon = (chainId: number) => <img style={{ height: '2em'}} src={require(`images/${NETWORKS_BY_ID[chainId].icon}`).default} />
 
 export function Navigation() {
-  const tx = useTranslator();
   const { isMobile } = useBreakpoints();
   const { pathname } = useLocation();
   const chainId = useChainId();

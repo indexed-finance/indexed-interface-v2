@@ -1,5 +1,5 @@
 import { isEqual } from 'lodash'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 
 // modified from https://usehooks.com/useDebounce/
 export function useDebounce<T>(value: T, delay: number): T {
