@@ -1,11 +1,11 @@
-import { AppState, Timeframe, requests, selectors } from "features";
-import { Card, Radio, RadioChangeEvent, Spin } from "antd";
-import { LineSeriesChart, Quote } from "components/atomic/molecules";
-import { convert } from "helpers";
-import { last, useFormattedIndexPool } from "hooks";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import noop from "lodash.noop";
+import { AppState, Timeframe, requests, selectors } from 'features';
+import { Card, Radio, RadioChangeEvent, Spin } from 'antd';
+import { LineSeriesChart, Quote } from 'components/atomic/molecules';
+import { convert } from 'helpers';
+import { last, useFormattedIndexPool } from 'hooks';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import noop from 'lodash.noop';
 
 interface Props {
   poolId: string;
@@ -14,15 +14,16 @@ interface Props {
 
 export function IndexPoolChart({ poolId, expanded = false }: Props) {
   const dispatch = useDispatch();
-  const [timeframe, setTimeframe] = useState<Timeframe>("1W");
+  const [timeframe, setTimeframe] = useState<Timeframe>('1W');
   const [rerendering, setRerendering] = useState(false);
   const data = useSelector((state: AppState) =>
-    selectors.selectTimeSeriesSnapshotData(state, poolId, timeframe, "value")
+    selectors.selectTimeSeriesSnapshotData(state, poolId, timeframe, 'value')
   );
-  const [historicalData, setHistoricalData] = useState<null | {
-    when: string;
-    price: string;
-  }>(null);
+  const [historicalData, setHistoricalData] =
+    useState<null | {
+      when: string;
+      price: string;
+    }>(null);
   const [netChange, netChangePercent] = useMemo(() => {
     const _first = data[0];
     const _last = last(data);
@@ -32,11 +33,11 @@ export function IndexPoolChart({ poolId, expanded = false }: Props) {
       : [0, 0];
     const delta = currentValue - firstValue;
     return [
-      convert.toCurrency(delta, { signDisplay: "always" }),
-      convert.toPercent(delta / firstValue, { signDisplay: "always" }),
+      convert.toCurrency(delta, { signDisplay: 'always' }),
+      convert.toPercent(delta / firstValue, { signDisplay: 'always' }),
     ];
   }, [data]);
-  const formattedPool = useFormattedIndexPool(poolId)
+  const formattedPool = useFormattedIndexPool(poolId);
   const handleTimeframeChange = useCallback(
     (event: RadioChangeEvent) => setTimeframe(event.target.value),
     []
@@ -46,18 +47,18 @@ export function IndexPoolChart({ poolId, expanded = false }: Props) {
     setRerendering(true);
     setTimeout(() => setRerendering(false), 0);
 
-    dispatch(requests.fetchSnapshotsData({ poolId, timeframe }));
-  }, [dispatch, poolId, timeframe]);
+    dispatch(requests.fetchSnapshotsData({ poolId }));
+  }, [dispatch, poolId]);
 
   return (
-    <Card style={{ height: "100%" }}>
+    <Card style={{ height: '100%' }}>
       {formattedPool ? (
         <>
           <div
             style={{
-              display: "flex",
-              alignItems: "flex-start",
-              justifyContent: "space-between",
+              display: 'flex',
+              alignItems: 'flex-start',
+              justifyContent: 'space-between',
             }}
           >
             <div style={{ flex: 1 }}>
@@ -69,7 +70,7 @@ export function IndexPoolChart({ poolId, expanded = false }: Props) {
                   historicalData ? historicalData.price : formattedPool.priceUsd
                 }
                 netChange={historicalData ? historicalData.when : netChange}
-                netChangePercent={historicalData ? "" : netChangePercent}
+                netChangePercent={historicalData ? '' : netChangePercent}
                 inline={true}
                 textSize="large"
                 style={{
@@ -78,13 +79,13 @@ export function IndexPoolChart({ poolId, expanded = false }: Props) {
                 }}
               />
             </div>
-            <div style={{ flex: 1, textAlign: "right" }}>
+            <div style={{ flex: 1, textAlign: 'right' }}>
               <Radio.Group
                 onChange={handleTimeframeChange}
                 value={timeframe}
                 size="large"
               >
-                {["1D", "1W", "2W", "1M" /*, "3M", "6M", "1Y"*/].map(
+                {['1D', '1W', '2W', '1M' /*, "3M", "6M", "1Y"*/].map(
                   (timeframe) => (
                     <Radio.Button key={timeframe} value={timeframe}>
                       {timeframe}
@@ -94,19 +95,21 @@ export function IndexPoolChart({ poolId, expanded = false }: Props) {
               </Radio.Group>
             </div>
           </div>
-          {<div
-            style={{ height: 260, overflow: "auto" }}
-            onMouseOut={() => setHistoricalData(null)}
-          >
-            {!rerendering && (
-              <LineSeriesChart
-                data={data}
-                expanded={expanded}
-                onChangeTheme={noop}
-                onMoveCrosshair={setHistoricalData}
-              />
-            )}
-          </div>}
+          {
+            <div
+              style={{ height: 260, overflow: 'auto' }}
+              onMouseOut={() => setHistoricalData(null)}
+            >
+              {!rerendering && (
+                <LineSeriesChart
+                  data={data}
+                  expanded={expanded}
+                  onChangeTheme={noop}
+                  onMoveCrosshair={setHistoricalData}
+                />
+              )}
+            </div>
+          }
         </>
       ) : (
         <Spin />
