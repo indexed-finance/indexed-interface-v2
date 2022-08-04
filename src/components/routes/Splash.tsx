@@ -100,7 +100,7 @@ export default function Splash() {
               </a>{" "}
               are available to redeem.
             </span>
-            </br>
+            <br></br>
             <span>
               If you are an effected victim that held any of the above assets at the time of the exploit and still have the associated balances, they can be redeemed for
               the remaining underlying assets.
@@ -143,7 +143,7 @@ export default function Splash() {
       >
         {poolsExist && <IndexPoolWidgetGroup />}
       </SplashSection>
-      
+
       <Divider />
     </Page>
   );

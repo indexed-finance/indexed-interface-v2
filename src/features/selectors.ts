@@ -96,6 +96,7 @@ export const selectors = {
     ],
     (pool, tokens, stats) => {
       const tokenIds = pool?.tokens.ids ?? [];
+
       const totalValueLocked =
         pool?.tokensList.reduce((total, tokenId) => {
           if (total === undefined) return undefined;
