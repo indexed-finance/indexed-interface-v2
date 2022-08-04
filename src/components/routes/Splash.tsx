@@ -84,11 +84,10 @@ export default function Splash() {
                 rel="noreferrer"
               >
                 CC10
-              </a>{" and"}
+              </a>{" and "}
                <a
                 href="https://etherscan.io/token/0xabafa52d3d5a2c18a4c1ae24480d22b831fc0413"
                 target="_blank"
-                style={{ color: "#FF160C" }}
               >
                 FFF
               </a>{" "}
@@ -101,7 +100,7 @@ export default function Splash() {
               </a>{" "}
               are available to redeem.
             </span>
-
+            </br>
             <span>
               If you are an effected victim that held any of the above assets at the time of the exploit and still have the associated balances, they can be redeemed for
               the remaining underlying assets.
