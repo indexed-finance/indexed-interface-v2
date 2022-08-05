@@ -4,10 +4,14 @@ import {
   createEntityAdapter,
   createSlice,
 } from "@reduxjs/toolkit";
-import { changedNetwork, mirroredServerState, restartedDueToError } from "../actions";
+import {
+  changedNetwork,
+  mirroredServerState,
+  restartedDueToError,
+} from "../actions";
 import { constants } from "ethers"; // Circular dependency.
 import { createMulticallDataParser } from "helpers";
-import { fetchInitialData, fetchVaultsData } from "../requests";
+import { fetchInitialData } from "../requests";
 import { fetchMulticallData } from "../batcher/requests";
 import { fetchTokenPriceData } from "./requests";
 import { pairsActions } from "../pairs";
@@ -16,13 +20,6 @@ import type { NormalizedToken } from "./types";
 export const tokensAdapter = createEntityAdapter<NormalizedToken>({
   selectId: (entry) => entry.id.toLowerCase(),
 });
-
-type TokenLike = {
-  id: string;
-  symbol: string;
-  name: string;
-  decimals: number;
-};
 
 const slice = createSlice({
   name: "tokens",
@@ -69,41 +66,21 @@ const slice = createSlice({
           decimals: 18,
           priceData: undefined,
           chainId: action.payload,
-          ...nativeToken
-        }
-        tokensAdapter.upsertOne(state, fullNativeToken)
+          ...nativeToken,
+        };
+        tokensAdapter.upsertOne(state, fullNativeToken);
       })
       .addCase(fetchInitialData.fulfilled, (state, action) => {
         if (action.payload) {
           const { tokens } = action.payload;
           const fullTokens = tokens.ids.map((id) => tokens.entities[id]);
           for (const token of fullTokens) {
-            if (typeof token.decimals === 'string') {
+            if (typeof token.decimals === "string") {
               token.decimals = +token.decimals;
             }
           }
 
           tokensAdapter.upsertMany(state, fullTokens);
-        }
-      })
-      .addCase(fetchVaultsData.fulfilled, (state, action) => {
-        const newTokens: NormalizedToken[] = [];
-        if (action.payload) {
-          const {vaults, chainId} = action.payload;
-          const tokenLike: TokenLike[] = [
-            ...vaults.map(v => ({ ...v, chainId })),
-            ...(vaults.reduce((arr, v) => ([
-              ...arr,
-              ...v.adapters.map(a => a.underlying),
-              ...v.adapters.map(a => a.wrapper),
-            ]), [] as TokenLike[]))
-          ].map(({ id, name, symbol, decimals }) => ({ id, name, symbol, decimals }));
-          for (const token of tokenLike) {
-            if (!state.entities[token.id.toLowerCase()]) {
-              newTokens.push({ ...token, chainId })
-            }
-          }
-          tokensAdapter.upsertMany(state, newTokens)
         }
       })
       .addCase(fetchTokenPriceData.fulfilled, (state, action) => {
@@ -127,7 +104,7 @@ const slice = createSlice({
         }
       })
       .addCase(pairsActions.uniswapPairsRegistered, (state, action) => {
-        const { pairs, chainId } = action.payload
+        const { pairs, chainId } = action.payload;
         for (const pair of pairs) {
           if (!state.entities[pair.id.toLowerCase()]) {
             let t0 = pair.token0
@@ -158,7 +135,7 @@ const slice = createSlice({
               symbol,
               name,
               decimals: 18,
-              chainId
+              chainId,
             };
           }
         }

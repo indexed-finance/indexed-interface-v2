@@ -3,7 +3,6 @@ import { BaseDrawer, useDrawer } from "./Drawer";
 import { Divider, Space, Typography, notification } from "antd";
 import { Fade } from "components/animations";
 import { OVERLAY_READY, fortmatic } from "ethereum";
-import { SUPPORTED_NETWORKS } from "config";
 import { UnsupportedChainIdError, useWeb3React } from "@web3-react/core";
 import { WalletConnectConnector } from "@web3-react/walletconnect-connector";
 import { actions } from "features";
@@ -48,7 +47,7 @@ export function WalletConnectionDrawer() {
   const { close } = useDrawer();
   const tx = useTranslator();
   const dispatch = useDispatch();
-  const { account, activate, chainId } = useWeb3React();
+  const { account, activate } = useWeb3React();
   const [attemptingActivation, setAttemptingActivation] = useState(false);
   const walletOptions = useWalletOptions();
   const attemptActivation = useCallback(

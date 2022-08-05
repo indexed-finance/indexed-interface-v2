@@ -1,7 +1,7 @@
 import { AppState, FormattedIndexPool, POOL_CALLER, selectors } from "features";
 import { useCachedValue } from "./use-debounce";
 import { useCallRegistrar } from "./use-call-registrar";
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import { useSelector } from "react-redux";
 import type { RegisteredCall } from "helpers";
 

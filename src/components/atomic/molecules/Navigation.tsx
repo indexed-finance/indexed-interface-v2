@@ -1,4 +1,3 @@
-import { AiOutlineUser } from "react-icons/ai";
 import { ExternalLink } from "components/atomic/atoms";
 import { FEATURE_FLAGS } from "feature-flags";
 import { FaGavel, FaListUl, FaSwimmingPool } from "react-icons/fa";
@@ -7,31 +6,40 @@ import { Link, useLocation } from "react-router-dom";
 import { Menu, Space } from "antd";
 import { NETWORKS, SUPPORTED_NETWORKS } from "../../../config/network";
 import { RiSafe2Line } from "react-icons/ri";
-import { useBreakpoints, useChainId, useRequestChangeNetworkCallback, useTranslator } from "hooks";
+import {
+  useBreakpoints,
+  useChainId,
+  useRequestChangeNetworkCallback,
+} from "hooks";
 import { useMemo } from "react";
 import Icon from "@ant-design/icons";
 
 const NETWORKS_BY_ID: Record<number, any> = {
-  '1': NETWORKS.mainnet,
-  '137': NETWORKS.polygon
-}
+  1: NETWORKS.mainnet,
+  137: NETWORKS.polygon,
+};
 
-function NetworkIcon({ chainId }: {chainId: number}) {
-  return <img style={{ height: '2em'}} src={require(`images/${NETWORKS_BY_ID[chainId].icon}`).default} />
+function NetworkIcon({ chainId }: { chainId: number }) {
+  return (
+    <img
+      alt={`${chainId}-icon`}
+      style={{ height: "2em" }}
+      src={require(`images/${NETWORKS_BY_ID[chainId].icon}`).default}
+    />
+  );
 }
 
 // const MaticIcon = () => <img src={MaticIconSvg} />;
 // const NetworkIcon = (chainId: number) => <img style={{ height: '2em'}} src={require(`images/${NETWORKS_BY_ID[chainId].icon}`).default} />
 
 export function Navigation() {
-  const tx = useTranslator();
   const { isMobile } = useBreakpoints();
   const { pathname } = useLocation();
   const chainId = useChainId();
-  const requestChangeNetwork = useRequestChangeNetworkCallback()
+  const requestChangeNetwork = useRequestChangeNetworkCallback();
 
   const selectedKey = useMemo(() => {
-    for (const link of ["portfolio", "staking", "index-pools"]) {
+    for (const link of ["index-pools"]) {
       if (pathname.includes(link)) {
         return link;
       }
@@ -65,14 +73,6 @@ export function Navigation() {
             </Space>
           </Link>
         </Menu.Item>
-        <Menu.Item key="vaults">
-          <Link to="/vaults">
-            <Space size="small">
-              <RiSafe2Line style={{ position: "relative", top: 2 }} />{" "}
-              {!isMobile && <span>Vaults</span>}
-            </Space>
-          </Link>
-        </Menu.Item>
         <Menu.Item key="timelocks">
           <Link to="/timelocks">
             <Space size="small">
@@ -81,26 +81,11 @@ export function Navigation() {
             </Space>
           </Link>
         </Menu.Item>
-        <Menu.Item key="staking">
-          <Link to="/staking">
-            <Space>
-              <RiSafe2Line style={{ position: "relative", top: 2 }} />{" "}
-              {!isMobile && <span>Staking</span>}
-            </Space>
-          </Link>
-        </Menu.Item>
       </Menu.SubMenu>
-      <Menu.Item key="portfolio">
-        <Link to="/portfolio">
-          <Space size="small">
-            <AiOutlineUser style={{ position: "relative", top: 2 }} />{" "}
-            {!isMobile && <span>{tx("PORTFOLIO")}</span>}
-          </Space>
-        </Link>
-      </Menu.Item>
+
       <Menu.Item>
         <ExternalLink
-          to="https://legacy.indexed.finance/governance"
+          to="https://www.tally.xyz/governance/eip155:1:0x95129751769f99CC39824a0793eF4933DD8Bb74B"
           withIcon={false}
         >
           <Space size="small">
@@ -111,20 +96,35 @@ export function Navigation() {
       </Menu.Item>
       <Menu.SubMenu
         title={NETWORKS_BY_ID[chainId].name}
-        icon={<Icon component={() => <NetworkIcon chainId={chainId} />} style={{ position: "relative", top: -2, left: -10 }} />}
+        icon={
+          <Icon
+            component={() => <NetworkIcon chainId={chainId} />}
+            style={{ position: "relative", top: -2, left: -10 }}
+          />
+        }
       >
         {SUPPORTED_NETWORKS.filter((n) => n !== chainId).map((id) => {
           const { name } = NETWORKS_BY_ID[id];
-          return <Menu.Item key={`${name}-network`} onClick={() => requestChangeNetwork(id)}>
-          {/* <Link to="/index-pools"> */}
-            <Space size="large">
-              <Icon component={() => <NetworkIcon chainId={id} />} style={{ position: "relative", top: -4 }}  />
-              <span style={{ textTransform: "uppercase", fontSize: 20 }}>{name}</span>
-            </Space>
-          {/* </Link> */}
-        </Menu.Item>
+          return (
+            <Menu.Item
+              key={`${name}-network`}
+              onClick={() => requestChangeNetwork(id)}
+            >
+              {/* <Link to="/index-pools"> */}
+              <Space size="large">
+                <Icon
+                  component={() => <NetworkIcon chainId={id} />}
+                  style={{ position: "relative", top: -4 }}
+                />
+                <span style={{ textTransform: "uppercase", fontSize: 20 }}>
+                  {name}
+                </span>
+              </Space>
+              {/* </Link> */}
+            </Menu.Item>
+          );
         })}
-       {/*  <Menu.Item key="eth-network">
+        {/*  <Menu.Item key="eth-network">
           <Link to="/index-pools">
             <Space size="large">
               <Icon component={MaticIcon} style={{ position: "relative", top: -4 }}  />{" "}

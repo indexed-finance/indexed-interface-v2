@@ -6,21 +6,10 @@ import { lazy } from "react";
 type RouteWithBreadcrumbs = RouteProps & { breadcrumbName?: TranslatedTerm };
 
 const Splash = lazy(() => import("./components/routes/Splash"));
-const Portfolio = lazy(() => import("./components/routes/Portfolio"));
-const Staking = lazy(() => import("./components/routes/Staking"));
-const Stake = lazy(() => import("./components/routes/Stake"));
 const Learn = lazy(() => import("./components/routes/Learn"));
 const LearnArticle = lazy(() => import("./components/routes/LearnArticle"));
-const UniswapStakeForm = lazy(
-  () => import("./components/routes/UniswapStakeForm")
-);
-const SushiswapStakeForm = lazy(
-  () => import("./components/routes/SushiswapStakeForm")
-);
 const IndexPools = lazy(() => import("./components/routes/IndexPools"));
 const IndexPool = lazy(() => import("./components/routes/IndexPool"));
-const Vaults = lazy(() => import("./components/routes/Vaults"));
-const Vault = lazy(() => import("./components/routes/Vault"));
 const Timelocks = lazy(() => import("./components/routes/Timelocks"));
 const CreateTimelock = lazy(() => import("./components/routes/CreateTimelock"));
 const TimelockWithdrawal = lazy(
@@ -32,33 +21,6 @@ export const routes: RouteWithBreadcrumbs[] = [
     path: "/",
     exact: true,
     component: Splash,
-  },
-  {
-    path: "/portfolio",
-    breadcrumbName: "PORTFOLIO",
-    exact: true,
-    component: Portfolio,
-  },
-  {
-    path: "/staking",
-    breadcrumbName: "STAKE",
-    exact: true,
-    component: Staking,
-  },
-  {
-    path: "/staking/:id",
-    exact: true,
-    component: Stake,
-  },
-  {
-    path: "/staking-new/:id",
-    exact: true,
-    component: UniswapStakeForm,
-  },
-  {
-    path: "/stake-sushi/:id",
-    exact: true,
-    component: SushiswapStakeForm,
   },
   {
     path: "/index-pools",
@@ -85,16 +47,6 @@ export const routes: RouteWithBreadcrumbs[] = [
     path: "/index-pools/:slug/burn",
     exact: true,
     component: IndexPool,
-  },
-  {
-    path: "/vaults",
-    exact: true,
-    component: Vaults,
-  },
-  {
-    path: "/vaults/:slug",
-    exact: true,
-    component: Vault,
   },
   {
     path: "/timelocks",

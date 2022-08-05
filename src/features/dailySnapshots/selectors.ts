@@ -1,7 +1,7 @@
-import { DailyPoolSnapshot } from "indexed-types";
-import { createEntityAdapter } from "@reduxjs/toolkit";
-import type { AppState } from "features/store";
-import type { NormalizedDailySnapshot } from "./types";
+import { DailyPoolSnapshot } from 'indexed-types';
+import { createEntityAdapter } from '@reduxjs/toolkit';
+import type { AppState } from 'features/store';
+import type { NormalizedDailySnapshot } from './types';
 
 export const dailySnapshotsAdapter =
   createEntityAdapter<NormalizedDailySnapshot>({
@@ -19,14 +19,14 @@ export const dailySnapshotsSelectors = {
   selectSortedSnapshotsOfPool: (
     state: AppState,
     poolId: string,
-    direction: "asc" | "desc" = "asc"
+    direction: 'asc' | 'desc' = 'asc'
   ) => {
     const snapshots = selectors
       .selectAll(state)
       .filter((dailySnapshot) => dailySnapshot.id.includes(poolId));
 
     return [...snapshots].sort((left, right) =>
-      direction === "asc" ? left.date - right.date : right.date - left.date
+      direction === 'asc' ? left.date - right.date : right.date - left.date
     );
   },
   selectSortedSnapshotsOfPoolInTimeframe: (
@@ -37,7 +37,7 @@ export const dailySnapshotsSelectors = {
     const snapshots = dailySnapshotsSelectors.selectSortedSnapshotsOfPool(
       state,
       poolId,
-      "asc"
+      'asc'
     );
     const unixNow = Date.now() / 1000;
 
@@ -50,25 +50,42 @@ export const dailySnapshotsSelectors = {
     poolId: string,
     timeframe: Timeframe,
     key: K
-  ): { time: number; value: DailyPoolSnapshot[K]}[] => {
+  ): { time: number; value: DailyPoolSnapshot[K] }[] => {
     const oneDay = 86400;
     const maxAgeLookup: Record<Timeframe, number> = {
-      "1D": oneDay,
-      "1W": oneDay * 7,
-      "2W": oneDay * 14,
-      "1M": oneDay * 30,
-      "3M": oneDay * 90,
-      "6M": oneDay * 180,
-      "1Y": oneDay * 365,
+      '1D': oneDay,
+      '1W': oneDay * 7,
+      '2W': oneDay * 14,
+      '1M': oneDay * 30,
+      '3M': oneDay * 90,
+      '6M': oneDay * 180,
+      '1Y': oneDay * 365,
     };
     const maxAgeInSeconds = maxAgeLookup[timeframe];
-    const snapshots =
-      dailySnapshotsSelectors.selectSortedSnapshotsOfPoolInTimeframe(
-        state,
-        poolId,
-        maxAgeInSeconds
-      );
-    const timeSeriesData = snapshots.map((snapshot) => ({
+
+    const nonEmptySnapshotData = () => {
+      let timeframe = maxAgeInSeconds;
+      let snapshots =
+        dailySnapshotsSelectors.selectSortedSnapshotsOfPoolInTimeframe(
+          state,
+          poolId,
+          timeframe
+        );
+
+      while (snapshots.length < 3) {
+        timeframe += oneDay;
+        snapshots =
+          dailySnapshotsSelectors.selectSortedSnapshotsOfPoolInTimeframe(
+            state,
+            poolId,
+            timeframe
+          );
+      }
+
+      return snapshots;
+    };
+
+    const timeSeriesData = nonEmptySnapshotData().map((snapshot) => ({
       time: snapshot.date,
       value: snapshot[key],
     }));
@@ -79,7 +96,7 @@ export const dailySnapshotsSelectors = {
     const snapshots = dailySnapshotsSelectors.selectSortedSnapshotsOfPool(
       state,
       poolId,
-      "desc"
+      'desc'
     );
     const mostRecent = snapshots[0];
     return mostRecent;
@@ -178,4 +195,4 @@ export const dailySnapshotsSelectors = {
   },
 };
 
-export type Timeframe = "1D" | "1W" | "2W" | "1M" | "3M" | "6M" | "1Y";
+export type Timeframe = '1D' | '1W' | '2W' | '1M' | '3M' | '6M' | '1Y';
