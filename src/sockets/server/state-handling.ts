@@ -1,18 +1,13 @@
-import { AppState, VAULTS_CALLER, actions, fetchVaultsData, selectors, store } from "features";
-import { MASTER_CHEF_ADDRESS, NETWORKS } from "config";
+import { AppState, actions, selectors, store } from "features";
+import { NETWORKS } from "config";
 import {
   TOKEN_PRICES_CALLER,
   buildUniswapPairs,
   createPairDataCalls,
   createPoolDetailCalls,
-  createStakingCalls,
   createTotalSuppliesCalls,
-  createVaultCalls,
 } from "hooks";
-import { createMasterChefCalls } from "hooks/masterchef-hooks";
-import { createNewStakingCalls } from "hooks/new-staking-hooks";
 import { getProvider, log, readState, writeState } from "./helpers";
-import { masterChefCaller } from "features/masterChef";
 import type { RegisteredCall, RegisteredCaller } from "helpers";
 import type { Unsubscribe } from "redux";
 
@@ -29,15 +24,13 @@ const getLastBlockNumber = () => {
     return lastState.batcher.blockNumber;
   }
   return -1;
-}
+};
 
 let lastBlockNumber = getLastBlockNumber();
 
 const poolsRegistered: Record<string, boolean> = {};
 const tokensRegistered: Record<string, boolean> = {};
 const pairsRegistered: Record<string, boolean> = {};
-const stakingPoolsRegistered: Record<string, boolean> = {};
-const vaultsRegistered: Record<string, string> = {}
 
 const NEW_SUBSCRIBER_DELAY_SECONDS = 15;
 const WRITE_STATE_INTERVAL = 5000;
@@ -50,17 +43,13 @@ function setSubscription() {
   unsubscribe = subscribe(() => {
     const state = getState();
     const indexPools = selectors.selectAllPools(state);
-    const stakingPools = selectors.selectAllStakingPools(state);
     const tokens = selectors.selectAllTokens(state);
-    const vaults = selectors.selectAllVaults(state)
 
-    if (indexPools.length > 0 && tokens.length > 0 && stakingPools.length > 0 && vaults.length > 0) {
+    if (indexPools.length > 0 && tokens.length > 0) {
       unsubscribe();
       const allCalls = [
         ...registerNewPools(),
         ...registerNewTokensAndPairs(),
-        ...registerNewStakingPools(),
-        ...registerNewVaults()
       ].filter((c) => c.offChainCalls.length > 0 || c.onChainCalls.length > 0);
       if (allCalls.length > 0) {
         dispatch(actions.callsRegistered(allCalls));
@@ -105,39 +94,16 @@ export async function setupStateHandling() {
       withSigner: false,
     })
   );
-  dispatch(
-    fetchVaultsData({
-      provider
-    })
-  )
-}
-
-function registerNewVaults() {
-  const state = getState();
-  const vaults = selectors.selectAllVaults(state);
-  const caller = VAULTS_CALLER;
-  const { vaultCalls } = vaults.reduce((prev, next) => {
-    const { onChainCalls, offChainCalls } = createVaultCalls(next.id, next.adapters.map(a => a.id), next.underlying.id);
-    prev.vaultCalls.onChainCalls.push(...onChainCalls)
-    prev.vaultCalls.offChainCalls.push(...offChainCalls)
-    return prev;
-  }, {
-    vaultCalls: {
-      chainId,
-      caller,
-      onChainCalls: [] as RegisteredCall[],
-      offChainCalls: [] as RegisteredCall[],
-    }
-  })
-  return [vaultCalls]
 }
 
 const BLOCKS_PER_DAY = 86400 / 13.5;
 
 function registerNewTokensAndPairs() {
   const state = getState();
-  const chainId = selectors.selectNetwork(state)
-  const allTokens = selectors.selectAllTokens(state).filter(t => t.chainId === chainId);
+  const chainId = selectors.selectNetwork(state);
+  const allTokens = selectors
+    .selectAllTokens(state)
+    .filter((t) => t.chainId === chainId);
   const allPairIds = Object.keys(state.pairs.entities).map((id) =>
     id.toLowerCase()
   );
@@ -154,7 +120,8 @@ function registerNewTokensAndPairs() {
     (pair) => !pairsRegistered[pair.id.toLowerCase()]
   );
 
-  if (chainId !== undefined) dispatch(actions.uniswapPairsRegistered({ pairs, chainId }));
+  if (chainId !== undefined)
+    dispatch(actions.uniswapPairsRegistered({ pairs, chainId }));
   const pairDataCalls = {
     caller: "Pair Data",
     chainId,
@@ -224,114 +191,10 @@ function registerNewPools() {
   return [poolDetailCalls];
 }
 
-function registerNewStakingPools() {
-  const state = getState();
-  const stakingPools = selectors
-    .selectAllStakingPools(state)
-    .filter((pool) => !stakingPoolsRegistered[pool.id.toLowerCase()]);
-  const newStakingPools = selectors
-    .selectAllNewStakingPools(state)
-    .filter((pool) => !stakingPoolsRegistered[pool.id.toLowerCase()]);
-  const masterChefPairs = selectors
-    .selectMasterChefPoolsWithRecognizedPairs(state)
-    .filter((pool) => !stakingPoolsRegistered[`MC-${pool.id}`.toLowerCase()]);
-  const newStakingMeta = selectors.selectNewStakingMeta(state);
-  const calls: RegisteredCaller[] = [];
-  const chainId = state.settings.network;
-  const masterChefAddress = MASTER_CHEF_ADDRESS[chainId]
-  if (newStakingPools.length > 0) {
-    const fromBlock = newStakingPools.sort(
-      (a, b) => b.lastRewardBlock - a.lastRewardBlock
-    )[0].lastRewardBlock;
-    const newStakingCalls = newStakingPools.reduce(
-      (prev, next) => {
-        const { id, token } = next;
-        const newStakingCalls = createNewStakingCalls(
-          newStakingMeta.id,
-          id,
-          token
-        );
-        prev.onChainCalls.push(...newStakingCalls.offChainCalls);
-        prev.offChainCalls.push(...newStakingCalls.offChainCalls);
-        return prev;
-      },
-      {
-        caller: "NewStaking",
-        chainId,
-        onChainCalls: [
-          {
-            target: newStakingMeta.rewardsSchedule,
-            function: "getRewardsForBlockRange",
-            interfaceKind: "RewardsSchedule",
-            args: [
-              fromBlock.toString(),
-              Math.floor(fromBlock + BLOCKS_PER_DAY).toString(),
-            ],
-          },
-        ],
-        offChainCalls: [],
-      } as RegisteredCaller
-    );
-    calls.push(newStakingCalls);
-
-    newStakingPools.forEach((pool) => {
-      stakingPoolsRegistered[pool.id.toLowerCase()] = true;
-    });
-  }
-  if (stakingPools.length > 0) {
-    const stakingCalls = stakingPools.reduce(
-      (prev, next) => {
-        const { id, stakingToken } = next;
-        const stakingCalls = createStakingCalls(id, stakingToken);
-
-        prev.onChainCalls.push(...stakingCalls.onChainCalls);
-
-        return prev;
-      },
-      {
-        caller: "Staking",
-        chainId,
-        onChainCalls: [],
-        offChainCalls: [],
-      } as RegisteredCaller
-    );
-    stakingPools.forEach((pool) => {
-      stakingPoolsRegistered[pool.id.toLowerCase()] = true;
-    });
-    calls.push(stakingCalls);
-  }
-  if (masterChefPairs.length > 0 && masterChefAddress) {
-    const mcCalls = masterChefPairs.reduce(
-      (prev, next) => {
-        const poolCalls = createMasterChefCalls(chainId, next.id, next.token);
-        prev.onChainCalls.push(...poolCalls);
-        return prev;
-      },
-      {
-        caller: masterChefCaller,
-        chainId,
-        onChainCalls: [
-          {
-            interfaceKind: "MasterChef",
-            target: masterChefAddress,
-            function: "totalAllocPoint",
-          },
-        ],
-        offChainCalls: [],
-      } as RegisteredCaller
-    );
-    masterChefPairs.forEach((pool) => {
-      stakingPoolsRegistered[`MC-${pool.id}`.toLowerCase()] = true;
-    });
-    calls.push(mcCalls);
-  }
-  return calls;
-}
-
 setupStateHandling();
 
-process.on('SIGTERM', () => {
-  console.info('SIGTERM signal received.');
+process.on("SIGTERM", () => {
+  console.info("SIGTERM signal received.");
   console.log(`Killing ${network} state updater...`);
-  process.exit(0)
-})
+  process.exit(0);
+});

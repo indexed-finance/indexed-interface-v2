@@ -9,8 +9,6 @@ import { useDispatch } from "react-redux";
 import {
   useIndexPoolContract,
   useIndexedNarwhalRouterContract,
-  useNirnVaultContract,
-  useStakingRewardsContract,
   useTokenContract,
 } from "./contract-hooks";
 import { usePoolSymbol } from "./pool-hooks";
@@ -287,14 +285,14 @@ export function useRoutedMintTransactionCallbacks(indexPool: string) {
           intermediaries,
           convert.toHex(poolAmountOut),
           { value: convert.toHex(amountInMax) }
-        ) 
+        );
       } else {
         console.log({
           indexPool,
           intermediaries,
           poolAmountOut: convert.toHex(poolAmountOut),
           tokenIn,
-          amountInMax: convert.toHex(amountInMax)
+          amountInMax: convert.toHex(amountInMax),
         });
         tx = contract.swapTokensForAllTokensAndMintExact(
           indexPool,
@@ -302,9 +300,9 @@ export function useRoutedMintTransactionCallbacks(indexPool: string) {
           convert.toHex(poolAmountOut),
           tokenIn,
           convert.toHex(amountInMax)
-        )
+        );
       }
-/*       const tx = fn === 'swapETHForAllTokensAndMintExact'
+      /*       const tx = fn === 'swapETHForAllTokensAndMintExact'
         // eslint-disable-next-line prefer-spread
         ? contract.swapETHForAllTokensAndMintExact.apply(contract, args as Parameters<IndexedNarwhalRouter['swapETHForAllTokensAndMintExact']>)
         // eslint-disable-next-line prefer-spread
@@ -315,9 +313,13 @@ export function useRoutedMintTransactionCallbacks(indexPool: string) {
       addTransaction(tx, { summary });
     },
     [contract, poolSymbol, addTransaction, indexPool]
-  )
+  );
 
-  return { mintExactAmountIn, mintSingleExactAmountOut, mintMultiExactAmountOut };
+  return {
+    mintExactAmountIn,
+    mintSingleExactAmountOut,
+    mintMultiExactAmountOut,
+  };
 }
 
 interface RoutedBurnTransactionCallbacks {
@@ -489,90 +491,4 @@ export function useBurnMultiTransactionCallback(poolAddress: string) {
     },
     [contract, addTransaction]
   );
-}
-export interface StakingTransactionCallbacks {
-  stake: (amount: string) => void;
-  withdraw: (amount: string) => void;
-  exit: () => void;
-  claim: () => void;
-}
-
-export function useStakingTransactionCallbacks(
-  stakingPool: string
-): StakingTransactionCallbacks {
-  const contract = useStakingRewardsContract(stakingPool);
-  const addTransaction = useAddTransactionCallback();
-
-  const stake = useCallback(
-    (amount: string) => {
-      // @todo Figure out a better way to handle this
-      if (!contract) throw new Error();
-      const tx = contract.stake(amount);
-      addTransaction(tx);
-    },
-    [contract, addTransaction]
-  );
-
-  const withdraw = useCallback(
-    (amount: string) => {
-      // @todo Figure out a better way to handle this
-      if (!contract) throw new Error();
-      const tx = contract.withdraw(amount);
-      addTransaction(tx);
-    },
-    [contract, addTransaction]
-  );
-
-  const exit = useCallback(() => {
-    // @todo Figure out a better way to handle this
-    if (!contract) throw new Error();
-    const tx = contract.exit();
-    addTransaction(tx);
-  }, [contract, addTransaction]);
-
-  const claim = useCallback(() => {
-    // @todo Figure out a better way to handle this
-    if (!contract) throw new Error();
-    const tx = contract.getReward();
-    addTransaction(tx);
-  }, [contract, addTransaction]);
-
-  return {
-    stake,
-    exit,
-    withdraw,
-    claim,
-  };
-}
-
-export function useNirnTransactionCallbacks(vault: string) {
-  const contract = useNirnVaultContract(vault);
-  const addTransaction = useAddTransactionCallback();
-
-  const deposit = useCallback((amount: string) => {
-    // @todo Figure out a better way to handle this
-    if (!contract) throw new Error();
-    const tx = contract.deposit(amount);
-    addTransaction(tx);
-  }, [contract, addTransaction])
-
-  const withdraw = useCallback((amount: string) => {
-    // @todo Figure out a better way to handle this
-    if (!contract) throw new Error();
-    const tx = contract.withdraw(amount);
-    addTransaction(tx);
-  }, [contract, addTransaction])
-
-  const withdrawUnderlying = useCallback((amount: string) => {
-    // @todo Figure out a better way to handle this
-    if (!contract) throw new Error();
-    const tx = contract.withdrawUnderlying(amount);
-    addTransaction(tx);
-  }, [contract, addTransaction])
-
-  return {
-    deposit,
-    withdraw,
-    withdrawUnderlying
-  }
 }

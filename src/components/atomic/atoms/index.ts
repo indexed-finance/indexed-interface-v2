@@ -6,7 +6,6 @@ export * from './ErrorBoundary';
 export * from './ExternalLink';
 export * from './Flipper';
 export * from './Label';
-export * from './NirnProtocol';
 export * from './Progress';
 export * from './Token';
 export * from './TokenInputDecorator';

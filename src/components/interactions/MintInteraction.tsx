@@ -21,7 +21,7 @@ import {
   usePoolTokenAddresses,
   useSingleTokenMintCallbacks,
 } from "hooks";
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 import { useSelector } from "react-redux";
 import BigNumber from "bignumber.js";
 
@@ -179,7 +179,6 @@ function UniswapMintInteraction({ indexPool }: Props) {
         fromToken,
         toToken,
         toAmount,
-        lastTouchedField,
       } = values;
       if (!toToken || !fromToken) {
         return;
@@ -260,7 +259,7 @@ function UniswapMintInteraction({ indexPool }: Props) {
           id: string;
         }[]
       }
-      
+
       loading={loading}
       spender={narwhalRouter}
       onSubmit={handleSubmit}

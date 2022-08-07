@@ -1,5 +1,5 @@
-import { PoolSwapData as Swap } from '@indexed-finance/subgraph-clients/dist/core/types'
-import { PairSwapData as Trade } from '@indexed-finance/subgraph-clients/dist/uniswap/types'
+import { PoolSwapData as Swap } from "@indexed-finance/subgraph-clients/dist/core/types";
+import { PairSwapData as Trade } from "@indexed-finance/subgraph-clients/dist/uniswap/types";
 import type { IndexPool, PoolUnderlyingToken } from "indexed-types";
 
 export interface NormalizedIndexPool
@@ -23,7 +23,8 @@ export interface NormalizedIndexPool
   swapFee: string;
 }
 
-export type NormalizedIndexPoolTransactions = NormalizedIndexPool["transactions"];
+export type NormalizedIndexPoolTransactions =
+  NormalizedIndexPool["transactions"];
 
 export type NormalizedIndexPoolTokenUpdate = {
   address: string;
@@ -47,7 +48,6 @@ export type NormalizedPoolUpdate = {
 export interface FormattedIndexPool {
   chainId: number;
   category: string;
-  canStake: boolean;
   id: string;
   symbol: string;
   priceUsd: string;

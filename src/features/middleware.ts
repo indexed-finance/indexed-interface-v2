@@ -6,7 +6,7 @@ import {
   fetchIndexPoolTransactions,
   fetchIndexPoolUpdates,
 } from "./indexPools";
-import { fetchInitialData, fetchVaultsData } from "./requests";
+import { fetchInitialData } from "./requests";
 import { fetchMulticallData } from "./batcher";
 import { fetchTokenPriceData } from "./tokens";
 import { selectors } from "./selectors";
@@ -81,8 +81,11 @@ if (!process.env.IS_SERVER) {
 // #region Bad Network
 export function badNetworkMiddleware({ dispatch, getState }: any) {
   return (next: any) => (action: any) => {
-    const { settings: { network } } = getState();
-    const badNetwork = network === undefined || !SUPPORTED_NETWORKS.includes(network)
+    const {
+      settings: { network },
+    } = getState();
+    const badNetwork =
+      network === undefined || !SUPPORTED_NETWORKS.includes(network);
 
     if (
       action.type !== actions.userDisconnected.type &&
@@ -120,8 +123,10 @@ function handleBlockNumberChange(newBlockNumber: number) {
       if (provider) {
         const chainId = provider.network.chainId;
         provider.getGasPrice().then((gasPrice) => {
-          dispatch(actions.setGasPrice({ chainId, gasPrice: gasPrice.toNumber() }))
-        })
+          dispatch(
+            actions.setGasPrice({ chainId, gasPrice: gasPrice.toNumber() })
+          );
+        });
       }
     }
   }
@@ -218,7 +223,6 @@ export function handleBatchUpdate() {
             fetchIndexPoolTransactions,
             fetchIndexPoolUpdates,
             fetchTokenPriceData,
-            fetchVaultsData,
           }[fn] as any;
 
           if (request) {

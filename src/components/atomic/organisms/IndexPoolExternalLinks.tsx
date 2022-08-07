@@ -4,8 +4,8 @@ import { ExternalLink } from "components/atomic/atoms";
 import { FormattedIndexPool } from "features";
 import { Fragment, useMemo } from "react";
 import { NETWORKS_BY_ID } from "../../../config/network";
-import { exchangeAddLiquidityLink, exchangeSwapLink, explorerAddressLink, uniswapInfoTokenLink } from "helpers";
-import { getPoolQuickswapLink, useChainId } from "hooks";
+import { exchangeAddLiquidityLink, exchangeSwapLink, explorerAddressLink } from "helpers";
+import { useChainId } from "hooks";
 
 const usePoolExternalLinks = (address: string, chainId: number): Array<{
   text: string;
