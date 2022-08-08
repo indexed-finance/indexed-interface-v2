@@ -1,7 +1,7 @@
 import * as yup from "yup";
 import { Alert, Button, Col, Divider, Row, Space, message } from "antd";
 import { BigNumber, convert } from "helpers";
-import { Flipper } from "components/atomic/atoms";
+import { Flipper } from "./Flipper";
 import { Formik, FormikProps, useFormikContext } from "formik";
 import {
   ReactNode,
@@ -11,7 +11,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { TokenSelector } from "components/atomic/organisms/TokenSelector"; // Circular dependency.
+import { TokenSelector } from "components/common/TokenSelector/TokenSelector"; // Circular dependency.
 import { selectors } from "features";
 import {
   useBreakpoints,

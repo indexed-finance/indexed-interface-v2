@@ -1,7 +1,8 @@
 import { AiOutlineBarChart, AiOutlinePlusCircle } from "react-icons/ai";
 import { Alert, Button, Col, Row, Space, Typography } from "antd";
-import { Label, Page, Token } from "components/atomic";
-import { TimelockCard } from "components/dndx";
+import { Label, Token } from "components/common";
+import { Page } from "components/layout";
+import { TimelockCard } from "components/timelock";
 import { convert } from "helpers";
 import { requests, selectors } from "features";
 import {
