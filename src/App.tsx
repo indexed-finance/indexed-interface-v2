@@ -1,16 +1,14 @@
 import {
   BadNetworkDrawer,
-  DEBUG,
-  DrawerProvider,
-  ErrorBoundary,
-  LayoutHeader,
   Page,
   TooltipProvider,
   TransactionList,
   useDiligenceDrawer,
   useTooltips,
-} from "components";
+} from "components/layout";
 import { BrowserRouter, Route, useLocation } from "react-router-dom";
+import { DEBUG, ErrorBoundary, LayoutHeader } from "components/layout";
+import { DrawerProvider } from "components/common";
 import { FEATURE_FLAGS } from "feature-flags";
 import { Layout, message, notification } from "antd";
 import { NETWORKS_BY_ID } from "./config/network";
@@ -21,24 +19,12 @@ import { ethers } from "ethers";
 import { routes } from "routes";
 import { store } from "features";
 import { useBreakpoints, useChainId, useWalletConnection } from "hooks";
-import ReactGA from "react-ga";
-
-const GOOGLE_ANALYTICS_TRACKING_CODE = "G-MHCR3CSH7C";
 
 export function getLibrary(_provider?: any, _connector?: any) {
   return new ethers.providers.Web3Provider(_provider, "any");
 }
 
-// Effect:
-// Run Google Analytics when user loads the production site.
 export function App() {
-  useEffect(() => {
-    if (process.env.NODE_ENV === "production") {
-      ReactGA.initialize(GOOGLE_ANALYTICS_TRACKING_CODE);
-      ReactGA.pageview(window.location.pathname + window.location.search);
-    }
-  }, []);
-
   return (
     <BrowserRouter>
       <Provider store={store}>
@@ -61,8 +47,8 @@ export function AppLayout() {
   const { pathname } = useLocation();
   const previousLocation = useRef(pathname);
   const { isMobile } = useBreakpoints();
-  const network = useChainId()
-  const badNetwork = useMemo(() => !NETWORKS_BY_ID[network], [network])
+  const network = useChainId();
+  const badNetwork = useMemo(() => !NETWORKS_BY_ID[network], [network]);
   const inner = (
     <>
       <LayoutHeader />

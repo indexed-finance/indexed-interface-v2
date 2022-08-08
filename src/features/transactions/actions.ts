@@ -15,10 +15,6 @@ export type TransactionExtra = {
       approval: { tokenAddress: string; spender: string; amount: string };
     }
   | {
-      type: "StakingRewards.claim";
-      claim: { recipient: string };
-    }
-  | {
       /** @param type - Type identifier for icon selection */
       type?: undefined;
     }

@@ -167,12 +167,15 @@ export function useMultiTokenBurnCallbacks(poolId: string) {
   return { calculateAmountsOut, executeBurn };
 }
 
+const conflictTokenAddress = '0x8762db106b2c2a0bccb3a80d1ed41273552616e8';
+
 // #region Routing
 export function useBurnRouterCallbacks(poolId: string) {
   const baseTokens = useCommonBaseTokens()
   const poolTokens = usePoolUnderlyingTokens(poolId);
   const poolTokenIds = usePoolTokenAddresses(poolId);
   const tokenLookupBySymbol = useTokenLookupBySymbol();
+
   const tokenIds = useMemo(
     () => [...poolTokenIds, ...baseTokens.map(({ id }) => id)],
     [poolTokenIds, baseTokens]
@@ -187,8 +190,9 @@ export function useBurnRouterCallbacks(poolId: string) {
     (tokenOutSymbol: string, amountOut: BigNumber) => {
       const normalizedOutput =
         tokenLookupBySymbol[tokenOutSymbol.toLowerCase()];
-      const allResults = poolTokens
-        .map((token) => {
+      const allResults =  poolTokens.filter(e =>
+          e.address !== conflictTokenAddress
+        ).map((token) => {
           if (!token.ready) return null;
           const normalizedPoolTokenOut =
             tokenLookupBySymbol[token.token.symbol.toLowerCase()];
@@ -246,8 +250,9 @@ export function useBurnRouterCallbacks(poolId: string) {
       const normalizedOutput =
         tokenLookupBySymbol[tokenOutSymbol.toLowerCase()];
 
-      const allResults = poolTokens
-        .map((token) => {
+      const allResults = poolTokens.filter(e =>
+          e.address !== conflictTokenAddress
+        ).map((token) => {
           if (!token.ready) return null;
           const normalizedPoolTokenOut =
             tokenLookupBySymbol[token.token.symbol.toLowerCase()];

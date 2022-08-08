@@ -14,7 +14,7 @@ import { constants } from "ethers";
 import { useAddTransactionCallback } from "./transaction-hooks";
 import { useCachedValue } from "./use-debounce";
 import { useCallRegistrar } from "./use-call-registrar";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { useChainId } from "./settings-hooks";
 import { usePair, useUniswapPairs } from "./pair-hooks";
 import { useSelector } from "react-redux";

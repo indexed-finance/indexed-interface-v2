@@ -1,4 +1,4 @@
-import { Page } from "components/atomic";
+import { Page } from "components/layout";
 import { Spin } from "antd";
 import { useMarkdownData } from "hooks";
 import { useParams } from "react-router-dom";
