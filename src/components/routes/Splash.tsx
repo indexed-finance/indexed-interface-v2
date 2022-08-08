@@ -1,10 +1,7 @@
 import { Alert, Button, Divider, Statistic, Typography } from "antd";
-import {
-  IndexPoolWidgetGroup,
-  Logo,
-  Page,
-  SplashSection,
-} from "components/atomic";
+import { IndexPoolWidgetGroup } from "components/index-pool";
+import { Logo, SplashSection } from "components/common";
+import { Page } from "components/layout";
 import { selectors } from "features";
 import { useBreakpoints } from "hooks";
 import { useHistory } from "react-router-dom";
@@ -76,7 +73,8 @@ export default function Splash() {
                 rel="noreferrer"
               >
                 DEFI5
-              </a>{", "}
+              </a>
+              {", "}
               and{" "}
               <a
                 href="https://etherscan.io/token/0x17ac188e09a7890a1844e5e65471fe8b0ccfadf3"
@@ -84,8 +82,9 @@ export default function Splash() {
                 rel="noreferrer"
               >
                 CC10
-              </a>{" and "}
-               <a
+              </a>
+              {" and "}
+              <a
                 href="https://etherscan.io/token/0xabafa52d3d5a2c18a4c1ae24480d22b831fc0413"
                 target="_blank"
                 rel="noreferrer"
@@ -104,8 +103,9 @@ export default function Splash() {
             </span>
             <br></br>
             <span>
-              If you are an effected victim that held any of the above assets at the time of the exploit and still have the associated balances, they can be redeemed for
-              the remaining underlying assets.
+              If you are an effected victim that held any of the above assets at
+              the time of the exploit and still have the associated balances,
+              they can be redeemed for the remaining underlying assets.
             </span>
 
             <Button

@@ -1,16 +1,14 @@
 import {
   BadNetworkDrawer,
-  DEBUG,
-  DrawerProvider,
-  ErrorBoundary,
-  LayoutHeader,
   Page,
   TooltipProvider,
   TransactionList,
   useDiligenceDrawer,
   useTooltips,
-} from "components";
+} from "components/layout";
 import { BrowserRouter, Route, useLocation } from "react-router-dom";
+import { DEBUG, ErrorBoundary, LayoutHeader } from "components/layout";
+import { DrawerProvider } from "components/common";
 import { FEATURE_FLAGS } from "feature-flags";
 import { Layout, message, notification } from "antd";
 import { NETWORKS_BY_ID } from "./config/network";

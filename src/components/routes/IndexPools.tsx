@@ -1,4 +1,6 @@
-import { IndexPoolWidgetGroup, Page } from "components/atomic";
+import { IndexPoolWidgetGroup } from "components/index-pool";
+import { Page } from "components/layout";
+
 import { useTranslator } from "hooks";
 
 export default function IndexPools() {
