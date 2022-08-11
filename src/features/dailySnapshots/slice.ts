@@ -27,7 +27,8 @@ const slice = createSlice({
         const dailySnapshots = Object.values(action.payload)
           .filter((each) => Boolean(each))
           .reduce(
-            (prev, { snapshot }) => [...prev, snapshot as any], /** @todo replace state types with types from subgraph client package */
+            (prev, { snapshot }) => [...prev, snapshot as any],
+            /** replace state types with types from subgraph client package */
             [] as DailyPoolSnapshot[]
           );
         dailySnapshotsAdapter.addMany(state, dailySnapshots);

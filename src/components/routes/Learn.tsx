@@ -8,11 +8,16 @@ import {
   Space,
   Typography,
 } from "antd";
-import { Label, LearnArticleCard, Page } from "components/atomic";
+import { Label } from "components/common";
+import { Page } from "components/layout";
 import { openDataPullRequest } from "helpers";
 import { useCallback, useState } from "react";
 import MDEditor from "@uiw/react-md-editor";
 import articles from "data/learn";
+
+import { useHistory } from "react-router-dom";
+import { useMarkdownData } from "hooks";
+import Markdown from "react-markdown";
 
 export default function Learn() {
   const [editing /*, setEditing*/] = useState(true);
@@ -133,6 +138,29 @@ export default function Learn() {
         </>
       )}
     </Page>
+  );
+}
+
+interface LearnArticleCardProps {
+  file: string;
+}
+
+function LearnArticleCard(props: LearnArticleCardProps) {
+  const { avatar, blurb, title, slug } = useMarkdownData(props.file);
+  const history = useHistory();
+
+  return (
+    <Card
+      bordered={true}
+      hoverable={true}
+      onClick={() => history.push(`/learn/${slug}`)}
+    >
+      <Card.Meta
+        avatar={<img alt={title} src={`/data/learn/${avatar}.png`} />}
+        title={title}
+        description={<Markdown>{blurb}</Markdown>}
+      />
+    </Card>
   );
 }
 

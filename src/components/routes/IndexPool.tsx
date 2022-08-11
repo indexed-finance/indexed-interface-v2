@@ -8,10 +8,14 @@ import {
   IndexPoolInteractionBar,
   IndexPoolPerformance,
   IndexPoolRecentTrades,
-  Page,
-} from "components/atomic";
+} from "components/index-pool";
+import { Page } from "components/layout";
 import { ReactNode, useCallback, useState } from "react";
-import { useBreakpoints, useFormattedIndexPool, usePoolDetailRegistrar } from "hooks";
+import {
+  useBreakpoints,
+  useFormattedIndexPool,
+  usePoolDetailRegistrar,
+} from "hooks";
 import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 
@@ -91,7 +95,7 @@ export default function IndexPool() {
   const poolId = useSelector((state: AppState) =>
     selectors.selectPoolIdByName(state, slug)
   );
-  const indexPool = useFormattedIndexPool(poolId)
+  const indexPool = useFormattedIndexPool(poolId);
   const [interaction, setInteraction] = useState<ReactNode>(null);
   const [interactionTitle, setInteractionTitle] = useState("");
   const handleInteractionBarChange = useCallback(

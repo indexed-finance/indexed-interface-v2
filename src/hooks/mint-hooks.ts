@@ -15,7 +15,6 @@ import { getTokenValueGetter, useUniswapTradingPairs } from "./pair-hooks";
 import { useCallback, useMemo } from "react";
 import { useChainId, useGasPrice } from "./settings-hooks";
 import { useCommonBaseTokens, useTokenLookupBySymbol, useTotalSuppliesWithLoadingIndicator } from "./token-hooks";
-import { useIndexedNarwhalRouterContract } from "./contract-hooks";
 import {
   useMintMultiTransactionCallback,
   useMintSingleTransactionCallbacks,
@@ -273,15 +272,19 @@ export function useMintRouterCallbacks(poolId: string) {
         if (!uniswapResult) return null;
         totalAmountIn = totalAmountIn.plus(convert.toBigNumber(uniswapResult.inputAmount.raw.toString()));
         const path = uniswapResult.route.encodedPath;
+
         console.log(`MULTI: ANY PAIRS USING SUSHI? ${uniswapResult.route.pairs.some((p) => p.sushi)}`)
+
         const sushiFirst = uniswapResult.route.pairs[0].sushi;
         const [address, sushiNext] = path.length === 3
           ? [uniswapResult.route.path[1].address, uniswapResult.route.pairs[1].sushi]
           : [constants.AddressZero, false]
         intermediaries.push(encodeIntermediary(address, sushiFirst, sushiNext))
+
+        return null;
       });
       if (intermediaries.length !== tokens.length) return null;
-      
+
       return {
         type: 'Multi',
         tokenIn: normalizedInput.id,
@@ -309,7 +312,7 @@ export function useMintRouterCallbacks(poolId: string) {
         console.log(`LOADING ${loading} totalSupply ${totalSupply.toString()}`)
         return null;
       }
-      
+
       const normalizedInput = tokenLookupBySymbol[tokenInSymbol.toLowerCase()];
       const poolRatio = amountOut.div(totalSupply).toNumber();
       const allResults = poolTokens
@@ -433,5 +436,5 @@ export function useMintRouterCallbacks(poolId: string) {
     executeRoutedMint,
     getBestMintRouteForAmountOut,
     loading
-  } 
+  }
 }

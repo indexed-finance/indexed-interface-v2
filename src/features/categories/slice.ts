@@ -1,9 +1,8 @@
 import { categoriesAdapter, categoriesSelectors as selectors } from "./selectors";
-import { createEntityAdapter, createSlice } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 import { fetchInitialData } from "../requests";
 import { mirroredServerState, restartedDueToError } from "../actions";
 import type { AppState } from "../store";
-import type { NormalizedCategory } from "./types";
 
 const initialState = categoriesAdapter.getInitialState();
 const categoriesInitialState = categoriesAdapter.addMany(initialState, [
@@ -124,4 +123,3 @@ const slice = createSlice({
 });
 
 export const { actions: categoriesActions, reducer: categoriesReducer } = slice;
-

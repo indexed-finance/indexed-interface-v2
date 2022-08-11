@@ -1,5 +1,5 @@
-import { CreateTimelockForm } from "components/dndx";
-import { Page } from "components/atomic";
+import { CreateTimelockForm } from "components/timelock";
+import { Page } from "components/layout";
 
 export default function CreateTimelock() {
   return (
